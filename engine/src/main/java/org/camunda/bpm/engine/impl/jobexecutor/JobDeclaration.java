@@ -22,8 +22,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.bpmn.parser.FailedJobRetryConfiguration;
+import org.camunda.bpm.engine.impl.cmd.DefaultJobRetryCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -100,7 +103,25 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
     job.setJobHandlerConfiguration(resolveJobHandlerConfiguration(context));
     job.setJobHandlerType(resolveJobHandlerType(context));
     job.setExclusive(resolveExclusive(context));
-    job.setRetries(resolveRetries(context));
+
+    Integer retries = null;
+    CommandContext commandContext = Context.getCommandContext();
+    DefaultJobRetryCmd defaultJobRetryCmd = new DefaultJobRetryCmd(job.getId(), null);
+    ActivityImpl currentActivity = defaultJobRetryCmd.getCurrentActivity(job);
+    if (currentActivity != null) {
+      FailedJobRetryConfiguration retryConfiguration =
+          defaultJobRetryCmd.getFailedJobRetryConfiguration(job, currentActivity);
+      if (retryConfiguration != null) {
+        retries = retryConfiguration.getRetries();
+      }
+    }
+
+    // When expression has 0 retries, set initial retries to 1 to avoid immediately raising an incident
+    if (retries != null && retries == 0) {
+      retries = 1;
+    }
+
+    job.setRetries(retries == null ? resolveRetries(context) : retries);
     job.setDuedate(resolveDueDate(context));
 
 
