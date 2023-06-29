@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.signal;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -39,14 +41,12 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.mockito.Mockito;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class SignalEventConcurrencyTest extends ConcurrencyTestHelper {
 
   @ClassRule
   public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule();
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -57,6 +57,7 @@ public class SignalEventConcurrencyTest extends ConcurrencyTestHelper {
   protected EventHandler signalEventHandler;
   protected EventHandler evSpy;
 
+  @Override
   @Before
   public void init() {
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
@@ -114,7 +115,6 @@ public class SignalEventConcurrencyTest extends ConcurrencyTestHelper {
     taskService.complete(mainTask.getId());
 
     // unblock the second thread in the handleEvent
-    signalThread.makeContinue();
     signalThread.waitUntilDone(true);
 
     // sending the signal will fail because it cannot find the execution anymore
