@@ -16,41 +16,41 @@
  */
 package org.camunda.bpm.engine.rest.util.container;
 
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.UriBuilder;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.UriBuilder;
-import java.io.IOException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
 public class JerseyServerBootstrap extends EmbeddedServerBootstrap {
 
-  private HttpServer server;
+  protected HttpServer server;
 
   public JerseyServerBootstrap() {
-    setupServer(new JaxrsApplication());
+    super(new JaxrsApplication());
   }
 
   public JerseyServerBootstrap(Application application) {
-    setupServer(application);
+    super(application);
   }
 
   @Override
-  public void start() {
-    try {
-      server.start();
-    } catch (IOException e) {
-      throw new ServerBootstrapException(e);
-    }
+  public void stop() {
+    server.shutdownNow();
   }
 
-  private void setupServer(Application application) {
+  @Override
+  protected void startServerInternal() throws Exception {
+    server.start();
+  }
+
+  @Override
+  protected void setupServer(Application application) {
     ResourceConfig rc = ResourceConfig.forApplication(application);
 
     Map<String, Object> properties = new HashMap<String, Object>();
@@ -61,16 +61,11 @@ public class JerseyServerBootstrap extends EmbeddedServerBootstrap {
     int port = Integer.parseInt(serverProperties.getProperty(PORT_PROPERTY));
     URI serverUri = UriBuilder.fromPath(ROOT_RESOURCE_PATH).scheme("http").host("localhost").port(port).build();
     try {
-      server = GrizzlyHttpServerFactory.createHttpServer(serverUri, rc);
+      server = GrizzlyHttpServerFactory.createHttpServer(serverUri, rc, false);
     } catch (IllegalArgumentException e) {
       throw new ServerBootstrapException(e);
     } catch (NullPointerException e) {
       throw new ServerBootstrapException(e);
     }
-  }
-
-  @Override
-  public void stop() {
-    server.shutdownNow();
   }
 }

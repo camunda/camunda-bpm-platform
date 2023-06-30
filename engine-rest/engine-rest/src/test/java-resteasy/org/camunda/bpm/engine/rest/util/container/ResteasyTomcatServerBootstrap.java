@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.rest.util.container;
 
-import org.camunda.bpm.engine.rest.util.container.TomcatServerBootstrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
 import org.jboss.shrinkwrap.resolver.api.maven.ScopeType;
