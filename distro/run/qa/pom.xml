@@ -87,6 +87,7 @@
     <profile>
       <id>integration-test-camunda-run</id>
       <modules>
+        <module>example-plugin</module>
         <module>integration-tests</module>
         <module>runtime</module>
       </modules>

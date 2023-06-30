@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +42,7 @@ public class SpringBootManagedContainer {
 
   public static final String APPLICATION_YML_PATH = "configuration/default.yml";
   public static final String RESOURCES_PATH = "configuration/resources";
+  public static final String USERLIB_PATH = "configuration/userlib";
 
   protected static final String BASE_TEST_APPLICATION_YML = "base-test-application.yml";
   protected static final String RUN_HOME_VARIABLE = "camunda.run.home";
