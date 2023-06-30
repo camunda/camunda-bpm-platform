@@ -37,8 +37,6 @@ import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenDependencies;
 
 public abstract class TomcatServerBootstrap extends AbstractServerBootstrap {
 
-  protected static final int RETRIES = 3;
-
   private Tomcat tomcat;
   private String workingDir;
   private String webXmlPath;
