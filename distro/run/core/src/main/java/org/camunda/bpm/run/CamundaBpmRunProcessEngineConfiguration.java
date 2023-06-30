@@ -16,11 +16,10 @@
  */
 package org.camunda.bpm.run;
 
+import jakarta.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
-
-import javax.inject.Inject;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
