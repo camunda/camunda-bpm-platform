@@ -17,8 +17,8 @@
 
 'use strict';
 
-var template = require('./cam-cockpit-delete-deployment-plugin.html')();
-var modalTemplate = require('./modals/cam-cockpit-delete-deployment-modal.html')();
+var template = require('./cam-cockpit-delete-deployment-plugin.html?raw');
+var modalTemplate = require('./modals/cam-cockpit-delete-deployment-modal.html?raw');
 
 var Controller = [
   '$scope',

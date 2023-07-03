@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-tasklist-filters.html')();
+var template = require('./cam-tasklist-filters.html?raw');
 
 var noop = function() {};
 

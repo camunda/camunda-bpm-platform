@@ -27,21 +27,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = (_env, argv = {}) => {
   const eeBuild = !!argv.eeBuild;
-  const webapps = [
-    {
-      name: 'cockpit',
-      indexFile: /ui\/cockpit\/client\/scripts\/index\.html$/
-    },
-    {
-      name: 'admin',
-      indexFile: /ui\/admin\/client\/scripts\/index\.html$/
-    },
-    {name: 'tasklist', indexFile: /ui\/tasklist\/client\/index\.html$/},
-    {
-      name: 'welcome',
-      indexFile: /ui\/welcome\/client\/scripts\/index\.html$/
-    }
-  ];
 
   const addEngines = engines => {
     return engines.reduce((acc, engine) => {
@@ -64,7 +49,6 @@ module.exports = (_env, argv = {}) => {
     }, {});
   };
 
-  const eeApps = ['admin', 'cockpit'];
   const developmentConfig = {
     output: {
       publicPath: '/'
@@ -110,60 +94,6 @@ module.exports = (_env, argv = {}) => {
       },
       open: ['/camunda/app/cockpit/default/']
     },
-    module: {
-      rules: [
-        ...webapps.map(({name, indexFile}) => {
-          const pluginDependencies = [];
-          if (name !== 'welcome') {
-            pluginDependencies.push({
-              ngModuleName: `${name}.plugin.${name}Plugins`,
-              requirePackageName: `${name}-plugin-${name}Plugins`
-            });
-            if (eeBuild && eeApps.includes(name)) {
-              pluginDependencies.push({
-                ngModuleName: `${name}.plugin.${name}EE`,
-                requirePackageName: `${name}-plugin-${name}EE`
-              });
-            }
-          }
-          const pluginPackages = [];
-          if (name !== 'welcome') {
-            pluginPackages.push({
-              name: `${name}-plugin-${name}Plugins`,
-              location: `/plugin/${name}/app/`,
-              main: 'plugin.js'
-            });
-            if (eeBuild && eeApps.includes(name)) {
-              pluginPackages.push({
-                name: `${name}-plugin-${name}EE`,
-                location: `/plugin/${name}EE/app/`,
-                main: 'plugin.js'
-              });
-            }
-          }
-
-          return {
-            test: indexFile,
-            exclude: /node_modules/,
-            loader: 'string-replace-loader',
-            options: {
-              multiple: [
-                {search: /\$APP_ROOT/g, replace: '/camunda'},
-                {search: /\$BASE/g, replace: `/camunda/app/${name}/{ENGINE}/`},
-                {
-                  search: /\$PLUGIN_DEPENDENCIES/g,
-                  replace: JSON.stringify(pluginDependencies)
-                },
-                {
-                  search: /\$PLUGIN_PACKAGES/g,
-                  replace: JSON.stringify(pluginPackages)
-                }
-              ]
-            }
-          };
-        })
-      ]
-    },
     plugins: [
       new webpack.DefinePlugin({
         // define custom global variables
@@ -177,8 +107,53 @@ module.exports = (_env, argv = {}) => {
 
   const merged = merge(commonConfig, developmentConfig);
   merged.plugins.forEach(plugin => {
+    const eeApps = ['admin', 'cockpit'];
+    function getPluginDeps(appName) {
+      const pluginDependencies = [];
+      if (appName !== 'welcome') {
+        pluginDependencies.push({
+          ngModuleName: `${appName}.plugin.${appName}Plugins`,
+          requirePackageName: `${appName}-plugin-${appName}Plugins`
+        });
+        if (eeBuild && eeApps.includes(appName)) {
+          pluginDependencies.push({
+            ngModuleName: `${appName}.plugin.${appName}EE`,
+            requirePackageName: `${appName}-plugin-${appName}EE`
+          });
+        }
+      }
+      return JSON.stringify(pluginDependencies);
+    }
+
+    function getPluginPackages(appName) {
+      const pluginPackages = [];
+      if (appName !== 'welcome') {
+        pluginPackages.push({
+          name: `${appName}-plugin-${appName}Plugins`,
+          location: `/plugin/${appName}/app/`,
+          main: 'plugin.js'
+        });
+        if (eeBuild && eeApps.includes(appName)) {
+          pluginPackages.push({
+            name: `${appName}-plugin-${appName}EE`,
+            location: `/plugin/${appName}EE/app/`,
+            main: 'plugin.js'
+          });
+        }
+      }
+      return JSON.stringify(pluginPackages);
+    }
+
     if (plugin instanceof HtmlWebpackPlugin) {
-      plugin.userOptions.publicPath = '/camunda';
+      const options = plugin.userOptions;
+      plugin.userOptions = {
+        ...options,
+        publicPath: '/camunda',
+        appRoot: '/camunda',
+        base: `/camunda/app/${options['appName']}/{ENGINE}/`,
+        pluginDeps: getPluginDeps(options['appName']),
+        pluginPackages: getPluginPackages(options['appName'])
+      };
     }
   });
   return merged;

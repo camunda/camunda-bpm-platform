@@ -17,8 +17,8 @@
 
 'use strict';
 
-var template = require('./tenantEdit.html')();
-var confirmationTemplate = require('./generic-confirmation.html')();
+var template = require('./tenantEdit.html?raw');
+var confirmationTemplate = require('./generic-confirmation.html?raw');
 
 var angular = require('camunda-commons-ui/vendor/angular');
 

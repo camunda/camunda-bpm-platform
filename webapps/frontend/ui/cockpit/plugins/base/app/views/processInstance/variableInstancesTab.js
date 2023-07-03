@@ -22,7 +22,7 @@ var angular = require('angular');
 var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
 var variableInstancesTabSearchConfig = require('./variable-instances-tab-search-config.json');
 
-var instancesTemplate = require('./variable-instances-tab.html')();
+var instancesTemplate = require('./variable-instances-tab.html?raw');
 var inspectTemplate = require('../../../../../client/scripts/components/variables/variable-inspect-dialog');
 var uploadTemplate = require('../../../../../client/scripts/components/variables/variable-upload-dialog');
 

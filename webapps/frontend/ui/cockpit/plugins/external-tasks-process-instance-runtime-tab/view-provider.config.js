@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./process-instance-runtime-external-tasks.html')();
+var template = require('./process-instance-runtime-external-tasks.html?raw');
 
 module.exports = [
   'ViewsProvider',

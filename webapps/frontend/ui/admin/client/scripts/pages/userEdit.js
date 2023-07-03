@@ -17,10 +17,10 @@
 
 'use strict';
 
-var template = require('./userEdit.html')();
-var groupTemplate = require('./create-group-membership.html')();
-var tenantTemplate = require('./create-tenant-user-membership.html')();
-var confirmationTemplate = require('./generic-confirmation.html')();
+var template = require('./userEdit.html?raw');
+var groupTemplate = require('./create-group-membership.html?raw');
+var tenantTemplate = require('./create-tenant-user-membership.html?raw');
+var confirmationTemplate = require('./generic-confirmation.html?raw');
 
 var angular = require('camunda-commons-ui/vendor/angular');
 

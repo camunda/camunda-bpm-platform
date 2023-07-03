@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./output-variable-table.html')();
+var template = require('./output-variable-table.html?raw');
 
 module.exports = [
   'ViewsProvider',

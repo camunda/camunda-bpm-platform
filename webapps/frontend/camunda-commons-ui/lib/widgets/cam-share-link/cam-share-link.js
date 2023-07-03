@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-share-link.html')();
+var template = require('./cam-share-link.html?raw');
 
 module.exports = [
   '$location',

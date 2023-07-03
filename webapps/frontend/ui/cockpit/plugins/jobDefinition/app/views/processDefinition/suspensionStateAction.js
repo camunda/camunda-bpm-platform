@@ -18,8 +18,8 @@
 'use strict';
 
 var angular = require('angular');
-var actionTemplate = require('./suspension-state-action.html')();
-var dialogTemplate = require('./job-definition-suspension-state-dialog.html')();
+var actionTemplate = require('./suspension-state-action.html?raw');
+var dialogTemplate = require('./job-definition-suspension-state-dialog.html?raw');
 
 var Configuration = function PluginConfiguration(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.jobDefinition.action', {

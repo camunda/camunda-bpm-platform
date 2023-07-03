@@ -28,7 +28,7 @@ import {
 
 window.define = define;
 window.require = rjsrequire;
-window.bust = '$CACHE_BUST';
+window.bust = CAMUNDA_VERSION; // eslint-disable-line
 
 //  camunda-cockpit-bootstrap is copied as-is, so we have to inline everything
 const appRoot = document.querySelector('base').getAttribute('app-root');
@@ -36,7 +36,7 @@ const baseImportPath = `${appRoot}/app/cockpit/`;
 
 requirejs.config({
   baseUrl: baseImportPath,
-  urlArgs: 'bust=$CACHE_BUST'
+  urlArgs: `bust=${CAMUNDA_VERSION}` // eslint-disable-line
 });
 
 function withSuffix(string, suffix) {
@@ -107,7 +107,7 @@ define('camunda-cockpit-bootstrap', function() {
         node.setAttribute('rel', 'stylesheet');
         node.setAttribute(
           'href',
-          plugin.location + '/plugin.css?bust=$CACHE_BUST'
+          plugin.location + `/plugin.css?bust=${CAMUNDA_VERSION}` // eslint-disable-line
         );
         document.head.appendChild(node);
       });

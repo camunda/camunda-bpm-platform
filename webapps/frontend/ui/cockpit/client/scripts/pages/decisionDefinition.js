@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./decision-definition.html')();
+var template = require('./decision-definition.html?raw');
 
 var angular = require('camunda-commons-ui/vendor/angular'),
   routeUtil = require('../../../../common/scripts/util/routeUtil'),

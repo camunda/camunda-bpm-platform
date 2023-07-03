@@ -18,7 +18,7 @@
 'use strict';
 
 var angular = require('camunda-bpm-sdk-js/vendor/angular');
-var template = require('./engineSelect.html')();
+var template = require('./engineSelect.html?raw');
 
 var $ = require('jquery');
 

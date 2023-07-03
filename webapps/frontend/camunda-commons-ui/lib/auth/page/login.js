@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./login.html')();
+var template = require('./login.html?raw');
 var logo = require('svg-inline-loader?classPrefix&removeSVGTagAttrs=false!./logo.svg');
 
 var $ = require('jquery');

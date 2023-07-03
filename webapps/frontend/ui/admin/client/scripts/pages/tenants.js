@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./tenants.html')();
+var template = require('./tenants.html?raw');
 var searchConfig = require('./tenants-search-plugin-config.json');
 
 var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils

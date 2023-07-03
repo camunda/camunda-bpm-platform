@@ -45,7 +45,7 @@ module.exports = async function loadPlugins(config, appName) {
       !camundaPlugins.includes(el.name) &&
       !el.name.startsWith(`${appName}-plugin-legacy`)
   ).map(el => {
-    addCssSource(`${el.location}/plugin.css?bust=$CACHE_BUST`);
+    addCssSource(`${el.location}/plugin.css?bust=${CAMUNDA_VERSION}`); // eslint-disable-line
     return `${el.location}/${el.main}`;
   });
 

@@ -19,7 +19,7 @@
 
 var angular = require('angular');
 
-var template = require('./variable-inspect-dialog.html')();
+var template = require('./variable-inspect-dialog.html?raw');
 
 var Controller = [
   '$http',

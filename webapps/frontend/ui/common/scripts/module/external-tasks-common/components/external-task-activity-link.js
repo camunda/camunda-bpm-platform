@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./external-task-activity-link.html')();
+var template = require('./external-task-activity-link.html?raw');
 
 module.exports = function() {
   return {

@@ -19,7 +19,7 @@
 
 var angular = require('angular');
 
-var actionTemplate = require('./add-variable-action.html')();
+var actionTemplate = require('./add-variable-action.html?raw');
 var addTemplate = require('../../../../../client/scripts/components/variables/variable-add-dialog');
 
 var Configuration = function PluginConfiguration(ViewsProvider) {

@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./process-definitions.html')();
+var template = require('./process-definitions.html?raw');
 
 module.exports = [
   'ViewsProvider',

@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-cockpit-resource-meta.html')();
+var template = require('./cam-cockpit-resource-meta.html?raw');
 
 module.exports = [
   function() {

@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./job-definition-suspension-overlay.html')();
+var template = require('./job-definition-suspension-overlay.html?raw');
 
 var Controller = [
   '$scope',

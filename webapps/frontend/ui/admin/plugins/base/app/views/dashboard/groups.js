@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./groups.html')();
+var template = require('./groups.html?raw');
 
 module.exports = [
   'ViewsProvider',

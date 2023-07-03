@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./users.html')();
+var template = require('./users.html?raw');
 
 module.exports = [
   'ViewsProvider',

@@ -16,18 +16,18 @@
         content="Camunda services GmbH"/>
 
   <!--< base href="/" /> -->
-  <base href="$BASE"
-        admin-api="$APP_ROOT/api/admin/"
-        cockpit-api="$APP_ROOT/api/cockpit/"
-        tasklist-api="$APP_ROOT/api/tasklist/"
-        welcome-api="$APP_ROOT/api/welcome/"
-        engine-api="$APP_ROOT/api/engine/"
-        app-root="$APP_ROOT"
+  <base href="<%= htmlWebpackPlugin.options.base %>"
+        admin-api="<%= htmlWebpackPlugin.options.appRoot %>/api/admin/"
+        cockpit-api="<%= htmlWebpackPlugin.options.appRoot %>/api/cockpit/"
+        tasklist-api="<%= htmlWebpackPlugin.options.appRoot %>/api/tasklist/"
+        welcome-api="<%= htmlWebpackPlugin.options.appRoot %>/api/welcome/"
+        engine-api="<%= htmlWebpackPlugin.options.appRoot %>/api/engine/"
+        app-root="<%= htmlWebpackPlugin.options.appRoot %>"
         app-name="tasklist"/>
 
   <link rel="stylesheet"
         type="text/css"
-        href="${'$APP_ROOT/app/tasklist/styles/user-styles.css?bust=$CACHE_BUST'}">
+        href="<%= htmlWebpackPlugin.options.appRoot %>/app/tasklist/styles/user-styles.css?bust=<%= htmlWebpackPlugin.options.version %>">
 </head>
 
 <body ng-controller="camTasklistAppCtrl">
@@ -71,20 +71,20 @@
 
 <!-- # page-footer -->
 <footer cam-widget-footer
-        version="v$VERSION"></footer>
+        version="v<%= htmlWebpackPlugin.options.version %>"></footer>
 
 
 <script type="text/javascript" $CSP_NONCE>
   window.tasklistConf = {
-    apiUri: '$APP_ROOT/api/engine',
+    apiUri: '<%= htmlWebpackPlugin.options.appRoot %>/api/engine',
     mock: false,
 
     // overrides the settings above
     resources: {}
   };
 
-  window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];
-  window.PLUGIN_PACKAGES = $PLUGIN_PACKAGES || [];
+  window.PLUGIN_DEPENDENCIES = <%= htmlWebpackPlugin.options.pluginDeps %> || [];
+  window.PLUGIN_PACKAGES = <%= htmlWebpackPlugin.options.pluginPackages %> || [];
 
   window.require = {
     waitSeconds: 0

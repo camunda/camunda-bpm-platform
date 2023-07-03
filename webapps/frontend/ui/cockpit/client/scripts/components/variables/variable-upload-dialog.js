@@ -19,7 +19,7 @@
 
 var angular = require('angular');
 
-var template = require('./variable-upload-dialog.html')();
+var template = require('./variable-upload-dialog.html?raw');
 
 var Controller = [
   '$uibModalInstance',

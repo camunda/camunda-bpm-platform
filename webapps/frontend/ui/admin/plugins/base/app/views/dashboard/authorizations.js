@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./authorizations.html')();
+var template = require('./authorizations.html?raw');
 
 module.exports = [
   'ViewsProvider',

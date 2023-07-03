@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./processDiagram.html')();
+var template = require('./processDiagram.html?raw');
 
 var angular = require('camunda-commons-ui/vendor/angular');
 

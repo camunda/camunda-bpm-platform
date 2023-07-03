@@ -20,7 +20,7 @@
 var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
 var angular = require('angular');
 
-var template = require('./called-process-instance-table.html')();
+var template = require('./called-process-instance-table.html?raw');
 
 module.exports = function(ngModule) {
   ngModule.controller('CalledProcessInstanceController', [

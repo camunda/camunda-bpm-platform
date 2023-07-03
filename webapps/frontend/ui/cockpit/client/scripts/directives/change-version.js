@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./change-version.html')();
+var template = require('./change-version.html?raw');
 
 module.exports = [
   '$timeout',

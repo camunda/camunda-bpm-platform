@@ -19,7 +19,7 @@
 
 var angular = require('angular');
 
-var template = require('./jobSuspension.html')();
+var template = require('./jobSuspension.html?raw');
 
 module.exports = [
   'ViewsProvider',

@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./dashboard.html')();
+var template = require('./dashboard.html?raw');
 
 var angular = require('camunda-commons-ui/vendor/angular');
 var isArray = angular.isArray;

@@ -24,7 +24,7 @@ var Viewer = require('./lib/navigatedViewer').default;
 var Modeler = require('camunda-dmn-js').CamundaPlatformModeler;
 var changeDmnNamespace = require('../../util/change-dmn-namespace');
 
-var template = require('./cam-widget-dmn-viewer.html')();
+var template = require('./cam-widget-dmn-viewer.html?raw');
 
 // This is only relevant when editMode===true,
 // but we only want to rewrite the function once

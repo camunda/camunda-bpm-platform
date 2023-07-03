@@ -17,8 +17,8 @@
 
 'use strict';
 
-var template = require('./authorizations.html')();
-var confirmTemplate = require('./confirm-delete-authorization.html')();
+var template = require('./authorizations.html?raw');
+var confirmTemplate = require('./confirm-delete-authorization.html?raw');
 
 module.exports = [
   '$routeProvider',

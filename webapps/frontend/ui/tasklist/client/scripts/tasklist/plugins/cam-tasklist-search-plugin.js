@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-tasklist-search-plugin.html')();
+var template = require('./cam-tasklist-search-plugin.html?raw');
 var searchConfigJSON = require('./cam-tasklist-search-plugin-config.json');
 
 var angular = require('camunda-commons-ui/vendor/angular');

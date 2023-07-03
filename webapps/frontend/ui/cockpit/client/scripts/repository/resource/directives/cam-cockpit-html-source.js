@@ -19,7 +19,7 @@
 
 'use strict';
 
-var template = require('./cam-cockpit-html-source.html')();
+var template = require('./cam-cockpit-html-source.html?raw');
 
 module.exports = [
   '$sce',

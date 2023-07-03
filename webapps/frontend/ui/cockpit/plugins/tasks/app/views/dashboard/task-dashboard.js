@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./task-dashboard.html')();
+var template = require('./task-dashboard.html?raw');
 
 module.exports = [
   'ViewsProvider',

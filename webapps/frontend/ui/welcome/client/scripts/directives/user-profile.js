@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./user-profile.html')();
+var template = require('./user-profile.html?raw');
 var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [

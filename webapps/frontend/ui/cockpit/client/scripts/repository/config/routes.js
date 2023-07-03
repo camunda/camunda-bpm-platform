@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./../controllers/cam-cockpit-repository-view.html')();
+var template = require('./../controllers/cam-cockpit-repository-view.html?raw');
 
 module.exports = [
   '$routeProvider',

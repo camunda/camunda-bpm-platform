@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./sortable-table-head.html')();
+var template = require('./sortable-table-head.html?raw');
 
 var Directive = function() {
   return {

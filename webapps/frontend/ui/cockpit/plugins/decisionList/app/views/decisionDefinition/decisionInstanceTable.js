@@ -19,7 +19,7 @@
 
 var angular = require('angular');
 
-var template = require('./decision-instance-table.html')();
+var template = require('./decision-instance-table.html?raw');
 var decisionSearchConfig = require('./decision-instance-search-config.json');
 
 var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils

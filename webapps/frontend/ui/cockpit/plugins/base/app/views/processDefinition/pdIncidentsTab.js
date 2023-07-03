@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./pd-incidents-tab.html')();
+var template = require('./pd-incidents-tab.html?raw');
 
 var Configuration = function PluginConfiguration(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.tab', {

@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./welcome.html')();
+var template = require('./welcome.html?raw');
 
 var RouteConfig = [
   '$routeProvider',

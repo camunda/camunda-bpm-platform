@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./external-tasks-tab.html')();
+var template = require('./external-tasks-tab.html?raw');
 
 module.exports = function() {
   return {

@@ -18,7 +18,7 @@
 'use strict';
 var $ = require('jquery');
 
-var template = require('./../modals/cam-tasklist-filter-modal.html')();
+var template = require('./../modals/cam-tasklist-filter-modal.html?raw');
 
 module.exports = [
   '$scope',

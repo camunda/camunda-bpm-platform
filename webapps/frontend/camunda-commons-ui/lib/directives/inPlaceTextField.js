@@ -18,7 +18,7 @@
 'use strict';
 
 var angular = require('camunda-bpm-sdk-js/vendor/angular');
-var template = require('./inPlaceTextField.html')();
+var template = require('./inPlaceTextField.html?raw');
 
 /**
  * @name inPlaceTextField

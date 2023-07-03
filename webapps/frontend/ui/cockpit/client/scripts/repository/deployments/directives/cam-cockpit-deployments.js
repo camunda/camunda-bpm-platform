@@ -19,7 +19,7 @@
 
 var lodash = require('camunda-commons-ui/vendor/lodash');
 
-var template = require('./cam-cockpit-deployments.html')();
+var template = require('./cam-cockpit-deployments.html?raw');
 var searchConfigJSON = require('./cam-cockpit-deployments-search-plugin-config.json');
 
 var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils

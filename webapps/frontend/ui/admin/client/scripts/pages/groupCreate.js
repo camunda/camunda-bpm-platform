@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./groupCreate.html')();
+var template = require('./groupCreate.html?raw');
 
 var Controller = [
   '$scope',

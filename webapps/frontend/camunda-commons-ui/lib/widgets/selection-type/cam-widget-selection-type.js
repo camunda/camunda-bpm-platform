@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-widget-selection-type.html');
+var template = require('./cam-widget-selection-type.html?raw');
 
 module.exports = [
   '$location',

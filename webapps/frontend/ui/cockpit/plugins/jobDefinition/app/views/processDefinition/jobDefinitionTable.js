@@ -20,7 +20,7 @@
 var angular = require('angular');
 var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
 
-var template = require('./job-definition-table.html')();
+var template = require('./job-definition-table.html?raw');
 
 var Controller = [
   '$scope',

@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-sortable-table-column.html')();
+var template = require('./cam-sortable-table-column.html?raw');
 
 var Directive = function() {
   return {

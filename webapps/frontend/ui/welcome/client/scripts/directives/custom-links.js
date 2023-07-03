@@ -16,7 +16,7 @@
  */
 
 'use strict';
-var template = require('./custom-links.html')();
+var template = require('./custom-links.html?raw');
 
 module.exports = [
   'customLinks',

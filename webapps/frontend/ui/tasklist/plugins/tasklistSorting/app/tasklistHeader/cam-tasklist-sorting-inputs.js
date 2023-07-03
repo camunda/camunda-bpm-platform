@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-tasklist-sorting-inputs.html')();
+var template = require('./cam-tasklist-sorting-inputs.html?raw');
 
 module.exports = [
   '$translate',

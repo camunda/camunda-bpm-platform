@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-tasklist-filter-modal-form-variable.html')();
+var template = require('./cam-tasklist-filter-modal-form-variable.html?raw');
 
 var angular = require('camunda-commons-ui/vendor/angular');
 

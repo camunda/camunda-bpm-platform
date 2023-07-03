@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./system.html')();
+var template = require('./system.html?raw');
 
 var angular = require('angular');
 

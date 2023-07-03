@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-searchable-area.html')();
+var template = require('./cam-searchable-area.html?raw');
 
 module.exports = function() {
   return {

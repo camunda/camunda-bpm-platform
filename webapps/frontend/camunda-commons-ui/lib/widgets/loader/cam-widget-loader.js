@@ -18,7 +18,7 @@
 'use strict';
 
 var angular = require('camunda-bpm-sdk-js/vendor/angular'),
-  template = require('./cam-widget-loader.html')();
+  template = require('./cam-widget-loader.html?raw');
 
 module.exports = [
   '$translate',

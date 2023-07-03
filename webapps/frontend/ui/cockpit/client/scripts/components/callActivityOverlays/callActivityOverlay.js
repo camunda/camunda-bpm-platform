@@ -17,7 +17,7 @@
 
 'use strict';
 const angular = require('angular');
-const template = require('./template.html')();
+const template = require('./template.html?raw');
 
 module.exports = {
   getCallActivityFlowNodes: getCallActivityFlowNodes,

@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-cockpit-definitions-plugin.html')();
+var template = require('./cam-cockpit-definitions-plugin.html?raw');
 
 var Controller = [
   '$scope',

@@ -20,7 +20,7 @@
 var angular = require('camunda-bpm-sdk-js/vendor/angular'),
   copy = angular.copy,
   $ = require('jquery'),
-  template = require('./cam-widget-search.html')();
+  template = require('./cam-widget-search.html?raw');
 
 var dateRegex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/;
 
