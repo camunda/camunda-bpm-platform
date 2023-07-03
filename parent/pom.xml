@@ -67,6 +67,10 @@
     <version.jboss-javaee-spec>3.0.2.Final</version.jboss-javaee-spec>
     <version.jakarta-ee-spec>10.0.0</version.jakarta-ee-spec>
 
+    <version.eirslett.frontend.maven.plugin>1.12.1</version.eirslett.frontend.maven.plugin>
+    <version.nodejs>17.9.1</version.nodejs>
+    <version.npm>8.11.0</version.npm>
+
     <!-- OSGi bundles properties -->
     <camunda.artifact />
     <camunda.osgi.import.camunda.spin.version>version="[$(version;==;${camunda.spin.version.clean}),$(version;=+;${camunda.spin.version.clean}))"</camunda.osgi.import.camunda.spin.version>
@@ -284,6 +288,16 @@
               </renames>
             </rules>
             <classifier>jakarta</classifier>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>com.github.eirslett</groupId>
+          <artifactId>frontend-maven-plugin</artifactId>
+          <version>${version.eirslett.frontend.maven.plugin}</version>
+          <configuration>
+            <nodeVersion>v${version.nodejs}</nodeVersion>
+            <npmVersion>${version.npm}</npmVersion>
           </configuration>
         </plugin>
       </plugins>

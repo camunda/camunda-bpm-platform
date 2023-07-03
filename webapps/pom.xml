@@ -16,10 +16,6 @@
   <name>Camunda Platform - Webapp - Root</name>
 
   <properties>
-    <version.eirslett.frontend.maven.plugin>1.12.1</version.eirslett.frontend.maven.plugin>
-    <version.nodejs>17.9.1</version.nodejs>
-    <version.npm>8.11.0</version.npm>
-
     <version.jetty>9.4.31.v20200723</version.jetty>
 
     <web.resources.override>src/main/runtime/default/webapp</web.resources.override>
@@ -159,11 +155,8 @@
       <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
-        <version>${version.eirslett.frontend.maven.plugin}</version>
         <inherited>false</inherited>
         <configuration>
-          <nodeVersion>v${version.nodejs}</nodeVersion>
-          <npmVersion>${version.npm}</npmVersion>
           <workingDirectory>./frontend</workingDirectory>
           <outputdir>${project.build.directory}/webapp</outputdir>
           <skip>${skip.frontend.build}</skip>

@@ -17,6 +17,7 @@
 
 const checker = require('license-checker');
 const path = require("path");
+const fs = require('fs');
 
 const PRODUCTION_LICENSES = [
     'Apache-2.0',
@@ -30,7 +31,8 @@ const PRODUCTION_LICENSES = [
 
 
 const ALLOWED_PACKAGES = [
-    'emitter-component@1.1.1' // uses MIT, but does not provide license field https://github.com/component/emitter/blob/master/LICENSE
+    'emitter-component@1.1.1', // uses MIT, but does not provide license field https://github.com/component/emitter/blob/master/LICENSE
+    'argparse@2.0.1', // uses Python-2.0 but isn't part of the prod build
 ];
 
 const parseResults = (ALLOWED_LICENSES, resolve, reject) =>
@@ -104,7 +106,11 @@ Main entry point for license book generation
 module.exports.writeThirdPartyNotice = function (dependencies){
     const licenseBook = {};
     const licenses = dependencies.dependencies;
+    let missingLicenseTexts = false;
+
     for (const license of licenses) {
+        const packageId = license.name + '@' + license.version;
+
         if (license.name === "swagger-ui") {
             // see https://jira.camunda.com/browse/OB-16
             license.licenseText =
@@ -116,10 +122,38 @@ module.exports.writeThirdPartyNotice = function (dependencies){
                 "------------------------------------------------------------\n\n" +
                 license.licenseText
         }
+
+        if (!license.licenseText) {
+            if (license.name.startsWith('@swagger-api/apidom-')) {
+                // these packages don't have a dedicated LICENSE file instead they are in a folder called LICENSES
+                const licensesPath = `node_modules/${license.name}/LICENSES/${license.licenseName}.txt`;
+                license.licenseText = fs.readFileSync(licensesPath).toString();
+            } else if (license.name === 'toggle-selection') {
+                // https://github.com/sudodoki/toggle-selection/blob/gh-pages/LICENSE
+                license.licenseText = fs.readFileSync('./tasks/licenses/LICENSE_toggle-selection').toString();
+            } else if (license.name === 'short-unique-id') {
+                // https://github.com/simplyhexagonal/short-unique-id/blob/main/src/index.ts
+                license.licenseText = 'Copyright 2017-2021 the Short Unique ID authors. All rights reserved. Apache 2.0 license.';
+            } else if (license.name === 'format') {
+                // https://sjs.mit-license.org/license.txt
+                license.licenseText = fs.readFileSync('./tasks/licenses/LICENSE_format').toString();
+            }
+        }
+
+        if (!license.licenseText) {
+            console.warn(`⚠️Missing license text: ${packageId} - ${license.licenseName} - ${license.repository}`);
+            missingLicenseTexts = true;
+        }
+
         license.licenseShort = license.licenseName;
         delete license.licenseName;
         license.outdated = false;
-        licenseBook[license.name + '@' + license.version] = license;
+        licenseBook[packageId] = license;
     }
+
+    if (missingLicenseTexts) {
+        throw new Error(`There are missing license texts.`);
+    }
+
     return JSON.stringify(licenseBook, null, 2)
 }
