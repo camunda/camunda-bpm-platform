@@ -68,17 +68,18 @@ pipeline {
           }
         }
         stage('stage-javadocs') {
-          when {
-            branch cambpmDefaultBranch();
-          }
+       //   when {
+       //     branch cambpmDefaultBranch();
+       //   }
           steps {
             cambpmConditionalRetry([
               agentLabel : 'centos-stable',
               runSteps   : {
                 cambpmRunMaven('.',
-                  "package javadoc:javadoc javadoc:aggregate -Pdistro,distro-wildfly,distro-webjar,javadocs -pl '!distro/wildfly/modules,!distro/wildfly26/modules' -DskipTests=true -Dskip.frontend.build=true",
+                  "package javadoc:javadoc javadoc:aggregate -Pdistro,distro-wildfly,distro-webjar,javadocs -pl " +
+                  "'!distro/wildfly/modules,!distro/wildfly26/modules,!engine-rest/engine-rest-openapi' -DskipTests=true -Dskip.frontend.build=true",
                   withNpm: true,
-                  jdkVersion: 'jdk-11-latest')
+                  jdkVersion: 'jdk-17-latest')
               },
               postSuccess: {
                 def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
