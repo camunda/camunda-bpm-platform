@@ -68,9 +68,9 @@ pipeline {
           }
         }
         stage('stage-javadocs') {
-       //   when {
-       //     branch cambpmDefaultBranch();
-       //   }
+          when {
+            branch cambpmDefaultBranch();
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel : 'centos-stable',
