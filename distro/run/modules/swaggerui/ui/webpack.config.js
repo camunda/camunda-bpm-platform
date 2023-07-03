@@ -28,7 +28,7 @@ const config = {
         }),
         new LicenseCheckerWebpackPlugin({
             // https://github.com/microsoft/license-checker-webpack-plugin/issues/25
-            filter: /(^.*[/\\]node_modules[/\\]((?:@[^/\\]+[/\\])?(?:[^@/\\][^/\\]*)))/,
+            filter: /(^.*[/\\]node_modules[/\\]((?:@[^/\\]+[/\\])?[^@\/\\][^\/\\]*))/,
             outputFilename: path.join( "..", "..", "THIRD-PARTY-NOTICE.json"),
             outputWriter: writeThirdPartyNotice,
             override: {

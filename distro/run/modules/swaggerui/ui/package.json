@@ -15,7 +15,7 @@
     "license-checker": "~25.0.1",
     "license-checker-webpack-plugin": "~0.2.1",
     "style-loader": "~3.3.3",
-    "webpack": "~5.87.0",
+    "webpack": "~5.88.1",
     "webpack-cli": "~5.1.4"
   }
 }
