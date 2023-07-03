@@ -23,12 +23,10 @@ import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
 
 import java.util.Arrays;
-import java.util.List;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -44,16 +42,11 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * @author Roman Smirnov
  *
  */
-@RunWith(Parameterized.class)
 public abstract class AuthorizationTest extends AbstractCockpitPluginTest {
 
   protected ProcessEngine processEngine;
@@ -69,22 +62,6 @@ public abstract class AuthorizationTest extends AbstractCockpitPluginTest {
   protected String groupId = "accounting";
   protected User user;
   protected Group group;
-
-  @Parameter(0)
-  public String authorizationRevokeMode;
-  protected String defaultAuthorizationRevokeMode;
-
-  /**
-   * Parameters:
-   * authorizationRevokeMode: The revoke authorization mode to use in engine configuration
-   */
-  @Parameters(name = "revoke check mode {0}")
-  public static List<Object[]> data() {
-    return Arrays.asList(new Object[][] {
-        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_ALWAYS },
-        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_AUTO }
-    });
-  }
 
   @Before
   public void setUp() throws Exception {
@@ -106,15 +83,11 @@ public abstract class AuthorizationTest extends AbstractCockpitPluginTest {
 
     identityService.setAuthentication(userId, Arrays.asList(groupId));
     enableAuthorization();
-
-    defaultAuthorizationRevokeMode = processEngineConfiguration.getAuthorizationCheckRevokes();
-    processEngineConfiguration.setAuthorizationCheckRevokes(authorizationRevokeMode);
   }
 
   @After
   public void tearDown() {
     disableAuthorization();
-    processEngineConfiguration.setAuthorizationCheckRevokes(defaultAuthorizationRevokeMode);
     for (User user : identityService.createUserQuery().list()) {
       identityService.deleteUser(user.getId());
     }

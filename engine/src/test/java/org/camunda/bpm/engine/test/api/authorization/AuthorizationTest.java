@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
@@ -57,15 +56,10 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * @author Roman Smirnov
  */
-@RunWith(Parameterized.class)
 public abstract class AuthorizationTest extends PluggableProcessEngineTest {
 
   protected String userId = "test";
@@ -77,22 +71,6 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTest {
   protected static final String VARIABLE_VALUE = "aVariableValue";
   protected List<String> deploymentIds = new ArrayList<>();
 
-  @Parameter(0)
-  public String authorizationRevokeMode;
-  protected String defaultAuthorizationRevokeMode;
-
-  /**
-   * Parameters:
-   * authorizationRevokeMode: The revoke authorization mode to use in engine configuration
-   */
-  @Parameters(name = "revoke check mode {0}")
-  public static List<Object[]> data() {
-    return Arrays.asList(new Object[][] {
-        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_ALWAYS },
-        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_AUTO }
-    });
-  }
-
   @Before
   public void setUp() throws Exception {
     user = createUser(userId);
@@ -102,15 +80,11 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTest {
 
     identityService.setAuthentication(userId, Arrays.asList(groupId));
     processEngineConfiguration.setAuthorizationEnabled(true);
-
-    defaultAuthorizationRevokeMode = processEngineConfiguration.getAuthorizationCheckRevokes();
-    processEngineConfiguration.setAuthorizationCheckRevokes(authorizationRevokeMode);
   }
 
   @After
   public void tearDown() {
     processEngineConfiguration.setAuthorizationEnabled(false);
-    processEngineConfiguration.setAuthorizationCheckRevokes(defaultAuthorizationRevokeMode);
     for (User user : identityService.createUserQuery().list()) {
       identityService.deleteUser(user.getId());
     }

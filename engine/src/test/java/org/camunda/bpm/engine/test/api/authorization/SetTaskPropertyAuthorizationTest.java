@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.util.ClockTestUtil;
@@ -41,9 +40,12 @@ import org.camunda.bpm.engine.test.util.TriConsumer;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
 
   protected static final String PROCESS_KEY = "oneTaskProcess";
@@ -51,13 +53,13 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
   @Rule
   public EntityRemoveRule entityRemoveRule = EntityRemoveRule.of(testRule);
 
-  @Parameter(1)
+  @Parameter(0)
   public String operationName;
-  @Parameter(2)
+  @Parameter(1)
   public TriConsumer<TaskService, String, Object> operation;
-  @Parameter(3)
+  @Parameter(2)
   public String taskId;
-  @Parameter(4)
+  @Parameter(3)
   public Object value;
 
   protected boolean deleteTask;
@@ -70,7 +72,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
    * setValue: The value to use to set property to
    * taskQueryBuilderMethodName: The corresponding taskQuery builder method name to use for assertion purposes
    */
-  @Parameters(name = "{1} (mode {0})")
+  @Parameters(name = "{0}")
   public static List<Object[]> data() {
     TriConsumer<TaskService, String, Object> setPriority = (taskService, taskId, value) -> taskService.setPriority(taskId, (int) value);
     TriConsumer<TaskService, String, Object> setName = (taskService, taskId, value) -> taskService.setName(taskId, (String) value);
@@ -79,16 +81,11 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
     TriConsumer<TaskService, String, Object> setFollowUpDate = (taskService, taskId, value) -> taskService.setFollowUpDate(taskId, (Date) value);
 
     return Arrays.asList(new Object[][] {
-        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_ALWAYS, "setPriority", setPriority, "taskId", 80 },
-        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_ALWAYS, "setName", setName, "taskId", "name" },
-        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_ALWAYS, "setDescription", setDescription, "taskId", "description" },
-        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_ALWAYS, "setDueDate", setDueDate, "taskId",  ClockTestUtil.setClockToDateWithoutMilliseconds() },
-        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_ALWAYS, "setFollowUpDate", setFollowUpDate, "taskId", ClockTestUtil.setClockToDateWithoutMilliseconds() },
-        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_AUTO, "setPriority", setPriority, "taskId", 80 },
-        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_AUTO, "setName", setName, "taskId", "name" },
-        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_AUTO, "setDescription", setDescription, "taskId", "description" },
-        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_AUTO, "setDueDate", setDueDate, "taskId",  ClockTestUtil.setClockToDateWithoutMilliseconds()},
-        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_AUTO, "setFollowUpDate", setFollowUpDate, "taskId", ClockTestUtil.setClockToDateWithoutMilliseconds() }
+        {"setPriority", setPriority, "taskId", 80 },
+        {"setName", setName, "taskId", "name" },
+        {"setDescription", setDescription, "taskId", "description" },
+        {"setDueDate", setDueDate, "taskId",  ClockTestUtil.setClockToDateWithoutMilliseconds() },
+        {"setFollowUpDate", setFollowUpDate, "taskId", ClockTestUtil.setClockToDateWithoutMilliseconds() }
     });
   }
 
