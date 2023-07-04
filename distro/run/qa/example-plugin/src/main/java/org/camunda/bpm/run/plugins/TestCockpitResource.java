@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.run.plugins;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
 import org.camunda.bpm.cockpit.plugin.resource.AbstractCockpitPluginRootResource;
 
 @Path("plugin/" + TestCockpitPlugin.ID)

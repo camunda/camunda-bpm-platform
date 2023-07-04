@@ -16,7 +16,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm.webapp</groupId>
-      <artifactId>camunda-webapp</artifactId>
+      <artifactId>camunda-webapp-jakarta</artifactId>
       <classifier>classes</classifier>
     </dependency>
 
@@ -26,11 +26,11 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.spec</groupId>
-      <artifactId>jboss-javaee-6.0</artifactId>
+      <groupId>jakarta.platform</groupId>
+      <artifactId>jakarta.jakartaee-web-api</artifactId>
       <type>pom</type>
       <scope>provided</scope>
-      <version>${version.jboss-javaee-spec}</version>
+      <version>10.0.0</version>
     </dependency>
 
   </dependencies>

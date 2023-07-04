@@ -18,12 +18,15 @@ package org.camunda.bpm.run.qa.plugin;
 
 import static io.restassured.RestAssured.when;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import io.restassured.response.Response;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.run.qa.util.SpringBootManagedContainer;
 import org.junit.After;
@@ -37,7 +40,14 @@ public class CockpitPluginAutoDeploymentIT {
   static SpringBootManagedContainer container;
   static String baseDirectory = SpringBootManagedContainer.getRunHome();
 
+  protected List<String> deployedPlugins = new ArrayList<>();
+
   @After
+  public void teardown() {
+    stopApp();
+    undeployPlugins();
+  }
+
   public void stopApp() {
     try {
       if (container != null) {
@@ -86,6 +96,18 @@ public class CockpitPluginAutoDeploymentIT {
     }
 
     Path pluginPath = Paths.get(pluginHome, jarName).toAbsolutePath();
-    Files.copy(pluginPath, runUserlibDir.resolve(pluginPath.getFileName()));
+    Path copy = Files.copy(pluginPath, runUserlibDir.resolve(pluginPath.getFileName()));
+
+    deployedPlugins.add(copy.toString());
+  }
+
+  protected void undeployPlugins() {
+    for (String pluginPath : deployedPlugins) {
+      try {
+        Files.delete(Paths.get(pluginPath));
+      } catch (IOException e) {
+        fail("unable to undeploy plugin " + pluginPath);
+      }
+    }
   }
 }
