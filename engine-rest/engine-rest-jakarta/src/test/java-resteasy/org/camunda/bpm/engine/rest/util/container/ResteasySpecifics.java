@@ -16,14 +16,12 @@
  */
 package org.camunda.bpm.engine.rest.util.container;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
 import jakarta.servlet.DispatcherType;
 import jakarta.ws.rs.core.Application;
-
+import java.util.HashMap;
+import java.util.Map;
 import org.camunda.bpm.engine.rest.CustomJacksonDateFormatTest;
 import org.camunda.bpm.engine.rest.ExceptionHandlerTest;
 import org.camunda.bpm.engine.rest.application.TestCustomResourceApplication;
@@ -126,6 +124,7 @@ public class ResteasySpecifics implements ContainerSpecifics {
             .addFilterUrlMapping("Resteasy", "/*", DispatcherType.REQUEST)));
   }
 
+  @Override
   public TestRule getTestRule(Class<?> testClass) {
     TestRuleFactory ruleFactory = DEFAULT_RULE_FACTORY;
 
@@ -144,15 +143,18 @@ public class ResteasySpecifics implements ContainerSpecifics {
       this.jaxRsApplication = jaxRsApplication;
     }
 
+    @Override
     public TestRule createTestRule() {
       return new ExternalResource() {
 
         ResteasyServerBootstrap bootstrap = new ResteasyServerBootstrap(jaxRsApplication);
 
+        @Override
         protected void before() throws Throwable {
           bootstrap.start();
         }
 
+        @Override
         protected void after() {
           bootstrap.stop();
         }
@@ -168,17 +170,20 @@ public class ResteasySpecifics implements ContainerSpecifics {
       this.deploymentInfo = deploymentInfo;
     }
 
+    @Override
     public TestRule createTestRule() {
       final TemporaryFolder tempFolder = new TemporaryFolder();
 
       return RuleChain.outerRule(tempFolder).around(new ExternalResource() {
 
-        final EmbeddedServerBootstrap bootstrap = new ResteasyUndertowServerBootstrap(deploymentInfo);
+        final AbstractServerBootstrap bootstrap = new ResteasyUndertowServerBootstrap(deploymentInfo);
 
+        @Override
         protected void before() {
           bootstrap.start();
         }
 
+        @Override
         protected void after() {
           bootstrap.stop();
         }

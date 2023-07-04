@@ -16,39 +16,37 @@
  */
 package org.camunda.bpm.engine.rest.util.container;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.net.BindException;
+import javax.ws.rs.core.Application;
 
-import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
+public abstract class EmbeddedServerBootstrap extends AbstractServerBootstrap {
 
-public abstract class EmbeddedServerBootstrap {
+  protected Application application;
 
-  protected static final String PORT_PROPERTY = "rest.http.port";
-  protected static final String ROOT_RESOURCE_PATH = "/rest-test";
-  private static final String PROPERTIES_FILE = "/testconfig.properties";
+  protected abstract void setupServer(Application application);
+  protected abstract void startServerInternal() throws Exception;
 
-  public abstract void start();
+  public EmbeddedServerBootstrap(Application application) {
+    this.application = application;
+    setupServer(application);
+  }
 
-  public abstract void stop();
-
-  protected Properties readProperties() {
-    InputStream propStream = null;
-    Properties properties = new Properties();
-
+  @Override
+  protected void startServer(int startUpRetries) {
     try {
-      propStream = AbstractRestServiceTest.class.getResourceAsStream(PROPERTIES_FILE);
-      properties.load(propStream);
-    } catch (IOException e) {
-      throw new ServerBootstrapException(e);
-    } finally {
-      try {
-        propStream.close();
-      } catch (IOException e) {
-        e.printStackTrace();
+      startServerInternal();
+    } catch (Exception e) {
+      if ((e instanceof BindException || e.getCause() instanceof BindException) && startUpRetries > 0) {
+        stop();
+        try {
+          Thread.sleep(500L);
+        } catch (Exception ex) {
+        }
+        setupServer(application);
+        startServer(--startUpRetries);
+      } else {
+        throw new ServerBootstrapException(e);
       }
     }
-
-    return properties;
   }
 }

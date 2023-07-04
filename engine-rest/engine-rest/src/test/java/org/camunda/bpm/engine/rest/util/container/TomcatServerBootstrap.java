@@ -20,8 +20,8 @@ import java.io.File;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.startup.Tomcat;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
@@ -35,7 +35,7 @@ import org.jboss.shrinkwrap.resolver.api.maven.ScopeType;
 import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenDependencies;
 
 
-public abstract class TomcatServerBootstrap extends EmbeddedServerBootstrap {
+public abstract class TomcatServerBootstrap extends AbstractServerBootstrap {
 
   private Tomcat tomcat;
   private String workingDir;
@@ -45,9 +45,29 @@ public abstract class TomcatServerBootstrap extends EmbeddedServerBootstrap {
     this.webXmlPath = webXmlPath;
   }
 
+  @Override
+  public void stop() {
+    try {
+      try {
+        tomcat.stop();
+      } catch (Exception e) {
+        Logger.getLogger(getClass().getName()).log(Level.WARNING, "Failed to stop tomcat instance", e);
+      }
 
+      try {
+        tomcat.destroy();
+      } catch (Exception e) {
+        Logger.getLogger(getClass().getName()).log(Level.WARNING, "Failed to destroy instance", e);
+      }
 
-  public void start() {
+      tomcat = null;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  protected void startServer(int startUpRetries) {
     Properties serverProperties = readProperties();
     int port = Integer.parseInt(serverProperties.getProperty(PORT_PROPERTY));
 
@@ -89,6 +109,14 @@ public abstract class TomcatServerBootstrap extends EmbeddedServerBootstrap {
 
     try {
       tomcat.start();
+      if (LifecycleState.FAILED.equals(tomcat.getConnector().getState())) {
+        stop();
+        try {
+          Thread.sleep(1500L);
+        } catch (Exception ex) {
+        }
+        startServer(--startUpRetries);
+      }
     } catch (LifecycleException e) {
       throw new RuntimeException(e);
     }
@@ -96,38 +124,18 @@ public abstract class TomcatServerBootstrap extends EmbeddedServerBootstrap {
 
   protected abstract void addRuntimeSpecificLibraries(WebArchive wa, PomEquippedResolveStage resolver);
 
-  private String getContextPath() {
+  protected String getContextPath() {
     return "rest-test";
   }
 
-  public void stop() {
-    try {
-      try {
-        tomcat.stop();
-      } catch (Exception e) {
-        Logger.getLogger(getClass().getName()).log(Level.WARNING, "Failed to stop tomcat instance", e);
-      }
-
-      try {
-        tomcat.destroy();
-      } catch (Exception e) {
-        Logger.getLogger(getClass().getName()).log(Level.WARNING, "Failed to destroy instance", e);
-      }
-
-      tomcat = null;
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  public String getWorkingDir() {
+  protected String getWorkingDir() {
     if (workingDir == null) {
       workingDir = System.getProperty("java.io.tmpdir");
     }
     return workingDir;
   }
 
-  public void setWorkingDir(String workingDir) {
+  protected void setWorkingDir(String workingDir) {
     this.workingDir = workingDir;
   }
 

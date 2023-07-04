@@ -17,30 +17,50 @@
 package org.camunda.bpm.engine.rest.util.container;
 
 import io.undertow.servlet.api.DeploymentInfo;
+import java.net.BindException;
+import java.util.Properties;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 
-import java.util.Properties;
+public class ResteasyUndertowServerBootstrap extends AbstractServerBootstrap {
 
-public class ResteasyUndertowServerBootstrap extends EmbeddedServerBootstrap {
-
-  private UndertowJaxrsServer server;
+  protected UndertowJaxrsServer server;
+  protected DeploymentInfo deploymentInfo;
 
   public ResteasyUndertowServerBootstrap(DeploymentInfo deploymentInfo) {
-    Properties serverProperties = readProperties();
-    int port = Integer.parseInt(serverProperties.getProperty(PORT_PROPERTY));
-
-    this.server = new UndertowJaxrsServer();
-    this.server.setPort(port);
-    this.server.deploy(deploymentInfo);
-  }
-
-  @Override
-  public void start() {
-    this.server.start();
+    this.deploymentInfo = deploymentInfo;
+    setupServer();
   }
 
   @Override
   public void stop() {
     this.server.stop();
+  }
+
+  @Override
+  protected void startServer(int startUpRetries) {
+    try {
+      this.server.start();
+    } catch (Exception e) {
+      if ((e instanceof BindException || e.getCause() instanceof BindException) && startUpRetries > 0) {
+        stop();
+        try {
+          Thread.sleep(1500L);
+        } catch (Exception ex) {
+        }
+        setupServer();
+        startServer(--startUpRetries);
+      } else {
+        throw new ServerBootstrapException(e);
+      }
+    }
+  }
+
+  protected void setupServer() {
+    Properties serverProperties = readProperties();
+    int port = Integer.parseInt(serverProperties.getProperty(PORT_PROPERTY));
+
+    this.server = new UndertowJaxrsServer();
+    this.server.setPort(port);
+    this.server.deploy(this.deploymentInfo);
   }
 }
