@@ -32,7 +32,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { CamundaBpmRun.class })
-@ActiveProfiles(profiles = { "test-auth-disabled" , "test-ldap-enabled" })
+@ActiveProfiles(profiles = { "test-auth-disabled" , "test-ldap-enabled", "test-ldap-auth-exception" })
 public class LdapConfigurationTest {
 
   @Autowired
@@ -68,6 +68,7 @@ public class LdapConfigurationTest {
     assertThat(props.isAcceptUntrustedCertificates()).isEqualTo(plugin.isAcceptUntrustedCertificates());
     assertThat(props.getInitialContextFactory()).isEqualTo(plugin.getInitialContextFactory());
     assertThat(props.getSecurityAuthentication()).isEqualTo(plugin.getSecurityAuthentication());
+    assertThat(props.isPasswordCheckCatchAuthenticationException()).isEqualTo(plugin.isPasswordCheckCatchAuthenticationException());
   }
 
   @Test
