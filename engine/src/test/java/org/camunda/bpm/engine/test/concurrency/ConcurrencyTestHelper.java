@@ -20,9 +20,9 @@ import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.junit.After;
 import org.junit.Before;
 
@@ -187,7 +187,7 @@ public abstract class ConcurrencyTestHelper {
     public void makeContinue() {
       synchronized (this) {
         if (exception != null) {
-          fail();
+          fail("Controlled thread has run into an exception already: " + exception.getClass().getName() + ". Stack trace:\n" + ExceptionUtil.getExceptionStacktrace(exception));
         }
         notifyAll();
       }
