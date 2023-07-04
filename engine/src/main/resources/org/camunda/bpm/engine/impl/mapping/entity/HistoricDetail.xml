@@ -505,6 +505,7 @@
     <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size > 0">
       inner join ${prefix}ACT_HI_TASKINST T
         on TASK_ID_ = T.ID_
+        and TASK_ID_ IS NOT NULL
         and
           <bind name="listOfIds" value="taskProcessInstanceIds"/>
           <bind name="fieldName" value="'T.PROC_INST_ID_'"/>
@@ -513,6 +514,7 @@
     <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size > 0">
       inner join ${prefix}ACT_HI_TASKINST T
         on TASK_ID_ = T.ID_
+        and TASK_ID_ IS NOT NULL
         and
           <bind name="listOfIds" value="taskCaseInstanceIds"/>
           <bind name="fieldName" value="'T.CASE_INST_ID_'"/>
