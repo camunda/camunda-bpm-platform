@@ -239,7 +239,7 @@
     <dependency>
       <groupId>org.jboss.weld.servlet</groupId>
       <artifactId>weld-servlet</artifactId>
-      <version>1.1.10.Final</version>
+      <version>2.4.8.Final</version>
       <scope>test</scope>
     </dependency>
 
@@ -483,7 +483,7 @@
                 <exclude>**/BusinessRuleTaskVersionTagTest.java</exclude>
                 <!-- CAM-1778 -->
                 <exludes>**/TestWarDeploymentWithProcessEnginePlugin.java</exludes>
-                
+
                 <exclude>**/SpringServletPATimerStartEventExpressionTest.java</exclude>
               </excludes>
               <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>

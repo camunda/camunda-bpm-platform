@@ -13,16 +13,8 @@
   <packaging>pom</packaging>
   <name>Camunda Platform - engine - CDI - Root</name>
 
-  <!--
-  Why this module structure?
-  Core is the user-facing camunda-engine-cdi artifact and is compiled against Weld 1.1.11.Final.
-  The compatibility module runs the tests contained in core with Weld 3.x.
-  This is implemented as a separate module and not as a profile of the core module, in order
-  to test the artifact that was compiled against Weld 1.1.11.Final (i.e. to ensure binary compatibility).
-  -->
   <modules>
     <module>core</module>
-    <module>compatibility-test-weld3</module>
   </modules>
 
   <profiles>
