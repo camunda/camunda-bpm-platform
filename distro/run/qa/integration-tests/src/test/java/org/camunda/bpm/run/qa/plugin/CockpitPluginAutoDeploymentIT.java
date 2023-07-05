@@ -62,6 +62,8 @@ public class CockpitPluginAutoDeploymentIT {
 
   public void runStartScript() {
     container = new SpringBootManagedContainer();
+    container.replaceConfigurationYml(SpringBootManagedContainer.APPLICATION_YML_PATH,
+        SpringBootManagedContainer.class.getClassLoader().getResourceAsStream("base-test-application.yml"));
     try {
       container.start();
     } catch (Exception e) {
