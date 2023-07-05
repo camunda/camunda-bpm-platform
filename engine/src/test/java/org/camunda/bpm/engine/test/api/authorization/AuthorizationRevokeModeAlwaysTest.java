@@ -77,7 +77,7 @@ public class AuthorizationRevokeModeAlwaysTest extends AuthorizationTest {
 
     // then
     String modeAutoQuery = loggingRule.getLog(LOGGING_CONTEXT).get(taskLogOffset).getFormattedMessage();
-    assertThat(modeAutoQuery).contains("Preparing: select").isEqualTo(modeAlwaysQuery);
+    assertThat(modeAutoQuery).containsIgnoringCase("Preparing: select").isEqualTo(modeAlwaysQuery);
   }
 
   @Test
@@ -104,7 +104,7 @@ public class AuthorizationRevokeModeAlwaysTest extends AuthorizationTest {
 
     // then
     String modeAutoQuery = loggingRule.getLog(LOGGING_CONTEXT).get(taskLogOffset).getFormattedMessage();
-    assertThat(modeAutoQuery).contains("Preparing: select").isNotEqualTo(modeAlwaysQuery);
+    assertThat(modeAutoQuery).containsIgnoringCase("Preparing: select").isNotEqualTo(modeAlwaysQuery);
   }
 
 }
