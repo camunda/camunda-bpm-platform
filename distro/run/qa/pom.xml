@@ -72,6 +72,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>example-plugin</module>
         <module>integration-tests</module>
       </modules>
     </profile>
