@@ -58,7 +58,6 @@ import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -69,6 +68,7 @@ import org.junit.Test;
 
 /**
  * @author Daniel Meyer
+ *
  */
 public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTest {
 
@@ -197,8 +197,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // then
     assertThat(query.count()).isEqualTo(0L);
-    assertThat(
-        authorizationService.createAuthorizationQuery().resourceType(TENANT).userIdIn(jonny1Id).count()).isEqualTo(0L);
+    assertThat(authorizationService.createAuthorizationQuery().resourceType(TENANT).userIdIn(jonny1Id).count()).isEqualTo(0L);
   }
 
   @Test
@@ -255,6 +254,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     assertNotNull(lockedUser);
     assertNotNull(lockedUser.getLockExpirationTime());
     assertEquals(maxNumOfAttempts, lockedUser.getAttempts());
+
 
     // create global auth
     Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
@@ -433,9 +433,9 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // then
     assertThat(query.count()).isEqualTo(0L);
-    assertThat(
-        authorizationService.createAuthorizationQuery().resourceType(TENANT).groupIdIn("group1").count()).isEqualTo(0L);
+    assertThat(authorizationService.createAuthorizationQuery().resourceType(TENANT).groupIdIn("group1").count()).isEqualTo(0L);
   }
+
 
   @Test
   public void testGroupUpdateAuthorizations() {
@@ -903,6 +903,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     assertNotNull(identityService.createUserQuery().singleResult());
     assertEquals(1, identityService.createUserQuery().count());
 
+
     // revoke permission for jonny2:
     processEngineConfiguration.setAuthorizationEnabled(false);
     ourPerms = authorizationService.createAuthorizationQuery().resourceType(USER).userIdIn(authUserId).singleResult();
@@ -920,6 +921,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     // now we cannot fetch the user
     assertNull(identityService.createUserQuery().singleResult());
     assertEquals(0, identityService.createUserQuery().count());
+
 
     // delete our perms
     processEngineConfiguration.setAuthorizationEnabled(false);
@@ -1272,18 +1274,28 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     identityService.createTenantUserMembership("tenantOne", "userTwo");
 
     // assume
-    List<Authorization> authorizations = engineRule.getAuthorizationService().createAuthorizationQuery().list();
+    List<Authorization> authorizations = engineRule.getAuthorizationService()
+        .createAuthorizationQuery()
+        .list();
 
     assertThat(authorizations).extracting("resourceId", "userId")
-        .containsExactlyInAnyOrder(tuple("tenantOne", "userOne"), tuple("tenantOne", "userTwo"));
+        .containsExactlyInAnyOrder(
+            tuple("tenantOne", "userOne"),
+            tuple("tenantOne", "userTwo")
+        );
 
     // when
     identityService.deleteTenantUserMembership("tenantOne", "userOne");
 
     // then
-    authorizations = engineRule.getAuthorizationService().createAuthorizationQuery().list();
+    authorizations = engineRule.getAuthorizationService()
+        .createAuthorizationQuery()
+        .list();
 
-    assertThat(authorizations).extracting("resourceId", "userId").containsExactly(tuple("tenantOne", "userTwo"));
+    assertThat(authorizations).extracting("resourceId", "userId")
+        .containsExactly(
+            tuple("tenantOne", "userTwo")
+        );
   }
 
   @Test
@@ -1304,18 +1316,28 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     identityService.createTenantGroupMembership("tenantOne", "groupTwo");
 
     // assume
-    List<Authorization> authorizations = engineRule.getAuthorizationService().createAuthorizationQuery().list();
+    List<Authorization> authorizations = engineRule.getAuthorizationService()
+        .createAuthorizationQuery()
+        .list();
 
     assertThat(authorizations).extracting("resourceId", "groupId")
-        .containsExactlyInAnyOrder(tuple("tenantOne", "groupOne"), tuple("tenantOne", "groupTwo"));
+        .containsExactlyInAnyOrder(
+            tuple("tenantOne", "groupOne"),
+            tuple("tenantOne", "groupTwo")
+        );
 
     // when
     identityService.deleteTenantGroupMembership("tenantOne", "groupOne");
 
     // then
-    authorizations = engineRule.getAuthorizationService().createAuthorizationQuery().list();
+    authorizations = engineRule.getAuthorizationService()
+        .createAuthorizationQuery()
+        .list();
 
-    assertThat(authorizations).extracting("resourceId", "groupId").containsExactly(tuple("tenantOne", "groupTwo"));
+    assertThat(authorizations).extracting("resourceId", "groupId")
+        .containsExactly(
+            tuple("tenantOne", "groupTwo")
+        );
   }
 
   protected void lockUser(String userId, String invalidPassword) throws ParseException {
