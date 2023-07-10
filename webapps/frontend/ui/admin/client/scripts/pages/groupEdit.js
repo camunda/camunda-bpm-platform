@@ -46,8 +46,7 @@ var Controller = [
     unescape,
     $translate
   ) {
-    var AuthorizationResource = camAPI.resource('authorization'),
-      GroupResource = camAPI.resource('group'),
+    var GroupResource = camAPI.resource('group'),
       TenantResource = camAPI.resource('tenant'),
       UserResource = camAPI.resource('user');
 
@@ -69,7 +68,6 @@ var Controller = [
 
     $scope.decodedGroupId = unescape(encodeURIComponent($routeParams.groupId));
 
-    $scope.availableOperations = {};
     $scope.groupUserList = null;
     $scope.tenantList = null;
 
@@ -176,7 +174,7 @@ var Controller = [
     );
 
     $scope.pageChange = function(page) {
-      search.updateSilently({page: !page || page == 1 ? null : page});
+      search.updateSilently({page: !page || page === 1 ? null : page});
     };
 
     var preparePaging = function(pages) {
@@ -255,41 +253,38 @@ var Controller = [
       TenantResource.count(searchParams, function(err, res) {
         groupTenantPages.total = res.count;
       });
-
-      checkRemoveTenantMembershipAuthorized();
-    });
-
-    var checkRemoveTenantMembershipAuthorized = function() {
-      AuthorizationResource.check(
-        {
-          permissionName: 'DELETE',
-          resourceName: 'tenant membership',
-          resourceType: 3
-        },
-        function(err, res) {
-          $scope.availableOperations.removeTenant = res.authorized;
-        }
-      );
-    };
-
-    GroupResource.options({id: $scope.decodedGroupId}, function(err, res) {
-      angular.forEach(res.links, function(link) {
-        $scope.availableOperations[link.rel] = true;
-      });
     });
 
     $scope.removeTenant = function(tenantId) {
       TenantResource.deleteGroupMember(
         {groupId: $scope.decodedGroupId, id: tenantId},
-        function() {
-          Notifications.addMessage({
-            type: 'success',
-            status: $translate.instant('NOTIFICATIONS_STATUS_SUCCESS'),
-            message: $translate.instant('GROUP_EDIT_REMOVED_FROM_TENANT', {
-              group: $scope.group.id
-            })
-          });
-          updateGroupTenantView();
+        function(err) {
+          if (err === null) {
+            Notifications.addMessage({
+              type: 'success',
+              status: $translate.instant('NOTIFICATIONS_STATUS_SUCCESS'),
+              message: $translate.instant('GROUP_EDIT_REMOVED_FROM_TENANT', {
+                group: $scope.group.id
+              })
+            });
+            updateGroupTenantView();
+          } else {
+            const {
+              response: {
+                body: {message}
+              }
+            } = err;
+            Notifications.addError({
+              status: $translate.instant('NOTIFICATIONS_STATUS_FAILED'),
+              message: $translate.instant(
+                'GROUP_EDIT_REMOVED_FROM_TENANT_FAILED',
+                {
+                  group: $scope.group.id,
+                  message
+                }
+              )
+            });
+          }
         }
       );
     };
@@ -306,9 +301,14 @@ var Controller = [
             });
             loadGroup();
           } else {
+            const {
+              response: {
+                body: {message}
+              }
+            } = err;
             Notifications.addError({
               status: $translate.instant('NOTIFICATIONS_STATUS_FAILED'),
-              message: $translate.instant('GROUP_EDIT_UPDATE_FAILED')
+              message: $translate.instant('GROUP_EDIT_UPDATE_FAILED', {message})
             });
           }
         }
@@ -343,9 +343,16 @@ var Controller = [
               });
               $location.path('/groups');
             } else {
+              const {
+                response: {
+                  body: {message}
+                }
+              } = err;
               Notifications.addError({
                 status: $translate.instant('NOTIFICATIONS_STATUS_FAILED'),
-                message: $translate.instant('GROUP_EDIT_DELETE_FAILED')
+                message: $translate.instant('GROUP_EDIT_DELETE_FAILED', {
+                  message
+                })
               });
             }
           });
@@ -363,7 +370,7 @@ var Controller = [
 
       dialog.result
         .then(function(result) {
-          if (result == 'SUCCESS') {
+          if (result === 'SUCCESS') {
             dialogCfg.callback();
           }
         })
@@ -405,12 +412,12 @@ var Controller = [
     // page controls ////////////////////////////////////
 
     $scope.show = function(fragment) {
-      return fragment == $location.search().tab;
+      return fragment === $location.search().tab;
     };
 
     $scope.activeClass = function(link) {
       var path = $location.absUrl();
-      return path.indexOf(link) != -1 ? 'active' : '';
+      return path.indexOf(link) !== -1 ? 'active' : '';
     };
 
     // initialization ///////////////////////////////////

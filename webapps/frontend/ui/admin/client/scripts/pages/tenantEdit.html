@@ -33,8 +33,7 @@
                  type="text"
                  ng-model="tenant.name"
                  novalidate
-                 required
-                 ng-disabled="!availableOperations.update" />
+                 required />
 
           <p class="text-danger"
              ng-show="editTenantForm.tenantName.$error.required">
@@ -43,8 +42,7 @@
         </div>
       </div>
 
-      <div class="form-group"
-           ng-show="availableOperations.update">
+      <div class="form-group">
         <div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 text-right">
           <button type="submit"
                   class="btn btn-primary"
@@ -55,7 +53,7 @@
     </form>
 
     <form class="form-horizontal"
-          ng-show="show('tenant') && availableOperations.delete">
+          ng-show="show('tenant')">
       <div class="h4">{{ 'TENANTS_DELETE_TENANT' | translate }}</div>
 
       <div uib-alert class="alert alert-danger">

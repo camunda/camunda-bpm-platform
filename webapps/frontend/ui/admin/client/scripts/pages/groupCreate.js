@@ -71,12 +71,14 @@ var Controller = [
           });
           $location.path('/groups');
         },
-        function() {
+        function({data: {message}}) {
           Notifications.addError({
             status: $translate.instant('NOTIFICATIONS_STATUS_FAILED'),
             message: $translate.instant('GROUP_CREATE_MESSAGE_ERROR', {
-              group: group.id
-            })
+              group: group.id,
+              message
+            }),
+            exclusive: true
           });
         }
       );
