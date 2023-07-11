@@ -44,7 +44,7 @@ spec:
       effect: "NoSchedule"
   containers:
   - name: maven
-    image: maven:3.8.6-openjdk-11-slim
+    image: maven:3.8.7-eclipse-temurin-17
     tty: true
     env:
       - name: LIMITS_CPU
@@ -75,108 +75,107 @@ spec:
         NEXUS_SNAPSHOT_REPOSITORY_ID = cambpmConfig.nexusSnapshotRepositoryId()
       }
       steps {
-        cambpmConditionalRetry([
-          agentLabel: "assembly-${env.JOB_BASE_NAME}-${env.BUILD_ID}",
-          suppressErrors: false,
-          runSteps: {
-            withVault([vaultSecrets: [
+        container('maven') {
+          cambpmConditionalRetry([
+            agentLabel    : "assembly-${env.JOB_BASE_NAME}-${env.BUILD_ID}",
+            suppressErrors: false,
+            runSteps      : {
+              withVault([vaultSecrets: [
                 [
-                    path        : 'secret/products/cambpm/ci/xlts.dev',
-                    secretValues: [
-                        [envVar: 'XLTS_REGISTRY', vaultKey: 'registry'],
-                        [envVar: 'XLTS_AUTH_TOKEN', vaultKey: 'authToken']]
+                  path        : 'secret/products/cambpm/ci/xlts.dev',
+                  secretValues: [
+                    [envVar: 'XLTS_REGISTRY', vaultKey: 'registry'],
+                    [envVar: 'XLTS_AUTH_TOKEN', vaultKey: 'authToken']]
                 ]]]) {
-              cambpmRunMaven('.',
+                cambpmRunMaven('.',
                   'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true',
                   withCatch: false,
-                  withNpm: true,
-                  // we use JDK 17 to build the artifacts, as it is required for supporting Spring Boot 3
-                  // the compiler source and target is set to JDK 8 in the release parents
-                  jdkVersion: 'jdk-17-latest')
-            }
-
-            // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
-            // add a new line for each group of artifacts
-            cambpmArchiveArtifacts('.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
-                                  '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip',
-                                  '.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip',
-                                  '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
-                                  '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
-                                  '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war',
-                                  '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
-                                  '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json')
-
-            cambpmStash("platform-stash-runtime",
-                        ".m2/org/camunda/**/*-SNAPSHOT/**",
-                        "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
-            cambpmStash("platform-stash-archives",
-                        ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz")
-            cambpmStash("platform-stash-qa",
-                      ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
-                      "**/*.zip,**/*.tar.gz")
-
-            script {
-              if (env.BRANCH_NAME == cambpmDefaultBranch()) {
-                // CE master triggers EE master
-                // otherwise CE PR branch triggers EE PR branch
-                eeMainProjectBranch = "cambpm-ee-main/" + cambpmDefaultBranch()
-              } else {
-                eeMainProjectBranch = params.EE_DOWNSTREAM
+                  withNpm: true)
               }
 
-              // JOB_NAME, e.g.: '7.15/cambpm-ce/cambpm-main/PR-1373'
-              // keep leading slash for the absolute project path
-              platformVersionDir = "/" + env.JOB_NAME.split('/')[0]
-              upstreamProjectName = "/" + env.JOB_NAME
-              upstreamBuildNumber = env.BUILD_NUMBER
+              // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
+              // add a new line for each group of artifacts
+              cambpmArchiveArtifacts('.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
+                '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip',
+                '.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip',
+                '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
+                '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
+                '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war',
+                '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
+                '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json')
 
-              if (env.BRANCH_NAME == cambpmDefaultBranch() || cambpmWithLabels('webapp-integration', 'all-as', 'h2', 'websphere', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'e2e')) {
-                cambpmTriggerDownstream(
-                  platformVersionDir + "/cambpm-ee/" + eeMainProjectBranch,
-                  [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
-                  string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber)],
-                  true, true, true, true
-                )
-              }
+              cambpmStash("platform-stash-runtime",
+                ".m2/org/camunda/**/*-SNAPSHOT/**",
+                "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
+              cambpmStash("platform-stash-archives",
+                ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz")
+              cambpmStash("platform-stash-qa",
+                ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
+                "**/*.zip,**/*.tar.gz")
 
-              // the sidetrack pipeline should be triggered on daily,
-              // or PR builds only, master builds should be excluded.
-              // The Sidetrack pipeline contains CRDB and Azure DB stages,
-              // triggered with the cockroachdb and sqlserver PR labels.
-              if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('all-db', 'cockroachdb', 'sqlserver')) {
-                cambpmTriggerDownstream(
-                  platformVersionDir + "/cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}",
-                  [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
-                  string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber)]
-                )
-              }
+              script {
+                if (env.BRANCH_NAME == cambpmDefaultBranch()) {
+                  // CE master triggers EE master
+                  // otherwise CE PR branch triggers EE PR branch
+                  eeMainProjectBranch = "cambpm-ee-main/" + cambpmDefaultBranch()
+                } else {
+                  eeMainProjectBranch = params.EE_DOWNSTREAM
+                }
 
-              // don't trigger the daily pipeline from a master branch build
-              // or if a PR has no relevant labels
-              if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('default-build', 'jdk', 'rolling-update', 'migration', 'wildfly', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')) {
-                cambpmTriggerDownstream(
-                  platformVersionDir + "/cambpm-ce/cambpm-daily/${env.BRANCH_NAME}",
-                  [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
-                  string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber)]
-                )
-              }
+                // JOB_NAME, e.g.: '7.15/cambpm-ce/cambpm-main/PR-1373'
+                // keep leading slash for the absolute project path
+                platformVersionDir = "/" + env.JOB_NAME.split('/')[0]
+                upstreamProjectName = "/" + env.JOB_NAME
+                upstreamBuildNumber = env.BUILD_NUMBER
 
-              // only execute on version (default) branch (e.g. master, 7.15)
-              if (env.BRANCH_NAME == cambpmDefaultBranch()) {
-                cambpmRunMaven('.',
+                if (env.BRANCH_NAME == cambpmDefaultBranch() || cambpmWithLabels('webapp-integration', 'all-as', 'h2', 'websphere', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'e2e')) {
+                  cambpmTriggerDownstream(
+                    platformVersionDir + "/cambpm-ee/" + eeMainProjectBranch,
+                    [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
+                     string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber)],
+                    true, true, true, true
+                  )
+                }
+
+                // the sidetrack pipeline should be triggered on daily,
+                // or PR builds only, master builds should be excluded.
+                // The Sidetrack pipeline contains CRDB and Azure DB stages,
+                // triggered with the cockroachdb and sqlserver PR labels.
+                if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('all-db', 'cockroachdb', 'sqlserver')) {
+                  cambpmTriggerDownstream(
+                    platformVersionDir + "/cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}",
+                    [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
+                     string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber)]
+                  )
+                }
+
+                // don't trigger the daily pipeline from a master branch build
+                // or if a PR has no relevant labels
+                if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('default-build', 'jdk', 'rolling-update', 'migration', 'wildfly', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')) {
+                  cambpmTriggerDownstream(
+                    platformVersionDir + "/cambpm-ce/cambpm-daily/${env.BRANCH_NAME}",
+                    [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
+                     string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber)]
+                  )
+                }
+
+                // only execute on version (default) branch (e.g. master, 7.15)
+                if (env.BRANCH_NAME == cambpmDefaultBranch()) {
+                  cambpmRunMaven('.',
                     'org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true',
                     withCatch: false,
                     withNpm: true)
+                }
               }
+            },
+            postFailure   : {
+              cambpmPublishTestResult()
+              // archive any heap dumps generated in the target folder
+              cambpmArchiveArtifacts(false, '**/target/*.hprof')
             }
-          },
-          postFailure: {
-            cambpmPublishTestResult()
-            // archive any heap dumps generated in the target folder
-            cambpmArchiveArtifacts(false, '**/target/*.hprof')
-          }
-        ])
+          ])
 
+        }
       }
     }
     stage('h2 UNIT, engine IT, webapp IT') {
