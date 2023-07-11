@@ -62,10 +62,7 @@ spec:
       requests:
         cpu: 3000m
         memory: 60Gi
-    workingDir: "/home/work"
-    volumeMounts:
-      - mountPath: /home/work
-        name: workspace-volume
+    workingDir: "/home/jenkins/agent"
 """
         }
       }
