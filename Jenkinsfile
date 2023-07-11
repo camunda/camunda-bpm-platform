@@ -46,6 +46,10 @@ spec:
   - name: maven
     image: maven:3.8.7-eclipse-temurin-17
     tty: true
+    command:
+      - sleep
+    args:
+      - 99d
     env:
       - name: LIMITS_CPU
         value: 1
