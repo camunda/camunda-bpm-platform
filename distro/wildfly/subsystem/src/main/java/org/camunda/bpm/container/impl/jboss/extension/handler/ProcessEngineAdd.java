@@ -61,8 +61,8 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
     ServiceController<ProcessEngine> controller = installService(context, processEngineConfiguration);
   }
 
-  protected ServiceController<ProcessEngine> installService(OperationContext context, 
-      ManagedProcessEngineMetadata processEngineConfiguration) {
+  protected ServiceController<ProcessEngine> installService(OperationContext context,
+                                                            ManagedProcessEngineMetadata processEngineConfiguration) {
 
     MscManagedProcessEngineController service = new MscManagedProcessEngineController(processEngineConfiguration);
     ServiceName name = ServiceNames.forManagedProcessEngine(processEngineConfiguration.getEngineName());
@@ -76,13 +76,13 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
 
   protected ManagedProcessEngineMetadata transformConfiguration(final OperationContext context, String engineName, final ModelNode model) throws OperationFailedException {
     return new ManagedProcessEngineMetadata(
-      SubsystemAttributeDefinitons.DEFAULT.resolveModelAttribute(context, model).asBoolean(),
-      engineName,
-      SubsystemAttributeDefinitons.DATASOURCE.resolveModelAttribute(context, model).asString(),
-      SubsystemAttributeDefinitons.HISTORY_LEVEL.resolveModelAttribute(context, model).asString(),
-      SubsystemAttributeDefinitons.CONFIGURATION.resolveModelAttribute(context, model).asString(),
-      getProperties(SubsystemAttributeDefinitons.PROPERTIES.resolveModelAttribute(context, model)),
-      getPlugins(SubsystemAttributeDefinitons.PLUGINS.resolveModelAttribute(context, model))
+        SubsystemAttributeDefinitons.DEFAULT.resolveModelAttribute(context, model).asBoolean(),
+        engineName,
+        SubsystemAttributeDefinitons.DATASOURCE.resolveModelAttribute(context, model).asString(),
+        SubsystemAttributeDefinitons.HISTORY_LEVEL.resolveModelAttribute(context, model).asString(),
+        SubsystemAttributeDefinitons.CONFIGURATION.resolveModelAttribute(context, model).asString(),
+        getProperties(SubsystemAttributeDefinitons.PROPERTIES.resolveModelAttribute(context, model)),
+        getPlugins(SubsystemAttributeDefinitons.PLUGINS.resolveModelAttribute(context, model))
     );
   }
 

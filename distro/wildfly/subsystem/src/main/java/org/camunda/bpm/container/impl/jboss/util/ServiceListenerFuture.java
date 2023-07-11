@@ -16,55 +16,53 @@
  */
 package org.camunda.bpm.container.impl.jboss.util;
 
+import org.jboss.msc.service.LifecycleEvent;
+import org.jboss.msc.service.LifecycleListener;
+import org.jboss.msc.service.ServiceController;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.jboss.msc.service.AbstractServiceListener;
-import org.jboss.msc.service.ServiceController;
-import org.jboss.msc.service.ServiceController.Substate;
-import org.jboss.msc.service.ServiceController.Transition;
-import org.jboss.msc.service.ServiceListener;
-
 /**
- * <p>A {@link Future} implementation backed by a {@link ServiceListener}</p>
- * 
+ * <p>A {@link Future} implementation backed by a {@link LifecycleListener}</p>
+ *
  * @author Daniel Meyer
- * 
+ *
  */
-public abstract class ServiceListenerFuture<S, V> extends AbstractServiceListener<S> implements ServiceListener<S>, Future<V> {
+public abstract class ServiceListenerFuture<S, V> implements LifecycleListener, Future<V> {
 
   protected final S serviceInstance;
-    
+
   public ServiceListenerFuture(S serviceInstance) {
     this.serviceInstance = serviceInstance;
   }
-  
+
   protected V value;
   boolean cancelled;
   boolean failed;
-  
+
   @Override
-  public void transition(ServiceController< ? extends S> controller, Transition transition) {
-    if(transition.getAfter().equals(Substate.UP)) {
+  public void handleEvent(final ServiceController<?> controller, final LifecycleEvent event) {
+    if(event.equals(LifecycleEvent.UP)) {
       serviceAvailable();
       synchronized(this)  {
         this.notifyAll();
       }
-    } else if(transition.getAfter().equals(Substate.CANCELLED)){
-      synchronized(this)  {
-        cancelled = true;
-        this.notifyAll();
-      }
-    } else if(transition.getAfter().equals(Substate.START_FAILED)) {
+    } else if(event.equals(LifecycleEvent.FAILED)) {
       synchronized (this) {
         failed = true;
         this.notifyAll();
       }
+    } else {
+      synchronized(this)  {
+        cancelled = true;
+        this.notifyAll();
+      }
     }
   }
-  
+
   protected abstract void serviceAvailable();
 
   public boolean cancel(boolean mayInterruptIfRunning) {
@@ -85,7 +83,7 @@ public abstract class ServiceListenerFuture<S, V> extends AbstractServiceListene
     if (!failed && !cancelled && value == null) {
       synchronized (this) {
         if (!failed && !cancelled && value == null) {
-          this.wait();          
+          this.wait();
         }
       }
     }

@@ -101,14 +101,14 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
 
     ProcessApplicationStopService paStopService = new ProcessApplicationStopService();
     ServiceBuilder<ProcessApplicationStopService> stopServiceBuilder = phaseContext.getServiceTarget().addService(paStopServiceName, paStopService)
-      .addDependency(phaseContext.getPhaseServiceName())
       .addDependency(ServiceNames.forBpmPlatformPlugins(), BpmPlatformPlugins.class, paStopService.getPlatformPluginsInjector())
       .setInitialMode(Mode.ACTIVE);
+    stopServiceBuilder.requires(phaseContext.getPhaseServiceName());
 
     if(paViewServiceName != null) {
-      stopServiceBuilder.addDependency(paViewServiceName, ComponentView.class, paStopService.getPaComponentViewInjector());
+      stopServiceBuilder.requires(paViewServiceName);
     } else {
-      stopServiceBuilder.addDependency(noViewStartService, ProcessApplicationInterface.class, paStopService.getNoViewProcessApplication());
+      stopServiceBuilder.requires(noViewStartService);
     }
 
     stopServiceBuilder.install();
@@ -132,20 +132,20 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
         }
         ServiceName deploymentServiceName = ServiceNames.forProcessApplicationDeploymentService(deploymentUnit.getName(), processArachiveName);
         ServiceBuilder<ProcessApplicationDeploymentService> serviceBuilder = phaseContext.getServiceTarget().addService(deploymentServiceName, deploymentService)
-          .addDependency(phaseContext.getPhaseServiceName())
-          .addDependency(paStopServiceName)
           .addDependency(processEngineServiceName, ProcessEngine.class, deploymentService.getProcessEngineInjector())
           .setInitialMode(Mode.ACTIVE);
+        serviceBuilder.requires(phaseContext.getPhaseServiceName());
+        serviceBuilder.requires(paStopServiceName);
 
         if(paViewServiceName != null) {
           // add a dependency on the component start service to make sure we are started after the pa-component (Singleton EJB) has started
-          serviceBuilder.addDependency(paComponent.getStartServiceName());
+          serviceBuilder.requires(paComponent.getStartServiceName());
           serviceBuilder.addDependency(paViewServiceName, ComponentView.class, deploymentService.getPaComponentViewInjector());
         } else {
           serviceBuilder.addDependency(noViewStartService, ProcessApplicationInterface.class, deploymentService.getNoViewProcessApplication());
         }
 
-        JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder, deploymentService.getExecutorInjector(), false);
+        JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder, deploymentService.getExecutorInjector());
 
         serviceBuilder.install();
 
@@ -160,10 +160,10 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     // register the managed process application start service
     ProcessApplicationStartService paStartService = new ProcessApplicationStartService(deploymentServiceNames, postDeploy, preUndeploy, module);
     ServiceBuilder<ProcessApplicationStartService> serviceBuilder = phaseContext.getServiceTarget().addService(paStartServiceName, paStartService)
-      .addDependency(phaseContext.getPhaseServiceName())
       .addDependency(ServiceNames.forBpmPlatformPlugins(), BpmPlatformPlugins.class, paStartService.getPlatformPluginsInjector())
-      .addDependencies(deploymentServiceNames)
       .setInitialMode(Mode.ACTIVE);
+    serviceBuilder.requires(phaseContext.getPhaseServiceName());
+    deploymentServiceNames.forEach(serviceName -> serviceBuilder.requires(serviceName));
 
     if (phaseContext.getServiceRegistry().getService(ServiceNames.forDefaultProcessEngine()) != null) {
       serviceBuilder.addDependency(ServiceNames.forDefaultProcessEngine(), ProcessEngine.class, paStartService.getDefaultProcessEngineInjector());

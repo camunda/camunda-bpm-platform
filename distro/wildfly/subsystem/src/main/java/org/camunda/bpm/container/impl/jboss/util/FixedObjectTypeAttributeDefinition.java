@@ -112,20 +112,12 @@ public class FixedObjectTypeAttributeDefinition extends ObjectTypeAttributeDefin
     public FixedObjectTypeAttributeDefinition build() {
       ParameterValidator validator = getValidator();
       if (validator == null) {
-        ObjectTypeValidator objectTypeValidator = new ObjectTypeValidator(isAllowNull(), valueTypes);
+        ObjectTypeValidator objectTypeValidator = new ObjectTypeValidator(isNillable(), valueTypes);
         setValidator(objectTypeValidator);
       }
       return new FixedObjectTypeAttributeDefinition(this, suffix, valueTypes);
     }
 
-    /*
-   --------------------------
-   added for binary compatibility for running compatibilty tests
-    */
-    @Override
-    public Builder setAllowNull(boolean allowNull) {
-      return super.setAllowNull(allowNull);
-    }
   }
 
 }
