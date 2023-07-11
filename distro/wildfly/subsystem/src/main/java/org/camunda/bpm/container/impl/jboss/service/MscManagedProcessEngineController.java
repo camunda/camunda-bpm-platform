@@ -263,14 +263,14 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
       .addDependency(datasourceBindInfo.getBinderServiceName(), DataSourceReferenceFactoryService.class, service.getDatasourceBinderServiceInjector())
       .addDependency(ServiceNames.forMscRuntimeContainerDelegate(), MscRuntimeContainerDelegate.class, service.getRuntimeContainerDelegateInjector())
       .addDependency(ServiceNames.forMscRuntimeContainerJobExecutorService(jobExecutorName), MscRuntimeContainerJobExecutor.class, service.getMscRuntimeContainerJobExecutorInjector())
-      .addDependency(ServiceNames.forMscExecutorService())
       .setInitialMode(Mode.ACTIVE);
+    serviceBuilder.requires(ServiceNames.forMscExecutorService());
 
     if(processEngineConfiguration.isDefault()) {
-      serviceBuilder.addAliases(ServiceNames.forDefaultProcessEngine());
+      serviceBuilder.provides(ServiceNames.forDefaultProcessEngine());
     }
 
-    JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder, service.getExecutorInjector(), false);
+    JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder, service.getExecutorInjector());
 
   }
 

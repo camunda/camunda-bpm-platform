@@ -139,14 +139,14 @@ public class SubsystemAttributeDefinitons {
             .setAttributeMarshaller(CustomMarshaller.OBJECT_AS_ELEMENT)
             .setAttributeParser(AttributeParser.OBJECT_LIST_PARSER)
             .setRequires(ModelConstants.PLUGIN_CLASS)
-            .setAllowNull(true)
+            .setRequired(false)
             .setRestartAllServices()
             .build();
 
     public static final ObjectListAttributeDefinition PLUGINS = ObjectListAttributeDefinition.Builder
             .of(ModelConstants.PLUGINS, PLUGIN)
             .setAttributeMarshaller(CustomMarshaller.OBJECT_LIST)
-            .setAllowNull(true)
+            .setRequired(false)
             .setAllowExpression(true)
             .setRestartAllServices()
             .build();

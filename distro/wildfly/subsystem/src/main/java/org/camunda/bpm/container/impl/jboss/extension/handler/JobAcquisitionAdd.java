@@ -25,7 +25,7 @@ import org.jboss.as.controller.*;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
-import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController.Mode;
 
 import java.util.List;
@@ -59,11 +59,11 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler {
     }
 
     // start new service for job executor
-    ServiceController<RuntimeContainerJobExecutor> serviceController = context.getServiceTarget().addService(ServiceNames.forMscRuntimeContainerJobExecutorService(acquisitionName), mscRuntimeContainerJobExecutor)
-      .addDependency(ServiceNames.forMscRuntimeContainerDelegate())
-      .addDependency(ServiceNames.forMscExecutorService())
-      .setInitialMode(Mode.ACTIVE)
-      .install();
+    ServiceBuilder<RuntimeContainerJobExecutor> serviceBuilder = context.getServiceTarget().addService(ServiceNames.forMscRuntimeContainerJobExecutorService(acquisitionName), mscRuntimeContainerJobExecutor)
+        .setInitialMode(Mode.ACTIVE);
+    serviceBuilder.requires(ServiceNames.forMscRuntimeContainerDelegate());
+    serviceBuilder.requires(ServiceNames.forMscExecutorService());
+    serviceBuilder.install();
   }
 
 }
