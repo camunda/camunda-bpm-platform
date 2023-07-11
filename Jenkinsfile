@@ -51,8 +51,6 @@ spec:
         value: 1
       - name: TZ
         value: Europe/Berlin
-      - name: DOCKER_HOST
-        value: tcp://localhost:2375
     resources:
       limits:
         cpu: 3000m
@@ -60,6 +58,10 @@ spec:
       requests:
         cpu: 3000m
         memory: 60Gi
+    workingDir: "/home/work"
+    volumeMounts:
+      - mountPath: /home/work
+        name: workspace-volume
 """
         }
       }
