@@ -51,8 +51,6 @@ spec:
     args:
       - 99d
     env:
-      - name: LIMITS_CPU
-        value: 1
       - name: TZ
         value: Europe/Berlin
     resources:
