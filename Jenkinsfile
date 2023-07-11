@@ -24,6 +24,45 @@ pipeline {
   }
   stages {
     stage('ASSEMBLY') {
+      agent {
+        kubernetes {
+          cloud 'kubernetes'
+          label "assembly-${env.JOB_BASE_NAME}-${env.BUILD_ID}"
+          defaultContainer 'jnlp'
+          yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    agent: ap7-ci-build-experiment
+spec:
+  nodeSelector:
+    cloud.google.com/gke-nodepool: agents-n1-standard-32-netssd-stable
+  tolerations:
+    - key: "agents-n1-standard-32-netssd-stable"
+      operator: "Exists"
+      effect: "NoSchedule"
+  containers:
+  - name: maven
+    image: maven:3.8.6-openjdk-11-slim
+    tty: true
+    env:
+      - name: LIMITS_CPU
+        value: 1
+      - name: TZ
+        value: Europe/Berlin
+      - name: DOCKER_HOST
+        value: tcp://localhost:2375
+    resources:
+      limits:
+        cpu: 3000m
+        memory: 60Gi
+      requests:
+        cpu: 3000m
+        memory: 60Gi
+"""
+        }
+      }
       when {
         expression {
           env.BRANCH_NAME == cambpmDefaultBranch() || (changeRequest() && !pullRequest.labels.contains('ci:no-build'))
@@ -35,7 +74,7 @@ pipeline {
       }
       steps {
         cambpmConditionalRetry([
-          agentLabel: 'h2_perf32',
+          agentLabel: "assembly-${env.JOB_BASE_NAME}-${env.BUILD_ID}",
           suppressErrors: false,
           runSteps: {
             withVault([vaultSecrets: [
@@ -223,9 +262,9 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'postgresql_142',
               runSteps: {
-                cambpmRunMaven('qa/', 
-                  'clean install -Pwildfly,postgresql,engine-integration-jakarta', 
-                  runtimeStash: true, 
+                cambpmRunMaven('qa/',
+                  'clean install -Pwildfly,postgresql,engine-integration-jakarta',
+                  runtimeStash: true,
                   archiveStash: true,
                   // we need to use JDK 17 for WildFly 27+ + Spring 6
                   jdkVersion: 'jdk-17-latest')
@@ -268,9 +307,9 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'postgresql_142',
               runSteps: {
-                cambpmRunMaven('qa/', 
-                  'clean install -Pwildfly,postgresql,postgresql-xa,engine-integration-jakarta', 
-                  runtimeStash: true, 
+                cambpmRunMaven('qa/',
+                  'clean install -Pwildfly,postgresql,postgresql-xa,engine-integration-jakarta',
+                  runtimeStash: true,
                   archiveStash: true,
                   // we need to use JDK 17 for WildFly 27+ + Spring 6
                   jdkVersion: 'jdk-17-latest')
@@ -511,7 +550,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMaven('qa/', 
+                cambpmRunMaven('qa/',
                   'clean install -Pwildfly-domain,h2,engine-integration-jakarta',
                   runtimeStash: true,
                   archiveStash: true,
