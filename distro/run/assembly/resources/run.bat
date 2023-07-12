@@ -138,6 +138,10 @@ IF [%swaggeruiChosen%]==[true] (
 
 ECHO classpath: %classPath%
 
+REM open a browser
+timeout /t 10 /nobreak > NUL
+start http://localhost:8080/camunda-welcome/index.html
+
 REM start the application
 IF [%detachProcess%]==[true] (
   REM in the background
