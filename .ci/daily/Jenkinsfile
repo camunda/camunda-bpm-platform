@@ -110,7 +110,10 @@ pipeline {
         }
         stage('Trigger Docker CE GHA') {
           when {
-            branch cambpmDefaultBranch();
+            expression {
+              // trigger docker CE build only on the master branch
+              env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
+            }
           }
           agent {
             kubernetes {
