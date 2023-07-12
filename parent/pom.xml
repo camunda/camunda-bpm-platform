@@ -68,8 +68,8 @@
     <version.jakarta-ee-spec>10.0.0</version.jakarta-ee-spec>
 
     <version.eirslett.frontend.maven.plugin>1.12.1</version.eirslett.frontend.maven.plugin>
-    <version.nodejs>17.9.1</version.nodejs>
-    <version.npm>8.11.0</version.npm>
+    <version.nodejs>18.16.1</version.nodejs>
+    <version.npm>9.5.1</version.npm>
 
     <!-- OSGi bundles properties -->
     <camunda.artifact />
