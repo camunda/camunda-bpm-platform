@@ -61,6 +61,7 @@ spec:
         cpu: 3000m
         memory: 60Gi
     workingDir: "/home/jenkins/agent"
+    runAsUser: 1000
 """
         }
       }
