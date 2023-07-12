@@ -39,14 +39,13 @@ IF "x%JAVA_HOME%" == "x" (
 )
 
 SET EXPECTED_JAVA_VERSION=17
-FOR /f "tokens=3" %%g IN ('java -version 2^>^&1 ^| findstr /i "version"') DO (
+FOR /f "tokens=3" %%g IN ('JAVA -version 2^>^&1 ^| findstr /i "version"') DO (
     SET JAVA_VERSION=%%g
 )
 SET JAVA_VERSION=%JAVA_VERSION:"=%
-FOR /f "delims=. tokens=2" %%v in ("%JAVA_VERSION%") do (
-  SET JAVA=%%v
-  ECHO Java version is %JAVA_VERSION%
-  IF %JAVA% LSS %EXPECTED_JAVA_VERSION% (
+ECHO Java version is %JAVA_VERSION%
+FOR /f "delims=. tokens=1" %%v in ("%JAVA_VERSION%") do (
+  IF %%v LSS %EXPECTED_JAVA_VERSION% (
     ECHO You must use at least JDK 17 to start Camunda Platform Run.
     GOTO :EOF
   )
