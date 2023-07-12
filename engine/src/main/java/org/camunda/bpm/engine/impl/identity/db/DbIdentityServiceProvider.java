@@ -299,7 +299,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
   public IdentityOperationResult deleteMembership(String userId, String groupId) {
     checkAuthorization(Permissions.DELETE, Resources.GROUP_MEMBERSHIP, groupId);
     if (existsMembership(userId, groupId)) {
-      deleteAuthorizations(Resources.GROUP_MEMBERSHIP, groupId);
+      deleteAuthorizationsForUser(Resources.GROUP_MEMBERSHIP, groupId, userId);
 
       Map<String, Object> parameters = new HashMap<>();
       parameters.put("userId", userId);

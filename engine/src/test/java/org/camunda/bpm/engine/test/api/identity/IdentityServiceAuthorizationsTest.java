@@ -51,6 +51,8 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
@@ -657,6 +659,69 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       assertEquals(jonny2, e.getUserId());
       assertExceptionInfo(DELETE.getName(), GROUP_MEMBERSHIP.resourceName(), "group1", info);
     }
+  }
+
+  @Test
+  public void shouldKeepAuthorizationsForAnyUser() {
+    // given
+    Group myGroup = identityService.newGroup("myGroup");
+    identityService.saveGroup(myGroup);
+
+    User myUser = identityService.newUser("myUser");
+    identityService.saveUser(myUser);
+
+    identityService.createMembership(myUser.getId(), myGroup.getId());
+
+    createAuthorization(AUTH_TYPE_GLOBAL, GROUP, myGroup.getId(), "*", ALL);
+    createAuthorization(AUTH_TYPE_GLOBAL, GROUP_MEMBERSHIP, myGroup.getId(), "*", ALL);
+    createAuthorization(AUTH_TYPE_GLOBAL, USER, myUser.getId(), "*", ALL);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    identityService.setAuthenticatedUserId(myUser.getId());
+
+    // when
+    identityService.deleteMembership(myUser.getId(), myGroup.getId());
+
+    // then
+    processEngineConfiguration.setAuthorizationEnabled(false);
+    List<Authorization> list = authorizationService.createAuthorizationQuery().list();
+    assertThat(list).extracting("resource", "resourceId", "userId", "permissions")
+        .containsExactlyInAnyOrder(tuple(GROUP.resourceType(), myGroup.getId(), "*", ALL.getValue()),
+            tuple(GROUP_MEMBERSHIP.resourceType(), myGroup.getId(), "*", ALL.getValue()),
+            tuple(USER.resourceType(), myUser.getId(), "*", ALL.getValue()));
+  }
+
+  @Test
+  public void shouldRemoveAuthorizationForUserAndKeepAuthorizationsForAnyUser() {
+    // given
+    Group myGroup = identityService.newGroup("myGroup");
+    identityService.saveGroup(myGroup);
+
+    User myUser = identityService.newUser("myUser");
+    identityService.saveUser(myUser);
+
+    identityService.createMembership(myUser.getId(), myGroup.getId());
+
+    createAuthorization(AUTH_TYPE_GLOBAL, GROUP, myGroup.getId(), "*", ALL);
+    createAuthorization(AUTH_TYPE_GLOBAL, GROUP_MEMBERSHIP, myGroup.getId(), "*", ALL);
+    createAuthorization(AUTH_TYPE_GRANT, GROUP_MEMBERSHIP, myGroup.getId(), myUser.getId(), ALL);
+    createAuthorization(AUTH_TYPE_GRANT, GROUP_MEMBERSHIP, myGroup.getId(), "foo", ALL);
+    createAuthorization(AUTH_TYPE_GLOBAL, USER, myUser.getId(), "*", ALL);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    identityService.setAuthenticatedUserId(myUser.getId());
+
+    // when
+    identityService.deleteMembership(myUser.getId(), myGroup.getId());
+
+    // then
+    processEngineConfiguration.setAuthorizationEnabled(false);
+    List<Authorization> list = authorizationService.createAuthorizationQuery().list();
+    assertThat(list).extracting("resource", "resourceId", "userId", "permissions")
+        .containsExactlyInAnyOrder(tuple(GROUP.resourceType(), myGroup.getId(), "*", ALL.getValue()),
+            tuple(GROUP_MEMBERSHIP.resourceType(), myGroup.getId(), "*", ALL.getValue()),
+            tuple(GROUP_MEMBERSHIP.resourceType(), myGroup.getId(), "foo", ALL.getValue()),
+            tuple(USER.resourceType(), myUser.getId(), "*", ALL.getValue()));
   }
 
   @Test
@@ -1327,6 +1392,19 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     for (Authorization authorization : authorizationService.createAuthorizationQuery().list()) {
       authorizationService.deleteAuthorization(authorization.getId());
     }
+  }
+
+  protected void createAuthorization(int authType,
+                                     Resources resource,
+                                     String resourceId,
+                                     String userId,
+                                     Permissions permission) {
+    Authorization authorization = authorizationService.createNewAuthorization(authType);
+    authorization.setResource(resource);
+    authorization.setResourceId(resourceId);
+    authorization.addPermission(permission);
+    authorization.setUserId(userId);
+    authorizationService.saveAuthorization(authorization);
   }
 
 }
