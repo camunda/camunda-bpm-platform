@@ -78,6 +78,8 @@ spec:
           agentLabel    : 'maven',
           suppressErrors: false,
           runSteps      : {
+            sh(label: 'GIT: Mark current directory as safe', script: "git config --global --add safe.directory \$PWD")
+            
             withVault([vaultSecrets: [
               [
                 path        : 'secret/products/cambpm/ci/xlts.dev',
