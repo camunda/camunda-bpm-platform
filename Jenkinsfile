@@ -24,12 +24,18 @@ pipeline {
   }
   stages {
     stage('ASSEMBLY') {
-      agent {
-        kubernetes {
-          cloud 'kubernetes'
-          label "assembly-${env.JOB_BASE_NAME}-${env.BUILD_ID}"
-          defaultContainer 'jnlp'
-          yaml """
+      when {
+        expression {
+          env.BRANCH_NAME == cambpmDefaultBranch() || (changeRequest() && !pullRequest.labels.contains('ci:no-build'))
+        }
+      }
+      environment {
+        NEXUS_SNAPSHOT_REPOSITORY = cambpmConfig.nexusSnapshotRepository()
+        NEXUS_SNAPSHOT_REPOSITORY_ID = cambpmConfig.nexusSnapshotRepositoryId()
+      }
+      steps {
+        cambpmConditionalRetry([
+        podSpec: """
 apiVersion: v1
 kind: Pod
 metadata:
@@ -61,21 +67,7 @@ spec:
         cpu: 3000m
         memory: 60Gi
     workingDir: "/home/jenkins/agent"
-"""
-        }
-      }
-      when {
-        expression {
-          env.BRANCH_NAME == cambpmDefaultBranch() || (changeRequest() && !pullRequest.labels.contains('ci:no-build'))
-        }
-      }
-      environment {
-        NEXUS_SNAPSHOT_REPOSITORY = cambpmConfig.nexusSnapshotRepository()
-        NEXUS_SNAPSHOT_REPOSITORY_ID = cambpmConfig.nexusSnapshotRepositoryId()
-      }
-      steps {
-        cambpmConditionalRetry([
-          agentLabel    : 'maven',
+""",
           suppressErrors: false,
           runSteps      : {
             sh(label: 'GIT: Mark current directory as safe', script: "git config --global --add safe.directory \$PWD")
