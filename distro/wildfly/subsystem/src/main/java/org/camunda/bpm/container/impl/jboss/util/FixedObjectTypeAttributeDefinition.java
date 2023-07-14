@@ -112,6 +112,8 @@ public class FixedObjectTypeAttributeDefinition extends ObjectTypeAttributeDefin
     public FixedObjectTypeAttributeDefinition build() {
       ParameterValidator validator = getValidator();
       if (validator == null) {
+        // TODO #isNillable() is not available in WFLY27, #isAllowNull() not available in WFLY28
+        // looks like optional is always true in constructor
         ObjectTypeValidator objectTypeValidator = new ObjectTypeValidator(isNillable(), valueTypes);
         setValidator(objectTypeValidator);
       }
