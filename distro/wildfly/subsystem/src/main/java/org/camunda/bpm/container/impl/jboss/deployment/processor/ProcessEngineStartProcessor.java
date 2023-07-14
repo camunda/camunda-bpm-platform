@@ -87,7 +87,7 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
     serviceBuilder.requires(phaseContext.getPhaseServiceName());
 
     // add Service dependencies
-    MscManagedProcessEngineController.initializeServiceBuilder(configuration, service, serviceBuilder, processEngineXml.getJobAcquisitionName());
+    service.initializeServiceBuilder(configuration, service, serviceBuilder, processEngineXml.getJobAcquisitionName());
 
     // install the service
     serviceBuilder.install();
