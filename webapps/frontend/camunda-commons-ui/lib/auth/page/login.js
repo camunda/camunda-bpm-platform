@@ -20,12 +20,9 @@
 var template = require('./login.html?raw');
 var logo = require('svg-inline-loader?classPrefix&removeSVGTagAttrs=false!./logo.svg');
 
-var $ = require('jquery');
-
 var Controller = [
   '$scope',
   '$rootScope',
-  'AuthenticationService',
   'Notifications',
   '$location',
   '$translate',
@@ -33,21 +30,28 @@ var Controller = [
   '$sce',
   'configuration',
   '$http',
+  'Views',
+  'canonicalAppName',
   function(
     $scope,
     $rootScope,
-    AuthenticationService,
     Notifications,
     $location,
     $translate,
     localConf,
     $sce,
     configuration,
-    $http
+    $http,
+    views,
+    canonicalAppName
   ) {
     $scope.logo = $sce.trustAsHtml(logo);
     $scope.status = 'INIT';
     $scope.appName = configuration.getAppName();
+
+    $scope.loginPlugins = views.getProviders({
+      component: `${canonicalAppName}.login`
+    });
 
     if ($rootScope.authentication) {
       return $location.path('/');
@@ -72,6 +76,15 @@ var Controller = [
           }
           localConf.set('firstVisit', true);
           $scope.showFirstLogin = true;
+
+          const unregisterListener = $scope.$on(
+            'first-visit-info-box-dismissed',
+            $scope.dismissInfoBox
+          );
+
+          $scope.$on('$destroy', function() {
+            unregisterListener();
+          });
         })
         .catch($scope.dismissInfoBox);
     }
@@ -83,36 +96,6 @@ var Controller = [
     $scope.dismissInfoBox = function() {
       $scope.showFirstLogin = false;
       localConf.set('firstVisit', false);
-    };
-
-    // ensure focus on username input
-    var autofocusField = $('form[name="signinForm"] [autofocus]')[0];
-    if (autofocusField) {
-      autofocusField.focus();
-    }
-
-    $scope.login = function() {
-      $scope.status = 'LOADING';
-      return AuthenticationService.login($scope.username, $scope.password)
-        .then(function() {
-          $scope.status = 'DONE';
-          Notifications.clearAll();
-          $scope.dismissInfoBox();
-        })
-        .catch(function(error) {
-          $scope.status = 'ERROR';
-          delete $scope.username;
-          delete $scope.password;
-
-          Notifications.addError({
-            status: $translate.instant('PAGE_LOGIN_FAILED'),
-            message:
-              (error.data && error.data.message) ||
-              $translate.instant('PAGE_LOGIN_ERROR_MSG'),
-            scope: $scope,
-            exclusive: true
-          });
-        });
     };
   }
 ];

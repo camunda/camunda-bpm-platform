@@ -32,7 +32,8 @@ var angular = require('camunda-bpm-sdk-js/vendor/angular'),
   fixDate = require('./fixDate'),
   ifUnauthorizedForwardToWelcomeApp = require('./ifUnauthorizedForwardToWelcomeApp'),
   unfixDate = require('./unfixDate'),
-  shouldDisplayAuthenticationError = require('./shouldDisplayAuthenticationError');
+  shouldDisplayAuthenticationError = require('./shouldDisplayAuthenticationError'),
+  canonicalAppName = require('./canocialAppName');
 
 var ngModule = angular.module('camunda.common.services', [
   // `ResourceResolver` relies on cam.commons.util for Notifications
@@ -56,6 +57,7 @@ ngModule.factory(
   'shouldDisplayAuthenticationError',
   shouldDisplayAuthenticationError
 );
+ngModule.provider('canonicalAppName', canonicalAppName);
 
 /**
  * Register http status interceptor per default

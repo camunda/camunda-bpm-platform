@@ -17,14 +17,11 @@
 
 'use strict';
 
-var angular = require('camunda-bpm-sdk-js/vendor/angular'),
-  view = require('./view'),
-  service = require('./service');
+const base = document.querySelector('base');
+const canonicalAppName = base.getAttribute('app-name');
 
-var pluginModule = angular.module('webapps.plugin', []);
-
-// this module is a bit different, so we handle it differently...
-view(pluginModule);
-service(pluginModule);
-
-module.exports = pluginModule;
+module.exports = function() {
+  this.$get = function() {
+    return canonicalAppName;
+  };
+};
