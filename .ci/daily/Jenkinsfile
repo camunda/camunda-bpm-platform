@@ -109,9 +109,9 @@ pipeline {
           }
         }
         stage('Trigger Docker CE GHA') {
-          when {
-            branch cambpmDefaultBranch();
-          }
+          //when {
+          //  branch cambpmDefaultBranch();
+          //}
           agent {
             kubernetes {
               cloud "kubernetes"
@@ -130,7 +130,8 @@ pipeline {
             INPUT_OWNER = 'camunda'
             INPUT_REPO = 'docker-camunda-bpm-platform'
             // ensure that the GHA trigger works for maintenance branches as well
-            INPUT_REF = cambpmGetDockerRepoBranch()
+            //INPUT_REF = cambpmGetDockerRepoBranch()
+            INPUT_REF = '3515-trigger-maintenance-snapshot-version'
             INPUT_WORKFLOW_FILE_NAME = 'build-test-and-publish-ce.yml'
             INPUT_WAIT_INPUT_WAIT_WORKFLOW = 'true'
           }
