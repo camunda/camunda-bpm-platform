@@ -159,6 +159,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     ProcessDefinitionEntity definition = execution.getProcessDefinition();
     if (definition != null) {
       evt.setProcessDefinitionKey(definition.getKey());
+      evt.setProcessDefinitionVersion(definition.getVersion());
     }
 
     evt.setActivityId(eventSource.getId());
@@ -192,6 +193,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     String processDefinitionKey = null;
     if (definition != null) {
       processDefinitionKey = definition.getKey();
+      evt.setProcessDefinitionVersion(definition.getVersion());
     }
 
     evt.setId(processInstanceId);
@@ -219,6 +221,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     ProcessDefinitionEntity definition = taskEntity.getProcessDefinition();
     if (definition != null) {
       processDefinitionKey = definition.getKey();
+      evt.setProcessDefinitionVersion(definition.getVersion());
     }
 
     String processDefinitionId = taskEntity.getProcessDefinitionId();
@@ -296,6 +299,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       if (definition != null) {
         evt.setProcessDefinitionId(definition.getId());
         evt.setProcessDefinitionKey(definition.getKey());
+        evt.setProcessDefinitionVersion(definition.getVersion());
       }
       evt.setRootProcessInstanceId(execution.getRootProcessInstanceId());
 
