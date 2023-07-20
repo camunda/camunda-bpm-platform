@@ -14,7 +14,6 @@ engine-webapp-unit:
   - 'aws_aurora_postgresql_14'
   - 'mariadb_106'
   - 'mysql_80'
-  - 'oracle_12'
   - 'oracle_19'
   - 'db2_115'
   - 'sqlserver_2017'

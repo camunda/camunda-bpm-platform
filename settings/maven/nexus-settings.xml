@@ -67,21 +67,9 @@
       <properties>
         <database.host>localhost</database.host>
         <database.port>1521</database.port>
-        <database.name>xe</database.name>
+        <database.name>orclcdb</database.name>
         <database.username>camunda</database.username>
         <database.password>camunda</database.password>
-      </properties>
-    </profile>
-    <profile>
-      <id>oracle-12</id>
-      <properties>
-        <database.name>orcl</database.name>
-      </properties>
-    </profile>
-    <profile>
-      <id>oracle-19</id>
-      <properties>
-        <database.name>orclcdb</database.name>
       </properties>
     </profile>
     <profile>
