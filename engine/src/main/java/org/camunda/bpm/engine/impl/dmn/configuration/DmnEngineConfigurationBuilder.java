@@ -135,4 +135,10 @@ public class DmnEngineConfigurationBuilder {
         .enableFeelLegacyBehavior(dmnFeelEnableLegacyBehavior);
     return this;
   }
+
+  public DmnEngineConfigurationBuilder returnBlankTableOutputAsNull(boolean dmnReturnBlankTableOutputAsNull) {
+    dmnEngineConfiguration.setReturnBlankTableOutputAsNull(dmnReturnBlankTableOutputAsNull);
+    return this;
+  }
+
 }
