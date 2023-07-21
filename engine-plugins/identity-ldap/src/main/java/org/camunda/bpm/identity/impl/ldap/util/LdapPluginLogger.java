@@ -18,7 +18,7 @@ package org.camunda.bpm.identity.impl.ldap.util;
 
 import javax.naming.directory.SearchResult;
 
-import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 import org.camunda.commons.logging.BaseLogger;
 
@@ -33,48 +33,29 @@ public class LdapPluginLogger extends BaseLogger {
   public static final LdapPluginLogger INSTANCE = BaseLogger.createLogger(
       LdapPluginLogger.class, PROJECT_CODE, "org.camunda.bpm.identity.impl.ldap", "00");
 
-  public void pluginActivated(String pluginClassName, String engineName)
-  {
+  public void pluginActivated(String pluginClassName, String engineName) {
     logInfo("001", "PLUGIN {} activated on process engine {}", pluginClassName, engineName);
   }
 
-  public void acceptingUntrustedCertificates()
-  {
+  public void acceptingUntrustedCertificates() {
     logWarn("002", "Enabling accept of untrusted certificates. Use at own risk.");
   }
 
-  public void exceptionWhenClosingLdapCOntext(Exception e)
-  {
+  public void exceptionWhenClosingLdapContext(Exception e) {
     logDebug("003", "exception while closing LDAP DIR CTX", e);
   }
 
-  public void invalidLdapGroupReturned(GroupEntity group, SearchResult searchResult)
-  {
-    logError("004", "LDAP group query returned a group with id null. This group will be ignored. "
+  public <E extends DbEntity> void invalidLdapEntityReturned(E entity, SearchResult searchResult) {
+    String entityType = entity instanceof UserEntity ? "user" : "group";
+    logError("004", "LDAP {} query returned a {} with id null. This {} will be ignored. "
         + "This indicates a misconfiguration of the LDAP plugin or a problem with the LDAP service."
-        + " Enable DEBUG/FINE logging for details.");
+        + " Enable DEBUG/FINE logging for details.", entityType, entityType, entityType);
     // log sensitive data only on FINE
-    logDebug("004", "Invalid group: {} based on search result {}", group, searchResult);
+    logDebug("004", "Invalid {}: {} based on search result {}", entityType, entity, searchResult);
   }
 
-  public void invalidLdapUserReturned(UserEntity user, SearchResult searchResult)
-  {
-    logError("004", "LDAP user query returned a user with id null. This user will be ignored. "
-        + "This indicates a misconfiguration of the LDAP plugin or a problem with the LDAP service."
-        + " Enable DEBUG/FINE logging for details.");
-    // log sensitive data only on FINE
-    logDebug("004", "Invalid user: {} based on search result {}", user, searchResult);
-  }
-
-  public void groupQueryResult(String summary)
-  {
+  public void queryResult(String summary) {
     // log sensitive data only on FINE
     logDebug("005", summary);
-  }
-
-  public void userQueryResult(String summary)
-  {
-    // log sensitive data only on FINE
-    logDebug("006", summary);
   }
 }

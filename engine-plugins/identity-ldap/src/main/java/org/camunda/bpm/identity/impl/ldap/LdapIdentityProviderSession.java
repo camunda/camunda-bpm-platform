@@ -24,28 +24,22 @@ import static org.camunda.bpm.engine.impl.context.Context.getProcessEngineConfig
 import static org.camunda.bpm.identity.impl.ldap.LdapConfiguration.DB_QUERY_WILDCARD;
 import static org.camunda.bpm.identity.impl.ldap.LdapConfiguration.LDAP_QUERY_WILDCARD;
 
-import java.io.IOException;
 import java.io.StringWriter;
+
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
-import javax.naming.AuthenticationException;
-import javax.naming.Context;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.Control;
-import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
-import javax.naming.ldap.PagedResultsControl;
-import javax.naming.ldap.PagedResultsResponseControl;
-import javax.naming.ldap.SortControl;
 import javax.naming.ldap.SortKey;
+import javax.naming.ldap.PagedResultsResponseControl;
+
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
@@ -55,16 +49,17 @@ import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
-import org.camunda.bpm.engine.impl.Direction;
-import org.camunda.bpm.engine.impl.GroupQueryProperty;
 import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.UserQueryProperty;
+import org.camunda.bpm.engine.impl.GroupQueryProperty;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
+import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.identity.impl.ldap.util.LdapPluginLogger;
 
 /**
@@ -75,11 +70,12 @@ import org.camunda.bpm.identity.impl.ldap.util.LdapPluginLogger;
 public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
   protected LdapConfiguration ldapConfiguration;
-  // one object of this class is created per thread. One initialContext is created per thread.
-  protected LdapContext initialContext;
+
+  protected LdapClient ldapClient;
 
   public LdapIdentityProviderSession(LdapConfiguration ldapConfiguration) {
     this.ldapConfiguration = ldapConfiguration;
+    this.ldapClient = new LdapClient(ldapConfiguration);
   }
 
   // Session Lifecycle //////////////////////////////////
@@ -89,67 +85,13 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   }
 
   public void close() {
-    closeLdapCtx(initialContext);
-  }
-
-  protected void closeLdapCtx(LdapContext context) {
-    if (context != null) {
-      try {
-        context.close();
-      } catch (Exception e) {
-        // ignore
-        LdapPluginLogger.INSTANCE.exceptionWhenClosingLdapCOntext(e);
-      }
-    }
-  }
-
-  protected InitialLdapContext openContext(String userDn, String password) {
-    Hashtable<String, String> env = new Hashtable<>();
-    env.put(Context.INITIAL_CONTEXT_FACTORY, ldapConfiguration.getInitialContextFactory());
-    env.put(Context.SECURITY_AUTHENTICATION, ldapConfiguration.getSecurityAuthentication());
-    env.put(Context.PROVIDER_URL, ldapConfiguration.getServerUrl());
-    env.put(Context.SECURITY_PRINCIPAL, userDn);
-    env.put(Context.SECURITY_CREDENTIALS, password);
-
-    // for anonymous login
-    if (ldapConfiguration.isAllowAnonymousLogin() && password.isEmpty()) {
-      env.put(Context.SECURITY_AUTHENTICATION, "none");
-    }
-
-    if (ldapConfiguration.isUseSsl()) {
-      env.put(Context.SECURITY_PROTOCOL, "ssl");
-    }
-
-    // add additional properties
-    Map<String, String> contextProperties = ldapConfiguration.getContextProperties();
-    if (contextProperties != null) {
-      env.putAll(contextProperties);
-    }
-
-    try {
-      return new InitialLdapContext(env, null);
-
-    } catch (AuthenticationException e) {
-      throw new LdapAuthenticationException("Could not authenticate with LDAP server", e);
-
-    } catch (NamingException e) {
-      throw new IdentityProviderException("Could not connect to LDAP server", e);
-
-    }
-  }
-
-  protected void ensureContextInitialized() {
-    if (initialContext == null) {
-      initialContext = openContext(ldapConfiguration.getManagerDn(), ldapConfiguration.getManagerPassword());
-    }
+    ldapClient.closeLdapCtx();
   }
 
   // Users /////////////////////////////////////////////////
 
   public User findUserById(String userId) {
-    return createUserQuery(getCommandContext())
-            .userId(userId)
-            .singleResult();
+    return createUserQuery(getCommandContext()).userId(userId).singleResult();
   }
 
   public UserQuery createUserQuery() {
@@ -166,12 +108,12 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   }
 
   public long findUserCountByQueryCriteria(LdapUserQueryImpl query) {
-    ensureContextInitialized();
+    ldapClient.ensureContextInitialized();
     return findUserByQueryCriteria(query).size();
   }
 
   public List<User> findUserByQueryCriteria(LdapUserQueryImpl query) {
-    ensureContextInitialized();
+    ldapClient.ensureContextInitialized();
 
     // convert DB wildcards to LDAP wildcards if necessary
     if (query.getEmailLike() != null) {
@@ -193,197 +135,59 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     }
   }
 
-  protected List<User> findUsersByGroupId(LdapUserQueryImpl query) {
-    StringBuilder resultLogger = new StringBuilder();
-    if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-      resultLogger.append("findUsersByGroupId: from ");
-      resultLogger.append(query.getFirstResult());
-    }
+  protected boolean paginationContinues(int currentSize, int maxResults) {
+    return nextPageDetected() && currentSize < maxResults;
+  }
 
+  protected List<User> findUsersByGroupId(LdapUserQueryImpl query) {
     String baseDn = getDnForGroup(query.getGroupId());
 
     // compose group search filter
     String groupSearchFilter = "(& " + ldapConfiguration.getGroupSearchFilter() + ")";
 
-    NamingEnumeration<SearchResult> enumeration = null;
-    try {
-      initializeControls(query, resultLogger);
+    initializeControls(query);
 
-      List<String> groupMemberList = new ArrayList<>();
-      int resultCount = 0;
-      int pageNumber = 0;
+    List<String> groupMembers = new ArrayList<>();
+    int resultCount = 0;
 
-      do {
-        enumeration = initialContext.search(baseDn, groupSearchFilter, ldapConfiguration.getSearchControls());
-        pageNumber++;
-        if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-          resultLogger.append(", (page:");
-          resultLogger.append(pageNumber);
-          resultLogger.append(")");
-        }
-
+    do {
+      try (LdapSearchResults searchResults = ldapClient.search(baseDn, groupSearchFilter)) {
         // first find group
-        while (enumeration.hasMoreElements()) {
-          SearchResult result = enumeration.nextElement();
-          Attribute memberAttribute = result.getAttributes().get(ldapConfiguration.getGroupMemberAttribute());
-          if (null != memberAttribute) {
-            NamingEnumeration<?> allMembers = memberAttribute.getAll();
-
+        while (searchResults.hasMoreElements()) {
+          String groupMemberAttribute = ldapConfiguration.getGroupMemberAttribute();
+          NamingEnumeration<String> allGroupMembers = LdapClient.getAllMembers(groupMemberAttribute, searchResults);
+          if (allGroupMembers != null) {
             // iterate group members
-            while (allMembers.hasMoreElements()) {
+            while (allGroupMembers.hasMoreElements()) {
               if (resultCount >= query.getFirstResult()) {
-                groupMemberList.add((String) allMembers.nextElement());
+                groupMembers.add(allGroupMembers.nextElement());
               }
               resultCount++;
             }
           }
         }
-      } while (isNextPageDetected(resultLogger) && groupMemberList.size() < query.getMaxResults());
+      }
+    } while (paginationContinues(groupMembers.size(), query.getMaxResults()));
 
-      List<User> userList = new ArrayList<>();
-      String userBaseDn = composeDn(ldapConfiguration.getUserSearchBase(), ldapConfiguration.getBaseDn());
-      int memberCount = 0;
-      for (String memberId : groupMemberList) {
-        if (userList.size() < query.getMaxResults() && memberCount >= query.getFirstResult()) {
-          if (ldapConfiguration.isUsePosixGroups()) {
-            query.userId(memberId);
-          }
-          List<User> users = ldapConfiguration.isUsePosixGroups() ?
-                  findUsersWithoutGroupId(query, userBaseDn, true) :
-                  findUsersWithoutGroupId(query, memberId, true);
-          if (!users.isEmpty()) {
-            userList.add(users.get(0));
-          }
+    List<User> userList = new ArrayList<>();
+    String userBaseDn = composeDn(ldapConfiguration.getUserSearchBase(), ldapConfiguration.getBaseDn());
+    int memberCount = 0;
+    for (String memberId : groupMembers) {
+      if (userList.size() < query.getMaxResults() && memberCount >= query.getFirstResult()) {
+        if (ldapConfiguration.isUsePosixGroups()) {
+          query.userId(memberId);
         }
-        memberCount++;
-      }
-      if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-        resultLogger.append("; Result size()=");
-        resultLogger.append(userList.size());
-        resultLogger.append(" FirstResult=");
-        resultLogger.append(userList.isEmpty() ? "--" : userList.get(0).getFirstName() + "]");
-      }
-      return userList;
-
-    } catch (NamingException e) {
-      if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-        resultLogger.append("; Exception ");
-        resultLogger.append(e);
-      }
-      throw new IdentityProviderException("Could not query for users " + resultLogger, e);
-    } finally {
-      try {
-        if (enumeration != null) {
-          enumeration.close();
+        List<User> users = ldapConfiguration.isUsePosixGroups() ?
+            findUsersWithoutGroupId(query, userBaseDn, true) :
+            findUsersWithoutGroupId(query, memberId, true);
+        if (!users.isEmpty()) {
+          userList.add(users.get(0));
         }
-      } catch (Exception e) {
-        // ignore silently
       }
-      if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-        resultLogger.append("]");
-        LdapPluginLogger.INSTANCE.userQueryResult(resultLogger.toString());
-      }
-
-    }
-  }
-
-  public List<User> findUsersWithoutGroupId(LdapUserQueryImpl query, String userBaseDn, boolean ignorePagination) {
-    StringBuilder resultLogger = new StringBuilder();
-    if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-      resultLogger.append("findUsersWithoutGroupId: from ");
-      resultLogger.append(query.getFirstResult());
+      memberCount++;
     }
 
-    NamingEnumeration<SearchResult> enumeration = null;
-    try {
-      initializeControls(query, resultLogger);
-
-      List<User> userList = new ArrayList<>();
-      int resultCount = 0;
-      int pageNumber = 0;
-
-      do {
-        String filter = getUserSearchFilter(query);
-        if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-          resultLogger.append(" search userBaseDn[");
-          resultLogger.append(userBaseDn);
-          resultLogger.append("] filter[");
-          resultLogger.append(filter);
-          resultLogger.append("];");
-        }
-        enumeration = initialContext.search(userBaseDn, filter, ldapConfiguration.getSearchControls());
-
-        pageNumber++;
-        // perform client-side paging
-        if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-          resultLogger.append(" (page:");
-          resultLogger.append(pageNumber);
-          resultLogger.append(") ");
-        }
-
-        while (enumeration.hasMoreElements()
-                && (userList.size() < query.getMaxResults() || ignorePagination)) {
-          SearchResult result = enumeration.nextElement();
-
-          UserEntity user = transformUser(result);
-
-          String userId = user.getId();
-
-          if (userId == null) {
-            LdapPluginLogger.INSTANCE.invalidLdapUserReturned(user, result);
-          } else {
-            if (isAuthenticatedUser(user) || isAuthorized(READ, USER, userId)) {
-
-              if (resultCount >= query.getFirstResult() || ignorePagination) {
-                if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-                  resultLogger.append("id=");
-                  resultLogger.append(user.getId());
-                  resultLogger.append(", firstName=");
-                  resultLogger.append(user.getFirstName());
-                  resultLogger.append(", lastName=");
-                  resultLogger.append(user.getLastName());
-
-                  resultLogger.append(" based on ");
-                  resultLogger.append(result);
-                  resultLogger.append(", ");
-                }
-                userList.add(user);
-              }
-              resultCount++;
-            }
-          }
-        }
-      } while (isNextPageDetected(resultLogger) && userList.size() < query.getMaxResults());
-
-      if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-        resultLogger.append(";Result size()=");
-        resultLogger.append(userList.size());
-        resultLogger.append(" First[");
-        resultLogger.append(userList.isEmpty() ? "--" : userList.get(0).getFirstName() + "]");
-      }
-      return userList;
-
-    } catch (NamingException e) {
-      if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-        resultLogger.append(";Exception: ");
-        resultLogger.append(e);
-      }
-      throw new IdentityProviderException("Could not query for users " + resultLogger, e);
-    } finally {
-      try {
-        if (enumeration != null) {
-          enumeration.close();
-        }
-      } catch (Exception e) {
-        // ignore silently
-      }
-
-      if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-        resultLogger.append("]");
-        LdapPluginLogger.INSTANCE.userQueryResult(resultLogger.toString());
-      }
-
-    }
+    return userList;
   }
 
   public boolean checkPassword(String userId, String password) {
@@ -400,10 +204,10 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
     /*
      * We only allow login with no password if anonymous login is set.
-     * RFC allows such a behavior but discourages the usage so we provide it for
-     * user which have an ldap with anonymous login.
+     * RFC allows such a behavior but discourages the usage, so we provide it for
+     * user which have a ldap with anonymous login.
      */
-    if (!ldapConfiguration.isAllowAnonymousLogin() && password.equals("")) {
+    if (!ldapConfiguration.isAllowAnonymousLogin() && password.isEmpty()) {
       return false;
     }
 
@@ -419,7 +223,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
       try {
         // bind authenticate for user + supplied password
-        context = openContext(user.getDn(), password);
+        context = ldapClient.openContext(user.getDn(), password);
         return true;
 
       } catch (LdapAuthenticationException e) {
@@ -430,7 +234,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
         }
 
       } finally {
-        closeLdapCtx(context);
+        ldapClient.closeLdapCtx(context);
 
       }
 
@@ -481,13 +285,26 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
     return search.toString();
   }
+  protected boolean isAuthenticatedAndAuthorized(String userId) {
+    return isAuthenticatedUser(userId) || isAuthorizedToRead(USER, userId);
+  }
+
+  public List<User> findUsersWithoutGroupId(LdapUserQueryImpl query, String userBaseDn, boolean ignorePagination) {
+    initializeControls(query);
+
+    return retrieveResults(userBaseDn,
+        getUserSearchFilter(query),
+        this::transformUser,
+        this::isAuthenticatedAndAuthorized,
+        query.getMaxResults(),
+        query.getFirstResult(),
+        ignorePagination);
+  }
 
   // Groups ///////////////////////////////////////////////
 
   public Group findGroupById(String groupId) {
-    return createGroupQuery(getCommandContext())
-            .groupId(groupId)
-            .singleResult();
+    return createGroupQuery(getCommandContext()).groupId(groupId).singleResult();
   }
 
   public GroupQuery createGroupQuery() {
@@ -499,8 +316,12 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   }
 
   public long findGroupCountByQueryCriteria(LdapGroupQuery ldapGroupQuery) {
-    ensureContextInitialized();
+    ldapClient.ensureContextInitialized();
     return findGroupByQueryCriteria(ldapGroupQuery).size();
+  }
+
+  protected boolean isAuthorizedToReadGroup(String groupId) {
+    return isAuthorizedToRead(GROUP, groupId);
   }
 
   public List<Group> findGroupByQueryCriteria(LdapGroupQuery query) {
@@ -510,91 +331,19 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       query.groupNameLike(query.getNameLike().replaceAll(DB_QUERY_WILDCARD, LDAP_QUERY_WILDCARD));
     }
 
-    StringBuilder resultLogger = new StringBuilder();
-    if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-      resultLogger.append("findGroupByQueryCriteria: from ");
-      resultLogger.append(query.getFirstResult());
-    }
-    ensureContextInitialized();
+    ldapClient.ensureContextInitialized();
 
     String groupBaseDn = composeDn(ldapConfiguration.getGroupSearchBase(), ldapConfiguration.getBaseDn());
 
-    NamingEnumeration<SearchResult> enumeration = null;
+    initializeControls(query);
 
-    try {
-      initializeControls(query, resultLogger);
-      String filter = getGroupSearchFilter(query);
-      // perform client-side paging
-      List<Group> groupList = new ArrayList<>();
-      int resultCount = 0;
-      int pageNumber = 0;
-
-      do {
-        enumeration = initialContext.search(groupBaseDn, filter, ldapConfiguration.getSearchControls());
-        pageNumber++;
-
-        if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-          resultLogger.append("; (page:");
-          resultLogger.append(pageNumber);
-          resultLogger.append(") [");
-        }
-
-        while (enumeration.hasMoreElements() && groupList.size() < query.getMaxResults()) {
-          SearchResult result = enumeration.nextElement();
-
-          GroupEntity group = transformGroup(result);
-
-          String groupId = group.getId();
-
-          if (groupId == null) {
-            LdapPluginLogger.INSTANCE.invalidLdapGroupReturned(group, result);
-          } else {
-            if (isAuthorized(READ, GROUP, groupId)) {
-
-              if (resultCount >= query.getFirstResult()) {
-                if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-                  resultLogger.append(group);
-                  resultLogger.append(" based on ");
-                  resultLogger.append(result);
-                  resultLogger.append(", ");
-                }
-                groupList.add(group);
-              }
-              resultCount++;
-            }
-          }
-        }
-      } while (isNextPageDetected(resultLogger) && groupList.size() < query.getMaxResults());
-
-      if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-        resultLogger.append("; Result size()=");
-        resultLogger.append(groupList.size());
-        resultLogger.append(" FirstResult=");
-        resultLogger.append(groupList.isEmpty() ? "--" : groupList.get(0).getName() + "]");
-      }
-      return groupList;
-
-    } catch (NamingException e) {
-      if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-        resultLogger.append("; Exception ");
-        resultLogger.append(e);
-      }
-      throw new IdentityProviderException("Could not query for users " + resultLogger, e);
-
-    } finally {
-      try {
-        if (enumeration != null) {
-          enumeration.close();
-        }
-      } catch (Exception e) {
-        // ignore silently
-      }
-      if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-        resultLogger.append("]");
-        LdapPluginLogger.INSTANCE.groupQueryResult(resultLogger.toString());
-      }
-
-    }
+    return retrieveResults(groupBaseDn,
+        getGroupSearchFilter(query),
+        this::transformGroup,
+        this::isAuthorizedToReadGroup,
+        query.getMaxResults(),
+        query.getFirstResult(),
+        false);
   }
 
   protected String getGroupSearchFilter(LdapGroupQuery query) {
@@ -638,10 +387,60 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
   // Utils ////////////////////////////////////////////
 
+  @SuppressWarnings("unchecked")
+  protected <E extends DbEntity, T> List<T> retrieveResults(String baseDn,
+                                                            String filter,
+                                                            Function<SearchResult, E> transformEntity,
+                                                            Predicate<String> resultCountPredicate,
+                                                            int maxResults,
+                                                            int firstResult,
+                                                            boolean ignorePagination) {
+    StringBuilder resultLogger = new StringBuilder();
+    if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
+      resultLogger.append("LDAP query results: [");
+    }
+
+    List<T> entities = new ArrayList<>();
+
+    int resultCount = 0;
+
+    do {
+      try (LdapSearchResults searchResults = ldapClient.search(baseDn, filter)) {
+        while (searchResults.hasMoreElements() && (entities.size() < maxResults || ignorePagination)) {
+          SearchResult result = searchResults.nextElement();
+
+          E entity = transformEntity.apply(result);
+
+          String id = entity.getId();
+          if (id != null && resultCountPredicate.test(id)) {
+            if (resultCount >= firstResult || ignorePagination) {
+              if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
+                resultLogger.append(entity);
+                resultLogger.append(" based on ");
+                resultLogger.append(result);
+                resultLogger.append(", ");
+              }
+              entities.add((T) entity);
+            }
+            resultCount++;
+          } else {
+            LdapPluginLogger.INSTANCE.invalidLdapEntityReturned(entity, result);
+
+          }
+        }
+      }
+    } while (paginationContinues(entities.size(), maxResults));
+
+    if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
+      resultLogger.append("]");
+      LdapPluginLogger.INSTANCE.queryResult(resultLogger.toString());
+    }
+
+    return entities;
+  }
+
   protected String getDnForUser(String userId) {
-    LdapUserEntity user = (LdapUserEntity) createUserQuery(getCommandContext())
-            .userId(userId)
-            .singleResult();
+    LdapUserEntity user = (LdapUserEntity) createUserQuery(getCommandContext()).userId(userId).singleResult();
     if (user == null) {
       return "";
     } else {
@@ -650,22 +449,11 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   }
 
   protected String getDnForGroup(String groupId) {
-    LdapGroupEntity group = (LdapGroupEntity) createGroupQuery(getCommandContext())
-            .groupId(groupId)
-            .singleResult();
+    LdapGroupEntity group = (LdapGroupEntity) createGroupQuery(getCommandContext()).groupId(groupId).singleResult();
     if (group == null) {
       return "";
     } else {
       return group.getDn();
-    }
-  }
-
-  protected String getStringAttributeValue(String attrName, Attributes attributes) throws NamingException {
-    Attribute attribute = attributes.get(attrName);
-    if (attribute != null) {
-      return (String) attribute.get();
-    } else {
-      return null;
     }
   }
 
@@ -677,24 +465,24 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     writer.write(")");
   }
 
-  protected LdapUserEntity transformUser(SearchResult result) throws NamingException {
+  protected UserEntity transformUser(SearchResult result) {
     final Attributes attributes = result.getAttributes();
     LdapUserEntity user = new LdapUserEntity();
     user.setDn(result.getNameInNamespace());
-    user.setId(getStringAttributeValue(ldapConfiguration.getUserIdAttribute(), attributes));
-    user.setFirstName(getStringAttributeValue(ldapConfiguration.getUserFirstnameAttribute(), attributes));
-    user.setLastName(getStringAttributeValue(ldapConfiguration.getUserLastnameAttribute(), attributes));
-    user.setEmail(getStringAttributeValue(ldapConfiguration.getUserEmailAttribute(), attributes));
+    user.setId(LdapClient.getValue(ldapConfiguration.getUserIdAttribute(), attributes));
+    user.setFirstName(LdapClient.getValue(ldapConfiguration.getUserFirstnameAttribute(), attributes));
+    user.setLastName(LdapClient.getValue(ldapConfiguration.getUserLastnameAttribute(), attributes));
+    user.setEmail(LdapClient.getValue(ldapConfiguration.getUserEmailAttribute(), attributes));
     return user;
   }
 
-  protected GroupEntity transformGroup(SearchResult result) throws NamingException {
+  protected GroupEntity transformGroup(SearchResult result) {
     final Attributes attributes = result.getAttributes();
     LdapGroupEntity group = new LdapGroupEntity();
     group.setDn(result.getNameInNamespace());
-    group.setId(getStringAttributeValue(ldapConfiguration.getGroupIdAttribute(), attributes));
-    group.setName(getStringAttributeValue(ldapConfiguration.getGroupNameAttribute(), attributes));
-    group.setType(getStringAttributeValue(ldapConfiguration.getGroupTypeAttribute(), attributes));
+    group.setId(LdapClient.getValue(ldapConfiguration.getGroupIdAttribute(), attributes));
+    group.setName(LdapClient.getValue(ldapConfiguration.getGroupNameAttribute(), attributes));
+    group.setType(LdapClient.getValue(ldapConfiguration.getGroupTypeAttribute(), attributes));
     return group;
   }
 
@@ -704,64 +492,54 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
    * @param query query asks, contains the order by requested
    * @return list of control to send to LDAP
    */
-  protected List<Control> getSortingControls(AbstractQuery<?, ?> query, StringBuilder resultLogger) {
+  protected List<Control> getSortingControls(AbstractQuery<?, ?> query) {
+    List<Control> controls = new ArrayList<>();
 
-    try {
-      List<Control> controls = new ArrayList<>();
+    List<QueryOrderingProperty> orderBy = query.getOrderingProperties();
+    if (orderBy != null) {
+      for (QueryOrderingProperty orderingProperty : orderBy) {
+        String propertyName = orderingProperty.getQueryProperty().getName();
+        SortKey sortKey = getSortKey(query, propertyName, orderingProperty);
 
-      List<QueryOrderingProperty> orderBy = query.getOrderingProperties();
-      if (orderBy != null) {
-        for (QueryOrderingProperty orderingProperty : orderBy) {
-          String propertyName = orderingProperty.getQueryProperty().getName();
-          if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-            resultLogger.append(", OrderBy[");
-            resultLogger.append(propertyName);
-            resultLogger.append("-");
-            resultLogger.append(orderingProperty.getDirection() == null ? "no_direction(desc)" : orderingProperty.getDirection().getName());
-            resultLogger.append("]");
-          }
-          SortKey sortKey = null;
-          if (query instanceof LdapUserQueryImpl) {
-            if (UserQueryProperty.USER_ID.getName().equals(propertyName)) {
-              sortKey = new SortKey(ldapConfiguration.getUserIdAttribute(), Direction.ASCENDING.equals(orderingProperty.getDirection()),
-                  null);
-
-            } else if (UserQueryProperty.EMAIL.getName().equals(propertyName)) {
-              sortKey = new SortKey(ldapConfiguration.getUserEmailAttribute(), Direction.ASCENDING.equals(orderingProperty.getDirection()),
-                  null);
-
-            } else if (UserQueryProperty.FIRST_NAME.getName().equals(propertyName)) {
-              sortKey = new SortKey(ldapConfiguration.getUserFirstnameAttribute(), Direction.ASCENDING.equals(orderingProperty.getDirection()),
-                  null);
-
-            } else if (UserQueryProperty.LAST_NAME.getName().equals(propertyName)) {
-              sortKey = new SortKey(ldapConfiguration.getUserLastnameAttribute(), Direction.ASCENDING.equals(orderingProperty.getDirection()),
-                  null);
-            }
-          } else if (query instanceof LdapGroupQuery) {
-              if (GroupQueryProperty.GROUP_ID.getName().equals(propertyName)) {
-                sortKey = new SortKey(ldapConfiguration.getGroupIdAttribute(),
-                        Direction.ASCENDING.equals(orderingProperty.getDirection()),
-                        null);
-              } else if (GroupQueryProperty.NAME.getName().equals(propertyName)) {
-                sortKey = new SortKey(ldapConfiguration.getGroupNameAttribute(),
-                        Direction.ASCENDING.equals(orderingProperty.getDirection()),
-                        null);
-              }
-              // not possible to order by Type: LDAP may not support the type
-          }
-
-          if (sortKey != null) {
-            controls.add(new SortControl(new SortKey[] { sortKey }, Control.CRITICAL));
-          }
+        if (sortKey != null) {
+          LdapClient.addSortKey(sortKey, controls);
         }
       }
-
-      return controls;
-
-    } catch (IOException e) {
-      throw new IdentityProviderException("Exception while setting paging settings", e);
     }
+
+    return controls;
+  }
+
+  protected SortKey getSortKey(AbstractQuery<?, ?> query, String propertyName, QueryOrderingProperty orderingProperty) {
+    if (query instanceof LdapUserQueryImpl) {
+      if (UserQueryProperty.USER_ID.getName().equals(propertyName)) {
+        return new SortKey(ldapConfiguration.getUserIdAttribute(),
+            Direction.ASCENDING.equals(orderingProperty.getDirection()), null);
+
+      } else if (UserQueryProperty.EMAIL.getName().equals(propertyName)) {
+        return new SortKey(ldapConfiguration.getUserEmailAttribute(),
+            Direction.ASCENDING.equals(orderingProperty.getDirection()), null);
+
+      } else if (UserQueryProperty.FIRST_NAME.getName().equals(propertyName)) {
+        return new SortKey(ldapConfiguration.getUserFirstnameAttribute(),
+            Direction.ASCENDING.equals(orderingProperty.getDirection()), null);
+
+      } else if (UserQueryProperty.LAST_NAME.getName().equals(propertyName)) {
+        return new SortKey(ldapConfiguration.getUserLastnameAttribute(),
+            Direction.ASCENDING.equals(orderingProperty.getDirection()), null);
+      }
+    } else if (query instanceof LdapGroupQuery) {
+      if (GroupQueryProperty.GROUP_ID.getName().equals(propertyName)) {
+        return new SortKey(ldapConfiguration.getGroupIdAttribute(),
+            Direction.ASCENDING.equals(orderingProperty.getDirection()), null);
+      } else if (GroupQueryProperty.NAME.getName().equals(propertyName)) {
+        return new SortKey(ldapConfiguration.getGroupNameAttribute(),
+            Direction.ASCENDING.equals(orderingProperty.getDirection()), null);
+      }
+      // not possible to order by Type: LDAP may not support the type
+    }
+
+    return null;
   }
 
   protected String composeDn(String... parts) {
@@ -789,17 +567,17 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   /**
    * @return true if the passed-in user is currently authenticated
    */
-  protected boolean isAuthenticatedUser(UserEntity user) {
-    if (user.getId() == null) {
+  protected boolean isAuthenticatedUser(String userid) {
+    if (userid == null) {
       return false;
     }
-    return user.getId().equalsIgnoreCase(getCommandContext().getAuthenticatedUserId());
+    return userid.equalsIgnoreCase(getCommandContext().getAuthenticatedUserId());
   }
 
-  protected boolean isAuthorized(Permission permission, Resource resource, String resourceId) {
-    return !ldapConfiguration.isAuthorizationCheckEnabled() || getCommandContext()
-            .getAuthorizationManager()
-            .isAuthorized(permission, resource, resourceId);
+  protected boolean isAuthorizedToRead(Resource resource, String resourceId) {
+    return !ldapConfiguration.isAuthorizationCheckEnabled() ||
+        getCommandContext().getAuthorizationManager()
+            .isAuthorized(READ, resource, resourceId);
   }
 
   // Based on https://www.owasp.org/index.php/Preventing_LDAP_Injection_in_Java
@@ -808,23 +586,23 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     for (int i = 0; i < filter.length(); i++) {
       char curChar = filter.charAt(i);
       switch (curChar) {
-        case '\\':
-          sb.append("\\5c");
-          break;
-        case '*':
-          sb.append("\\2a");
-          break;
-        case '(':
-          sb.append("\\28");
-          break;
-        case ')':
-          sb.append("\\29");
-          break;
-        case '\u0000':
-          sb.append("\\00");
-          break;
-        default:
-          sb.append(curChar);
+      case '\\':
+        sb.append("\\5c");
+        break;
+      case '*':
+        sb.append("\\2a");
+        break;
+      case '(':
+        sb.append("\\28");
+        break;
+      case ')':
+        sb.append("\\29");
+        break;
+      case '\u0000':
+        sb.append("\\00");
+        break;
+      default:
+        sb.append(curChar);
       }
     }
     return sb.toString();
@@ -833,55 +611,21 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   /**
    * Initializes paged results and sort controls. Might not be supported by all LDAP implementations.
    */
-  protected void initializeControls(AbstractQuery<?, ?> query, StringBuilder resultLogger) throws NamingException {
-    if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-      resultLogger.append(query.getFirstResult());
-
-      resultLogger.append(" ");
-      resultLogger.append(query);
-      resultLogger.append(" ");
-
-
-      resultLogger.append(ldapConfiguration.isSortControlSupported() ? " -sort-" : "-nosort-");
-
-      if (!isPaginationSupported()) {
-        resultLogger.append(" -noPagination");
-
-      } else {
-        resultLogger.append(" -pagination(");
-        resultLogger.append(ldapConfiguration.getPageSize());
-        resultLogger.append(")");
-      }
-    }
-
+  protected void initializeControls(AbstractQuery<?, ?> query) {
     List<Control> listControls = new ArrayList<>();
     if (ldapConfiguration.isSortControlSupported()) {
-      listControls.addAll(getSortingControls(query, resultLogger));
+      listControls.addAll(getSortingControls(query));
     }
 
     try {
       if (isPaginationSupported()) {
-        listControls.add(new PagedResultsControl(getPageSize(), Control.NONCRITICAL));
+        LdapClient.addPaginationControl(listControls, null, getPageSize());
       }
+    } catch (IdentityProviderException ignored) {
+      // Ignore exception when pagination is not supported
+    } finally {
       if (!listControls.isEmpty()) {
-        initialContext.setRequestControls(listControls.toArray(new Control[0]));
-      }
-    } catch (NamingException | IOException e) {
-      // page control is not supported by this LDAP
-      if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-        resultLogger.append("Unsupported page Control;");
-      }
-      // set supported list controls
-      if (!listControls.isEmpty()) {
-        try {
-          initialContext.setRequestControls(listControls.toArray(new Control[0]));
-        } catch (NamingException ne) {
-          // this exception is not related to the page control, so throw it
-          if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-            resultLogger.append("Unsupported Control;");
-          }
-          throw ne;
-        }
+        ldapClient.setRequestControls(listControls);
       }
     }
   }
@@ -889,73 +633,45 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   /**
    * Check in the context if we reach the last page on the query
    *
-   * @param resultLogger Logger to send information
    * @return new page detected
    */
-  protected boolean isNextPageDetected(StringBuilder resultLogger) {
+  protected boolean nextPageDetected() {
     // if the pagination is not activated, there isn't a next page.
     if (!isPaginationSupported()) {
       return false;
     }
 
-    try {
-      Control[] controls = initialContext.getResponseControls();
-      if (controls == null) {
-        if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-          resultLogger.append("No-controls-from-the-server");
-        }
-        return false;
-      }
-
-      List<Control> newControlList = new ArrayList<>();
-      boolean newPageDetected = false;
-      for (Control control : controls) {
-        if (control instanceof PagedResultsResponseControl) {
-          PagedResultsResponseControl prrc = (PagedResultsResponseControl) control;
-          byte[] cookie = prrc.getCookie();
-
-          if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-            resultLogger.append("; End-of-page? ");
-            resultLogger.append((cookie == null ? "No-more-page" : "Next-page-detected"));
-          }
-          // Re-activate paged results
-          try {
-            newControlList.add(new PagedResultsControl(getPageSize(), cookie, Control.CRITICAL));
-          } catch (IOException e) {
-            if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-              resultLogger.append("Error-when-set-again-the-new-cookie ");
-              resultLogger.append(e);
-            }
-            // stop to loop
-            return false;
-          }
-          newPageDetected = cookie != null;
-        }
-      }
-      if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-        resultLogger.append("; SetAgain controlList.size()=");
-        resultLogger.append(newControlList.size());
-      }
-      if (!newControlList.isEmpty()) {
-        // This is more an UPDATE than a SET. All previous control (sorting) does not need to
-        // be set again, the current context keeps them, and the next page is correctly ordered for example.
-        // In the current context, just the PageResultControl must be re-set (even this a xxxResultxxx)
-        // All another result (SortResponseControl for example) must not be set again, nor the SortControl.
-        initialContext.setRequestControls(newControlList.toArray(new Control[0]));
-      }
-      if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-        resultLogger.append("; Done. NewPageDetected=");
-        resultLogger.append(newPageDetected);
-      }
-
-      return newPageDetected;
-    } catch (NamingException ne) {
-      if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
-        resultLogger.append("Could not manage ResponseControl; ");
-        resultLogger.append(ne);
-      }
+    Control[] controls = ldapClient.getResponseControls();
+    if (controls == null) {
       return false;
     }
+
+    List<Control> newControlList = new ArrayList<>();
+    boolean newPageDetected = false;
+    for (Control control : controls) {
+      if (control instanceof PagedResultsResponseControl) {
+        PagedResultsResponseControl prrc = (PagedResultsResponseControl) control;
+        byte[] cookie = prrc.getCookie();
+
+        // Re-activate paged results
+        try {
+          LdapClient.addPaginationControl(newControlList, cookie, getPageSize());
+        } catch (IdentityProviderException e) {
+          return false;
+        }
+        newPageDetected = cookie != null;
+      }
+    }
+
+    if (!newControlList.isEmpty()) {
+      // This is more an UPDATE than a SET. All previous control (sorting) does not need to
+      // be set again, the current context keeps them, and the next page is correctly ordered for example.
+      // In the current context, just the PageResultControl must be re-set (even this a xxxResultxxx)
+      // All another result (SortResponseControl for example) must not be set again, nor the SortControl.
+      ldapClient.setRequestControls(newControlList);
+    }
+
+    return newPageDetected;
   }
 
   protected boolean isPaginationSupported() {
@@ -986,4 +702,5 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     // since multi-tenancy is not supported for the LDAP plugin, always return null
     return null;
   }
+
 }
