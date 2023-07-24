@@ -62,7 +62,9 @@ public class ExampleCompatibilityTest extends DmnModelTest {
          // DMN 1.2
          {Dmn.readModelFromStream(ExampleCompatibilityTest.class.getResourceAsStream("Example-DMN-1.2.dmn"))},
          // DMN 1.3
-         {Dmn.readModelFromStream(ExampleCompatibilityTest.class.getResourceAsStream("Example-DMN-1.3.dmn"))}
+         {Dmn.readModelFromStream(ExampleCompatibilityTest.class.getResourceAsStream("Example-DMN-1.3.dmn"))},
+         // DMN 1.4
+         {Dmn.readModelFromStream(ExampleCompatibilityTest.class.getResourceAsStream("Example-DMN-1.4.dmn"))}
      });
    }
 
