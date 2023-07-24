@@ -23,6 +23,7 @@ public final class DmnModelConstants {
   public static final String DMN12_NS = "http://www.omg.org/spec/DMN/20180521/MODEL/";
   public static final String DMN13_NS = "https://www.omg.org/spec/DMN/20191111/MODEL/";
   public static final String DMN14_NS = "https://www.omg.org/spec/DMN/20211108/MODEL/";
+  public static final String DMN15_NS = "https://www.omg.org/spec/DMN/20230324/MODEL/";
   public static final String LATEST_DMN_NS = DMN13_NS;
 
   /**
@@ -40,7 +41,7 @@ public final class DmnModelConstants {
   public static final String DMN_12_SCHEMA_LOCATION = "org/camunda/bpm/model/dmn/schema/DMN12.xsd";
   public static final String DMN_13_SCHEMA_LOCATION = "org/camunda/bpm/model/dmn/schema/DMN13.xsd";
   public static final String DMN_14_SCHEMA_LOCATION = "org/camunda/bpm/model/dmn/schema/DMN14.xsd";
-
+  public static final String DMN_15_SCHEMA_LOCATION = "org/camunda/bpm/model/dmn/schema/DMN15.xsd";
   /**
    * The location of the DMN 1.1 XML schema released with Camunda 7.4.0
    */
@@ -51,6 +52,7 @@ public final class DmnModelConstants {
   public static final String FEEL12_NS = "http://www.omg.org/spec/DMN/20180521/FEEL/";
   public static final String FEEL13_NS = "https://www.omg.org/spec/DMN/20191111/FEEL/";
   public static final String FEEL14_NS = "https://www.omg.org/spec/DMN/20211108/FEEL/";
+  public static final String FEEL15_NS = "https://www.omg.org/spec/DMN/20230324/FEEL/";
 
   /** Camunda namespace */
   public static final String CAMUNDA_NS = "http://camunda.org/schema/1.0/dmn";
