@@ -68,7 +68,8 @@ public class DmnExpressionTransformHelper {
     String expressionLanguage = context.getModelInstance().getDefinitions().getExpressionLanguage();
     if (!DefaultDmnEngineConfiguration.FEEL_EXPRESSION_LANGUAGE.equals(expressionLanguage) &&
         !DefaultDmnEngineConfiguration.FEEL_EXPRESSION_LANGUAGE_DMN12.equals(expressionLanguage) &&
-        !DefaultDmnEngineConfiguration.FEEL_EXPRESSION_LANGUAGE_DMN13.equals(expressionLanguage)) {
+        !DefaultDmnEngineConfiguration.FEEL_EXPRESSION_LANGUAGE_DMN13.equals(expressionLanguage) &&
+        !DefaultDmnEngineConfiguration.FEEL_EXPRESSION_LANGUAGE_DMN14.equals(expressionLanguage)) {
       return expressionLanguage;
     }
     else {
