@@ -5,7 +5,6 @@
 #   databases: [LIST; OPTIONAL; Doc: defines the databases to be used in the stage generation ]
 engine-webapp-unit:
   databases:
-  - 'postgresql_122'
   - 'postgresql_132'
   - 'postgresql_142'
   - 'postgresql_150'
