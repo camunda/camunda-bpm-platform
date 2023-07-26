@@ -70,16 +70,31 @@ public class SpringTransactionInterceptor extends CommandInterceptor {
       // don't use lambdas here => CAM-12810
       return (T) transactionTemplate.execute((TransactionCallback) status -> next.execute(command));
     } catch (TransactionSystemException ex) {
-      // When CockroachDB is used, a CRDB concurrency error may occur on transaction commit.
-      // To ensure that these errors are still detected as OLEs, we must catch them and wrap
-      // them in a CrdbTransactionRetryException
-      SQLException sqlException = (SQLException) ex.getCause();
-      if (processEngineConfiguration != null
-          && DbSqlSession.isCrdbConcurrencyConflictOnCommit(sqlException, processEngineConfiguration)) {
-        throw ProcessEngineLogger.PERSISTENCE_LOGGER.crdbTransactionRetryExceptionOnCommit(ex);
+      public <T> T execute(final Command<T> command) {
+    TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+    transactionTemplate.setPropagationBehavior(transactionPropagation);
+    try {
+      // don't use lambdas here => CAM-12810
+      return (T) transactionTemplate.execute((TransactionCallback) status -> next.execute(command));
+    } catch (TransactionSystemException ex) {
+      Throwable cause = ex.getCause();
+       
+      if (cause != null && cause instanceof SQLException) {
+        handleCrdbConcurrencyError((SQLException) cause);
       } else {
         throw ex;
       }
     }
-  }
+    
+    /**
+      * When CockroachDB is used, a CRDB concurrency error may occur on transaction commit.
+      * To ensure that these errors are still detected as OLEs, we must catch them and wrap
+      * them in a CrdbTransactionRetryException
+      */  
+    private void handleCrdbConcurrencyError(SQLException sqlException) 
+      if (processEngineConfiguration != null
+          && DbSqlSession.isCrdbConcurrencyConflictOnCommit(sqlException, processEngineConfiguration)) {
+        throw ProcessEngineLogger.PERSISTENCE_LOGGER.crdbTransactionRetryExceptionOnCommit(ex);
+      }
+    }
 }
