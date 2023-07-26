@@ -70,13 +70,6 @@ public class SpringTransactionInterceptor extends CommandInterceptor {
       // don't use lambdas here => CAM-12810
       return (T) transactionTemplate.execute((TransactionCallback) status -> next.execute(command));
     } catch (TransactionSystemException ex) {
-      public <T> T execute(final Command<T> command) {
-    TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-    transactionTemplate.setPropagationBehavior(transactionPropagation);
-    try {
-      // don't use lambdas here => CAM-12810
-      return (T) transactionTemplate.execute((TransactionCallback) status -> next.execute(command));
-    } catch (TransactionSystemException ex) {
       Throwable cause = ex.getCause();
        
       if (cause != null && cause instanceof SQLException) {
