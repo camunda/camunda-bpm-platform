@@ -73,9 +73,9 @@ public class SpringTransactionInterceptor extends CommandInterceptor {
       Throwable cause = ex.getCause();
 
       if (cause != null && cause instanceof SQLException) {
-          handleCrdbConcurrencyError((SQLException) cause);
+        handleCrdbConcurrencyError((SQLException) cause);
       } else {
-          throw ex;
+        throw ex;
       }
     }
   }
