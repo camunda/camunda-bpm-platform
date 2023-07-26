@@ -6,6 +6,6 @@
     "build": "redoc-cli build -t ./template.hbs target/dependency/openapi.json -o target/index.html"
   },
   "dependencies": {
-    "redoc-cli": "0.13.20"
+    "redoc-cli": "0.13.21"
   }
 }
