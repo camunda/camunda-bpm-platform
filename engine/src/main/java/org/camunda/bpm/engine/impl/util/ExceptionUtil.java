@@ -351,7 +351,6 @@ public class ExceptionUtil {
 
     } catch (Exception ex) {
       throw wrapPersistenceException(ex);
-
     }
   }
 

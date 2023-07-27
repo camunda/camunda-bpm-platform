@@ -31,31 +31,36 @@ public class ExceptionLogger extends BaseLogger {
 
   public static final String PROJECT_CODE = "ENGINE-REST";
   public static final String REST_API = "org.camunda.bpm.engine.rest.exception";
+
   public static final ExceptionLogger REST_LOGGER = BaseLogger.createLogger(ExceptionLogger.class,
-                                                                               PROJECT_CODE,
-                                                                               REST_API,
-                                                                               "HTTP");
+      PROJECT_CODE,
+      REST_API,
+      "HTTP"
+  );
 
   public void log(Throwable throwable) {
     Response.Status status = ExceptionHandlerHelper.getInstance().getStatus(throwable);
     int statusCode = status.getStatusCode();
 
-    if (statusCode >= 500) {
-      if (persistenceConnectionError(throwable)) {
-        // Persistence connection exceptions are logged as errors
-        logError(String.valueOf(statusCode), getStackTrace(throwable));
-
-      } else {
-        logWarn(String.valueOf(statusCode), getStackTrace(throwable));
-
-      }
-    } else {
+    if (statusCode < 500) {
       logDebug(String.valueOf(statusCode), getStackTrace(throwable));
+      return;
     }
+
+    logInternalServerAndOtherStatusCodes(throwable, statusCode);
+  }
+
+  protected void logInternalServerAndOtherStatusCodes(Throwable throwable, int statusCode) {
+
+    if (isPersistenceConnectionError(throwable)) {
+      logError(String.valueOf(statusCode), getStackTrace(throwable));
+      return;
+    }
+
+    logWarn(String.valueOf(statusCode), getStackTrace(throwable));
   }
 
   protected String getStackTrace(Throwable aThrowable) {
-
     final Writer result = new StringWriter();
     final PrintWriter printWriter = new PrintWriter(result);
     aThrowable.printStackTrace(printWriter);
@@ -63,22 +68,22 @@ public class ExceptionLogger extends BaseLogger {
     return result.toString();
   }
 
-  protected boolean persistenceConnectionError(Throwable throwable) {
-    if (throwable instanceof ProcessEnginePersistenceException) {
-      SQLException sqlException = (SQLException) throwable.getCause().getCause();
-      if (sqlException != null) {
-        String sqlState = sqlException.getSQLState();
-        return sqlState != null && sqlState.startsWith(PERSISTENCE_CONNECTION_ERROR_CLASS);
+  protected boolean isPersistenceConnectionError(Throwable throwable) {
+    boolean isPersistenceException = (throwable instanceof ProcessEnginePersistenceException);
 
-      } else {
-        return false;
-
-      }
-
-    } else {
+    if (!isPersistenceException) {
       return false;
-
     }
+
+    SQLException sqlException = (SQLException) throwable.getCause().getCause();
+
+    if (sqlException == null) {
+      return false;
+    }
+
+    String sqlState = sqlException.getSQLState();
+
+    return sqlState != null && sqlState.startsWith(PERSISTENCE_CONNECTION_ERROR_CLASS);
   }
 
 }
