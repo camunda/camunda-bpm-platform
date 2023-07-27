@@ -348,7 +348,6 @@ public class ExceptionUtil {
   public static <T> T doWithExceptionWrapper(Supplier<T> supplier) {
     try {
       return supplier.get();
-
     } catch (Exception ex) {
       throw wrapPersistenceException(ex);
     }

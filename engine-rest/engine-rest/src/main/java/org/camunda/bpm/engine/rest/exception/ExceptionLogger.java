@@ -60,10 +60,10 @@ public class ExceptionLogger extends BaseLogger {
     logWarn(String.valueOf(statusCode), getStackTrace(throwable));
   }
 
-  protected String getStackTrace(Throwable aThrowable) {
+  protected String getStackTrace(Throwable throwable) {
     final Writer result = new StringWriter();
     final PrintWriter printWriter = new PrintWriter(result);
-    aThrowable.printStackTrace(printWriter);
+    throwable.printStackTrace(printWriter);
 
     return result.toString();
   }
