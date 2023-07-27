@@ -73,7 +73,7 @@ public class SpringTransactionInterceptor extends CommandInterceptor {
       Throwable cause = ex.getCause();
 
       if (cause != null && cause instanceof SQLException) {
-        handleCrdbConcurrencyError((SQLException) cause);
+        handleCrdbConcurrencyError((SQLException) cause, ex);
       } else {
         throw ex;
       }
@@ -85,11 +85,11 @@ public class SpringTransactionInterceptor extends CommandInterceptor {
     * To ensure that these errors are still detected as OLEs, we must catch them and wrap
     * them in a CrdbTransactionRetryException
     */
-  private void handleCrdbConcurrencyError(SQLException sqlException)
+  private void handleCrdbConcurrencyError(SQLException sqlException, TransactionSystemException cause)
     if (processEngineConfiguration != null
         && DbSqlSession.isCrdbConcurrencyConflictOnCommit(sqlException, processEngineConfiguration)) {
 
-      throw ProcessEngineLogger.PERSISTENCE_LOGGER.crdbTransactionRetryExceptionOnCommit(ex);
+      throw ProcessEngineLogger.PERSISTENCE_LOGGER.crdbTransactionRetryExceptionOnCommit(cause);
     }
   }
 }
