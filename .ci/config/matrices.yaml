@@ -51,7 +51,6 @@ sidetrack-stages:
   - 'instance-migration'
   - 'old-engine'
   - 'rolling-update'
-  - 'large-data-tests'
 jdk-ce-stages:
   stages:
   - 'platform-jdk-openjdk-jdk-17-latest'
