@@ -445,26 +445,6 @@ pipeline {
             ])
           }
         }
-        stage('engine-UNIT-plugins') {
-          when {
-            expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels()
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMaven('engine/', 'clean test -Pcheck-plugins', runtimeStash: true)
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-                // archive any heap dumps generated in the target folder
-                cambpmArchiveArtifacts(false, '**/target/*.hprof')
-              }
-            ])
-          }
-        }
         stage('engine-UNIT-database-table-prefix') {
           when {
             expression {
