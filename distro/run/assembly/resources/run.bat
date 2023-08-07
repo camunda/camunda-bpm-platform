@@ -40,7 +40,7 @@ IF "x%JAVA_HOME%" == "x" (
 
 SET EXPECTED_JAVA_VERSION=17
 FOR /f "tokens=3" %%g IN ('JAVA -version 2^>^&1 ^| findstr /i "version"') DO (
-    SET JAVA_VERSION=%%g
+  SET JAVA_VERSION=%%g
 )
 SET JAVA_VERSION=%JAVA_VERSION:"=%
 ECHO Java version is %JAVA_VERSION%
