@@ -6,7 +6,10 @@
       tag = "Decision Definition"
       summary = "Update History Time to Live By Key And Tenant"
       desc = "Updates the latest version of the decision definition for tenant.
-              The field is used within [History cleanup](${docsUrl}/user-guide/process-engine/history/#history-cleanup)." />
+              The field is used within [History cleanup](${docsUrl}/user-guide/process-engine/history/#history-cleanup).
+              The value of the update is mandatory by default and does not allow `null` values. To enable them, please
+              set the feature flag `enforceHistoryTimeToLive` to `false`. Read more in [Configuration Properties]
+              (${docsUrl}/reference/deployment-descriptors/tags/process-engine#configuration-properties)" />
 
   "parameters" : [
 
