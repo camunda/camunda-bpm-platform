@@ -1737,7 +1737,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       initDatabaseVendorAndVersion(databaseMetaData);
 
     } catch (SQLException e) {
-      LOG.databaseConnectionAccessException(e);
+      throw LOG.databaseConnectionAccessException(e);
     } finally {
       try {
         if (connection != null) {
