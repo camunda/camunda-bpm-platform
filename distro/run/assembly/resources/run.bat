@@ -47,7 +47,7 @@ ECHO Java version is %JAVA_VERSION%
 FOR /f "delims=. tokens=1" %%v in ("%JAVA_VERSION%") do (
   IF %%v LSS %EXPECTED_JAVA_VERSION% (
     ECHO You must use at least JDK 17 to start Camunda Platform Run.
-    GOTO :End
+    GOTO :EOF
   )
 )
 
