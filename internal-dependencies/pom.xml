@@ -149,7 +149,7 @@
 
       <!-- groovy script engine dependencies -->
       <dependency>
-        <groupId>org.codehaus.groovy</groupId>
+        <groupId>org.apache.groovy</groupId>
         <artifactId>groovy-bom</artifactId>
         <version>${version.groovy}</version>
         <scope>import</scope>
