@@ -14,24 +14,13 @@
   <name>Camunda Platform - engine - REST - Root</name>
 
   <properties>
-    <version.rest-assured>4.5.0</version.rest-assured>
-    <!-- override groovy version with the one used by rest-assured -->
-    <version.groovy>3.0.9</version.groovy>
+    <version.rest-assured>5.3.1</version.rest-assured>
     <version.apache.httpcore>4.4.5</version.apache.httpcore>
     <version.commons-codec>1.15</version.commons-codec>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-      <!-- explicitly declare groovy dependencies, so it prevents our groovy version
-            from overriding the groovy version from rest-assured -->
-      <dependency>
-        <groupId>org.codehaus.groovy</groupId>
-        <artifactId>groovy-bom</artifactId>
-        <version>${version.groovy}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
       <dependency>
         <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-core-internal-dependencies</artifactId>
