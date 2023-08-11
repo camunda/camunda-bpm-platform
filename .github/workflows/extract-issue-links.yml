@@ -8,9 +8,7 @@ on:
         required: true
 
 jobs:
-  call-reusable-flow:
-    uses: camunda/automation-platform-github-actions/.github/workflows/extract-issue-links.yml@main
-    secrets: inherit
-    with:
-      versions: ${{ github.event.inputs.versions }}
-      translation-notification-matcher: 7\.[0-9]+\.0
+  log-input:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "received versions ${{ inputs.versions }}"
