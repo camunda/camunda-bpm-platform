@@ -63,6 +63,7 @@ public class InMemProcessEngineConfiguration {
     config.setHistory("audit");
     config.setJobExecutorActivate(false);
     config.setDbMetricsReporterActivate(false);
+    config.setEnforceHistoryTimeToLive(false);
 
     return config;
   }

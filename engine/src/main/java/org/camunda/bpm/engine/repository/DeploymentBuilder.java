@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipInputStream;
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.exception.NotFoundException;
@@ -214,6 +215,10 @@ public interface DeploymentBuilder {
    * @throws NotValidException
    *    if there are duplicate resource names from different deployments to re-deploy.
    *
+   * @throws ParseException
+   *    In case of a BPMN Parsing exception due to null historyTimeToLive. To disable this behaviour, configure the
+   *    feature flag `enforceHistoryTimeToLive` to `false`.
+   *
    * @throws AuthorizationException
    *  thrown if the current user does not possess the following permissions:
    *   <ul>
@@ -235,6 +240,10 @@ public interface DeploymentBuilder {
    *
    * @throws NotValidException
    *    if there are duplicate resource names from different deployments to re-deploy.
+   *
+   * @throws ParseException
+   *    In case of a BPMN Parsing exception due to null historyTimeToLive. To disable this behaviour, configure the
+   *    feature flag `enforceHistoryTimeToLive` to `false`.
    *
    * @throws AuthorizationException
    *  thrown if the current user does not possess the following permissions:

@@ -127,8 +127,11 @@ public class MultiEngineCommandContextTest {
 
   private ProcessEngine createProcessEngine(String name) {
     StandaloneInMemProcessEngineConfiguration processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
+
     processEngineConfiguration.setProcessEngineName(name);
     processEngineConfiguration.setJdbcUrl(String.format("jdbc:h2:mem:%s", name));
+    processEngineConfiguration.setEnforceHistoryTimeToLive(false);
+
     return processEngineConfiguration.buildProcessEngine();
   }
 

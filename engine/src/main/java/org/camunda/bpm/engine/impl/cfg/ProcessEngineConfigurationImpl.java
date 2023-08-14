@@ -927,7 +927,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * Feature flag that fails the deployment of resources that historyTimeToLive-aware (processes, cases, decisions) in
    * case it is null.
    */
-  protected boolean enforceHistoryTimeToLive = false;
+  protected boolean enforceHistoryTimeToLive = true;
 
   protected String batchOperationHistoryTimeToLive;
   protected Map<String, String> batchOperationsForHistoryCleanup;
