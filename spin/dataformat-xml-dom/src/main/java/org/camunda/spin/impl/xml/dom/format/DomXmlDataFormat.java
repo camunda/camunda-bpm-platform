@@ -16,14 +16,13 @@
  */
 package org.camunda.spin.impl.xml.dom.format;
 
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.Map;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerFactory;
-
-import java.util.Collections;
-import java.util.Map;
-
 import org.camunda.spin.impl.xml.dom.DomXmlAttribute;
 import org.camunda.spin.impl.xml.dom.DomXmlElement;
 import org.camunda.spin.impl.xml.dom.DomXmlLogger;
@@ -37,7 +36,6 @@ import org.w3c.dom.Element;
 
 /**
  * @author Daniel Meyer
- *
  */
 public class DomXmlDataFormat implements DataFormat<SpinXmlElement> {
 
@@ -54,13 +52,19 @@ public class DomXmlDataFormat implements DataFormat<SpinXmlElement> {
   public static final String XXE_PROPERTY = "xxe-processing";
   public static final String SP_PROPERTY = "secure-processing";
 
-  /** the DocumentBuilderFactory used by the reader */
+  /**
+   * the DocumentBuilderFactory used by the reader
+   */
   protected DocumentBuilderFactory documentBuilderFactory;
 
-  /** the TransformerFactory instance used by the writer */
+  /**
+   * the TransformerFactory instance used by the writer
+   */
   protected TransformerFactory transformerFactory;
 
-  /** the JaxBContextProvider instance used by this writer. */
+  /**
+   * the JaxBContextProvider instance used by this writer.
+   */
   protected JaxBContextProvider jaxBContextProvider;
 
   protected DomXmlDataFormatReader reader;
@@ -70,6 +74,8 @@ public class DomXmlDataFormat implements DataFormat<SpinXmlElement> {
   protected final String name;
 
   protected boolean prettyPrint;
+
+  protected InputStream formattingConfiguration;
 
   public DomXmlDataFormat(String name) {
     this(name, defaultDocumentBuilderFactory());
@@ -100,6 +106,7 @@ public class DomXmlDataFormat implements DataFormat<SpinXmlElement> {
     this.name = name;
     this.documentBuilderFactory = documentBuilderFactory;
     this.prettyPrint = true;
+    this.formattingConfiguration = null;
 
     LOG.usingDocumentBuilderFactory(documentBuilderFactory.getClass().getName());
 
@@ -115,14 +122,17 @@ public class DomXmlDataFormat implements DataFormat<SpinXmlElement> {
     this.mapper = new DomXmlDataFormatMapper(this);
   }
 
+  @Override
   public Class<? extends SpinXmlElement> getWrapperType() {
     return DomXmlElement.class;
   }
 
+  @Override
   public SpinXmlElement createWrapperInstance(Object parameter) {
     return createElementWrapper((Element) parameter);
   }
 
+  @Override
   public String getName() {
     return name;
   }
@@ -135,14 +145,17 @@ public class DomXmlDataFormat implements DataFormat<SpinXmlElement> {
     return new DomXmlAttribute(attr, this);
   }
 
+  @Override
   public DomXmlDataFormatReader getReader() {
     return reader;
   }
 
+  @Override
   public DomXmlDataFormatWriter getWriter() {
     return writer;
   }
 
+  @Override
   public DomXmlDataFormatMapper getMapper() {
     return mapper;
   }
@@ -180,6 +193,16 @@ public class DomXmlDataFormat implements DataFormat<SpinXmlElement> {
     this.prettyPrint = prettyPrint;
   }
 
+  public InputStream getFormattingConfiguration() {
+    return this.formattingConfiguration;
+  }
+
+  public void setFormattingConfiguration(InputStream formattingConfiguration) {
+    this.formattingConfiguration = formattingConfiguration;
+    //writer need a new formattingTemplate with the new formattingConfiguration
+    this.writer.setFormattingTemplates(this.writer.reloadFormattingTemplates());
+  }
+
   public static TransformerFactory defaultTransformerFactory() {
     return TransformerFactory.newInstance();
   }
@@ -188,8 +211,7 @@ public class DomXmlDataFormat implements DataFormat<SpinXmlElement> {
     return configurableDocumentBuilderFactory(Collections.emptyMap());
   }
 
-  public static DocumentBuilderFactory configurableDocumentBuilderFactory(
-      Map<String,Object> configurationProperties) {
+  public static DocumentBuilderFactory configurableDocumentBuilderFactory(Map<String, Object> configurationProperties) {
 
     DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 

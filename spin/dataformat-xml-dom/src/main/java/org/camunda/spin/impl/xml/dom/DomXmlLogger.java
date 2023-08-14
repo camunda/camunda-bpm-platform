@@ -17,7 +17,6 @@
 package org.camunda.spin.impl.xml.dom;
 
 import java.util.NoSuchElementException;
-
 import org.camunda.commons.logging.BaseLogger;
 import org.camunda.spin.impl.logging.SpinLogger;
 import org.camunda.spin.xml.SpinXPathException;
@@ -189,7 +188,7 @@ public class DomXmlLogger extends SpinLogger {
   }
 
   public SpinXmlDataFormatException unableToFindStripSpaceXsl(String expression) {
-    return new SpinXmlDataFormatException(exceptionMessage("037", "Unable to find strip-space.xsl '{}'", expression));
+    return new SpinXmlDataFormatException(exceptionMessage("037", "No formatting configuration defined and unable to find the default '{}'", expression));
   }
 
   public SpinXmlDataFormatException unableToLoadFormattingTemplates(Throwable cause) {

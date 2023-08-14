@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -53,6 +52,7 @@ public class DomXmlDataFormatWriter implements DataFormatWriter {
     this.formattingTemplates = reloadFormattingTemplates();
   }
 
+  @Override
   public void writeToWriter(Writer writer, Object input) {
     writeResult(new StreamResult(writer), input);
   }
@@ -71,28 +71,42 @@ public class DomXmlDataFormatWriter implements DataFormatWriter {
     }
   }
 
-
   /**
-   * Return a {@link Templates} instance for the strip-spaces.xsl stylesheet.
+   * Return a {@link Templates} instance for formatting configuration.
    * Uses the configured {@link TransformerFactory} from the {@link DomXmlDataFormat}.
+   * Uses the formatting configuration from the {@link DomXmlDataFormat} if defined,
+   * falls back to a default otherwise.
    *
-   * @return the templates instance for strip-spaces.xsl.
+   * @return the templates instance for the formatting configuration.
    */
   protected Templates reloadFormattingTemplates() {
-    TransformerFactory transformerFactory = domXmlDataFormat.getTransformerFactory();
+    final TransformerFactory transformerFactory = this.domXmlDataFormat.getTransformerFactory();
 
-    try (InputStream xslIn =
-        DomXmlDataFormatWriter.class.getClassLoader().getResourceAsStream(STRIP_SPACE_XSL)) {
-      if (xslIn == null) {
+    try (final InputStream formattingConfiguration = getFormattingConfiguration()) {
+      if (formattingConfiguration == null) {
         throw LOG.unableToFindStripSpaceXsl(STRIP_SPACE_XSL);
       }
-
-      Source xslt = new StreamSource(xslIn);
-      Templates newTemplates = transformerFactory.newTemplates(xslt);
-      return newTemplates;
-    } catch (IOException | TransformerConfigurationException ex) {
+      return transformerFactory.newTemplates(new StreamSource(formattingConfiguration));
+    } catch (final IOException | TransformerConfigurationException ex) {
       throw LOG.unableToLoadFormattingTemplates(ex);
     }
+  }
+
+  /**
+   * Set the {@link Templates} which used for creating the transformer.
+   * @param formattingTemplates
+   */
+  protected void setFormattingTemplates(Templates formattingTemplates) {
+    this.formattingTemplates = formattingTemplates;
+  }
+
+  private InputStream getFormattingConfiguration() {
+    final InputStream importedConfiguration = this.domXmlDataFormat.getFormattingConfiguration();
+    if (importedConfiguration != null) {
+      return importedConfiguration;
+    }
+    // default strip-spaces.xsl
+    return DomXmlDataFormatWriter.class.getClassLoader().getResourceAsStream(STRIP_SPACE_XSL);
   }
 
   /**

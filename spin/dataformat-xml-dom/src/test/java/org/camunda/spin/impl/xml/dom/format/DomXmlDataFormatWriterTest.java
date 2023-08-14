@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
@@ -38,15 +39,23 @@ import org.junit.Test;
 public class DomXmlDataFormatWriterTest {
 
   private final String newLine = System.getProperty("line.separator");
-  private final String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><order><product>Milk</product><product>Coffee</product></order>";
-
+  private final String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><order><product>Milk</product><product>Coffee</product><product> </product></order>";
 
   private final String formattedXmlIbmJDK = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><order>" + newLine
       + "  <product>Milk</product>" + newLine
       + "  <product>Coffee</product>" + newLine
+      + "  <product/>" + newLine
       + "</order>";
 
   private final String formattedXml = formattedXmlIbmJDK + newLine;
+
+  private final String formattedXmlWithWhitespaceInProductIbmJDK = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><order>" + newLine
+      + "  <product>Milk</product>" + newLine
+      + "  <product>Coffee</product>" + newLine
+      + "  <product> </product>" + newLine
+      + "</order>";
+
+  private final String formattedXmlWithWhitespaceInProduct = formattedXmlWithWhitespaceInProductIbmJDK + newLine;
 
 
   // this is what execution.setVariable("test", spinXml); does
@@ -74,12 +83,16 @@ public class DomXmlDataFormatWriterTest {
    * IBM JDK does not generate a new line character at the end
    * of an XSLT-transformed XML document. See CAM-14806.
    */
-  private String getExpectedFormattedXML() {
+  private String getExpectedFormattedXML(boolean withWhitespaceInElement) {
     if (JdkUtil.runsOnIbmJDK()) {
-      return formattedXmlIbmJDK;
+      return withWhitespaceInElement ? formattedXmlWithWhitespaceInProductIbmJDK : formattedXmlIbmJDK;
     } else {
-      return formattedXml;
+      return withWhitespaceInElement ? formattedXmlWithWhitespaceInProduct : formattedXml;
     }
+  }
+
+  private String getExpectedFormattedXML() {
+    return getExpectedFormattedXML(false);
   }
 
   /**
@@ -169,12 +182,13 @@ public class DomXmlDataFormatWriterTest {
     String expectedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><order>" + newLine
         + "  <product>Milk</product>" + newLine
         + "  <product>Coffee</product>" + newLine
+        + "  <product> </product>" + newLine
         + "</order>";
 
     DataFormat<SpinXmlElement> dataFormat = new DomXmlDataFormat(DataFormats.XML_DATAFORMAT_NAME);
     ((DomXmlDataFormat) dataFormat).setPrettyPrint(false);
 
-    SpinXmlElement spinXml = SpinFactory.INSTANCE.createSpin(formattedXml, dataFormat);
+    SpinXmlElement spinXml = SpinFactory.INSTANCE.createSpin(formattedXmlWithWhitespaceInProduct, dataFormat);
 
     // when
     byte[] serializedValue = serializeValue(spinXml);
@@ -189,5 +203,35 @@ public class DomXmlDataFormatWriterTest {
 
     // then
     assertThat(spinXmlElement.toString()).isEqualTo(expectedXml);
+  }
+
+  /**
+   * new feature provided by https://github.com/camunda/camunda-bpm-platform/issues/3633: custom formatting
+   * configuration to preserve-space.
+   */
+  @Test
+  public void testCustomStripSpaceXSL() throws Exception {
+    final DataFormat<SpinXmlElement> dataFormat = new DomXmlDataFormat(DataFormats.XML_DATAFORMAT_NAME);
+
+    try (final InputStream inputStream = DomXmlDataFormatWriterTest.class.getClassLoader()
+        .getResourceAsStream("org/camunda/spin/strip-space-preserve-space.xsl")) {
+      ((DomXmlDataFormat) dataFormat).setFormattingConfiguration(inputStream);
+    }
+
+    final SpinXmlElement spinXml = SpinFactory.INSTANCE.createSpin(this.xml, dataFormat);
+
+    // when
+    final byte[] serializedValue = serializeValue(spinXml);
+
+    // then
+    // assert that xml has not been formatted
+    assertThat(new String(serializedValue, "UTF-8")).isEqualTo(getExpectedFormattedXML(true));
+
+    // when
+    // this is what execution.getVariable("test"); does
+    final SpinXmlElement spinXmlElement = deserializeValue(serializedValue, dataFormat);
+
+    // then
+    assertThat(spinXmlElement.toString()).isEqualTo(getExpectedFormattedXML(true));
   }
 }
