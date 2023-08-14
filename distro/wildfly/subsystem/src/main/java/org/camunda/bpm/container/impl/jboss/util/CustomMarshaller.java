@@ -16,10 +16,10 @@
  */
 package org.camunda.bpm.container.impl.jboss.util;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import java.lang.reflect.Field;
 import java.util.List;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.AttributeMarshaller;
 import org.jboss.as.controller.DefaultAttributeMarshaller;
@@ -168,7 +168,7 @@ public class CustomMarshaller {
         for (ModelNode element: resourceModel.get(attribute.getName()).asList()) {
           writer.writeStartElement(objectType.getXmlName());
           for (AttributeDefinition valueType : valueTypes) {
-            valueType.getAttributeMarshaller().marshallAsElement(valueType, element, false, writer);
+            valueType.getMarshaller().marshallAsElement(valueType, element, false, writer);
           }
           writer.writeEndElement();
         }

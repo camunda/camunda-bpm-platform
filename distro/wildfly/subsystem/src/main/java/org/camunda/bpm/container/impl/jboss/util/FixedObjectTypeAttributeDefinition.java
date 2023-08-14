@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.container.impl.jboss.util;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.logging.Logger;
 import org.jboss.as.controller.AbstractAttributeDefinitionBuilder;
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.MapAttributeDefinition;
@@ -26,13 +32,6 @@ import org.jboss.as.controller.operations.validation.ObjectTypeValidator;
 import org.jboss.as.controller.operations.validation.ParameterValidator;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.logging.Logger;
 
 /**
  * Fix value type validation for ObjectTypeAttributeDefinition containing a map as value type.
@@ -54,6 +53,7 @@ public class FixedObjectTypeAttributeDefinition extends ObjectTypeAttributeDefin
   protected void addValueTypeDescription(ModelNode node,
                                          String prefix,
                                          ResourceBundle bundle,
+                                         boolean forOperation,
                                          ResourceDescriptionResolver resolver,
                                          Locale locale) {
     super.addValueTypeDescription(node, prefix, bundle, false, resolver, locale);
