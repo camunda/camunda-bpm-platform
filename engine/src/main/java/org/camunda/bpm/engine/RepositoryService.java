@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -497,6 +498,7 @@ public interface RepositoryService {
    * @param historyTimeToLive
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @throws NotAllowedException in case feature flag `enforceHistoryTimeToLive` is set to true and the given historyTimeToLive value is null.
    */
   void updateProcessDefinitionHistoryTimeToLive(String processDefinitionId, Integer historyTimeToLive);
 
@@ -506,6 +508,7 @@ public interface RepositoryService {
    * @param historyTimeToLive
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#DECISION_DEFINITION}.
+   * @throws NotAllowedException in case feature flag `enforceHistoryTimeToLive` is set to true and the given historyTimeToLive value is null.
    */
   void updateDecisionDefinitionHistoryTimeToLive(String decisionDefinitionId, Integer historyTimeToLive);
 
@@ -513,6 +516,7 @@ public interface RepositoryService {
    * Updates time to live of case definition. The field is used within history cleanup process.
    * @param caseDefinitionId
    * @param historyTimeToLive
+   * @throws NotAllowedException in case feature flag `enforceHistoryTimeToLive` is set to true and the given historyTimeToLive value is null.
    */
   void updateCaseDefinitionHistoryTimeToLive(String caseDefinitionId, Integer historyTimeToLive);
 

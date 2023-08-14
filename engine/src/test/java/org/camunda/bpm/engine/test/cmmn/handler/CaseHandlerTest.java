@@ -22,12 +22,15 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.handler.CaseHandler;
 import org.camunda.bpm.engine.impl.cmmn.handler.CmmnHandlerContext;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,6 +52,13 @@ public class CaseHandlerTest extends CmmnElementHandlerTest {
 
     context.setDeployment(deployment);
     context.setModel(modelInstance);
+
+    Context.setProcessEngineConfiguration(new StandaloneInMemProcessEngineConfiguration().setEnforceHistoryTimeToLive(false));
+  }
+
+  @After
+  public void tearDown() {
+    Context.removeProcessEngineConfiguration();
   }
 
   @Test
@@ -120,6 +130,29 @@ public class CaseHandlerTest extends CmmnElementHandlerTest {
 
     // then
     assertNull(activity.getHistoryTimeToLive());
+  }
+
+  @Test(expected = NotValidException.class) // then
+  public void shouldThrowNotValidExceptionOnNullHTTLAndEnforceHTTLTrue() {
+    // given
+    Context.getProcessEngineConfiguration().setEnforceHistoryTimeToLive(true);
+
+    // when
+    handler.handleElement(caseDefinition, context);
+  }
+
+  @Test
+  public void shouldReturnCaseWithValidHTTL() {
+    // given
+    Context.getProcessEngineConfiguration().setEnforceHistoryTimeToLive(true);
+
+    caseDefinition.setCamundaHistoryTimeToLiveString("5");
+
+    // when
+    CaseDefinitionEntity result = (CaseDefinitionEntity) handler.handleElement(caseDefinition, context);
+
+    // then
+    assertEquals(Integer.valueOf(5), result.getHistoryTimeToLive());
   }
 
   @Test

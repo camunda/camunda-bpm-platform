@@ -24,13 +24,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-
+import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.handler.DefaultCmmnElementHandlerRegistry;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransform;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformer;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.model.cmmn.Cmmn;
@@ -43,6 +44,7 @@ import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
 import org.camunda.bpm.model.cmmn.instance.Stage;
 import org.camunda.bpm.model.xml.impl.util.IoUtil;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -76,6 +78,14 @@ public class CmmnTransformerTest {
 
     caseDefinition = createElement(definitions, "aCaseDefinition", Case.class);
     casePlanModel = createElement(caseDefinition, "aCasePlanModel", CasePlanModel.class);
+
+    Context.setProcessEngineConfiguration(new StandaloneInMemProcessEngineConfiguration()
+        .setEnforceHistoryTimeToLive(false));
+  }
+
+  @After
+  public void tearDown() {
+    Context.removeProcessEngineConfiguration();
   }
 
   protected <T extends CmmnModelElementInstance> T createElement(CmmnModelElementInstance parentElement, String id, Class<T> elementClass) {

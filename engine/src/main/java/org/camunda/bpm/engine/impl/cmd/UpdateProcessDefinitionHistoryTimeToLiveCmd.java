@@ -16,16 +16,18 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureGreaterThanOrEqual;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.HistoryTimeToLiveParser;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureGreaterThanOrEqual;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Svetlana Dorokhova
@@ -42,16 +44,20 @@ public class UpdateProcessDefinitionHistoryTimeToLiveCmd implements Command<Void
     this.historyTimeToLive = historyTimeToLive;
   }
 
-  public Void execute(CommandContext commandContext) {
-    checkAuthorization(commandContext);
+  public Void execute(CommandContext context) {
+    checkAuthorization(context);
 
     ensureNotNull(BadUserRequestException.class, "processDefinitionId", processDefinitionId);
+
     if (historyTimeToLive != null) {
       ensureGreaterThanOrEqual(BadUserRequestException.class, "", "historyTimeToLive", historyTimeToLive, 0);
     }
 
-    ProcessDefinitionEntity processDefinitionEntity = commandContext.getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
-    logUserOperation(commandContext, processDefinitionEntity);
+    HistoryTimeToLiveParser parser = HistoryTimeToLiveParser.create(context);
+    parser.validate(historyTimeToLive);
+
+    ProcessDefinitionEntity processDefinitionEntity = context.getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
+    logUserOperation(context, processDefinitionEntity);
     processDefinitionEntity.setHistoryTimeToLive(historyTimeToLive);
 
     return null;

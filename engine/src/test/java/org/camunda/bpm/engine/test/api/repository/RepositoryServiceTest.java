@@ -37,7 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.assertj.core.groups.Tuple;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.EntityTypes;
@@ -47,9 +46,9 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
@@ -755,20 +754,22 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
   public void testDeployRevisedProcessAfterDeleteOnOtherProcessEngine() {
 
     // Setup both process engines
-    ProcessEngine processEngine1 = new StandaloneProcessEngineConfiguration()
-      .setProcessEngineName("reboot-test-schema")
-      .setDatabaseSchemaUpdate(org.camunda.bpm.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE)
-      .setJdbcUrl("jdbc:h2:mem:activiti-process-cache-test;DB_CLOSE_DELAY=1000")
-      .setJobExecutorActivate(false)
-      .buildProcessEngine();
+    ProcessEngine processEngine1 = new StandaloneProcessEngineConfiguration().setProcessEngineName("reboot-test-schema")
+        .setDatabaseSchemaUpdate(org.camunda.bpm.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE)
+        .setJdbcUrl("jdbc:h2:mem:activiti-process-cache-test;DB_CLOSE_DELAY=1000")
+        .setJobExecutorActivate(false)
+        .setEnforceHistoryTimeToLive(false)
+        .buildProcessEngine();
+
     RepositoryService repositoryService1 = processEngine1.getRepositoryService();
 
-    ProcessEngine processEngine2 = new StandaloneProcessEngineConfiguration()
-      .setProcessEngineName("reboot-test")
-      .setDatabaseSchemaUpdate(org.camunda.bpm.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
-      .setJdbcUrl("jdbc:h2:mem:activiti-process-cache-test;DB_CLOSE_DELAY=1000")
-      .setJobExecutorActivate(false)
-      .buildProcessEngine();
+    ProcessEngine processEngine2 = new StandaloneProcessEngineConfiguration().setProcessEngineName("reboot-test")
+        .setDatabaseSchemaUpdate(org.camunda.bpm.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
+        .setJdbcUrl("jdbc:h2:mem:activiti-process-cache-test;DB_CLOSE_DELAY=1000")
+        .setJobExecutorActivate(false)
+        .setEnforceHistoryTimeToLive(false)
+        .buildProcessEngine();
+
     RepositoryService repositoryService2 = processEngine2.getRepositoryService();
     RuntimeService runtimeService2 = processEngine2.getRuntimeService();
     TaskService taskService2 = processEngine2.getTaskService();
@@ -1079,6 +1080,72 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
     caseDefinition = findOnlyCaseDefinition();
 
     assertEquals(null, caseDefinition.getHistoryTimeToLive());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
+  public void shouldFailToUpdateHistoryTimeToLiveOnCaseDefinitionHTTLUpdate() {
+    boolean enforceHistoryTimeToLiveBefore = processEngineConfiguration.isEnforceHistoryTimeToLive();
+
+    try {
+      // given
+      CaseDefinition caseDefinition = findOnlyCaseDefinition();
+      processEngineConfiguration.setEnforceHistoryTimeToLive(true);
+
+      // when
+      repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinition.getId(), null);
+      fail("Updating Cases definitions with HistoryTimeToLive Null value while enforceHistoryTimeToLive is true should fail");
+    } catch (Exception e) {
+      // then
+      assertThat(e).isInstanceOf(NotAllowedException.class);
+    } finally {
+      // restore config to the test's previous state
+      processEngineConfiguration.setEnforceHistoryTimeToLive(enforceHistoryTimeToLiveBefore);
+    }
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
+  public void shouldFailToUpdateHistoryTimeToLiveOnProcessDefinitionHTTLUpdate() {
+    boolean enforceHistoryTimeToLiveBefore = processEngineConfiguration.isEnforceHistoryTimeToLive();
+
+    try {
+      // given
+      ProcessDefinition processDefinition = findOnlyProcessDefinition();
+      processEngineConfiguration.setEnforceHistoryTimeToLive(true);
+
+      // when
+      repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinition.getId(), null);
+
+      fail("Updating Cases definitions with HistoryTimeToLive Null value while enforceHistoryTimeToLive is true should fail");
+    } catch (Exception e) {
+      // then
+      assertThat(e).isInstanceOf(NotAllowedException.class);
+    } finally {
+      processEngineConfiguration.setEnforceHistoryTimeToLive(enforceHistoryTimeToLiveBefore);
+    }
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/dmn/Example.dmn"})
+  @Test
+  public void shouldFailToUpdateHistoryTimeToLiveOnDecisionDefinitionHTTLUpdate() {
+    boolean enforceHistoryTimeToLiveBefore = processEngineConfiguration.isEnforceHistoryTimeToLive();
+
+    try {
+      //given
+      DecisionDefinition decisionDefinition = findOnlyDecisionDefinition();
+      processEngineConfiguration.setEnforceHistoryTimeToLive(true);
+
+      //when
+      repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), null);
+
+      fail("Updating Cases definitions with HistoryTimeToLive Null value while enforceHistoryTimeToLive is true should fail");
+    } catch (Exception e) {
+      // then
+      assertThat(e).isInstanceOf(NotAllowedException.class);
+    } finally {
+      processEngineConfiguration.setEnforceHistoryTimeToLive(enforceHistoryTimeToLiveBefore);
+    }
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
