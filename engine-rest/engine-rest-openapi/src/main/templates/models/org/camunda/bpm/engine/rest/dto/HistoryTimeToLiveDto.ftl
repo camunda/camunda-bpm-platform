@@ -8,7 +8,7 @@
         minimum = 0
         last = true
         desc = "New value for historyTimeToLive field of the definition.
-                Can not be negative."/>
+                Cannot be negative."/>
 
 </@lib.dto>
 </#macro>
