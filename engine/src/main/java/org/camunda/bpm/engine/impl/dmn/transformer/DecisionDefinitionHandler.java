@@ -19,9 +19,8 @@ package org.camunda.bpm.engine.impl.dmn.transformer;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnElementTransformContext;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnDecisionTransformHandler;
-import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.HistoryTimeToLiveParser;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
-import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.model.dmn.instance.Decision;
 
 public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
@@ -39,20 +38,13 @@ public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
     decisionDefinition.setCategory(category);
     decisionDefinition.setVersionTag(decision.getVersionTag());
 
-    setHistoryTTL(decision, decisionDefinition);
+    validateAndSetHTTL(decision, decisionDefinition);
 
     return decisionDefinition;
   }
 
-  private void setHistoryTTL(Decision decision, DecisionDefinitionEntity decisionDefinition) {
-    Integer localHistoryTimeToLive = ParseUtil.parseHistoryTimeToLive(decision.getCamundaHistoryTimeToLiveString());
-
-    if (localHistoryTimeToLive != null) {
-      decisionDefinition.setHistoryTimeToLive(localHistoryTimeToLive);
-    } else {
-      Integer configuredHistoryTTL = ParseUtil.parseHistoryTimeToLive(Context.getProcessEngineConfiguration().getHistoryTimeToLive());
-      decisionDefinition.setHistoryTimeToLive(configuredHistoryTTL);
-    }
-
+  protected void validateAndSetHTTL(Decision decision, DecisionDefinitionEntity decisionDefinition) {
+    Integer historyTimeToLive = HistoryTimeToLiveParser.create().parse(decision);
+    decisionDefinition.setHistoryTimeToLive(historyTimeToLive);
   }
 }

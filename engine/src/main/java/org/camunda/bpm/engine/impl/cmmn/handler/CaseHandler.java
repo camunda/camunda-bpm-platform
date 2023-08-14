@@ -17,13 +17,12 @@
 package org.camunda.bpm.engine.impl.cmmn.handler;
 
 import java.util.HashMap;
+import org.camunda.bpm.engine.impl.HistoryTimeToLiveParser;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformerLogger;
-import org.camunda.bpm.engine.impl.task.TaskDefinition;
-import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.Case;
@@ -54,13 +53,20 @@ public class CaseHandler extends CmmnElementHandler<Case, CmmnCaseDefinition> {
     definition.setKey(element.getId());
     definition.setName(element.getName());
     definition.setDeploymentId(deployment.getId());
-    definition.setTaskDefinitions(new HashMap<String, TaskDefinition>());
-    definition.setHistoryTimeToLive(ParseUtil.parseHistoryTimeToLive(element.getCamundaHistoryTimeToLiveString()));
-    CmmnModelInstance model = context.getModel();
+    definition.setTaskDefinitions(new HashMap<>());
 
+    validateAndSetHTTL(element, definition);
+
+    CmmnModelInstance model = context.getModel();
     Definitions definitions = model.getDefinitions();
     String category = definitions.getTargetNamespace();
+
     definition.setCategory(category);
+  }
+
+  protected static void validateAndSetHTTL(Case element, CaseDefinitionEntity definition) {
+    Integer historyTimeToLive = HistoryTimeToLiveParser.create().parse(element);
+    definition.setHistoryTimeToLive(historyTimeToLive);
   }
 
   protected CaseDefinitionEntity createActivity(CmmnElement element, CmmnHandlerContext context) {
