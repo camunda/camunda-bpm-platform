@@ -33,6 +33,7 @@
     <property name="jdbcBatchProcessing" value="false"/>
 
     <property name="generalResourceWhitelistPattern" value=".+"/>
+    <property name="enforceHistoryTimeToLive" value="false" />
   </bean>
 
 </beans>

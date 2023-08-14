@@ -36,6 +36,7 @@
     <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
 
     <property name="jdbcBatchProcessing" value="${jdbcBatchProcessing}"/>
+    <property name="enforceHistoryTimeToLive" value="false" />
 
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 

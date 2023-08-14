@@ -29,6 +29,9 @@
     
     <!-- enable expressions in adhoc queries -->
     <property name="enableExpressionsInAdhocQueries" value="true" />
+
+    <property name="enforceHistoryTimeToLive" value="false" />
+
   </bean>
 
 </beans>

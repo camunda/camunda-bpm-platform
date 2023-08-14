@@ -30,6 +30,7 @@
     <property name="taskMetricsEnabled" value="false" />
 
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
+    <property name="enforceHistoryTimeToLive" value="false" />
 
   </bean>
 

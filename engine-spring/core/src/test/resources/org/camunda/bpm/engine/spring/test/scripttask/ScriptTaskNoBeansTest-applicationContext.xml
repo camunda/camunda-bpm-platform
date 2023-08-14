@@ -30,6 +30,7 @@
     <property name="dbMetricsReporterActivate" value="false" />
     <property name="telemetryReporterActivate" value="false" />
     <property name="taskMetricsEnabled" value="false" />
+    <property name="enforceHistoryTimeToLive" value="false" />
     <property name="beans">
       <map>
       </map>

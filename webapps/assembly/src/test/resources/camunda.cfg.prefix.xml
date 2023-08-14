@@ -38,6 +38,7 @@
     <property name="databaseTablePrefix" value="SCHEMA1." />
 
     <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
+    <property name="enforceHistoryTimeToLive" value="false" />
 
   </bean>
 </beans>
