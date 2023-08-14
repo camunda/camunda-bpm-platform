@@ -36,7 +36,7 @@
     <version.jackson>2.15.2</version.jackson>
     <version.xml.bind-api>2.3.3</version.xml.bind-api>
     <version.xml.jaxb-impl>2.3.6</version.xml.jaxb-impl>
-    <version.snakeyaml>1.33</version.snakeyaml>
+    <version.snakeyaml>2.1</version.snakeyaml>
     <version.httpclient>4.5.14</version.httpclient>
 
     <version.slf4j>1.7.26</version.slf4j>
