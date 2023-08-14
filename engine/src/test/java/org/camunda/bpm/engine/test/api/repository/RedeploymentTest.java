@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
@@ -46,6 +47,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -75,10 +77,17 @@ public class RedeploymentTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   protected RepositoryService repositoryService;
+  protected boolean enforceHistoryTimeToLive;
 
   @Before
   public void setUp() {
     repositoryService = engineRule.getRepositoryService();
+    enforceHistoryTimeToLive = engineRule.getProcessEngineConfiguration().isEnforceHistoryTimeToLive();
+  }
+
+  @After
+  public void tearDown() {
+    engineRule.getProcessEngineConfiguration().setEnforceHistoryTimeToLive(enforceHistoryTimeToLive);
   }
 
   @Test
@@ -815,6 +824,219 @@ public class RedeploymentTest {
     // then
     verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 3);
     verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 2);
+  }
+
+  @Test
+  public void shouldFailOnNullHTTLForAddDeploymentResourceById() {
+    // given
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    BpmnModelInstance model1 = createProcessWithServiceTask(PROCESS_1_KEY);
+    BpmnModelInstance model2 = createProcessWithUserTask(PROCESS_2_KEY);
+
+    // first deployment
+    Deployment deployment1 = testRule.deploy(repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_1_NAME, model1)
+        .addModelInstance(RESOURCE_2_NAME, model2));
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 1);
+
+    Resource resource = getResourceByName(deployment1.getId(), RESOURCE_1_NAME);
+
+    // second deployment
+    model1 = createProcessWithScriptTask(PROCESS_1_KEY);
+    model2 = createProcessWithReceiveTask(PROCESS_2_KEY);
+
+    testRule.deploy(repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_1_NAME, model1)
+        .addModelInstance(RESOURCE_2_NAME, model2));
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 2);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 2);
+
+    engineRule.getProcessEngineConfiguration().setEnforceHistoryTimeToLive(true);
+
+    try {
+      // when
+      testRule.deploy(repositoryService
+          .createDeployment()
+          .name(DEPLOYMENT_NAME)
+          .addDeploymentResourceById(deployment1.getId(), resource.getId()));
+
+      fail("addDeploymentResourceById should fail due to enforceHistoryTimeToLive=true and null historyTimeToLive");
+    } catch (Exception e) {
+      assertTrue(e instanceof ProcessEngineException);
+    }
+  }
+
+  @Test
+  public void shouldFailOnNullHTTLForAddDeploymentResourcesById() {
+    // given
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    BpmnModelInstance model1 = createProcessWithServiceTask(PROCESS_1_KEY);
+    BpmnModelInstance model2 = createProcessWithUserTask(PROCESS_2_KEY);
+    BpmnModelInstance model3 = createProcessWithScriptTask(PROCESS_3_KEY);
+
+    // first deployment
+    Deployment deployment1 = testRule.deploy(repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_1_NAME, model1)
+        .addModelInstance(RESOURCE_2_NAME, model2)
+        .addModelInstance(RESOURCE_3_NAME, model3));
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 1);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_3_KEY), 1);
+
+    Resource resource11 = getResourceByName(deployment1.getId(), RESOURCE_1_NAME);
+    Resource resource13 = getResourceByName(deployment1.getId(), RESOURCE_3_NAME);
+
+    // second deployment
+    model1 = createProcessWithScriptTask(PROCESS_1_KEY);
+    model2 = createProcessWithReceiveTask(PROCESS_2_KEY);
+    model3 = createProcessWithUserTask(PROCESS_3_KEY);
+
+    Deployment deployment2 = testRule.deploy(repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_1_NAME, model1)
+        .addModelInstance(RESOURCE_2_NAME, model2)
+        .addModelInstance(RESOURCE_3_NAME, model3));
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 2);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 2);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_3_KEY), 2);
+
+    Resource resource21 = getResourceByName(deployment2.getId(), RESOURCE_1_NAME);
+    Resource resource23 = getResourceByName(deployment2.getId(), RESOURCE_3_NAME);
+
+    // when (1)
+    testRule.deploy(repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceById(deployment1.getId(), resource11.getId())
+        .addDeploymentResourceById(deployment1.getId(), resource13.getId()));
+
+    // then (1)
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 3);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 2);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_3_KEY), 3);
+
+    engineRule.getProcessEngineConfiguration().setEnforceHistoryTimeToLive(true);
+
+    // when
+    try {
+      testRule.deploy(repositoryService
+          .createDeployment()
+          .name(DEPLOYMENT_NAME)
+          .addDeploymentResourcesById(deployment2.getId(), Arrays.asList(resource21.getId(), resource23.getId())));
+
+      fail("addDeploymentResourcesById should fail due to enforceHistoryTimeToLive=true and null HistoryTimeToLive resources");
+    } catch (Exception e) {
+      assertTrue(e instanceof ProcessEngineException);
+    }
+  }
+
+  @Test
+  public void shouldFailOnNullHTTLOnAddDeploymentResourceByName() {
+    // given
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    BpmnModelInstance model1 = createProcessWithServiceTask(PROCESS_1_KEY);
+
+    // first deployment
+    Deployment deployment1 = testRule.deploy(repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-1")
+        .addModelInstance(RESOURCE_1_NAME, model1));
+
+    assertEquals(1, repositoryService.getDeploymentResources(deployment1.getId()).size());
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+
+    // second deployment
+    BpmnModelInstance model2 = createProcessWithReceiveTask(PROCESS_2_KEY);
+
+    Deployment deployment2 = testRule.deploy(repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-2")
+        .addModelInstance(RESOURCE_2_NAME, model2));
+
+    assertEquals(1, repositoryService.getDeploymentResources(deployment2.getId()).size());
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 1);
+
+    engineRule.getProcessEngineConfiguration().setEnforceHistoryTimeToLive(true);
+
+    try {
+      // when
+      testRule.deploy(repositoryService
+          .createDeployment()
+          .name(DEPLOYMENT_NAME + "-3")
+          .addDeploymentResourceByName(deployment1.getId(), RESOURCE_1_NAME)
+          .addDeploymentResourceByName(deployment2.getId(), RESOURCE_2_NAME));
+
+      fail("addDeploymentResourcesById should fail due to enforceHistoryTimeToLive=true and null HistoryTimeToLive resources");
+    } catch (Exception e) {
+      assertTrue(e instanceof ProcessEngineException);
+    }
+  }
+
+  @Test
+  public void shouldFailOnNullHTTLOnAddDeploymentResourcesByName() {
+    // given
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    BpmnModelInstance model1 = createProcessWithServiceTask(PROCESS_1_KEY);
+    BpmnModelInstance model2 = createProcessWithUserTask(PROCESS_2_KEY);
+
+    // first deployment
+    Deployment deployment1 = testRule.deploy(repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_1_NAME, model1)
+        .addModelInstance(RESOURCE_2_NAME, model2));
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 1);
+
+    Resource resource1 = getResourceByName(deployment1.getId(), RESOURCE_1_NAME);
+    Resource resource2 = getResourceByName(deployment1.getId(), RESOURCE_2_NAME);
+
+    // second deployment
+    model1 = createProcessWithScriptTask(PROCESS_1_KEY);
+    model2 = createProcessWithReceiveTask(PROCESS_2_KEY);
+
+    testRule.deploy(repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_1_NAME, model1)
+        .addModelInstance(RESOURCE_2_NAME, model2));
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 2);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 2);
+
+    engineRule.getProcessEngineConfiguration().setEnforceHistoryTimeToLive(true);
+
+    try {
+      // when
+      testRule.deploy(repositoryService
+          .createDeployment()
+          .addDeploymentResourcesById(deployment1.getId(), Collections.singletonList(resource1.getId()))
+          .addDeploymentResourcesByName(deployment1.getId(), Collections.singletonList(resource2.getName())));
+
+      fail("addDeploymentResourcesByName should fail due to enforceHistoryTimeToLive=true and null HistoryTimeToLive resources");
+    } catch (Exception e) {
+      assertTrue(e instanceof ProcessEngineException);
+    }
   }
 
   @Test

@@ -19,23 +19,25 @@ package org.camunda.bpm.application.impl.deployment;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.Callable;
-
 import org.camunda.bpm.application.ProcessApplicationExecutionException;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -89,6 +91,8 @@ public class RedeploymentProcessApplicationTest {
   @Parameter(4)
   public TestProvider testProvider;
 
+  public boolean enforceHistoryTimeToLive;
+
   @Parameters(name = "scenario {index}")
   public static Collection<Object[]> scenarios() {
     return Arrays.asList(new Object[][] {
@@ -106,10 +110,17 @@ public class RedeploymentProcessApplicationTest {
     caseService = engineRule.getCaseService();
     decisionService = engineRule.getDecisionService();
     managementService = engineRule.getManagementService();
+
+    enforceHistoryTimeToLive = engineRule.getProcessEngineConfiguration().isEnforceHistoryTimeToLive();
+  }
+
+  @After
+  public void tearDown() {
+    engineRule.getProcessEngineConfiguration().setEnforceHistoryTimeToLive(enforceHistoryTimeToLive);
   }
 
   @Test
-	public void definitionOnePreviousDeploymentWithPA() {
+  public void definitionOnePreviousDeploymentWithPA() {
     // given
 
     MyEmbeddedProcessApplication application = new MyEmbeddedProcessApplication();
@@ -140,7 +151,79 @@ public class RedeploymentProcessApplicationTest {
   }
 
   @Test
-	public void definitionTwoPreviousDeploymentWithPA() {
+  public void deploymentShouldFailOnNullHTTLAndEnforceHistoryTimeToLiveTrue() {
+    // given
+    Deployment deployment1 = null;
+    try {
+      MyEmbeddedProcessApplication application = new MyEmbeddedProcessApplication();
+      engineRule.getProcessEngineConfiguration().setEnforceHistoryTimeToLive(true);
+
+      // when
+      // deployment does not accept null HTTL resources
+      deployment1 = repositoryService
+          .createDeployment(application.getReference())
+          .name(DEPLOYMENT_NAME)
+          .addClasspathResource(resource1)
+          .deploy();
+
+      fail("The deployment should have thrown an exception due to mandatory enforcement of historyTimeToLive");
+    } catch (Exception e) {
+      // then
+      assertTrue("Deployment1 should fail due to mandatory historyTimeToLive", e instanceof ProcessEngineException);
+    } finally {
+
+      // cleanup
+      if (deployment1 != null) {
+        deleteDeployments(deployment1);
+      }
+    }
+  }
+
+  @Test
+  public void redeploymentShouldFailOnNullHTTLAndEnforceHistoryTimeToLiveTrue() {
+    // given
+    Deployment deployment1 = null;
+    Deployment deployment2 = null;
+    try {
+      MyEmbeddedProcessApplication application = new MyEmbeddedProcessApplication();
+      engineRule.getProcessEngineConfiguration().setEnforceHistoryTimeToLive(false);
+
+      // first deployment allows null HTTL
+      deployment1 = repositoryService
+          .createDeployment(application.getReference())
+          .name(DEPLOYMENT_NAME)
+          .addClasspathResource(resource1)
+          .deploy();
+
+      // enforceHistoryTimeToLive=true should prevent deployment2 from getting deployed
+      engineRule.getProcessEngineConfiguration().setEnforceHistoryTimeToLive(true);
+
+      // when - second deployment
+      deployment2 = repositoryService
+          .createDeployment()
+          .name(DEPLOYMENT_NAME)
+          .addDeploymentResources(deployment1.getId())
+          .deploy();
+
+      fail("The second deployment should have thrown an exception due to mandatory enforcement of historyTimeToLive");
+    } catch (Exception e) {
+      // then
+      assertTrue("Deployment2 should fail due to mandatory historyTimeToLive", e instanceof ProcessEngineException);
+    } finally {
+
+      // cleanup
+      if (deployment1 != null) {
+        deleteDeployments(deployment1);
+      }
+
+      if (deployment2 != null) {
+        deleteDeployments(deployment1, deployment2);
+      }
+    }
+  }
+
+  @Test
+  public void definitionTwoPreviousDeploymentWithPA() {
     // given
 
     // first deployment
