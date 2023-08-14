@@ -147,7 +147,7 @@
                 <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
                 <concurrent>
                     <context-services>
-                        <context-service name="default" jndi-name="java:jboss/ee/concurrency/context/default" use-transaction-setup-provider="true"/>
+                        <context-service name="default" jndi-name="java:jboss/ee/concurrency/context/default"/>
                     </context-services>
                     <managed-thread-factories>
                         <managed-thread-factory name="default" jndi-name="java:jboss/ee/concurrency/factory/default" context-service="default"/>
@@ -205,7 +205,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:17.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:18.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -305,6 +305,9 @@
                         <server-ssl-context name="applicationSSC" key-manager="applicationKM"/>
                     </server-ssl-contexts>
                 </tls>
+                <policy name="jacc">
+                    <jacc-policy/>
+                </policy>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:infinispan:14.0">
                 <cache-container name="ejb" default-cache="passivation" marshaller="PROTOSTREAM" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
@@ -403,7 +406,7 @@
                 <http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-sasl-authentication"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:resource-adapters:6.1"/>
+            <subsystem xmlns="urn:jboss:domain:resource-adapters:7.0"/>
             <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
             <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
                 <deployment-permissions>
@@ -636,7 +639,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:17.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:18.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -736,6 +739,9 @@
                         <server-ssl-context name="applicationSSC" key-manager="applicationKM"/>
                     </server-ssl-contexts>
                 </tls>
+                <policy name="jacc">
+                    <jacc-policy/>
+                </policy>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:infinispan:14.0">
                 <cache-container name="ejb" default-cache="dist" marshaller="PROTOSTREAM" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
@@ -897,7 +903,7 @@
                 <http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-sasl-authentication"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:resource-adapters:6.1"/>
+            <subsystem xmlns="urn:jboss:domain:resource-adapters:7.0"/>
             <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
             <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
                 <deployment-permissions>
@@ -1104,7 +1110,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:17.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:18.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -1204,6 +1210,9 @@
                         <server-ssl-context name="applicationSSC" key-manager="applicationKM"/>
                     </server-ssl-contexts>
                 </tls>
+                <policy name="jacc">
+                    <jacc-policy/>
+                </policy>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:iiop-openjdk:3.0">
                 <orb socket-binding="iiop"/>
@@ -1337,7 +1346,7 @@
                 <http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-sasl-authentication"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:resource-adapters:6.1"/>
+            <subsystem xmlns="urn:jboss:domain:resource-adapters:7.0"/>
             <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
             <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
                 <deployment-permissions>
@@ -1536,7 +1545,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:17.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:18.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -1636,6 +1645,9 @@
                         <server-ssl-context name="applicationSSC" key-manager="applicationKM"/>
                     </server-ssl-contexts>
                 </tls>
+                <policy name="jacc">
+                    <jacc-policy/>
+                </policy>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:iiop-openjdk:3.0">
                 <orb socket-binding="iiop"/>
@@ -1836,7 +1848,7 @@
                 <http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-sasl-authentication"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:resource-adapters:6.1"/>
+            <subsystem xmlns="urn:jboss:domain:resource-adapters:7.0"/>
             <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
             <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
                 <deployment-permissions>
