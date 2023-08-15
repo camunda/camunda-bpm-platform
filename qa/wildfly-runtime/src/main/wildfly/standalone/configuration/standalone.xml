@@ -157,7 +157,7 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:discovery:1.0"/>
         <subsystem xmlns="urn:jboss:domain:distributable-ejb:1.0" default-bean-management="default">
-            <infinispan-bean-management name="default" cache-container="ejb" cache="passivation" max-active-beans="10000"/>
+            <infinispan-bean-management name="default" max-active-beans="10000" cache-container="ejb" cache="passivation"/>
             <local-client-mappings-registry/>
             <infinispan-timer-management name="persistent" cache-container="ejb" cache="persistent" max-active-timers="10000"/>
             <infinispan-timer-management name="transient" cache-container="ejb" cache="transient" max-active-timers="10000"/>
@@ -362,26 +362,6 @@
         <subsystem xmlns="urn:wildfly:elytron-oidc-client:2.0"/>
         <subsystem xmlns="urn:wildfly:health:1.0" security-enabled="false"/>
         <subsystem xmlns="urn:jboss:domain:infinispan:14.0">
-            <cache-container name="ejb" default-cache="passivation" marshaller="PROTOSTREAM" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
-                <local-cache name="passivation">
-                    <expiration interval="0"/>
-                    <file-store passivation="true" purge="false"/>
-                </local-cache>
-            </cache-container>
-            <cache-container name="web" default-cache="passivation" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.web.infinispan">
-                <local-cache name="passivation">
-                    <expiration interval="0"/>
-                    <file-store passivation="true" purge="false"/>
-                </local-cache>
-                <local-cache name="sso">
-                    <expiration interval="0"/>
-                </local-cache>
-            </cache-container>
-            <cache-container name="server" default-cache="default" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.singleton.server">
-                <local-cache name="default">
-                    <expiration interval="0"/>
-                </local-cache>
-            </cache-container>
             <cache-container name="hibernate" marshaller="JBOSS" modules="org.infinispan.hibernate-cache">
                 <local-cache name="entity">
                     <heap-memory size="10000"/>
@@ -396,6 +376,33 @@
                 </local-cache>
                 <local-cache name="pending-puts">
                     <expiration max-idle="60000"/>
+                </local-cache>
+            </cache-container>
+            <cache-container name="ejb" default-cache="passivation" marshaller="PROTOSTREAM" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
+                <local-cache name="passivation">
+                    <expiration interval="0"/>
+                    <file-store passivation="true"/>
+                </local-cache>
+                <local-cache name="persistent">
+                    <locking isolation="REPEATABLE_READ"/>
+                    <transaction mode="BATCH"/>
+                    <expiration interval="0"/>
+                    <file-store preload="true"/>
+                </local-cache>
+                <local-cache name="transient">
+                    <locking isolation="REPEATABLE_READ"/>
+                    <transaction mode="BATCH"/>
+                    <expiration interval="0"/>
+                    <file-store passivation="true" purge="true"/>
+                </local-cache>
+            </cache-container>
+            <cache-container name="web" default-cache="passivation" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.web.infinispan">
+                <local-cache name="passivation">
+                    <expiration interval="0"/>
+                    <file-store passivation="true"/>
+                </local-cache>
+                <local-cache name="sso">
+                    <expiration interval="0"/>
                 </local-cache>
             </cache-container>
         </subsystem>
