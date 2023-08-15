@@ -11,7 +11,6 @@
     "ADMIN_LICENSE_NOTIFICATION_STATUS_FAILED": "Failed",
     "ADMIN_LICENSE_NOTIFICATION_STATUS_SUCCESS": "Success",
     "ADMIN_LICENSE_NOT_HAVE": "Do not have a license key?",
-    "ADMIN_LICENSE_NO_KEY": "No license key has been provided.",
     "ADMIN_LICENSE_PASTE_KEY": "Paste your license key here…",
     "ADMIN_LICENSE_SAVE_KEY": "Save Key",
     "ADMIN_LICENSE_TAB_KEY_FAILED": "Failed to store license key: {{message}}",
