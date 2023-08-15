@@ -24,10 +24,14 @@
         </a>
       </div>
     </header>
-
+    <div class="loader-state empty"
+         ng-if="loadingState === 'EMPTY'">
+      {{ 'AUTHORIZATION_EMPTY' | translate }}
+    </div>
     <form class="form-horizontal"
           name="createAuthForm"
-          ng-controller="AuthorizationCreateController">
+          ng-controller="AuthorizationCreateController"
+          ng-if="authorizations.length > 0">
       <table class="cam-table">
         <thead>
           <tr>

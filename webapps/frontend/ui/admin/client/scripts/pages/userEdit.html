@@ -6,8 +6,7 @@
         <a href="#/users/{{user.id | escape}}?tab=profile">{{ 'USERS_PROFILE' | translate }}</a>
       </li>
 
-      <li ng-class="activeClass('account')"
-          ng-show="availableOperations.update">
+      <li ng-class="activeClass('account')">
         <a href="#/users/{{user.id | escape}}?tab=account">{{ 'USERS_ACCOUNT' | translate }}</a>
       </li>
 
@@ -64,7 +63,6 @@
                    class="form-control"
                    type="text"
                    ng-model="profile.firstName"
-                   ng-disabled="!availableOperations.update"
                    novalidate
                    required/>
 
@@ -84,7 +82,6 @@
                    type="text"
                    class="form-control"
                    ng-model="profile.lastName"
-                   ng-disabled="!availableOperations.update"
                    novalidate
                    required />
 
@@ -105,7 +102,6 @@
                    class="form-control"
                    type="text"
                    ng-model="profile.email"
-                   ng-disabled="!availableOperations.update"
                    data-email />
 
             <p class="help-block"
@@ -115,8 +111,7 @@
           </div>
         </div>
 
-        <div class="form-group"
-             ng-show="availableOperations.update">
+        <div class="form-group">
           <div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 text-right">
             <button type="submit"
                     class="btn btn-primary"
@@ -131,7 +126,6 @@
 
     <div ng-if="show('account')">
       <form class="form-horizontal"
-            ng-if="availableOperations.update"
             name="updateCredentialsForm">
 
         <div class="h4">{{ 'USERS_CHANGE_PASSWORD' | translate }}</div>
@@ -208,8 +202,7 @@
       </form>
 
 
-      <form class="form-horizontal"
-            ng-if="availableOperations.delete">
+      <form class="form-horizontal">
 
         <div class="h4">{{ 'USERS_DELETE_USER' | translate }}</div>
 
@@ -270,8 +263,7 @@
                 <th class="group-type"
                     cam-sortable-table-column
                     sort-by-property="type">{{ 'USERS_GROUP_TYPE' | translate }}</th>
-                <th class="action"
-                    ng-show="availableOperations.removeGroup">
+                <th class="action">
                   {{ 'USERS_ACTION' | translate }}
                 </th>
               </tr>
@@ -291,8 +283,7 @@
                   {{group.type}}
                 </td>
 
-                <td class="action"
-                    ng-show="availableOperations.removeGroup">
+                <td class="action">
                   <a ng-click="removeGroup(group.id)">{{ 'USERS_REMOVE' | translate }}</a>
                 </td>
               </tr>
@@ -331,8 +322,7 @@
               <th class="tenant-name"
                     cam-sortable-table-column
                     sort-by-property="name">{{ 'USERS_TENANT_NAME' | translate }}</th>
-              <th class="action"
-                  ng-show="availableOperations.removeTenant">
+              <th class="action">
                 {{ 'USERS_ACTION' | translate }}
               </th>
             </tr>
@@ -348,8 +338,7 @@
                 {{ tenant.name }}
               </td>
 
-              <td class="action"
-                  ng-show="availableOperations.removeTenant">
+              <td class="action">
                 <a ng-click="removeTenant(tenant.id)">{{ 'USERS_REMOVE' | translate }}</a>
               </td>
             </tr>

@@ -63,10 +63,7 @@
       <a href="#/tenants">{{ 'TENANTS_TENANTS' | translate }}</a>
     </li>
 
-    <li ng-class="activeClass('#/authorization')"
-        show-if-authorized
-        auth-permission="READ"
-        auth-resource-name="authorization">
+    <li ng-class="activeClass('#/authorization')">
       <a href="#/authorization?resource=0">{{ 'AUTHORIZATION_AUTHORIZATIONS' | translate }}</a>
     </li>
     <li ng-class="activeClass('#/system')">
