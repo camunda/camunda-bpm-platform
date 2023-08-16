@@ -584,6 +584,8 @@
                             <property name="maxJobsPerAcquisition">3</property>
                         </properties>
                     </job-acquisition>
+                    <job-acquisition name="second"/>
+                    <job-acquisition name="third"/>
                 </job-acquisitions>
             </job-executor>
         </subsystem>
