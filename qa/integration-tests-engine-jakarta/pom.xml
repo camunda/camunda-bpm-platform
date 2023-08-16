@@ -14,10 +14,10 @@
   <properties>
     <!-- Needs to be updated after a new WildFly release -->
     <wildfly.container.adapter.groupId>org.wildfly.arquillian</wildfly.container.adapter.groupId>
-    <wildfly.container.adapter.version>5.0.0.Alpha6</wildfly.container.adapter.version>
+    <wildfly.container.adapter.version>5.0.1.Final</wildfly.container.adapter.version>
     <version.spring.framework>${version.spring.framework6}</version.spring.framework>
 
-    <version.arquillian>1.7.0.Alpha13</version.arquillian>
+    <version.arquillian>1.7.0.Final</version.arquillian>
 
     <redirect.test.output>true</redirect.test.output>
   </properties>
