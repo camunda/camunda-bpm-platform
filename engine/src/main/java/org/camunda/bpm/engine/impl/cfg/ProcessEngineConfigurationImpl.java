@@ -1055,6 +1055,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected ExceptionCodeProvider builtinExceptionCodeProvider;
 
+  /** Controls whether the time cycle is re-evaluated when due. */
+  protected boolean reevaluateTimeCycleWhenDue = false;
+
   /**
    * @return {@code true} if the exception code feature is disabled and vice-versa.
    */
@@ -5323,6 +5326,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public int getCommandRetries() {
     return commandRetries;
+  }
+
+  public boolean isReevaluateTimeCycleWhenDue() {
+    return reevaluateTimeCycleWhenDue;
+  }
+
+  public ProcessEngineConfigurationImpl setReevaluateTimeCycleWhenDue(boolean reevaluateTimeCycleWhenDue) {
+    this.reevaluateTimeCycleWhenDue = reevaluateTimeCycleWhenDue;
+    return this;
   }
 
   protected CrdbTransactionRetryInterceptor getCrdbRetryInterceptor() {

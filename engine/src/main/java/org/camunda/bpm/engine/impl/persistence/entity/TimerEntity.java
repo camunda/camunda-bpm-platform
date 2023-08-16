@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.RepeatingFailedJobListener;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.TimerJobConfiguration;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 
 /**
@@ -79,6 +81,14 @@ public class TimerEntity extends JobEntity {
         // this timer is a repeating timer and
         // a follow up timer job has not been scheduled yet
 
+        // when reevaluateTimeCycleWhenDue is enabled and cycle is an expression
+        if (isReevaluateTimeCycleWhenDue(commandContext) && isCycleExpression()) {
+          String expressionValue = commandContext.getProcessEngineConfiguration()
+              .getExpressionManager()
+              .createExpression(jobDefinition.getJobConfiguration().substring(7))
+              .getValue(execution).toString();
+          repeat = adjustRepeatBasedOnNewExpression(expressionValue);
+        }
         Date newDueDate = calculateRepeat();
 
         if (newDueDate != null) {
@@ -98,6 +108,28 @@ public class TimerEntity extends JobEntity {
         }
       }
     }
+  }
+
+  protected boolean isReevaluateTimeCycleWhenDue(CommandContext commandContext) {
+    return commandContext.getProcessEngineConfiguration().isReevaluateTimeCycleWhenDue();
+  }
+
+  protected boolean isCycleExpression() {
+    String jobConfiguration = jobDefinition.getJobConfiguration();
+    return jobConfiguration.contains("CYCLE: #") || jobConfiguration.contains("CYCLE: $");
+  }
+
+  protected String adjustRepeatBasedOnNewExpression(String expressionValue) {
+    String changedRepeat = expressionValue; // changed to a cron expression
+    if (expressionValue.startsWith("R")) { // changed to a repeatable interval
+      if (repeat.startsWith("R")) { // was repeatable interval
+        changedRepeat = expressionValue.replace("/", "/" + repeat.split("/")[1] + "/");
+      } else {// was a cron expression
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        changedRepeat = expressionValue.replace("/", "/" + sdf.format(ClockUtil.getCurrentTime()) + "/");
+      }
+    }
+    return changedRepeat;
   }
 
   protected RepeatingFailedJobListener createRepeatingFailedJobListener(CommandExecutor commandExecutor) {
