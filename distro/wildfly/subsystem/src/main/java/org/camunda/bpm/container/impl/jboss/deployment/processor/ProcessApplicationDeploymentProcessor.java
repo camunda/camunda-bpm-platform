@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.deployment.scanning.VfsProcessApplicationScanner;
@@ -41,12 +39,9 @@ import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.jboss.util.JBossCompatibilityExtension;
 import org.camunda.bpm.container.impl.jboss.util.ProcessesXmlWrapper;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
-import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugins;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.jboss.as.ee.component.ComponentDescription;
-import org.jboss.as.ee.component.ComponentView;
 import org.jboss.as.ee.component.ViewDescription;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
@@ -57,10 +52,8 @@ import org.jboss.jandex.AnnotationInstance;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleClassLoader;
 import org.jboss.msc.service.ServiceBuilder;
-import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
-import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.vfs.VirtualFile;
 
 
@@ -92,18 +85,20 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     final ServiceName paViewServiceName = getProcessApplicationViewServiceName(paComponent);
 
     Module module = deploymentUnit.getAttachment(Attachments.MODULE);
-    final String moduleName = module.getIdentifier().toString();
+    final String moduleName = module.getName();
     final ServiceName paStartServiceName = ServiceNames.forProcessApplicationStartService(moduleName);
     final ServiceName paStopServiceName = ServiceNames.forProcessApplicationStopService(moduleName);
     final ServiceName noViewStartService = ServiceNames.forNoViewProcessApplicationStartService(moduleName);
 
-    List<ServiceName> deploymentServiceNames = new ArrayList<ServiceName>();
+    List<ServiceName> deploymentServiceNames = new ArrayList<>();
+
+    ServiceBuilder<?> stopServiceBuilder = phaseContext.getServiceTarget().addService();
+    stopServiceBuilder.requires(phaseContext.getPhaseServiceName());
+    stopServiceBuilder.provides(paStopServiceName);
+    stopServiceBuilder.setInitialMode(Mode.ACTIVE);
 
     ProcessApplicationStopService paStopService = new ProcessApplicationStopService();
-    ServiceBuilder<ProcessApplicationStopService> stopServiceBuilder = phaseContext.getServiceTarget().addService(paStopServiceName, paStopService)
-      .addDependency(ServiceNames.forBpmPlatformPlugins(), BpmPlatformPlugins.class, paStopService.getPlatformPluginsInjector())
-      .setInitialMode(Mode.ACTIVE);
-    stopServiceBuilder.requires(phaseContext.getPhaseServiceName());
+    stopServiceBuilder.setInstance(paStopService);
 
     if(paViewServiceName != null) {
       stopServiceBuilder.requires(paViewServiceName);
@@ -124,25 +119,28 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
         Map<String, byte[]> deploymentResources = getDeploymentResources(processArchive, deploymentUnit, processesXmlWrapper.getProcessesXmlFile());
 
         // add the deployment service for each process archive we deploy.
-        ProcessApplicationDeploymentService deploymentService = new ProcessApplicationDeploymentService(deploymentResources, processArchive, module);
         String processArachiveName = processArchive.getName();
         if(processArachiveName == null) {
           // use random name for deployment service if name is null (we cannot ask the process application yet since the component might not be up.
           processArachiveName = UUID.randomUUID().toString();
         }
         ServiceName deploymentServiceName = ServiceNames.forProcessApplicationDeploymentService(deploymentUnit.getName(), processArachiveName);
-        ServiceBuilder<ProcessApplicationDeploymentService> serviceBuilder = phaseContext.getServiceTarget().addService(deploymentServiceName, deploymentService)
-          .addDependency(processEngineServiceName, ProcessEngine.class, deploymentService.getProcessEngineInjector())
-          .setInitialMode(Mode.ACTIVE);
+        ServiceBuilder<?> serviceBuilder = phaseContext.getServiceTarget().addService();
+        serviceBuilder.provides(deploymentServiceName);
+        serviceBuilder.requires(processEngineServiceName);
         serviceBuilder.requires(phaseContext.getPhaseServiceName());
         serviceBuilder.requires(paStopServiceName);
+        serviceBuilder.setInitialMode(Mode.ACTIVE);
+
+        ProcessApplicationDeploymentService deploymentService = new ProcessApplicationDeploymentService(deploymentResources, processArchive, module);
+        serviceBuilder.setInstance(deploymentService);
 
         if(paViewServiceName != null) {
           // add a dependency on the component start service to make sure we are started after the pa-component (Singleton EJB) has started
           serviceBuilder.requires(paComponent.getStartServiceName());
-          serviceBuilder.addDependency(paViewServiceName, ComponentView.class, deploymentService.getPaComponentViewInjector());
+          serviceBuilder.requires(paViewServiceName);
         } else {
-          serviceBuilder.addDependency(noViewStartService, ProcessApplicationInterface.class, deploymentService.getNoViewProcessApplication());
+          serviceBuilder.requires(noViewStartService);
         }
 
         JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder, deploymentService.getExecutorInjector());
@@ -158,20 +156,23 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     AnnotationInstance preUndeploy = ProcessApplicationAttachments.getPreUndeployDescription(deploymentUnit);
 
     // register the managed process application start service
-    ProcessApplicationStartService paStartService = new ProcessApplicationStartService(deploymentServiceNames, postDeploy, preUndeploy, module);
-    ServiceBuilder<ProcessApplicationStartService> serviceBuilder = phaseContext.getServiceTarget().addService(paStartServiceName, paStartService)
-      .addDependency(ServiceNames.forBpmPlatformPlugins(), BpmPlatformPlugins.class, paStartService.getPlatformPluginsInjector())
-      .setInitialMode(Mode.ACTIVE);
+    ServiceBuilder<?> serviceBuilder = phaseContext.getServiceTarget().addService();
+    serviceBuilder.provides(paStartServiceName);
+    serviceBuilder.requires(paStartServiceName);
+    serviceBuilder.setInitialMode(Mode.ACTIVE);
     serviceBuilder.requires(phaseContext.getPhaseServiceName());
     deploymentServiceNames.forEach(serviceName -> serviceBuilder.requires(serviceName));
 
+    ProcessApplicationStartService paStartService = new ProcessApplicationStartService(deploymentServiceNames, postDeploy, preUndeploy, module);
+    serviceBuilder.setInstance(paStartService);
+
     if (phaseContext.getServiceRegistry().getService(ServiceNames.forDefaultProcessEngine()) != null) {
-      serviceBuilder.addDependency(ServiceNames.forDefaultProcessEngine(), ProcessEngine.class, paStartService.getDefaultProcessEngineInjector());
+      serviceBuilder.requires(paStartServiceName);
     }
     if(paViewServiceName != null) {
-      serviceBuilder.addDependency(paViewServiceName, ComponentView.class, paStartService.getPaComponentViewInjector());
+      serviceBuilder.requires(paViewServiceName);
     } else {
-      serviceBuilder.addDependency(noViewStartService, ProcessApplicationInterface.class, paStartService.getNoViewProcessApplication());
+      serviceBuilder.requires(noViewStartService);
     }
 
     serviceBuilder.install();
@@ -197,12 +198,6 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     return paComponentDescription;
   }
 
-  @SuppressWarnings("unchecked")
-  protected ProcessEngine getProcessEngineForArchive(ServiceName serviceName, ServiceRegistry serviceRegistry) {
-    ServiceController<ProcessEngine> processEngineServiceController = (ServiceController<ProcessEngine>) serviceRegistry.getRequiredService(serviceName);
-    return processEngineServiceController.getValue();
-  }
-
   protected ServiceName getProcessEngineServiceName(ProcessArchiveXml processArchive) {
     ServiceName serviceName = null;
     if(processArchive.getProcessEngineName() == null || processArchive.getProcessEngineName().length() == 0) {
@@ -217,7 +212,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
 
     final Module module = deploymentUnit.getAttachment(MODULE);
 
-    Map<String, byte[]> resources = new HashMap<String, byte[]>();
+    Map<String, byte[]> resources = new HashMap<>();
 
     // first, add all resources listed in the processe.xml
     List<String> process = processArchive.getProcessResourceNames();

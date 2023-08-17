@@ -2348,23 +2348,5 @@
                 <extension module="org.wildfly.extension.microprofile.telemetry"/>
             </excluded-extensions>
         </host-exclude>
-        <host-exclude name="WildFly28.0">
-            <host-release id="WildFly28.0"/>
-            <excluded-extensions>
-                <extension module="org.wildfly.extension.micrometer"/>
-                <extension module="org.wildfly.extension.microprofile.lra-participant"/>
-                <extension module="org.wildfly.extension.microprofile.lra-coordinator"/>
-                <extension module="org.wildfly.extension.microprofile.telemetry"/>
-            </excluded-extensions>
-        </host-exclude>
-        <host-exclude name="WildFly29.0">
-            <host-release id="WildFly29.0"/>
-            <excluded-extensions>
-                <extension module="org.wildfly.extension.micrometer"/>
-                <extension module="org.wildfly.extension.microprofile.lra-participant"/>
-                <extension module="org.wildfly.extension.microprofile.lra-coordinator"/>
-                <extension module="org.wildfly.extension.microprofile.telemetry"/>
-            </excluded-extensions>
-        </host-exclude>
     </host-excludes>
 </domain>
