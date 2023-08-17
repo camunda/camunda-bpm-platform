@@ -18,7 +18,6 @@ package org.camunda.bpm.sql.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,7 +25,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.SortedSet;
 import java.util.stream.Collectors;
 import liquibase.Contexts;
 import liquibase.Liquibase;
@@ -35,7 +33,7 @@ import liquibase.change.core.SQLFileChange;
 import liquibase.changelog.ChangeSet;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
-import liquibase.database.OfflineConnection;
+import liquibase.diff.DiffGeneratorFactory;
 import liquibase.diff.DiffResult;
 import liquibase.diff.ObjectDifferences;
 import liquibase.diff.compare.CompareControl;
@@ -44,13 +42,8 @@ import liquibase.diff.output.ObjectChangeFilter;
 import liquibase.diff.output.changelog.DiffToChangeLog;
 import liquibase.exception.DatabaseException;
 import liquibase.exception.LiquibaseException;
-import liquibase.exception.LiquibaseParseException;
-import liquibase.parser.SnapshotParser;
-import liquibase.parser.SnapshotParserFactory;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import liquibase.resource.FileSystemResourceAccessor;
-import liquibase.resource.InputStreamList;
-import liquibase.resource.ResourceAccessor;
 import liquibase.snapshot.DatabaseSnapshot;
 import liquibase.snapshot.SnapshotControl;
 import liquibase.snapshot.SnapshotGeneratorFactory;
@@ -81,6 +74,7 @@ public class SqlScriptTest {
   protected String databaseType;
   protected String projectVersion;
   protected Liquibase liquibase;
+  protected DiffGeneratorFactory databaseDiffer;
 
   @Before
   public void setup() throws Exception {
@@ -91,20 +85,16 @@ public class SqlScriptTest {
     databaseType = properties.getProperty("database.type");
     projectVersion = properties.getProperty("project.version");
 
-    SnapshotParserFactory.getInstance().register(new DirectAccessSnapshotParser());
-
     database = getDatabase();
     liquibase = getLiquibase();
-    liquibase.dropAll();
+    databaseDiffer = DiffGeneratorFactory.getInstance();
+    cleanUpDatabaseTables();
   }
 
   @After
   public void tearDown() throws Exception {
-    try {
-      liquibase.dropAll();
-    } finally {
-      liquibase.close();
-    }
+    cleanUpDatabaseTables();
+    liquibase.close();
   }
 
   @Test
@@ -112,31 +102,30 @@ public class SqlScriptTest {
     // given
     executeSqlScript("create", "engine");
     executeSqlScript("create", "identity");
-    DatabaseSnapshot snapshotManualScripts = createCurrentDatabaseSnapshot();
-    liquibase.dropAll();
+    DatabaseSnapshot snapshotScripts = createCurrentDatabaseSnapshot();
+    cleanUpDatabaseTables();
 
     // when set up with Liquibase changelog
     liquibase.update(new Contexts());
 
     // then
-    DatabaseSnapshot snapshotLiquibaseChangelog = createCurrentDatabaseSnapshot();
-    Database currentDatabase = getDatabaseForSnapshot(snapshotManualScripts);
-    Database upgradedDatabase = getDatabaseForSnapshot(snapshotLiquibaseChangelog);
-    DiffResult diffResult = liquibase.diff(currentDatabase, upgradedDatabase, new CompareControl());
-    List<ChangeSet> changeSetsToApply = new DiffToChangeLog(diffResult, new CustomDiffOutputControl()).generateChangeSets();
+    DatabaseSnapshot snapshotLiquibase = createCurrentDatabaseSnapshot();
+    DiffResult diffResult = databaseDiffer.compare(snapshotScripts, snapshotLiquibase, new CompareControl());
+    List<ChangeSet> changeSetsToApply = new DiffToChangeLog(diffResult, new CustomDiffOutputControl())
+        .generateChangeSets();
 
     assertThat(changeSetsToApply)
-      .withFailMessage("Liquibase database schema misses changes: %s", getChanges(changeSetsToApply))
-      .isEmpty();
+        .withFailMessage("Liquibase database schema misses changes: %s", getChanges(changeSetsToApply))
+        .isEmpty();
   }
 
   @Test
   public void shouldEqualOldUpgradedAndNewCreatedViaLiquibase() throws Exception {
-    try (Liquibase liquibaseOld = getLiquibase("scripts-old/")) {
+    try (Liquibase liquibaseOld = getLiquibase("scripts-old/", getDatabase())) {
       // given
       liquibase.update(new Contexts());
       DatabaseSnapshot snapshotCurrent = createCurrentDatabaseSnapshot();
-      liquibase.dropAll();
+      cleanUpDatabaseTables();
 
       // old changelog executed
       liquibaseOld.update(new Contexts());
@@ -146,14 +135,12 @@ public class SqlScriptTest {
 
       // then
       DatabaseSnapshot snapshotUpgraded = createCurrentDatabaseSnapshot();
-      Database currentDatabase = getDatabaseForSnapshot(snapshotCurrent);
-      Database upgradedDatabase = getDatabaseForSnapshot(snapshotUpgraded);
-      DiffResult diffResult = liquibase.diff(currentDatabase, upgradedDatabase, new CompareControl());
+      DiffResult diffResult = databaseDiffer.compare(snapshotCurrent, snapshotUpgraded, new CompareControl());
       List<ChangeSet> changeSetsToApply = new DiffToChangeLog(diffResult, new DiffOutputControl()).generateChangeSets();
 
       assertThat(changeSetsToApply)
-        .withFailMessage("Resulting upgraded database misses changes: %s", getChanges(changeSetsToApply))
-        .isEmpty();
+          .withFailMessage("Resulting upgraded database misses changes: %s", getChanges(changeSetsToApply))
+          .isEmpty();
     }
   }
 
@@ -167,7 +154,7 @@ public class SqlScriptTest {
     executeSqlScript("create", "identity");
     DatabaseSnapshot snapshotCurrent = createCurrentDatabaseSnapshot();
 
-    liquibase.dropAll();
+    cleanUpDatabaseTables();
 
     // old CREATE scripts executed
     executeSqlScript("scripts-old/", "create", "engine_" + oldMajorMinor + ".0");
@@ -180,14 +167,13 @@ public class SqlScriptTest {
 
     // then
     DatabaseSnapshot snapshotUpgraded = createCurrentDatabaseSnapshot();
-    Database currentDatabase = getDatabaseForSnapshot(snapshotCurrent);
-    Database upgradedDatabase = getDatabaseForSnapshot(snapshotUpgraded);
-    DiffResult diffResult = liquibase.diff(currentDatabase, upgradedDatabase, new CompareControl());
-    List<ChangeSet> changeSetsToApply = new DiffToChangeLog(diffResult, new DiffOutputControl()).generateChangeSets();
+    DiffResult diffResult = databaseDiffer.compare(snapshotCurrent, snapshotUpgraded, new CompareControl());
+    List<ChangeSet> changeSetsToApply = new DiffToChangeLog(diffResult, new CustomDiffOutputControl())
+        .generateChangeSets();
 
     assertThat(changeSetsToApply)
-      .withFailMessage("Resulting upgraded database schema differs: %s", getChanges(changeSetsToApply))
-      .isEmpty();
+        .withFailMessage("Resulting upgraded database schema differs: %s", getChanges(changeSetsToApply))
+        .isEmpty();
   }
 
   protected void executeSqlScript(String sqlFolder, String sqlScript) throws LiquibaseException {
@@ -202,25 +188,36 @@ public class SqlScriptTest {
     database.execute(sqlFileChange.generateStatements(database), null);
   }
 
+  protected void cleanUpDatabaseTables() {
+    try {
+      liquibase.dropAll();
+      // dropAll can be incomplete if it takes too long, second attempt should
+      // clean up leftovers
+      liquibase.dropAll();
+    } catch (Exception e) {
+      // ignored
+    }
+  }
+
   protected Database getDatabase() throws DatabaseException {
     String databaseUrl = properties.getProperty("database.url");
     String databaseUser = properties.getProperty("database.username");
     String databasePassword = properties.getProperty("database.password");
     String databaseClass = properties.getProperty("database.driver");
-    return DatabaseFactory.getInstance().openDatabase(databaseUrl, databaseUser, databasePassword, databaseClass,
-        null, null, null, new ClassLoaderResourceAccessor());
+    return DatabaseFactory.getInstance().openDatabase(databaseUrl, databaseUser, databasePassword, databaseClass, null,
+        null, null, new ClassLoaderResourceAccessor());
   }
 
   protected Liquibase getLiquibase() throws URISyntaxException {
-    return new Liquibase("camunda-changelog.xml", getAccessorForChangelogDirectory(""), database);
+    return getLiquibase("", database);
   }
 
-  protected Liquibase getLiquibase(String baseDirectory) throws URISyntaxException {
+  protected static Liquibase getLiquibase(String baseDirectory, Database database) throws URISyntaxException {
     return new Liquibase("camunda-changelog.xml", getAccessorForChangelogDirectory(baseDirectory), database);
   }
 
-  protected FileSystemResourceAccessor getAccessorForChangelogDirectory(String baseDirectory) throws URISyntaxException {
-    URI changelogUri = getClass().getClassLoader().getResource(baseDirectory + "sql/liquibase").toURI();
+  protected static FileSystemResourceAccessor getAccessorForChangelogDirectory(String baseDirectory) throws URISyntaxException {
+    URI changelogUri = SqlScriptTest.class.getClassLoader().getResource(baseDirectory + "sql/liquibase").toURI();
     return new FileSystemResourceAccessor(Paths.get(changelogUri).toAbsolutePath().toFile());
   }
 
@@ -229,73 +226,11 @@ public class SqlScriptTest {
         .createSnapshot(database.getDefaultSchema(), database, new SnapshotControl(database));
   }
 
-  protected Database getDatabaseForSnapshot(DatabaseSnapshot snapshot) throws Exception {
-    String offlineDatabaseUrl = "offline:" + databaseType + "?snapshot=foo";
-    SnapshotResourceAccessor snapshotAccessor = new SnapshotResourceAccessor(snapshot);
-    OfflineConnection offlineDatabaseConnection = new OfflineConnection(offlineDatabaseUrl, snapshotAccessor);
-    return DatabaseFactory.getInstance().findCorrectDatabaseImplementation(offlineDatabaseConnection);
-  }
-
-  protected List<String> getChanges(List<ChangeSet> changeSetsToApply) {
+  protected static List<String> getChanges(List<ChangeSet> changeSetsToApply) {
     return changeSetsToApply.stream()
         .flatMap(cs -> cs.getChanges().stream())
         .map(Change::getDescription)
         .collect(Collectors.toList());
-  }
-
-  protected static class DirectAccessSnapshotParser implements SnapshotParser {
-
-    @Override
-    public int getPriority() {
-      return 0;
-    }
-
-    @Override
-    public DatabaseSnapshot parse(String path, ResourceAccessor resourceAccessor) throws LiquibaseParseException {
-      return ((SnapshotResourceAccessor) resourceAccessor).getSnapshot();
-    }
-
-    @Override
-    public boolean supports(String path, ResourceAccessor resourceAccessor) {
-      return resourceAccessor instanceof SnapshotResourceAccessor;
-    }
-  }
-
-  protected static class SnapshotResourceAccessor implements ResourceAccessor {
-
-    private DatabaseSnapshot snapshot;
-
-    public SnapshotResourceAccessor(DatabaseSnapshot snapshot) {
-      this.snapshot = snapshot;
-    }
-
-    @Override
-    public InputStreamList openStreams(String relativeTo, String streamPath) throws IOException {
-      return null;
-    }
-
-    @Override
-    public InputStream openStream(String relativeTo, String streamPath) throws IOException {
-      return null;
-    }
-
-    @Override
-    public SortedSet<String> list(String relativeTo,
-        String path,
-        boolean recursive,
-        boolean includeFiles,
-        boolean includeDirectories) throws IOException {
-      return null;
-    }
-
-    @Override
-    public SortedSet<String> describeLocations() {
-      return null;
-    }
-
-    public DatabaseSnapshot getSnapshot() {
-      return snapshot;
-    }
   }
 
   protected static class CustomDiffOutputControl extends DiffOutputControl {
