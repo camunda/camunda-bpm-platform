@@ -3,9 +3,9 @@
   "version": "7.20.0-SNAPSHOT",
   "private": true,
   "scripts": {
-    "build": "redoc-cli build -t ./template.hbs target/dependency/openapi.json -o target/index.html"
+    "build": "./build.js"
   },
   "dependencies": {
-    "redoc-cli": "0.13.21"
+    "redoc": "2.1.1"
   }
 }
