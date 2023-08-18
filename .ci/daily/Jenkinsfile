@@ -89,9 +89,9 @@ pipeline {
           }
         }
         stage('stage-restapi-docs') {
-          when {
+          /*when {
             branch cambpmDefaultBranch();
-          }
+          }*/
           steps {
             cambpmConditionalRetry([
               agentLabel : 'centos-stable',
