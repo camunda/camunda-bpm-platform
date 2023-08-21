@@ -54,7 +54,8 @@
       <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
     </dependency>
     
-    <!-- jersey-server (transitive dependency of camunda-bpm-spring-boot-starter-rest)
+    <!-- TODO
+      jersey-server (transitive dependency of camunda-bpm-spring-boot-starter-rest)
       requires JAXB API and Activation API
       to be present; Its pom has an optional profile 
       (activated by Java 11+) that adds these dependencies.

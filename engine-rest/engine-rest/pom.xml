@@ -38,9 +38,10 @@
     <dependency>
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
       <artifactId>jackson-jaxrs-json-provider</artifactId>
-      <!--
+      <!-- TODO
       * Since version 2.10.0 this dependency comes with transitive Jakarta dependencies
-      * These trans-deps are directly included in JDKs <= Java 8 * For Java >= 9 compatible containers, we make sure to include these dependencies
+      * These trans-deps are directly included in JDKs <= Java 8
+      * For Java >= 9 compatible containers, we make sure to include these dependencies
       -->
       <exclusions>
         <exclusion>

@@ -421,7 +421,7 @@
       </build>
     </profile>
     <profile>
-      <id>below-java11</id>
+      <id>below-java11</id> <!-- TODO can be removed after 7.20 is released-->
       <activation>
         <jdk>(,11)</jdk>
       </activation>
@@ -442,7 +442,7 @@
       </build>
     </profile>
     <profile>
-      <id>java11</id>
+      <id>java11</id> <!-- TODO can be removed after 7.20 is released-->
       <activation>
         <jdk>[11,)</jdk>
       </activation>

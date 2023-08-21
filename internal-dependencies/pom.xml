@@ -38,7 +38,8 @@
         <artifactId>HikariCP</artifactId>
         <version>${version.hikaricp}</version>
         <exclusions>
-          <!-- When building with Java 8, hikari has a dependency to SLF4j 1.7.
+          <!-- TODO
+          When building with Java 8, hikari has a dependency to SLF4j 1.7.
           When building with Java 11 or higher, Hikari has a dependency to SLF4j 
           2.0.0-alpha1 instead. We are therefore excluding this dependency here
           and assume that it comes from other dependencies where it is used 
