@@ -261,10 +261,19 @@ module.exports = [
                 template: confirmationTemplate,
                 controller: [
                   '$scope',
-                  function($dialogScope) {
+                  '$timeout',
+                  function($dialogScope, $timeout) {
                     $dialogScope.question = $translate.instant(
                       'USERS_USER_DELETE_CONFIRM',
                       {user: $scope.user.id}
+                    );
+                    $timeout(() =>
+                      Notifications.addMessage({
+                        type: 'info',
+                        status: 'Warning',
+                        unsafe: true,
+                        message: $translate.instant('USERS_USER_DELETE_INFO')
+                      })
                     );
                   }
                 ]
