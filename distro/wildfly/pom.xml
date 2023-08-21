@@ -45,7 +45,7 @@
                   <message>
                     *****************************************************************************************************
                     *                                                                                                   *
-                    *                You must use at least JDK 11 to compile Camunda Platform Wildfly!!!               *
+                    *                You must use at least JDK 11 to compile Camunda Platform Wildfly!!!                *
                     *                                                                                                   *
                     *****************************************************************************************************
                   </message>
