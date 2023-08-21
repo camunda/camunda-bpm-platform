@@ -1671,7 +1671,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
 
     // when bean changed and job is due
     myBean.setCycle("R2/PT2H");
-    moveByHours(1);
+    moveByHours(1); // execute second job
 
     // then one more job is left due in 2 hours
     Date duedate = managementService.createJobQuery().singleResult().getDuedate();
@@ -1707,14 +1707,14 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
 
     TaskQuery taskQuery = taskService.createTaskQuery().taskDefinitionKey("aTaskName");
     assertEquals(0, taskQuery.count());
-    moveByHours(1);
+    moveByHours(1); // execute first job
     assertEquals(1, taskQuery.count());
 
     // when bean changed and job is due
     myBean.setCycle("R2/PT2H");
-    moveByHours(1);
+    moveByHours(1); // execute second job
 
-    // then no one more job is left
+    // then no more job left
     assertThat(managementService.createJobQuery().singleResult()).isNull();
     assertEquals(2, taskQuery.count());
   }
@@ -1723,7 +1723,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
   public void shouldReevaluateCronTimerCycleWhenDue() throws Exception {
     // given
     ClockUtil.setCurrentTime(new Date(1692338400000l)); //"2023/8/18 8:00:00"
-    MyBean myBean = new MyBean("0 0 * ? * * *");
+    MyBean myBean = new MyBean("0 0 * ? * * *"); // every hour
     processEngineConfiguration.getBeans().put("myBean", myBean);
     processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
 
@@ -1732,8 +1732,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     moveByHours(1); // execute first job
 
     // when bean changed and job is due
-    myBean.setCycle("0 0 0/2 ? * * *");
-    moveByHours(1);
+    myBean.setCycle("0 0 0/2 ? * * *"); // at 0 minutes past the hour, every 2 hours
+    moveByHours(1); // execute second job
 
     // then one more job is left due in 2 hours
     Date duedate = managementService.createJobQuery().singleResult().getDuedate();
@@ -1750,11 +1750,11 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
 
     createAndDeployProcessWithStartTimer();
-    moveByHours(1);
+    moveByHours(1); // execute first job
 
     // when bean changed and job is due
-    myBean.setCycle("0 0 0/2 ? * * *");
-    moveByHours(1);
+    myBean.setCycle("0 0 0/2 ? * * *"); // at 0 minutes past the hour, every 2 hours
+    moveByHours(1); // execute second job
 
     // then one more job is left due in 2 hours
     Date duedate = managementService.createJobQuery().singleResult().getDuedate();

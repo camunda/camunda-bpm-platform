@@ -774,12 +774,12 @@ public class BoundaryTimerNonInterruptingEventTest {
 
     JobQuery jobQuery = managementService.createJobQuery();
     assertThat(jobQuery.count()).isEqualTo(1);
-    moveByHours(1);
+    moveByHours(1); // execute first job
     assertThat(jobQuery.count()).isEqualTo(1);
 
     // when bean changed and job is due
     myBean.setCycle("R2/PT2H");
-    moveByHours(1);
+    moveByHours(1); // execute second job
 
     // then one more job is left due in 2 hours
     assertThat(jobQuery.count()).isEqualTo(1);
@@ -799,14 +799,14 @@ public class BoundaryTimerNonInterruptingEventTest {
 
     JobQuery jobQuery = managementService.createJobQuery();
     assertThat(jobQuery.count()).isEqualTo(1);
-    moveByHours(1);
+    moveByHours(1); // execute first job
     assertThat(jobQuery.count()).isEqualTo(1);
 
     // when bean changed and job is due
     myBean.setCycle("R2/PT2H");
-    moveByHours(1);
+    moveByHours(1); // execute second job
 
-    // then no one more job is left (two jobs has been executed already
+    // then no more jobs are left (two jobs has been executed already)
     assertThat(managementService.createJobQuery().singleResult()).isNull();
   }
 

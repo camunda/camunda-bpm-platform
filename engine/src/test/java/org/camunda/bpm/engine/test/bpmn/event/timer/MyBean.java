@@ -20,7 +20,8 @@ import java.io.Serializable;
 
 public class MyBean implements Serializable {
 
-  private static final long serialVersionUID = 6579820932062158085L;
+  private static final long serialVersionUID = 1L;
+
   protected String cycle;
 
   public MyBean(String cycle) {
