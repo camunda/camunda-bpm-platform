@@ -36,6 +36,7 @@
     <version.feel-scala>1.15.3</version.feel-scala>
     <plugin.version.javadoc>3.0.1</plugin.version.javadoc>
     <version.java>11</version.java>
+<!--    <maven.compiler.release>11</maven.compiler.release>-->
   </properties>
 
   <build>
