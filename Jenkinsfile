@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@3690']) _
 
 def failedStageTypes = []
 
@@ -13,6 +13,7 @@ pipeline {
   environment {
     LOGGER_LOG_LEVEL = 'DEBUG'
     MAVEN_VERSION = 'maven-3.8-latest'
+    JDK_VERSION = 'jdk-11-latest'
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
