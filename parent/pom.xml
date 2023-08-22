@@ -206,7 +206,7 @@
              <Bundle-Name>${project.name}</Bundle-Name>
              <Bundle-SymbolicName>${camunda.osgi.symbolic.name}</Bundle-SymbolicName>
              <Bundle-Activator>${camunda.osgi.activator}</Bundle-Activator>
-<!--             <Export-Package>${camunda.osgi.export}</Export-Package>-->
+             <Export-Package>${camunda.osgi.export}</Export-Package>
              <Import-Package>${camunda.osgi.import}</Import-Package>
              <DynamicImport-Package>${camunda.osgi.dynamic}</DynamicImport-Package>
              <Private-Package>${camunda.osgi.private.pkg}</Private-Package>
@@ -219,7 +219,6 @@
              <Export-Service>${camunda.osgi.export.service}</Export-Service>
              <Import-Service>${camunda.osgi.import.service}</Import-Service>
              <Embed-Dependency>${camunda.osgi.embed}</Embed-Dependency>
-<!--              <_nodefaultversion>true</_nodefaultversion>-->
             </instructions>
            <versions>
             <camunda.osgi.version.clean>${project.version}</camunda.osgi.version.clean>

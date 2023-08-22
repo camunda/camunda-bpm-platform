@@ -348,10 +348,10 @@
     </camunda.artifact>
     <camunda.osgi.export.pkg>
       !${camunda.artifact}.engine.variable.*,
-      ${camunda.artifact};${camunda.osgi.version};-noimport:=true,
-      ${camunda.artifact}.application.*;${camunda.osgi.version};-noimport:=true,
-      ${camunda.artifact}.container.*;${camunda.osgi.version};-noimport:=true,
-      ${camunda.artifact}.engine.*;${camunda.osgi.version};-noimport:=true
+      ${camunda.artifact},
+      ${camunda.artifact}.application.*,
+      ${camunda.artifact}.container.*,
+      ${camunda.artifact}.engine.*
     </camunda.osgi.export.pkg>
     <camunda.osgi.import.additional>
       !com.google.gson.*,
