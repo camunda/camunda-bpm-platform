@@ -764,8 +764,8 @@ public class BoundaryTimerNonInterruptingEventTest {
   }
 
   @Test
-  @Deployment
-  public void shouldReevaluateTimerCycleWhenDue() throws Exception {
+  @Deployment(resources = {TIMER_NON_INTERRUPTING_EVENT})
+  public void shouldReevaluateLongerTimerCycleWhenDue() throws Exception {
     // given
     MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R2/PT1H");
     processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
@@ -800,7 +800,7 @@ public class BoundaryTimerNonInterruptingEventTest {
 
   @Test
   @Deployment(resources = {TIMER_NON_INTERRUPTING_EVENT})
-  public void shouldReevaluateTimerCycleWhenDue2() throws Exception {
+  public void shouldReevaluateShorterTimerCycleWhenDue() throws Exception {
     // given
     MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R3/PT2H");
     processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
@@ -816,7 +816,6 @@ public class BoundaryTimerNonInterruptingEventTest {
     // when bean changed and job is due
     myCycleTimerBean.setCycle("R2/PT1H");
     moveByHours(2); // execute second job
-    System.out.println(jobQuery.singleResult().getDuedate());
 
     // then one more job is left due in 1 hours
     assertThat(jobQuery.count()).isEqualTo(1);

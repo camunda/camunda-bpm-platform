@@ -89,7 +89,7 @@ public class TimerEntity extends JobEntity {
               .getValue(execution).toString();
           repeat = adjustRepeatBasedOnNewExpression(expressionValue);
         }
-        Date newDueDate = calculateRepeat();
+        Date newDueDate = calculateNewDueDate();
 
         if (newDueDate != null) {
           // the listener is added to the transaction as SYNC on ROLLABCK,
@@ -121,21 +121,61 @@ public class TimerEntity extends JobEntity {
   }
 
   protected String adjustRepeatBasedOnNewExpression(String expressionValue) {
-    String changedRepeat = expressionValue; // changed to a cron expression
+    String changedRepeat;
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     if (expressionValue.startsWith("R")) { // changed to a repeatable interval
-      if (repeat.startsWith("R") && isSameRepeatCycle(expressionValue)) { // is the same repeatable interval
-        changedRepeat = expressionValue.replace("/", "/" + repeat.split("/")[1] + "/");
-      } else {// was a cron expression or a new repeatable interval => adjust the date
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+      if (repeat.startsWith("R") ) {
+        if (isSameRepeatCycle(expressionValue)) {
+          // the same repeatable interval => keep the start date
+          changedRepeat = repeat;
+        } else {
+          // different repeatable interval => change the start date
+          changedRepeat = expressionValue.replace("/", "/" + sdf.format(ClockUtil.getCurrentTime()) + "/");
+        }
+      } else {
+        // was a cron expression => change the start date
+        changedRepeat = expressionValue.replace("/", "/" + sdf.format(ClockUtil.getCurrentTime()) + "/");
+      }
+    } else {
+      // changed to a cron expression
+      changedRepeat = expressionValue;
+    }
+
+
+    return changedRepeat;
+  }
+
+  protected String adjustRepeatBasedOfnNewExpression(String expressionValue) {
+    String changedRepeat = repeat; // same
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    if (expressionValue.startsWith("R")) { // changed to a repeatable interval
+      if (repeat.startsWith("R") && !isSameRepeatCycle(expressionValue)) {
+        if (isSameRepeatCycle(expressionValue)) {
+          changedRepeat = repeat;
+        } else {
+          // is the same repeatable interval => keep the start date
+          changedRepeat = expressionValue.replace("/", "/" + sdf.format(ClockUtil.getCurrentTime()) + "/");
+
+        }
+      } else {
+        // was a cron expression or a new repeatable interval => adjust the start date
         changedRepeat = expressionValue.replace("/", "/" + sdf.format(ClockUtil.getCurrentTime()) + "/");
       }
     }
+
+
     return changedRepeat;
   }
 
   protected boolean isSameRepeatCycle(String expressionValue) {
     String[] currentRepeat = repeat.split("/");      // "R3/date/PT2H"
+//for (String string : currentRepeat) {
+//  System.out.println(string);
+//}
     String[] newRepeat = expressionValue.split("/"); // "R3/PT2H"
+//    for (String string : newRepeat) {
+//      System.out.println(string);
+//    }
     return currentRepeat[0].equals(newRepeat[0]) && currentRepeat[2].equals(newRepeat[1]);
   }
 
@@ -153,7 +193,7 @@ public class TimerEntity extends JobEntity {
       .schedule(newTimer);
   }
 
-  public Date calculateRepeat() {
+  public Date calculateNewDueDate() {
     BusinessCalendar businessCalendar = Context
         .getProcessEngineConfiguration()
         .getBusinessCalendarManager()
