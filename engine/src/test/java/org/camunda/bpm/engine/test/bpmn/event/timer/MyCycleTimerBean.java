@@ -18,13 +18,13 @@ package org.camunda.bpm.engine.test.bpmn.event.timer;
 
 import java.io.Serializable;
 
-public class MyBean implements Serializable {
+public class MyCycleTimerBean implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
   protected String cycle;
 
-  public MyBean(String cycle) {
+  public MyCycleTimerBean(String cycle) {
     this.cycle = cycle;
   }
 

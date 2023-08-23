@@ -35,7 +35,6 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cmd.DeleteJobsCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
@@ -73,7 +72,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
 
   @After
   public void tearDown() {
-    processEngineConfiguration.getBeans().remove("myBean");
+    processEngineConfiguration.getBeans().remove("myCycleTimerBean");
     processEngineConfiguration.setReevaluateTimeCycleWhenDue(reevaluateTimeCycleWhenDue);
   }
 
@@ -1661,8 +1660,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
   @Test
   public void shouldReevaluateTimerCycleWhenDue() throws Exception {
     // given
-    MyBean myBean = new MyBean("R2/PT1H");
-    processEngineConfiguration.getBeans().put("myBean", myBean);
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R2/PT1H");
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
     processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
 
     createAndDeployProcessWithStartTimer();
@@ -1670,7 +1669,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     moveByHours(1); // execute first job
 
     // when bean changed and job is due
-    myBean.setCycle("R2/PT2H");
+    myCycleTimerBean.setCycle("R2/PT2H");
     moveByHours(1); // execute second job
 
     // then one more job is left due in 2 hours
@@ -1682,8 +1681,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
   @Test
   public void shouldNotReevaluateTimerCycle() throws Exception {
     // given
-    MyBean myBean = new MyBean("R2/PT1H");
-    processEngineConfiguration.getBeans().put("myBean", myBean);
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R2/PT1H");
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
     processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
 
     createAndDeployProcessWithStartTimer();
@@ -1699,8 +1698,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
   @Test
   public void shouldNotReevaluateTimerCycleWhenDue() throws Exception {
     // given
-    MyBean myBean = new MyBean("R2/PT1H");
-    processEngineConfiguration.getBeans().put("myBean", myBean);
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R2/PT1H");
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
     processEngineConfiguration.setReevaluateTimeCycleWhenDue(false);
 
     createAndDeployProcessWithStartTimer();
@@ -1711,7 +1710,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     assertEquals(1, taskQuery.count());
 
     // when bean changed and job is due
-    myBean.setCycle("R2/PT2H");
+    myCycleTimerBean.setCycle("R2/PT2H");
     moveByHours(1); // execute second job
 
     // then no more job left
@@ -1723,8 +1722,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
   public void shouldReevaluateCronTimerCycleWhenDue() throws Exception {
     // given
     ClockUtil.setCurrentTime(new Date(1692338400000l)); //"2023/8/18 8:00:00"
-    MyBean myBean = new MyBean("0 0 * ? * * *"); // every hour
-    processEngineConfiguration.getBeans().put("myBean", myBean);
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("0 0 * ? * * *"); // every hour
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
     processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
 
     createAndDeployProcessWithStartTimer();
@@ -1732,7 +1731,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     moveByHours(1); // execute first job
 
     // when bean changed and job is due
-    myBean.setCycle("0 0 0/2 ? * * *"); // at 0 minutes past the hour, every 2 hours
+    myCycleTimerBean.setCycle("0 0 0/2 ? * * *"); // at 0 minutes past the hour, every 2 hours
     moveByHours(1); // execute second job
 
     // then one more job is left due in 2 hours
@@ -1745,15 +1744,15 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
   public void shouldReevaluateRepeatingToCronTimerCycleWhenDue() throws Exception {
     // given
     ClockUtil.setCurrentTime(new Date(1692338400000l)); //"2023/8/18 8:00:00"
-    MyBean myBean = new MyBean("R2/PT1H");
-    processEngineConfiguration.getBeans().put("myBean", myBean);
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R2/PT1H");
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
     processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
 
     createAndDeployProcessWithStartTimer();
     moveByHours(1); // execute first job
 
     // when bean changed and job is due
-    myBean.setCycle("0 0 0/2 ? * * *"); // at 0 minutes past the hour, every 2 hours
+    myCycleTimerBean.setCycle("0 0 0/2 ? * * *"); // at 0 minutes past the hour, every 2 hours
     moveByHours(1); // execute second job
 
     // then one more job is left due in 2 hours
@@ -1783,10 +1782,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
 
   protected void moveByHours(int hours) throws Exception {
     ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + ((hours * 60 * 1000 * 60) + 5000)));
-    JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
-    jobExecutor.start();
-    Thread.sleep(1000);
-    jobExecutor.shutdown();
+    testRule.executeAvailableJobs(false);
   }
 
   protected String getNextExecutableJobId() {
@@ -1805,15 +1801,12 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
   }
 
   protected void createAndDeployProcessWithStartTimer() {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process")
+    testRule.deploy(Bpmn.createExecutableProcess("process")
         .startEvent()
-        .timerWithCycle("#{myBean.getCycle()}")
+        .timerWithCycle("#{myCycleTimerBean.getCycle()}")
         .userTask("aTaskName")
         .endEvent()
-        .done();
-
-    testRule.deploy(repositoryService.createDeployment()
-        .addModelInstance("process.bpmn", modelInstance));
+        .done());
   }
 
 }

@@ -14,7 +14,7 @@
 
         <boundaryEvent id="timer" attachedToRef="task" cancelActivity="false">
             <timerEventDefinition>
-                <timeCycle>#{myBean.getCycle()}</timeCycle>
+                <timeCycle>#{myCycleTimerBean.getCycle()}</timeCycle>
             </timerEventDefinition>
         </boundaryEvent>
         <sequenceFlow id="flow3" sourceRef="timer" targetRef="aTaskName"/>

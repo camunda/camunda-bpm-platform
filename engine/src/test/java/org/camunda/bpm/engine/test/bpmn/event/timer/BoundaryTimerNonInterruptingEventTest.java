@@ -35,7 +35,6 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -88,7 +87,7 @@ public class BoundaryTimerNonInterruptingEventTest {
   @After
   public void tearDown() {
     ClockUtil.reset();
-    processEngineConfiguration.getBeans().remove("myBean");
+    processEngineConfiguration.getBeans().remove("myCycleTimerBean");
     processEngineConfiguration.setReevaluateTimeCycleWhenDue(reevaluateTimeCycleWhenDue);
   }
 
@@ -766,8 +765,8 @@ public class BoundaryTimerNonInterruptingEventTest {
   @Deployment
   public void shouldReevaluateTimerCycleWhenDue() throws Exception {
     // given
-    MyBean myBean = new MyBean("R2/PT1H");
-    processEngineConfiguration.getBeans().put("myBean", myBean);
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R2/PT1H");
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
     processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
 
     runtimeService.startProcessInstanceByKey("nonInterruptingCycle").getId();
@@ -778,7 +777,7 @@ public class BoundaryTimerNonInterruptingEventTest {
     assertThat(jobQuery.count()).isEqualTo(1);
 
     // when bean changed and job is due
-    myBean.setCycle("R2/PT2H");
+    myCycleTimerBean.setCycle("R2/PT2H");
     moveByHours(1); // execute second job
 
     // then one more job is left due in 2 hours
@@ -789,11 +788,33 @@ public class BoundaryTimerNonInterruptingEventTest {
 
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerNonInterruptingEventTest.shouldReevaluateTimerCycleWhenDue.bpmn20.xml"})
-  public void shouldNotReevaluateTimerCycleWhenDue() throws Exception {
+  public void shouldNotReevaluateTimerCycle() throws Exception {
     // given
-    MyBean myBean = new MyBean("R2/PT1H");
-    processEngineConfiguration.getBeans().put("myBean", myBean);
-    processEngineConfiguration.setReevaluateTimeCycleWhenDue(false);
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R2/PT1H");
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
+    processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
+
+    runtimeService.startProcessInstanceByKey("nonInterruptingCycle").getId();
+
+    JobQuery jobQuery = managementService.createJobQuery();
+    assertThat(jobQuery.count()).isEqualTo(1);
+    moveByHours(1); // execute first job
+    assertThat(jobQuery.count()).isEqualTo(1);
+
+    // when job is due
+    moveByHours(1); // execute second job
+
+    // then no more jobs are left (two jobs has been executed already)
+    assertThat(managementService.createJobQuery().singleResult()).isNull();
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerNonInterruptingEventTest.shouldReevaluateTimerCycleWhenDue.bpmn20.xml"})
+  public void shouldNotReevaluateTimerCycleIfCycleDoesNotChange() throws Exception {
+    // given
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R2/PT1H");
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
+    processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
 
     runtimeService.startProcessInstanceByKey("nonInterruptingCycle").getId();
 
@@ -803,19 +824,17 @@ public class BoundaryTimerNonInterruptingEventTest {
     assertThat(jobQuery.count()).isEqualTo(1);
 
     // when bean changed and job is due
-    myBean.setCycle("R2/PT2H");
+    myCycleTimerBean.setCycle("R2/PT2H");
     moveByHours(1); // execute second job
 
-    // then no more jobs are left (two jobs has been executed already)
-    assertThat(managementService.createJobQuery().singleResult()).isNull();
+    // then one more job is left due in 2 hours
+    assertThat(jobQuery.count()).isEqualTo(1);
+    assertThat(jobQuery.singleResult().getDuedate())
+        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + ((2 * 60 * 1000 * 60))));
   }
 
-  //we cannot use waitForExecutor... method since there will always be one job left
-  private void moveByHours(int hours) throws Exception {
+  protected void moveByHours(int hours) throws Exception {
     ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + ((hours * 60 * 1000 * 60) + 5000)));
-    JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
-    jobExecutor.start();
-    Thread.sleep(1000);
-    jobExecutor.shutdown();
+    testHelper.executeAvailableJobs(false);
   }
 }
