@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -115,6 +114,7 @@ public class TimerEntity extends JobEntity {
   }
 
   protected boolean isCycleExpression() {
+    // Note timer cycle configuration is constructed in BpmnParse#parseTimer
     String jobConfiguration = jobDefinition.getJobConfiguration();
     return jobConfiguration.contains("CYCLE: #") || jobConfiguration.contains("CYCLE: $");
   }
@@ -125,8 +125,7 @@ public class TimerEntity extends JobEntity {
       if (repeat.startsWith("R")) { // was repeatable interval
         changedRepeat = expressionValue.replace("/", "/" + repeat.split("/")[1] + "/");
       } else {// was a cron expression
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        changedRepeat = expressionValue.replace("/", "/" + sdf.format(ClockUtil.getCurrentTime()) + "/");
+        changedRepeat = expressionValue.replace("/", "/" + ClockUtil.getCurrentTime() + "/");
       }
     }
     return changedRepeat;
