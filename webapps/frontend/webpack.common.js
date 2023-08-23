@@ -68,11 +68,6 @@ module.exports = {
         __dirname,
         'ui/welcome/client/scripts/camunda-welcome-bootstrap.js'
       )
-    },
-
-    /* Shared */
-    'lib/ngDefine': {
-      import: path.resolve(__dirname, 'ui/common/lib/ngDefine.js')
     }
   },
   stats: {
@@ -170,6 +165,22 @@ module.exports = {
         {
           from: path.resolve(__dirname, 'public'),
           to: './'
+        },
+        {
+          from: path.resolve(
+            __dirname,
+            'node_modules/requirejs-angular-define/dist/ngDefine.js'
+          ),
+          to: './lib',
+          noErrorOnMissing: true
+        },
+        {
+          from: path.resolve(
+            __dirname,
+            '../../node_modules/requirejs-angular-define/dist/ngDefine.js'
+          ),
+          to: './lib',
+          noErrorOnMissing: true
         }
       ]
     }),
