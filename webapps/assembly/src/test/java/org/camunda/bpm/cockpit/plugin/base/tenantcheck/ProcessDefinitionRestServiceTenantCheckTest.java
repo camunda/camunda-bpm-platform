@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -86,11 +87,11 @@ public class ProcessDefinitionRestServiceTenantCheckTest extends AbstractCockpit
     identityService.setAuthentication("user", null, null);
 
     // when
-    List<ProcessDefinitionStatisticsDto> result = resource.queryStatistics(uriInfo, null, null);
+    List<ProcessDefinitionStatisticsDto> actual = resource.queryStatistics(uriInfo, null, null);
 
     // then
-    assertThat(result).hasSize(1);
-    assertThat(result).extracting("key", "tenantId")
+    assertThat(actual).hasSize(1);
+    assertThat(actual).extracting("key", "tenantId")
         .containsOnly(tuple("multiTenancyCallActivity", null));
   }
 
@@ -100,11 +101,11 @@ public class ProcessDefinitionRestServiceTenantCheckTest extends AbstractCockpit
     identityService.setAuthentication("user", null, Collections.singletonList(TENANT_ONE));
 
     // when
-    List<ProcessDefinitionStatisticsDto> result = resource.queryStatistics(uriInfo, null, null);
+    List<ProcessDefinitionStatisticsDto> actual = resource.queryStatistics(uriInfo, null, null);
 
     // then
-    assertThat(result).hasSize(2);
-    assertThat(result).extracting("key", "tenantId")
+    assertThat(actual).hasSize(2);
+    assertThat(actual).extracting("key", "tenantId")
         .containsSequence(tuple("multiTenancyCallActivity", null),
                           tuple("userTaskProcess", TENANT_ONE));
   }
@@ -116,11 +117,11 @@ public class ProcessDefinitionRestServiceTenantCheckTest extends AbstractCockpit
     identityService.setAuthentication("user", null, null);
 
     // when
-    List<ProcessDefinitionStatisticsDto> result = resource.queryStatistics(uriInfo, null, null);
+    List<ProcessDefinitionStatisticsDto> actual = resource.queryStatistics(uriInfo, null, null);
 
     // then
-    assertThat(result).hasSize(3);
-    assertThat(result).extracting("key", "tenantId")
+    assertThat(actual).hasSize(3);
+    assertThat(actual).extracting("key", "tenantId")
         .containsSequence(tuple("multiTenancyCallActivity", null),
                           tuple("userTaskProcess", TENANT_ONE),
                           tuple("userTaskProcess", TENANT_TWO));
@@ -132,11 +133,11 @@ public class ProcessDefinitionRestServiceTenantCheckTest extends AbstractCockpit
     identityService.setAuthentication("user", Collections.singletonList(Groups.CAMUNDA_ADMIN), null);
 
     // when
-    List<ProcessDefinitionStatisticsDto> result = resource.queryStatistics(uriInfo, null, null);
+    List<ProcessDefinitionStatisticsDto> actual = resource.queryStatistics(uriInfo, null, null);
 
     // then
-    assertThat(result).hasSize(3);
-    assertThat(result).extracting("key", "tenantId")
+    assertThat(actual).hasSize(3);
+    assertThat(actual).extracting("key", "tenantId")
         .containsSequence(tuple("multiTenancyCallActivity", null),
                           tuple("userTaskProcess", TENANT_ONE),
                           tuple("userTaskProcess", TENANT_TWO));
@@ -148,11 +149,11 @@ public class ProcessDefinitionRestServiceTenantCheckTest extends AbstractCockpit
     identityService.setAuthentication("user", Collections.singletonList(ADMIN_GROUP), null);
 
     // when
-    List<ProcessDefinitionStatisticsDto> result = resource.queryStatistics(uriInfo, null, null);
+    List<ProcessDefinitionStatisticsDto> actual = resource.queryStatistics(uriInfo, null, null);
 
     // then
-    assertThat(result).hasSize(3);
-    assertThat(result).extracting("key", "tenantId")
+    assertThat(actual).hasSize(3);
+    assertThat(actual).extracting("key", "tenantId")
         .containsSequence(tuple("multiTenancyCallActivity", null),
                           tuple("userTaskProcess", TENANT_ONE),
                           tuple("userTaskProcess", TENANT_TWO));
@@ -164,14 +165,87 @@ public class ProcessDefinitionRestServiceTenantCheckTest extends AbstractCockpit
     identityService.setAuthentication("adminUser", null, null);
 
     // when
-    List<ProcessDefinitionStatisticsDto> result = resource.queryStatistics(uriInfo, null, null);
+    List<ProcessDefinitionStatisticsDto> actual = resource.queryStatistics(uriInfo, null, null);
 
     // then
-    assertThat(result).hasSize(3);
-    assertThat(result).extracting("key", "tenantId")
+    assertThat(actual).hasSize(3);
+    assertThat(actual).extracting("key", "tenantId")
         .containsSequence(tuple("multiTenancyCallActivity", null),
                           tuple("userTaskProcess", TENANT_ONE),
                           tuple("userTaskProcess", TENANT_TWO));
+  }
+
+  @Test
+  public void getStatisticsCountNoAuthenticatedTenant() {
+    // given
+    identityService.setAuthentication("user", null, null);
+
+    // when
+    CountResultDto actual = resource.getStatisticsCount(uriInfo);
+
+    // then
+    assertThat(actual.getCount()).isEqualTo(1);
+  }
+
+  @Test
+  public void getStatisticsCountWithAuthenticatedTenant() {
+    // given
+    identityService.setAuthentication("user", null, Collections.singletonList(TENANT_ONE));
+
+    // when
+    CountResultDto actual = resource.getStatisticsCount(uriInfo);
+
+    // then
+    assertThat(actual.getCount()).isEqualTo(2);
+  }
+
+  @Test
+  public void getStatisticsCountWithDisabledTenantCheck() {
+    // given
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    // when
+    CountResultDto actual = resource.getStatisticsCount(uriInfo);
+
+    // then
+    assertThat(actual.getCount()).isEqualTo(3);
+  }
+
+  @Test
+  public void getStatisticsCountWithCamundaAdmin() {
+    // given
+    identityService.setAuthentication("user", Collections.singletonList(Groups.CAMUNDA_ADMIN), null);
+
+    // when
+    CountResultDto actual = resource.getStatisticsCount(uriInfo);
+
+    // then
+    assertThat(actual.getCount()).isEqualTo(3);
+  }
+
+  @Test
+  public void getStatisticsCountWithAdminGroups() {
+    // given
+    identityService.setAuthentication("user", Collections.singletonList(ADMIN_GROUP), null);
+
+    // when
+    CountResultDto actual = resource.getStatisticsCount(uriInfo);
+
+    // then
+    assertThat(actual.getCount()).isEqualTo(3);
+  }
+
+  @Test
+  public void getStatisticsCountWithAdminUsers() {
+    // given
+    identityService.setAuthentication("adminUser", null, null);
+
+    // when
+    CountResultDto actual = resource.getStatisticsCount(uriInfo);
+
+    // then
+    assertThat(actual.getCount()).isEqualTo(3);
   }
 
 }

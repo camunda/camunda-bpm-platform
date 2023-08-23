@@ -18,6 +18,7 @@ package org.camunda.bpm.cockpit.plugin.base.authorization;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessDefinitionStatisticsDto;
 import org.camunda.bpm.cockpit.impl.plugin.resources.ProcessDefinitionRestService;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,10 +73,10 @@ public class ProcessDefinitionRestServiceAuthorizationTest  extends Authorizatio
   @Test
   public void queryStatisticsWithoutAuthorization() {
     // when
-    List<ProcessDefinitionStatisticsDto> result = resource.queryStatistics(uriInfo, null, null);
+    List<ProcessDefinitionStatisticsDto> actual = resource.queryStatistics(uriInfo, null, null);
 
     // then
-    assertThat(result).isEmpty();
+    assertThat(actual).isEmpty();
   }
 
   @Test
@@ -85,11 +86,11 @@ public class ProcessDefinitionRestServiceAuthorizationTest  extends Authorizatio
     createGrantAuthorization(PROCESS_DEFINITION, key, userId, READ);
 
     // when
-    List<ProcessDefinitionStatisticsDto> result = resource.queryStatistics(uriInfo, null, null);
+    List<ProcessDefinitionStatisticsDto> actual = resource.queryStatistics(uriInfo, null, null);
 
     // then
-    assertThat(result).hasSize(1);
-    assertThat(result).extracting("key", "tenantId")
+    assertThat(actual).hasSize(1);
+    assertThat(actual).extracting("key", "tenantId")
         .containsOnly(tuple(CALLING_USER_TASK_PROCESS_KEY, null));
   }
 
@@ -99,11 +100,11 @@ public class ProcessDefinitionRestServiceAuthorizationTest  extends Authorizatio
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
 
     // when
-    List<ProcessDefinitionStatisticsDto> result = resource.queryStatistics(uriInfo, null, null);
+    List<ProcessDefinitionStatisticsDto> actual = resource.queryStatistics(uriInfo, null, null);
 
     // then
-    assertThat(result).hasSize(2);
-    assertThat(result).extracting("key", "tenantId")
+    assertThat(actual).hasSize(2);
+    assertThat(actual).extracting("key", "tenantId")
         .containsSequence(tuple(CALLING_USER_TASK_PROCESS_KEY, null),
                           tuple(USER_TASK_PROCESS_KEY, null));
   }
@@ -116,13 +117,61 @@ public class ProcessDefinitionRestServiceAuthorizationTest  extends Authorizatio
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
 
     // when
-    List<ProcessDefinitionStatisticsDto> result = resource.queryStatistics(uriInfo, null, null);
+    List<ProcessDefinitionStatisticsDto> actual = resource.queryStatistics(uriInfo, null, null);
 
     // then
-    assertThat(result).hasSize(2);
-    assertThat(result).extracting("key", "tenantId")
+    assertThat(actual).hasSize(2);
+    assertThat(actual).extracting("key", "tenantId")
         .containsSequence(tuple(CALLING_USER_TASK_PROCESS_KEY, null),
                           tuple(USER_TASK_PROCESS_KEY, null));
+  }
+
+  @Test
+  public void getStatisticsCountWithoutAuthorization() {
+    // when
+    CountResultDto actual = resource.getStatisticsCount(uriInfo);
+
+    // then
+    assertThat(actual.getCount()).isEqualTo(0);
+  }
+
+  @Test
+  public void getStatisticsCountWithReadPermissionOnProcessDefinition() {
+    // given
+    String key = selectProcessDefinitionByKey(CALLING_USER_TASK_PROCESS_KEY).getKey();
+    createGrantAuthorization(PROCESS_DEFINITION, key, userId, READ);
+
+    // when
+    CountResultDto actual = resource.getStatisticsCount(uriInfo);
+
+    // then
+    assertThat(actual.getCount()).isEqualTo(1);
+  }
+
+  @Test
+  public void getStatisticsCountWithReadPermissionOnAnyProcessDefinition() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
+
+    // when
+    CountResultDto actual = resource.getStatisticsCount(uriInfo);
+
+    // then
+    assertThat(actual.getCount()).isEqualTo(2);
+  }
+
+  @Test
+  public void getStatisticsCountWithMultipleReadPermissions() {
+    // given
+    String key = selectProcessDefinitionByKey(CALLING_USER_TASK_PROCESS_KEY).getKey();
+    createGrantAuthorization(PROCESS_DEFINITION, key, userId, READ);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
+
+    // when
+    CountResultDto actual = resource.getStatisticsCount(uriInfo);
+
+    // then
+    assertThat(actual.getCount()).isEqualTo(2);
   }
 
 }

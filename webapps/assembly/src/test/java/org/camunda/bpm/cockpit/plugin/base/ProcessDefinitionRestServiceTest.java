@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -199,9 +200,11 @@ public class ProcessDefinitionRestServiceTest extends AbstractCockpitPluginTest 
 
     // when
     List<ProcessDefinitionStatisticsDto> actual = resource.queryStatistics(uriInfo, null, null);
+    CountResultDto actualCount = resource.getStatisticsCount(uriInfo);
 
     // then
     assertThat(actual).hasSize(1);
+    assertThat(actualCount.getCount()).isEqualTo(actual.size());
     assertProcessDefinitionStatisticsDto(actual.get(0), processDefinition, 4, 5);
   }
 
@@ -227,9 +230,11 @@ public class ProcessDefinitionRestServiceTest extends AbstractCockpitPluginTest 
 
     // when
     List<ProcessDefinitionStatisticsDto> actual = resource.queryStatistics(uriInfo, null, null);
+    CountResultDto actualCount = resource.getStatisticsCount(uriInfo);
 
     // then
     assertThat(actual).hasSize(2);
+    assertThat(actualCount.getCount()).isEqualTo(actual.size());
     assertProcessDefinitionStatisticsDto(actual.get(0), pdTenant1, 2, 3);
     assertProcessDefinitionStatisticsDto(actual.get(1), pdTenant2, 2, 2);
   }
@@ -237,9 +242,11 @@ public class ProcessDefinitionRestServiceTest extends AbstractCockpitPluginTest 
   protected void verifyPaginatedResult(int firstResult, int maxResults, int expectedResults) {
     // when
     List<ProcessDefinitionStatisticsDto> actual = resource.queryStatistics(uriInfo, firstResult, maxResults);
+    CountResultDto actualCount = resource.getStatisticsCount(uriInfo);
 
     // then
     assertThat(actual).hasSize(expectedResults);
+    assertThat(actualCount.getCount()).isEqualTo(10);
     for (int i = 0; i < expectedResults; i++) {
       assertThat(actual.get(i).getKey()).isEqualTo("ProcessDefinition-" + (i + firstResult));
       assertThat(actual.get(i).getName()).isEqualTo("Process Definition " + (i + firstResult));
@@ -267,9 +274,11 @@ public class ProcessDefinitionRestServiceTest extends AbstractCockpitPluginTest 
 
     // when
     List<ProcessDefinitionStatisticsDto> actual = resource.queryStatistics(uriInfo, null, null);
+    CountResultDto actualCount = resource.getStatisticsCount(uriInfo);
 
     // then
     assertThat(actual).hasSize(1);
+    assertThat(actualCount.getCount()).isEqualTo(actual.size());
     assertThat(actual.get(0).getKey()).isEqualTo(key);
     assertThat(actual.get(0).getName()).isEqualTo(name);
   }
@@ -303,9 +312,11 @@ public class ProcessDefinitionRestServiceTest extends AbstractCockpitPluginTest 
 
     // when
     List<ProcessDefinitionStatisticsDto> actual = resource.queryStatistics(uriInfo, null, null);
+    CountResultDto actualCount = resource.getStatisticsCount(uriInfo);
 
     // then
     assertThat(actual).hasSize(expectedResults);
+    assertThat(actualCount.getCount()).isEqualTo(actual.size());
   }
 
   @Test
@@ -342,9 +353,11 @@ public class ProcessDefinitionRestServiceTest extends AbstractCockpitPluginTest 
 
     // when
     List<ProcessDefinitionStatisticsDto> actual = resource.queryStatistics(uriInfo, null, null);
+    CountResultDto actualCount = resource.getStatisticsCount(uriInfo);
 
     // then
     assertThat(actual).hasSize(4);
+    assertThat(actualCount.getCount()).isEqualTo(actual.size());
     for (int i = 0; i < expectedKeysOrder.size(); i++) {
       String expectedKey = expectedKeysOrder.get(i);
       assertThat(actual.get(i).getKey()).isEqualTo(expectedKey);
