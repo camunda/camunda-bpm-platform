@@ -61,6 +61,8 @@ import org.junit.rules.RuleChain;
  */
 public class BoundaryTimerNonInterruptingEventTest {
 
+  protected static final String TIMER_NON_INTERRUPTING_EVENT = "org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerNonInterruptingEventTest.shouldReevaluateTimerCycleWhenDue.bpmn20.xml";
+
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
@@ -780,14 +782,60 @@ public class BoundaryTimerNonInterruptingEventTest {
     myCycleTimerBean.setCycle("R2/PT2H");
     moveByHours(1); // execute second job
 
-    // then one more job is left due in 2 hours
+    // then a job is due in 2 hours
     assertThat(jobQuery.count()).isEqualTo(1);
     assertThat(jobQuery.singleResult().getDuedate())
-        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + ((2 * 60 * 1000 * 60))));
+    .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + ((2 * 60 * 1000 * 60))));
+
+    moveByHours(2); // execute first job of the new cycle
+
+    // then a job is due in 2 hours
+    assertThat(jobQuery.singleResult().getDuedate())
+    .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + ((2 * 60 * 1000 * 60))));
+    assertThat(jobQuery.count()).isEqualTo(1);
+
+    moveByHours(2);  // execute second job of the new cycle => no more jobs
+    assertThat(jobQuery.count()).isEqualTo(0);
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerNonInterruptingEventTest.shouldReevaluateTimerCycleWhenDue.bpmn20.xml"})
+  @Deployment(resources = {TIMER_NON_INTERRUPTING_EVENT})
+  public void shouldReevaluateTimerCycleWhenDue2() throws Exception {
+    // given
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R3/PT2H");
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
+    processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
+
+    runtimeService.startProcessInstanceByKey("nonInterruptingCycle").getId();
+
+    JobQuery jobQuery = managementService.createJobQuery();
+    assertThat(jobQuery.count()).isEqualTo(1);
+    moveByHours(2); // execute first job
+    assertThat(jobQuery.count()).isEqualTo(1);
+
+    // when bean changed and job is due
+    myCycleTimerBean.setCycle("R2/PT1H");
+    moveByHours(2); // execute second job
+    System.out.println(jobQuery.singleResult().getDuedate());
+
+    // then one more job is left due in 1 hours
+    assertThat(jobQuery.count()).isEqualTo(1);
+    assertThat(jobQuery.singleResult().getDuedate())
+    .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + ((1 * 60 * 1000 * 60))));
+
+    moveByHours(1); // execute first job of the new cycle
+
+     // then a job is due in 1 hours
+    assertThat(jobQuery.singleResult().getDuedate())
+    .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + ((1 * 60 * 1000 * 60))));
+    assertThat(jobQuery.count()).isEqualTo(1);
+
+    moveByHours(1); // execute second job of the new cycle => no more jobs
+    assertThat(jobQuery.count()).isEqualTo(0);
+  }
+
+  @Test
+  @Deployment(resources = {TIMER_NON_INTERRUPTING_EVENT})
   public void shouldNotReevaluateTimerCycle() throws Exception {
     // given
     MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R2/PT1H");
@@ -809,7 +857,7 @@ public class BoundaryTimerNonInterruptingEventTest {
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerNonInterruptingEventTest.shouldReevaluateTimerCycleWhenDue.bpmn20.xml"})
+  @Deployment(resources = {TIMER_NON_INTERRUPTING_EVENT})
   public void shouldNotReevaluateTimerCycleIfCycleDoesNotChange() throws Exception {
     // given
     MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R2/PT1H");

@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -122,13 +123,20 @@ public class TimerEntity extends JobEntity {
   protected String adjustRepeatBasedOnNewExpression(String expressionValue) {
     String changedRepeat = expressionValue; // changed to a cron expression
     if (expressionValue.startsWith("R")) { // changed to a repeatable interval
-      if (repeat.startsWith("R")) { // was repeatable interval
+      if (repeat.startsWith("R") && isSameRepeatCycle(expressionValue)) { // is the same repeatable interval
         changedRepeat = expressionValue.replace("/", "/" + repeat.split("/")[1] + "/");
-      } else {// was a cron expression
-        changedRepeat = expressionValue.replace("/", "/" + ClockUtil.getCurrentTime() + "/");
+      } else {// was a cron expression or a new repeatable interval => adjust the date
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        changedRepeat = expressionValue.replace("/", "/" + sdf.format(ClockUtil.getCurrentTime()) + "/");
       }
     }
     return changedRepeat;
+  }
+
+  protected boolean isSameRepeatCycle(String expressionValue) {
+    String[] currentRepeat = repeat.split("/");      // "R3/date/PT2H"
+    String[] newRepeat = expressionValue.split("/"); // "R3/PT2H"
+    return currentRepeat[0].equals(newRepeat[0]) && currentRepeat[2].equals(newRepeat[1]);
   }
 
   protected RepeatingFailedJobListener createRepeatingFailedJobListener(CommandExecutor commandExecutor) {
