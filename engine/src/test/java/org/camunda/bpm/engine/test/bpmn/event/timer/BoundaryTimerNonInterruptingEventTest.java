@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RepositoryService;
@@ -62,6 +63,9 @@ import org.junit.rules.RuleChain;
 public class BoundaryTimerNonInterruptingEventTest {
 
   protected static final String TIMER_NON_INTERRUPTING_EVENT = "org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerNonInterruptingEventTest.shouldReevaluateTimerCycleWhenDue.bpmn20.xml";
+
+  protected static final long ONE_HOUR = TimeUnit.HOURS.toMillis(1L);
+  protected static final long TWO_HOURS = TimeUnit.HOURS.toMillis(2L);
 
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
@@ -785,13 +789,13 @@ public class BoundaryTimerNonInterruptingEventTest {
     // then a job is due in 2 hours
     assertThat(jobQuery.count()).isEqualTo(1);
     assertThat(jobQuery.singleResult().getDuedate())
-    .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + ((2 * 60 * 1000 * 60))));
+        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + TWO_HOURS));
 
     moveByHours(2); // execute first job of the new cycle
 
     // then a job is due in 2 hours
     assertThat(jobQuery.singleResult().getDuedate())
-    .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + ((2 * 60 * 1000 * 60))));
+        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + TWO_HOURS));
     assertThat(jobQuery.count()).isEqualTo(1);
 
     moveByHours(2);  // execute second job of the new cycle => no more jobs
@@ -820,13 +824,13 @@ public class BoundaryTimerNonInterruptingEventTest {
     // then one more job is left due in 1 hours
     assertThat(jobQuery.count()).isEqualTo(1);
     assertThat(jobQuery.singleResult().getDuedate())
-    .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + ((1 * 60 * 1000 * 60))));
+        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + ONE_HOUR));
 
     moveByHours(1); // execute first job of the new cycle
 
      // then a job is due in 1 hours
     assertThat(jobQuery.singleResult().getDuedate())
-    .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + ((1 * 60 * 1000 * 60))));
+        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + ONE_HOUR));
     assertThat(jobQuery.count()).isEqualTo(1);
 
     moveByHours(1); // execute second job of the new cycle => no more jobs
@@ -877,11 +881,11 @@ public class BoundaryTimerNonInterruptingEventTest {
     // then one more job is left due in 2 hours
     assertThat(jobQuery.count()).isEqualTo(1);
     assertThat(jobQuery.singleResult().getDuedate())
-        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + ((2 * 60 * 1000 * 60))));
+        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + TWO_HOURS));
   }
 
-  protected void moveByHours(int hours) throws Exception {
-    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + ((hours * 60 * 1000 * 60) + 5000)));
+  protected void moveByHours(int hours) {
+    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + (TimeUnit.HOURS.toMillis(hours) + 5000)));
     testHelper.executeAvailableJobs(false);
   }
 }

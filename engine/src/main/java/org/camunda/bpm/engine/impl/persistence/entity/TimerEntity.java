@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.calendar.BusinessCalendar;
 import org.camunda.bpm.engine.impl.calendar.CycleBusinessCalendar;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -83,11 +84,10 @@ public class TimerEntity extends JobEntity {
 
         // when reevaluateTimeCycleWhenDue is enabled and cycle is an expression
         if (isReevaluateTimeCycleWhenDue(commandContext) && isCycleExpression()) {
-          String expressionValue = commandContext.getProcessEngineConfiguration()
-              .getExpressionManager()
-              .createExpression(jobDefinition.getJobConfiguration().substring(7))
-              .getValue(execution).toString();
-          repeat = adjustRepeatBasedOnNewExpression(expressionValue);
+          String expressionValue = parseExpression(commandContext);
+          if (expressionValue != null) {
+            repeat = adjustRepeatBasedOnNewExpression(expressionValue);
+          }
         }
         Date newDueDate = calculateNewDueDate();
 
@@ -108,6 +108,20 @@ public class TimerEntity extends JobEntity {
         }
       }
     }
+  }
+
+  protected String parseExpression(CommandContext commandContext) {
+    String expressionValue = null;
+    String expression = jobDefinition.getJobConfiguration().substring(7);
+    try {
+      expressionValue = commandContext.getProcessEngineConfiguration()
+          .getExpressionManager()
+          .createExpression(expression)
+          .getValue(execution).toString();
+    } catch (Exception e) {
+      throw ProcessEngineLogger.UTIL_LOGGER.exceptionWhileParsingCycleExpresison(expression, e);
+    }
+    return expressionValue;
   }
 
   protected boolean isReevaluateTimeCycleWhenDue(CommandContext commandContext) {
@@ -140,42 +154,12 @@ public class TimerEntity extends JobEntity {
       // changed to a cron expression
       changedRepeat = expressionValue;
     }
-
-
-    return changedRepeat;
-  }
-
-  protected String adjustRepeatBasedOfnNewExpression(String expressionValue) {
-    String changedRepeat = repeat; // same
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    if (expressionValue.startsWith("R")) { // changed to a repeatable interval
-      if (repeat.startsWith("R") && !isSameRepeatCycle(expressionValue)) {
-        if (isSameRepeatCycle(expressionValue)) {
-          changedRepeat = repeat;
-        } else {
-          // is the same repeatable interval => keep the start date
-          changedRepeat = expressionValue.replace("/", "/" + sdf.format(ClockUtil.getCurrentTime()) + "/");
-
-        }
-      } else {
-        // was a cron expression or a new repeatable interval => adjust the start date
-        changedRepeat = expressionValue.replace("/", "/" + sdf.format(ClockUtil.getCurrentTime()) + "/");
-      }
-    }
-
-
     return changedRepeat;
   }
 
   protected boolean isSameRepeatCycle(String expressionValue) {
     String[] currentRepeat = repeat.split("/");      // "R3/date/PT2H"
-//for (String string : currentRepeat) {
-//  System.out.println(string);
-//}
     String[] newRepeat = expressionValue.split("/"); // "R3/PT2H"
-//    for (String string : newRepeat) {
-//      System.out.println(string);
-//    }
     return currentRepeat[0].equals(newRepeat[0]) && currentRepeat[2].equals(newRepeat[1]);
   }
 
