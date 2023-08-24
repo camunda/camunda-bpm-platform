@@ -302,10 +302,8 @@
       </dependency>
       <dependency>
         <groupId>org.camunda.template-engines</groupId>
-        <artifactId>camunda-template-engines-bom</artifactId>
-        <version>${version.camunda.template-engines}</version>
-        <scope>import</scope>
-        <type>pom</type>
+        <artifactId>camunda-template-engines-freemarker</artifactId>
+        <version>${version.camunda.freemarker.template.engine}</version>
       </dependency>
       <dependency>
         <groupId>org.camunda.bpm.extension.xslt</groupId>
