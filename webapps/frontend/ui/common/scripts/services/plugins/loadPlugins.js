@@ -46,15 +46,17 @@ module.exports = async function loadPlugins(config, appName) {
       !el.name.startsWith(`${appName}-plugin-legacy`)
   ).map(el => {
     addCssSource(`${el.location}/plugin.css?bust=${CAMUNDA_VERSION}`); // eslint-disable-line
-    return `${el.location}/${el.main}`;
+    return `${el.location}/${el.main}?bust=${CAMUNDA_VERSION}`; // eslint-disable-line
   });
 
   const baseImportPath = `${appRoot}/app/${appName}/`;
   const fetchers = customScripts.map(url =>
-    _import(baseImportPath + withSuffix(url, '.js')) // eslint-disable-line
-      .catch(
-        e => console.error(e) // eslint-disable-line
-      )
+    // eslint-disable-next-line
+    _import(
+      baseImportPath + withSuffix(url, '.js') + `?bust=${CAMUNDA_VERSION}` // eslint-disable-line
+    ).catch(
+      e => console.error(e) // eslint-disable-line
+    )
   );
 
   fetchers.push(
