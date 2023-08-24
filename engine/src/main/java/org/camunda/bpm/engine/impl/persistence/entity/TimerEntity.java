@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.RepeatingFailedJobListener;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationType;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.TimerJobConfiguration;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -40,6 +41,10 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
  * @author Tom Baeyens
  */
 public class TimerEntity extends JobEntity {
+
+  protected static final String CYCLE_EXPRESSION_START_TYPE_1 = TimerDeclarationType.CYCLE + ": #";
+  protected static final String CYCLE_EXPRESSION_START_TYPE_2 = TimerDeclarationType.CYCLE + ": $";
+  public static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
   public static final String TYPE = "timer";
 
@@ -112,7 +117,7 @@ public class TimerEntity extends JobEntity {
 
   protected String parseExpression(CommandContext commandContext) {
     String expressionValue = null;
-    String expression = jobDefinition.getJobConfiguration().substring(7);
+    String expression = jobDefinition.getJobConfiguration().substring(CYCLE_EXPRESSION_START_TYPE_1.length() - 1);
     try {
       expressionValue = commandContext.getProcessEngineConfiguration()
           .getExpressionManager()
@@ -131,12 +136,12 @@ public class TimerEntity extends JobEntity {
   protected boolean isCycleExpression() {
     // Note timer cycle configuration is constructed in BpmnParse#parseTimer
     String jobConfiguration = jobDefinition.getJobConfiguration();
-    return jobConfiguration.contains("CYCLE: #") || jobConfiguration.contains("CYCLE: $");
+    return jobConfiguration.contains(CYCLE_EXPRESSION_START_TYPE_1)
+        || jobConfiguration.contains(CYCLE_EXPRESSION_START_TYPE_2);
   }
 
   protected String adjustRepeatBasedOnNewExpression(String expressionValue) {
     String changedRepeat;
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     if (expressionValue.startsWith("R")) { // changed to a repeatable interval
       if (repeat.startsWith("R") ) {
         if (isSameRepeatCycle(expressionValue)) {
@@ -144,11 +149,11 @@ public class TimerEntity extends JobEntity {
           changedRepeat = repeat;
         } else {
           // different repeatable interval => change the start date
-          changedRepeat = expressionValue.replace("/", "/" + sdf.format(ClockUtil.getCurrentTime()) + "/");
+          changedRepeat = replaceRepeatCycleAndDate(expressionValue);
         }
       } else {
         // was a cron expression => change the start date
-        changedRepeat = expressionValue.replace("/", "/" + sdf.format(ClockUtil.getCurrentTime()) + "/");
+        changedRepeat = replaceRepeatCycleAndDate(expressionValue);
       }
     } else {
       // changed to a cron expression
@@ -160,7 +165,16 @@ public class TimerEntity extends JobEntity {
   protected boolean isSameRepeatCycle(String expressionValue) {
     String[] currentRepeat = repeat.split("/");      // "R3/date/PT2H"
     String[] newRepeat = expressionValue.split("/"); // "R3/PT2H"
-    return currentRepeat[0].equals(newRepeat[0]) && currentRepeat[2].equals(newRepeat[1]);
+    if (currentRepeat.length == 3 && newRepeat.length == 2) {
+      return currentRepeat[0].equals(newRepeat[0]) && currentRepeat[2].equals(newRepeat[1]);
+    } else {
+      // incorrect cycle => keep the existing one
+      return false;
+    }
+  }
+
+  public static String replaceRepeatCycleAndDate(String repeatExpression) {
+    return repeatExpression.replace("/", "/" + SIMPLE_DATE_FORMAT.format(ClockUtil.getCurrentTime()) + "/");
   }
 
   protected RepeatingFailedJobListener createRepeatingFailedJobListener(CommandExecutor commandExecutor) {
