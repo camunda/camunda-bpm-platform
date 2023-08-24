@@ -307,12 +307,6 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
-      <dependency>
-        <groupId>org.camunda.bpm.extension.xslt</groupId>
-        <artifactId>camunda-bpm-xslt</artifactId>
-        <version>${version.camunda.ee.xslt-plugin}</version>
-      </dependency>
-
     </dependencies>
   </dependencyManagement>
 </project>
