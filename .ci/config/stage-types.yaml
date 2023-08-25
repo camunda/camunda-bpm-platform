@@ -55,6 +55,7 @@ instance-migration:
   stash:
     runtimeStash: true
     qaStash: true
+  jdkVersion: 'jdk-8-latest'
 old-engine:
   directory: 'qa'
   command: 'verify -Pold-engine,'
