@@ -69,9 +69,6 @@ pipeline {
           }
         }
         stage('stage-javadocs') {
-          when {
-            branch cambpmDefaultBranch();
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel : 'centos-stable',
@@ -84,15 +81,12 @@ pipeline {
               },
               postSuccess: {
                 def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
-                cambpmPublishDocs("\"target/site/apidocs/\"", projectVersion, "javadoc")
+                //cambpmPublishDocs("\"target/site/apidocs/\"", projectVersion, "javadoc")
               }
             ])
           }
         }
         stage('stage-restapi-docs') {
-          when {
-            branch cambpmDefaultBranch();
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel : 'centos-stable',
@@ -104,7 +98,7 @@ pipeline {
               },
               postSuccess: {
                 def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
-                cambpmPublishDocs("\"engine-rest/docs/target/index.html\"", projectVersion, "rest")
+                //cambpmPublishDocs("\"engine-rest/docs/target/index.html\"", projectVersion, "rest")
               }
             ])
           }
