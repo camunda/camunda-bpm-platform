@@ -70,26 +70,18 @@ public class SpringTransactionInterceptor extends CommandInterceptor {
       // don't use lambdas here => CAM-12810
       return (T) transactionTemplate.execute((TransactionCallback) status -> next.execute(command));
     } catch (TransactionSystemException ex) {
+      // When CockroachDB is used, a CRDB concurrency error may occur on transaction commit.
+      // To ensure that these errors are still detected as OLEs, we must catch them and wrap
+      // them in a CrdbTransactionRetryException
       Throwable cause = ex.getCause();
+      if (cause instanceof SQLException && processEngineConfiguration != null
+              && DbSqlSession.isCrdbConcurrencyConflictOnCommit((SQLException) cause, processEngineConfiguration)) {
+        throw ProcessEngineLogger.PERSISTENCE_LOGGER.crdbTransactionRetryExceptionOnCommit(cause);
 
-      if (cause != null && cause instanceof SQLException) {
-        handleCrdbConcurrencyError((SQLException) cause, ex);
       } else {
         throw ex;
-      }
-    }
-  }
-    
-  /**
-    * When CockroachDB is used, a CRDB concurrency error may occur on transaction commit.
-    * To ensure that these errors are still detected as OLEs, we must catch them and wrap
-    * them in a CrdbTransactionRetryException
-    */
-  private void handleCrdbConcurrencyError(SQLException sqlException, TransactionSystemException cause)
-    if (processEngineConfiguration != null
-        && DbSqlSession.isCrdbConcurrencyConflictOnCommit(sqlException, processEngineConfiguration)) {
 
-      throw ProcessEngineLogger.PERSISTENCE_LOGGER.crdbTransactionRetryExceptionOnCommit(cause);
+      }
     }
   }
 }
