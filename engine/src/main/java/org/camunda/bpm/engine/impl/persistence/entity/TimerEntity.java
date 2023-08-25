@@ -169,7 +169,7 @@ public class TimerEntity extends JobEntity {
       return currentRepeat[0].equals(newRepeat[0]) && currentRepeat[2].equals(newRepeat[1]);
     } else {
       // incorrect cycle => keep the existing one
-      return false;
+      return true;
     }
   }
 

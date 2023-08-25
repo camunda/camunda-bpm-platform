@@ -859,6 +859,29 @@ public class BoundaryTimerNonInterruptingEventTest {
     assertThat(managementService.createJobQuery().singleResult()).isNull();
   }
 
+  @Test
+  @Deployment(resources = {TIMER_NON_INTERRUPTING_EVENT})
+  public void shouldNotReevaluateTimerCycleWhenNewCycleIsIncorrect() throws Exception {
+    // given
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R2/PT1H");
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
+    processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
+
+    runtimeService.startProcessInstanceByKey("nonInterruptingCycle").getId();
+
+    JobQuery jobQuery = managementService.createJobQuery();
+    assertThat(jobQuery.count()).isEqualTo(1);
+    moveByHours(1); // execute first job
+    assertThat(jobQuery.count()).isEqualTo(1);
+
+    // when job is due
+    myCycleTimerBean.setCycle("R2\\PT2H"); // set incorrect cycle
+    moveByHours(1); // execute second job
+
+    // then no more jobs are left (two jobs has been executed already)
+    assertThat(managementService.createJobQuery().singleResult()).isNull();
+  }
+
 
   protected void moveByHours(int hours) {
     ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + (TimeUnit.HOURS.toMillis(hours) + 5000)));
