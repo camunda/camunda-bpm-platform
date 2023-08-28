@@ -526,8 +526,8 @@
 
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
-          <artifactId>arquillian-tomcat-managed-7</artifactId>
-          <version>1.0.0.CR5</version>
+          <artifactId>arquillian-tomcat-managed-8</artifactId>
+          <version>1.1.0.Final</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
