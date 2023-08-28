@@ -1765,6 +1765,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
         .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + TWO_HOURS));
   }
 
+  @Test
   public void shouldReevaluateCronToRepeatigTimerCycle() throws Exception {
     // given
     ClockUtil.setCurrentTime(new Date(1692338400000l)); //"2023/8/18 8:00:00"
