@@ -51,11 +51,10 @@ sql-scripts:
   - 'cockroachdb'
 instance-migration:
   directory: 'qa/test-db-instance-migration'
-  command: 'verify -Pinstance-migration,'
+  command: 'clean install -Pinstance-migration,'
   stash:
     runtimeStash: true
     qaStash: true
-  jdkVersion: 'jdk-8-latest'
 old-engine:
   directory: 'qa'
   command: 'verify -Pold-engine,'

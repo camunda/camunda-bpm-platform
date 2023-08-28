@@ -19,7 +19,6 @@
          modules for those versions that are not supported for a given database
          (e.g. for CockroachDB, all `test-fixture` modules before 7.14 are skipped). -->
     <skip-test-fixture>false</skip-test-fixture>
-    <version.java>8</version.java>
   </properties>
 
   <modules>
