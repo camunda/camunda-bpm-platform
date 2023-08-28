@@ -196,10 +196,10 @@ public class EngineUtilLogger extends ProcessEngineLogger {
         "Operation {} requires active command context. No command context active on thread {}.", operation, Thread.currentThread()));
   }
 
-  public ProcessEngineException exceptionWhileParsingCronExpresison(String duedateDescription, Exception e) {
+  public ProcessEngineException exceptionWhileParsingCycleExpresison(String duedateDescription, Exception e) {
     return new ProcessEngineException(exceptionMessage(
         "026",
-        "Exception while parsing cron expression '{}': {}", duedateDescription, e.getMessage()), e);
+        "Exception while parsing cycle expression '{}': {}", duedateDescription, e.getMessage()), e);
   }
 
   public ProcessEngineException exceptionWhileResolvingDuedate(String duedate, Exception e) {

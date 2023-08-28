@@ -58,7 +58,7 @@ public class RepeatingFailedJobListener implements TransactionListener {
           .getJobManager()
           .findJobById(jobId);
 
-      Date newDueDate = failedJob.calculateRepeat();
+      Date newDueDate = failedJob.calculateNewDueDate();
 
       if (newDueDate != null) {
         failedJob.createNewTimerJob(newDueDate);
