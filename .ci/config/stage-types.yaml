@@ -51,7 +51,7 @@ sql-scripts:
   - 'cockroachdb'
 instance-migration:
   directory: 'qa/test-db-instance-migration'
-  command: 'clean install -Pinstance-migration,'
+  command: 'verify -Pinstance-migration,'
   stash:
     runtimeStash: true
     qaStash: true
