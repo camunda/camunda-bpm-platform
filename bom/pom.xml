@@ -305,12 +305,6 @@
         <artifactId>camunda-template-engines-freemarker</artifactId>
         <version>${version.camunda.freemarker.template.engine}</version>
       </dependency>
-      <dependency>
-        <groupId>org.camunda.bpm.extension.xslt</groupId>
-        <artifactId>camunda-bpm-xslt</artifactId>
-        <version>${version.camunda.ee.xslt-plugin}</version>
-      </dependency>
-
     </dependencies>
   </dependencyManagement>
 </project>
