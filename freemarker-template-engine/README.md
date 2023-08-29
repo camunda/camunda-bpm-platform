@@ -1,17 +1,25 @@
-﻿camunda-template-engines-jsr223
+﻿camunda-template-engines-freemarker
 ===============================
 
 <p>
-  <a href="http://camunda.org/">Home</a> |
-  <a href="http://camunda.org/community/forum.html">Forum</a> |
-  <a href="https://app.camunda.com/jira/browse/CAM">Issues</a> |
+  <a href="https://docs.camunda.org/manual/latest/">Camunda 7 Docs</a> |
+  <a href="https://forum.camunda.io/c/camunda-platform-7-topics/39">Forum</a> |
   <a href="LICENSE">License</a>
 </p>
 
-Modules which contains wrappers of Java template engines as
+Wrapper of Java Freemarker 2.3 template engine as
 [JSR 223](https://www.jcp.org/en/jsr/detail?id=223) compatible
-[script engines](http://docs.oracle.com/javase/7/docs/api/javax/script/ScriptEngine.html).
-Therefore they can be used in the [Camunda Platform](https://camunda.com/products/camunda-bpm/) as scripting languages.
+[script engine](http://docs.oracle.com/javase/7/docs/api/javax/script/ScriptEngine.html).
+
+You can use the template engine in Camunda Automation Platform 7 as scripting language.
+
+## More template engines (Community Extensions)
+
+You can find the following template engine extensions in Camundas [Community Hub](https://github.com/camunda-community-hub/camunda-7-template-engines-jsr223/):
+
+* Velocity 2.3
+* xQuery Saxon 9.6
+* XSLT Saxon 9.6
 
 ## Contributing
 

@@ -2,88 +2,56 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.camunda.template-engines</groupId>
-    <artifactId>camunda-template-engines-bom</artifactId>
-    <version>2.2.0-SNAPSHOT</version>
-    <relativePath>bom</relativePath>
+    <groupId>org.camunda</groupId>
+    <artifactId>camunda-bpm-release-parent</artifactId>
+    <version>2.2.7</version>
+    <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
+    <relativePath />
   </parent>
 
-  <artifactId>camunda-template-engines-root</artifactId>
-  <name>camunda template engines jsr223 - root</name>
+  <artifactId>camunda-template-engines-freemarker</artifactId>
+  <version>2.2.0-SNAPSHOT</version>
+  
+  <name>camunda template engine jsr223 freemarker</name>
+
   <inceptionYear>2014</inceptionYear>
-  <packaging>pom</packaging>
 
   <properties>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
   </properties>
 
-  <modules>
-    <module>bom</module>
-    <module>freemarker</module>
-    <module>velocity</module>
-    <module>xquery-saxon</module>
-  </modules>
+  <dependencies>
+    <dependency>
+      <groupId>org.freemarker</groupId>
+      <artifactId>freemarker</artifactId>
+      <version>2.3.31</version>
+    </dependency>
 
-  <dependencyManagement>
-    <dependencies>
-      <!-- please use commons only for in the test scope, to keep
-      the coupling between scripting engines and a particular Camunda version minimal -->
-      <dependency>
-        <groupId>org.camunda.commons</groupId>
-        <artifactId>camunda-commons-bom</artifactId>
-        <version>1.10.0</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
 
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.13.2</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.assertj</groupId>
-        <artifactId>assertj-core</artifactId>
-        <version>3.20.2</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.freemarker</groupId>
-        <artifactId>freemarker</artifactId>
-        <version>2.3.31</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.velocity</groupId>
-        <artifactId>velocity-engine-core</artifactId>
-        <version>2.3</version>
-      </dependency>
-
-      <dependency>
-		<groupId>net.sf.saxon</groupId>
-		<artifactId>Saxon-HE</artifactId>
-		<version>9.6.0-6</version>
-      </dependency>
-
-    </dependencies>
-  </dependencyManagement>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>3.20.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.17</version>
-          <configuration>
-            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.17</version>
+        <configuration>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -92,6 +60,15 @@
             <Export-Package>org.camunda.templateengines*</Export-Package>
           </instructions>
         </configuration>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
