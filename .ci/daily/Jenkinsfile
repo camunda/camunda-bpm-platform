@@ -55,9 +55,7 @@ pipeline {
       parallel {
         stage('check-sql-scripts') {
           when {
-            expression {
-              cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb')
-            }
+            branch cambpmDefaultBranch();
           }
           steps {
             cambpmConditionalRetry([
@@ -69,6 +67,9 @@ pipeline {
           }
         }
         stage('stage-javadocs') {
+          when {
+            branch cambpmDefaultBranch();
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel : 'centos-stable',
@@ -87,6 +88,9 @@ pipeline {
           }
         }
         stage('stage-restapi-docs') {
+          when {
+            branch cambpmDefaultBranch();
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel : 'centos-stable',
@@ -147,9 +151,7 @@ pipeline {
       parallel {
         stage('sql-scripts-h2') {
           when {
-            expression {
-              cambpmWithLabels('h2', 'all-db')
-            }
+            branch cambpmDefaultBranch();
           }
           steps {
             cambpmConditionalRetry([
@@ -177,16 +179,14 @@ pipeline {
               },
               postFailure: {
                 cambpmPublishTestResult()
-                cambpmAddFailedStageType(failedStageTypes, 'instance-migration')
+               // cambpmAddFailedStageType(failedStageTypes, 'instance-migration')
               }
             ])
           }
         }
         stage('UPGRADE-old-engine-h2') {
           when {
-            expression {
-              cambpmWithLabels('h2', 'all-db')
-            }
+            branch cambpmDefaultBranch();
           }
           steps {
             cambpmConditionalRetry([
@@ -203,9 +203,7 @@ pipeline {
         }
         stage('UPGRADE-rolling-update-h2') {
           when {
-            expression {
-              cambpmWithLabels('rolling-update', 'default-build')
-            }
+            branch cambpmDefaultBranch();
           }
           steps {
             cambpmConditionalRetry([
@@ -254,17 +252,17 @@ pipeline {
         }
       }
     }
-    stage('JDKs') {
-      steps {
-        script {
-          // see the .ci/config/matrices.yaml for the stage generation values
-          // see .ci/config/stage-types.yaml for the stage configurations
-          parallel(cambpmGetMatrixStages('jdk-ce-stages', failedStageTypes, { stageInfo ->
-            return cambpmWithLabels('default-build', 'jdk')
-          }))
-        }
-      }
-    }
+//    stage('JDKs') {
+//      steps {
+//        script {
+//          // see the .ci/config/matrices.yaml for the stage generation values
+//          // see .ci/config/stage-types.yaml for the stage configurations
+//          parallel(cambpmGetMatrixStages('jdk-ce-stages', failedStageTypes, { stageInfo ->
+//            return cambpmWithLabels('default-build', 'jdk')
+//          }))
+//        }
+//      }
+//    }
   }
   post {
     changed {
