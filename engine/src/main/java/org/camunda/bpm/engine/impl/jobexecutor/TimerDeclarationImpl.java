@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -31,7 +30,6 @@ import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
  * @author Tom Baeyens
@@ -160,8 +158,7 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
 
   protected String prepareRepeat(String dueDate) {
     if (dueDate.startsWith("R") && dueDate.split("/").length==2) {
-      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-      return dueDate.replace("/","/"+sdf.format(ClockUtil.getCurrentTime())+"/");
+      return TimerEntity.replaceRepeatCycleAndDate(dueDate);
     }
     return dueDate;
   }
