@@ -55,6 +55,15 @@ instance-migration:
   stash:
     runtimeStash: true
     qaStash: true
+  labels:
+  - 'all-db'
+  - 'db2'
+  - 'mysql'
+  - 'oracle'
+  - 'mariadb'
+  - 'sqlserver'
+  - 'postgresql'
+  - 'cockroachdb'
 old-engine:
   directory: 'qa'
   command: 'verify -Pold-engine,'
@@ -75,6 +84,15 @@ rolling-update:
   stash:
     runtimeStash: true
     qaStash: true
+  labels:
+  - 'all-db'
+  - 'db2'
+  - 'mysql'
+  - 'oracle'
+  - 'mariadb'
+  - 'sqlserver'
+  - 'postgresql'
+  - 'cockroachdb'
 large-data-tests:
   directory: 'qa/large-data-tests'
   command: 'verify -Plarge-data-tests,'
@@ -82,6 +100,15 @@ large-data-tests:
     runtimeStash: true
   timeout:
     cockroachdb: 14400
+  labels:
+  - 'all-db'
+  - 'db2'
+  - 'mysql'
+  - 'oracle'
+  - 'mariadb'
+  - 'sqlserver'
+  - 'postgresql'
+  - 'cockroachdb'
 engine-rest-unit-jersey-2:
   directory: 'engine-rest/engine-rest'
   command: 'clean install -Pjersey2'
