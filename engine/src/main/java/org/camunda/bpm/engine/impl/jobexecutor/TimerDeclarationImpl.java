@@ -157,7 +157,7 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
   }
 
   protected String prepareRepeat(String dueDate) {
-    if (dueDate.startsWith("R") && dueDate.split("/").length==2) {
+    if (dueDate.startsWith("R")) {
       return TimerEntity.replaceRepeatCycleAndDate(dueDate);
     }
     return dueDate;

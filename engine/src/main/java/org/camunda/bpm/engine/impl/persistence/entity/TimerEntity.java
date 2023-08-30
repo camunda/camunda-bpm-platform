@@ -164,9 +164,11 @@ public class TimerEntity extends JobEntity {
 
   protected boolean isSameRepeatCycle(String expressionValue) {
     String[] currentRepeat = repeat.split("/");      // "R3/date/PT2H"
-    String[] newRepeat = expressionValue.split("/"); // "R3/PT2H"
+    String[] newRepeat = expressionValue.split("/"); // "R3/PT2H" or "R3/date/PT2H"
     if (currentRepeat.length == 3 && newRepeat.length == 2) {
       return currentRepeat[0].equals(newRepeat[0]) && currentRepeat[2].equals(newRepeat[1]);
+    } else if (currentRepeat.length == 3 && newRepeat.length == 3) {
+      return repeat.equals(expressionValue);
     } else {
       // incorrect cycle => keep the existing one
       return true;
@@ -174,7 +176,10 @@ public class TimerEntity extends JobEntity {
   }
 
   public static String replaceRepeatCycleAndDate(String repeatExpression) {
-    return repeatExpression.replace("/", "/" + SIMPLE_DATE_FORMAT.format(ClockUtil.getCurrentTime()) + "/");
+    if (repeatExpression.split("/").length == 2) {
+      return repeatExpression.replace("/", "/" + SIMPLE_DATE_FORMAT.format(ClockUtil.getCurrentTime()) + "/");
+    }
+    return repeatExpression; // expression include start date
   }
 
   protected RepeatingFailedJobListener createRepeatingFailedJobListener(CommandExecutor commandExecutor) {
