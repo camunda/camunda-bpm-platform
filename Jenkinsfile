@@ -51,7 +51,7 @@ pipeline {
                   withCatch: false,
                   withNpm: true,
                   // we use JDK 17 to build the artifacts, as it is required for supporting Spring Boot 3
-                  // the compiler source and target is set to JDK 8 in the release parents
+                  // the compiler source and target is set to JDK 11 in the release parents
                   jdkVersion: 'jdk-17-latest')
             }
 
@@ -228,7 +228,7 @@ pipeline {
                   'clean install -Pwildfly,postgresql,engine-integration-jakarta', 
                   runtimeStash: true, 
                   archiveStash: true,
-                  // we need to use JDK 17 for WildFly 27+ + Spring 6
+                  // we need to use JDK 17 for Spring 6
                   jdkVersion: 'jdk-17-latest')
               },
               postFailure: {
@@ -273,7 +273,7 @@ pipeline {
                   'clean install -Pwildfly,postgresql,postgresql-xa,engine-integration-jakarta', 
                   runtimeStash: true, 
                   archiveStash: true,
-                  // we need to use JDK 17 for WildFly 27+ + Spring 6
+                  // we need to use JDK 17 for Spring 6
                   jdkVersion: 'jdk-17-latest')
               },
               postFailure: {
@@ -334,9 +334,7 @@ pipeline {
                 cambpmRunMaven('qa/',
                   'clean install -Pwildfly,h2,webapps-integration',
                   runtimeStash: true,
-                  archiveStash: true,
-                  // we need to use JDK 11 for WildFly 27+
-                  jdkVersion: 'jdk-11-latest')
+                  archiveStash: true)
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -496,7 +494,7 @@ pipeline {
                   'clean install -Pwildfly-domain,h2,engine-integration-jakarta',
                   runtimeStash: true,
                   archiveStash: true,
-                  // we need to use JDK 17 for WildFly 27+ + Spring 6
+                  // we need to use JDK 17 for Spring 6
                   jdkVersion: 'jdk-17-latest')
               },
               postFailure: {
@@ -519,7 +517,7 @@ pipeline {
                   'clean install -Pwildfly,wildfly-servlet,h2,engine-integration-jakarta',
                   runtimeStash: true,
                   archiveStash: true,
-                  // we need to use JDK 17 for WildFly 27+ + Spring 6
+                  // we need to use JDK 17 for Spring 6
                   jdkVersion: 'jdk-17-latest')
               },
               postFailure: {
