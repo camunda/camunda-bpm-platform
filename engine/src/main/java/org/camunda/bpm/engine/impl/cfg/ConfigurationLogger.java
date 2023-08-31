@@ -113,4 +113,10 @@ public class ConfigurationLogger extends ProcessEngineLogger {
     logError("015", "Exception while reading configuration property: {}", e.getMessage());
   }
 
+  public void logHistoryTimeToLiveDefaultValueWarning() {
+    logWarn("016", "You are using the default TTL (Time To Live) of 180 days (six months); "
+        + "the history clean-up feature will delete your data after six months. "
+        + "We recommend adjusting the TTL configuration property aligned with your specific requirements.");
+  }
+
 }
