@@ -195,8 +195,8 @@ public class DeploymentQueryTest extends PluggableProcessEngineTest {
         .createDeploymentQuery()
         .deploymentSource(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE);
 
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
+    assertEquals(2, query.list().size());
+    assertEquals(2, query.count());
   }
 
   @Test
@@ -205,8 +205,8 @@ public class DeploymentQueryTest extends PluggableProcessEngineTest {
         .createDeploymentQuery()
         .deploymentSource(null);
 
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
+    assertEquals(0, query.list().size());
+    assertEquals(0, query.count());
   }
 
   @Test
@@ -268,7 +268,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTest {
     Deployment deploymentTwo = deployments.get(1);
     assertEquals("org/camunda/bpm/engine/test/repository/two_.bpmn20.xml", deploymentTwo.getName());
     assertEquals(deploymentTwoId, deploymentTwo.getId());
-    assertNull(deploymentTwo.getSource());
+    assertEquals("process application", deploymentTwo.getSource());
     assertNull(deploymentTwo.getTenantId());
   }
 
