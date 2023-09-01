@@ -13,7 +13,7 @@ pipeline {
   environment {
     LOGGER_LOG_LEVEL = 'DEBUG'
     MAVEN_VERSION = 'maven-3.8-latest'
-    JDK_VERSION = 'jdk-11-latest'
+    DEF_JDK_VERSION = 'jdk-11-latest'
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
