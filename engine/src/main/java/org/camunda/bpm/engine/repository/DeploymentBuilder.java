@@ -217,7 +217,7 @@ public interface DeploymentBuilder {
    *
    * @throws ParseException
    *    In case of a BPMN Parsing exception due to null historyTimeToLive. To disable this behaviour, configure the
-   *    feature flag `enforceHistoryTimeToLive` to `false`.
+   *    feature flag {@code enforceHistoryTimeToLive} to {@code false}.
    *
    * @throws AuthorizationException
    *  thrown if the current user does not possess the following permissions:
@@ -243,7 +243,7 @@ public interface DeploymentBuilder {
    *
    * @throws ParseException
    *    In case of a BPMN Parsing exception due to null historyTimeToLive. To disable this behaviour, configure the
-   *    feature flag `enforceHistoryTimeToLive` to `false`.
+   *    feature flag {@code enforceHistoryTimeToLive} to {@code false}.
    *
    * @throws AuthorizationException
    *  thrown if the current user does not possess the following permissions:

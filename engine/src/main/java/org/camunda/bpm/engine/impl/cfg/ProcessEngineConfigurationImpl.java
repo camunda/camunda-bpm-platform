@@ -1336,7 +1336,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     try {
       Integer value = ParseUtil.parseHistoryTimeToLive(historyTimeToLive);
 
-      if (value == DEFAULT_HISTORY_TIME_TO_LIVE_VALUE) {
+      if (value != null && value == DEFAULT_HISTORY_TIME_TO_LIVE_VALUE) {
         LOG.logHistoryTimeToLiveDefaultValueWarning();
       }
     } catch (Exception e) {

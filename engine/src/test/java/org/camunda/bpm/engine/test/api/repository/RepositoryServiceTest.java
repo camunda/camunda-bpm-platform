@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -59,8 +60,6 @@ import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.core.model.CallableElement;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
@@ -91,6 +90,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -104,15 +104,23 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
   private static final String NAMESPACE = "xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL'";
   private static final String TARGET_NAMESPACE = "targetNamespace='" + BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS + "'";
 
+  private boolean enforceHistoryTimeToLiveBefore;
+
+  @Before
+  public void setUp() {
+    this.enforceHistoryTimeToLiveBefore = processEngineConfiguration.isEnforceHistoryTimeToLive();
+  }
+
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
-    commandExecutor.execute(new Command<Object>() {
-      public Object execute(CommandContext commandContext) {
-        commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByHandlerType(TimerActivateProcessDefinitionHandler.TYPE);
-        return null;
-      }
+    commandExecutor.execute(commandContext -> {
+      commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByHandlerType(TimerActivateProcessDefinitionHandler.TYPE);
+      return null;
     });
+
+    // restore config to the test's previous state
+    processEngineConfiguration.setEnforceHistoryTimeToLive(enforceHistoryTimeToLiveBefore);
   }
 
   private void checkDeployedBytes(InputStream deployedResource, byte[] utf8Bytes) throws IOException {
@@ -1085,67 +1093,47 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   @Test
   public void shouldFailToUpdateHistoryTimeToLiveOnCaseDefinitionHTTLUpdate() {
-    boolean enforceHistoryTimeToLiveBefore = processEngineConfiguration.isEnforceHistoryTimeToLive();
-
-    try {
+    assertThatThrownBy(() -> {
       // given
       CaseDefinition caseDefinition = findOnlyCaseDefinition();
       processEngineConfiguration.setEnforceHistoryTimeToLive(true);
 
       // when
       repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinition.getId(), null);
-      fail("Updating Cases definitions with HistoryTimeToLive Null value while enforceHistoryTimeToLive is true should fail");
-    } catch (Exception e) {
-      // then
-      assertThat(e).isInstanceOf(NotAllowedException.class);
-    } finally {
-      // restore config to the test's previous state
-      processEngineConfiguration.setEnforceHistoryTimeToLive(enforceHistoryTimeToLiveBefore);
-    }
+    })
+        // then
+        .isInstanceOf(NotAllowedException.class)
+        .hasMessage("Null historyTimeToLive values are not allowed");
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void shouldFailToUpdateHistoryTimeToLiveOnProcessDefinitionHTTLUpdate() {
-    boolean enforceHistoryTimeToLiveBefore = processEngineConfiguration.isEnforceHistoryTimeToLive();
-
-    try {
+    assertThatThrownBy(() -> {
       // given
       ProcessDefinition processDefinition = findOnlyProcessDefinition();
       processEngineConfiguration.setEnforceHistoryTimeToLive(true);
 
       // when
-      repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinition.getId(), null);
-
-      fail("Updating Cases definitions with HistoryTimeToLive Null value while enforceHistoryTimeToLive is true should fail");
-    } catch (Exception e) {
-      // then
-      assertThat(e).isInstanceOf(NotAllowedException.class);
-    } finally {
-      processEngineConfiguration.setEnforceHistoryTimeToLive(enforceHistoryTimeToLiveBefore);
-    }
+      repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinition.getId(), null);})
+        // then
+        .isInstanceOf(NotAllowedException.class)
+        .hasMessage("Null historyTimeToLive values are not allowed");
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/dmn/Example.dmn"})
   @Test
   public void shouldFailToUpdateHistoryTimeToLiveOnDecisionDefinitionHTTLUpdate() {
-    boolean enforceHistoryTimeToLiveBefore = processEngineConfiguration.isEnforceHistoryTimeToLive();
-
-    try {
-      //given
+    assertThatThrownBy(() -> {
+      // given
       DecisionDefinition decisionDefinition = findOnlyDecisionDefinition();
       processEngineConfiguration.setEnforceHistoryTimeToLive(true);
 
-      //when
-      repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), null);
-
-      fail("Updating Cases definitions with HistoryTimeToLive Null value while enforceHistoryTimeToLive is true should fail");
-    } catch (Exception e) {
-      // then
-      assertThat(e).isInstanceOf(NotAllowedException.class);
-    } finally {
-      processEngineConfiguration.setEnforceHistoryTimeToLive(enforceHistoryTimeToLiveBefore);
-    }
+      // when
+      repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), null);})
+        // then
+        .isInstanceOf(NotAllowedException.class)
+        .hasMessage("Null historyTimeToLive values are not allowed");
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})

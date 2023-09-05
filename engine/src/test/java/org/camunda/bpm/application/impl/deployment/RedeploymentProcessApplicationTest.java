@@ -16,13 +16,16 @@
  */
 package org.camunda.bpm.application.impl.deployment;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Callable;
 import org.camunda.bpm.application.ProcessApplicationExecutionException;
 import org.camunda.bpm.application.ProcessApplicationReference;
@@ -93,6 +96,8 @@ public class RedeploymentProcessApplicationTest {
 
   public boolean enforceHistoryTimeToLive;
 
+  public final List<Deployment> deploymentsToCleanup = new ArrayList<>();
+
   @Parameters(name = "scenario {index}")
   public static Collection<Object[]> scenarios() {
     return Arrays.asList(new Object[][] {
@@ -117,6 +122,10 @@ public class RedeploymentProcessApplicationTest {
   @After
   public void tearDown() {
     engineRule.getProcessEngineConfiguration().setEnforceHistoryTimeToLive(enforceHistoryTimeToLive);
+
+    if (!deploymentsToCleanup.isEmpty()) {
+      deleteDeployments(deploymentsToCleanup);
+    }
   }
 
   @Test
@@ -147,7 +156,7 @@ public class RedeploymentProcessApplicationTest {
     // then
     assertTrue(application.isCalled());
 
-    deleteDeployments(deployment1, deployment2);
+    deploymentsToCleanup.addAll(Arrays.asList(deployment1, deployment2));
   }
 
   @Test
@@ -174,7 +183,7 @@ public class RedeploymentProcessApplicationTest {
 
       // cleanup
       if (deployment1 != null) {
-        deleteDeployments(deployment1);
+        deploymentsToCleanup.add(deployment1);
       }
     }
   }
@@ -208,16 +217,18 @@ public class RedeploymentProcessApplicationTest {
       fail("The second deployment should have thrown an exception due to mandatory enforcement of historyTimeToLive");
     } catch (Exception e) {
       // then
-      assertTrue("Deployment2 should fail due to mandatory historyTimeToLive", e instanceof ProcessEngineException);
+      assertThat(e)
+          .withFailMessage("Deployment2 should throw ProcessEngineException due to mandatory historyTimeToLive")
+          .isInstanceOf(ProcessEngineException.class);
     } finally {
 
       // cleanup
       if (deployment1 != null) {
-        deleteDeployments(deployment1);
+        deploymentsToCleanup.add(deployment1);
       }
 
       if (deployment2 != null) {
-        deleteDeployments(deployment1, deployment2);
+        deploymentsToCleanup.add(deployment2);
       }
     }
   }
@@ -258,11 +269,11 @@ public class RedeploymentProcessApplicationTest {
     assertFalse(application1.isCalled());
     assertTrue(application2.isCalled());
 
-    deleteDeployments(deployment1, deployment2, deployment3);
+    deploymentsToCleanup.addAll(Arrays.asList(deployment1, deployment2, deployment3));
   }
 
   @Test
-	public void definitionTwoPreviousDeploymentFirstDeploymentWithPA() {
+  public void definitionTwoPreviousDeploymentFirstDeploymentWithPA() {
     // given
 
     // first deployment
@@ -295,11 +306,11 @@ public class RedeploymentProcessApplicationTest {
     // then
     assertTrue(application1.isCalled());
 
-    deleteDeployments(deployment1, deployment2, deployment3);
+    deploymentsToCleanup.addAll(Arrays.asList(deployment1, deployment2, deployment3));
   }
 
   @Test
-	public void definitionTwoPreviousDeploymentDeleteSecondDeployment() {
+  public void definitionTwoPreviousDeploymentDeleteSecondDeployment() {
     // given
 
     // first deployment
@@ -335,11 +346,11 @@ public class RedeploymentProcessApplicationTest {
     assertTrue(application1.isCalled());
     assertFalse(application2.isCalled());
 
-    deleteDeployments(deployment1, deployment3);
+    deploymentsToCleanup.addAll(Arrays.asList(deployment1, deployment3));
   }
 
   @Test
-	public void definitionTwoPreviousDeploymentUnregisterSecondPA() {
+  public void definitionTwoPreviousDeploymentUnregisterSecondPA() {
     // given
 
     // first deployment
@@ -375,11 +386,11 @@ public class RedeploymentProcessApplicationTest {
     assertTrue(application1.isCalled());
     assertFalse(application2.isCalled());
 
-    deleteDeployments(deployment1, deployment2, deployment3);
+    deploymentsToCleanup.addAll(Arrays.asList(deployment1, deployment2, deployment3));
   }
 
   @Test
-	public void definitionTwoDifferentPreviousDeploymentsWithDifferentPA() {
+  public void definitionTwoDifferentPreviousDeploymentsWithDifferentPA() {
     // given
 
     // first deployment
@@ -426,11 +437,11 @@ public class RedeploymentProcessApplicationTest {
     assertFalse(application1.isCalled());
     assertTrue(application2.isCalled());
 
-    deleteDeployments(deployment1, deployment2, deployment3);
+    deploymentsToCleanup.addAll(Arrays.asList(deployment1, deployment2, deployment3));
   }
 
   @Test
-	public void definitionTwoPreviousDeploymentsWithDifferentPA() {
+  public void definitionTwoPreviousDeploymentsWithDifferentPA() {
     // given
 
     // first deployment
@@ -477,7 +488,14 @@ public class RedeploymentProcessApplicationTest {
     assertTrue(application1.isCalled());
     assertFalse(application2.isCalled());
 
-    deleteDeployments(deployment1, deployment2, deployment3);
+    deploymentsToCleanup.addAll(Arrays.asList(deployment1, deployment2, deployment3));
+  }
+
+  protected void deleteDeployments(List<Deployment> deployments) {
+    Deployment[] array = new Deployment[deployments.size()];
+    array = deployments.toArray(array);
+
+    deleteDeployments(array);
   }
 
   protected void deleteDeployments(Deployment... deployments){

@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -870,7 +871,9 @@ public class RedeploymentTest {
 
       fail("addDeploymentResourceById should fail due to enforceHistoryTimeToLive=true and null historyTimeToLive");
     } catch (Exception e) {
-      assertTrue(e instanceof ProcessEngineException);
+      assertThat(e)
+          .isInstanceOf(ProcessEngineException.class)
+          .hasMessageContaining("History Time To Live cannot be null");
     }
   }
 
@@ -940,7 +943,9 @@ public class RedeploymentTest {
 
       fail("addDeploymentResourcesById should fail due to enforceHistoryTimeToLive=true and null HistoryTimeToLive resources");
     } catch (Exception e) {
-      assertTrue(e instanceof ProcessEngineException);
+      assertThat(e)
+          .isInstanceOf(ProcessEngineException.class)
+          .hasMessageContaining("History Time To Live cannot be null");
     }
   }
 
@@ -986,7 +991,9 @@ public class RedeploymentTest {
 
       fail("addDeploymentResourcesById should fail due to enforceHistoryTimeToLive=true and null HistoryTimeToLive resources");
     } catch (Exception e) {
-      assertTrue(e instanceof ProcessEngineException);
+      assertThat(e)
+          .isInstanceOf(ProcessEngineException.class)
+          .hasMessageContaining("History Time To Live cannot be null");
     }
   }
 
@@ -1035,7 +1042,9 @@ public class RedeploymentTest {
 
       fail("addDeploymentResourcesByName should fail due to enforceHistoryTimeToLive=true and null HistoryTimeToLive resources");
     } catch (Exception e) {
-      assertTrue(e instanceof ProcessEngineException);
+      assertThat(e)
+          .isInstanceOf(ProcessEngineException.class)
+          .hasMessageContaining("History Time To Live cannot be null");
     }
   }
 
