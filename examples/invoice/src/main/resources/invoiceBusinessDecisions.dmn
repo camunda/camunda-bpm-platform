@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="invoiceBusinessDecisions" name="Invoice Business Decisions" namespace="http://camunda.org/schema/1.0/dmn">
-  <decision id="invoiceClassification" name="Invoice Classification">
+  <decision id="invoiceClassification" name="Invoice Classification" camunda:historyTimeToLive="30">
     <decisionTable id="decisionTable">
       <input id="clause1" label="Invoice Amount" camunda:inputVariable="">
         <inputExpression id="inputExpression1" typeRef="double">
@@ -77,7 +77,7 @@
       </rule>
     </decisionTable>
   </decision>
-  <decision id="invoice-assign-approver" name="Assign Approver Group">
+  <decision id="invoice-assign-approver" name="Assign Approver Group" camunda:historyTimeToLive="30">
     <informationRequirement id="InformationRequirement_1kkeocv">
       <requiredDecision href="#invoiceClassification" />
     </informationRequirement>
