@@ -154,7 +154,7 @@ define('camunda-tasklist-bootstrap', function() {
           });
 
           // configure RequireJS
-          requirejs.config(conf);
+          requirejs.config({baseUrl: '../', ...conf});
 
           // load the dependencies and bootstrap the AngularJS application
           requirejs(custom.deps || [], function() {
