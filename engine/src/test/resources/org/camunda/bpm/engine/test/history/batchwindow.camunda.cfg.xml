@@ -38,6 +38,7 @@
     <property name="jdbcBatchProcessing" value="${jdbcBatchProcessing}"/>
 
     <property name="historyCleanupBatchWindowStartTime" value="16:00" />
+    <property name="enforceHistoryTimeToLive" value="false" />
 
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 

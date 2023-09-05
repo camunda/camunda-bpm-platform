@@ -45,6 +45,7 @@
         <property name="dbMetricsReporterActivate" value="false" />
         <property name="taskMetricsEnabled" value="false" />
         <property name="telemetryReporterActivate" value="false" />
+        <property name="enforceHistoryTimeToLive" value="false" />
     </bean>
 
     <bean id="processEngine" class="org.camunda.bpm.engine.spring.ProcessEngineFactoryBean">

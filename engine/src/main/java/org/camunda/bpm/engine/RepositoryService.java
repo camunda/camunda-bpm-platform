@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -493,26 +494,30 @@ public interface RepositoryService {
 
   /**
    * Updates time to live of process definition. The field is used within history cleanup process.
-   * @param processDefinitionId
-   * @param historyTimeToLive
+   * @param processDefinitionId The id of the process definition to update
+   * @param historyTimeToLive the value of history time to live to update
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @throws NotAllowedException in case feature flag {@code enforceHistoryTimeToLive} is set to {@code true} and the given historyTimeToLive value is {@code null}.
    */
   void updateProcessDefinitionHistoryTimeToLive(String processDefinitionId, Integer historyTimeToLive);
 
   /**
    * Updates time to live of decision definition. The field is used within history cleanup process.
-   * @param decisionDefinitionId
-   * @param historyTimeToLive
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#DECISION_DEFINITION}.
+   *
+   * @param decisionDefinitionId The id of the decision definition to update
+   * @param historyTimeToLive    the value of history time to live to update
+   * @throws AuthorizationException If the user has no {@link Permissions#UPDATE} permission on {@link Resources#DECISION_DEFINITION}.
+   * @throws NotAllowedException    in case feature flag {@code enforceHistoryTimeToLive} is set to {@code true} and the given historyTimeToLive value is {@code null}.
    */
   void updateDecisionDefinitionHistoryTimeToLive(String decisionDefinitionId, Integer historyTimeToLive);
 
   /**
    * Updates time to live of case definition. The field is used within history cleanup process.
-   * @param caseDefinitionId
-   * @param historyTimeToLive
+   *
+   * @param caseDefinitionId  The given case definition id to update
+   * @param historyTimeToLive the value of history time to live to update
+   * @throws NotAllowedException in case feature flag {@code enforceHistoryTimeToLive} is set to true and the given historyTimeToLive value is {@code null}.
    */
   void updateCaseDefinitionHistoryTimeToLive(String caseDefinitionId, Integer historyTimeToLive);
 

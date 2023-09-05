@@ -12,6 +12,7 @@
 		<property name="databaseSchemaUpdate" value="true" />				
 		<property name="jobExecutorActivate" value="false" />
 		<property name="mailServerPort" value="5025" />
+		<property name="enforceHistoryTimeToLive" value="false" />
 
         <!-- turn off metrics reporter -->
         <property name="dbMetricsReporterActivate" value="false" />

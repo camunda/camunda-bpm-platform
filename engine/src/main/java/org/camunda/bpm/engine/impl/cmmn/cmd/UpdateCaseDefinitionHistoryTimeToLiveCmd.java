@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl.cmmn.cmd;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.HistoryTimeToLiveParser;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -44,20 +45,22 @@ public class UpdateCaseDefinitionHistoryTimeToLiveCmd implements Command<Void>, 
   }
 
   @Override
-  public Void execute(CommandContext commandContext) {
+  public Void execute(CommandContext context) {
     ensureNotNull(BadUserRequestException.class, "caseDefinitionId", caseDefinitionId);
 
     if (historyTimeToLive != null) {
       ensureGreaterThanOrEqual(BadUserRequestException.class, "", "historyTimeToLive", historyTimeToLive, 0);
     }
 
-    CaseDefinitionEntity caseDefinitionEntity = commandContext.getCaseDefinitionManager().findLatestDefinitionById(caseDefinitionId);
+    validate(historyTimeToLive, context);
 
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    CaseDefinitionEntity caseDefinitionEntity = context.getCaseDefinitionManager().findLatestDefinitionById(caseDefinitionId);
+
+    for (CommandChecker checker : context.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkUpdateCaseDefinition(caseDefinitionEntity);
     }
 
-    logUserOperation(commandContext, caseDefinitionEntity);
+    logUserOperation(context, caseDefinitionEntity);
     caseDefinitionEntity.setHistoryTimeToLive(historyTimeToLive);
 
     return null;
@@ -74,5 +77,10 @@ public class UpdateCaseDefinitionHistoryTimeToLiveCmd implements Command<Void>, 
         caseDefinitionId,
         caseDefinitionEntity.getTenantId(),
         propertyChanges);
+  }
+
+  protected void validate(Integer historyTimeToLive, CommandContext context) {
+    HistoryTimeToLiveParser parser = HistoryTimeToLiveParser.create(context);
+    parser.validate(historyTimeToLive);
   }
 }

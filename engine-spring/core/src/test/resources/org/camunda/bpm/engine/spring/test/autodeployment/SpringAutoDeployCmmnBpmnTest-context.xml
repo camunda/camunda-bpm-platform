@@ -34,6 +34,7 @@
         <value>classpath*:/org/camunda/bpm/engine/spring/test/autodeployment/autodeploy.*.bpmn20.xml</value>
       </array>
     </property>
+    <property name="enforceHistoryTimeToLive" value="false" />
   </bean>
   
   <bean id="processEngine" class="org.camunda.bpm.engine.spring.ProcessEngineFactoryBean">

@@ -19,12 +19,13 @@ package org.camunda.bpm.engine.impl.dmn.transformer;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnElementTransformContext;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnDecisionTransformHandler;
-import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.HistoryTimeToLiveParser;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
-import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.model.dmn.instance.Decision;
 
 public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
+
+  protected boolean skipEnforceTtl = false;
 
   @Override
   protected DmnDecisionImpl createDmnElement() {
@@ -39,20 +40,21 @@ public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
     decisionDefinition.setCategory(category);
     decisionDefinition.setVersionTag(decision.getVersionTag());
 
-    setHistoryTTL(decision, decisionDefinition);
+    validateAndSetHTTL(decision, decisionDefinition, isSkipEnforceTtl());
 
     return decisionDefinition;
   }
 
-  private void setHistoryTTL(Decision decision, DecisionDefinitionEntity decisionDefinition) {
-    Integer localHistoryTimeToLive = ParseUtil.parseHistoryTimeToLive(decision.getCamundaHistoryTimeToLiveString());
+  protected void validateAndSetHTTL(Decision decision, DecisionDefinitionEntity decisionDefinition, boolean skipEnforceTtl) {
+    Integer historyTimeToLive = HistoryTimeToLiveParser.create().parse(decision, decisionDefinition.getKey(), skipEnforceTtl);
+    decisionDefinition.setHistoryTimeToLive(historyTimeToLive);
+  }
 
-    if (localHistoryTimeToLive != null) {
-      decisionDefinition.setHistoryTimeToLive(localHistoryTimeToLive);
-    } else {
-      Integer configuredHistoryTTL = ParseUtil.parseHistoryTimeToLive(Context.getProcessEngineConfiguration().getHistoryTimeToLive());
-      decisionDefinition.setHistoryTimeToLive(configuredHistoryTTL);
-    }
+  public boolean isSkipEnforceTtl() {
+    return skipEnforceTtl;
+  }
 
+  public void setSkipEnforceTtl(boolean skipEnforceTtl) {
+    this.skipEnforceTtl = skipEnforceTtl;
   }
 }

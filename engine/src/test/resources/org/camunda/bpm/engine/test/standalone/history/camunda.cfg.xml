@@ -29,6 +29,7 @@
     
     <!-- History cleanup for batch operations -->
     <property name="batchOperationHistoryTimeToLive" value="P5D"/>
+    <property name="enforceHistoryTimeToLive" value="false" />
 
     <property name="batchOperationsForHistoryCleanup">
       <map>

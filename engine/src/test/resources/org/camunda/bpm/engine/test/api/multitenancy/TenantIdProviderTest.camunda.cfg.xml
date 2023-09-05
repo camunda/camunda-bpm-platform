@@ -13,6 +13,8 @@
 
     <property name="tenantIdProvider" ref="tenantIdProvider"></property>
 
+    <property name="enforceHistoryTimeToLive" value="false" />
+
   </bean>
   
   <bean id="tenantIdProvider" class="org.camunda.bpm.engine.test.api.multitenancy.TenantIdProviderTest$TestTenantIdProvider"></bean>
