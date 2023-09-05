@@ -82,6 +82,7 @@ public class SequentialJobAcquisitionTest {
     standaloneProcessEngineConfiguration.setJobExecutorActivate(false);
     standaloneProcessEngineConfiguration.setJobExecutor(jobExecutor);
     standaloneProcessEngineConfiguration.setDbMetricsReporterActivate(false);
+
     ProcessEngine engine = standaloneProcessEngineConfiguration.buildProcessEngine();
 
     createdProcessEngines.add(engine);
@@ -115,6 +116,7 @@ public class SequentialJobAcquisitionTest {
     engineConfiguration1.setJobExecutorActivate(false);
     engineConfiguration1.setJobExecutor(jobExecutor);
     engineConfiguration1.setDbMetricsReporterActivate(false);
+
     ProcessEngine engine1 = engineConfiguration1.buildProcessEngine();
     createdProcessEngines.add(engine1);
 
@@ -125,7 +127,10 @@ public class SequentialJobAcquisitionTest {
     engineConfiguration2.setJobExecutorActivate(false);
     engineConfiguration2.setJobExecutor(jobExecutor);
     engineConfiguration2.setDbMetricsReporterActivate(false);
+    engineConfiguration2.setEnforceHistoryTimeToLive(false);
+
     ProcessEngine engine2 = engineConfiguration2.buildProcessEngine();
+
     createdProcessEngines.add(engine2);
 
     // stop the acquisition
@@ -175,6 +180,7 @@ public class SequentialJobAcquisitionTest {
     engineConfiguration1.setJobExecutorActivate(false);
     engineConfiguration1.setJobExecutor(jobExecutor);
     engineConfiguration1.setDbMetricsReporterActivate(false);
+
     ProcessEngine engine1 = engineConfiguration1.buildProcessEngine();
     createdProcessEngines.add(engine1);
 
@@ -185,6 +191,7 @@ public class SequentialJobAcquisitionTest {
     engineConfiguration2.setJobExecutorActivate(false);
     engineConfiguration2.setJobExecutor(jobExecutor);
     engineConfiguration2.setDbMetricsReporterActivate(false);
+
     ProcessEngine engine2 = engineConfiguration2.buildProcessEngine();
     createdProcessEngines.add(engine2);
 

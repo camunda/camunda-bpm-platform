@@ -113,4 +113,29 @@ public class ConfigurationLogger extends ProcessEngineLogger {
     logError("015", "Exception while reading configuration property: {}", e.getMessage());
   }
 
+  /**
+   * Method for logging message when default history time to live is configured.
+   *
+   * @param definitionKey the correlated definition key with which history time to live is related to.
+   *                      For processes related to httl, that is the processDefinitionKey, for cases the case definition key
+   *                      whereas for decisions is the decision definition key.
+   */
+  public void logHistoryTimeToLiveDefaultValueWarning(String definitionKey) {
+    String message = formatHTTLDefaultValueMessage(definitionKey);
+
+    logWarn("016", message);
+  }
+
+  protected String formatHTTLDefaultValueMessage(String definitionKey) {
+    String result = "You are using the default TTL (Time To Live) of 180 days (six months); "
+        + "the history clean-up feature will delete your data after six months. "
+        + "We recommend adjusting the TTL configuration property aligned with your specific requirements.";
+
+    if (definitionKey != null) {
+      result = "definitionKey: " + definitionKey + "; " + result;
+    }
+
+    return result;
+  }
+
 }

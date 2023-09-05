@@ -16,20 +16,20 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureGreaterThanOrEqual;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.HistoryTimeToLiveParser;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureGreaterThanOrEqual;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Svetlana Dorokhova
@@ -46,16 +46,19 @@ public class UpdateDecisionDefinitionHistoryTimeToLiveCmd implements Command<Voi
     this.historyTimeToLive = historyTimeToLive;
   }
 
-  public Void execute(CommandContext commandContext) {
-    checkAuthorization(commandContext);
+  public Void execute(CommandContext context) {
+    checkAuthorization(context);
 
     ensureNotNull(BadUserRequestException.class, "decisionDefinitionId", decisionDefinitionId);
+
     if (historyTimeToLive != null) {
       ensureGreaterThanOrEqual(BadUserRequestException.class, "", "historyTimeToLive", historyTimeToLive, 0);
     }
 
-    DecisionDefinitionEntity decisionDefinitionEntity = commandContext.getDecisionDefinitionManager().findDecisionDefinitionById(decisionDefinitionId);
-    logUserOperation(commandContext, decisionDefinitionEntity);
+    validate(historyTimeToLive, context);
+
+    DecisionDefinitionEntity decisionDefinitionEntity = context.getDecisionDefinitionManager().findDecisionDefinitionById(decisionDefinitionId);
+    logUserOperation(context, decisionDefinitionEntity);
     decisionDefinitionEntity.setHistoryTimeToLive(historyTimeToLive);
 
     return null;
@@ -75,5 +78,10 @@ public class UpdateDecisionDefinitionHistoryTimeToLiveCmd implements Command<Voi
 
     commandContext.getOperationLogManager()
       .logDecisionDefinitionOperation(UserOperationLogEntry.OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE, decisionDefinitionEntity.getTenantId(), propertyChanges);
+  }
+
+  protected void validate(Integer historyTimeToLive, CommandContext context) {
+    HistoryTimeToLiveParser parser = HistoryTimeToLiveParser.create(context);
+    parser.validate(historyTimeToLive);
   }
 }

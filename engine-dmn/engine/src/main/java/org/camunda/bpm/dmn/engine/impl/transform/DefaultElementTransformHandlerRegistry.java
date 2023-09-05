@@ -36,10 +36,10 @@ import org.camunda.bpm.model.dmn.instance.Variable;
 
 public class DefaultElementTransformHandlerRegistry implements DmnElementTransformHandlerRegistry {
 
-  protected static final Map<Class<? extends DmnModelElementInstance>, DmnElementTransformHandler> handlers = getDefaultElementTransformHandlers();
+  protected final Map<Class<? extends DmnModelElementInstance>, DmnElementTransformHandler> handlers = getDefaultElementTransformHandlers();
 
   protected static Map<Class<? extends DmnModelElementInstance>, DmnElementTransformHandler> getDefaultElementTransformHandlers() {
-    Map<Class<? extends DmnModelElementInstance>, DmnElementTransformHandler> handlers = new HashMap<Class<? extends DmnModelElementInstance>, DmnElementTransformHandler>();
+    Map<Class<? extends DmnModelElementInstance>, DmnElementTransformHandler> handlers = new HashMap<>();
 
     handlers.put(Definitions.class, new DmnDecisionRequirementsGraphTransformHandler());
     handlers.put(Decision.class, new DmnDecisionTransformHandler());

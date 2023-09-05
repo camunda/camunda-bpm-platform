@@ -19,6 +19,7 @@
     
     <!-- mail server configurations -->
     <property name="history" value="full" />
+    <property name="enforceHistoryTimeToLive" value="false" />
 
     <property name="processEnginePlugins">
       <list>

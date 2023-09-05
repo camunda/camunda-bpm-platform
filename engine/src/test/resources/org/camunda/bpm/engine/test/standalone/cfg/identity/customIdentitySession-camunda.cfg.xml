@@ -24,6 +24,7 @@
     <property name="dbMetricsReporterActivate" value="false" />
     <property name="telemetryReporterActivate" value="false" />
     <property name="taskMetricsEnabled" value="false" />
+    <property name="enforceHistoryTimeToLive" value="false" />
 
     <!-- provide a custom IdentitySessionFactory that returns a custom IdentitySession -->
     <property name="customSessionFactories">

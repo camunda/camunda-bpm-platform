@@ -34,7 +34,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.ActivityTypes;
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -42,6 +41,7 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.delegate.VariableListener;
 import org.camunda.bpm.engine.impl.Condition;
+import org.camunda.bpm.engine.impl.HistoryTimeToLiveParser;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryConditionalEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
@@ -151,7 +151,6 @@ import org.camunda.bpm.engine.impl.task.listener.DelegateExpressionTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.ExpressionTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.ScriptTaskListener;
 import org.camunda.bpm.engine.impl.util.DecisionEvaluationUtil;
-import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.util.ScriptUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
@@ -633,14 +632,8 @@ public class BpmnParse extends Parse {
     processDefinition.setProperty(PROPERTYNAME_TASK_PRIORITY, parsePriority(processElement, PROPERTYNAME_TASK_PRIORITY));
     processDefinition.setVersionTag(processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "versionTag"));
 
-    try {
-      String historyTimeToLive = processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive",
-          Context.getProcessEngineConfiguration().getHistoryTimeToLive());
-      processDefinition.setHistoryTimeToLive(ParseUtil.parseHistoryTimeToLive(historyTimeToLive));
-    }
-    catch (Exception e) {
-      addError(new BpmnParseException(e.getMessage(), processElement, e));
-    }
+    boolean skipEnforceTtl = !deployment.isNew();
+    validateAndSetHTTL(processElement, processDefinition, skipEnforceTtl);
 
     boolean isStartableInTasklist = isStartable(processElement);
     processDefinition.setStartableInTasklist(isStartableInTasklist);
@@ -665,6 +658,17 @@ public class BpmnParse extends Parse {
       activity.setDelegateAsyncBeforeUpdate(null);
     }
     return processDefinition;
+  }
+
+  protected void validateAndSetHTTL(Element processElement, ProcessDefinitionEntity processDefinition, boolean skipEnforceTtl) {
+    try {
+      String processDefinitionKey = processDefinition.getKey();
+      Integer historyTimeToLive = HistoryTimeToLiveParser.create().parse(processElement, processDefinitionKey, skipEnforceTtl);
+      processDefinition.setHistoryTimeToLive(historyTimeToLive);
+    }
+    catch (Exception e) {
+      addError(new BpmnParseException(e.getMessage(), processElement, e));
+    }
   }
 
   protected void parseLaneSets(Element parentElement, ProcessDefinitionEntity processDefinition) {

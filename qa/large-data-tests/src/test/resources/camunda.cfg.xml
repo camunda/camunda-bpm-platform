@@ -25,6 +25,7 @@
     <property name="taskMetricsEnabled" value="false" />
 
     <property name="jdbcBatchProcessing" value="${jdbcBatchProcessing}"/>
+    <property name="enforceHistoryTimeToLive" value="false" />
 
   </bean>
 

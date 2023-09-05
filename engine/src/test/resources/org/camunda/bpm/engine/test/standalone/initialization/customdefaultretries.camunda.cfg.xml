@@ -24,6 +24,7 @@
 
     <!-- default job retries -->
     <property name="defaultNumberOfRetries" value="5" />
+    <property name="enforceHistoryTimeToLive" value="false" />
 
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />

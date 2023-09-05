@@ -19,6 +19,7 @@
     <property name="jobExecutorActivate" value="false" />
 
     <property name="metricsEnabled" value="false"/>
+    <property name="enforceHistoryTimeToLive" value="false" />
     
     <!-- mail server configurations -->
     <property name="history" value="full" />

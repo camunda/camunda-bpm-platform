@@ -29,6 +29,7 @@
     <property name="defaultSerializationFormat" value="application/json"/>
 
     <property name="jdbcBatchProcessing" value="${jdbcBatchProcessing}"/>
+    <property name="enforceHistoryTimeToLive" value="false" />
 
   </bean>
 

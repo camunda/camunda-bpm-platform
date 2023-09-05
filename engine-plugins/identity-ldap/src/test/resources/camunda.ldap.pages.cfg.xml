@@ -21,6 +21,7 @@
         <property name="jobExecutorActivate" value="false" />
 
         <property name="createDiagramOnDeploy" value="true" />
+        <property name="enforceHistoryTimeToLive" value="false" />
 
         <property name="processEnginePlugins">
             <list>

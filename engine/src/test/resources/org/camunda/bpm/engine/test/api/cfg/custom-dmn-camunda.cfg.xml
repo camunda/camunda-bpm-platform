@@ -16,6 +16,7 @@
         <property name="defaultInputExpressionExpressionLanguage" value="groovy" />
       </bean>
     </property>
+    <property name="enforceHistoryTimeToLive" value="false" />
     
   </bean>
 
