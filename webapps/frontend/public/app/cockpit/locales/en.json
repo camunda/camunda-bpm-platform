@@ -2103,6 +2103,8 @@
     "PLUGIN_PROCESS_DEF_INCIDENTS": "Incidents",
     "PLUGIN_PROCESS_DEF_LIST": "List",
     "PLUGIN_PROCESS_DEF_NAME": "Name",
+    "PLUGIN_PROCESS_DEF_KEY": "Key",
+    "PLUGIN_PROCESS_DEF_LIKE": "like",
     "PLUGIN_PROCESS_DEF_NO_PROCESS_DEF": "No process definitions deployed",
     "PLUGIN_PROCESS_DEF_PREVIEWS": "Previews",
     "PLUGIN_PROCESS_DEF_PREV_RUNNING_INSTANCE": "1 running instance",

@@ -35,17 +35,19 @@ function CamPaginationSearchIntegrationController(
   search,
   exposeScopeProperties
 ) {
+  this.searchId = $scope.searchId || 'search';
+  this.paginationId = $scope.paginationId || 'page';
   this.searchWidgetUtils = searchWidgetUtils;
   this.search = search;
   this.lastSearchQueryString = null;
   this.locationChange = true;
 
   // reset Page when changing Tabs
-  $scope.$on('$destroy', function() {
+  $scope.$on('$destroy', () => {
     // when not resetting searches, state from other page is used
     // which can lead to search not reloading due to dirty check
     $scope.config.searches = null;
-    search('page', null);
+    search(this.paginationId, null);
   });
 
   exposeScopeProperties($scope, this, [
@@ -105,7 +107,7 @@ CamPaginationSearchIntegrationController.prototype.onBlockedChange = function(
 };
 
 CamPaginationSearchIntegrationController.prototype.getSearchQueryString = function() {
-  return this.search().searchQuery;
+  return this.search()[this.searchId + 'Query'];
 };
 
 CamPaginationSearchIntegrationController.prototype.hasSearchQueryStringChanged = function() {
@@ -130,7 +132,7 @@ CamPaginationSearchIntegrationController.prototype.onPageChange = function(
     return;
   }
 
-  this.search('page', !newValue || newValue == 1 ? null : newValue);
+  this.search(this.paginationId, !newValue || newValue == 1 ? null : newValue);
 
   if (!this.hasSearchQueryStringChanged()) {
     this.executeQueries();
@@ -152,7 +154,7 @@ CamPaginationSearchIntegrationController.prototype.onLocationChange = function()
 };
 
 CamPaginationSearchIntegrationController.prototype.getCurrentPageFromSearch = function() {
-  return +this.search().page || 1;
+  return +this.search()[this.paginationId] || 1;
 };
 
 CamPaginationSearchIntegrationController.prototype.updateQuery = function(
@@ -178,7 +180,7 @@ CamPaginationSearchIntegrationController.prototype.resetPage = function() {
   var params = this.search();
 
   this.pages.current = 1;
-  params.page = 1;
+  params[this.paginationId] = 1;
 
   // Replace url with old pagination, so browser history is more clean
   this.search.updateSilently(params, true);

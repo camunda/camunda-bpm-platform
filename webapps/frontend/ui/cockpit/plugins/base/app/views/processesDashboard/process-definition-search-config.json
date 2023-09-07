@@ -1,0 +1,159 @@
+{
+  "types": [
+    {
+      "id": {
+        "key": "name",
+        "value": "PLUGIN_PROCESS_DEF_NAME"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        },
+        {
+          "key": "Like",
+          "value": "PLUGIN_PROCESS_DEF_LIKE"
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "key",
+        "value": "PLUGIN_PROCESS_DEF_KEY"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        },
+        {
+          "key": "Like",
+          "value": "PLUGIN_PROCESS_DEF_LIKE"
+        }
+      ]
+    }
+  ],
+  "operators": {
+    "undefined":  [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      },
+      {
+        "key": "like",
+        "value": "PROCESS_INSTANCE_OPERATOR_LIKE"
+      }
+    ],
+    "string":     [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      },
+      {
+        "key": "like",
+        "value": "PROCESS_INSTANCE_OPERATOR_LIKE"
+      }
+    ],
+    "number":     [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      }
+    ],
+    "boolean":    [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      }
+    ],
+    "object":     [{
+      "key": "eq",
+      "value": "="
+    },
+      {
+        "key": "neq",
+        "value": "!="
+      }],
+    "date":     [{
+      "key": "lteq",
+      "value": "PROCESS_INSTANCE_OPERATOR_BEFORE"
+    },
+      {
+        "key": "gteq",
+        "value": "PROCESS_INSTANCE_OPERATOR_AFTER"
+      }]
+  },
+  "tooltips": {
+    "inputPlaceholder": "PROCESS_INSTANCE_ADD_CRITERIA",
+    "invalid": "PROCESS_INSTANCE_INVALID",
+    "deleteSearch": "PROCESS_INSTANCE_DELETE_SEARCH",
+    "type": "PROCESS_INSTANCE_TYPE",
+    "name": "PROCESS_INSTANCE_NAME",
+    "operator": "PROCESS_INSTANCE_OPERATOR",
+    "value": "PROCESS_INSTANCE_VALUE"
+  }
+}

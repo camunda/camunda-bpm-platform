@@ -2096,6 +2096,8 @@
     "PLUGIN_PROCESS_DEF_INCIDENTS": "Zwischenfälle",
     "PLUGIN_PROCESS_DEF_LIST": "Liste",
     "PLUGIN_PROCESS_DEF_NAME": "Name",
+    "PLUGIN_PROCESS_DEF_KEY": "Key",
+    "PLUGIN_PROCESS_DEF_LIKE": "wie",
     "PLUGIN_PROCESS_DEF_NO_PROCESS_DEF": "Keine Prozessdefinitionen deployed",
     "PLUGIN_PROCESS_DEF_PREVIEWS": "Vorschauen",
     "PLUGIN_PROCESS_DEF_PREV_RUNNING_INSTANCE": "1 laufende Instanz",
