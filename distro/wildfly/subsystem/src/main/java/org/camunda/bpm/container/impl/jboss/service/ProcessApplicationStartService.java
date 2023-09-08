@@ -24,9 +24,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.PreUndeploy;
 import org.camunda.bpm.application.ProcessApplicationDeploymentInfo;
@@ -52,7 +53,6 @@ import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
-import org.jboss.msc.value.InjectedValue;
 
 /**
  * <p>This service is responsible for starting the {@link MscManagedProcessApplication} service.</p>
@@ -82,13 +82,15 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
   protected final Collection<ServiceName> deploymentServiceNames;
 
   // for view-exposing ProcessApplicationComponents
-  protected InjectedValue<ComponentView> paComponentViewInjector = new InjectedValue<ComponentView>();
-  protected InjectedValue<ProcessApplicationInterface> noViewProcessApplication = new InjectedValue<ProcessApplicationInterface>();
+  protected final Supplier<ComponentView> paComponentViewSupplier;
+  protected final Supplier<ProcessApplicationInterface> noViewProcessApplication;
 
-  /** injector for the default process engine */
-  protected InjectedValue<ProcessEngine> defaultProcessEngineInjector = new InjectedValue<ProcessEngine>();
+  /** Supplier for the default process engine */
+  protected final Supplier<ProcessEngine> defaultProcessEngineSupplier;
 
-  protected InjectedValue<BpmPlatformPlugins> platformPluginsInjector = new InjectedValue<BpmPlatformPlugins>();
+  protected final Supplier<BpmPlatformPlugins> platformPluginsSupplier;
+
+  protected final Consumer<ProcessApplicationStartService> paStartServiceConsumer;
 
   protected AnnotationInstance preUndeployDescription;
   protected AnnotationInstance postDeployDescription;
@@ -98,27 +100,42 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
 
   protected Module paModule;
 
-  public ProcessApplicationStartService(Collection<ServiceName> deploymentServiceNames, AnnotationInstance postDeployDescription, AnnotationInstance preUndeployDescription, Module paModule) {
+  public ProcessApplicationStartService(
+      Collection<ServiceName> deploymentServiceNames,
+      AnnotationInstance postDeployDescription,
+      AnnotationInstance preUndeployDescription,
+      Module paModule,
+      Supplier<ComponentView> paComponentViewSupplier,
+      Supplier<ProcessApplicationInterface> noViewProcessApplication,
+      Supplier<ProcessEngine> defaultProcessEngineSupplier,
+      Supplier<BpmPlatformPlugins> platformPluginsSupplier,
+      Consumer<ProcessApplicationStartService> paStartServiceConsumer) {
     this.deploymentServiceNames = deploymentServiceNames;
     this.postDeployDescription = postDeployDescription;
     this.preUndeployDescription = preUndeployDescription;
     this.paModule = paModule;
+    this.paComponentViewSupplier = paComponentViewSupplier;
+    this.noViewProcessApplication = noViewProcessApplication;
+    this.defaultProcessEngineSupplier = defaultProcessEngineSupplier;
+    this.platformPluginsSupplier = platformPluginsSupplier;
+    this.paStartServiceConsumer = paStartServiceConsumer;
   }
 
   @Override
   public void start(StartContext context) throws StartException {
+    paStartServiceConsumer.accept(this);
 
     ManagedReference reference = null;
     try {
 
       // get the process application component
       ProcessApplicationInterface processApplication = null;
-      ComponentView componentView = paComponentViewInjector.getOptionalValue();
+      ComponentView componentView = paComponentViewSupplier.get();
       if(componentView != null) {
         reference = componentView.createInstance();
         processApplication = (ProcessApplicationInterface) reference.getInstance();
       } else {
-        processApplication = noViewProcessApplication.getValue();
+        processApplication = noViewProcessApplication.get();
       }
 
       // create & populate the process application info object
@@ -126,13 +143,13 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       processApplicationInfo.setName(processApplication.getName());
       processApplicationInfo.setProperties(processApplication.getProperties());
 
-      referencedProcessEngines = new HashSet<ProcessEngine>();
-      List<ProcessApplicationDeploymentInfo> deploymentInfos = new ArrayList<ProcessApplicationDeploymentInfo>();
+      referencedProcessEngines = new HashSet<>();
+      List<ProcessApplicationDeploymentInfo> deploymentInfos = new ArrayList<>();
 
       for (ServiceName deploymentServiceName : deploymentServiceNames) {
 
         ProcessApplicationDeploymentService value = getDeploymentService(context, deploymentServiceName);
-        referencedProcessEngines.add(value.getProcessEngineInjector().getValue());
+        referencedProcessEngines.add(value.getProcessEngineSupplier().get());
 
         ProcessApplicationDeployment deployment = value.getDeployment();
         if(deployment != null) {
@@ -147,7 +164,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       }
       processApplicationInfo.setDeploymentInfo(deploymentInfos);
 
-      notifyBpmPlatformPlugins(platformPluginsInjector.getValue(), processApplication);
+      notifyBpmPlatformPlugins(platformPluginsSupplier.get(), processApplication);
 
       if(postDeployDescription != null) {
         invokePostDeploy(processApplication);
@@ -180,18 +197,19 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
 
   @Override
   public void stop(StopContext context) {
+    paStartServiceConsumer.accept(null);
 
     ManagedReference reference = null;
     try {
 
       // get the process application component
       ProcessApplicationInterface processApplication = null;
-      ComponentView componentView = paComponentViewInjector.getOptionalValue();
+      ComponentView componentView = paComponentViewSupplier.get();
       if(componentView != null) {
         reference = componentView.createInstance();
         processApplication = (ProcessApplicationInterface) reference.getInstance();
       } else {
-        processApplication = noViewProcessApplication.getValue();
+        processApplication = noViewProcessApplication.get();
       }
 
       invokePreUndeploy(processApplication);
@@ -251,7 +269,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
 
   protected Object[] getInjections(Method lifecycleMethod) {
     final Type[] parameterTypes = lifecycleMethod.getGenericParameterTypes();
-    final List<Object> parameters = new ArrayList<Object>();
+    final List<Object> parameters = new ArrayList<>();
 
     for (Type parameterType : parameterTypes) {
 
@@ -263,7 +281,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
 
         // support injection of the default process engine, if present
         if(ProcessEngine.class.isAssignableFrom(parameterClass)) {
-          parameters.add(defaultProcessEngineInjector.getOptionalValue());
+          parameters.add(defaultProcessEngineSupplier.get());
           injectionResolved = true;
         }
 
@@ -280,7 +298,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
 
         // support injection of List<ProcessEngine>
         if(actualTypeArguments.length==1 && ProcessEngine.class.isAssignableFrom((Class<?>) actualTypeArguments[0])) {
-          parameters.add(new ArrayList<ProcessEngine>(referencedProcessEngines));
+          parameters.add(new ArrayList<>(referencedProcessEngines));
           injectionResolved = true;
         }
       }
@@ -307,25 +325,9 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     return deploymentService.getValue();
   }
 
-  public InjectedValue<ProcessApplicationInterface> getNoViewProcessApplication() {
-    return noViewProcessApplication;
-  }
-
-  public InjectedValue<ComponentView> getPaComponentViewInjector() {
-    return paComponentViewInjector;
-  }
-
   @Override
   public ProcessApplicationStartService getValue() throws IllegalStateException, IllegalArgumentException {
     return this;
-  }
-
-  public InjectedValue<ProcessEngine> getDefaultProcessEngineInjector() {
-    return defaultProcessEngineInjector;
-  }
-
-  public InjectedValue<BpmPlatformPlugins> getPlatformPluginsInjector() {
-    return platformPluginsInjector;
   }
 
 }
