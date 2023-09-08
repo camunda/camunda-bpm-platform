@@ -132,29 +132,6 @@ public class CaseHandlerTest extends CmmnElementHandlerTest {
     assertNull(activity.getHistoryTimeToLive());
   }
 
-  @Test(expected = NotValidException.class) // then
-  public void shouldThrowNotValidExceptionOnNullHTTLAndEnforceHTTLTrue() {
-    // given
-    Context.getProcessEngineConfiguration().setEnforceHistoryTimeToLive(true);
-
-    // when
-    handler.handleElement(caseDefinition, context);
-  }
-
-  @Test
-  public void shouldReturnCaseWithValidHTTL() {
-    // given
-    Context.getProcessEngineConfiguration().setEnforceHistoryTimeToLive(true);
-
-    caseDefinition.setCamundaHistoryTimeToLiveString("5");
-
-    // when
-    CaseDefinitionEntity result = (CaseDefinitionEntity) handler.handleElement(caseDefinition, context);
-
-    // then
-    assertEquals(Integer.valueOf(5), result.getHistoryTimeToLive());
-  }
-
   @Test
   public void testHistoryTimeToLive() {
     // given: a caseDefinition

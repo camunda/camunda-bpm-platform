@@ -23,6 +23,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.impl.cfg.ConfigurationLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -36,6 +37,10 @@ import org.camunda.bpm.model.dmn.instance.Decision;
  * the relevant configuration as well.
  */
 public class HistoryTimeToLiveParser {
+
+  protected static final ConfigurationLogger LOG = ConfigurationLogger.CONFIG_LOGGER;
+
+  private static final int DEFAULT_HISTORY_TIME_TO_LIVE_VALUE = 180;
 
   private final boolean enforceNonNullValue;
   private final String configValue;
@@ -94,14 +99,18 @@ public class HistoryTimeToLiveParser {
    * the parsed value.
    *
    * @param historyTimeToLiveString the history time to live string expression in ISO-8601 format
-   * @return the parsed integer value of HTTL
-   * @throws NotValidException in case enforcement of non null values is on and the parsed result was null
+   * @return the parsed integer value of history time to live
+   * @throws NotValidException in case enforcement of non-null values is on and the parsed result was null
    */
   protected Integer parseAndValidate(String historyTimeToLiveString) throws NotValidException {
     Integer result = ParseUtil.parseHistoryTimeToLive(historyTimeToLiveString);
 
     if (enforceNonNullValue && result == null) {
       throw new NotValidException("History Time To Live cannot be null");
+    }
+
+    if (result != null && result == DEFAULT_HISTORY_TIME_TO_LIVE_VALUE) {
+      LOG.logHistoryTimeToLiveDefaultValueWarning();
     }
 
     return result;

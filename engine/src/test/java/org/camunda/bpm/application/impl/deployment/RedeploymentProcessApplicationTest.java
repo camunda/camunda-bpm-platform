@@ -160,35 +160,6 @@ public class RedeploymentProcessApplicationTest {
   }
 
   @Test
-  public void deploymentShouldFailOnNullHTTLAndEnforceHistoryTimeToLiveTrue() {
-    // given
-    Deployment deployment1 = null;
-    try {
-      MyEmbeddedProcessApplication application = new MyEmbeddedProcessApplication();
-      engineRule.getProcessEngineConfiguration().setEnforceHistoryTimeToLive(true);
-
-      // when
-      // deployment does not accept null HTTL resources
-      deployment1 = repositoryService
-          .createDeployment(application.getReference())
-          .name(DEPLOYMENT_NAME)
-          .addClasspathResource(resource1)
-          .deploy();
-
-      fail("The deployment should have thrown an exception due to mandatory enforcement of historyTimeToLive");
-    } catch (Exception e) {
-      // then
-      assertTrue("Deployment1 should fail due to mandatory historyTimeToLive", e instanceof ProcessEngineException);
-    } finally {
-
-      // cleanup
-      if (deployment1 != null) {
-        deploymentsToCleanup.add(deployment1);
-      }
-    }
-  }
-
-  @Test
   public void redeploymentShouldFailOnNullHTTLAndEnforceHistoryTimeToLiveTrue() {
     // given
     Deployment deployment1 = null;

@@ -414,8 +414,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public static final int DEFAULT_INVOCATIONS_PER_BATCH_JOB = 1;
 
-  public static final int DEFAULT_HISTORY_TIME_TO_LIVE_VALUE = 180;
-
   protected static final Map<Object, Object> DEFAULT_BEANS_MAP = new HashMap<>();
 
   protected static final String PRODUCT_NAME = "Camunda BPM Runtime";
@@ -1334,11 +1332,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initHistoryTimeToLive() {
     try {
-      Integer value = ParseUtil.parseHistoryTimeToLive(historyTimeToLive);
-
-      if (value != null && value == DEFAULT_HISTORY_TIME_TO_LIVE_VALUE) {
-        LOG.logHistoryTimeToLiveDefaultValueWarning();
-      }
+      ParseUtil.parseHistoryTimeToLive(historyTimeToLive);
     } catch (Exception e) {
       throw LOG.invalidPropertyValue("historyTimeToLive", historyTimeToLive, e);
     }
