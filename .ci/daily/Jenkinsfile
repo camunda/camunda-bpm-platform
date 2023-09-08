@@ -229,7 +229,7 @@ pipeline {
         stage('PERFORMANCE-large-data-h2') {
           when {
             expression {
-              cambpmWithLabels('h2')
+              cambpmWithLabels()
             }
           }
           steps {
