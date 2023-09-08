@@ -177,25 +177,25 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     AnnotationInstance preUndeploy = ProcessApplicationAttachments.getPreUndeployDescription(deploymentUnit);
 
     // register the managed process application start service
-    ServiceBuilder<?> serviceBuilder = phaseContext.getServiceTarget().addService();
+    ServiceBuilder<?> processApplicationStartServiceBuilder = phaseContext.getServiceTarget().addService();
 
-    Consumer<ProcessApplicationStartService> paStartServiceConsumer = serviceBuilder.provides(paStartServiceName);
-    Supplier<ComponentView> paComponentViewSupplier = serviceBuilder.requires(paViewServiceName);
-    Supplier<ProcessApplicationInterface> noViewProcessApplication = serviceBuilder.requires(noViewStartService);
-    Supplier<ProcessEngine> defaultProcessEngineSupplier = serviceBuilder.requires(ServiceNames.forDefaultProcessEngine());
-    Supplier<BpmPlatformPlugins> platformPluginsSupplierStartService = serviceBuilder.requires(ServiceNames.forBpmPlatformPlugins());
-    serviceBuilder.requires(phaseContext.getPhaseServiceName());
-    deploymentServiceNames.forEach(serviceName -> serviceBuilder.requires(serviceName));
+    Consumer<ProcessApplicationStartService> paStartServiceConsumer = processApplicationStartServiceBuilder.provides(paStartServiceName);
+    Supplier<ComponentView> paComponentViewSupplier = processApplicationStartServiceBuilder.requires(paViewServiceName);
+    Supplier<ProcessApplicationInterface> noViewProcessApplication = processApplicationStartServiceBuilder.requires(noViewStartService);
+    Supplier<BpmPlatformPlugins> platformPluginsSupplierStartService = processApplicationStartServiceBuilder.requires(ServiceNames.forBpmPlatformPlugins());
+    processApplicationStartServiceBuilder.requires(phaseContext.getPhaseServiceName());
+    deploymentServiceNames.forEach(serviceName -> processApplicationStartServiceBuilder.requires(serviceName));
 
-    serviceBuilder.setInitialMode(Mode.ACTIVE);
+    processApplicationStartServiceBuilder.setInitialMode(Mode.ACTIVE);
 
+    Supplier<ProcessEngine> defaultProcessEngineSupplier = null;
     if (phaseContext.getServiceRegistry().getService(ServiceNames.forDefaultProcessEngine()) != null) {
-      serviceBuilder.requires(paStartServiceName);
+      defaultProcessEngineSupplier = processApplicationStartServiceBuilder.requires(ServiceNames.forDefaultProcessEngine());
     }
     if(paViewServiceName != null) {
-      serviceBuilder.requires(paViewServiceName);
+      processApplicationStartServiceBuilder.requires(paViewServiceName);
     } else {
-      serviceBuilder.requires(noViewStartService);
+      processApplicationStartServiceBuilder.requires(noViewStartService);
     }
 
     ProcessApplicationStartService paStartService = new ProcessApplicationStartService(
@@ -209,8 +209,8 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
         platformPluginsSupplierStartService,
         paStartServiceConsumer);
 
-    serviceBuilder.setInstance(paStartService);
-    serviceBuilder.install();
+    processApplicationStartServiceBuilder.setInstance(paStartService);
+    processApplicationStartServiceBuilder.install();
   }
 
   @Override

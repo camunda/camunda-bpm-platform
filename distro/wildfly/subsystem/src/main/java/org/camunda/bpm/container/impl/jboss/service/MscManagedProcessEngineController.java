@@ -275,7 +275,6 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
 
     if(processEngineConfiguration.isDefault()) {
       processEngineConsumers.add(serviceBuilder.provides(ServiceNames.forDefaultProcessEngine()));
-      // serviceBuilder.addAliases(ServiceNames.forDefaultProcessEngine());
     }
 
     JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder);
