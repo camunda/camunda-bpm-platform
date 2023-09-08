@@ -17,7 +17,6 @@
 package org.camunda.bpm.container.impl.jboss.service;
 
 import jakarta.transaction.TransactionManager;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -68,13 +67,13 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
 
   protected static final String CONNECT_PROCESS_ENGINE_PLUGIN_NAME = "org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin";
 
-  protected InjectedValue<ExecutorService> executorInjector = new InjectedValue<ExecutorService>();
+  protected InjectedValue<ExecutorService> executorInjector = new InjectedValue<>();
 
   // Injecting these values makes the MSC aware of our dependencies on these resources.
   // This ensures that they are available when this service is started
-  protected final InjectedValue<TransactionManager> transactionManagerInjector = new InjectedValue<TransactionManager>();
-  protected final InjectedValue<DataSourceReferenceFactoryService> datasourceBinderServiceInjector = new InjectedValue<DataSourceReferenceFactoryService>();
-  protected final InjectedValue<MscRuntimeContainerJobExecutor> mscRuntimeContainerJobExecutorInjector = new InjectedValue<MscRuntimeContainerJobExecutor>();
+  protected final InjectedValue<TransactionManager> transactionManagerInjector = new InjectedValue<>();
+  protected final InjectedValue<DataSourceReferenceFactoryService> datasourceBinderServiceInjector = new InjectedValue<>();
+  protected final InjectedValue<MscRuntimeContainerJobExecutor> mscRuntimeContainerJobExecutorInjector = new InjectedValue<>();
 
   protected ManagedProcessEngineMetadata processEngineMetadata;
 
@@ -279,7 +278,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
       // serviceBuilder.addAliases(ServiceNames.forDefaultProcessEngine());
     }
 
-    JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder, service.getExecutorInjector());
+    JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder);
 
   }
 
