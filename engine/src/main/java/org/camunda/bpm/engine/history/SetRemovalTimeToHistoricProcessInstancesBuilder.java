@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.impl.batch.removaltime.ProcessSetRemovalTimeJobHandler;
 
 /**
  * Fluent builder to set the removal time to historic process instances and
@@ -58,6 +59,30 @@ public interface SetRemovalTimeToHistoricProcessInstancesBuilder {
    * @return the builder.
    */
   SetRemovalTimeToHistoricProcessInstancesBuilder hierarchical();
+
+  /**
+   * Processes removal time updates in chunks, taking into account defined limits. This
+   * can lead to multiple executions of the job to keep the transaction from timing out
+   * due to too many rows that would need to be updated within one transaction.
+   *
+   * @since 7.20
+   *
+   * @return the builder.
+   */
+  SetRemovalTimeToHistoricProcessInstancesBuilder updateInChunks();
+
+  /**
+   * Defines the size of the chunks in which removal time updates are processed.
+   * The value must be a positive integer value that doesn't exceed the
+   * {@link ProcessSetRemovalTimeJobHandler#MAX_CHUNK_SIZE}.
+   *
+   * Only has an effect if {@link #updateInChunks()} is invoked as well.
+   *
+   * @since 7.20
+   *
+   * @return the builder.
+   */
+  SetRemovalTimeToHistoricProcessInstancesBuilder chunkSize(int chunkSize);
 
   /**
    * Sets the removal time asynchronously as batch. The returned batch can be used to

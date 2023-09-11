@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.impl.HistoricDetailQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
@@ -57,7 +56,7 @@ public class HistoricDetailManager extends AbstractHistoricManager {
     parameters.put("taskCaseInstanceIds", historicCaseInstanceIds);
     deleteHistoricDetails(parameters);
   }
-  
+
   public void deleteHistoricDetailsByVariableInstanceId(String historicVariableInstanceId) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("variableInstanceId", historicVariableInstanceId);
@@ -111,21 +110,23 @@ public class HistoricDetailManager extends AbstractHistoricManager {
     getTenantManager().configureQuery(query);
   }
 
-  public void addRemovalTimeToDetailsByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public DbOperation addRemovalTimeToDetailsByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime, Integer batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
+    parameters.put("maxResults", batchSize);
 
-    getDbEntityManager()
+    return getDbEntityManager()
       .updatePreserveOrder(HistoricDetailEventEntity.class, "updateHistoricDetailsByRootProcessInstanceId", parameters);
   }
 
-  public void addRemovalTimeToDetailsByProcessInstanceId(String processInstanceId, Date removalTime) {
+  public DbOperation addRemovalTimeToDetailsByProcessInstanceId(String processInstanceId, Date removalTime, Integer batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
+    parameters.put("maxResults", batchSize);
 
-    getDbEntityManager()
+    return getDbEntityManager()
       .updatePreserveOrder(HistoricDetailEventEntity.class, "updateHistoricDetailsByProcessInstanceId", parameters);
   }
 

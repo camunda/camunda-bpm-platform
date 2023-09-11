@@ -51,10 +51,17 @@ public class BatchJobDeclaration extends JobDeclaration<BatchJobContext, Message
     return context.getBatch().getBatchJobDefinitionId();
   }
 
+  @Override
   public ParameterValueProvider getJobPriorityProvider() {
     long batchJobPriority = Context.getProcessEngineConfiguration()
         .getBatchJobPriority();
     return new ConstantValueProvider(batchJobPriority);
   }
 
+  @Override
+  public MessageEntity reconfigure(BatchJobContext context, MessageEntity job) {
+    super.reconfigure(context, job);
+    job.setJobHandlerConfiguration(new BatchJobConfiguration(context.getConfiguration().getId()));
+    return job;
+  }
 }

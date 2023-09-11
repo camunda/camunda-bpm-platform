@@ -23,7 +23,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -114,7 +113,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery().list();
 
     // then
-    assertProperties(userOperationLogEntries, "mode", "removalTime", "hierarchical", "nrOfInstances", "async");
+    assertProperties(userOperationLogEntries, "mode", "removalTime", "hierarchical", "nrOfInstances", "async", "updateInChunks", "chunkSize");
     assertOperationType(userOperationLogEntries, "SetRemovalTime");
     assertCategory(userOperationLogEntries, "Operator");
     assertEntityType(userOperationLogEntries, "ProcessInstance");
@@ -314,6 +313,105 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
     assertThat(userOperationLogEntry.getNewValue()).isEqualTo("false");
+  }
+
+  @Test
+  public void shouldWriteUserOperationLogForProcessInstances_UpdateInChunksTrue() {
+    // given
+    testRule.process().serviceTask().deploy().start();
+
+    identityService.setAuthenticatedUserId("aUserId");
+
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+
+    // when
+    historyService.setRemovalTimeToHistoricProcessInstances()
+      .clearedRemovalTime()
+      .byQuery(historicProcessInstanceQuery)
+      .updateInChunks()
+      .executeAsync();
+
+    UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
+      .property("updateInChunks")
+      .singleResult();
+
+    // then
+    assertThat(userOperationLogEntry.getOrgValue()).isNull();
+    assertThat(userOperationLogEntry.getNewValue()).isEqualTo("true");
+  }
+
+  @Test
+  public void shouldWriteUserOperationLogForProcessInstances_UpdateInChunksFalse() {
+    // given
+    testRule.process().serviceTask().deploy().start();
+
+    identityService.setAuthenticatedUserId("aUserId");
+
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+
+    // when
+    historyService.setRemovalTimeToHistoricProcessInstances()
+      .clearedRemovalTime()
+      .byQuery(historicProcessInstanceQuery)
+      .executeAsync();
+
+    UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
+      .property("updateInChunks")
+      .singleResult();
+
+    // then
+    assertThat(userOperationLogEntry.getOrgValue()).isNull();
+    assertThat(userOperationLogEntry.getNewValue()).isEqualTo("false");
+  }
+
+  @Test
+  public void shouldWriteUserOperationLogForProcessInstances_ChunkSize() {
+    // given
+    testRule.process().serviceTask().deploy().start();
+
+    identityService.setAuthenticatedUserId("aUserId");
+
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+
+    // when
+    historyService.setRemovalTimeToHistoricProcessInstances()
+      .clearedRemovalTime()
+      .byQuery(historicProcessInstanceQuery)
+      .updateInChunks()
+      .chunkSize(12)
+      .executeAsync();
+
+    UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
+      .property("chunkSize")
+      .singleResult();
+
+    // then
+    assertThat(userOperationLogEntry.getOrgValue()).isNull();
+    assertThat(userOperationLogEntry.getNewValue()).isEqualTo("12");
+  }
+
+  @Test
+  public void shouldWriteUserOperationLogForProcessInstances_ChunkSizeNull() {
+    // given
+    testRule.process().serviceTask().deploy().start();
+
+    identityService.setAuthenticatedUserId("aUserId");
+
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+
+    // when
+    historyService.setRemovalTimeToHistoricProcessInstances()
+      .clearedRemovalTime()
+      .byQuery(historicProcessInstanceQuery)
+      .executeAsync();
+
+    UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
+      .property("chunkSize")
+      .singleResult();
+
+    // then
+    assertThat(userOperationLogEntry.getOrgValue()).isNull();
+    assertThat(userOperationLogEntry.getNewValue()).isNull();
   }
 
   @Test
@@ -738,7 +836,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     assertThat(userOperationLogEntries.size()).isEqualTo(expectedProperties.length);
 
     assertThat(userOperationLogEntries)
-      .extracting("property")
+      .extracting("property", String.class)
       .containsExactlyInAnyOrder(expectedProperties);
   }
 

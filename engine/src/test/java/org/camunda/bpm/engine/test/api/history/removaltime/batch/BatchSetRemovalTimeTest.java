@@ -30,7 +30,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.HistoryService;
@@ -389,10 +388,10 @@ public class BatchSetRemovalTimeTest {
       .setInvocationsPerBatchJob(2);
 
     String processInstanceIdOne = testRule.process().userTask().deploy().start();
-    Batch batchOne = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceIdOne), "");
+    historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceIdOne), "");
 
     String processInstanceIdTwo = testRule.process().userTask().deploy().start();
-    Batch batchTwo = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceIdTwo), "");
+    historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceIdTwo), "");
 
     List<HistoricBatch> historicBatches = historyService.createHistoricBatchQuery()
       .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)
@@ -501,10 +500,10 @@ public class BatchSetRemovalTimeTest {
       .setInvocationsPerBatchJob(1);
 
     String processInstanceIdOne = testRule.process().userTask().deploy().start();
-    Batch batchOne = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceIdOne), "");
+    historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceIdOne), "");
 
     String processInstanceIdTwo = testRule.process().userTask().deploy().start();
-    Batch batchTwo = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceIdTwo), "");
+    historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceIdTwo), "");
 
     List<HistoricBatch> historicBatches = historyService.createHistoricBatchQuery()
       .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)
@@ -1007,7 +1006,7 @@ public class BatchSetRemovalTimeTest {
   public void shouldSetRemovalTimeForBatch_BaseTimeStart() {
     // given
     String processInstanceId = testRule.process().serviceTask().deploy().start();
-    Batch batch = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
+    historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
 
     HistoricBatch historicBatch = historyService.createHistoricBatchQuery()
       .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)
@@ -1188,7 +1187,7 @@ public class BatchSetRemovalTimeTest {
       .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END);
 
     String processInstanceId = testRule.process().serviceTask().deploy().start();
-    Batch batch = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
+    historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
 
     HistoricBatch historicBatch = historyService.createHistoricBatchQuery()
       .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)
@@ -1227,7 +1226,7 @@ public class BatchSetRemovalTimeTest {
     configuration.initHistoryCleanup();
 
     String processInstanceId = testRule.process().serviceTask().deploy().start();
-    Batch batch = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
+    historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
 
     HistoricBatch historicBatch = historyService.createHistoricBatchQuery()
       .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)
@@ -1602,7 +1601,7 @@ public class BatchSetRemovalTimeTest {
     configuration.initHistoryCleanup();
 
     String processInstanceId = testRule.process().serviceTask().deploy().start();
-    Batch batch = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
+    historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
 
     HistoricBatch historicBatch = historyService.createHistoricBatchQuery()
       .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)
@@ -1778,7 +1777,7 @@ public class BatchSetRemovalTimeTest {
   public void shouldSetRemovalTimeForBatch_Absolute() {
     // given
     String processInstanceId = testRule.process().serviceTask().deploy().start();
-    Batch batch = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
+    historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
 
     HistoricBatch historicBatch = historyService.createHistoricBatchQuery()
       .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)
@@ -2059,8 +2058,8 @@ public class BatchSetRemovalTimeTest {
     // given
     String processInstanceId = testRule.process().serviceTask().deploy().start();
 
-    Batch batchOne = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
-    Batch batchTwo = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
+    historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
+    historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
 
     List<HistoricBatch> historicBatches = historyService.createHistoricBatchQuery()
       .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)

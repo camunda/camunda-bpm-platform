@@ -26,6 +26,22 @@
                                   "b4d2ad94-7240-11e9-98b7-be5e0f7575b7"
                                 ]
                               }
+                   }',
+                   '"example-2": {
+                     "summary": "POST `/history/process-instance/set-removal-time`",
+                     "value": {
+                                "absoluteRemovalTime": "2019-05-05T11:56:24.725+0200",
+                                "hierarchical": true,
+                                "updateInChunks": true,
+                                "updateChunkSize": 300,
+                                "historicProcessInstanceQuery": {
+                                  "unfinished": true
+                                },
+                                "historicProcessInstanceIds": [
+                                  "b4d2ad98-7240-11e9-98b7-be5e0f7575b7",
+                                  "b4d2ad94-7240-11e9-98b7-be5e0f7575b7"
+                                ]
+                              }
                    }'
                 ] />
   "responses" : {

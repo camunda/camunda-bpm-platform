@@ -583,8 +583,8 @@ public class DbEntityManager implements Session, EntityLoadListener {
    * @param statement
    * @param parameter
    */
-  public void updatePreserveOrder(Class<? extends DbEntity> entityType, String statement, Object parameter) {
-    performBulkOperationPreserveOrder(entityType, statement, parameter, UPDATE_BULK);
+  public DbOperation updatePreserveOrder(Class<? extends DbEntity> entityType, String statement, Object parameter) {
+    return performBulkOperationPreserveOrder(entityType, statement, parameter, UPDATE_BULK);
   }
 
   public void delete(Class<? extends DbEntity> entityType, String statement, Object parameter) {

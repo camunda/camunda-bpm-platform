@@ -26,6 +26,8 @@ public class SetRemovalTimeToHistoricProcessInstancesDto extends AbstractSetRemo
   protected String[] historicProcessInstanceIds;
   protected HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
   protected boolean hierarchical;
+  protected boolean updateInChunks;
+  protected Integer updateChunkSize;
 
   public String[] getHistoricProcessInstanceIds() {
     return historicProcessInstanceIds;
@@ -51,4 +53,19 @@ public class SetRemovalTimeToHistoricProcessInstancesDto extends AbstractSetRemo
     this.hierarchical = hierarchical;
   }
 
+  public boolean isUpdateInChunks() {
+    return updateInChunks;
+  }
+
+  public void setUpdateInChunks(boolean updateInChunks) {
+    this.updateInChunks = updateInChunks;
+  }
+
+  public Integer getUpdateChunkSize() {
+    return updateChunkSize;
+  }
+
+  public void setUpdateChunkSize(Integer updateChunkSize) {
+    this.updateChunkSize = updateChunkSize;
+  }
 }

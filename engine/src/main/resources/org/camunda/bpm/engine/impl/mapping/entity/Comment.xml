@@ -62,43 +62,153 @@
   <!-- UPDATE -->
   <update id="updateCommentsByRootProcessInstanceId"
           parameterType="java.util.Map">
-      update ${prefix}ACT_HI_COMMENT set
+      update
+      <if test="maxResults != null">
+        ${limitBeforeWithoutOffset}
+      </if>
+      ${prefix}ACT_HI_COMMENT set
       REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
 
       where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+      <if test="maxResults != null">
+        and (REMOVAL_TIME_ is null or REMOVAL_TIME_ != #{removalTime, jdbcType=TIMESTAMP})
+        ${limitAfterWithoutOffset}
+      </if>
+  </update>
+
+  <update id="updateCommentsByRootProcessInstanceId_postgres"
+          parameterType="java.util.Map">
+      update ${prefix}ACT_HI_COMMENT set
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      <if test="maxResults != null">
+        ${limitBeforeInUpdate} ${prefix}ACT_HI_COMMENT
+      </if>
+
+      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+      <if test="maxResults != null">
+        and (REMOVAL_TIME_ is null or REMOVAL_TIME_ != #{removalTime, jdbcType=TIMESTAMP})
+        ${limitAfterInUpdate}
+      </if>
+  </update>
+
+  <update id="updateCommentsByRootProcessInstanceId_mysql"
+          parameterType="java.util.Map">
+      update ${prefix}ACT_HI_COMMENT
+      <choose>
+        <when test="maxResults != null">
+          ${limitBeforeInUpdate} ${prefix}ACT_HI_COMMENT
+        </when>
+        <otherwise>
+          set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+        </otherwise>
+      </choose>
+
+      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+      <if test="maxResults != null">
+        and (REMOVAL_TIME_ is null or REMOVAL_TIME_ != #{removalTime, jdbcType=TIMESTAMP})
+        ${limitAfterInUpdate}
+        set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      </if>
   </update>
 
   <update id="updateCommentsByRootProcessInstanceId_mssql"
           parameterType="java.util.Map">
-    update RES set
+    update
+    <if test="maxResults != null">
+      ${limitBeforeWithoutOffset}
+    </if>
+    RES set
     RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
     FROM ${prefix}ACT_HI_COMMENT RES WITH (FORCESEEK)
     where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+    <if test="maxResults != null">
+      and (REMOVAL_TIME_ is null or REMOVAL_TIME_ != #{removalTime, jdbcType=TIMESTAMP})
+      ${limitAfterWithoutOffset}
+    </if>
   </update>
 
   <update id="updateCommentsByProcessInstanceId"
           parameterType="java.util.Map">
-    update ${prefix}ACT_HI_COMMENT
+    update
+    <if test="maxResults != null">
+      ${limitBeforeWithoutOffset}
+    </if>
+    ${prefix}ACT_HI_COMMENT
       set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      where (PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
         or TASK_ID_ in (
           SELECT ID_
           FROM ${prefix}ACT_HI_TASKINST
           WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
-        )
+        ))
+      <if test="maxResults != null">
+        and (REMOVAL_TIME_ is null or REMOVAL_TIME_ != #{removalTime, jdbcType=TIMESTAMP})
+        ${limitAfterWithoutOffset}
+      </if>
+  </update>
+
+  <update id="updateCommentsByProcessInstanceId_postgres"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_COMMENT
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      <if test="maxResults != null">
+        ${limitBeforeInUpdate} ${prefix}ACT_HI_COMMENT
+      </if>
+      where (PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+        or TASK_ID_ in (
+          SELECT ID_
+          FROM ${prefix}ACT_HI_TASKINST
+          WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+        ))
+      <if test="maxResults != null">
+        and (REMOVAL_TIME_ is null or REMOVAL_TIME_ != #{removalTime, jdbcType=TIMESTAMP})
+        ${limitAfterInUpdate}
+      </if>
+  </update>
+
+  <update id="updateCommentsByProcessInstanceId_mysql"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_COMMENT
+      <choose>
+        <when test="maxResults != null">
+          ${limitBeforeInUpdate} ${prefix}ACT_HI_COMMENT
+        </when>
+        <otherwise>
+          set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+        </otherwise>
+      </choose>
+      where (PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+        or TASK_ID_ in (
+          SELECT ID_
+          FROM ${prefix}ACT_HI_TASKINST
+          WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+        ))
+      <if test="maxResults != null">
+        and (REMOVAL_TIME_ is null or REMOVAL_TIME_ != #{removalTime, jdbcType=TIMESTAMP})
+        ${limitAfterInUpdate}
+        set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      </if>
   </update>
 
   <update id="updateCommentsByProcessInstanceId_mssql"
           parameterType="java.util.Map">
-    update RES set
+    update
+    <if test="maxResults != null">
+      ${limitBeforeWithoutOffset}
+    </if>
+    RES set
       RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
       FROM ${prefix}ACT_HI_COMMENT RES WITH (FORCESEEK)
-      where RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      where (RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
         or RES.TASK_ID_ in (
           SELECT ID_
           FROM ${prefix}ACT_HI_TASKINST
           WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
-        )
+        ))
+      <if test="maxResults != null">
+        and (REMOVAL_TIME_ is null or REMOVAL_TIME_ != #{removalTime, jdbcType=TIMESTAMP})
+        ${limitAfterWithoutOffset}
+      </if>
   </update>
 
   <!-- COMMENT DELETE -->

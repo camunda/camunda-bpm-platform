@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -43,6 +42,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
@@ -146,6 +146,31 @@ public abstract class JobEntity extends AcquirableJobEntity
 
   public void init(CommandContext commandContext) {
     // nothing to do
+  }
+
+  public void init(CommandContext commandContext, boolean shouldResetLock, boolean shouldCallDeleteHandler) {
+    if (shouldCallDeleteHandler) {
+      // clean additional data related to this job
+      JobHandler jobHandler = getJobHandler();
+      if (jobHandler != null) {
+        jobHandler.onDelete(getJobHandlerConfiguration(), this);
+      }
+    }
+
+    // cancel the retries -> will resolve job incident if present
+    int retries = HistoryCleanupHelper.getMaxRetries();
+    setRetries(retries);
+
+    // delete the job's exception byte array and exception message
+    if (exceptionByteArrayId != null) {
+      clearFailedJobException();
+    }
+
+    // clean the lock information
+    if (shouldResetLock) {
+      setLockOwner(null);
+      setLockExpirationTime(null);
+    }
   }
 
   public void insert() {
@@ -669,6 +694,7 @@ public abstract class JobEntity extends AcquirableJobEntity
     this.lastFailureLogId = lastFailureLogId;
   }
 
+  @Override
   public String getFailedActivityId() {
     return failedActivityId;
   }
