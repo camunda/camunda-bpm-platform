@@ -40,7 +40,7 @@ public class HistoryTimeToLiveParser {
 
   protected static final ConfigurationLogger LOG = ConfigurationLogger.CONFIG_LOGGER;
 
-  private static final int DEFAULT_HISTORY_TIME_TO_LIVE_VALUE = 180;
+  protected static final int DEFAULT_HISTORY_TIME_TO_LIVE_VALUE = 180;
 
   protected final boolean enforceNonNullValue;
   protected final String configValue;
