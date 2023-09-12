@@ -662,7 +662,8 @@ public class BpmnParse extends Parse {
 
   protected void validateAndSetHTTL(Element processElement, ProcessDefinitionEntity processDefinition) {
     try {
-      Integer historyTimeToLive = HistoryTimeToLiveParser.create().parse(processElement);
+      String processDefinitionId = processDefinition.getId();
+      Integer historyTimeToLive = HistoryTimeToLiveParser.create().parse(processElement, processDefinitionId);
       processDefinition.setHistoryTimeToLive(historyTimeToLive);
     }
     catch (Exception e) {

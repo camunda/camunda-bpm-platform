@@ -113,10 +113,29 @@ public class ConfigurationLogger extends ProcessEngineLogger {
     logError("015", "Exception while reading configuration property: {}", e.getMessage());
   }
 
-  public void logHistoryTimeToLiveDefaultValueWarning() {
-    logWarn("016", "You are using the default TTL (Time To Live) of 180 days (six months); "
+  /**
+   * Method for logging message when default history time to live is configured.
+   *
+   * @param processDefinitionId the correlated process definition id with which history time to live is related. If
+   *                            the flow is not related to a process definition (e.g HTTL configuration that are on Decision deployments
+   *                            that don't have a related processDefinitionId), this parameters can be null and will not be logged.
+   */
+  public void logHistoryTimeToLiveDefaultValueWarning(String processDefinitionId) {
+    String message = formatHTTLDefaultValueMessage(processDefinitionId);
+
+    logWarn("016", message);
+  }
+
+  protected String formatHTTLDefaultValueMessage(String processDefinitionId) {
+    String result = "You are using the default TTL (Time To Live) of 180 days (six months); "
         + "the history clean-up feature will delete your data after six months. "
-        + "We recommend adjusting the TTL configuration property aligned with your specific requirements.");
+        + "We recommend adjusting the TTL configuration property aligned with your specific requirements.";
+
+    if (processDefinitionId != null) {
+      result = "processDefinitionId: " + processDefinitionId + ";" + result;
+    }
+
+    return result;
   }
 
 }

@@ -33,14 +33,16 @@ import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.dmn.instance.Decision;
 
 /**
- * Class that encapsulates the business logic of parsing HistoryTimeToLive of different resources and considers
- * the relevant configuration as well.
+ * Class that encapsulates the business logic of parsing HistoryTimeToLive of different deployable resources (process, definition, case).
+ * <p>
+ * Furthermore, it considers notifying the users with a logging message when parsing historyTimeToLive values that are
+ * the same with the default camunda modeler TTL value (see {@code CAMUNDA_MODELER_TTL_DEFAULT_VALUE}).
  */
 public class HistoryTimeToLiveParser {
 
   protected static final ConfigurationLogger LOG = ConfigurationLogger.CONFIG_LOGGER;
 
-  protected static final int DEFAULT_HISTORY_TIME_TO_LIVE_VALUE = 180;
+  protected static final int CAMUNDA_MODELER_TTL_DEFAULT_VALUE = 180; // This value is hardcoded into camunda modeler
 
   protected final boolean enforceNonNullValue;
   protected final String configValue;
@@ -76,16 +78,16 @@ public class HistoryTimeToLiveParser {
     }
   }
 
-  public Integer parse(Element processElement) {
+  public Integer parse(Element processElement, String processDefinitionId) {
     String historyTimeToLiveString = processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive", configValue);
 
-    return parseAndValidate(historyTimeToLiveString);
+    return parseAndValidate(historyTimeToLiveString, processDefinitionId);
   }
 
-  public Integer parse(Case caseElement) {
+  public Integer parse(Case caseElement, String processDefinitionId) {
     String historyTimeToLiveString = getValueOrConfig(caseElement.getCamundaHistoryTimeToLiveString());
 
-    return parseAndValidate(historyTimeToLiveString);
+    return parseAndValidate(historyTimeToLiveString, processDefinitionId);
   }
 
   public Integer parse(Decision decision) {
@@ -102,18 +104,30 @@ public class HistoryTimeToLiveParser {
    * @return the parsed integer value of history time to live
    * @throws NotValidException in case enforcement of non-null values is on and the parsed result was null
    */
-  protected Integer parseAndValidate(String historyTimeToLiveString) throws NotValidException {
+  protected Integer parseAndValidate(String historyTimeToLiveString, String processDefinitionId) throws NotValidException {
     Integer result = ParseUtil.parseHistoryTimeToLive(historyTimeToLiveString);
 
     if (enforceNonNullValue && result == null) {
       throw new NotValidException("History Time To Live cannot be null");
     }
 
-    if (result != null && result == DEFAULT_HISTORY_TIME_TO_LIVE_VALUE) {
-      LOG.logHistoryTimeToLiveDefaultValueWarning();
+    if (result != null && result == CAMUNDA_MODELER_TTL_DEFAULT_VALUE) {
+      LOG.logHistoryTimeToLiveDefaultValueWarning(processDefinitionId);
     }
 
     return result;
+  }
+
+  /**
+   * Parses the given HistoryTimeToLive String expression and then executes any applicable validation before returning
+   * the parsed value. Overloaded method without using processDefinitionId for cases where it is unavailable.
+   *
+   * @param historyTimeToLiveString the history time to live string expression in ISO-8601 format
+   * @return the parsed integer value of history time to live
+   * @throws NotValidException in case enforcement of non-null values is on and the parsed result was null
+   */
+  protected Integer parseAndValidate(String historyTimeToLiveString) throws NotValidException {
+    return parseAndValidate(historyTimeToLiveString, null);
   }
 
   protected String getValueOrConfig(String value) {
