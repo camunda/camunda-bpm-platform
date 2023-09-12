@@ -199,13 +199,27 @@ public class HistoryTimeToLiveDeploymentTest {
   }
 
   @Test
-  public void shouldLogMessageOnDefaultConfig() {
+  public void shouldNotLogMessageOnDefaultConfigOriginatingFromConfig() {
     // given
     processEngineConfiguration.setHistoryTimeToLive(DEFAULT_HTTL_CONFIG_VALUE);
 
     // when
     testRule.deploy(repositoryService.createDeployment(processApplication.getReference())
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml"));
+
+    // then
+    assertThat(loggingRule.getFilteredLog(EXPECTED_DEFAULT_CONFIG_MSG)).hasSize(0);
+  }
+
+  @Test
+  public void shouldLogMessageOnDefaultValueOfModel() {
+    // given
+    String nonDefaultValue = "179";
+    processEngineConfiguration.setHistoryTimeToLive(nonDefaultValue);
+
+    // when
+    testRule.deploy(repositoryService.createDeployment(processApplication.getReference())
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version3.bpmn20.xml"));
 
     // then
     assertThat(loggingRule.getFilteredLog(EXPECTED_DEFAULT_CONFIG_MSG)).hasSize(1);

@@ -20,7 +20,6 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS;
 
 import java.util.Objects;
-import java.util.Optional;
 import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.cfg.ConfigurationLogger;
@@ -45,11 +44,11 @@ public class HistoryTimeToLiveParser {
   protected static final int CAMUNDA_MODELER_TTL_DEFAULT_VALUE = 180; // This value is hardcoded into camunda modeler
 
   protected final boolean enforceNonNullValue;
-  protected final String configValue;
+  protected final String httlConfigValue;
 
-  protected HistoryTimeToLiveParser(boolean enforceNonNullValue, String configValue) {
+  protected HistoryTimeToLiveParser(boolean enforceNonNullValue, String httlConfigValue) {
     this.enforceNonNullValue = enforceNonNullValue;
-    this.configValue = configValue;
+    this.httlConfigValue = httlConfigValue;
   }
 
   public static HistoryTimeToLiveParser create() {
@@ -79,19 +78,19 @@ public class HistoryTimeToLiveParser {
   }
 
   public Integer parse(Element processElement, String processDefinitionId) {
-    String historyTimeToLiveString = processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive", configValue);
+    String historyTimeToLiveString = processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive");
 
     return parseAndValidate(historyTimeToLiveString, processDefinitionId);
   }
 
   public Integer parse(Case caseElement, String processDefinitionId) {
-    String historyTimeToLiveString = getValueOrConfig(caseElement.getCamundaHistoryTimeToLiveString());
+    String historyTimeToLiveString = caseElement.getCamundaHistoryTimeToLiveString();
 
     return parseAndValidate(historyTimeToLiveString, processDefinitionId);
   }
 
   public Integer parse(Decision decision) {
-    String historyTimeToLiveString = getValueOrConfig(decision.getCamundaHistoryTimeToLiveString());
+    String historyTimeToLiveString = decision.getCamundaHistoryTimeToLiveString();
 
     return parseAndValidate(historyTimeToLiveString);
   }
@@ -101,21 +100,23 @@ public class HistoryTimeToLiveParser {
    * the parsed value.
    *
    * @param historyTimeToLiveString the history time to live string expression in ISO-8601 format
+   * @param processDefinitionId     the correlated process definition id that this historyTimeToLive was fetched. Can be
+   *                                null if it is not present.
    * @return the parsed integer value of history time to live
    * @throws NotValidException in case enforcement of non-null values is on and the parsed result was null
    */
   protected Integer parseAndValidate(String historyTimeToLiveString, String processDefinitionId) throws NotValidException {
-    Integer result = ParseUtil.parseHistoryTimeToLive(historyTimeToLiveString);
+    HTTLParsedResult result = new HTTLParsedResult(historyTimeToLiveString);
 
-    if (enforceNonNullValue && result == null) {
+    if (result.isInValidAgainstConfig()) {
       throw new NotValidException("History Time To Live cannot be null");
     }
 
-    if (result != null && result == CAMUNDA_MODELER_TTL_DEFAULT_VALUE) {
+    if (result.shouldBeLogged()) {
       LOG.logHistoryTimeToLiveDefaultValueWarning(processDefinitionId);
     }
 
-    return result;
+    return result.valueAsInteger;
   }
 
   /**
@@ -130,7 +131,26 @@ public class HistoryTimeToLiveParser {
     return parseAndValidate(historyTimeToLiveString, null);
   }
 
-  protected String getValueOrConfig(String value) {
-    return Optional.ofNullable(value).orElse(configValue);
+  protected class HTTLParsedResult {
+
+    protected final boolean systemDefaultConfigWillBeUsed;
+    protected final String value;
+    protected final Integer valueAsInteger;
+
+    public HTTLParsedResult(String historyTimeToLiveString) {
+      this.systemDefaultConfigWillBeUsed = (historyTimeToLiveString == null);
+      this.value = systemDefaultConfigWillBeUsed ? httlConfigValue : historyTimeToLiveString;
+      this.valueAsInteger = ParseUtil.parseHistoryTimeToLive(value);
+    }
+
+    protected boolean isInValidAgainstConfig() {
+      return enforceNonNullValue && (valueAsInteger == null);
+    }
+
+    protected boolean shouldBeLogged() {
+      return !systemDefaultConfigWillBeUsed // only values originating from models make sense to be logged
+          && valueAsInteger != null
+          && valueAsInteger == CAMUNDA_MODELER_TTL_DEFAULT_VALUE;
+    }
   }
 }
