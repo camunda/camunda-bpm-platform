@@ -498,7 +498,7 @@ public interface RepositoryService {
    * @param historyTimeToLive
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.
-   * @throws NotAllowedException in case feature flag `enforceHistoryTimeToLive` is set to true and the given historyTimeToLive value is null.
+   * @throws NotAllowedException in case feature flag {@code enforceHistoryTimeToLive} is set to {@code true} and the given historyTimeToLive value is {@code null}.
    */
   void updateProcessDefinitionHistoryTimeToLive(String processDefinitionId, Integer historyTimeToLive);
 
