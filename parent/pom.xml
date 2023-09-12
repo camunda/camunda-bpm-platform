@@ -107,6 +107,7 @@
     <camunda.osgi.remove.headers>Ignore-Package,Include-Resource,Private-Package,Bundle-DocURL</camunda.osgi.remove.headers>
     <camunda.osgi.include.resource>{maven-resources}</camunda.osgi.include.resource>
     <camunda.osgi.embed />
+    <plugin.version.maven-bundle>5.1.9</plugin.version.maven-bundle> <!-- compatible with JDK 17 -->
   </properties>
 
   <dependencyManagement>
@@ -199,7 +200,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
-          <version>5.1.9</version>
+          <version>${plugin.version.maven-bundle}</version>
           <configuration>
            <excludeDependencies>${camunda.osgi.exclude.dependencies}</excludeDependencies>
            <instructions>
