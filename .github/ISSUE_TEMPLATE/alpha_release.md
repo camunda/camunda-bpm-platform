@@ -14,8 +14,8 @@ assignees:
 
 ```[tasklist] Tasks
 - [ ] [Check calendar appointments](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-Checkcalendarappointments)
-- [ ] [Prepare the Blogpost](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-PreparetheBlogpost)
-- [ ] [Submit the blogpost to Marketing](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-SubmittheblogposttoMarketing)
+- [ ] [Prepare the Forum post](https://confluence.camunda.com/pages/viewpage.action?spaceKey=AP&title=Performing+an+Alpha+Release#PerforminganAlphaRelease-Preparetheforumpost)
+- [ ] [Share the forum post with PM for review](https://confluence.camunda.com/pages/viewpage.action?spaceKey=AP&title=Performing+an+Alpha+Release#PerforminganAlphaRelease-SharetheforumpostwithPMforreview)
 - [ ] [Release GitHub issues](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-ReleaseGitHubissues)
 - [ ] [Remind QA to create the alpha release test plan and to update the minor release test plan](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-RemindQAtocreatethealphareleasetestplanandtoupdatetheminorreleasetestplan)
 - [ ] [Monitor CI](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-MonitorCI)
@@ -32,7 +32,7 @@ assignees:
 - [ ] [Check Docker Images](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-CheckDockerImages)
 - [ ] [Publish the Enterprise Page](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-PublishtheEnterprisePage)
 - [ ] [Inform the Support Team and Forward the Security Reports](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-InformtheSupportTeamandForwardtheSecurityReports)
-- [ ] [Forum](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-Forum)
+- [ ] [Announce the Release in the Forum](https://confluence.camunda.com/pages/viewpage.action?spaceKey=AP&title=Performing+an+Alpha+Release#PerforminganAlphaRelease-AnnouncetheReleaseintheForum)
 - [ ] [Improve this Guide](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-ImprovethisGuide)
 - [ ] [Present and Celebrate the Release](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-PresentandCelebratetheRelease)
 - [ ] [Pick Next Release Manager](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-PickNextReleaseManager)
