@@ -42,10 +42,10 @@ public class HistoryTimeToLiveParser {
 
   private static final int DEFAULT_HISTORY_TIME_TO_LIVE_VALUE = 180;
 
-  private final boolean enforceNonNullValue;
-  private final String configValue;
+  protected final boolean enforceNonNullValue;
+  protected final String configValue;
 
-  private HistoryTimeToLiveParser(boolean enforceNonNullValue, String configValue) {
+  protected HistoryTimeToLiveParser(boolean enforceNonNullValue, String configValue) {
     this.enforceNonNullValue = enforceNonNullValue;
     this.configValue = configValue;
   }
