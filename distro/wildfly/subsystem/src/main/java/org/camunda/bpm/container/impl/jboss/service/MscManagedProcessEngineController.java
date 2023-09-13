@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
@@ -67,7 +68,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
 
   protected static final String CONNECT_PROCESS_ENGINE_PLUGIN_NAME = "org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin";
 
-  protected InjectedValue<ExecutorService> executorInjector = new InjectedValue<>();
+  protected Supplier<ExecutorService> executorSupplier;
 
   // Injecting these values makes the MSC aware of our dependencies on these resources.
   // This ensures that they are available when this service is started
@@ -91,7 +92,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
 
   public void start(final StartContext context) throws StartException {
     context.asynchronous();
-    executorInjector.getValue().submit(new Runnable() {
+    executorSupplier.get().submit(new Runnable() {
       public void run() {
         try {
           startInternal(context);
@@ -277,7 +278,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
       processEngineConsumers.add(serviceBuilder.provides(ServiceNames.forDefaultProcessEngine()));
     }
 
-    JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder);
+    this.executorSupplier = JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder);
 
   }
 
@@ -285,8 +286,8 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     return processEngine;
   }
 
-  public InjectedValue<ExecutorService> getExecutorInjector() {
-    return executorInjector;
+  public Supplier<ExecutorService> getExecutorInjector() {
+    return executorSupplier;
   }
 
   public ManagedProcessEngineMetadata getProcessEngineMetadata() {
