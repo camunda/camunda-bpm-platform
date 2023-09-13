@@ -108,13 +108,6 @@ var Controller = [
         });
     }
 
-    $scope.availableOperations = {};
-    camAPI.resource('tenant').options(function(err, res) {
-      angular.forEach(res.links, function(link) {
-        $scope.availableOperations[link.rel] = true;
-      });
-    });
-
     $scope.$root.showBreadcrumbs = true;
 
     pageService.titleSet($translate.instant('TENANTS_TENANTS'));

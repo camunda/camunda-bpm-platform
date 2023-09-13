@@ -229,7 +229,7 @@
                   <mapper>
                     <chainedmapper>
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
-                      <regexpmapper from="^(org.camunda.template-engines.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${version.camunda.template-engines}.jar" handledirsep="yes" />
+                      <regexpmapper from="^(org.camunda.template-engines.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${version.camunda.freemarker.template.engine}.jar" handledirsep="yes" />
                     </chainedmapper>
                   </mapper>
                 </copy>
@@ -289,7 +289,7 @@
                   <include name="**/module.xml" />
                 </replace>
 
-                <replace dir="target/modules" token="@version.camunda.template-engines@" value="${version.camunda.template-engines}">
+                <replace dir="target/modules" token="@version.camunda.freemarker.template.engine@" value="${version.camunda.freemarker.template.engine}">
                   <include name="**/module.xml" />
                 </replace>
 

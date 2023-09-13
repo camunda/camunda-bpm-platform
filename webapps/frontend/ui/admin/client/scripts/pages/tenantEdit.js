@@ -70,7 +70,6 @@ var Controller = [
     $scope.decodedTenantId = unescape(
       encodeURIComponent($routeParams.tenantId)
     );
-    $scope.availableOperations = {};
     $scope.tenantGroupList = null;
     $scope.tenantUserList = null;
 
@@ -179,7 +178,7 @@ var Controller = [
     );
 
     $scope.pageChange = function(page) {
-      search.updateSilently({page: !page || page == 1 ? null : page});
+      search.updateSilently({page: !page || page === 1 ? null : page});
     };
 
     function prepareTenantMemberView(memberPages) {
@@ -259,12 +258,6 @@ var Controller = [
       });
     }
 
-    TenantResource.options($scope.decodedTenantId, function(err, res) {
-      angular.forEach(res.links, function(link) {
-        $scope.availableOperations[link.rel] = true;
-      });
-    });
-
     $scope.updateTenant = function() {
       var updateData = {
         id: $scope.decodedTenantId,
@@ -280,9 +273,16 @@ var Controller = [
           });
           loadTenant();
         } else {
+          const {
+            response: {
+              body: {message}
+            }
+          } = err;
           Notifications.addError({
             status: $translate.instant('NOTIFICATIONS_STATUS_FAILED'),
-            message: $translate.instant('TENANTS_TENANT_UPDATE_FAILED')
+            message: $translate.instant('TENANTS_TENANT_UPDATE_FAILED', {
+              message
+            })
           });
         }
       });
@@ -316,11 +316,16 @@ var Controller = [
               });
               $location.path('/tenants');
             } else {
-              Notifications.addMessage({
-                type: 'success',
-                status: $translate.instant('NOTIFICATIONS_STATUS_SUCCESS'),
+              const {
+                response: {
+                  body: {message}
+                }
+              } = err;
+              Notifications.addError({
+                status: $translate.instant('NOTIFICATIONS_STATUS_FAILED'),
                 message: $translate.instant('TENANTS_TENANT_DELETE_FAILED', {
-                  tenant: $scope.tenant.id
+                  tenant: $scope.tenant.id,
+                  message
                 })
               });
             }
@@ -332,12 +337,12 @@ var Controller = [
     // page controls ////////////////////////////////////
 
     $scope.show = function(fragment) {
-      return fragment == $location.search().tab;
+      return fragment === $location.search().tab;
     };
 
     $scope.activeClass = function(link) {
       var path = $location.absUrl();
-      return path.indexOf(link) != -1 ? 'active' : '';
+      return path.indexOf(link) !== -1 ? 'active' : '';
     };
 
     // initialization ///////////////////////////////////

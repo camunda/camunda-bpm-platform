@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.impl.cfg;
 
 import javax.naming.NamingException;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
@@ -91,10 +90,10 @@ public class ConfigurationLogger extends ProcessEngineLogger {
       "Invalid value '{}' for configuration property '{}'.", propertyValue, propertyName), e);
   }
 
-  public void databaseConnectionAccessException(Exception cause) {
-    logError(
+  public ProcessEngineException databaseConnectionAccessException(Exception cause) {
+    return new ProcessEngineException(exceptionMessage(
       "012",
-      "Exception on accessing the database connection: {}", cause.getMessage());
+      "Exception on accessing the database connection: {}", cause.getMessage()), cause);
   }
 
   public void databaseConnectionCloseException(Exception cause) {

@@ -136,15 +136,6 @@ var Controller = [
         });
     }
 
-    $scope.availableOperations = {};
-    UserResource.OPTIONS()
-      .$promise.then(function(response) {
-        angular.forEach(response.links, function(link) {
-          $scope.availableOperations[link.rel] = true;
-        });
-      })
-      .catch(angular.noop);
-
     $scope.$root.showBreadcrumbs = true;
 
     pageService.titleSet($translate.instant('USERS_USERS'));

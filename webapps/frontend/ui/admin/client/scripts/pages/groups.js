@@ -98,15 +98,6 @@ var Controller = [
         .catch(angular.noop);
     }
 
-    $scope.availableOperations = {};
-    GroupResource.OPTIONS()
-      .$promise.then(function(response) {
-        angular.forEach(response.links, function(link) {
-          $scope.availableOperations[link.rel] = true;
-        });
-      })
-      .catch(angular.noop);
-
     $scope.$root.showBreadcrumbs = true;
 
     pageService.titleSet($translate.instant('GROUPS_GROUP'));

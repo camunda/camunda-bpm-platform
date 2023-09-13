@@ -38,7 +38,7 @@ module.exports = [
         resourceId: '*',
         permissions: ['ALL'],
         identityId: '',
-        identityType: 'User'
+        identityType: 'Group'
       });
     };
 

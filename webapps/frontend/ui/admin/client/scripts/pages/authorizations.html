@@ -24,10 +24,14 @@
         </a>
       </div>
     </header>
-
+    <div class="loader-state empty"
+         ng-if="loadingState === 'EMPTY'">
+      {{ 'AUTHORIZATION_EMPTY' | translate }}
+    </div>
     <form class="form-horizontal"
           name="createAuthForm"
-          ng-controller="AuthorizationCreateController">
+          ng-controller="AuthorizationCreateController"
+          ng-if="authorizations.length > 0">
       <table class="cam-table">
         <thead>
           <tr>
@@ -84,7 +88,7 @@
 
                 <input type="text"
                        class="input-auth-name form-control"
-                       placeholder="{{ 'AUTHORIZATION_USER_GROUP_ID' | translate }}"
+                       placeholder="{{ (getIdentityTypeFor(authorization) == 'Group' ? 'AUTHORIZATION_GROUP_ID' : 'AUTHORIZATION_USER_ID') | translate }}"
                        ng-disabled="isIdentityIdDisabledFor(authorization)"
                        ng-class="{'ng-invalid': !authorization.identityId}"
                        ng-model="authorization.identityId"/>
@@ -185,6 +189,12 @@
                   <span class="glyphicon glyphicon-ban-circle"></span>
                 </a>
               </div>
+            </td>
+            <td class="info">
+              <span class="glyphicon glyphicon-exclamation-sign"
+                    ng-if="authorization.userId"
+                    uib-tooltip="{{ 'AUTHORIZATION_USER_AUTH_INFO' | translate }}"
+                    tooltip-placement="left" />
             </td>
           </tr>
         </tbody>

@@ -66,9 +66,16 @@ var Controller = [
           });
           $location.path('/tenants');
         } else {
+          const {
+            response: {
+              body: {message}
+            }
+          } = err;
           Notifications.addError({
             status: $translate.instant('NOTIFICATIONS_STATUS_FAILED'),
-            message: $translate.instant('TENANTS_CREATE_TENANT_FAILED')
+            message: $translate.instant('TENANTS_CREATE_TENANT_FAILED', {
+              message
+            })
           });
         }
       });
