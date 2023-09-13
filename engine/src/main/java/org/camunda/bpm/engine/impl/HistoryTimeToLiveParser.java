@@ -77,22 +77,22 @@ public class HistoryTimeToLiveParser {
     }
   }
 
-  public Integer parse(Element processElement, String processDefinitionId) {
+  public Integer parse(Element processElement, String definitionKey) {
     String historyTimeToLiveString = processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive");
 
-    return parseAndValidate(historyTimeToLiveString, processDefinitionId);
+    return parseAndValidate(historyTimeToLiveString, definitionKey);
   }
 
-  public Integer parse(Case caseElement, String processDefinitionId) {
+  public Integer parse(Case caseElement, String definitionKey) {
     String historyTimeToLiveString = caseElement.getCamundaHistoryTimeToLiveString();
 
-    return parseAndValidate(historyTimeToLiveString, processDefinitionId);
+    return parseAndValidate(historyTimeToLiveString, definitionKey);
   }
 
-  public Integer parse(Decision decision) {
+  public Integer parse(Decision decision, String definitionKey) {
     String historyTimeToLiveString = decision.getCamundaHistoryTimeToLiveString();
 
-    return parseAndValidate(historyTimeToLiveString);
+    return parseAndValidate(historyTimeToLiveString, definitionKey);
   }
 
   /**
@@ -100,12 +100,12 @@ public class HistoryTimeToLiveParser {
    * the parsed value.
    *
    * @param historyTimeToLiveString the history time to live string expression in ISO-8601 format
-   * @param processDefinitionId     the correlated process definition id that this historyTimeToLive was fetched. Can be
-   *                                null if it is not present.
+   * @param definitionKey           the correlated definition key that this historyTimeToLive was fetched from
+   *                                (process definition key for processes, decision definition key for decisions, case definition key for cases).
    * @return the parsed integer value of history time to live
    * @throws NotValidException in case enforcement of non-null values is on and the parsed result was null
    */
-  protected Integer parseAndValidate(String historyTimeToLiveString, String processDefinitionId) throws NotValidException {
+  protected Integer parseAndValidate(String historyTimeToLiveString, String definitionKey) throws NotValidException {
     HTTLParsedResult result = new HTTLParsedResult(historyTimeToLiveString);
 
     if (result.isInValidAgainstConfig()) {
@@ -113,7 +113,7 @@ public class HistoryTimeToLiveParser {
     }
 
     if (result.shouldBeLogged()) {
-      LOG.logHistoryTimeToLiveDefaultValueWarning(processDefinitionId);
+      LOG.logHistoryTimeToLiveDefaultValueWarning(definitionKey);
     }
 
     return result.valueAsInteger;

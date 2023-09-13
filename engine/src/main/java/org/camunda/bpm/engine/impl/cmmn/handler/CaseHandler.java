@@ -65,8 +65,8 @@ public class CaseHandler extends CmmnElementHandler<Case, CmmnCaseDefinition> {
   }
 
   protected void validateAndSetHTTL(Case element, CaseDefinitionEntity definition) {
-    String processDefinitionId = definition.getId();
-    Integer historyTimeToLive = HistoryTimeToLiveParser.create().parse(element, processDefinitionId);
+    String caseDefinitionKey = definition.getKey();
+    Integer historyTimeToLive = HistoryTimeToLiveParser.create().parse(element, caseDefinitionKey);
     definition.setHistoryTimeToLive(historyTimeToLive);
   }
 

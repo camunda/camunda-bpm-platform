@@ -116,23 +116,23 @@ public class ConfigurationLogger extends ProcessEngineLogger {
   /**
    * Method for logging message when default history time to live is configured.
    *
-   * @param processDefinitionId the correlated process definition id with which history time to live is related. If
-   *                            the flow is not related to a process definition (e.g HTTL configuration that are on Decision deployments
-   *                            that don't have a related processDefinitionId), this parameters can be null and will not be logged.
+   * @param definitionKey the correlated definition key with which history time to live is related to.
+   *                      For processes related to httl, that is the processDefinitionKey, for cases the case definition key
+   *                      whereas for decisions is the decision definition key.
    */
-  public void logHistoryTimeToLiveDefaultValueWarning(String processDefinitionId) {
-    String message = formatHTTLDefaultValueMessage(processDefinitionId);
+  public void logHistoryTimeToLiveDefaultValueWarning(String definitionKey) {
+    String message = formatHTTLDefaultValueMessage(definitionKey);
 
     logWarn("016", message);
   }
 
-  protected String formatHTTLDefaultValueMessage(String processDefinitionId) {
+  protected String formatHTTLDefaultValueMessage(String definitionKey) {
     String result = "You are using the default TTL (Time To Live) of 180 days (six months); "
         + "the history clean-up feature will delete your data after six months. "
         + "We recommend adjusting the TTL configuration property aligned with your specific requirements.";
 
-    if (processDefinitionId != null) {
-      result = "processDefinitionId: " + processDefinitionId + ";" + result;
+    if (definitionKey != null) {
+      result = "definitionKey: " + definitionKey + ";" + result;
     }
 
     return result;

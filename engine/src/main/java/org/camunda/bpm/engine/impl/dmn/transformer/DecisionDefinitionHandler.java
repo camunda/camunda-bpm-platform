@@ -44,7 +44,7 @@ public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
   }
 
   protected void validateAndSetHTTL(Decision decision, DecisionDefinitionEntity decisionDefinition) {
-    Integer historyTimeToLive = HistoryTimeToLiveParser.create().parse(decision);
+    Integer historyTimeToLive = HistoryTimeToLiveParser.create().parse(decision, decisionDefinition.getKey());
     decisionDefinition.setHistoryTimeToLive(historyTimeToLive);
   }
 }

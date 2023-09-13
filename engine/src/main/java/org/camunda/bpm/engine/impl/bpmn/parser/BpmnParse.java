@@ -151,7 +151,6 @@ import org.camunda.bpm.engine.impl.task.listener.DelegateExpressionTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.ExpressionTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.ScriptTaskListener;
 import org.camunda.bpm.engine.impl.util.DecisionEvaluationUtil;
-import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.util.ScriptUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
@@ -662,8 +661,8 @@ public class BpmnParse extends Parse {
 
   protected void validateAndSetHTTL(Element processElement, ProcessDefinitionEntity processDefinition) {
     try {
-      String processDefinitionId = processDefinition.getId();
-      Integer historyTimeToLive = HistoryTimeToLiveParser.create().parse(processElement, processDefinitionId);
+      String processDefinitionKey = processDefinition.getKey();
+      Integer historyTimeToLive = HistoryTimeToLiveParser.create().parse(processElement, processDefinitionKey);
       processDefinition.setHistoryTimeToLive(historyTimeToLive);
     }
     catch (Exception e) {
