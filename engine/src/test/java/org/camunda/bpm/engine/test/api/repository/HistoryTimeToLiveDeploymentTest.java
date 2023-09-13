@@ -21,8 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import ch.qos.logback.classic.Level;
-import java.util.Set;
-import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ParseException;
@@ -30,21 +28,15 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.repository.DeploymentHandlerFactory;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.bpmn.deployment.VersionedDeploymentHandlerFactory;
-import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -60,13 +52,7 @@ public class HistoryTimeToLiveDeploymentTest {
 
   protected static final String DEFAULT_HTTL_CONFIG_VALUE = "180";
 
-  @ClassRule
-  public static ProcessEngineBootstrapRule DEFAULT_CONFIG_RULE = new ProcessEngineBootstrapRule(configuration -> {
-    // given
-    configuration.setEnforceHistoryTimeToLive(true);
-  });
-
-  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(DEFAULT_CONFIG_RULE);
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
@@ -82,15 +68,7 @@ public class HistoryTimeToLiveDeploymentTest {
   protected ManagementService managementService;
   protected ProcessEngine processEngine;
 
-  private EmbeddedProcessApplication processApplication;
-  protected DeploymentHandlerFactory defaultDeploymentHandlerFactory;
-  protected DeploymentHandlerFactory customDeploymentHandlerFactory;
-
-  protected ProcessApplicationManager processApplicationManager;
-  protected DeploymentCache deploymentCache;
-  Set<String> registeredDeployments;
-
-  String historyTimeToLive;
+  protected String historyTimeToLive;
 
   @Before
   public void setUp() throws Exception {
@@ -99,22 +77,14 @@ public class HistoryTimeToLiveDeploymentTest {
     repositoryService = engineRule.getRepositoryService();
     managementService = engineRule.getManagementService();
 
-    defaultDeploymentHandlerFactory = processEngineConfiguration.getDeploymentHandlerFactory();
-    customDeploymentHandlerFactory = new VersionedDeploymentHandlerFactory();
-    processApplication = new EmbeddedProcessApplication();
-
-    processApplicationManager = processEngineConfiguration.getProcessApplicationManager();
-    deploymentCache = processEngineConfiguration.getDeploymentCache();
-    registeredDeployments = processEngineConfiguration.getRegisteredDeployments();
     historyTimeToLive = processEngineConfiguration.getHistoryTimeToLive();
+    processEngineConfiguration.setEnforceHistoryTimeToLive(true);
   }
 
   @After
   public void tearDown() throws Exception {
-    clearProcessApplicationDeployments();
-    processApplication.undeploy();
-    processEngineConfiguration.setDeploymentHandlerFactory(defaultDeploymentHandlerFactory);
     processEngineConfiguration.setHistoryTimeToLive(historyTimeToLive);
+    processEngineConfiguration.setEnforceHistoryTimeToLive(false);
     ClockUtil.reset();
   }
 
@@ -122,7 +92,7 @@ public class HistoryTimeToLiveDeploymentTest {
   public void processWithoutHTTLShouldFail() {
     assertThatThrownBy(() -> {
       // when
-      testRule.deploy(repositoryService.createDeployment(processApplication.getReference())
+      testRule.deploy(repositoryService.createDeployment()
           .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml"));})
 
         // then
@@ -131,10 +101,23 @@ public class HistoryTimeToLiveDeploymentTest {
   }
 
   @Test
+  public void processWithHTTLShouldSucceed() {
+    // when
+    testRule.deploy(repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version3.bpmn20.xml"));
+
+    Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
+
+    // then
+    assertThat(deployment).isNotNull();
+  }
+
+  @Test
   public void caseWithHTTLShouldSucceed() {
     // when
     testRule.deploy(repositoryService
-        .createDeployment(processApplication.getReference())
+        .createDeployment()
         .addClasspathResource("org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithHistoryTimeToLive.cmmn"));
 
     Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
@@ -147,7 +130,7 @@ public class HistoryTimeToLiveDeploymentTest {
   public void caseWithoutHTTLShouldFail() {
     assertThatThrownBy(() -> {
       // when
-      testRule.deploy(repositoryService.createDeployment(processApplication.getReference())
+      testRule.deploy(repositoryService.createDeployment()
           .addClasspathResource("org/camunda/bpm/engine/test/api/cmmn/oneTaskCase2.cmmn"));})
 
         // then
@@ -160,7 +143,7 @@ public class HistoryTimeToLiveDeploymentTest {
   public void decisionWithHTTLShouldSucceed() {
     // when
     testRule.deploy(repositoryService
-        .createDeployment(processApplication.getReference())
+        .createDeployment()
         .addClasspathResource("org/camunda/bpm/engine/test/api/dmn/Example.dmn"));
 
     Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
@@ -174,7 +157,7 @@ public class HistoryTimeToLiveDeploymentTest {
     assertThatThrownBy(() -> {
       // when
       testRule.deploy(repositoryService
-          .createDeployment(processApplication.getReference())
+          .createDeployment()
           .addClasspathResource("org/camunda/bpm/engine/test/api/dmn/Another_Example.dmn"));})
 
         // then
@@ -189,7 +172,7 @@ public class HistoryTimeToLiveDeploymentTest {
     processEngineConfiguration.setHistoryTimeToLive("5");
 
     // when
-    testRule.deploy(repositoryService.createDeployment(processApplication.getReference())
+    testRule.deploy(repositoryService.createDeployment()
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml"));
 
     Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
@@ -204,7 +187,7 @@ public class HistoryTimeToLiveDeploymentTest {
     processEngineConfiguration.setHistoryTimeToLive(DEFAULT_HTTL_CONFIG_VALUE);
 
     // when
-    testRule.deploy(repositoryService.createDeployment(processApplication.getReference())
+    testRule.deploy(repositoryService.createDeployment()
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml"));
 
     // then
@@ -218,7 +201,7 @@ public class HistoryTimeToLiveDeploymentTest {
     processEngineConfiguration.setHistoryTimeToLive(nonDefaultValue);
 
     // when
-    testRule.deploy(repositoryService.createDeployment(processApplication.getReference())
+    testRule.deploy(repositoryService.createDeployment()
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version3.bpmn20.xml"));
 
     // then
@@ -233,20 +216,11 @@ public class HistoryTimeToLiveDeploymentTest {
     processEngineConfiguration.setHistoryTimeToLive(nonDefaultValue);
 
     // when
-    testRule.deploy(repositoryService.createDeployment(processApplication.getReference())
+    testRule.deploy(repositoryService.createDeployment()
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml"));
 
     // then
     assertThat(loggingRule.getFilteredLog(EXPECTED_DEFAULT_CONFIG_MSG)).hasSize(0);
-  }
-
-  /*
-   * Clears the deployment caches to simulate a stop of the process engine.
-   */
-  protected void clearProcessApplicationDeployments() {
-    processApplicationManager.clearRegistrations();
-    registeredDeployments.clear();
-    deploymentCache.discardProcessDefinitionCache();
   }
 
 }
