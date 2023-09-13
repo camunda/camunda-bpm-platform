@@ -180,8 +180,13 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     ServiceBuilder<?> processApplicationStartServiceBuilder = phaseContext.getServiceTarget().addService();
 
     Consumer<ProcessApplicationStartService> paStartServiceConsumer = processApplicationStartServiceBuilder.provides(paStartServiceName);
-    Supplier<ComponentView> paComponentViewSupplier = processApplicationStartServiceBuilder.requires(paViewServiceName);
-    Supplier<ProcessApplicationInterface> noViewProcessApplication = processApplicationStartServiceBuilder.requires(noViewStartService);
+    Supplier<ComponentView> paComponentViewSupplier = null;
+    Supplier<ProcessApplicationInterface> noViewProcessApplication = null;
+    if (paViewServiceName != null) {
+      paComponentViewSupplier = processApplicationStartServiceBuilder.requires(paViewServiceName);
+    } else {
+      noViewProcessApplication = processApplicationStartServiceBuilder.requires(noViewStartService);
+    }
     Supplier<BpmPlatformPlugins> platformPluginsSupplierStartService = processApplicationStartServiceBuilder.requires(ServiceNames.forBpmPlatformPlugins());
     processApplicationStartServiceBuilder.requires(phaseContext.getPhaseServiceName());
     deploymentServiceNames.forEach(serviceName -> processApplicationStartServiceBuilder.requires(serviceName));
