@@ -206,7 +206,7 @@ public class HistoryTimeToLiveDeploymentTest {
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version3.bpmn20.xml"));
 
     // then
-    assertThat(loggingRule.getFilteredLog("definitionKey: process;" + EXPECTED_DEFAULT_CONFIG_MSG)).hasSize(1);
+    assertThat(loggingRule.getFilteredLog("definitionKey: process; " + EXPECTED_DEFAULT_CONFIG_MSG)).hasSize(1);
   }
 
   @Test
@@ -220,7 +220,7 @@ public class HistoryTimeToLiveDeploymentTest {
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/case_with_180_httl.cmmn"));
 
     // then
-    assertThat(loggingRule.getFilteredLog("definitionKey: testCase;" + EXPECTED_DEFAULT_CONFIG_MSG)).hasSize(1);
+    assertThat(loggingRule.getFilteredLog("definitionKey: testCase; " + EXPECTED_DEFAULT_CONFIG_MSG)).hasSize(1);
   }
 
   @Test
@@ -234,7 +234,7 @@ public class HistoryTimeToLiveDeploymentTest {
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/decision_with_180_httl.dmn"));
 
     // then
-    assertThat(loggingRule.getFilteredLog("definitionKey: testDecision;" + EXPECTED_DEFAULT_CONFIG_MSG)).hasSize(1);
+    assertThat(loggingRule.getFilteredLog("definitionKey: testDecision; " + EXPECTED_DEFAULT_CONFIG_MSG)).hasSize(1);
   }
 
   @Test

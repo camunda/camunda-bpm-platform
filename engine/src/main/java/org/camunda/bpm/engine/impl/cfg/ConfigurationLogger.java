@@ -132,7 +132,7 @@ public class ConfigurationLogger extends ProcessEngineLogger {
         + "We recommend adjusting the TTL configuration property aligned with your specific requirements.";
 
     if (definitionKey != null) {
-      result = "definitionKey: " + definitionKey + ";" + result;
+      result = "definitionKey: " + definitionKey + "; " + result;
     }
 
     return result;
