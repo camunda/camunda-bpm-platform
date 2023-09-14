@@ -580,21 +580,19 @@ public class DbSqlSessionFactory implements SessionFactory {
     dbSpecificConstants.put(DB2, constants);
 
     // mssql
-    databaseSpecificLimitBeforeStatements.put(MSSQL, "SELECT SUB.* FROM (");
+    databaseSpecificLimitBeforeStatements.put(MSSQL, "");
     optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements.put(MSSQL, "");
-    databaseSpecificInnerLimitAfterStatements.put(MSSQL, ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow}");
-    databaseSpecificLimitAfterStatements.put(MSSQL, databaseSpecificInnerLimitAfterStatements.get(MSSQL) + " ORDER BY SUB.rnk");
-    optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements.put(MSSQL, "");
-    String mssqlLimitBetweenWithoutColumns = ", row_number() over (ORDER BY ${internalOrderBy}) rnk FROM ( select distinct ";
-    databaseSpecificLimitBetweenStatements.put(MSSQL, mssqlLimitBetweenWithoutColumns + "RES.* ");
+    databaseSpecificLimitAfterStatements.put(MSSQL, "OFFSET #{firstResult} ROWS FETCH NEXT #{maxResults} ROWS ONLY");
+    databaseSpecificInnerLimitAfterStatements.put(MSSQL, databaseSpecificLimitAfterStatements.get(MSSQL));
+    optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements.put(MSSQL, "OFFSET 0 ROWS FETCH NEXT #{maxResults} ROWS ONLY");
+    databaseSpecificLimitBetweenStatements.put(MSSQL, "");
     databaseSpecificLimitBetweenFilterStatements.put(MSSQL, "");
-    databaseSpecificLimitBetweenAcquisitionStatements.put(MSSQL, mssqlLimitBetweenWithoutColumns
-        + "RES.ID_, RES.REV_, RES.TYPE_, RES.LOCK_EXP_TIME_, RES.LOCK_OWNER_, RES.EXCLUSIVE_, RES.PROCESS_INSTANCE_ID_, RES.DUEDATE_, RES.PRIORITY_ ");
+    databaseSpecificLimitBetweenAcquisitionStatements.put(MSSQL, "");
     databaseSpecificLimitBeforeWithoutOffsetStatements.put(MSSQL, "TOP (#{maxResults})");
     databaseSpecificLimitAfterWithoutOffsetStatements.put(MSSQL, "");
-    databaseSpecificOrderByStatements.put(MSSQL, "");
-    databaseSpecificLimitBeforeNativeQueryStatements.put(MSSQL, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${internalOrderBy}) rnk FROM (");
-    databaseSpecificDistinct.put(MSSQL, "");
+    databaseSpecificOrderByStatements.put(MSSQL, "order by ${internalOrderBy}");
+    databaseSpecificLimitBeforeNativeQueryStatements.put(MSSQL, "");
+    databaseSpecificDistinct.put(MSSQL, "distinct");
     databaseSpecificNumericCast.put(MSSQL, "");
 
     databaseSpecificCountDistinctBeforeStart.put(MSSQL, defaultDistinctCountBeforeStart);
