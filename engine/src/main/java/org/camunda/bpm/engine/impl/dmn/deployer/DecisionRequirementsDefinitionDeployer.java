@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
+import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnElementTransformHandler;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnTransformer;
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -28,10 +30,12 @@ import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.dmn.DecisionLogger;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionManager;
+import org.camunda.bpm.engine.impl.dmn.transformer.DecisionDefinitionHandler;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.model.dmn.instance.Decision;
 
 /**
  * {@link Deployer} responsible to parse DMN 1.1 XML files and create the proper
@@ -55,6 +59,10 @@ public class DecisionRequirementsDefinitionDeployer extends AbstractDefinitionDe
     byte[] bytes = resource.getBytes();
     ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
 
+    if (!deployment.isNew()) {
+      skipEnforceTtl(true);
+    }
+
     try {
       DecisionRequirementsDefinitionEntity drd = transformer
           .createTransform()
@@ -65,7 +73,16 @@ public class DecisionRequirementsDefinitionDeployer extends AbstractDefinitionDe
 
     } catch (Exception e) {
       throw LOG.exceptionParseDmnResource(resource.getName(), e);
+
+    } finally {
+      skipEnforceTtl(false);
+
     }
+  }
+
+  public void skipEnforceTtl(boolean skipEnforceTtl) {
+    DmnElementTransformHandler<Decision, DmnDecisionImpl> handler = transformer.getElementTransformHandlerRegistry().getHandler(Decision.class);
+    ((DecisionDefinitionHandler) handler).setSkipEnforceTtl(skipEnforceTtl);
   }
 
   @Override

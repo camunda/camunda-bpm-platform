@@ -632,7 +632,8 @@ public class BpmnParse extends Parse {
     processDefinition.setProperty(PROPERTYNAME_TASK_PRIORITY, parsePriority(processElement, PROPERTYNAME_TASK_PRIORITY));
     processDefinition.setVersionTag(processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "versionTag"));
 
-    validateAndSetHTTL(processElement, processDefinition);
+    boolean skipEnforceTtl = !deployment.isNew();
+    validateAndSetHTTL(processElement, processDefinition, skipEnforceTtl);
 
     boolean isStartableInTasklist = isStartable(processElement);
     processDefinition.setStartableInTasklist(isStartableInTasklist);
@@ -659,10 +660,10 @@ public class BpmnParse extends Parse {
     return processDefinition;
   }
 
-  protected void validateAndSetHTTL(Element processElement, ProcessDefinitionEntity processDefinition) {
+  protected void validateAndSetHTTL(Element processElement, ProcessDefinitionEntity processDefinition, boolean skipEnforceTtl) {
     try {
       String processDefinitionKey = processDefinition.getKey();
-      Integer historyTimeToLive = HistoryTimeToLiveParser.create().parse(processElement, processDefinitionKey);
+      Integer historyTimeToLive = HistoryTimeToLiveParser.create().parse(processElement, processDefinitionKey, skipEnforceTtl);
       processDefinition.setHistoryTimeToLive(historyTimeToLive);
     }
     catch (Exception e) {

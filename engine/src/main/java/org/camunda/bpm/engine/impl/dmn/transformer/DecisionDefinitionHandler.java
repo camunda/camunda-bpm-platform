@@ -25,6 +25,8 @@ import org.camunda.bpm.model.dmn.instance.Decision;
 
 public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
 
+  protected boolean skipEnforceTtl = false;
+
   @Override
   protected DmnDecisionImpl createDmnElement() {
     return new DecisionDefinitionEntity();
@@ -38,13 +40,21 @@ public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
     decisionDefinition.setCategory(category);
     decisionDefinition.setVersionTag(decision.getVersionTag());
 
-    validateAndSetHTTL(decision, decisionDefinition);
+    validateAndSetHTTL(decision, decisionDefinition, isSkipEnforceTtl());
 
     return decisionDefinition;
   }
 
-  protected void validateAndSetHTTL(Decision decision, DecisionDefinitionEntity decisionDefinition) {
-    Integer historyTimeToLive = HistoryTimeToLiveParser.create().parse(decision, decisionDefinition.getKey());
+  protected void validateAndSetHTTL(Decision decision, DecisionDefinitionEntity decisionDefinition, boolean skipEnforceTtl) {
+    Integer historyTimeToLive = HistoryTimeToLiveParser.create().parse(decision, decisionDefinition.getKey(), skipEnforceTtl);
     decisionDefinition.setHistoryTimeToLive(historyTimeToLive);
+  }
+
+  public boolean isSkipEnforceTtl() {
+    return skipEnforceTtl;
+  }
+
+  public void setSkipEnforceTtl(boolean skipEnforceTtl) {
+    this.skipEnforceTtl = skipEnforceTtl;
   }
 }

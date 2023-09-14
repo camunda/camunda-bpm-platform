@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.cfg.ConfigurationLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.impl.util.xml.Element;
@@ -77,22 +78,22 @@ public class HistoryTimeToLiveParser {
     }
   }
 
-  public Integer parse(Element processElement, String definitionKey) {
+  public Integer parse(Element processElement, String definitionKey, boolean skipEnforceTtl) {
     String historyTimeToLiveString = processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive");
 
-    return parseAndValidate(historyTimeToLiveString, definitionKey);
+    return parseAndValidate(historyTimeToLiveString, definitionKey, skipEnforceTtl);
   }
 
-  public Integer parse(Case caseElement, String definitionKey) {
+  public Integer parse(Case caseElement, String definitionKey, boolean skipEnforceTtl) {
     String historyTimeToLiveString = caseElement.getCamundaHistoryTimeToLiveString();
 
-    return parseAndValidate(historyTimeToLiveString, definitionKey);
+    return parseAndValidate(historyTimeToLiveString, definitionKey, skipEnforceTtl);
   }
 
-  public Integer parse(Decision decision, String definitionKey) {
+  public Integer parse(Decision decision, String definitionKey, boolean skipEnforceTtl) {
     String historyTimeToLiveString = decision.getCamundaHistoryTimeToLiveString();
 
-    return parseAndValidate(historyTimeToLiveString, definitionKey);
+    return parseAndValidate(historyTimeToLiveString, definitionKey, skipEnforceTtl);
   }
 
   /**
@@ -102,33 +103,24 @@ public class HistoryTimeToLiveParser {
    * @param historyTimeToLiveString the history time to live string expression in ISO-8601 format
    * @param definitionKey           the correlated definition key that this historyTimeToLive was fetched from
    *                                (process definition key for processes, decision definition key for decisions, case definition key for cases).
+   * @param skipEnforceTtl skips enforcing the TTL.
    * @return the parsed integer value of history time to live
    * @throws NotValidException in case enforcement of non-null values is on and the parsed result was null
    */
-  protected Integer parseAndValidate(String historyTimeToLiveString, String definitionKey) throws NotValidException {
+  protected Integer parseAndValidate(String historyTimeToLiveString, String definitionKey, boolean skipEnforceTtl) throws NotValidException {
     HTTLParsedResult result = new HTTLParsedResult(historyTimeToLiveString);
 
-    if (result.isInValidAgainstConfig()) {
-      throw new NotValidException("History Time To Live cannot be null");
-    }
+    if (!skipEnforceTtl) {
+      if (result.isInValidAgainstConfig()) {
+        throw new NotValidException("History Time To Live cannot be null");
+      }
 
-    if (result.shouldBeLogged()) {
-      LOG.logHistoryTimeToLiveDefaultValueWarning(definitionKey);
+      if (result.shouldBeLogged()) {
+        LOG.logHistoryTimeToLiveDefaultValueWarning(definitionKey);
+      }
     }
 
     return result.valueAsInteger;
-  }
-
-  /**
-   * Parses the given HistoryTimeToLive String expression and then executes any applicable validation before returning
-   * the parsed value. Overloaded method without using processDefinitionId for cases where it is unavailable.
-   *
-   * @param historyTimeToLiveString the history time to live string expression in ISO-8601 format
-   * @return the parsed integer value of history time to live
-   * @throws NotValidException in case enforcement of non-null values is on and the parsed result was null
-   */
-  protected Integer parseAndValidate(String historyTimeToLiveString) throws NotValidException {
-    return parseAndValidate(historyTimeToLiveString, null);
   }
 
   protected class HTTLParsedResult {

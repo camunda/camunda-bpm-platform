@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -249,6 +250,51 @@ public class HistoryTimeToLiveDeploymentTest {
 
     // then
     assertThat(loggingRule.getFilteredLog(EXPECTED_DEFAULT_CONFIG_MSG)).hasSize(0);
+  }
+
+  @Test
+  public void shouldGetDeployedProcess() {
+    // given
+    processEngineConfiguration.setEnforceHistoryTimeToLive(false);
+
+    // when
+    DeploymentWithDefinitions definitions = testRule.deploy(repositoryService.createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml"));
+
+    // then
+    processEngineConfiguration.setEnforceHistoryTimeToLive(true);
+    processEngineConfiguration.getDeploymentCache().purgeCache();
+    repositoryService.getProcessDefinition(definitions.getDeployedProcessDefinitions().get(0).getId());
+  }
+
+  @Test
+  public void shouldGetDeployedDecision() {
+    // given
+    processEngineConfiguration.setEnforceHistoryTimeToLive(false);
+
+    // when
+    DeploymentWithDefinitions definitions = testRule.deploy(repositoryService.createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/dmn/Another_Example.dmn"));
+
+    // then
+    processEngineConfiguration.setEnforceHistoryTimeToLive(true);
+    processEngineConfiguration.getDeploymentCache().purgeCache();
+    repositoryService.getDecisionDefinition(definitions.getDeployedDecisionDefinitions().get(0).getId());
+  }
+
+  @Test
+  public void shouldGetDeployedCase() {
+    // given
+    processEngineConfiguration.setEnforceHistoryTimeToLive(false);
+
+    // when
+    DeploymentWithDefinitions definitions = testRule.deploy(repositoryService.createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/cmmn/oneTaskCase2.cmmn"));
+
+    // then
+    processEngineConfiguration.setEnforceHistoryTimeToLive(true);
+    processEngineConfiguration.getDeploymentCache().purgeCache();
+    repositoryService.getCaseDefinition(definitions.getDeployedCaseDefinitions().get(0).getId());
   }
 
 }
