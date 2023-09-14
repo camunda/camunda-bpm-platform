@@ -18,7 +18,6 @@ package org.camunda.bpm.container.impl.jboss.extension;
 
 import org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfiguration;
 import org.camunda.bpm.container.impl.jboss.util.CustomMarshaller;
-import org.camunda.bpm.container.impl.jboss.util.FixedObjectTypeAttributeDefinition;
 import org.jboss.as.controller.*;
 import org.jboss.as.controller.registry.AttributeAccess;
 import org.jboss.dmr.ModelNode;
@@ -134,7 +133,7 @@ public class SubsystemAttributeDefinitons {
         PROPERTIES
     };
 
-    public static final FixedObjectTypeAttributeDefinition PLUGIN = FixedObjectTypeAttributeDefinition.Builder
+    public static final ObjectTypeAttributeDefinition PLUGIN = ObjectTypeAttributeDefinition.Builder
             .of(ModelConstants.PLUGIN, PLUGIN_ATTRIBUTES)
             .setAttributeMarshaller(CustomMarshaller.OBJECT_AS_ELEMENT)
             .setAttributeParser(AttributeParser.OBJECT_LIST_PARSER)
