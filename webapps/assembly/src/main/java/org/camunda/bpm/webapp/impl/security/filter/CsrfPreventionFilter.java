@@ -51,15 +51,15 @@ import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
  *           Client                            Server
  *              |                                 |
  *              | GET Fetch Request              \| JSESSIONID
- *              |---------------------------------| X-XSRF-Token
+ *              |---------------------------------| X-XSRF-TOKEN
  *              |                                /| pair generation
  *              |/Response to Fetch Request       |
  *              |---------------------------------|
  * JSESSIONID   |\                                |
- * X-XSRF-Token |                                 |
+ * X-XSRF-TOKEN |                                 |
  * pair cached  | POST Request with valid token  \| JSESSIONID
  *              | header                          |
- *              |---------------------------------| X-XSRF-Token
+ *              |---------------------------------| X-XSRF-TOKEN
  *              |                                /| pair validation
  *              |/ Response to POST Request       |
  *              |---------------------------------|
@@ -69,7 +69,7 @@ import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
  *           Client                            Server
  *              |                                 |
  *              | POST Request without token      | JSESSIONID
- *              | header                         \| X-XSRF-Token
+ *              | header                         \| X-XSRF-TOKEN
  *              |---------------------------------| pair validation
  *              |                                /|
  *              |/Request is rejected             |
@@ -79,7 +79,7 @@ import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
  *           Client                            Server
  *              |                                 |
  *              | POST Request with invalid token\| JSESSIONID
- *              |---------------------------------| X-XSRF-Token
+ *              |---------------------------------| X-XSRF-TOKEN
  *              |                                /| pair validation
  *              |/Request is rejected             |
  *              |---------------------------------|
