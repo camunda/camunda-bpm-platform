@@ -99,7 +99,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
 
     List<ServiceName> deploymentServiceNames = new ArrayList<>();
 
-    ServiceBuilder<?> stopServiceBuilder = phaseContext.getServiceTarget().addService();
+    ServiceBuilder<?> stopServiceBuilder = phaseContext.getServiceTarget().addService(paStopServiceName);
     stopServiceBuilder.requires(phaseContext.getPhaseServiceName());
     Supplier<BpmPlatformPlugins> platformPluginsSupplier = stopServiceBuilder.requires(ServiceNames.forBpmPlatformPlugins());
     Consumer<ProcessApplicationStopService> stopServiceConsumer = stopServiceBuilder.provides(paStopServiceName);
@@ -140,7 +140,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
           processArachiveName = UUID.randomUUID().toString();
         }
         ServiceName deploymentServiceName = ServiceNames.forProcessApplicationDeploymentService(deploymentUnit.getName(), processArachiveName);
-        ServiceBuilder<?> deploymentServiceBuilder = phaseContext.getServiceTarget().addService();
+        ServiceBuilder<?> deploymentServiceBuilder = phaseContext.getServiceTarget().addService(deploymentServiceName);
 
         Consumer<ProcessApplicationDeploymentService> deploymentServiceConsumer = deploymentServiceBuilder.provides(deploymentServiceName);
         Supplier<ProcessEngine> processEngineServiceSupplier = deploymentServiceBuilder.requires(processEngineServiceName);
@@ -177,7 +177,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     AnnotationInstance preUndeploy = ProcessApplicationAttachments.getPreUndeployDescription(deploymentUnit);
 
     // register the managed process application start service
-    ServiceBuilder<?> processApplicationStartServiceBuilder = phaseContext.getServiceTarget().addService();
+    ServiceBuilder<?> processApplicationStartServiceBuilder = phaseContext.getServiceTarget().addService(paStartServiceName);
 
     Consumer<ProcessApplicationStartService> paStartServiceConsumer = processApplicationStartServiceBuilder.provides(paStartServiceName);
     Supplier<ComponentView> paComponentViewSupplier = null;
