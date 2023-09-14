@@ -25,8 +25,7 @@
       </div>
     </header>
 
-    <div class="deployed-processes"
-         ng-if="activeSection"
+    <div ng-if="activeSection"
          ng-controller="CamPaginationSearchIntegrationController as SearchController">
 
       <div cam-widget-search
@@ -41,7 +40,8 @@
 
       <div cam-widget-loader
            loading-state="{{SearchController.loadingState}}"
-           text-empty="{{ 'PLGN_SEAR_NO_MATCH' | translate }}">
+           class="deployed-processes"
+           text-empty="{{ 'PLUGIN_PROCESS_DEF_NO_PROCESS_DEF' | translate }}">
 
         <table ng-if="activeTab === 'list'"
                class="process-definitions-list cam-table">
@@ -64,7 +64,11 @@
             </td>
 
             <td class="incidents">
-              <span>{{ pd.incidents }}</span>
+              <a ng-if="pd.incidents && hasSearchPlugin"
+                 ng-click="onIncidentsClick(pd.key)">
+                {{ pd.incidents }}
+              </a>
+              <span ng-if="!pd.incidents || !hasSearchPlugin">{{ pd.incidents }}</span>
             </td>
 
             <td ng-if="pd.instances >= 0" class="instances">
