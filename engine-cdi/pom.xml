@@ -15,18 +15,7 @@
 
   <modules>
     <module>core</module>
+    <module>jakarta</module>
   </modules>
-
-  <profiles>
-    <profile>
-      <id>jdk11</id>
-      <activation>
-        <jdk>[11,)</jdk>
-      </activation>
-      <modules>
-        <module>jakarta</module>
-      </modules>
-    </profile>
-  </profiles>
 
 </project>

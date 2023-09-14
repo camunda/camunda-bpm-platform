@@ -898,31 +898,6 @@
         </pluginManagement>
       </build>
     </profile>
-    
-    <profile>
-      <id>below-java11</id>
-      <activation>
-        <jdk>(,11)</jdk>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <artifactId>maven-compiler-plugin</artifactId>
-              <configuration>
-                <!-- Jakarta-based classes can only be used with JDK 11+ -->
-                <excludes combine.children="append">
-                  <exclude>**/Jakarta*.java</exclude>
-                </excludes>
-                <testExcludes>
-                  <exclude>**/Jakarta*.java</exclude>
-                </testExcludes>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
 
     <!-- test profiles -->
     <profile>
