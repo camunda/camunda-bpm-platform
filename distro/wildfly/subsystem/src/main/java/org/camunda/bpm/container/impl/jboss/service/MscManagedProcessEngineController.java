@@ -286,10 +286,6 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     return processEngine;
   }
 
-  public Supplier<ExecutorService> getExecutorInjector() {
-    return executorSupplier;
-  }
-
   public ManagedProcessEngineMetadata getProcessEngineMetadata() {
     return processEngineMetadata;
   }
