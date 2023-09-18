@@ -15,6 +15,7 @@
         <property name="jobExecutorAcquireByDueDate">true</property>
         <property name="jdbcMaxActiveConnections">5</property>
         <property name="dmnEnabled">false</property>
+        <property name="enforceHistoryTimeToLive">false</property>
     </properties>
     
   </process-engine>

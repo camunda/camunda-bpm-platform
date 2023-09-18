@@ -38,6 +38,7 @@
     <property name="jdbcBatchProcessing" value="${jdbcBatchProcessing}"/>
 
     <property name="generalResourceWhitelistPattern" value=".+"/>
+    <property name="enforceHistoryTimeToLive" value="false" />
 
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 

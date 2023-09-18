@@ -4,6 +4,7 @@
 
   <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
     <property name="history" value="full"/>
+    <property name="enforceHistoryTimeToLive" value="false" />
   </bean>
 
 </beans>

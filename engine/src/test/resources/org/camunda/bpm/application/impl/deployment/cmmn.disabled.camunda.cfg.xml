@@ -27,6 +27,8 @@
 
     <property name="cmmnEnabled" value="false" />
 
+    <property name="enforceHistoryTimeToLive" value="false" />
+
   </bean>
 
 </beans>

@@ -7,6 +7,7 @@
         <property name="history" value="full" />
         <property name="databaseSchemaUpdate" value="true" />
         <property name="jobExecutorActivate" value="false" />
+        <property name="enforceHistoryTimeToLive" value="false" />
         <property name="idGenerator">
             <bean class="org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator"/>
         </property>

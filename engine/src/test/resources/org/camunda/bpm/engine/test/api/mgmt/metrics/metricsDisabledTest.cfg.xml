@@ -23,6 +23,7 @@
     <property name="telemetryReporterActivate" value="false" />
     <property name="metricsEnabled" value="false" />
     <property name="taskMetricsEnabled" value="false" />
+    <property name="enforceHistoryTimeToLive" value="false" />
 
   </bean>
 

@@ -39,6 +39,7 @@
 
     <property name="historyCleanupBatchWindowStartTime" value="16:00" />
     <property name="historyCleanupDegreeOfParallelism" value="8" />
+    <property name="enforceHistoryTimeToLive" value="false" />
 
   </bean>
 

@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
 import org.camunda.bpm.engine.RepositoryService;
@@ -46,6 +45,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -75,10 +75,17 @@ public class RedeploymentTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   protected RepositoryService repositoryService;
+  protected boolean enforceHistoryTimeToLive;
 
   @Before
   public void setUp() {
     repositoryService = engineRule.getRepositoryService();
+    enforceHistoryTimeToLive = engineRule.getProcessEngineConfiguration().isEnforceHistoryTimeToLive();
+  }
+
+  @After
+  public void tearDown() {
+    engineRule.getProcessEngineConfiguration().setEnforceHistoryTimeToLive(enforceHistoryTimeToLive);
   }
 
   @Test

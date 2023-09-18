@@ -923,6 +923,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected String historyTimeToLive;
 
+  /**
+   * Feature flag that fails the deployment of process, decision, and case resources if their historyTimeToLive is {@code null}.
+   */
+  protected boolean enforceHistoryTimeToLive = true;
+
   protected String batchOperationHistoryTimeToLive;
   protected Map<String, String> batchOperationsForHistoryCleanup;
   protected Map<String, Integer> parsedBatchOperationsForHistoryCleanup;
@@ -4932,6 +4937,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setHistoryTimeToLive(String historyTimeToLive) {
     this.historyTimeToLive = historyTimeToLive;
+  }
+
+  public boolean isEnforceHistoryTimeToLive() {
+    return enforceHistoryTimeToLive;
+  }
+
+  public ProcessEngineConfigurationImpl setEnforceHistoryTimeToLive(boolean enforceHistoryTimeToLive) {
+    this.enforceHistoryTimeToLive = enforceHistoryTimeToLive;
+    return this;
   }
 
   public String getBatchOperationHistoryTimeToLive() {
