@@ -117,6 +117,7 @@ module.exports = {
   plugins: [
     new HtmlWebPackPlugin({
       minify: false,
+      inject: false,
       appName: 'cockpit',
       template: path.resolve(__dirname, 'ui/cockpit/client/scripts/index.html'),
       filename: 'app/cockpit/index.html',
@@ -127,6 +128,7 @@ module.exports = {
     }),
     new HtmlWebPackPlugin({
       minify: false,
+      inject: false,
       appName: 'tasklist',
       template: path.resolve(__dirname, 'ui/tasklist/client/index.html'),
       filename: 'app/tasklist/index.html',
@@ -137,6 +139,7 @@ module.exports = {
     }),
     new HtmlWebPackPlugin({
       minify: false,
+      inject: false,
       appName: 'admin',
       template: path.resolve(__dirname, 'ui/admin/client/scripts/index.html'),
       filename: 'app/admin/index.html',
@@ -147,6 +150,7 @@ module.exports = {
     }),
     new HtmlWebPackPlugin({
       minify: false,
+      inject: false,
       appName: 'welcome',
       template: path.resolve(__dirname, 'ui/welcome/client/scripts/index.html'),
       filename: 'app/welcome/index.html',

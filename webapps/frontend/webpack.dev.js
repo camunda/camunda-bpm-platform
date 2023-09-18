@@ -150,7 +150,7 @@ module.exports = (_env, argv = {}) => {
         ...options,
         publicPath: '/camunda',
         appRoot: '/camunda',
-        base: `/camunda/app/${options['appName']}/{ENGINE}/`,
+        appBase: `/camunda/app/${options['appName']}/{ENGINE}/`,
         pluginDeps: getPluginDeps(options['appName']),
         pluginPackages: getPluginPackages(options['appName'])
       };

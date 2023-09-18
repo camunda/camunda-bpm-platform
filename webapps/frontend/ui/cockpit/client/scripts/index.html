@@ -16,7 +16,7 @@
           content="camunda services GmbH" />
 
     <!-- settings the base path for relative links -->
-    <base href="<%= htmlWebpackPlugin.options.base %>"
+    <base href="<%= htmlWebpackPlugin.options.appBase %>"
           admin-api="<%= htmlWebpackPlugin.options.appRoot %>/api/admin/"
           cockpit-api="<%= htmlWebpackPlugin.options.appRoot %>/api/cockpit/"
           tasklist-api="<%= htmlWebpackPlugin.options.appRoot %>/api/tasklist/"
@@ -36,6 +36,8 @@
           app-root="$APP_ROOT"
           cam-exclude-plugins="cockpit.dashboard:process-definition-tiles" />
     -->
+
+    <%= htmlWebpackPlugin.tags.headTags %>
 
     <link rel="stylesheet"
           type="text/css"
