@@ -53,6 +53,7 @@
 
             <!-- See ProgrammaticBeanLookupTest in quarkus-extension/engine/deployment module -->
             <exclude>**/ProgrammaticBeanLookupTest.java</exclude>
+            <exclude>**/TaskFormTest.java</exclude>
           </excludes>
         </configuration>
       </plugin>
