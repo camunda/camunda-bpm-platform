@@ -25,7 +25,7 @@ import java.io.StringWriter;
 public final class StringUtil {
 
   /**
-   * Checks whether a {@link String} seams to be an expression or not
+   * Checks whether a String seams to be an expression or not
    *
    * @param text the text to check
    * @return true if the text seams to be an expression false otherwise
@@ -39,7 +39,7 @@ public final class StringUtil {
   }
 
   /**
-   * Splits a {@link String} by an expression.
+   * Splits a String by an expression.
    *
    * @param text the text to split
    * @param regex the regex to split by
@@ -86,7 +86,7 @@ public final class StringUtil {
     }
     return stringBuilder.toString();
   }
-  
+
   /**
    * Returns either the passed in String, or if the String is <code>null</code>, an empty String ("").
    *
@@ -102,10 +102,10 @@ public final class StringUtil {
   public static String defaultString(String text) {
       return text == null ? "" : text;
   }
-  
+
   /**
    * Fetches the stack trace of an exception as a String.
-   * 
+   *
    * @param throwable to get the stack trace from
    * @return the stack trace as String
    */
