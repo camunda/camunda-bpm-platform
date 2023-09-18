@@ -424,7 +424,8 @@ public class HttpRequestConfigTest {
     } catch (ConnectorRequestException e) {
       // then
       assertThat(e).hasMessageContaining("Invalid value for request configuration option: " + CONNECTION_TIMEOUT.getName());
-      assertThat(e).hasCause(new ClassCastException("java.lang.String cannot be cast to java.lang.Integer"));
+      assertThat(e).hasCauseInstanceOf(ClassCastException.class);
+      assertThat(e.getCause()).hasMessageContaining("java.lang.String cannot be cast to class java.lang.Integer");
     }
   }
 
@@ -438,7 +439,8 @@ public class HttpRequestConfigTest {
     } catch (ConnectorRequestException e) {
       // then
       assertThat(e).hasMessageContaining("Invalid value for request configuration option: " + AUTHENTICATION_ENABLED.getName());
-      assertThat(e).hasCause(new ClassCastException("java.lang.String cannot be cast to java.lang.Boolean"));
+      assertThat(e).hasCauseInstanceOf(ClassCastException.class);
+      assertThat(e.getCause()).hasMessageContaining("java.lang.String cannot be cast to class java.lang.Boolean");
     }
   }
 
@@ -452,7 +454,8 @@ public class HttpRequestConfigTest {
     } catch (ConnectorRequestException e) {
       // then
       assertThat(e).hasMessageContaining("Invalid value for request configuration option: " + PROXY.getName());
-      assertThat(e).hasCause(new ClassCastException("java.lang.String cannot be cast to org.apache.http.HttpHost"));
+      assertThat(e).hasCauseInstanceOf(ClassCastException.class);
+      assertThat(e.getCause()).hasMessageContaining("java.lang.String cannot be cast to class org.apache.http.HttpHost");
     }
   }
 
@@ -466,7 +469,8 @@ public class HttpRequestConfigTest {
     } catch (ConnectorRequestException e) {
       // then
       assertThat(e).hasMessageContaining("Invalid value for request configuration option: " + PROXY_PREFERRED_AUTH_SCHEMES.getName());
-      assertThat(e).hasCause(new ClassCastException("java.lang.Integer cannot be cast to java.util.Collection"));
+      assertThat(e).hasCauseInstanceOf(ClassCastException.class);
+      assertThat(e.getCause()).hasMessageContaining("java.lang.Integer cannot be cast to class java.util.Collection");
     }
   }
 

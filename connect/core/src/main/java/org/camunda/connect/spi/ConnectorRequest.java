@@ -25,12 +25,12 @@ import java.util.Map;
  *
  * <p>The parameters of a request can be provided using the generic map of input
  * parameters. See ({@link #setRequestParameters(Map)}):
- * <pre>
+ * <code>
  *  SomeConnectorRequest req = connector.createRequest();
  *  req.setRequestParameter("endpointUrl", "http://mysystem.loc/foo");
  *  req.setRequestParameter("payload", "some important payload");
  *  req.execute();
- * </pre>
+ * </code>
  * This makes it possible to use the connector in a generic / configurable system like
  * the camunda process engine.
  * </p>
@@ -38,12 +38,12 @@ import java.util.Map;
  * <p>Optionally, a connector may also extend the request interface and provide
  * dedicated (type-safe) methods for configuring a request, preferably in a
  * fluent API fashion:
- * <pre>
+ * <code>
  *  connector.createRequest()
  *    .endpointUrl("http://mysystem.loc/foo")
  *    .payload("some important payload")
  *    .execute();
- * </pre>
+ * </code>
  * This makes it easy to use the connector in a standalone way.
  * </p>
  *
