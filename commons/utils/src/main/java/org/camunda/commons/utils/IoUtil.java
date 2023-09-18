@@ -30,20 +30,20 @@ public class IoUtil {
   public static final Charset ENCODING_CHARSET = Charset.forName("UTF-8");
 
   /**
-   * Returns the input stream as {@link String}.
+   * Returns the input stream as String.
    *
    * @param inputStream the input stream
-   * @return the input stream as {@link String}.
+   * @return the input stream as String.
    */
   public static String inputStreamAsString(InputStream inputStream) {
     return new String(inputStreamAsByteArray(inputStream), ENCODING_CHARSET);
   }
 
   /**
-   * Returns the input stream as {@link byte[]}.
+   * Returns the input stream as byte[].
    *
    * @param inputStream the input stream
-   * @return the input stream as {@link byte[]}.
+   * @return the input stream as byte[].
    */
   public static byte[] inputStreamAsByteArray(InputStream inputStream) {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -61,12 +61,12 @@ public class IoUtil {
       closeSilently(inputStream);
     }
   }
-  
+
   /**
-   * Returns the {@link Reader} content as {@link String}.
+   * Returns the Reader content as String.
    *
-   * @param reader the {@link Reader}
-   * @return the {@link Reader} content as {@link String}
+   * @param reader the Reader
+   * @return the Reader content as String
    */
   public static String readerAsString(Reader reader) {
     StringBuilder buffer = new StringBuilder();
@@ -86,10 +86,10 @@ public class IoUtil {
   }
 
   /**
-   * Returns the {@link String} as {@link InputStream}.
+   * Returns the String as InputStream.
    *
-   * @param string the {@link String} to convert
-   * @return the {@link InputStream} containing the {@link String}
+   * @param string the String to convert
+   * @return the InputStream containing the String
    */
   public static InputStream stringAsInputStream(String string) {
     return new ByteArrayInputStream(string.getBytes(ENCODING_CHARSET));
@@ -114,7 +114,7 @@ public class IoUtil {
    * Returns the content of a file with specified filename
    *
    * @param filename name of the file to load
-   * @return Content of the file as {@link String}
+   * @return Content of the file as String
    */
   public static String fileAsString(String filename) {
     File classpathFile = getClasspathFile(filename);
@@ -122,10 +122,10 @@ public class IoUtil {
   }
 
   /**
-   * Returns the content of a {@link File}.
+   * Returns the content of a File.
    *
    * @param file the file to load
-   * @return Content of the file as {@link String}
+   * @return Content of the file as String
    */
   public static String fileAsString(File file) {
     try {
@@ -136,10 +136,10 @@ public class IoUtil {
   }
 
   /**
-   * Returns the content of a {@link File}.
+   * Returns the content of a File.
    *
    * @param file the file to load
-   * @return Content of the file as {@link String}
+   * @return Content of the file as String
    */
   public static byte[] fileAsByteArray(File file) {
     try {
@@ -149,11 +149,11 @@ public class IoUtil {
     }
   }
 
-  
+
   /**
    * Returns the input stream of a file with specified filename
    *
-   * @param filename the name of a {@link File} to load
+   * @param filename the name of a File to load
    * @return the file content as input stream
    * @throws IoUtilException if the file cannot be loaded
    */
@@ -165,7 +165,7 @@ public class IoUtil {
   /**
    * Returns the input stream of a file.
    *
-   * @param file the {@link File} to load
+   * @param file the File to load
    * @return the file content as input stream
    * @throws IoUtilException if the file cannot be loaded
    */
@@ -178,7 +178,7 @@ public class IoUtil {
   }
 
   /**
-   * Returns the {@link File} for a filename.
+   * Returns the File for a filename.
    *
    * @param filename the filename to load
    * @return the file object
@@ -192,7 +192,7 @@ public class IoUtil {
   }
 
   /**
-   * Returns the {@link File} for a filename.
+   * Returns the File for a filename.
    *
    * @param filename the filename to load
    * @param classLoader the classLoader to load file with, if null falls back to TCCL and then this class's classloader
