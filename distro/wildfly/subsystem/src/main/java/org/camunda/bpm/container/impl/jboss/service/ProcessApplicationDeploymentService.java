@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,7 +66,6 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
   protected final Supplier<ProcessApplicationInterface> noViewProcessApplicationSupplier;
   // for view-exposing ProcessApplicationComponents
   protected final Supplier<ComponentView> paComponentViewSupplier;
-  Consumer<ProcessApplicationDeploymentService> deploymentServiceConsumer;
 
   /** the map of deployment resources obtained  through scanning */
   protected final Map<String,byte[]> deploymentMap;
@@ -86,8 +84,7 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
       Supplier<ExecutorService> executorSupplier,
       Supplier<ProcessEngine> processEngineInjector,
       Supplier<ProcessApplicationInterface> noViewProcessApplication,
-      Supplier<ComponentView> paComponentView,
-      Consumer<ProcessApplicationDeploymentService> deploymentServiceConsumer) {
+      Supplier<ComponentView> paComponentView) {
     this.deploymentMap = deploymentMap;
     this.processArchive = processArchive;
     this.module = module;
@@ -95,11 +92,9 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
     this.processEngineSupplier = processEngineInjector;
     this.noViewProcessApplicationSupplier = noViewProcessApplication;
     this.paComponentViewSupplier = paComponentView;
-    this.deploymentServiceConsumer = deploymentServiceConsumer;
   }
 
   public void start(final StartContext context) throws StartException {
-    deploymentServiceConsumer.accept(this);
     context.asynchronous();
     executorSupplier.get().submit(new Runnable() {
       public void run() {
@@ -116,7 +111,6 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
   }
 
   public void stop(final StopContext context) {
-    deploymentServiceConsumer.accept(null);
 
     context.asynchronous();
     executorSupplier.get().submit(new Runnable() {

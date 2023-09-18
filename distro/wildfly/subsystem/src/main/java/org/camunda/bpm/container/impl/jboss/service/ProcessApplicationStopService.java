@@ -17,10 +17,10 @@
 package org.camunda.bpm.container.impl.jboss.service;
 
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugin;
 import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugins;
@@ -30,6 +30,7 @@ import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
+import org.jboss.msc.value.InjectedValue;
 
 /**
  * Responsible for invoking {@link BpmPlatformPlugin#postProcessApplicationUndeploy(ProcessApplicationInterface)}
@@ -46,16 +47,18 @@ public class ProcessApplicationStopService implements Service<ProcessApplication
   protected final Supplier<ComponentView> paComponentViewSupplier;
   protected final Supplier<ProcessApplicationInterface> noViewApplicationSupplier;
   protected final Supplier<BpmPlatformPlugins> platformPluginsSupplier;
-  protected final Consumer<ProcessApplicationStopService> processApplicationStopServiceConsumer;
+  protected InjectedValue<ComponentView> paComponentViewInjector = new InjectedValue<ComponentView>();
+  protected InjectedValue<ProcessApplicationInterface> noViewProcessApplication = new InjectedValue<ProcessApplicationInterface>();
+
+  protected InjectedValue<BpmPlatformPlugins> platformPluginsInjector = new InjectedValue<BpmPlatformPlugins>();
 
   public ProcessApplicationStopService(Supplier<ComponentView> paComponentViewSupplier,
       Supplier<ProcessApplicationInterface> noViewApplicationSupplier,
-      Supplier<BpmPlatformPlugins> platformPluginsSupplier,
-      Consumer<ProcessApplicationStopService> processApplicationStopServiceConsumer) {
+      Supplier<BpmPlatformPlugins> platformPluginsSupplier
+      ) {
     this.paComponentViewSupplier = paComponentViewSupplier;
     this.noViewApplicationSupplier = noViewApplicationSupplier;
     this.platformPluginsSupplier = platformPluginsSupplier;
-    this.processApplicationStopServiceConsumer = processApplicationStopServiceConsumer;
   }
 
   @Override
@@ -65,13 +68,11 @@ public class ProcessApplicationStopService implements Service<ProcessApplication
 
   @Override
   public void start(StartContext arg0) throws StartException {
-    processApplicationStopServiceConsumer.accept(this);
   }
 
   @Override
   public void stop(StopContext arg0) {
 
-    processApplicationStopServiceConsumer.accept(null);
 
     ManagedReference reference = null;
     try {

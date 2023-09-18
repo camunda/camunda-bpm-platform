@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -90,7 +89,6 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
 
   protected final Supplier<BpmPlatformPlugins> platformPluginsSupplier;
 
-  protected final Consumer<ProcessApplicationStartService> paStartServiceConsumer;
 
   protected AnnotationInstance preUndeployDescription;
   protected AnnotationInstance postDeployDescription;
@@ -108,8 +106,8 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       Supplier<ComponentView> paComponentViewSupplier,
       Supplier<ProcessApplicationInterface> noViewProcessApplication,
       Supplier<ProcessEngine> defaultProcessEngineSupplier,
-      Supplier<BpmPlatformPlugins> platformPluginsSupplier,
-      Consumer<ProcessApplicationStartService> paStartServiceConsumer) {
+      Supplier<BpmPlatformPlugins> platformPluginsSupplier
+      ) {
     this.deploymentServiceNames = deploymentServiceNames;
     this.postDeployDescription = postDeployDescription;
     this.preUndeployDescription = preUndeployDescription;
@@ -118,12 +116,10 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     this.noViewProcessApplication = noViewProcessApplication;
     this.defaultProcessEngineSupplier = defaultProcessEngineSupplier;
     this.platformPluginsSupplier = platformPluginsSupplier;
-    this.paStartServiceConsumer = paStartServiceConsumer;
   }
 
   @Override
   public void start(StartContext context) throws StartException {
-    paStartServiceConsumer.accept(this);
 
     ManagedReference reference = null;
     try {
@@ -197,7 +193,6 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
 
   @Override
   public void stop(StopContext context) {
-    paStartServiceConsumer.accept(null);
 
     ManagedReference reference = null;
     try {
