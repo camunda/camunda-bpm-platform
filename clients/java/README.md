@@ -24,8 +24,8 @@ The **Camunda External Task Client (Java)** allows to set up remote Service Task
 * The topic subscription can be configured with the fluent api of the [TopicSubscriptionBuilder](client/src/main/java/org/camunda/bpm/client/topic/TopicSubscriptionBuilder.java).
 
 ## Prerequisites
-* Oracle Hotspot v1.8+ (JDK 8)
-* Camunda BPM Platform 7.9.0+
+* Java (supported version by the used Camunda Platform 7)
+* Camunda Platform 7
 
 ## Maven coordinates
 The following Maven coordinate needs to be added to the projects `pom.xml`:
@@ -34,16 +34,6 @@ The following Maven coordinate needs to be added to the projects `pom.xml`:
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-external-task-client</artifactId>
   <version>${version}</version>
-</dependency>
-```
-
-### JDK 9+ Support
-If you want to use a JDK higher than 1.8, please add the following dependency to the projects `pom.xml`:
-```xml
-<dependency>
-  <groupId>com.sun.xml.bind</groupId>
-  <artifactId>jaxb-impl</artifactId>
-  <version>2.2.4</version>
 </dependency>
 ```
 

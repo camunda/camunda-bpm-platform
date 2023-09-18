@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda</groupId>
     <artifactId>camunda-bpm-release-parent</artifactId>
-    <version>2.2.7</version>
+    <version>2.3.0</version>
     <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
     <relativePath />
   </parent>
@@ -33,7 +33,6 @@
     <version.camunda.spin>1.21.0</version.camunda.spin>
     <version.camunda.freemarker.template.engine>2.1.0</version.camunda.freemarker.template.engine>
     <version.feel-scala>1.15.3</version.feel-scala>
-    <plugin.version.javadoc>3.0.1</plugin.version.javadoc>
   </properties>
 
   <build>
