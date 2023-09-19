@@ -75,10 +75,10 @@ public class ProcessApplicationStopService implements Service<ProcessApplication
 
 
     ManagedReference reference = null;
+    ProcessApplicationInterface processApplication = null;
     try {
 
       // get the process application component
-      ProcessApplicationInterface processApplication = null;
       if(paComponentViewSupplier != null) {
         ComponentView componentView = paComponentViewSupplier.get();
         reference = componentView.createInstance();
@@ -103,6 +103,9 @@ public class ProcessApplicationStopService implements Service<ProcessApplication
     finally {
       if(reference != null) {
         reference.release();
+      }
+      if (processApplication != null ) {
+        processApplication = null;
       }
     }
   }
