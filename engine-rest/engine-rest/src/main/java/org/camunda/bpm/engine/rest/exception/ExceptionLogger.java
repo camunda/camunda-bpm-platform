@@ -64,7 +64,7 @@ public class ExceptionLogger extends BaseLogger {
       return false;
     }
 
-    SQLException sqlException = getSecondCause((ProcessEnginePersistenceException) throwable);
+    SQLException sqlException = getSqlException((ProcessEnginePersistenceException) throwable);
 
     if (sqlException == null) {
       return false;
@@ -77,10 +77,13 @@ public class ExceptionLogger extends BaseLogger {
 
   protected SQLException getSqlException(ProcessEnginePersistenceException e) {
     boolean hasTwoCauses = e.getCause() != null && e.getCause().getCause() != null;
+
     if (!hasTwoCauses) {
       return null;
     }
+
     Throwable cause = e.getCause().getCause();
+
     return cause instanceof SQLException ? (SQLException) cause : null;
   }
 
