@@ -3,7 +3,7 @@
   <bpmn2:collaboration id="_Collaboration_3">
     <bpmn2:participant id="process-with-sub-process" name="Process with Sub-Process" processRef="processWithSubProcess"/>
   </bpmn2:collaboration>
-  <bpmn2:process id="processWithSubProcess" isExecutable="true">
+  <bpmn2:process id="processWithSubProcess" isExecutable="true" camunda:historyTimeToLive="P180D">
     <bpmn2:startEvent id="StartEvent_1" name="Start Event">
       <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
     </bpmn2:startEvent>
