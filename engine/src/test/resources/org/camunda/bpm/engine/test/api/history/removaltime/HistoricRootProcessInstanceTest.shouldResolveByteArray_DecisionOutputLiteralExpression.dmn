@@ -2,9 +2,10 @@
 <definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
              id="definitions"
              name="Definitions"
+             xmlns:camunda="http://camunda.org/schema/1.0/dmn"
              namespace="http://camunda.org/schema/1.0/dmn">
 
-  <decision id="testDecision" name="Decision with Literal Expression">
+  <decision id="testDecision" name="Decision with Literal Expression" camunda:historyTimeToLive="5">
     <variable name="result" typeRef="bytes" />
     <literalExpression>
       <text>pojo</text>

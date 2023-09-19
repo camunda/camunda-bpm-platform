@@ -2,9 +2,10 @@
 <definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
              id="definitions"
              name="camunda"
+             xmlns:camunda="http://camunda.org/schema/1.0/dmn"
              namespace="http://camunda.org/schema/1.0/dmn">
  
-  <decision id="decision" name="Check Order">
+  <decision id="decision" name="Check Order" camunda:historyTimeToLive="P180D">
     <decisionTable id="decisionTable">
 
       <input id="clause1" label="CustomerStatus">

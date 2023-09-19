@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             xmlns:camunda="http://camunda.org/schema/1.0/dmn"
              id="definitions-two"
              name="camunda"
              namespace="xyz_">
-  <decision id="xyz_" name="Xyz_">
+  <decision id="xyz_" name="Xyz_" camunda:historyTimeToLive="5">
     <decisionTable id="decisionTable">
       <input id="clause1" label="Input">
         <inputExpression id="inputExpression1" typeRef="string">
