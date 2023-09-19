@@ -38,7 +38,7 @@ public class ClassloadingDuringJobExecutionTest extends AbstractFoxPlatformInteg
   protected static String process =
       "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" +
       "<definitions xmlns=\"http://www.omg.org/spec/BPMN/20100524/MODEL\" xmlns:camunda=\"http://camunda.org/schema/1.0/bpmn\" targetNamespace=\"Examples\">\r\n" +
-      "  <process id=\"Process_1\" name=\"ServiceTask_Throw_BMPN_Error\" isExecutable=\"true\" historyTimeToLive=\"P180D\">\r\n" +
+      "  <process id=\"Process_1\" name=\"ServiceTask_Throw_BMPN_Error\" isExecutable=\"true\" camunda:historyTimeToLive=\"P180D\">\r\n" +
       "    <startEvent id=\"StartEvent_1\">\r\n" +
       "    </startEvent>\r\n" +
       "    <sequenceFlow id=\"SequenceFlow_03wj6bv\" sourceRef=\"StartEvent_1\" targetRef=\"Task_1bkcm2v\" />\r\n" +
