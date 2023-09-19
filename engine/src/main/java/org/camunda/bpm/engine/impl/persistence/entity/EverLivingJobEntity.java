@@ -41,13 +41,13 @@ public class EverLivingJobEntity extends JobEntity {
   @Override
   protected void postExecute(CommandContext commandContext) {
     LOG.debugJobExecuted(this);
-    init(commandContext, false, true);
+    init(commandContext);
     commandContext.getHistoricJobLogManager().fireJobSuccessfulEvent(this);
   }
 
   @Override
   public void init(CommandContext commandContext) {
-    init(commandContext, false, false);
+    init(commandContext, false, true);
   }
 
   @Override

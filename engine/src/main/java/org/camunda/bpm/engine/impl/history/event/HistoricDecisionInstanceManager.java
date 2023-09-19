@@ -313,22 +313,22 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
       Set<String> entities) {
     Map<Class<? extends DbEntity>, DbOperation> updateOperations = new HashMap<>();
 
-    if (entities == null || entities.isEmpty()
-        || entities.contains(HistoricDecisionInstanceEntity.class.getName())
-        || entities.contains(HistoricDecisionInputInstanceEntity.class.getName())
-        || entities.contains(HistoricDecisionOutputInstanceEntity.class.getName())) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("rootProcessInstanceId", rootProcessInstanceId);
+    parameters.put("removalTime", removalTime);
+    parameters.put("maxResults", batchSize);
 
-      Map<String, Object> parameters = new HashMap<>();
-      parameters.put("rootProcessInstanceId", rootProcessInstanceId);
-      parameters.put("removalTime", removalTime);
-      parameters.put("maxResults", batchSize);
-
+    if (isPerformUpdate(entities, HistoricDecisionInstanceEntity.class)) {
       addOperation(getDbEntityManager().updatePreserveOrder(HistoricDecisionInstanceEntity.class,
           "updateHistoricDecisionInstancesByRootProcessInstanceId", parameters), updateOperations);
+    }
 
+    if (isPerformUpdate(entities, HistoricDecisionInputInstanceEntity.class)) {
       addOperation(getDbEntityManager().updatePreserveOrder(HistoricDecisionInputInstanceEntity.class,
           "updateHistoricDecisionInputInstancesByRootProcessInstanceId", parameters), updateOperations);
+    }
 
+    if (isPerformUpdate(entities, HistoricDecisionOutputInstanceEntity.class)) {
       addOperation(getDbEntityManager().updatePreserveOrder(HistoricDecisionOutputInstanceEntity.class,
           "updateHistoricDecisionOutputInstancesByRootProcessInstanceId", parameters), updateOperations);
     }
@@ -346,22 +346,22 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
       Set<String> entities) {
     Map<Class<? extends DbEntity>, DbOperation> updateOperations = new HashMap<>();
 
-    if (entities == null || entities.isEmpty()
-        || entities.contains(HistoricDecisionInstanceEntity.class.getName())
-        || entities.contains(HistoricDecisionInputInstanceEntity.class.getName())
-        || entities.contains(HistoricDecisionOutputInstanceEntity.class.getName())) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("processInstanceId", processInstanceId);
+    parameters.put("removalTime", removalTime);
+    parameters.put("maxResults", batchSize);
 
-      Map<String, Object> parameters = new HashMap<>();
-      parameters.put("processInstanceId", processInstanceId);
-      parameters.put("removalTime", removalTime);
-      parameters.put("maxResults", batchSize);
-
+    if (isPerformUpdate(entities, HistoricDecisionInstanceEntity.class)) {
       addOperation(getDbEntityManager().updatePreserveOrder(HistoricDecisionInstanceEntity.class,
           "updateHistoricDecisionInstancesByProcessInstanceId", parameters), updateOperations);
+    }
 
+    if (isPerformUpdate(entities, HistoricDecisionInputInstanceEntity.class)) {
       addOperation(getDbEntityManager().updatePreserveOrder(HistoricDecisionInputInstanceEntity.class,
           "updateHistoricDecisionInputInstancesByProcessInstanceId", parameters), updateOperations);
+    }
 
+    if (isPerformUpdate(entities, HistoricDecisionOutputInstanceEntity.class)) {
       addOperation(getDbEntityManager().updatePreserveOrder(HistoricDecisionOutputInstanceEntity.class,
           "updateHistoricDecisionOutputInstancesByProcessInstanceId", parameters), updateOperations);
     }
@@ -444,10 +444,6 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
     deleteOperations.put(HistoricDecisionInstanceEntity.class, deleteDecisionInstances);
 
     return deleteOperations;
-  }
-
-  protected static void addOperation(DbOperation operation, Map<Class<? extends DbEntity>, DbOperation> operations) {
-    operations.put(operation.getEntityType(), operation);
   }
 
   protected static boolean isEnableHistoricInstancePermissions() {

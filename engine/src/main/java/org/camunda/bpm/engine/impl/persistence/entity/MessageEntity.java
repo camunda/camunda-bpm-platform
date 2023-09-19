@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 
 
 /**
- * NOTE: instances of Messge Entity should be created via {@link MessageJobDeclaration}.
+ * NOTE: instances of Message Entity should be created via {@link MessageJobDeclaration}.
  *
  * @author Tom Baeyens
  */

@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -469,21 +468,5 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
   protected static boolean isEnableHistoricInstancePermissions() {
     return Context.getProcessEngineConfiguration()
         .isEnableHistoricInstancePermissions();
-  }
-
-  protected static void addOperation(DbOperation operation, Map<Class<? extends DbEntity>, DbOperation> operations) {
-    operations.put(operation.getEntityType(), operation);
-  }
-
-  protected static void addOperation(Collection<DbOperation> newOperations, Map<Class<? extends DbEntity>, DbOperation> operations) {
-    newOperations.forEach(operation -> operations.put(operation.getEntityType(), operation));
-  }
-
-  protected static boolean isPerformUpdate(Set<String> entities, Class<?> entityClass) {
-    return entities == null || entities.isEmpty() || entities.contains(entityClass.getName());
-  }
-
-  protected static boolean isPerformUpdateOnly(Set<String> entities, Class<?> entityClass) {
-    return entities != null && entities.size() == 1 && entities.contains(entityClass.getName());
   }
 }

@@ -60,7 +60,7 @@ public class ProcessSetRemovalTimeResultHandler implements TransactionListener {
     // use the new command executor since the command context might already have been closed/finished
     commandExecutor.execute(context -> {
         JobEntity job = context.getJobManager().findJobById(jobId);
-        Set<String> entitiesToUpdate = getEntitiesToUpdate(operations, chunkSize, commandContext);
+        Set<String> entitiesToUpdate = getEntitiesToUpdate(operations, chunkSize);
         if (entitiesToUpdate.isEmpty() && !operations.containsKey(HistoricProcessInstanceEventEntity.class)) {
           // update the process instance last to avoid orphans
           entitiesToUpdate = new HashSet<>();
@@ -88,12 +88,10 @@ public class ProcessSetRemovalTimeResultHandler implements TransactionListener {
     return configurationEntity;
   }
 
-  protected static Set<String> getEntitiesToUpdate(Map<Class<? extends DbEntity>, DbOperation> operations,
-      int chunkSize,
-      CommandContext commandContext) {
+  protected static Set<String> getEntitiesToUpdate(Map<Class<? extends DbEntity>, DbOperation> operations, int chunkSize) {
     return operations.entrySet().stream()
         .filter(op -> op.getValue().getRowsAffected() == chunkSize)
-        .map(e -> e.getKey().getName())
+        .map(op -> op.getKey().getName())
         .collect(Collectors.toSet());
   }
 }
