@@ -75,10 +75,13 @@ public class ExceptionLogger extends BaseLogger {
     return sqlState != null && sqlState.startsWith(PERSISTENCE_CONNECTION_ERROR_CLASS);
   }
 
-  protected SQLException getSecondCause(ProcessEnginePersistenceException e) {
+  protected SQLException getSqlException(ProcessEnginePersistenceException e) {
     boolean hasTwoCauses = e.getCause() != null && e.getCause().getCause() != null;
-
-    return hasTwoCauses ? (SQLException) e.getCause().getCause() : null;
+    if (!hasTwoCauses) {
+      return null;
+    }
+    Throwable cause = e.getCause().getCause();
+    return cause instanceOf SQLException ? (SQLException) cause : null;
   }
 
 }
