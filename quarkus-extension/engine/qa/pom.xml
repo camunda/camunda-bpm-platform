@@ -16,6 +16,14 @@
 
   <dependencyManagement>
     <dependencies>
+      <!-- Add Quarkus BOM to fix Maven artifact dependencies overriden by Arquillian BOM -->
+      <dependency>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-bom</artifactId>
+        <version>${version.quarkus}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <dependency>
         <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-core-internal-dependencies</artifactId>
