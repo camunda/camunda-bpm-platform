@@ -7,7 +7,7 @@
 
   <message id="message" name="Message" />
 
-  <process id="intermediateMessageProcess" isExecutable="true">
+  <process id="intermediateMessageProcess" isExecutable="true" camunda:historyTimeToLive="5">
 
     <startEvent id="start" />
     <sequenceFlow sourceRef="start" targetRef="messageEvent" />

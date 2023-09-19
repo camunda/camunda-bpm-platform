@@ -6,7 +6,7 @@
 
   <signal id="alertSignal" name="alert" />
 
-  <process id="catchSignal" isExecutable="true">
+  <process id="catchSignal" isExecutable="true" camunda:historyTimeToLive="5">
 
     <startEvent id="start" />
 

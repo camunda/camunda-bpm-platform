@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions"
              xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-             targetNamespace="Examples">
+             targetNamespace="Examples"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn">
+
 
   <message id="myMessage" name="Test Message" />
 
-  <process id="testProcess" isExecutable="true">
+  <process id="testProcess" isExecutable="true" camunda:historyTimeToLive="5">
 
     <startEvent id="start" />
 
