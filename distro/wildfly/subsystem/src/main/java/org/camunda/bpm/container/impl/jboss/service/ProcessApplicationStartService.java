@@ -106,8 +106,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       Supplier<ComponentView> paComponentViewSupplier,
       Supplier<ProcessApplicationInterface> noViewProcessApplication,
       Supplier<ProcessEngine> defaultProcessEngineSupplier,
-      Supplier<BpmPlatformPlugins> platformPluginsSupplier
-      ) {
+      Supplier<BpmPlatformPlugins> platformPluginsSupplier) {
     this.deploymentServiceNames = deploymentServiceNames;
     this.postDeployDescription = postDeployDescription;
     this.preUndeployDescription = preUndeployDescription;

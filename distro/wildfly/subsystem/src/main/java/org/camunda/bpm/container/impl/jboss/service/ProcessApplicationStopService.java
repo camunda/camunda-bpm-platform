@@ -54,8 +54,7 @@ public class ProcessApplicationStopService implements Service<ProcessApplication
 
   public ProcessApplicationStopService(Supplier<ComponentView> paComponentViewSupplier,
       Supplier<ProcessApplicationInterface> noViewApplicationSupplier,
-      Supplier<BpmPlatformPlugins> platformPluginsSupplier
-      ) {
+      Supplier<BpmPlatformPlugins> platformPluginsSupplier) {
     this.paComponentViewSupplier = paComponentViewSupplier;
     this.noViewApplicationSupplier = noViewApplicationSupplier;
     this.platformPluginsSupplier = platformPluginsSupplier;
@@ -68,11 +67,11 @@ public class ProcessApplicationStopService implements Service<ProcessApplication
 
   @Override
   public void start(StartContext arg0) throws StartException {
+    // nothing to do
   }
 
   @Override
   public void stop(StopContext arg0) {
-
 
     ManagedReference reference = null;
     ProcessApplicationInterface processApplication = null;

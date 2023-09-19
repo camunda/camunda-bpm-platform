@@ -111,7 +111,6 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
   }
 
   public void stop(final StopContext context) {
-
     context.asynchronous();
     executorSupplier.get().submit(new Runnable() {
       public void run() {
