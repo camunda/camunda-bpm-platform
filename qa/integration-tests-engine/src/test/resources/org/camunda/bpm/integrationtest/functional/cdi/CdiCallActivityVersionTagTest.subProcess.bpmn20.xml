@@ -8,7 +8,7 @@
                   targetNamespace="http://bpmn.io/schema/bpmn"
                   exporter="Camunda Modeler"
                   exporterVersion="1.12.0">
-  <bpmn:process id="subProcess" name="versionTagProcess" isExecutable="true" camunda:versionTag="ver-0.1">
+  <bpmn:process id="subProcess" name="versionTagProcess" isExecutable="true" camunda:versionTag="ver-0.1" camunda:historyTimeToLive="P180D">
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>SequenceFlow_03lsnh9</bpmn:outgoing>
     </bpmn:startEvent>
