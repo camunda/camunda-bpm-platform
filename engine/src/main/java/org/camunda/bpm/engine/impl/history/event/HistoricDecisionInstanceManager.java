@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.impl.CleanableHistoricDecisionInstanceReportImpl;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
@@ -444,11 +443,6 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
     deleteOperations.put(HistoricDecisionInstanceEntity.class, deleteDecisionInstances);
 
     return deleteOperations;
-  }
-
-  protected static boolean isEnableHistoricInstancePermissions() {
-    return Context.getProcessEngineConfiguration()
-        .isEnableHistoricInstancePermissions();
   }
 
 }
