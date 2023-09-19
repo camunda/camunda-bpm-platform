@@ -16,16 +16,13 @@
  */
 package org.camunda.bpm.engine.rest.exception;
 
-import javax.ws.rs.core.Response;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.sql.SQLException;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.PERSISTENCE_CONNECTION_ERROR_CLASS;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.getExceptionStacktrace;
 
+import java.sql.SQLException;
+import javax.ws.rs.core.Response;
 import org.camunda.bpm.engine.ProcessEnginePersistenceException;
 import org.camunda.commons.logging.BaseLogger;
-
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.PERSISTENCE_CONNECTION_ERROR_CLASS;
 
 public class ExceptionLogger extends BaseLogger {
 
@@ -43,7 +40,7 @@ public class ExceptionLogger extends BaseLogger {
     int statusCode = status.getStatusCode();
 
     if (statusCode < 500) {
-      logDebug(String.valueOf(statusCode), getStackTrace(throwable));
+      logDebug(String.valueOf(statusCode), getExceptionStacktrace(throwable));
       return;
     }
 
@@ -53,19 +50,11 @@ public class ExceptionLogger extends BaseLogger {
   protected void logInternalServerAndOtherStatusCodes(Throwable throwable, int statusCode) {
 
     if (isPersistenceConnectionError(throwable)) {
-      logError(String.valueOf(statusCode), getStackTrace(throwable));
+      logError(String.valueOf(statusCode), getExceptionStacktrace(throwable));
       return;
     }
 
-    logWarn(String.valueOf(statusCode), getStackTrace(throwable));
-  }
-
-  protected String getStackTrace(Throwable throwable) {
-    final Writer result = new StringWriter();
-    final PrintWriter printWriter = new PrintWriter(result);
-    throwable.printStackTrace(printWriter);
-
-    return result.toString();
+    logWarn(String.valueOf(statusCode), getExceptionStacktrace(throwable));
   }
 
   protected boolean isPersistenceConnectionError(Throwable throwable) {
@@ -75,7 +64,7 @@ public class ExceptionLogger extends BaseLogger {
       return false;
     }
 
-    SQLException sqlException = (SQLException) throwable.getCause().getCause();
+    SQLException sqlException = getSecondCause((ProcessEnginePersistenceException) throwable);
 
     if (sqlException == null) {
       return false;
@@ -84,6 +73,12 @@ public class ExceptionLogger extends BaseLogger {
     String sqlState = sqlException.getSQLState();
 
     return sqlState != null && sqlState.startsWith(PERSISTENCE_CONNECTION_ERROR_CLASS);
+  }
+
+  protected SQLException getSecondCause(ProcessEnginePersistenceException e) {
+    boolean hasTwoCauses = e.getCause() != null && e.getCause().getCause() != null;
+
+    return hasTwoCauses ? (SQLException) e.getCause().getCause() : null;
   }
 
 }
