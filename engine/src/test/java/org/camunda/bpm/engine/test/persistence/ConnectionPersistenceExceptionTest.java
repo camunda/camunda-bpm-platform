@@ -16,9 +16,16 @@
  */
 package org.camunda.bpm.engine.test.persistence;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.PERSISTENCE_CONNECTION_ERROR_CLASS;
+
+import java.sql.SQLException;
+import java.util.Properties;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
-import org.assertj.core.api.ThrowableAssert;
+import org.apache.ibatis.exceptions.PersistenceException;
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
@@ -30,16 +37,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.PERSISTENCE_CONNECTION_ERROR_CLASS;
 
 @RequiredDatabase(excludes = { DbSqlSessionFactory.H2 })
 public class ConnectionPersistenceExceptionTest {
@@ -91,29 +88,14 @@ public class ConnectionPersistenceExceptionTest {
     String jdbcUrl = resetUrl.replace(host + ":" + port, "not-existing-server:123");
     ((PooledDataSource) engineConfig.getDataSource()).setUrl(jdbcUrl);
 
-    Iterator<Throwable> exceptionHierarchy = catchExceptionHierarchy(() -> {
-      // when
-      identityService.deleteUser("foo");
-    });
-    exceptionHierarchy.next(); // Top-level engine exception
-    exceptionHierarchy.next(); // MyBatis exception
-    return (SQLException) exceptionHierarchy.next(); // SQLException
-  }
+    Throwable result = catchThrowable(() -> identityService.deleteUser("foo"));
 
-  protected Iterator<Throwable> catchExceptionHierarchy(ThrowableAssert.ThrowingCallable callable) {
-    Throwable throwable = catchThrowable(callable);
-    List<Throwable> exceptions = new ArrayList<>();
-    exceptions.add(throwable);
-    Throwable cause = throwable;
-    do {
-      cause = cause.getCause();
-      if (cause != null) {
-        exceptions.add(cause);
-      }
+    assertThat(result)
+        .isInstanceOf(ProcessEngineException.class)
+        .hasCauseInstanceOf(PersistenceException.class)
+        .hasRootCauseExactlyInstanceOf(SQLException.class);
 
-    } while (cause != null);
-
-    return exceptions.iterator();
+    return (SQLException) result.getCause().getCause(); // SQLException
   }
 
 }
