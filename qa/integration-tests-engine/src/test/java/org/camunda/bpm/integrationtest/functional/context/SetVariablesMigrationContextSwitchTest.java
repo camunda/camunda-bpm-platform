@@ -48,6 +48,7 @@ public class SetVariablesMigrationContextSwitchTest extends AbstractFoxPlatformI
 
   public static BpmnModelInstance oneTaskProcess(String key) {
     return Bpmn.createExecutableProcess(key)
+        .camundaHistoryTimeToLive(180)
       .startEvent()
       .userTask("userTask")
       .endEvent()

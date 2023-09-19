@@ -67,10 +67,12 @@ public class BulkHistoryDeleteDmnDisabledTest {
   @Test
   public void bulkHistoryDeleteWithDisabledDmn() {
     BpmnModelInstance model = Bpmn.createExecutableProcess("someProcess")
+        .camundaHistoryTimeToLive(180)
         .startEvent()
-          .userTask("userTask")
+        .userTask("userTask")
         .endEvent()
         .done();
+
     testRule.deploy(model);
     List<String> ids = prepareHistoricProcesses("someProcess");
     runtimeService.deleteProcessInstances(ids, null, true, true);

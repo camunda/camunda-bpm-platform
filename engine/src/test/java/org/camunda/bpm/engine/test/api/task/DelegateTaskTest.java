@@ -105,7 +105,8 @@ public class DelegateTaskTest {
   public void testGetFollowUpDate() {
     // given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process")
-      .startEvent()
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
       .userTask()
         .camundaFollowUpDate(FOLLOW_UP_DATE_STRING)
         .camundaTaskListenerClass("create", GetFollowUpDateListener.class)
@@ -129,7 +130,8 @@ public class DelegateTaskTest {
   public void testSetFollowUpDate() {
     // given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process")
-      .startEvent()
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
       .userTask()
         .camundaTaskListenerClass("create", SetFollowUpDateListener.class)
       .endEvent()
@@ -152,6 +154,7 @@ public class DelegateTaskTest {
   public void testLastUpdated() {
     // given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process")
+        .camundaHistoryTimeToLive(180)
         .startEvent()
         .userTask()
           .camundaTaskListenerClass(TaskListener.EVENTNAME_UPDATE, LastUpdateListener.class)

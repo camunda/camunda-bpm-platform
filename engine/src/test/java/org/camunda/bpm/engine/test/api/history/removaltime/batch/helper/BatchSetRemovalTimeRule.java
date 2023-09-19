@@ -176,7 +176,7 @@ public class BatchSetRemovalTimeRule extends BatchRule {
     protected static final String PROCESS_KEY = "process";
     protected static final String ROOT_PROCESS_KEY = "rootProcess";
 
-    ProcessBuilder builder = Bpmn.createExecutableProcess(PROCESS_KEY);
+    ProcessBuilder builder = Bpmn.createExecutableProcess(PROCESS_KEY).camundaHistoryTimeToLive(180);
     StartEventBuilder startEventBuilder = builder.startEvent();
     ProcessBuilder rootProcessBuilder = null;
     Integer ttl;

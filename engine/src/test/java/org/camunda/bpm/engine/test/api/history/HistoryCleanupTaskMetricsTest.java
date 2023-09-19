@@ -50,6 +50,7 @@ public class HistoryCleanupTaskMetricsTest {
   private static final String DEFAULT_TTL_DAYS = "P5D";
 
   private static final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess("process")
+      .camundaHistoryTimeToLive(180)
       .startEvent("start")
       .userTask("userTask1")
       .sequenceFlowId("seq")

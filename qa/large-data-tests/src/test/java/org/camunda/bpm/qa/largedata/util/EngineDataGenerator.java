@@ -255,7 +255,8 @@ public class EngineDataGenerator {
 
   protected BpmnModelInstance createSimpleServiceTaskProcess() {
     return Bpmn.createExecutableProcess(getAutoCompleteProcessKey())
-      .startEvent()
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
       .serviceTask()
         .camundaExpression("${true}")
       .endEvent()
@@ -264,6 +265,7 @@ public class EngineDataGenerator {
 
   protected BpmnModelInstance createAsyncServiceTaskProcess() {
     return Bpmn.createExecutableProcess(getAsyncTaskProcessKey())
+        .camundaHistoryTimeToLive(180)
         .startEvent()
         .serviceTask()
           .camundaAsyncBefore()
@@ -274,7 +276,8 @@ public class EngineDataGenerator {
 
   protected BpmnModelInstance createUserTaskProcess() {
     return Bpmn.createExecutableProcess(getUserTaskProcessKey())
-      .startEvent()
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
       .userTask("userTaskToComplete")
       .userTask("pendingUserTask")
       .endEvent()

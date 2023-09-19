@@ -43,12 +43,13 @@ public class ProcessWithExternalTaskScenario {
    */
   public static void deploy(ProcessEngine engine, String topicName) {
     BpmnModelInstance instance = Bpmn.createExecutableProcess(PROCESS_DEF_KEY)
-            .startEvent()
-            .serviceTask(EXTERNAL_TASK)
-            .camundaType(EXTERNAL_TASK_TYPE)
-            .camundaTopic(topicName)
-            .endEvent()
-            .done();
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
+        .serviceTask(EXTERNAL_TASK)
+        .camundaType(EXTERNAL_TASK_TYPE)
+        .camundaTopic(topicName)
+        .endEvent()
+        .done();
 
     engine.getRepositoryService().createDeployment()
         .addModelInstance(ProcessWithExternalTaskScenario.class.getSimpleName() + ".startProcessWithFetch.bpmn20.xml", instance)

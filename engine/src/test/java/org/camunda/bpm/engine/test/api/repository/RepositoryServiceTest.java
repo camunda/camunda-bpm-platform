@@ -142,7 +142,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
     //and model instance with umlauts
     String umlautsString = "äöüÄÖÜß";
     String resourceName = "deployment.bpmn";
-    BpmnModelInstance instance = Bpmn.createExecutableProcess("umlautsProcess").startEvent(umlautsString).done();
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("umlautsProcess").camundaHistoryTimeToLive(180).startEvent(umlautsString).done();
     String instanceAsString = Bpmn.convertToString(instance);
 
     //when instance is deployed via addString method

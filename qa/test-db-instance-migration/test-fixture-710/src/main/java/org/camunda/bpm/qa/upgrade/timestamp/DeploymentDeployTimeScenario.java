@@ -31,8 +31,10 @@ public class DeploymentDeployTimeScenario extends AbstractTimestampMigrationScen
 
   protected static final String PROCESS_DEFINITION_KEY = "deploymentDeployTimeProcess";
   protected static final String DEPLOYMENT_NAME = "DeployTimeDeploymentTest";
+
   protected static final BpmnModelInstance DEPLOYMENT_MODEL  = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
-    .startEvent("start")
+      .camundaHistoryTimeToLive(180)
+      .startEvent("start")
     .serviceTask("task")
       .camundaDelegateExpression("${true}")
     .endEvent("end")

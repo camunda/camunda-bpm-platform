@@ -75,6 +75,7 @@ public class DecisionMetricsTest extends AbstractMetricsTest {
   @Test
   public void testBusinessRuleTask() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("testProcess")
+        .camundaHistoryTimeToLive(180)
         .startEvent()
         .businessRuleTask("task")
         .endEvent()
