@@ -14,7 +14,8 @@
           "key": "Like",
           "value": "PLUGIN_PROCESS_DEF_LIKE"
         }
-      ]
+      ],
+      "default": true
     },
     {
       "id": {

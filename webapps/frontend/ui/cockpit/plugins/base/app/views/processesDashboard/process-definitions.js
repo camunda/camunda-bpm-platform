@@ -94,8 +94,10 @@ module.exports = [
 
           // only get count of process definitions
           const countProcessDefinitions = function() {
+            $scope.mainLoadingState = 'LOADING';
             processDefinitionService.count({latest: true}, (err, count) => {
-              if (err) $scope.loadingState = 'ERROR';
+              if (err) $scope.mainLoadingState = 'ERROR';
+              else $scope.mainLoadingState = count ? 'LOADED' : 'EMPTY';
               $scope.processDefinitionsCount = count;
             });
           };
@@ -130,10 +132,7 @@ module.exports = [
                 PluginProcessDefinitionResource.queryStatistics(params)
                   .$promise.then(statistics => {
                     $scope.processDefinitionData = statistics;
-                    $scope.loadingState = 'LOADED';
-                    $scope.loadingState = statistics.length
-                      ? 'LOADED'
-                      : 'EMPTY';
+                    $scope.loadingState = res.count ? 'LOADED' : 'EMPTY';
                     return statistics;
                   })
                   .catch(angular.noop);
@@ -147,17 +146,9 @@ module.exports = [
 
           const removeActionDeleteListener = $scope.$on(
             'processes.action.delete',
-            function(event, definitionId) {
-              const definitions = $scope.processDefinitionData;
-
-              for (let i = 0; i < definitions.length; i++) {
-                if (definitions[i].id === definitionId) {
-                  definitions.splice(i, 1);
-                  break;
-                }
-              }
-
-              $scope.processDefinitionsCount = definitions.length;
+            () => {
+              countProcessDefinitions();
+              updateView();
             }
           );
 

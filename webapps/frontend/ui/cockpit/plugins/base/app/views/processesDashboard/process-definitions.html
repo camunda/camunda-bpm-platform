@@ -28,112 +28,118 @@
     <div ng-if="activeSection"
          ng-controller="CamPaginationSearchIntegrationController as SearchController">
 
-      <div cam-widget-search
-           cam-widget-search-id='pdSearch'
-           cam-widget-search-total="SearchController.pages.total"
-           cam-widget-search-valid-searches="SearchController.config.searches"
-           cam-widget-search-translations="SearchController.config.tooltips"
-           cam-widget-search-types="SearchController.config.types"
-           cam-widget-search-operators="SearchController.config.operators"
-           cam-widget-search-mode="search">
-      </div>
-
       <div cam-widget-loader
-           loading-state="{{SearchController.loadingState}}"
+           loading-state="{{mainLoadingState}}"
            class="deployed-processes"
            text-empty="{{ 'PLUGIN_PROCESS_DEF_NO_PROCESS_DEF' | translate }}">
 
-        <table ng-if="activeTab === 'list'"
-               class="process-definitions-list cam-table">
-          <thead sortable-table-head
-                 head-columns="headColumns"
-                 on-sort-change="onSortChange(null, null, sortBy)"
-                 default-sort="sortBy">
-          </thead>
-          <tbody>
-          <tr ng-repeat="pd in processDefinitionData">
-            <td class="state">
-              <div ng-if="pd.incidents >= 0" state-circle incidentsCount="pd.incidents">
+        <div cam-widget-search
+             cam-widget-search-id='pdSearch'
+             cam-widget-search-total="SearchController.pages.total"
+             cam-widget-search-valid-searches="SearchController.config.searches"
+             cam-widget-search-translations="SearchController.config.tooltips"
+             cam-widget-search-types="SearchController.config.types"
+             cam-widget-search-operators="SearchController.config.operators"
+             cam-widget-search-mode="search"
+             cam-widget-search-storage-group="'PD'">
+        </div>
+
+        <div cam-widget-loader
+             loading-state="{{SearchController.loadingState}}"
+             class="deployed-processes"
+             text-empty="{{ 'PLUGIN_PROCESS_DEF_NO_PROCESS_DEF' | translate }}">
+
+          <table ng-if="activeTab === 'list'"
+                 class="process-definitions-list cam-table">
+            <thead sortable-table-head
+                   head-columns="headColumns"
+                   on-sort-change="onSortChange(null, null, sortBy)"
+                   default-sort="sortBy">
+            </thead>
+            <tbody>
+            <tr ng-repeat="pd in processDefinitionData">
+              <td class="state">
+                <div ng-if="pd.incidents >= 0" state-circle incidentsCount="pd.incidents">
+                  <a ng-if="pd.incidents && hasSearchPlugin"
+                     ng-click="onIncidentsClick(pd.key)"
+                     class="incidents-link"></a>
+                </div>
+                <div ng-if="pd.incidents === undefined">
+                  <span class="glyphicon glyphicon-refresh animate-spin"></span>
+                </div>
+              </td>
+
+              <td class="incidents">
                 <a ng-if="pd.incidents && hasSearchPlugin"
-                   ng-click="onIncidentsClick(pd.key)"
-                   class="incidents-link"></a>
-              </div>
-              <div ng-if="pd.incidents == undefined">
+                   ng-click="onIncidentsClick(pd.key)">
+                  {{ pd.incidents }}
+                </a>
+                <span ng-if="!pd.incidents || !hasSearchPlugin">{{ pd.incidents }}</span>
+              </td>
+
+              <td ng-if="pd.instances >= 0" class="instances">
+                {{ pd.instances }}
+              </td>
+              <td ng-if="pd.instances == undefined">
                 <span class="glyphicon glyphicon-refresh animate-spin"></span>
-              </div>
-            </td>
+              </td>
 
-            <td class="incidents">
-              <a ng-if="pd.incidents && hasSearchPlugin"
-                 ng-click="onIncidentsClick(pd.key)">
-                {{ pd.incidents }}
-              </a>
-              <span ng-if="!pd.incidents || !hasSearchPlugin">{{ pd.incidents }}</span>
-            </td>
+              <td class="key" cam-widget-clipboard="pd.key">
+                <a href="#/process-definition/{{ pd.id }}">
+                  {{ pd.key }}
+                </a>
+              </td>
 
-            <td ng-if="pd.instances >= 0" class="instances">
-              {{ pd.instances }}
-            </td>
-            <td ng-if="pd.instances == undefined">
-              <span class="glyphicon glyphicon-refresh animate-spin"></span>
-            </td>
+              <td class="name" cam-widget-clipboard="pd.name">
+                <a href="#/process-definition/{{ pd.id }}">
+                  {{ pd.name }}
+                </a>
+              </td>
 
-            <td class="key">
+              <td class="tenant-id">
+                {{ pd.tenantId }}
+              </td>
+
+              <td ng-if="hasHistoryPlugin"
+                  class="history-link">
+                <a href="#/process-definition/{{ pd.id }}/history">
+                  {{'PLUGIN_PROCESS_DEF_HISTORY_VIEW' | translate}}
+                </a>
+              </td>
+
+              <td ng-if="hasReportPlugin"
+                  class="report-link">
+                <a href="#/reports/reporting-duration-report?processDefinitionKey={{ pd.key }}">
+                  <span class="glyphicon glyphicon-signal"></span>
+                </a>
+              </td>
+
+              <td ng-if="hasActionPlugin">
+                <view ng-repeat="processesAction in processesActions"
+                      data-plugin-id="{{ processAction.id }}"
+                      vars="definitionVars"
+                      provider="processesAction"></view>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+
+          <div ng-if="activeTab === 'previews'"
+               class="tile-grid">
+            <div ng-repeat="pd in processDefinitionData"
+                 class="tile col-xs-12 col-sm-6 col-md-4 col-lg-3">
               <a href="#/process-definition/{{ pd.id }}">
-                {{ pd.key }}
-              </a>
-            </td>
+                <h4 class="tile-header">
+                  {{ pd.name || pd.key }}
+                </h4>
 
-            <td class="name">
-              <a href="#/process-definition/{{ pd.id }}">
-                {{ pd.name }}
-              </a>
-            </td>
-
-            <td class="tenant-id">
-              {{ pd.tenantId }}
-            </td>
-
-            <td ng-if="hasHistoryPlugin"
-                class="history-link">
-              <a href="#/process-definition/{{ pd.id }}/history">
-                {{'PLUGIN_PROCESS_DEF_HISTORY_VIEW' | translate}}
-              </a>
-            </td>
-
-            <td ng-if="hasReportPlugin"
-                class="report-link">
-              <a href="#/reports/reporting-duration-report?processDefinitionKey={{ pd.key }}">
-                <span class="glyphicon glyphicon-signal"></span>
-              </a>
-            </td>
-
-            <td ng-if="hasActionPlugin">
-              <view ng-repeat="processesAction in processesActions"
-                    data-plugin-id="{{ processAction.id }}"
-                    vars="definitionVars"
-                    provider="processesAction"></view>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-
-        <div ng-if="activeTab === 'previews'"
-             class="tile-grid">
-          <div ng-repeat="pd in processDefinitionData"
-               class="tile col-xs-12 col-sm-6 col-md-4 col-lg-3">
-            <a href="#/process-definition/{{ pd.id }}">
-              <h4 class="tile-header">
-                {{ pd.name || pd.key }}
-              </h4>
-
-              <span class="tile-body">
+                <span class="tile-body">
               <span ng-if="activeTab === 'previews'"
                     process-diagram-preview
                     process-definition-id="pd.id"></span>
             </span>
 
-              <span class="tile-footer">
+                <span class="tile-footer">
               <span ng-if="!pd.instances || pd.instances === 0"
                     class="instances"
                     translate="PLUGIN_PROCESS_DEF_PREV_RUNNING_INSTANCES"
@@ -157,23 +163,25 @@
                     class="circle-tiles"></span>
               <span ng-if="pd.incidents == undefined" class="circle-tiles"></span>
             </span>
-            </a>
+              </a>
+            </div>
           </div>
+
+          <ul uib-pagination
+              ng-if="SearchController.pages.total > SearchController.pages.size"
+              class="pagination-sm"
+              pagination-id="pdPage"
+
+              page="SearchController.pages.current"
+              ng-model="SearchController.pages.current"
+
+              total-items="SearchController.pages.total"
+              items-per-page="SearchController.pages.size"
+
+              max-size="7"
+              boundary-links="true"></ul>
+
         </div>
-
-        <ul uib-pagination
-            ng-if="SearchController.pages.total > SearchController.pages.size"
-            class="pagination-sm"
-            pagination-id="pdPage"
-
-            page="SearchController.pages.current"
-            ng-model="SearchController.pages.current"
-
-            total-items="SearchController.pages.total"
-            items-per-page="SearchController.pages.size"
-
-            max-size="7"
-            boundary-links="true"></ul>
 
       </div>
 
