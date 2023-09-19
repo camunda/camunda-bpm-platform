@@ -4,7 +4,7 @@
                   xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   targetNamespace="Examples">
-  <case id="case" name="Case" historyTimeToLive="P180D">
+  <case id="case" name="Case" camunda:historyTimeToLive="P180D">
 
     <casePlanModel id="CasePlanModel_1">
 
