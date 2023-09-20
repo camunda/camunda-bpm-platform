@@ -75,10 +75,11 @@ public class MetricsTest {
     //clean up before start
     clearMetrics();
     TEST_RULE.deploy(Bpmn.createExecutableProcess("testProcess")
-                         .startEvent()
-                         .manualTask()
-                         .endEvent()
-                         .done());
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
+        .manualTask()
+        .endEvent()
+        .done());
   }
 
   @After
@@ -109,10 +110,11 @@ public class MetricsTest {
   public void testEndMetricWithWaitState() {
     //given
     TEST_RULE.deploy(Bpmn.createExecutableProcess("userProcess")
-                         .startEvent()
-                         .userTask("Task")
-                         .endEvent()
-                         .done());
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
+        .userTask("Task")
+        .endEvent()
+        .done());
 
     //when
     runtimeService.startProcessInstanceByKey("userProcess");

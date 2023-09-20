@@ -48,6 +48,7 @@ public class TaskMetricsTest {
 
   protected static final String PROCESS_KEY = "process";
   protected static final BpmnModelInstance USER_TASK_PROCESS = Bpmn.createExecutableProcess(PROCESS_KEY)
+      .camundaHistoryTimeToLive(180)
       .startEvent()
       .userTask("task").camundaAssignee("kermit")
       .endEvent()
@@ -191,6 +192,7 @@ public class TaskMetricsTest {
   public void shouldCreateTaskMetricWithAssignmentByTaskListener() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess(PROCESS_KEY)
+        .camundaHistoryTimeToLive(180)
         .startEvent()
         .userTask("task").camundaTaskListenerClass("create", AssignmentTaskListener.class)
         .endEvent()
@@ -225,6 +227,7 @@ public class TaskMetricsTest {
   public void shouldCreateTaskMetricsWithMultipleAssignments() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess(PROCESS_KEY)
+        .camundaHistoryTimeToLive(180)
         .startEvent()
         .userTask("task")
           .camundaAssignee("kermit")
@@ -253,6 +256,7 @@ public class TaskMetricsTest {
   public void shouldCreateTaskMetricOnClaim() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess(PROCESS_KEY)
+        .camundaHistoryTimeToLive(180)
         .startEvent()
         .userTask("task")
         .endEvent()
@@ -271,6 +275,7 @@ public class TaskMetricsTest {
     long taskWorkers = 3500L;
     long lowerErrorBoundary = Math.floorDiv((int)(taskWorkers * 90), 100);// 10% off is acceptable
     testRule.deploy(Bpmn.createExecutableProcess(PROCESS_KEY)
+        .camundaHistoryTimeToLive(180)
         .startEvent()
         .userTask("task")
         .endEvent()

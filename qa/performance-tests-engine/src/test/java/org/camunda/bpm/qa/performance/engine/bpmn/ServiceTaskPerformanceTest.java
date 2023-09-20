@@ -40,7 +40,8 @@ public class ServiceTaskPerformanceTest extends ProcessEnginePerformanceTestCase
     variables.put("approved", true);
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
-      .startEvent()
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
       .serviceTask()
         .camundaClass(NoopDelegate.class.getName())
       .exclusiveGateway("decision").condition("approved", "${approved}")

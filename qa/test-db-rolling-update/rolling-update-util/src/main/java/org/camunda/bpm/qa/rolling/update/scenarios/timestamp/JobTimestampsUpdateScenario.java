@@ -39,12 +39,14 @@ public class JobTimestampsUpdateScenario extends AbstractTimestampUpdateScenario
   protected static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
   protected static final Date LOCK_EXP_TIME = new Date(TIME + 300_000L);
   protected static final String PROCESS_DEFINITION_KEY = "jobTimestampsUpdateTestProcess";
-  protected static final BpmnModelInstance SINGLE_JOB_MODEL  = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
-    .startEvent("start")
-    .intermediateCatchEvent("catch")
+
+  protected static final BpmnModelInstance SINGLE_JOB_MODEL = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+      .camundaHistoryTimeToLive(180)
+      .startEvent("start")
+      .intermediateCatchEvent("catch")
       .timerWithDate(SDF.format(TIMESTAMP))
-    .endEvent("end")
-    .done();
+      .endEvent("end")
+      .done();
 
   @DescribesScenario("initJobTimestamps")
   @Times(1)

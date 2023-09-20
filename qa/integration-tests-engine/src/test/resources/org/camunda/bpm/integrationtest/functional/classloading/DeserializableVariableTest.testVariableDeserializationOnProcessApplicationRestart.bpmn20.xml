@@ -4,7 +4,7 @@
   typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="Examples">
 
 
-  <process id="testDeserializeVariable" isExecutable="true">
+  <process id="testDeserializeVariable" isExecutable="true" camunda:historyTimeToLive="5">
     <startEvent id="theStart" />    
     <sequenceFlow sourceRef="theStart" targetRef="servicetask1" />
     

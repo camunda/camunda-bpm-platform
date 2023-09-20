@@ -5,7 +5,7 @@
   targetNamespace="Examples">
 
 
-  <process id="serviceTaskProcess" isExecutable="true">
+  <process id="serviceTaskProcess" isExecutable="true"  camunda:historyTimeToLive="5">
 
     <startEvent id="start" />
     <sequenceFlow sourceRef="start" targetRef="serviceTask" />

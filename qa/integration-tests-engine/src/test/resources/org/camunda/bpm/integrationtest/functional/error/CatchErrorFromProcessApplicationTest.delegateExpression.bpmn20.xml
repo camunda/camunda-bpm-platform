@@ -7,7 +7,7 @@
   <error id="myError" errorCode="MyError" />
   <error id="myException" errorCode="org.camunda.bpm.integrationtest.functional.error.MyBusinessException" />
 
-  <process id="testProcessDelegateExpression" isExecutable="true">
+  <process id="testProcessDelegateExpression" isExecutable="true" camunda:historyTimeToLive="5">
   
     <startEvent id="start" />
 

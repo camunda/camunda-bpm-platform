@@ -9,7 +9,7 @@
              expressionLanguage="http://www.w3.org/1999/XPath" 
              id="sid-996e5db9-6d63-4134-be9c-6b810964b27e" targetNamespace="Test" typeLanguage="http://www.w3.org/2001/XMLSchema" 
              xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-  <process id="TimerExecutionProcess" isExecutable="true">
+  <process id="TimerExecutionProcess" isExecutable="true" camunda:historyTimeToLive="P180D">
     <startEvent id="sid-239F9BB2-874B-492C-93F5-5CFE5DFE7850"></startEvent>
     <intermediateCatchEvent id="sid-21E3409F-5A8A-40DD-93FA-2CB17E2BD666">
       <timerEventDefinition id="sid-15f0ad92-1980-4111-93e0-d1ce1950e16c">

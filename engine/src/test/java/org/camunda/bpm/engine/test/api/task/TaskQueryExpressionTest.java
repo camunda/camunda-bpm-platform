@@ -393,10 +393,11 @@ public class TaskQueryExpressionTest {
 
   protected void createBusinessKeyDeployment(String aBusinessKey) {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("aProcessDefinition")
-      .startEvent()
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
         .userTask()
-      .endEvent()
-      .done();
+        .endEvent()
+        .done();
 
    testRule.deploy(modelInstance);
 

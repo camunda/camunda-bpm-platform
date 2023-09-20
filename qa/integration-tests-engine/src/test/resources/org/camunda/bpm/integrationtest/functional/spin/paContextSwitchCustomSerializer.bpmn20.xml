@@ -4,7 +4,7 @@
         targetNamespace="Examples" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
         xmlns:camunda="http://camunda.org/schema/1.0/bpmn" >
 
-  <process id="processWithTimer" isExecutable="true">
+  <process id="processWithTimer" isExecutable="true" camunda:historyTimeToLive="5">
     <startEvent id="start"/>
     <intermediateCatchEvent id="timer" camunda:asyncBefore="true">
       <timerEventDefinition>

@@ -5,7 +5,7 @@
   targetNamespace="Examples">
 
 
-  <process id="theProcess" isExecutable="true">
+  <process id="theProcess" isExecutable="true" camunda:historyTimeToLive="5">
 
     <startEvent id="start" />
 

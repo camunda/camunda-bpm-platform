@@ -103,10 +103,11 @@ public class JobEntityTest {
   public void shouldCheckCreateTimeOnMessage() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess("process")
-      .startEvent()
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
         .camundaAsyncBefore()
-      .endEvent()
-      .done());
+        .endEvent()
+        .done());
 
     runtimeService.startProcessInstanceByKey("process");
 
@@ -125,10 +126,11 @@ public class JobEntityTest {
   public void shouldCheckCreateTimeOnTimer() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess("process")
-      .startEvent()
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
         .timerWithDuration("PT5S")
-      .endEvent()
-      .done());
+        .endEvent()
+        .done());
 
     runtimeService.startProcessInstanceByKey("process");
 
@@ -163,12 +165,13 @@ public class JobEntityTest {
   public void shouldShowFailedActivityIdPropertyForFailingAsyncTask() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .serviceTask("theTask")
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
+        .serviceTask("theTask")
         .camundaAsyncBefore()
         .camundaClass(FailingDelegate.class)
-      .endEvent()
-      .done());
+        .endEvent()
+        .done());
 
     runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", true));
     JobEntity job = (JobEntity) managementService.createJobQuery().singleResult();
@@ -192,12 +195,13 @@ public class JobEntityTest {
     engineRule.getProcessEngineConfiguration().setLoggingContextActivityId(null);
 
     testRule.deploy(Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .serviceTask("theTask")
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
+        .serviceTask("theTask")
         .camundaAsyncBefore()
         .camundaClass(FailingDelegate.class)
-      .endEvent()
-      .done());
+        .endEvent()
+        .done());
 
     runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", true));
     JobEntity job = (JobEntity) managementService.createJobQuery().singleResult();
@@ -219,14 +223,17 @@ public class JobEntityTest {
   public void shouldShowFailedActivityIdPropertyForAsyncTaskWithFailingFollowUp() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .serviceTask("theTask")
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
+        .serviceTask("theTask")
         .camundaAsyncBefore()
         .camundaClass(ChangeVariablesDelegate.class)
-      .serviceTask("theTask2").camundaClass(ChangeVariablesDelegate.class)
-      .serviceTask("theTask3").camundaClass(FailingDelegate.class)
-      .endEvent()
-      .done());
+        .serviceTask("theTask2")
+        .camundaClass(ChangeVariablesDelegate.class)
+        .serviceTask("theTask3")
+        .camundaClass(FailingDelegate.class)
+        .endEvent()
+        .done());
 
     runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", true));
     JobEntity job = (JobEntity) managementService.createJobQuery().singleResult();

@@ -4,7 +4,7 @@
     <participant id="Process_Engine_1" name="invoice-inbound" processRef="invoice-it"/>
   </collaboration>
   <message id="message_146" name="myMessage" />
-  <process id="invoice-it" name="invoice-inbound" isExecutable="true">
+  <process id="invoice-it" name="invoice-inbound" isExecutable="true" camunda:historyTimeToLive="5">
     <laneSet id="laneSet_109">
       <lane id="Freigebender_105" name="Freigebender">
         <flowNodeRef>Rechnung_freigeben_125</flowNodeRef>

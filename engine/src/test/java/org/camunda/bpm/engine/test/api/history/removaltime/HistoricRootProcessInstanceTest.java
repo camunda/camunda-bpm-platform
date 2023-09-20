@@ -70,15 +70,18 @@ import org.junit.Test;
 public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
 
   protected final String CALLED_PROCESS_KEY = "calledProcess";
+
   protected final BpmnModelInstance CALLED_PROCESS = Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
-    .startEvent()
+      .camundaHistoryTimeToLive(180)
+      .startEvent()
       .userTask("userTask")
-        .name("userTask")
-        .camundaAssignee("foo")
+      .name("userTask")
+      .camundaAssignee("foo")
       .serviceTask()
-        .camundaAsyncBefore()
-        .camundaClass(FailingDelegate.class.getName())
-    .endEvent().done();
+      .camundaAsyncBefore()
+      .camundaClass(FailingDelegate.class.getName())
+      .endEvent()
+      .done();
 
   protected final String CALLING_PROCESS_KEY = "callingProcess";
   protected final BpmnModelInstance CALLING_PROCESS = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)

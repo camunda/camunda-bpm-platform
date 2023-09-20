@@ -88,12 +88,13 @@ public class DefaultLoadGenerator {
   }
 
   protected static BpmnModelInstance createProcess(int id){
-    return Bpmn.createExecutableProcess("process"+id)
-                  .startEvent()
-                  .userTask()
-                    .camundaAssignee("demo")
-                  .endEvent()
-                .done();
+    return Bpmn.createExecutableProcess("process" + id)
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
+        .userTask()
+        .camundaAssignee("demo")
+        .endEvent()
+        .done();
   }
 
 }

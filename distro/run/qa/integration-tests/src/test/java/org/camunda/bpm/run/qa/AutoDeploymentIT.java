@@ -79,7 +79,13 @@ public class AutoDeploymentIT {
     resourcesDir.toFile().mkdirs();
     File bpmnFile = Paths.get(resourcesDir.toString(), "process.bpmn").toFile();
     bpmnFile.createNewFile();
-    BpmnModelInstance model = Bpmn.createExecutableProcess(processDefinitionId).startEvent().endEvent().done();
+
+    BpmnModelInstance model = Bpmn.createExecutableProcess(processDefinitionId)
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
+        .endEvent()
+        .done();
+
     Bpmn.writeModelToFile(bpmnFile, model);
     dummyFiles.add(bpmnFile);
   }

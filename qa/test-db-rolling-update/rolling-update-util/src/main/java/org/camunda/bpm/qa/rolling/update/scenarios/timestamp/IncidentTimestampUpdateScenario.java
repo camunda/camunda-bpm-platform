@@ -34,13 +34,15 @@ import org.camunda.bpm.qa.upgrade.Times;
 public class IncidentTimestampUpdateScenario extends AbstractTimestampUpdateScenario {
 
   protected static final String PROCESS_DEFINITION_KEY = "oneIncidentTimestampServiceTaskProcess";
-  protected static final BpmnModelInstance FAILING_SERVICE_TASK_MODEL  = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
-    .startEvent("start")
+
+  protected static final BpmnModelInstance FAILING_SERVICE_TASK_MODEL = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+      .camundaHistoryTimeToLive(180)
+      .startEvent("start")
       .serviceTask("incidentTimestampTask")
-        .camundaAsyncBefore()
-        .camundaClass(FailingDelegate.class.getName())
-    .endEvent("end")
-    .done();
+      .camundaAsyncBefore()
+      .camundaClass(FailingDelegate.class.getName())
+      .endEvent("end")
+      .done();
 
   @DescribesScenario("initIncidentTimestamp")
   @Times(1)
