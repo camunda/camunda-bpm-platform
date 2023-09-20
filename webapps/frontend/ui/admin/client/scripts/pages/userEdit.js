@@ -256,75 +256,82 @@ module.exports = [
           // delete user form /////////////////////////////
 
           $scope.deleteUser = function() {
-            $modal
-              .open({
-                template: confirmationTemplate,
-                controller: [
-                  '$scope',
-                  '$timeout',
-                  function($dialogScope, $timeout) {
-                    $dialogScope.question = $translate.instant(
-                      'USERS_USER_DELETE_CONFIRM',
-                      {user: $scope.user.id}
-                    );
-                    $timeout(() =>
-                      Notifications.addMessage({
-                        type: 'info',
-                        status: 'Warning',
-                        unsafe: true,
-                        message: $translate.instant('USERS_USER_DELETE_INFO')
-                      })
-                    );
-                  }
-                ]
-              })
-              .result.then(function() {
-                UserResource.delete({id: $scope.decodedUserId}, function(err) {
-                  if (err === null) {
-                    if ($scope.authenticatedUser.name !== $scope.user.id) {
-                      Notifications.addMessage({
-                        type: 'success',
-                        status: $translate.instant(
-                          'NOTIFICATIONS_STATUS_SUCCESS'
-                        ),
-                        message: $translate.instant(
-                          'USERS_USER_DELETE_SUCCESS',
-                          {
-                            user: $scope.user.id
+            $modal.open({
+              template: confirmationTemplate,
+              controller: [
+                '$scope',
+                '$timeout',
+                function($dialogScope, $timeout) {
+                  $dialogScope.question = $translate.instant(
+                    'USERS_USER_DELETE_CONFIRM',
+                    {user: $scope.user.id}
+                  );
+                  $dialogScope.delete = () => {
+                    UserResource.delete({id: $scope.decodedUserId}, function(
+                      err
+                    ) {
+                      if (err === null) {
+                        if ($scope.authenticatedUser.name !== $scope.user.id) {
+                          $timeout(() => {
+                            Notifications.addMessage({
+                              type: 'success',
+                              status: $translate.instant(
+                                'NOTIFICATIONS_STATUS_SUCCESS'
+                              ),
+                              message: $translate.instant(
+                                'USERS_USER_DELETE_SUCCESS',
+                                {
+                                  user: $scope.user.id
+                                }
+                              )
+                            });
+                          }, 200);
+                          $location.path('/users');
+                        } else {
+                          $http
+                            .get(Uri.appUri('engine://engine/'))
+                            .then(function(response) {
+                              var engines = response.data;
+
+                              engines.forEach(function(engine) {
+                                AuthenticationService.logout(engine.name);
+                              });
+                            })
+                            .catch(angular.noop);
+                        }
+                        $dialogScope.$close();
+                      } else {
+                        const {
+                          response: {
+                            body: {message}
                           }
-                        )
-                      });
-
-                      $location.path('/users');
-                    } else {
-                      $http
-                        .get(Uri.appUri('engine://engine/'))
-                        .then(function(response) {
-                          var engines = response.data;
-
-                          engines.forEach(function(engine) {
-                            AuthenticationService.logout(engine.name);
-                          });
-                        })
-                        .catch(angular.noop);
-                    }
-                  } else {
-                    const {
-                      response: {
-                        body: {message}
+                        } = err;
+                        Notifications.addError({
+                          status: $translate.instant(
+                            'NOTIFICATIONS_STATUS_ERROR'
+                          ),
+                          message: $translate.instant(
+                            'USERS_USER_DELETE_FAILED',
+                            {
+                              user: $scope.user.id,
+                              message
+                            }
+                          )
+                        });
                       }
-                    } = err;
-                    Notifications.addError({
-                      status: $translate.instant('NOTIFICATIONS_STATUS_ERROR'),
-                      message: $translate.instant('USERS_USER_DELETE_FAILED', {
-                        user: $scope.user.id,
-                        message
-                      })
                     });
-                  }
-                });
-              })
-              .catch(angular.noop);
+                  };
+                  $timeout(() =>
+                    Notifications.addMessage({
+                      type: 'info',
+                      status: $translate.instant('USERS_WARNING'),
+                      unsafe: true,
+                      message: $translate.instant('USERS_USER_DELETE_INFO')
+                    })
+                  );
+                }
+              ]
+            });
           };
 
           // Unlock User

@@ -323,39 +323,50 @@ var Controller = [
           template: confirmationTemplate,
           controller: [
             '$scope',
-            function($dialogScope) {
+            '$timeout',
+            function($dialogScope, $timeout) {
               $dialogScope.question = $translate.instant(
                 'GROUP_EDIT_DELETE_CONFIRM',
                 {group: $scope.group.id}
               );
+              $dialogScope.delete = () => {
+                GroupResource.delete({id: $scope.decodedGroupId}, function(
+                  err
+                ) {
+                  if (err === null) {
+                    $timeout(() => {
+                      Notifications.addMessage({
+                        type: 'success',
+                        status: $translate.instant(
+                          'NOTIFICATIONS_STATUS_SUCCESS'
+                        ),
+                        message: $translate.instant(
+                          'GROUP_EDIT_DELETE_SUCCESS',
+                          {
+                            group: $scope.group.id
+                          }
+                        )
+                      });
+                    }, 200);
+                    $location.path('/groups');
+                    $dialogScope.$close();
+                  } else {
+                    const {
+                      response: {
+                        body: {message}
+                      }
+                    } = err;
+                    Notifications.addError({
+                      status: $translate.instant('NOTIFICATIONS_STATUS_FAILED'),
+                      message: $translate.instant('GROUP_EDIT_DELETE_FAILED', {
+                        message
+                      })
+                    });
+                  }
+                });
+              };
             }
           ]
-        })
-        .result.then(function() {
-          GroupResource.delete({id: $scope.decodedGroupId}, function(err) {
-            if (err === null) {
-              Notifications.addMessage({
-                type: 'success',
-                status: $translate.instant('NOTIFICATIONS_STATUS_SUCCESS'),
-                message: $translate.instant('GROUP_EDIT_DELETE_SUCCESS', {
-                  group: $scope.group.id
-                })
-              });
-              $location.path('/groups');
-            } else {
-              const {
-                response: {
-                  body: {message}
-                }
-              } = err;
-              Notifications.addError({
-                status: $translate.instant('NOTIFICATIONS_STATUS_FAILED'),
-                message: $translate.instant('GROUP_EDIT_DELETE_FAILED', {
-                  message
-                })
-              });
-            }
-          });
         })
         .catch(angular.noop);
     };

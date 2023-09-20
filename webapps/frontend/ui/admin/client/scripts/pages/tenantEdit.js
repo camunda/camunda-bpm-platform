@@ -63,6 +63,7 @@ var Controller = [
         }
       ]);
     }
+
     refreshBreadcrumbs();
 
     $scope.tenant = null;
@@ -219,6 +220,7 @@ var Controller = [
     }
 
     $scope.canSortUserEntries = true;
+
     function updateTenantUserView() {
       var prep = prepareTenantMemberView(tenantUserPages);
 
@@ -291,47 +293,59 @@ var Controller = [
     // delete group form /////////////////////////////
 
     $scope.deleteTenant = function() {
-      $modal
-        .open({
-          template: confirmationTemplate,
-          controller: [
-            '$scope',
-            function($dialogScope) {
-              $dialogScope.question = $translate.instant(
-                'TENANTS_TENANT_DELETE_CONFIRM',
-                {tenant: $scope.tenant.id}
-              );
-            }
-          ]
-        })
-        .result.then(function() {
-          TenantResource.delete({id: $scope.decodedTenantId}, function(err) {
-            if (err === null) {
-              Notifications.addMessage({
-                type: 'success',
-                status: $translate.instant('NOTIFICATIONS_STATUS_SUCCESS'),
-                message: $translate.instant('TENANTS_TENANT_DELETE_SUCCESS', {
-                  tenant: $scope.tenant.id
-                })
-              });
-              $location.path('/tenants');
-            } else {
-              const {
-                response: {
-                  body: {message}
+      $modal.open({
+        template: confirmationTemplate,
+        controller: [
+          '$scope',
+          '$timeout',
+          function($dialogScope, $timeout) {
+            $dialogScope.question = $translate.instant(
+              'TENANTS_TENANT_DELETE_CONFIRM',
+              {tenant: $scope.tenant.id}
+            );
+            $dialogScope.delete = () => {
+              TenantResource.delete({id: $scope.decodedTenantId}, function(
+                err
+              ) {
+                if (err === null) {
+                  $timeout(() => {
+                    Notifications.addMessage({
+                      type: 'success',
+                      status: $translate.instant(
+                        'NOTIFICATIONS_STATUS_SUCCESS'
+                      ),
+                      message: $translate.instant(
+                        'TENANTS_TENANT_DELETE_SUCCESS',
+                        {
+                          tenant: $scope.tenant.id
+                        }
+                      )
+                    });
+                  }, 200);
+                  $location.path('/tenants');
+                  $dialogScope.$close();
+                } else {
+                  const {
+                    response: {
+                      body: {message}
+                    }
+                  } = err;
+                  Notifications.addError({
+                    status: $translate.instant('NOTIFICATIONS_STATUS_FAILED'),
+                    message: $translate.instant(
+                      'TENANTS_TENANT_DELETE_FAILED',
+                      {
+                        tenant: $scope.tenant.id,
+                        message
+                      }
+                    )
+                  });
                 }
-              } = err;
-              Notifications.addError({
-                status: $translate.instant('NOTIFICATIONS_STATUS_FAILED'),
-                message: $translate.instant('TENANTS_TENANT_DELETE_FAILED', {
-                  tenant: $scope.tenant.id,
-                  message
-                })
               });
-            }
-          });
-        })
-        .catch(angular.noop);
+            };
+          }
+        ]
+      });
     };
 
     // page controls ////////////////////////////////////
