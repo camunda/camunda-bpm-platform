@@ -56,14 +56,19 @@ public class NoViewProcessApplicationStartService implements Service<ProcessAppl
   }
 
   public void stop(StopContext context) {
-
+    if (this.reference != null && this.reference instanceof ProcessApplicationReferenceImpl) {
+      ((ProcessApplicationReferenceImpl) this.reference)
+          .setSkipClear(false)
+          .clear();
+    }
   }
 
   /*
    * Ensures the reference is not cleared before the stop methods of all services are executed
-   * and in particular ProcessApplicationStopService#stop() where the flag is returned to false
+   * and in particular ProcessApplicationStopService#stop()
+   * Perform the #clear in the #stop of this service instead
    */
-  public void enableSkipClear() {
+  protected void enableSkipClear() {
     if (this.reference instanceof ProcessApplicationReferenceImpl) {
       ((ProcessApplicationReferenceImpl) this.reference).setSkipClear(true);
     }

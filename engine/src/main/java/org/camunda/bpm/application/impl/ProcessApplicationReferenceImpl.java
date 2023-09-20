@@ -81,7 +81,8 @@ public class ProcessApplicationReferenceImpl implements ProcessApplicationRefere
     }
   }
 
-  public void setSkipClear(boolean skipClear) {
+  public ProcessApplicationReferenceImpl setSkipClear(boolean skipClear) {
     this.skipClear = skipClear;
+    return this;
   }
 }
