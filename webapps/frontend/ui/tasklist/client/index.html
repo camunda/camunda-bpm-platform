@@ -15,8 +15,7 @@
   <meta name="author"
         content="Camunda services GmbH"/>
 
-  <!--< base href="/" /> -->
-  <base href="<%= htmlWebpackPlugin.options.base %>"
+  <base href="<%= htmlWebpackPlugin.options.appBase %>"
         admin-api="<%= htmlWebpackPlugin.options.appRoot %>/api/admin/"
         cockpit-api="<%= htmlWebpackPlugin.options.appRoot %>/api/cockpit/"
         tasklist-api="<%= htmlWebpackPlugin.options.appRoot %>/api/tasklist/"
@@ -24,6 +23,8 @@
         engine-api="<%= htmlWebpackPlugin.options.appRoot %>/api/engine/"
         app-root="<%= htmlWebpackPlugin.options.appRoot %>"
         app-name="tasklist"/>
+
+  <%= htmlWebpackPlugin.tags.headTags %>
 
   <link rel="stylesheet"
         type="text/css"

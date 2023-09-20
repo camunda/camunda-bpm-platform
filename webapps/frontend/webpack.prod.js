@@ -113,7 +113,7 @@ module.exports = () => {
       plugin.userOptions = {
         ...plugin.userOptions,
         appRoot: '$APP_ROOT',
-        base: '$BASE',
+        appBase: '$BASE',
         pluginDeps: '$PLUGIN_DEPENDENCIES',
         pluginPackages: '$PLUGIN_PACKAGES'
       };
