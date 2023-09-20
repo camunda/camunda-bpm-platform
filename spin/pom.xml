@@ -36,7 +36,7 @@
     <jython.version>2.5.3</jython.version>
     <logback.version>1.2.11</logback.version>
     <powermock.version>2.0.9</powermock.version>
-    <spin.version.old>1.19.0</spin.version.old>
+    <spin.version.old>1.22.0</spin.version.old>
     <xml.bind-api.version>2.3.3</xml.bind-api.version>
 
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
