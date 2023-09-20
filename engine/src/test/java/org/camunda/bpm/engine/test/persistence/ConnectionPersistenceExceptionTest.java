@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.test.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.PERSISTENCE_CONNECTION_ERROR_CLASS;
 
 import java.sql.SQLException;
@@ -90,12 +90,12 @@ public class ConnectionPersistenceExceptionTest {
 
     Throwable result = catchThrowable(() -> identityService.deleteUser("foo"));
 
-    assertThat(result)
-        .isInstanceOf(ProcessEngineException.class)
-        .hasCauseInstanceOf(PersistenceException.class)
-        .hasRootCauseExactlyInstanceOf(SQLException.class);
+    assertThat(result).isInstanceOf(ProcessEngineException.class);
+    assertThat(result.getCause())
+        .isInstanceOf(PersistenceException.class) // 1st cause
+        .hasCauseInstanceOf(SQLException.class); // 2nd cause
 
-    return (SQLException) result.getCause().getCause(); // SQLException
+    return (SQLException) result.getCause().getCause();
   }
 
 }
