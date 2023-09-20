@@ -18,7 +18,7 @@
 
     <!-- database driver versions -->
     <version.h2>2.1.214</version.h2>
-    <version.h2-v1>1.4.190</version.h2-v1><!-- used for instance migration qa -->
+    <version.h2-v1>1.4.200</version.h2-v1><!-- used for instance migration qa -->
     <version.oracle>19.3.0.0</version.oracle>
     <version.mariadb>1.7.6</version.mariadb>
     <version.mariadb-v1>1.1.8</version.mariadb-v1>

@@ -71,23 +71,12 @@
 
   <modules>
     <module>engine-rest</module>
+    <module>engine-rest-jakarta</module>
     <module>engine-rest-openapi</module>
     <module>engine-rest-openapi-generator</module>
     <module>assembly</module>
+    <module>assembly-jakarta</module>
     <module>docs</module>
   </modules>
-
-  <profiles>
-    <profile>
-      <id>jdk11-and-onwards</id>
-      <activation>
-        <jdk>[11,)</jdk>
-      </activation>
-      <modules>
-        <module>engine-rest-jakarta</module>
-        <module>assembly-jakarta</module>
-      </modules>
-    </profile>
-  </profiles>
 
 </project>

@@ -157,6 +157,13 @@
       <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-impl</artifactId>
+      <version>${version.xml.jaxb-impl}</version>
+      <scope>provided</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -313,23 +320,5 @@
     </testResources>
 
   </build>
-
-  <profiles>
-    <profile>
-      <id>jdk-9-plus</id>
-      <activation>
-        <jdk>(1.8,)</jdk>
-      </activation>
-
-      <dependencies>
-        <dependency>
-          <groupId>com.sun.xml.bind</groupId>
-          <artifactId>jaxb-impl</artifactId>
-          <version>${version.xml.jaxb-impl}</version>
-          <scope>provided</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
 
 </project>

@@ -326,19 +326,10 @@
 
   <modules>
     <module>assembly</module>
+    <module>assembly-jakarta</module>
   </modules>
 
   <profiles>
-    <profile>
-      <id>jdk11-and-onwards</id>
-      <activation>
-        <jdk>[11,)</jdk>
-      </activation>
-      <modules>
-        <module>assembly-jakarta</module>
-      </modules>
-    </profile>
-
     <profile>
       <id>skipFrontendBuild</id>
       <properties>

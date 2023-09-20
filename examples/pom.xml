@@ -94,19 +94,7 @@
 
   <modules>
     <module>invoice</module>
+    <module>invoice-jakarta</module>
   </modules>
-
-  <profiles>
-    <profile>
-      <id>jdk11-and-onwards</id>
-      <activation>
-        <jdk>[11,)</jdk>
-      </activation>
-      <modules>
-        <module>invoice-jakarta</module>
-      </modules>
-    </profile>
-  </profiles>
-
 
 </project>

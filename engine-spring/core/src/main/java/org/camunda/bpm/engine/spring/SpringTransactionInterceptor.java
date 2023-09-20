@@ -73,12 +73,14 @@ public class SpringTransactionInterceptor extends CommandInterceptor {
       // When CockroachDB is used, a CRDB concurrency error may occur on transaction commit.
       // To ensure that these errors are still detected as OLEs, we must catch them and wrap
       // them in a CrdbTransactionRetryException
-      SQLException sqlException = (SQLException) ex.getCause();
-      if (processEngineConfiguration != null
-          && DbSqlSession.isCrdbConcurrencyConflictOnCommit(sqlException, processEngineConfiguration)) {
-        throw ProcessEngineLogger.PERSISTENCE_LOGGER.crdbTransactionRetryExceptionOnCommit(ex);
+      Throwable cause = ex.getCause();
+      if (cause instanceof SQLException && processEngineConfiguration != null
+              && DbSqlSession.isCrdbConcurrencyConflictOnCommit((SQLException) cause, processEngineConfiguration)) {
+        throw ProcessEngineLogger.PERSISTENCE_LOGGER.crdbTransactionRetryExceptionOnCommit(cause);
+
       } else {
         throw ex;
+
       }
     }
   }

@@ -54,7 +54,7 @@ public class CycleBusinessCalendar implements BusinessCalendar {
 
     }
     catch (Exception e) {
-      throw LOG.exceptionWhileParsingCronExpresison(duedateDescription, e);
+      throw LOG.exceptionWhileParsingCycleExpresison(duedateDescription, e);
     }
 
   }

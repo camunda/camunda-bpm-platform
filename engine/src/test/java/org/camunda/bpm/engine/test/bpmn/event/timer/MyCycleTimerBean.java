@@ -14,5 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.camunda.bpm.engine.test.bpmn.event.timer;
 
-require('requirejs-angular-define/dist/ngDefine');
+import java.io.Serializable;
+
+public class MyCycleTimerBean implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
+  protected String cycle;
+
+  public MyCycleTimerBean(String cycle) {
+    this.cycle = cycle;
+  }
+
+  public String getCycle() {
+    return this.cycle;
+  }
+  public void setCycle(String cycle) {
+    this.cycle = cycle;
+  }
+}

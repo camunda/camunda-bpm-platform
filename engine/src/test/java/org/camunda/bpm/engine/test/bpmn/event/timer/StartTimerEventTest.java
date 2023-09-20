@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.impl.cmd.DeleteJobsCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -53,6 +54,8 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
 import org.joda.time.LocalDateTime;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -60,6 +63,22 @@ import org.junit.Test;
  * @author Joram Barrez
  */
 public class StartTimerEventTest extends PluggableProcessEngineTest {
+
+  protected static final long ONE_HOUR = TimeUnit.HOURS.toMillis(1L);
+  protected static final long TWO_HOURS = TimeUnit.HOURS.toMillis(2L);
+
+  protected boolean reevaluateTimeCycleWhenDue;
+
+  @Before
+  public void setUp() {
+    reevaluateTimeCycleWhenDue = processEngineConfiguration.isReevaluateTimeCycleWhenDue();
+  }
+
+  @After
+  public void tearDown() {
+    processEngineConfiguration.getBeans().remove("myCycleTimerBean");
+    processEngineConfiguration.setReevaluateTimeCycleWhenDue(reevaluateTimeCycleWhenDue);
+  }
 
   @Deployment
   @Test
@@ -219,7 +238,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
 
     assertEquals(0, jobQuery.count());
   }
-  
+
   @Deployment
   @Test
   public void testRecalculateExpressionStartTimerEvent() throws Exception {
@@ -228,19 +247,19 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample");
     assertEquals(1, jobQuery.count());
     assertEquals(0, processInstanceQuery.count());
-    
+
     Job job = jobQuery.singleResult();
     Date oldDate = job.getDuedate();
-    
+
     // when
     moveByMinutes(2);
     Date currentTime = ClockUtil.getCurrentTime();
     managementService.recalculateJobDuedate(job.getId(), false);
-    
+
     // then
     assertEquals(1, jobQuery.count());
     assertEquals(0, processInstanceQuery.count());
-    
+
     Date newDate = jobQuery.singleResult().getDuedate();
     assertNotEquals(oldDate, newDate);
     assertTrue(oldDate.before(newDate));
@@ -256,7 +275,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
 
     assertEquals(0, jobQuery.count());
   }
-  
+
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/timer/StartTimerEventTest.testRecalculateExpressionStartTimerEvent.bpmn20.xml")
   @Test
   public void testRecalculateUnchangedExpressionStartTimerEventCreationDateBased() throws Exception {
@@ -265,15 +284,15 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample");
     assertEquals(1, jobQuery.count());
     assertEquals(0, processInstanceQuery.count());
-    
+
     // when
     moveByMinutes(1);
     managementService.recalculateJobDuedate(jobQuery.singleResult().getId(), true);
-    
+
     // then due date should be based on the creation time
     assertEquals(1, jobQuery.count());
     assertEquals(0, processInstanceQuery.count());
-    
+
     Job jobUpdated = jobQuery.singleResult();
     Date expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusHours(2).toDate();
     assertEquals(expectedDate, jobUpdated.getDuedate());
@@ -429,7 +448,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     ProcessInstance startedProcessInstance = runtimeService.createProcessInstanceQuery().singleResult();
     // make sure process instance was started
     assertThat(processInstance.getId()).isEqualTo(startedProcessInstance.getId());
-    
+
   }
 
   @Deployment
@@ -1241,7 +1260,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     String anotherJobId = jobQuery.singleResult().getId();
     assertFalse(jobId.equals(anotherJobId));
   }
-  
+
   @Test
   public void testRecalculateTimeCycleExpressionCurrentDateBased() throws Exception {
     // given
@@ -1257,7 +1276,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
 
     testRule.deploy(repositoryService.createDeployment()
       .addModelInstance("process.bpmn", modelInstance));
-    
+
     JobQuery jobQuery = managementService.createJobQuery();
     assertEquals(1, jobQuery.count());
 
@@ -1274,7 +1293,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     assertEquals(jobId, jobUpdated.getId());
     assertNotEquals(oldDuedate, jobUpdated.getDuedate());
     assertTrue(oldDuedate.before(jobUpdated.getDuedate()));
-    
+
     // when
     Mocks.register("cycle", "R/PT10M");
     managementService.recalculateJobDuedate(jobId, false);
@@ -1284,10 +1303,10 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     assertEquals(jobId, jobUpdated.getId());
     assertNotEquals(oldDuedate, jobUpdated.getDuedate());
     assertTrue(oldDuedate.after(jobUpdated.getDuedate()));
-    
+
     Mocks.reset();
   }
-  
+
   @Test
   public void testRecalculateTimeCycleExpressionCreationDateBased() throws Exception {
     // given
@@ -1303,7 +1322,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
 
     testRule.deploy(repositoryService.createDeployment()
       .addModelInstance("process.bpmn", modelInstance));
-    
+
     JobQuery jobQuery = managementService.createJobQuery();
     assertEquals(1, jobQuery.count());
 
@@ -1320,7 +1339,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     assertEquals(jobId, jobUpdated.getId());
     Date expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusMinutes(15).toDate();
     assertEquals(expectedDate, jobUpdated.getDuedate());
-    
+
     // when
     Mocks.register("cycle", "R/PT10M");
     managementService.recalculateJobDuedate(jobId, true);
@@ -1332,10 +1351,10 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     assertTrue(oldDuedate.after(jobUpdated.getDuedate()));
     expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusMinutes(10).toDate();
     assertEquals(expectedDate, jobUpdated.getDuedate());
-    
+
     Mocks.reset();
   }
-  
+
   @Deployment
   @Test
   public void testFailingTimeCycle() throws Exception {
@@ -1505,7 +1524,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     // then
     assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
   }
-  
+
   @Test
   public void testRecalculateNonInterruptingWithUnchangedDurationExpressionInEventSubprocessCurrentDateBased() throws Exception {
     // given
@@ -1524,14 +1543,14 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     testRule.deploy(repositoryService.createDeployment()
       .addModelInstance("process.bpmn", modelInstance));
 
-    runtimeService.startProcessInstanceByKey("process", 
+    runtimeService.startProcessInstanceByKey("process",
         Variables.createVariables().putValue("duration", "PT70S"));
-    
+
     JobQuery jobQuery = managementService.createJobQuery();
     Job job = jobQuery.singleResult();
     String jobId = job.getId();
     Date oldDueDate = job.getDuedate();
-    
+
     // when
     moveByMinutes(2);
     Date currentTime = ClockUtil.getCurrentTime();
@@ -1544,11 +1563,11 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     assertTrue(oldDueDate.before(newDuedate));
     Date expectedDate = LocalDateTime.fromDateFields(currentTime).plusSeconds(70).toDate();
     assertThat(newDuedate).isCloseTo(expectedDate, 1000l);
-    
+
     managementService.executeJob(jobId);
     assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
   }
-  
+
   @Test
   public void testRecalculateNonInterruptingWithChangedDurationExpressionInEventSubprocessCreationDateBased() throws Exception {
     // given
@@ -1567,14 +1586,14 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     testRule.deploy(repositoryService.createDeployment()
       .addModelInstance("process.bpmn", modelInstance));
 
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", 
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process",
         Variables.createVariables().putValue("duration", "PT60S"));
-    
+
     JobQuery jobQuery = managementService.createJobQuery();
     Job job = jobQuery.singleResult();
     String jobId = job.getId();
     Date oldDueDate = job.getDuedate();
-    
+
     // when
     runtimeService.setVariable(pi.getId(), "duration", "PT2M");
     managementService.recalculateJobDuedate(jobId, true);
@@ -1585,7 +1604,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     Date expectedDate = LocalDateTime.fromDateFields(jobQuery.singleResult().getCreateTime()).plusMinutes(2).toDate();
     assertTrue(oldDueDate.before(newDuedate));
     assertTrue(expectedDate.equals(newDuedate));
-    
+
     managementService.executeJob(jobId);
     assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
   }
@@ -1642,6 +1661,251 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     assertEquals(2, managementService.createJobQuery().withRetriesLeft().count());
   }
 
+  @Test
+  public void shouldReevaluateTimerCycleWhenDue() throws Exception {
+    // given
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R2/PT1H");
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
+    processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
+
+    createAndDeployProcessWithStartTimer();
+
+    moveByHours(1); // execute first job
+
+    // when bean changed and job is due
+    myCycleTimerBean.setCycle("R2/PT2H");
+    moveByHours(1); // execute second job
+
+    // then one more job is left due in 2 hours
+    Date duedate = managementService.createJobQuery().singleResult().getDuedate();
+    assertThat(duedate)
+        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + TWO_HOURS));
+  }
+
+  @Test
+  public void shouldNotReevaluateTimerCycle() throws Exception {
+    // given
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R2/PT1H");
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
+    processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
+
+    createAndDeployProcessWithStartTimer();
+
+    // when the timer is executed twice
+    moveByHours(1); // execute first job
+    moveByHours(1); // execute second job
+
+    // then no more jobs left
+    assertThat(managementService.createJobQuery().singleResult()).isNull();
+  }
+
+  @Test
+  public void shouldNotReevaluateTimerCycleWhenFeatureDisabled() throws Exception {
+    // given
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R2/PT1H");
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
+    processEngineConfiguration.setReevaluateTimeCycleWhenDue(false);
+
+    createAndDeployProcessWithStartTimer();
+
+    TaskQuery taskQuery = taskService.createTaskQuery().taskDefinitionKey("aTaskName");
+    assertEquals(0, taskQuery.count());
+    moveByHours(1); // execute first job
+    assertEquals(1, taskQuery.count());
+
+    // when bean changed and job is due
+    myCycleTimerBean.setCycle("R2/PT2H");
+    moveByHours(1); // execute second job
+
+    // then no more job left
+    assertThat(managementService.createJobQuery().singleResult()).isNull();
+    assertEquals(2, taskQuery.count());
+  }
+
+  @Test
+  public void shouldReevaluateCronTimerCycleWhenDue() throws Exception {
+    // given
+    ClockUtil.setCurrentTime(new Date(1692338400000l)); //"2023/8/18 8:00:00"
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("0 0 * ? * * *"); // every hour
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
+    processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
+
+    createAndDeployProcessWithStartTimer();
+
+    moveByHours(1); // execute first job
+
+    // when bean changed and job is due
+    myCycleTimerBean.setCycle("0 0 0/2 ? * * *"); // at 0 minutes past the hour, every 2 hours
+    moveByHours(1); // execute second job
+
+    // then one more job is left due in 2 hours
+    Date duedate = managementService.createJobQuery().singleResult().getDuedate();
+    assertThat(duedate)
+        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + TWO_HOURS));
+  }
+
+  @Test
+  public void shouldReevaluateRepeatingToCronTimerCycle() throws Exception {
+    // given
+    ClockUtil.setCurrentTime(new Date(1692338400000l)); // "2023/8/18 8:00:00"
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R2/PT1H");
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
+    processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
+
+    createAndDeployProcessWithStartTimer();
+    moveByHours(1); // execute first job
+
+    // when bean changed and job is due
+    myCycleTimerBean.setCycle("0 0 0/2 ? * * *"); // at 0 minutes past the hour, every 2 hours
+    moveByHours(1); // execute second job
+
+    // then one more job is left due in 2 hours
+    Date duedate = managementService.createJobQuery().singleResult().getDuedate();
+    assertThat(duedate)
+        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + TWO_HOURS));
+  }
+
+  @Test
+  public void shouldReevaluateCronToRepeatingTimerCycle() throws Exception {
+    // given
+    ClockUtil.setCurrentTime(new Date(1692338400000l)); //"2023/8/18 8:00:00"
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("0 0 * ? * * *"); // every hour
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
+    processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
+
+    createAndDeployProcessWithStartTimer();
+    moveByHours(1); // execute first job
+
+    // when bean changed and job is due
+    myCycleTimerBean.setCycle("R2/PT2H");
+    moveByHours(1); // execute second job
+    JobQuery jobQuery = managementService.createJobQuery();
+
+    // then one more job is left due in 2 hours
+    Date duedate = jobQuery.singleResult().getDuedate();
+    assertThat(duedate)
+        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + TWO_HOURS));
+
+    moveByHours(2); // execute first job from new cycle
+
+    // one more job is left due in 2 hours
+    duedate = jobQuery.singleResult().getDuedate();
+    assertThat(duedate)
+        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + TWO_HOURS));
+
+    moveByHours(2); // execute second job from new cycle
+
+    // then no more jobs left
+    assertThat(jobQuery.singleResult())
+        .isNull();
+  }
+
+  @Test
+  public void shouldReevaluateCronToRepeatingTimerCycleWithDate() throws Exception {
+    // given
+    ClockUtil.setCurrentTime(new Date(1692338400000l)); //"2023/8/18 8:00:00"
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("0 0 * ? * * *"); // every hour
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
+    processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
+
+    createAndDeployProcessWithStartTimer();
+    moveByHours(1); // execute first job, "2023/8/18 9:00:00"
+
+    // when bean changed and job is due
+    myCycleTimerBean.setCycle("R2/2023-08-18T14:00/PT30M");
+    moveByHours(1); // execute second job, "2023/8/18 10:00:00"
+    JobQuery jobQuery = managementService.createJobQuery();
+
+    // then one more job is left due in 4 hours
+    Date duedate = jobQuery.singleResult().getDuedate();
+    assertThat(duedate)
+        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + TimeUnit.HOURS.toMillis(4L)));
+
+    moveByHours(4); // execute first job from new cycle, "2023/8/18 14:00:00"
+
+    // one more job is left due in 30 minutes
+    duedate = jobQuery.singleResult().getDuedate();
+    assertThat(duedate)
+        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + TimeUnit.MINUTES.toMillis(30L)));
+
+    moveByHours(1); // execute second job from new cycle
+
+    // then no more jobs left
+    assertThat(jobQuery.singleResult())
+        .isNull();
+  }
+
+  @Test
+  public void shouldReevaluateRepeatingTimerCycleWithDate() throws Exception {
+    // given
+    ClockUtil.setCurrentTime(new Date(1692338400000l)); //"2023/8/18 8:00:00"
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R3/2023-08-18T8:00/PT1H"); // every hour
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
+    processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
+
+    createAndDeployProcessWithStartTimer();
+    moveByHours(1); // execute first job, "2023/8/18 9:00:00"
+
+    // when bean changed and job is due
+    myCycleTimerBean.setCycle("R2/PT2H");
+    moveByHours(1); // execute second job, "2023/8/18 10:00:00"
+    JobQuery jobQuery = managementService.createJobQuery();
+
+    // then one more job is left due in 2 hours
+    Date duedate = jobQuery.singleResult().getDuedate();
+    assertThat(duedate)
+        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + TWO_HOURS));
+
+    moveByHours(2); // execute first job from new cycle, "2023/8/18 12:00:00"
+
+    // one more job is left due in 2 hours
+    duedate = jobQuery.singleResult().getDuedate();
+    assertThat(duedate)
+        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + TWO_HOURS));
+
+    moveByHours(2); // execute second job from new cycle
+
+    // then no more jobs left
+    assertThat(jobQuery.singleResult())
+        .isNull();
+  }
+
+  @Test
+  public void shouldReevaluateRepeatingTimerCycleToTimerCycleWithDate() throws Exception {
+    // given
+    ClockUtil.setCurrentTime(new Date(1692338400000l)); //"2023/8/18 8:00:00"
+    MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R3/PT1H"); // every hour
+    processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
+    processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
+
+    createAndDeployProcessWithStartTimer();
+    moveByHours(1); // execute first job, "2023/8/18 9:00:00"
+
+    // when bean changed and job is due
+    myCycleTimerBean.setCycle("R2/2023-08-18T10:00/PT2H");
+    moveByHours(1); // execute second job, "2023/8/18 10:00:00"
+    JobQuery jobQuery = managementService.createJobQuery();
+
+    // then one more job is left due in 2 hours
+    Date duedate = jobQuery.singleResult().getDuedate();
+    assertThat(duedate)
+    .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + TWO_HOURS));
+
+    moveByHours(2); // execute first job from new cycle, "2023/8/18 12:00:00"
+
+    // one more job is left due in 2 hours
+    duedate = jobQuery.singleResult().getDuedate();
+    assertThat(duedate)
+    .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + TWO_HOURS));
+
+    moveByHours(2); // execute second job from new cycle
+
+    // then no more jobs left
+    assertThat(jobQuery.singleResult())
+    .isNull();
+  }
+
+
   // util methods ////////////////////////////////////////
 
   /**
@@ -1661,6 +1925,11 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
 
   }
 
+  protected void moveByHours(int hours) {
+    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + (TimeUnit.HOURS.toMillis(hours) + 5000)));
+    testRule.executeAvailableJobs(false);
+  }
+
   protected String getNextExecutableJobId() {
     List<Job> jobs = managementService.createJobQuery().executable().listPage(0, 1);
     if (jobs.size() == 1) {
@@ -1674,6 +1943,15 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     String jobId = managementService.createJobQuery().singleResult().getId();
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new DeleteJobsCmd(jobId, true));
+  }
+
+  protected void createAndDeployProcessWithStartTimer() {
+    testRule.deploy(Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .timerWithCycle("#{myCycleTimerBean.getCycle()}")
+        .userTask("aTaskName")
+        .endEvent()
+        .done());
   }
 
 }
