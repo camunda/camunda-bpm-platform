@@ -28,6 +28,7 @@
 
     <property name="history" value="full"/>
     <property name="telemetryReporterActivate" value="false" />
+    <property name="enforceHistoryTimeToLive" value="false" />
 
   </bean>
 

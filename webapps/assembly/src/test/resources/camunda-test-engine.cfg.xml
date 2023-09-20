@@ -28,6 +28,7 @@
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 
     <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
+    <property name="enforceHistoryTimeToLive" value="false" />
   </bean>
   
   <!--<bean id="uuidGenerator" class="org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator" />-->

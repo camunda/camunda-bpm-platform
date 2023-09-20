@@ -35,6 +35,7 @@
       </array>
     </property>
     <property name="deploymentTenantId" value="tenant1" />
+    <property name="enforceHistoryTimeToLive" value="false" />
   </bean>
   
   <bean id="processEngine" class="org.camunda.bpm.engine.spring.ProcessEngineFactoryBean">

@@ -37,6 +37,7 @@
       </list>
     </property>
 
+    <property name="enforceHistoryTimeToLive" value="false" />
     
   </bean>
 

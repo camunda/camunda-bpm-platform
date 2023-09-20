@@ -1324,6 +1324,7 @@ public class TelemetryReporterTest {
 
   protected BpmnModelInstance createProcessWithBusinessRuleTask(String processId, String decisionRef) {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(processId)
+        .camundaHistoryTimeToLive(180)
         .startEvent()
         .businessRuleTask("task")
         .endEvent()

@@ -358,6 +358,7 @@ public class DeploymentCacheCfgTest {
 
   protected BpmnModelInstance createModel(String suffix) {
     BpmnModelInstance bpmnModel = Bpmn.createExecutableProcess("Process" + suffix)
+        .camundaHistoryTimeToLive(180)
         .startEvent("startEvent")
         .userTask().name("User Task")
         .endEvent("endEvent")

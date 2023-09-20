@@ -26,6 +26,7 @@
     <property name="taskMetricsEnabled" value="false" />
     
     <property name="createDiagramOnDeploy" value="true" />
+    <property name="enforceHistoryTimeToLive" value="false" />
     
     <property name="identityProviderSessionFactory">
         <bean class="org.camunda.bpm.engine.impl.persistence.GenericManagerFactory">

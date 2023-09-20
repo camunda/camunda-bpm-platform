@@ -604,10 +604,11 @@ public class TaskQueryOrTest {
   public void shouldReturnTasksWithProcessVariableValueNotLikeOrEquals() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask()
-      .endEvent()
-      .done();
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
+        .userTask()
+        .endEvent()
+        .done();
 
     repositoryService
       .createDeployment()
@@ -632,11 +633,12 @@ public class TaskQueryOrTest {
   public void shouldInitializeFormKeys() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .startEvent()
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
         .userTask()
-          .camundaFormKey("aFormKey")
-      .endEvent()
-      .done();
+        .camundaFormKey("aFormKey")
+        .endEvent()
+        .done();
 
     repositoryService
       .createDeployment()
@@ -647,7 +649,8 @@ public class TaskQueryOrTest {
       .startProcessInstanceByKey("aProcessDefinition");
 
     BpmnModelInstance anotherProcessDefinition = Bpmn.createExecutableProcess("anotherProcessDefinition")
-      .startEvent()
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
         .userTask()
           .camundaFormKey("anotherFormKey")
       .endEvent()
@@ -680,7 +683,8 @@ public class TaskQueryOrTest {
   public void shouldReturnTasksWithProcessDefinitionNameOrProcessDefinitionKey() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .name("process1")
+        .camundaHistoryTimeToLive(180)
+        .name("process1")
       .startEvent()
         .userTask()
       .endEvent()
@@ -694,7 +698,8 @@ public class TaskQueryOrTest {
     runtimeService.startProcessInstanceByKey("aProcessDefinition");
 
     BpmnModelInstance anotherProcessDefinition = Bpmn.createExecutableProcess("anotherProcessDefinition")
-      .startEvent()
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
         .userTask()
       .endEvent()
       .done();
@@ -722,7 +727,8 @@ public class TaskQueryOrTest {
   public void shouldReturnTasksWithProcessInstanceBusinessKeyOrProcessInstanceBusinessKeyLike() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .startEvent()
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
         .userTask()
       .endEvent()
       .done();
@@ -736,7 +742,8 @@ public class TaskQueryOrTest {
       .startProcessInstanceByKey("aProcessDefinition", "aBusinessKey");
 
     BpmnModelInstance anotherProcessDefinition = Bpmn.createExecutableProcess("anotherProcessDefinition")
-      .startEvent()
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
         .userTask()
       .endEvent()
       .done();
@@ -765,7 +772,8 @@ public class TaskQueryOrTest {
   public void shouldReturnTasksWithProcessInstanceBusinessKeyOrProcessInstanceBusinessKeyLikeAndAssignee() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .startEvent()
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
         .userTask()
       .endEvent()
       .done();
@@ -782,7 +790,8 @@ public class TaskQueryOrTest {
     .startProcessInstanceByKey("aProcessDefinition", "aBusinessKey");
 
     BpmnModelInstance anotherProcessDefinition = Bpmn.createExecutableProcess("anotherProcessDefinition")
-      .startEvent()
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
         .userTask()
       .endEvent()
       .done();
@@ -820,7 +829,8 @@ public class TaskQueryOrTest {
   public void shouldReturnTasksWithProcessInstanceBusinessKeyOrProcessInstanceBusinessKeyLikeOrStandaloneAssignee() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .startEvent()
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
         .userTask()
       .endEvent()
       .done();

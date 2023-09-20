@@ -5,7 +5,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   targetNamespace="Examples">
 
-  <process id="callingProcessScriptConditionalFlow" isExecutable="true">
+  <process id="callingProcessScriptConditionalFlow" isExecutable="true" camunda:historyTimeToLive="5">
 
     <startEvent id="theStart" />
 

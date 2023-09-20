@@ -23,6 +23,7 @@
     <property name="history" value="${history.level}" />
 
     <property name="failedJobRetryTimeCycle" value="R5/PT5M" />
+    <property name="enforceHistoryTimeToLive" value="false" />
 
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />

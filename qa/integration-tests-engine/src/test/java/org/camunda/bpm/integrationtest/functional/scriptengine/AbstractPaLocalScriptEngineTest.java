@@ -48,6 +48,7 @@ public abstract class AbstractPaLocalScriptEngineTest extends AbstractFoxPlatfor
 
   protected static StringAsset createScriptTaskProcess(String scriptFormat, String scriptText) {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
+        .camundaHistoryTimeToLive(180)
       .startEvent()
       .scriptTask()
         .scriptFormat(scriptFormat)

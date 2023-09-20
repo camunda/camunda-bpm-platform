@@ -46,12 +46,14 @@ import org.junit.runner.RunWith;
 public class MigrationContextSwitchBeansTest extends AbstractFoxPlatformIntegrationTest {
 
   public static final BpmnModelInstance ONE_TASK_PROCESS = Bpmn.createExecutableProcess("oneTaskProcess")
+      .camundaHistoryTimeToLive(180)
     .startEvent()
     .userTask("userTask")
     .endEvent()
     .done();
 
   public static final BpmnModelInstance BOUNDARY_EVENT_PROCESS = Bpmn.createExecutableProcess("boundaryProcess")
+      .camundaHistoryTimeToLive(180)
     .startEvent()
     .userTask("userTask")
     .boundaryEvent()

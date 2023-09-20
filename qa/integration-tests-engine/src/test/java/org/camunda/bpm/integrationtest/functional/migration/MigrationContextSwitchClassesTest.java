@@ -48,6 +48,7 @@ public class MigrationContextSwitchClassesTest extends AbstractFoxPlatformIntegr
 
   public static final BpmnModelInstance oneTaskProcess(String key) {
     return  Bpmn.createExecutableProcess(key)
+        .camundaHistoryTimeToLive(180)
       .startEvent()
       .userTask("userTask")
       .endEvent()
@@ -56,6 +57,7 @@ public class MigrationContextSwitchClassesTest extends AbstractFoxPlatformIntegr
 
   public static final BpmnModelInstance subProcessProcess(String key) {
     return  Bpmn.createExecutableProcess(key)
+        .camundaHistoryTimeToLive(180)
       .startEvent()
       .subProcess()
       .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, InstantiationListener.class.getName())
@@ -70,6 +72,7 @@ public class MigrationContextSwitchClassesTest extends AbstractFoxPlatformIntegr
   }
 
   public static final BpmnModelInstance BOUNDARY_EVENT_PROCESS = Bpmn.createExecutableProcess("boundaryProcess")
+      .camundaHistoryTimeToLive(180)
     .startEvent()
     .userTask("userTask")
     .boundaryEvent()

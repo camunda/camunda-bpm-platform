@@ -30,6 +30,7 @@
     <!-- enable expressions in adhoc queries -->
     <property name="enableExpressionsInAdhocQueries" value="false" />
     <property name="enableExpressionsInStoredQueries" value="false" />
+    <property name="enforceHistoryTimeToLive" value="false" />
   </bean>
 
 </beans>

@@ -24,6 +24,8 @@
     
     <!-- history level -->
     <property name="history" value="${history.level}" />
+
+    <property name="enforceHistoryTimeToLive" value="false" />
     
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />

@@ -32,6 +32,7 @@
     <property name="history" value="${history.level}" />
 
     <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
+    <property name="enforceHistoryTimeToLive" value="false" />    
 
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 

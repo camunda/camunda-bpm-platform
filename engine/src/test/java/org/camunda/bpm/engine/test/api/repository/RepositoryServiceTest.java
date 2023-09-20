@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -37,7 +38,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.assertj.core.groups.Tuple;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.EntityTypes;
@@ -47,9 +47,9 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
@@ -60,8 +60,6 @@ import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.core.model.CallableElement;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
@@ -92,6 +90,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -105,15 +104,23 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
   private static final String NAMESPACE = "xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL'";
   private static final String TARGET_NAMESPACE = "targetNamespace='" + BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS + "'";
 
+  private boolean enforceHistoryTimeToLiveBefore;
+
+  @Before
+  public void setUp() {
+    this.enforceHistoryTimeToLiveBefore = processEngineConfiguration.isEnforceHistoryTimeToLive();
+  }
+
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
-    commandExecutor.execute(new Command<Object>() {
-      public Object execute(CommandContext commandContext) {
-        commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByHandlerType(TimerActivateProcessDefinitionHandler.TYPE);
-        return null;
-      }
+    commandExecutor.execute(commandContext -> {
+      commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByHandlerType(TimerActivateProcessDefinitionHandler.TYPE);
+      return null;
     });
+
+    // restore config to the test's previous state
+    processEngineConfiguration.setEnforceHistoryTimeToLive(enforceHistoryTimeToLiveBefore);
   }
 
   private void checkDeployedBytes(InputStream deployedResource, byte[] utf8Bytes) throws IOException {
@@ -135,7 +142,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
     //and model instance with umlauts
     String umlautsString = "äöüÄÖÜß";
     String resourceName = "deployment.bpmn";
-    BpmnModelInstance instance = Bpmn.createExecutableProcess("umlautsProcess").startEvent(umlautsString).done();
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("umlautsProcess").camundaHistoryTimeToLive(180).startEvent(umlautsString).done();
     String instanceAsString = Bpmn.convertToString(instance);
 
     //when instance is deployed via addString method
@@ -755,20 +762,22 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
   public void testDeployRevisedProcessAfterDeleteOnOtherProcessEngine() {
 
     // Setup both process engines
-    ProcessEngine processEngine1 = new StandaloneProcessEngineConfiguration()
-      .setProcessEngineName("reboot-test-schema")
-      .setDatabaseSchemaUpdate(org.camunda.bpm.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE)
-      .setJdbcUrl("jdbc:h2:mem:activiti-process-cache-test;DB_CLOSE_DELAY=1000")
-      .setJobExecutorActivate(false)
-      .buildProcessEngine();
+    ProcessEngine processEngine1 = new StandaloneProcessEngineConfiguration().setProcessEngineName("reboot-test-schema")
+        .setDatabaseSchemaUpdate(org.camunda.bpm.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE)
+        .setJdbcUrl("jdbc:h2:mem:activiti-process-cache-test;DB_CLOSE_DELAY=1000")
+        .setJobExecutorActivate(false)
+        .setEnforceHistoryTimeToLive(false)
+        .buildProcessEngine();
+
     RepositoryService repositoryService1 = processEngine1.getRepositoryService();
 
-    ProcessEngine processEngine2 = new StandaloneProcessEngineConfiguration()
-      .setProcessEngineName("reboot-test")
-      .setDatabaseSchemaUpdate(org.camunda.bpm.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
-      .setJdbcUrl("jdbc:h2:mem:activiti-process-cache-test;DB_CLOSE_DELAY=1000")
-      .setJobExecutorActivate(false)
-      .buildProcessEngine();
+    ProcessEngine processEngine2 = new StandaloneProcessEngineConfiguration().setProcessEngineName("reboot-test")
+        .setDatabaseSchemaUpdate(org.camunda.bpm.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
+        .setJdbcUrl("jdbc:h2:mem:activiti-process-cache-test;DB_CLOSE_DELAY=1000")
+        .setJobExecutorActivate(false)
+        .setEnforceHistoryTimeToLive(false)
+        .buildProcessEngine();
+
     RepositoryService repositoryService2 = processEngine2.getRepositoryService();
     RuntimeService runtimeService2 = processEngine2.getRuntimeService();
     TaskService taskService2 = processEngine2.getTaskService();
@@ -1079,6 +1088,52 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
     caseDefinition = findOnlyCaseDefinition();
 
     assertEquals(null, caseDefinition.getHistoryTimeToLive());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
+  public void shouldFailToUpdateHistoryTimeToLiveOnCaseDefinitionHTTLUpdate() {
+    assertThatThrownBy(() -> {
+      // given
+      CaseDefinition caseDefinition = findOnlyCaseDefinition();
+      processEngineConfiguration.setEnforceHistoryTimeToLive(true);
+
+      // when
+      repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinition.getId(), null);
+    })
+        // then
+        .isInstanceOf(NotAllowedException.class)
+        .hasMessage("Null historyTimeToLive values are not allowed");
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
+  public void shouldFailToUpdateHistoryTimeToLiveOnProcessDefinitionHTTLUpdate() {
+    assertThatThrownBy(() -> {
+      // given
+      ProcessDefinition processDefinition = findOnlyProcessDefinition();
+      processEngineConfiguration.setEnforceHistoryTimeToLive(true);
+
+      // when
+      repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinition.getId(), null);})
+        // then
+        .isInstanceOf(NotAllowedException.class)
+        .hasMessage("Null historyTimeToLive values are not allowed");
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/dmn/Example.dmn"})
+  @Test
+  public void shouldFailToUpdateHistoryTimeToLiveOnDecisionDefinitionHTTLUpdate() {
+    assertThatThrownBy(() -> {
+      // given
+      DecisionDefinition decisionDefinition = findOnlyDecisionDefinition();
+      processEngineConfiguration.setEnforceHistoryTimeToLive(true);
+
+      // when
+      repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), null);})
+        // then
+        .isInstanceOf(NotAllowedException.class)
+        .hasMessage("Null historyTimeToLive values are not allowed");
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})

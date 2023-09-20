@@ -37,10 +37,11 @@ public class ActivityInstanceCountMetricsTest extends AbstractMetricsTest {
   @Test
   public void testBpmnActivityInstances() {
     testRule.deploy(Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .manualTask()
-      .endEvent()
-    .done());
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
+        .manualTask()
+        .endEvent()
+        .done());
 
     // given
     // that no activity instances have been executed

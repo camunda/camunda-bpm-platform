@@ -39,7 +39,7 @@ public class GroovyAsyncScriptExecutionTest extends AbstractFoxPlatformIntegrati
       "  xmlns=\"http://www.omg.org/spec/BPMN/20100524/MODEL\"\r\n" +
       "  xmlns:camunda=\"http://camunda.org/schema/1.0/bpmn\"\r\n" +
       "  targetNamespace=\"Examples\">\r\n" +
-      "  <process id=\"process\" isExecutable=\"true\">\r\n" +
+      "  <process id=\"process\" isExecutable=\"true\" camunda:historyTimeToLive=\"P180D\">\r\n" +
       "    <startEvent id=\"theStart\" />\r\n" +
       "    <sequenceFlow id=\"flow1\" sourceRef=\"theStart\" targetRef=\"theScriptTask\" />\r\n" +
       "    <scriptTask id=\"theScriptTask\" name=\"Execute script\" scriptFormat=\"groovy\" camunda:asyncBefore=\"true\">\r\n" +

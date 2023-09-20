@@ -6,7 +6,7 @@
              id="definitions_cf5d1264-4bf6-48ef-87b1-5d6f503a54c1"
              targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL"
              xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL">
-  <process id="process" isExecutable="true">
+  <process id="process" isExecutable="true" camunda:historyTimeToLive="5">
     <startEvent id="startEvent_58b8adca-d2bd-4412-b3fe-0067e3b30981">
       <outgoing>sequenceFlow_3b07b1ea-c1ca-4fc9-89a8-7ab4b157c46d
       </outgoing>

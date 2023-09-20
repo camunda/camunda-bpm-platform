@@ -49,6 +49,7 @@ import org.junit.rules.RuleChain;
 public class DelegateExecutionContextTest {
 
   protected static final BpmnModelInstance SERVICE_TASK_DELEGATE_PROCESS = Bpmn.createExecutableProcess()
+      .camundaHistoryTimeToLive(180)
       .startEvent()
       .serviceTask("serviceTask1")
         .camundaClass(DelegateClass.class.getName())
@@ -57,12 +58,14 @@ public class DelegateExecutionContextTest {
 
 
   protected static final BpmnModelInstance EXEUCTION_LISTENER_PROCESS = Bpmn.createExecutableProcess()
+      .camundaHistoryTimeToLive(180)
       .startEvent()
         .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, ExecutionListenerImpl.class.getName())
       .endEvent()
       .done();
 
   protected static final BpmnModelInstance SIGNAL_EVENT_PROCESS = Bpmn.createExecutableProcess()
+      .camundaHistoryTimeToLive(180)
       .startEvent()
         .intermediateCatchEvent("catchSignal")
           .signal("${delegateExecutionContextBean.getCurrentActivityId()}")
@@ -72,7 +75,8 @@ public class DelegateExecutionContextTest {
   protected static final BpmnModelInstance getSingleUserTaskProcessWithSignalStartEventSubprocess() {
     ProcessBuilder processBuilder = Bpmn.createExecutableProcess();
     BpmnModelInstance model = processBuilder
-      .startEvent("start")
+        .camundaHistoryTimeToLive(180)
+        .startEvent("start")
         .userTask("A")
       .endEvent()
       .done();

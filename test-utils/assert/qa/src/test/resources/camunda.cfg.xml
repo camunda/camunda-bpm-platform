@@ -18,6 +18,7 @@
     <property name="jobExecutorActivate" value="false" />
 
     <property name="history" value="full" />
+    <property name="enforceHistoryTimeToLive" value="false" />
 
   </bean>
 </beans>

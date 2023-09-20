@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" id="definitions_bbfdd863-d073-440a-9027-e5a4fdf9f85a" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" exporter="Camunda Modeler" exporterVersion="1.12.0">
-  <process id="process" isExecutable="true">
+  <process id="process" isExecutable="true" camunda:historyTimeToLive="5">
     <startEvent id="startEvent_648db707-1c56-4110-9359-bc105737a25b">
       <outgoing>sequenceFlow_ac59b697-c430-4a52-a340-5118231b1105</outgoing>
     </startEvent>

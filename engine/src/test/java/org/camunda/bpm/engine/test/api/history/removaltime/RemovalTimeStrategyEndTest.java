@@ -97,12 +97,15 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   protected final String CALLED_PROCESS_KEY = "calledProcess";
+
   protected final BpmnModelInstance CALLED_PROCESS = Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
-    .startEvent()
+      .camundaHistoryTimeToLive(180)
+      .startEvent()
       .userTask("userTask")
-        .name("userTask")
-        .camundaCandidateUsers("foo")
-    .endEvent().done();
+      .name("userTask")
+      .camundaCandidateUsers("foo")
+      .endEvent()
+      .done();
 
   protected final String CALLING_PROCESS_KEY = "callingProcess";
   protected final BpmnModelInstance CALLING_PROCESS = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)

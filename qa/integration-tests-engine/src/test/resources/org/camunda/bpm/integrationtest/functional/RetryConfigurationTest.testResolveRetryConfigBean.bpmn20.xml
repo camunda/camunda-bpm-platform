@@ -5,7 +5,7 @@
                   xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1"
                   targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler"
                   exporterVersion="1.10.0">
-  <bpmn:process id="testRetry" name="Retry config" isExecutable="true">
+  <bpmn:process id="testRetry" name="Retry config" isExecutable="true" camunda:historyTimeToLive="P180D">
     <bpmn:startEvent id="startEventProcessStarted" name="Process&#10;started">
       <bpmn:outgoing>SequenceFlow1</bpmn:outgoing>
     </bpmn:startEvent>

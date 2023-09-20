@@ -44,6 +44,7 @@ public class RequestScopeIT {
     // given
     repositoryService.createDeployment()
         .addModelInstance("scriptTaskProcess.bpmn", Bpmn.createExecutableProcess("scriptTaskProcess")
+            .camundaHistoryTimeToLive(5)
             .startEvent()
             .scriptTask()
               .scriptFormat("javascript")
