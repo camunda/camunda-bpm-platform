@@ -19,7 +19,6 @@ package org.camunda.bpm.container.impl.jboss.service;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
-import org.camunda.bpm.application.impl.ProcessApplicationReferenceImpl;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -39,7 +38,6 @@ public class NoViewProcessApplicationStartService implements Service<ProcessAppl
 
   public NoViewProcessApplicationStartService(ProcessApplicationReference reference) {
     this.reference = reference;
-    enableSkipClear();
   }
 
   public ProcessApplicationInterface getValue() throws IllegalStateException, IllegalArgumentException {
@@ -56,22 +54,7 @@ public class NoViewProcessApplicationStartService implements Service<ProcessAppl
   }
 
   public void stop(StopContext context) {
-    if (this.reference != null && this.reference instanceof ProcessApplicationReferenceImpl) {
-      ((ProcessApplicationReferenceImpl) this.reference)
-          .setSkipClear(false)
-          .clear();
-    }
-  }
 
-  /*
-   * Ensures the reference is not cleared before the stop methods of all services are executed
-   * and in particular ProcessApplicationStopService#stop()
-   * Perform the #clear in the #stop of this service instead
-   */
-  protected void enableSkipClear() {
-    if (this.reference instanceof ProcessApplicationReferenceImpl) {
-      ((ProcessApplicationReferenceImpl) this.reference).setSkipClear(true);
-    }
   }
 
 }

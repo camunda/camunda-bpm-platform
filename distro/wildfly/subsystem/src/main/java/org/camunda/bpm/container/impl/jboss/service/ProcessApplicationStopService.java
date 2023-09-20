@@ -17,7 +17,6 @@
 package org.camunda.bpm.container.impl.jboss.service;
 
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,21 +43,10 @@ public class ProcessApplicationStopService implements Service<ProcessApplication
   private final static Logger LOGGER = Logger.getLogger(ProcessApplicationStopService.class.getName());
 
   // for view-exposing ProcessApplicationComponents
-  protected final Supplier<ComponentView> paComponentViewSupplier;
-  protected final Supplier<ProcessApplicationInterface> noViewApplicationSupplier;
-  protected final Supplier<BpmPlatformPlugins> platformPluginsSupplier;
   protected InjectedValue<ComponentView> paComponentViewInjector = new InjectedValue<ComponentView>();
   protected InjectedValue<ProcessApplicationInterface> noViewProcessApplication = new InjectedValue<ProcessApplicationInterface>();
 
   protected InjectedValue<BpmPlatformPlugins> platformPluginsInjector = new InjectedValue<BpmPlatformPlugins>();
-
-  public ProcessApplicationStopService(Supplier<ComponentView> paComponentViewSupplier,
-      Supplier<ProcessApplicationInterface> noViewApplicationSupplier,
-      Supplier<BpmPlatformPlugins> platformPluginsSupplier) {
-    this.paComponentViewSupplier = paComponentViewSupplier;
-    this.noViewApplicationSupplier = noViewApplicationSupplier;
-    this.platformPluginsSupplier = platformPluginsSupplier;
-  }
 
   @Override
   public ProcessApplicationStopService getValue() throws IllegalStateException, IllegalArgumentException {
@@ -78,16 +66,16 @@ public class ProcessApplicationStopService implements Service<ProcessApplication
 
       // get the process application component
       ProcessApplicationInterface processApplication = null;
-      if(paComponentViewSupplier != null) {
-        ComponentView componentView = paComponentViewSupplier.get();
+      ComponentView componentView = paComponentViewInjector.getOptionalValue();
+      if(componentView != null) {
         reference = componentView.createInstance();
         processApplication = (ProcessApplicationInterface) reference.getInstance();
       }
       else {
-        processApplication = noViewApplicationSupplier.get();
+        processApplication = noViewProcessApplication.getValue();
       }
 
-      BpmPlatformPlugins bpmPlatformPlugins = platformPluginsSupplier.get();
+      BpmPlatformPlugins bpmPlatformPlugins = platformPluginsInjector.getValue();
       List<BpmPlatformPlugin> plugins = bpmPlatformPlugins.getPlugins();
 
       for (BpmPlatformPlugin bpmPlatformPlugin : plugins) {
@@ -104,6 +92,19 @@ public class ProcessApplicationStopService implements Service<ProcessApplication
         reference.release();
       }
     }
+  }
+
+
+  public InjectedValue<ProcessApplicationInterface> getNoViewProcessApplication() {
+    return noViewProcessApplication;
+  }
+
+  public InjectedValue<ComponentView> getPaComponentViewInjector() {
+    return paComponentViewInjector;
+  }
+
+  public InjectedValue<BpmPlatformPlugins> getPlatformPluginsInjector() {
+    return platformPluginsInjector;
   }
 
 }

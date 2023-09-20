@@ -50,8 +50,6 @@ public class ProcessApplicationReferenceImpl implements ProcessApplicationRefere
 
   protected String name;
 
-  protected boolean skipClear;
-
   public ProcessApplicationReferenceImpl(AbstractProcessApplication processApplication) {
     this.processApplication = new WeakReference<AbstractProcessApplication>(processApplication);
     this.name = processApplication.getName();
@@ -76,13 +74,7 @@ public class ProcessApplicationReferenceImpl implements ProcessApplicationRefere
   }
 
   public void clear() {
-    if (!skipClear) {
-      processApplication.clear();
-    }
+    processApplication.clear();
   }
 
-  public ProcessApplicationReferenceImpl setSkipClear(boolean skipClear) {
-    this.skipClear = skipClear;
-    return this;
-  }
 }
