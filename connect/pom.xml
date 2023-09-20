@@ -17,7 +17,7 @@
     <assertj.version>2.9.1</assertj.version>
     <commons.version>1.13.0</commons.version>
     <commons-codec.version>1.15</commons-codec.version>
-    <connect.version.old>1.5.0</connect.version.old>
+    <connect.version.old>1.6.0</connect.version.old>
     <httpclient.version>4.5.13</httpclient.version>
     <junit.version>4.13.1</junit.version>
     <logback.version>1.2.11</logback.version>
