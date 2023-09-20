@@ -17,7 +17,7 @@
 
 import '../styles/styles.less';
 
-window.jQuery = require('jquery');
+window.$ = window.jQuery = require('jquery');
 
 import {
   requirejs,

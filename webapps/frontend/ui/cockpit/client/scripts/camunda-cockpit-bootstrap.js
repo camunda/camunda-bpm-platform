@@ -18,7 +18,7 @@
 import 'ui/cockpit/client/styles/styles.less';
 import 'ui/cockpit/client/styles/styles-components.less';
 
-window.jQuery = require('jquery');
+window.$ = window.jQuery = require('jquery');
 
 import {
   requirejs,
