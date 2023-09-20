@@ -17,8 +17,8 @@
 package org.camunda.bpm.engine;
 
 /**
- * Wrapper Exception on all MyBatis API calls to the db. It is used to hide SQL details and be the interface with
- * process engine.
+ * Exception thrown by the persistence layer of the process engine in the occurrence of a problematic interaction
+ * with the datasource.
  */
 public class ProcessEnginePersistenceException extends ProcessEngineException {
 
