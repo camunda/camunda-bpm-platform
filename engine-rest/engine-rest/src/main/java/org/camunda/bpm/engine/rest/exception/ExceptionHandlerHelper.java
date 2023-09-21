@@ -37,7 +37,7 @@ import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanValidationExceptio
 public class ExceptionHandlerHelper {
 
   protected static final ExceptionLogger LOGGER = ExceptionLogger.REST_LOGGER;
-  protected static ExceptionHandlerHelper INSTANCE = new ExceptionHandlerHelper();
+  protected static final ExceptionHandlerHelper INSTANCE = new ExceptionHandlerHelper();
 
   private ExceptionHandlerHelper() {
   }
