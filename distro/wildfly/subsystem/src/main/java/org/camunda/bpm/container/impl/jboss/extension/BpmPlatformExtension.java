@@ -19,6 +19,7 @@ package org.camunda.bpm.container.impl.jboss.extension;
 import org.camunda.bpm.container.impl.jboss.extension.resource.BpmPlatformRootDefinition;
 import org.jboss.as.controller.Extension;
 import org.jboss.as.controller.ExtensionContext;
+import org.jboss.as.controller.ModelVersion;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.SubsystemRegistration;
 import org.jboss.as.controller.descriptions.StandardResourceDescriptionResolver;
@@ -26,8 +27,6 @@ import org.jboss.as.controller.parsing.ExtensionParsingContext;
 
 import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.SUBSYSTEM_NAME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUBSYSTEM;
-
-
 
 /**
  * Defines the bpm-platform subsystem for Wildfly 8+ application server
@@ -54,7 +53,7 @@ public class BpmPlatformExtension implements Extension {
 
   @Override
   public void initialize(ExtensionContext context) {
-    SubsystemRegistration subsystem = context.registerSubsystem(SUBSYSTEM_NAME, BPM_PLATFORM_SUBSYSTEM_MAJOR_VERSION, BPM_PLATFORM_SUBSYSTEM_MINOR_VERSION);
+    SubsystemRegistration subsystem = context.registerSubsystem(SUBSYSTEM_NAME, ModelVersion.create(BPM_PLATFORM_SUBSYSTEM_MAJOR_VERSION, BPM_PLATFORM_SUBSYSTEM_MINOR_VERSION));
     subsystem.registerSubsystemModel(BpmPlatformRootDefinition.INSTANCE);
     subsystem.registerXMLElementWriter(parser);
   }

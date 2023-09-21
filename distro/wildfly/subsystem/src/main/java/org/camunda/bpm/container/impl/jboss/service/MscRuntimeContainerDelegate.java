@@ -281,6 +281,7 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
 
   protected void stopTrackingServices() {
     serviceContainer.removeListener(processEngineServiceTracker);
+    serviceContainer.removeListener(processApplicationServiceTracker);
   }
 
   /**

@@ -31,71 +31,70 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 import org.jboss.msc.service.ServiceBuilder;
-import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 
 
 /**
- * <p>Deployment Unit Processor that creates process engine services for each 
+ * <p>Deployment Unit Processor that creates process engine services for each
  * process engine configured in a <code>processes.xml</code> file</p>
- * 
+ *
  * @author Daniel Meyer
  *
  */
 public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
-  
+
   // this can happen at the beginning of the phase
-  public static final int PRIORITY = 0x0000; 
+  public static final int PRIORITY = 0x0000;
 
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-    
+
     final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
-    
+
     if(!ProcessApplicationAttachments.isProcessApplication(deploymentUnit)) {
       return;
     }
-    
+
     List<ProcessesXmlWrapper> processesXmls = ProcessApplicationAttachments.getProcessesXmls(deploymentUnit);
-    for (ProcessesXmlWrapper wrapper : processesXmls) {            
+    for (ProcessesXmlWrapper wrapper : processesXmls) {
       for (ProcessEngineXml processEngineXml : wrapper.getProcessesXml().getProcessEngines()) {
-        startProcessEngine(processEngineXml, phaseContext);      
+        startProcessEngine(processEngineXml, phaseContext);
       }
     }
-    
+
   }
 
   protected void startProcessEngine(ProcessEngineXml processEngineXml, DeploymentPhaseContext phaseContext) {
-    
+
     final ServiceTarget serviceTarget = phaseContext.getServiceTarget();
-    
+
     // transform configuration
     ManagedProcessEngineMetadata configuration = transformConfiguration(processEngineXml);
-    
+
     // validate the configuration
     configuration.validate();
-    
+
     // create service instance
     MscManagedProcessEngineController service = new MscManagedProcessEngineController(configuration);
-    
+
     // get the service name for the process engine
     ServiceName serviceName = ServiceNames.forManagedProcessEngine(processEngineXml.getName());
-    
+
     // get service builder
     ServiceBuilder<ProcessEngine> serviceBuilder = serviceTarget.addService(serviceName, service);
-    
+
     // make this service depend on the current phase -> makes sure it is removed with the phase service at undeployment
-    serviceBuilder.addDependency(phaseContext.getPhaseServiceName());
-    
+    serviceBuilder.requires(phaseContext.getPhaseServiceName());
+
     // add Service dependencies
     MscManagedProcessEngineController.initializeServiceBuilder(configuration, service, serviceBuilder, processEngineXml.getJobAcquisitionName());
 
     // install the service
     serviceBuilder.install();
-    
+
   }
 
-  /** transforms the configuration as provided via the {@link ProcessEngineXml} 
+  /** transforms the configuration as provided via the {@link ProcessEngineXml}
    * into a {@link ManagedProcessEngineMetadata} */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   protected ManagedProcessEngineMetadata transformConfiguration(ProcessEngineXml processEngineXml) {
@@ -105,12 +104,12 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
         processEngineXml.getDatasource(),
         processEngineXml.getProperties().get("history"),
         processEngineXml.getConfigurationClass(),
-        (Map) processEngineXml.getProperties(),
+        processEngineXml.getProperties(),
         processEngineXml.getPlugins());
   }
 
   public void undeploy(DeploymentUnit deploymentUnit) {
-        
+
   }
 
 }

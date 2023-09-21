@@ -28,12 +28,12 @@ import org.jboss.msc.service.StopContext;
 /**
  * <p>Start Service for process applications that do not expose an EE Component View
  * (like {@link ServletProcessApplication}</p>
- * 
+ *
  * @author Daniel Meyer
  *
  */
 public class NoViewProcessApplicationStartService implements Service<ProcessApplicationInterface> {
-  
+
   protected ProcessApplicationReference reference;
 
   public NoViewProcessApplicationStartService(ProcessApplicationReference reference) {
@@ -43,9 +43,9 @@ public class NoViewProcessApplicationStartService implements Service<ProcessAppl
   public ProcessApplicationInterface getValue() throws IllegalStateException, IllegalArgumentException {
     try {
       return reference.getProcessApplication();
-      
+
     } catch (ProcessApplicationUnavailableException e) {
-      throw new IllegalStateException("Process application '"+reference.getName()+"' is not unavailable.", e);
+      throw new IllegalStateException("Process application '" + reference.getName() + "' is not available.", e);
     }
   }
 

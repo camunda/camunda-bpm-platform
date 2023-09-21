@@ -30,9 +30,10 @@ import org.jboss.as.server.deployment.module.ModuleSpecification;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoader;
+import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
-
+import org.jboss.msc.service.ServiceTarget;
 
 /**
  * <p>This Processor creates implicit module dependencies for process applications</p>
@@ -107,11 +108,11 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
     ProcessApplicationModuleService processApplicationModuleService = new ProcessApplicationModuleService();
     ServiceName serviceName = ServiceNames.forProcessApplicationModuleService(moduleName);
 
-    phaseContext.getServiceTarget()
-      .addService(serviceName, processApplicationModuleService)
-      .addDependency(phaseContext.getPhaseServiceName())
-      .setInitialMode(Mode.ACTIVE)
-      .install();
+    final ServiceBuilder<ServiceTarget> serviceBuilder = phaseContext.getServiceTarget()
+        .addService(serviceName, processApplicationModuleService)
+        .setInitialMode(Mode.ACTIVE);
+    serviceBuilder.requires(phaseContext.getPhaseServiceName());
+    serviceBuilder.install();
 
   }
 

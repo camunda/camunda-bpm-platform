@@ -69,9 +69,9 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
 
   // Injecting these values makes the MSC aware of our dependencies on these resources.
   // This ensures that they are available when this service is started
-  protected final InjectedValue<TransactionManager> transactionManagerInjector = new InjectedValue<TransactionManager>();
-  protected final InjectedValue<DataSourceReferenceFactoryService> datasourceBinderServiceInjector = new InjectedValue<DataSourceReferenceFactoryService>();
-  protected final InjectedValue<MscRuntimeContainerJobExecutor> mscRuntimeContainerJobExecutorInjector = new InjectedValue<MscRuntimeContainerJobExecutor>();
+  protected final InjectedValue<TransactionManager> transactionManagerInjector = new InjectedValue<>();
+  protected final InjectedValue<DataSourceReferenceFactoryService> datasourceBinderServiceInjector = new InjectedValue<>();
+  protected final InjectedValue<MscRuntimeContainerJobExecutor> mscRuntimeContainerJobExecutorInjector = new InjectedValue<>();
 
   protected ManagedProcessEngineMetadata processEngineMetadata;
 
@@ -256,21 +256,21 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
   }
 
   public static void initializeServiceBuilder(ManagedProcessEngineMetadata processEngineConfiguration, MscManagedProcessEngineController service,
-          ServiceBuilder<ProcessEngine> serviceBuilder, String jobExecutorName) {
+    ServiceBuilder<ProcessEngine> serviceBuilder, String jobExecutorName) {
 
     ContextNames.BindInfo datasourceBindInfo = ContextNames.bindInfoFor(processEngineConfiguration.getDatasourceJndiName());
     serviceBuilder.addDependency(ServiceName.JBOSS.append("txn").append("TransactionManager"), TransactionManager.class, service.getTransactionManagerInjector())
       .addDependency(datasourceBindInfo.getBinderServiceName(), DataSourceReferenceFactoryService.class, service.getDatasourceBinderServiceInjector())
       .addDependency(ServiceNames.forMscRuntimeContainerDelegate(), MscRuntimeContainerDelegate.class, service.getRuntimeContainerDelegateInjector())
       .addDependency(ServiceNames.forMscRuntimeContainerJobExecutorService(jobExecutorName), MscRuntimeContainerJobExecutor.class, service.getMscRuntimeContainerJobExecutorInjector())
-      .addDependency(ServiceNames.forMscExecutorService())
       .setInitialMode(Mode.ACTIVE);
+    serviceBuilder.requires(ServiceNames.forMscExecutorService());
 
     if(processEngineConfiguration.isDefault()) {
       serviceBuilder.addAliases(ServiceNames.forDefaultProcessEngine());
     }
 
-    JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder, service.getExecutorInjector(), false);
+    JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder, service.getExecutorInjector());
 
   }
 
