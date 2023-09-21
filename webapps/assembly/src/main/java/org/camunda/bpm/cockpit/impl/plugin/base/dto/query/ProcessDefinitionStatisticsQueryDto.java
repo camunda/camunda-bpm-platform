@@ -29,11 +29,11 @@ public class ProcessDefinitionStatisticsQueryDto extends AbstractRestQueryParame
   private static final Map<String, String> VALID_SORT_VALUES;
   static {
     VALID_SORT_VALUES = new HashMap<>();
-    VALID_SORT_VALUES.put("incidents", "GROUPED.INCIDENT_COUNT_");
-    VALID_SORT_VALUES.put("instances", "GROUPED.INSTANCE_COUNT_");
-    VALID_SORT_VALUES.put("key", "RES.KEY_");
-    VALID_SORT_VALUES.put("name", "RES.NAME_");
-    VALID_SORT_VALUES.put("tenantId", "RES.TENANT_ID_");
+    VALID_SORT_VALUES.put("incidents", "INCIDENT_COUNT_");
+    VALID_SORT_VALUES.put("instances", "INSTANCE_COUNT_");
+    VALID_SORT_VALUES.put("key", "KEY_");
+    VALID_SORT_VALUES.put("name", "NAME_");
+    VALID_SORT_VALUES.put("tenantId", "TENANT_ID_");
   }
 
   protected String key;

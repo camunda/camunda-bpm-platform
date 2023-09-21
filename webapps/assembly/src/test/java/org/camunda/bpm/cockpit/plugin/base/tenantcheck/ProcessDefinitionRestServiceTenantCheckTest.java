@@ -106,8 +106,8 @@ public class ProcessDefinitionRestServiceTenantCheckTest extends AbstractCockpit
     // then
     assertThat(actual).hasSize(2);
     assertThat(actual).extracting("key", "tenantId")
-        .containsSequence(tuple("multiTenancyCallActivity", null),
-                          tuple("userTaskProcess", TENANT_ONE));
+        .containsOnly(tuple("multiTenancyCallActivity", null),
+                      tuple("userTaskProcess", TENANT_ONE));
   }
 
   @Test
@@ -122,9 +122,9 @@ public class ProcessDefinitionRestServiceTenantCheckTest extends AbstractCockpit
     // then
     assertThat(actual).hasSize(3);
     assertThat(actual).extracting("key", "tenantId")
-        .containsSequence(tuple("multiTenancyCallActivity", null),
-                          tuple("userTaskProcess", TENANT_ONE),
-                          tuple("userTaskProcess", TENANT_TWO));
+        .containsOnly(tuple("multiTenancyCallActivity", null),
+                      tuple("userTaskProcess", TENANT_ONE),
+                      tuple("userTaskProcess", TENANT_TWO));
   }
 
   @Test
@@ -138,9 +138,9 @@ public class ProcessDefinitionRestServiceTenantCheckTest extends AbstractCockpit
     // then
     assertThat(actual).hasSize(3);
     assertThat(actual).extracting("key", "tenantId")
-        .containsSequence(tuple("multiTenancyCallActivity", null),
-                          tuple("userTaskProcess", TENANT_ONE),
-                          tuple("userTaskProcess", TENANT_TWO));
+        .containsOnly(tuple("multiTenancyCallActivity", null),
+                      tuple("userTaskProcess", TENANT_ONE),
+                      tuple("userTaskProcess", TENANT_TWO));
   }
 
   @Test
@@ -154,9 +154,9 @@ public class ProcessDefinitionRestServiceTenantCheckTest extends AbstractCockpit
     // then
     assertThat(actual).hasSize(3);
     assertThat(actual).extracting("key", "tenantId")
-        .containsSequence(tuple("multiTenancyCallActivity", null),
-                          tuple("userTaskProcess", TENANT_ONE),
-                          tuple("userTaskProcess", TENANT_TWO));
+        .containsOnly(tuple("multiTenancyCallActivity", null),
+                      tuple("userTaskProcess", TENANT_ONE),
+                      tuple("userTaskProcess", TENANT_TWO));
   }
 
   @Test
@@ -170,9 +170,9 @@ public class ProcessDefinitionRestServiceTenantCheckTest extends AbstractCockpit
     // then
     assertThat(actual).hasSize(3);
     assertThat(actual).extracting("key", "tenantId")
-        .containsSequence(tuple("multiTenancyCallActivity", null),
-                          tuple("userTaskProcess", TENANT_ONE),
-                          tuple("userTaskProcess", TENANT_TWO));
+        .containsOnly(tuple("multiTenancyCallActivity", null),
+                      tuple("userTaskProcess", TENANT_ONE),
+                      tuple("userTaskProcess", TENANT_TWO));
   }
 
   @Test

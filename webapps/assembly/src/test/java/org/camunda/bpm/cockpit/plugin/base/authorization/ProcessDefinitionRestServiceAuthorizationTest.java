@@ -105,8 +105,8 @@ public class ProcessDefinitionRestServiceAuthorizationTest  extends Authorizatio
     // then
     assertThat(actual).hasSize(2);
     assertThat(actual).extracting("key", "tenantId")
-        .containsSequence(tuple(CALLING_USER_TASK_PROCESS_KEY, null),
-                          tuple(USER_TASK_PROCESS_KEY, null));
+        .containsOnly(tuple(CALLING_USER_TASK_PROCESS_KEY, null),
+                      tuple(USER_TASK_PROCESS_KEY, null));
   }
 
   @Test
@@ -122,8 +122,8 @@ public class ProcessDefinitionRestServiceAuthorizationTest  extends Authorizatio
     // then
     assertThat(actual).hasSize(2);
     assertThat(actual).extracting("key", "tenantId")
-        .containsSequence(tuple(CALLING_USER_TASK_PROCESS_KEY, null),
-                          tuple(USER_TASK_PROCESS_KEY, null));
+        .containsOnly(tuple(CALLING_USER_TASK_PROCESS_KEY, null),
+                      tuple(USER_TASK_PROCESS_KEY, null));
   }
 
   @Test
