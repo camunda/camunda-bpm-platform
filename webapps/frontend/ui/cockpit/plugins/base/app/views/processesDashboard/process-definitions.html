@@ -89,7 +89,12 @@
                 </a>
               </td>
 
-              <td class="name" cam-widget-clipboard="pd.name">
+              <td class="name"
+                  ng-if="!pd.name"></td>
+
+              <td class="name"
+                  cam-widget-clipboard="pd.name"
+                  ng-if="pd.name">
                 <a href="#/process-definition/{{ pd.id }}">
                   {{ pd.name }}
                 </a>
