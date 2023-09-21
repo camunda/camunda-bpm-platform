@@ -61,9 +61,12 @@ public interface SetRemovalTimeToHistoricProcessInstancesBuilder {
   SetRemovalTimeToHistoricProcessInstancesBuilder hierarchical();
 
   /**
-   * Processes removal time updates in chunks, taking into account defined limits. This
-   * can lead to multiple executions of the job to keep the transaction from timing out
-   * due to too many rows that would need to be updated within one transaction.
+   * Handles removal time updates in chunks, taking into account the defined
+   * size in {@code removalTimeUpdateChunkSize} in the process engine
+   * configuration. The size of the chunks can also be overridden per call with
+   * the {@link #chunkSize(int)} option. Enabling this option can lead to
+   * multiple executions of the resulting jobs, preventing the database
+   * transaction from timing out by limiting the number of rows to update.
    *
    * @since 7.20
    *
@@ -75,8 +78,11 @@ public interface SetRemovalTimeToHistoricProcessInstancesBuilder {
    * Defines the size of the chunks in which removal time updates are processed.
    * The value must be a positive integer value that doesn't exceed the
    * {@link ProcessSetRemovalTimeJobHandler#MAX_CHUNK_SIZE}.
-   *
+   * 
    * Only has an effect if {@link #updateInChunks()} is invoked as well.
+   * 
+   * If undefined, the operation uses the `removalTimeUpdateChunkSize` defined
+   * in the process engine configuration.
    *
    * @since 7.20
    *
