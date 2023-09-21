@@ -16,9 +16,14 @@
  */
 package org.camunda.bpm.engine.impl.persistence;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 
 
@@ -46,5 +51,21 @@ public class AbstractHistoricManager extends AbstractManager {
 
   public boolean isHistoryLevelFullEnabled() {
     return isHistoryLevelFullEnabled;
+  }
+
+  protected static boolean isPerformUpdate(Set<String> entities, Class<?> entityClass) {
+    return entities == null || entities.isEmpty() || entities.contains(entityClass.getName());
+  }
+
+  protected static boolean isPerformUpdateOnly(Set<String> entities, Class<?> entityClass) {
+    return entities != null && entities.size() == 1 && entities.contains(entityClass.getName());
+  }
+
+  protected static void addOperation(DbOperation operation, Map<Class<? extends DbEntity>, DbOperation> operations) {
+    operations.put(operation.getEntityType(), operation);
+  }
+
+  protected static void addOperation(Collection<DbOperation> newOperations, Map<Class<? extends DbEntity>, DbOperation> operations) {
+    newOperations.forEach(operation -> operations.put(operation.getEntityType(), operation));
   }
 }

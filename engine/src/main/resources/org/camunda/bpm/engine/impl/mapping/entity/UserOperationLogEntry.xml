@@ -87,50 +87,137 @@
 
   <update id="updateUserOperationLogByRootProcessInstanceId"
           parameterType="java.util.Map">
-      update ${prefix}ACT_HI_OP_LOG set
+      update
+      <if test="maxResults != null">
+        ${limitBeforeWithoutOffset}
+      </if>
+      ${prefix}ACT_HI_OP_LOG set
       REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
 
       where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+      <if test="maxResults != null">
+        and (REMOVAL_TIME_ is null or REMOVAL_TIME_ != #{removalTime, jdbcType=TIMESTAMP})
+        ${limitAfterWithoutOffset}
+      </if>
+  </update>
+
+  <update id="updateUserOperationLogByRootProcessInstanceId_postgres"
+          parameterType="java.util.Map">
+      update ${prefix}ACT_HI_OP_LOG set
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      <if test="maxResults != null">
+        ${limitBeforeInUpdate} ${prefix}ACT_HI_OP_LOG
+      </if>
+
+      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+      <if test="maxResults != null">
+        and (REMOVAL_TIME_ is null or REMOVAL_TIME_ != #{removalTime, jdbcType=TIMESTAMP})
+        ${limitAfterInUpdate}
+      </if>
   </update>
 
   <update id="updateUserOperationLogByRootProcessInstanceId_mssql"
           parameterType="java.util.Map">
-      update RES set
-    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-    FROM ${prefix}ACT_HI_OP_LOG RES WITH (FORCESEEK)
+      update
+      <if test="maxResults != null">
+        ${limitBeforeWithoutOffset}
+      </if>
+      RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      FROM ${prefix}ACT_HI_OP_LOG RES WITH (FORCESEEK)
       where RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+      <if test="maxResults != null">
+        and (REMOVAL_TIME_ is null or REMOVAL_TIME_ != #{removalTime, jdbcType=TIMESTAMP})
+        ${limitAfterWithoutOffset}
+      </if>
   </update>
 
   <update id="updateUserOperationLogByRootProcessInstanceId_mysql"
           parameterType="java.util.Map">
-      update ${prefix}ACT_HI_OP_LOG set
-      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
-      TIMESTAMP_ = TIMESTAMP_
+      update ${prefix}ACT_HI_OP_LOG
+      <choose>
+        <when test="maxResults != null">
+          ${limitBeforeInUpdate} ${prefix}ACT_HI_OP_LOG
+        </when>
+        <otherwise>
+          set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+              TIMESTAMP_ = TIMESTAMP_
+        </otherwise>
+      </choose>
 
       where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+      <if test="maxResults != null">
+        and (REMOVAL_TIME_ is null or REMOVAL_TIME_ != #{removalTime, jdbcType=TIMESTAMP})
+        ${limitAfterInUpdate}
+        set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+            TIMESTAMP_ = TIMESTAMP_
+      </if>
   </update>
 
   <update id="updateUserOperationLogByProcessInstanceId"
           parameterType="java.util.Map">
-    update ${prefix}ACT_HI_OP_LOG
+    update
+    <if test="maxResults != null">
+      ${limitBeforeWithoutOffset}
+    </if>
+    ${prefix}ACT_HI_OP_LOG
       set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
       where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      <if test="maxResults != null">
+        and (REMOVAL_TIME_ is null or REMOVAL_TIME_ != #{removalTime, jdbcType=TIMESTAMP})
+        ${limitAfterWithoutOffset}
+      </if>
+  </update>
+
+  <update id="updateUserOperationLogByProcessInstanceId_postgres"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_OP_LOG
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      <if test="maxResults != null">
+        ${limitBeforeInUpdate} ${prefix}ACT_HI_OP_LOG
+      </if>
+      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      <if test="maxResults != null">
+        and (REMOVAL_TIME_ is null or REMOVAL_TIME_ != #{removalTime, jdbcType=TIMESTAMP})
+        ${limitAfterInUpdate}
+      </if>
   </update>
 
   <update id="updateUserOperationLogByProcessInstanceId_mssql"
           parameterType="java.util.Map">
-    update RES set
+    update
+    <if test="maxResults != null">
+      ${limitBeforeWithoutOffset}
+    </if>
+    RES set
     RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
     FROM ${prefix}ACT_HI_OP_LOG RES WITH (FORCESEEK)
       where RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      <if test="maxResults != null">
+        and (REMOVAL_TIME_ is null or REMOVAL_TIME_ != #{removalTime, jdbcType=TIMESTAMP})
+        ${limitAfterWithoutOffset}
+      </if>
   </update>
 
   <update id="updateUserOperationLogByProcessInstanceId_mysql"
           parameterType="java.util.Map">
     update ${prefix}ACT_HI_OP_LOG
-      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
-          TIMESTAMP_ = TIMESTAMP_
+      <choose>
+        <when test="maxResults != null">
+          ${limitBeforeInUpdate} ${prefix}ACT_HI_OP_LOG
+        </when>
+        <otherwise>
+          set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+              TIMESTAMP_ = TIMESTAMP_
+        </otherwise>
+      </choose>
       where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      <if test="maxResults != null">
+        and (REMOVAL_TIME_ is null or REMOVAL_TIME_ != #{removalTime, jdbcType=TIMESTAMP})
+        ${limitAfterInUpdate}
+        set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+            TIMESTAMP_ = TIMESTAMP_
+      </if>
   </update>
 
   <update id="updateOperationLogAnnotationByOperationId"

@@ -19,6 +19,7 @@ package org.camunda.bpm.qa.upgrade;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.qa.upgrade.batch.SetRemovalTimeToProcessInstanceScenario;
 import org.camunda.bpm.qa.upgrade.httl.EnforceHistoryTimeToLiveScenario;
 import org.camunda.bpm.qa.upgrade.variables.JpaVariableScenario;
 
@@ -40,6 +41,7 @@ public class TestFixture {
     // example scenario setup
     runner.setupScenarios(JpaVariableScenario.class);
     runner.setupScenarios(EnforceHistoryTimeToLiveScenario.class);
+    runner.setupScenarios(SetRemovalTimeToProcessInstanceScenario.class);
 
     processEngine.close();
   }

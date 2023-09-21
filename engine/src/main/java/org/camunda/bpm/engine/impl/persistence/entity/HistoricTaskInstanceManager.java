@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl;
@@ -184,21 +183,23 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
     }
   }
 
-  public void addRemovalTimeToTaskInstancesByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public DbOperation addRemovalTimeToTaskInstancesByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime, Integer batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
+    parameters.put("maxResults", batchSize);
 
-    getDbEntityManager()
+    return getDbEntityManager()
       .updatePreserveOrder(HistoricTaskInstanceEventEntity.class, "updateHistoricTaskInstancesByRootProcessInstanceId", parameters);
   }
 
-  public void addRemovalTimeToTaskInstancesByProcessInstanceId(String processInstanceId, Date removalTime) {
+  public DbOperation addRemovalTimeToTaskInstancesByProcessInstanceId(String processInstanceId, Date removalTime, Integer batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
+    parameters.put("maxResults", batchSize);
 
-    getDbEntityManager()
+    return getDbEntityManager()
       .updatePreserveOrder(HistoricTaskInstanceEventEntity.class, "updateHistoricTaskInstancesByProcessInstanceId", parameters);
   }
 

@@ -66,4 +66,17 @@ public interface BatchJobHandler<T> extends JobHandler<BatchJobConfiguration> {
    */
   void deleteJobs(BatchEntity batch);
 
+  /**
+   * Determine the number of invocations ber patch job. This can be defined by
+   * the related batch job handler specifically or otherwise taken from the
+   * engine configuration.
+   *
+   * @param batchType
+   *          the batch's type to help determine any engine configuration
+   *          related to it
+   * @param configuration
+   *          the configuration object
+   * @return the number of invocations ber patch job
+   */
+  int calculateInvocationsPerBatchJob(String batchType, T configuration);
 }

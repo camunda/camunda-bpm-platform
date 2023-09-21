@@ -16,15 +16,21 @@
  */
 package org.camunda.bpm.engine.impl.cmd.batch.removaltime;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
+import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
 import org.camunda.bpm.engine.impl.batch.removaltime.SetRemovalTimeBatchConfiguration;
 import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricProcessInstancesBuilderImpl;
 import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricProcessInstancesBuilderImpl.Mode;
@@ -32,13 +38,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Tassilo Weidner
@@ -90,7 +89,9 @@ public class SetRemovalTimeToHistoricProcessInstancesCmd implements Command<Batc
     return new SetRemovalTimeBatchConfiguration(elementConfiguration.getIds(), elementConfiguration.getMappings())
         .setHierarchical(builder.isHierarchical())
         .setHasRemovalTime(hasRemovalTime())
-        .setRemovalTime(builder.getRemovalTime());
+        .setRemovalTime(builder.getRemovalTime())
+        .setUpdateInChunks(builder.isUpdateInChunks())
+        .setChunkSize(builder.getChunkSize());
   }
 
   protected boolean hasRemovalTime() {
@@ -105,6 +106,8 @@ public class SetRemovalTimeToHistoricProcessInstancesCmd implements Command<Batc
     propertyChanges.add(new PropertyChange("hierarchical", null, builder.isHierarchical()));
     propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, true));
+    propertyChanges.add(new PropertyChange("updateInChunks", null, builder.isUpdateInChunks()));
+    propertyChanges.add(new PropertyChange("chunkSize", null, builder.getChunkSize()));
 
     commandContext.getOperationLogManager()
       .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_SET_REMOVAL_TIME, propertyChanges);

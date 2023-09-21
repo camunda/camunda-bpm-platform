@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.HistoricJobLogQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
@@ -68,21 +67,23 @@ public class HistoricJobLogManager extends AbstractHistoricManager {
 
   // update ///////////////////////////////////////////////////////////////////
 
-  public void addRemovalTimeToJobLogByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public DbOperation addRemovalTimeToJobLogByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime, Integer batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
+    parameters.put("maxResults", batchSize);
 
-    getDbEntityManager()
+    return getDbEntityManager()
       .updatePreserveOrder(HistoricJobLogEventEntity.class, "updateJobLogByRootProcessInstanceId", parameters);
   }
 
-  public void addRemovalTimeToJobLogByProcessInstanceId(String processInstanceId, Date removalTime) {
+  public DbOperation addRemovalTimeToJobLogByProcessInstanceId(String processInstanceId, Date removalTime, Integer batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
+    parameters.put("maxResults", batchSize);
 
-    getDbEntityManager()
+    return getDbEntityManager()
       .updatePreserveOrder(HistoricJobLogEventEntity.class, "updateJobLogByProcessInstanceId", parameters);
   }
 

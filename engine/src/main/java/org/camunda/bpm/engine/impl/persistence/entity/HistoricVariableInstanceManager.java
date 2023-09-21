@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl;
@@ -45,7 +44,7 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
       }
     }
   }
-  
+
   public void deleteHistoricVariableInstanceByProcessInstanceIds(List<String> historicProcessInstanceIds) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processInstanceIds", historicProcessInstanceIds);
@@ -137,21 +136,23 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
     }
   }
 
-  public void addRemovalTimeToVariableInstancesByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public DbOperation addRemovalTimeToVariableInstancesByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime, Integer batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
+    parameters.put("maxResults", batchSize);
 
-    getDbEntityManager()
+    return getDbEntityManager()
       .updatePreserveOrder(HistoricVariableInstanceEntity.class, "updateHistoricVariableInstancesByRootProcessInstanceId", parameters);
   }
 
-  public void addRemovalTimeToVariableInstancesByProcessInstanceId(String processInstanceId, Date removalTime) {
+  public DbOperation addRemovalTimeToVariableInstancesByProcessInstanceId(String processInstanceId, Date removalTime, Integer batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
+    parameters.put("maxResults", batchSize);
 
-    getDbEntityManager()
+    return getDbEntityManager()
       .updatePreserveOrder(HistoricVariableInstanceEntity.class, "updateHistoricVariableInstancesByProcessInstanceId", parameters);
   }
 

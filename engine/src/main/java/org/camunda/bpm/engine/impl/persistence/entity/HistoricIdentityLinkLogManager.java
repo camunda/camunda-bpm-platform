@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
 import org.camunda.bpm.engine.impl.HistoricIdentityLinkLogQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
@@ -49,21 +48,23 @@ public class HistoricIdentityLinkLogManager extends AbstractHistoricManager {
     return getDbEntityManager().selectList("selectHistoricIdentityLinkByQueryCriteria", query, page);
   }
 
-  public void addRemovalTimeToIdentityLinkLogByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public DbOperation addRemovalTimeToIdentityLinkLogByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime, Integer batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
+    parameters.put("maxResults", batchSize);
 
-    getDbEntityManager()
+    return getDbEntityManager()
       .updatePreserveOrder(HistoricIdentityLinkLogEventEntity.class, "updateIdentityLinkLogByRootProcessInstanceId", parameters);
   }
 
-  public void addRemovalTimeToIdentityLinkLogByProcessInstanceId(String processInstanceId, Date removalTime) {
+  public DbOperation addRemovalTimeToIdentityLinkLogByProcessInstanceId(String processInstanceId, Date removalTime, Integer batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
+    parameters.put("maxResults", batchSize);
 
-    getDbEntityManager()
+    return getDbEntityManager()
       .updatePreserveOrder(HistoricIdentityLinkLogEventEntity.class, "updateIdentityLinkLogByProcessInstanceId", parameters);
   }
 

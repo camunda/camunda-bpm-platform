@@ -194,6 +194,15 @@ import org.camunda.bpm.engine.rest.util.URLEncodingUtil;
 
     }
 
+    if (dto.isUpdateInChunks()) {
+      builder.updateInChunks();
+    }
+
+    Integer chunkSize = dto.getUpdateChunkSize();
+    if (chunkSize != null) {
+      builder.chunkSize(chunkSize);
+    }
+
     Batch batch = builder.executeAsync();
     return BatchDto.fromBatch(batch);
   }

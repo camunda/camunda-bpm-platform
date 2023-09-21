@@ -16,11 +16,14 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 
 
 /**
- * NOTE: instances of Messge Entity should be created via {@link MessageJobDeclaration}.
+ * NOTE: instances of Message Entity should be created via {@link MessageJobDeclaration}.
  *
  * @author Tom Baeyens
  */
@@ -29,6 +32,8 @@ public class MessageEntity extends JobEntity {
   public static final String TYPE = "message";
 
   private static final long serialVersionUID = 1L;
+
+  private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   private String repeat = null;
 
@@ -39,8 +44,26 @@ public class MessageEntity extends JobEntity {
     this.repeat = repeat;
   }
 
+  @Override
   public String getType() {
     return TYPE;
+  }
+
+  @Override
+  protected void postExecute(CommandContext commandContext) {
+    LOG.debugJobExecuted(this);
+    if (repeat != null && !repeat.isEmpty()) {
+      init(commandContext, false, true);
+    } else {
+      delete(true);
+    }
+    commandContext.getHistoricJobLogManager().fireJobSuccessfulEvent(this);
+  }
+
+  @Override
+  public void init(CommandContext commandContext, boolean shouldResetLock, boolean shouldCallDeleteHandler) {
+    super.init(commandContext, shouldResetLock, shouldCallDeleteHandler);
+    repeat = null;
   }
 
   @Override

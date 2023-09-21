@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.impl.batch;
 
+import com.google.gson.JsonElement;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
@@ -32,11 +38,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
-import com.google.gson.JsonElement;
-
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Common methods for batch job handlers based on list of ids, providing serialization, configuration instantiation, etc.
@@ -45,6 +46,7 @@ import java.util.List;
  */
 public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> implements BatchJobHandler<T>, OptimisticLockingListener {
 
+  @Override
   public abstract JobDeclaration<BatchJobContext, MessageEntity> getJobDeclaration();
 
   @Override
@@ -114,8 +116,6 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
     }
 
     executeHandler(batchConfiguration, execution, commandContext, tenantId);
-
-    commandContext.getByteArrayManager().delete(byteArray);
   }
 
   protected abstract void executeHandler(final T configuration,
@@ -249,6 +249,18 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
       return OptimisticLockingResult.IGNORE;
     }
     return OptimisticLockingResult.THROW;
+  }
+
+  @Override
+  public int calculateInvocationsPerBatchJob(String batchType, T configuration) {
+    ProcessEngineConfigurationImpl engineConfig = Context.getProcessEngineConfiguration();
+    Map<String, Integer> invocationsPerBatchJobByBatchType = engineConfig.getInvocationsPerBatchJobByBatchType();
+    Integer invocationCount = invocationsPerBatchJobByBatchType.get(batchType);
+    if (invocationCount != null) {
+      return invocationCount;
+    } else {
+      return engineConfig.getInvocationsPerBatchJob();
+    }
   }
 
 }

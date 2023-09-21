@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.impl.batch.builder;
 
+import java.util.List;
+import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.batch.Batch;
@@ -26,9 +28,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-
-import java.util.List;
-import java.util.Map;
 
 public class BatchBuilder {
 
@@ -130,7 +129,7 @@ public class BatchBuilder {
     String type = jobHandler.getType();
     batch.setType(type);
 
-    int invocationPerBatchJobCount = calculateInvocationsPerBatchJob(type);
+    int invocationPerBatchJobCount = jobHandler.calculateInvocationsPerBatchJob(type, config);
     batch.setInvocationsPerBatchJob(invocationPerBatchJobCount);
 
     batch.setTenantId(tenantId);
@@ -205,23 +204,6 @@ public class BatchBuilder {
     }
 
     return (instanceCount / invocationPerBatchJobCount) + 1;
-  }
-
-  protected int calculateInvocationsPerBatchJob(String batchType) {
-    ProcessEngineConfigurationImpl engineConfig = commandContext.getProcessEngineConfiguration();
-
-    Map<String, Integer> invocationsPerBatchJobByBatchType =
-        engineConfig.getInvocationsPerBatchJobByBatchType();
-
-    Integer invocationCount = invocationsPerBatchJobByBatchType.get(batchType);
-
-    if (invocationCount != null) {
-      return invocationCount;
-
-    } else {
-      return engineConfig.getInvocationsPerBatchJob();
-
-    }
   }
 
 }

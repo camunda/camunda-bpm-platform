@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.impl.HistoricIncidentQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
@@ -53,21 +52,23 @@ public class HistoricIncidentManager extends AbstractHistoricManager {
     return getDbEntityManager().selectList("selectHistoricIncidentByQueryCriteria", query, page);
   }
 
-  public void addRemovalTimeToIncidentsByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public DbOperation addRemovalTimeToIncidentsByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime, Integer batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
+    parameters.put("maxResults", batchSize);
 
-    getDbEntityManager()
+    return getDbEntityManager()
       .updatePreserveOrder(HistoricIncidentEventEntity.class, "updateHistoricIncidentsByRootProcessInstanceId", parameters);
   }
 
-  public void addRemovalTimeToIncidentsByProcessInstanceId(String processInstanceId, Date removalTime) {
+  public DbOperation addRemovalTimeToIncidentsByProcessInstanceId(String processInstanceId, Date removalTime, Integer batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
+    parameters.put("maxResults", batchSize);
 
-    getDbEntityManager()
+    return getDbEntityManager()
       .updatePreserveOrder(HistoricIncidentEventEntity.class, "updateHistoricIncidentsByProcessInstanceId", parameters);
   }
 

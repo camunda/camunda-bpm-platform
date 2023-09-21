@@ -16,10 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
@@ -45,35 +46,39 @@ public class ByteArrayManager extends AbstractManager {
     getDbEntityManager().insert(arr);
   }
 
-  public void addRemovalTimeToByteArraysByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public DbOperation addRemovalTimeToByteArraysByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime, Integer batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
+    parameters.put("maxResults", batchSize);
 
-    getDbEntityManager()
+    return getDbEntityManager()
       .updatePreserveOrder(ByteArrayEntity.class, "updateByteArraysByRootProcessInstanceId", parameters);
   }
 
-  public void addRemovalTimeToByteArraysByProcessInstanceId(String processInstanceId, Date removalTime) {
+  public List<DbOperation> addRemovalTimeToByteArraysByProcessInstanceId(String processInstanceId, Date removalTime, Integer batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
+    parameters.put("maxResults", batchSize);
 
     // Make individual statements for each entity type that references byte arrays.
     // This can lead to query plans that involve less aggressive locking by databases (e.g. DB2).
     // See CAM-10360 for reference.
-    getDbEntityManager()
-      .updatePreserveOrder(ByteArrayEntity.class, "updateVariableByteArraysByProcessInstanceId", parameters);
-    getDbEntityManager()
-      .updatePreserveOrder(ByteArrayEntity.class, "updateDecisionInputsByteArraysByProcessInstanceId", parameters);
-    getDbEntityManager()
-      .updatePreserveOrder(ByteArrayEntity.class, "updateDecisionOutputsByteArraysByProcessInstanceId", parameters);
-    getDbEntityManager()
-      .updatePreserveOrder(ByteArrayEntity.class, "updateJobLogByteArraysByProcessInstanceId", parameters);
-    getDbEntityManager()
-      .updatePreserveOrder(ByteArrayEntity.class, "updateExternalTaskLogByteArraysByProcessInstanceId", parameters);
-    getDbEntityManager()
-      .updatePreserveOrder(ByteArrayEntity.class, "updateAttachmentByteArraysByProcessInstanceId", parameters);
+    List<DbOperation> operations = new ArrayList<>();
+    operations.add(getDbEntityManager()
+      .updatePreserveOrder(ByteArrayEntity.class, "updateVariableByteArraysByProcessInstanceId", parameters));
+    operations.add(getDbEntityManager()
+      .updatePreserveOrder(ByteArrayEntity.class, "updateDecisionInputsByteArraysByProcessInstanceId", parameters));
+    operations.add(getDbEntityManager()
+      .updatePreserveOrder(ByteArrayEntity.class, "updateDecisionOutputsByteArraysByProcessInstanceId", parameters));
+    operations.add(getDbEntityManager()
+      .updatePreserveOrder(ByteArrayEntity.class, "updateJobLogByteArraysByProcessInstanceId", parameters));
+    operations.add(getDbEntityManager()
+      .updatePreserveOrder(ByteArrayEntity.class, "updateExternalTaskLogByteArraysByProcessInstanceId", parameters));
+    operations.add(getDbEntityManager()
+      .updatePreserveOrder(ByteArrayEntity.class, "updateAttachmentByteArraysByProcessInstanceId", parameters));
+    return operations;
   }
 
   public DbOperation deleteByteArraysByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {

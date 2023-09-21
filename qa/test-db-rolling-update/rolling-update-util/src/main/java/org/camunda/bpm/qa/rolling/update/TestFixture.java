@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.qa.rolling.update.scenarios.DeploymentWhichShouldBeDeletedScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.authorization.AuthorizationScenario;
+import org.camunda.bpm.qa.rolling.update.scenarios.batch.SetRemovalTimeToProcessInstanceScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.callactivity.ProcessWithCallActivityScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.cleanup.HistoryCleanupScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.eventSubProcess.ProcessWithEventSubProcessScenario;
@@ -82,6 +83,7 @@ public class TestFixture {
     if (RollingUpdateConstants.NEW_ENGINE_TAG.equals(currentFixtureTag)) { // create data with new engine
       runner.setupScenarios(HistoryCleanupScenario.class);
       runner.setupScenarios(EmptyStringVariableScenario.class);
+      runner.setupScenarios(SetRemovalTimeToProcessInstanceScenario.class);
     }
 
     processEngine.close();

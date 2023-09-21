@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.engine.test.util;
 
+import static org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl.DEFAULT_INVOCATIONS_PER_BATCH_JOB;
+
+import java.util.ArrayList;
+import java.util.List;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -23,11 +27,6 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl.DEFAULT_INVOCATIONS_PER_BATCH_JOB;
 
 public class BatchRule extends TestWatcher {
 
@@ -39,6 +38,7 @@ public class BatchRule extends TestWatcher {
     this.engineTestRule = engineTestRule;
   }
 
+  @Override
   protected void finished(Description description) {
     engineRule.getProcessEngineConfiguration()
         .setInvocationsPerBatchJob(DEFAULT_INVOCATIONS_PER_BATCH_JOB);
@@ -54,9 +54,15 @@ public class BatchRule extends TestWatcher {
         HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery()
             .batchId(batchId)
             .singleResult();
-
         if (historicBatch != null) {
           engineRule.getHistoryService().deleteHistoricBatch(historicBatch.getId());
+        }
+
+        Batch batch = engineRule.getManagementService().createBatchQuery()
+            .batchId(batchId)
+            .singleResult();
+        if (batch != null) {
+          engineRule.getManagementService().deleteBatch(batchId, true);
         }
       }
     }
@@ -74,8 +80,11 @@ public class BatchRule extends TestWatcher {
     executeSeedJobs(batch);
 
     List<Job> jobs = getExecutionJobs(batch);
-    for (Job job : jobs) {
-      engineRule.getManagementService().executeJob(job.getId());
+    while (!jobs.isEmpty()) {
+      for (Job job : jobs) {
+        engineRule.getManagementService().executeJob(job.getId());
+      }
+      jobs = getExecutionJobs(batch);
     }
 
     engineRule.getManagementService().executeJob(
@@ -83,6 +92,13 @@ public class BatchRule extends TestWatcher {
   }
 
   public void executeSeedJobs(Batch batch) {
+    executeSeedJobs(batch, false);
+  }
+
+  public void executeSeedJobs(Batch batch, boolean cleanUp) {
+    if (cleanUp) {
+      batchIds.add(batch.getId());
+    }
     while (getSeedJob(batch) != null) {
       engineRule.getManagementService().executeJob(getSeedJob(batch).getId());
     }
