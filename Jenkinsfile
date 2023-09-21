@@ -196,6 +196,24 @@ pipeline {
             ])
           }
         }
+        stage('quarkus-UNIT') {
+          when {
+            expression {
+              cambpmWithLabels('h2', 'default-build')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMaven('quarkus-extension/', 'clean install', jdkVersion: 'jdk-17-latest')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+              }
+            ])
+          }
+        }
         stage('engine-IT-tomcat-9-postgresql-142') {
           when {
             expression {
