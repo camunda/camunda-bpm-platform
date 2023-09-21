@@ -194,18 +194,9 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>default-deploy</id>
-            <phase>deploy</phase>
-            <goals>
-              <goal>deploy</goal>
-            </goals>
-            <configuration>
-              <skipStaging>true</skipStaging>
-            </configuration>
-          </execution>
-        </executions>
+        <configuration>
+          <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+        </configuration>
       </plugin>
     </plugins>
   </build>
