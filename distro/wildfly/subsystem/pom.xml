@@ -100,7 +100,7 @@
           </includes>
           <forkMode>once</forkMode>
         </configuration>
-      </plugin>     
+      </plugin>
     </plugins>
   </build>
 

@@ -69,6 +69,7 @@
         <module>assembly</module>
         <module>modules</module>
         <module>subsystem</module>
+        <module>subsystem27-compatibility</module>
       </modules>
     </profile>
     <profile>
