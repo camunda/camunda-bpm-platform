@@ -196,7 +196,6 @@
         <artifactId>nexus-staging-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>deploy</id>
             <phase>deploy</phase>
             <goals>
               <goal>deploy</goal>
