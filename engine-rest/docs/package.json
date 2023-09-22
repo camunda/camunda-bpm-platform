@@ -1,6 +1,6 @@
 {
   "name": "docs",
-  "version": "7.20.0-alpha6",
+  "version": "7.20.0-SNAPSHOT",
   "private": true,
   "scripts": {
     "build": "./build.js"
