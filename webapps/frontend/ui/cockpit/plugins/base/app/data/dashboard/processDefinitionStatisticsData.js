@@ -36,13 +36,6 @@ var Controller = [
       }).$promise;
     });
 
-    processData.provide('processDefinitionStatistics', [
-      'processDefinitions',
-      function(processDefinitions) {
-        return aggregateStatistics(processDefinitions);
-      }
-    ]);
-
     processData.provide('processDefinitionWithRootIncidentsStatistics', [
       'processDefinitionsWithRootIncidents',
       function(processDefinitions) {

@@ -29,6 +29,15 @@ module.exports = [
           method: 'POST',
           isArray: true,
           params: {action: 'called-process-definitions'}
+        },
+        queryStatistics: {
+          method: 'GET',
+          isArray: true,
+          params: {id: 'statistics'}
+        },
+        statisticsCount: {
+          method: 'GET',
+          params: {id: 'statistics-count'}
         }
       }
     );

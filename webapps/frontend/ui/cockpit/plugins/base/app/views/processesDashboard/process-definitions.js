@@ -17,7 +17,9 @@
 
 'use strict';
 
-var template = require('./process-definitions.html?raw');
+const angular = require('angular');
+const template = require('./process-definitions.html?raw');
+const searchConfig = require('./process-definition-search-config.json');
 
 module.exports = [
   'ViewsProvider',
@@ -32,15 +34,37 @@ module.exports = [
         'camAPI',
         'localConf',
         '$translate',
-        function($scope, Views, camAPI, localConf, $translate) {
+        '$location',
+        'search',
+        'PluginProcessDefinitionResource',
+        function(
+          $scope,
+          Views,
+          camAPI,
+          localConf,
+          $translate,
+          $location,
+          search,
+          PluginProcessDefinitionResource
+        ) {
           var processDefinitionService = camAPI.resource('process-definition');
+
+          $scope.searchId = 'pdSearch';
+          $scope.paginationId = 'pdPage';
+          $scope.pages = null;
+          $scope.query = null;
+          $scope.sortBy = loadLocal({sortBy: 'name', sortOrder: 'asc'});
+          $scope.config = searchConfig;
+          $scope.onSearchChange = params =>
+            updateView(params.query, params.pages);
+          $scope.onSortChange = updateView;
 
           $scope.processesActions = Views.getProviders({
             component: 'cockpit.processes.action'
           });
           $scope.hasActionPlugin = $scope.processesActions.length > 0;
 
-          var processInstancePlugins = Views.getProviders({
+          const processInstancePlugins = Views.getProviders({
             component: 'cockpit.processInstance.view'
           });
           $scope.hasHistoryPlugin =
@@ -57,118 +81,74 @@ module.exports = [
 
           // prettier-ignore
           $scope.headColumns = [
-          { class: 'state',    request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_STATE')},
-          { class: 'incidents',request: 'incidentCount', sortable: true,  content: $translate.instant('PLUGIN_PROCESS_DEF_INCIDENTS')},
-          { class: 'instances',request: 'instances'    , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_RUNNING_INSTANCES')},
-          { class: 'name',     request: 'label' , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_NAME')},
-          { class: 'tenantID', request: 'tenantId'     , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_TENANT_ID')},
-          { class: 'history',  request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_HISTORY_VIEW'), condition: $scope.hasReportPlugin},
-          { class: 'report',   request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_REPORT'), condition: $scope.hasReportPlugin},
-          { class: 'action',   request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_ACTION'), condition: $scope.hasActionPlugin}
-        ];
-
-          // Default sorting
-          var defaultValue = {
-            sortBy: 'label',
-            sortOrder: 'asc',
-            sortReverse: false
-          };
-
-          $scope.sortObj = loadLocal(defaultValue);
-
-          // Update Table
-          $scope.onSortChange = function(sortObj) {
-            sortObj = sortObj || $scope.sortObj;
-            // transforms sortOrder to boolean required by anqular-sorting;
-            sortObj.sortReverse = sortObj.sortOrder !== 'asc';
-            saveLocal(sortObj);
-            $scope.sortObj = sortObj;
-          };
-
-          var processData = $scope.processData.newChild($scope);
-
-          var getPDIncidentsCount = function(incidents) {
-            if (!incidents) {
-              return 0;
-            }
-            return incidents.reduce(function(sum, incident) {
-              return sum + incident.incidentCount;
-            }, 0);
-          };
-
-          $scope.loadingState = 'LOADING';
+            { class: 'state',    request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_STATE')},
+            { class: 'incidents',request: 'incidents', sortable: true,  content: $translate.instant('PLUGIN_PROCESS_DEF_INCIDENTS')},
+            { class: 'instances',request: 'instances', sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_RUNNING_INSTANCES')},
+            { class: 'key',      request: 'key', sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_KEY')},
+            { class: 'name',     request: 'name', sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_NAME')},
+            { class: 'tenantID', request: 'tenantId', sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_TENANT_ID')},
+            { class: 'history',  request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_HISTORY_VIEW'), condition: $scope.hasReportPlugin},
+            { class: 'report',   request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_REPORT'), condition: $scope.hasReportPlugin},
+            { class: 'action',   request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_ACTION'), condition: $scope.hasActionPlugin}
+          ];
 
           // only get count of process definitions
-          var countProcessDefinitions = function() {
-            processDefinitionService.count(
-              {
-                latest: true
-              },
-              function(err, count) {
-                if (err) {
-                  $scope.loadingState = 'ERROR';
-                }
-                $scope.processDefinitionsCount = count;
-              }
-            );
-          };
-
-          // get full list of process definitions and related resources
-          var listProcessDefinitions = function() {
-            $scope.loadingState = 'LOADING';
-
-            processData.observe('processDefinitionStatistics', function(
-              processDefinitionStatistics
-            ) {
-              $scope.processDefinitionData = processDefinitionStatistics.map(
-                function(el) {
-                  var definition = el.definition;
-                  definition.label = definition.name || definition.key;
-                  return definition;
-                }
-              );
-
-              $scope.processDefinitionsCount =
-                $scope.processDefinitionData.length;
-              $scope.loadingState = 'LOADED';
-
-              $scope.statistics = processDefinitionStatistics;
-
-              $scope.statistics.forEach(function(statistic) {
-                var processDefId = statistic.definition.id;
-                var foundIds = $scope.processDefinitionData.filter(function(
-                  pd
-                ) {
-                  return pd.id === processDefId;
-                });
-
-                var foundObject = foundIds[0];
-                if (foundObject) {
-                  foundObject.incidents = statistic.incidents;
-                  foundObject.incidentCount = getPDIncidentsCount(
-                    foundObject.incidents
-                  );
-                  foundObject.instances = statistic.instances;
-                }
-              });
+          const countProcessDefinitions = function() {
+            $scope.mainLoadingState = 'LOADING';
+            processDefinitionService.count({latest: true}, (err, count) => {
+              if (err) $scope.mainLoadingState = 'ERROR';
+              else $scope.mainLoadingState = count ? 'LOADED' : 'EMPTY';
+              $scope.processDefinitionsCount = count;
             });
           };
 
+          // get full list of process definitions and related resources
+          function updateView(queryObj, pagesObj, sortObj) {
+            $scope.loadingState = 'LOADING';
+            $scope.query = queryObj || $scope.query;
+            $scope.pages = pagesObj || $scope.pages;
+            $scope.sortBy = sortObj || $scope.sortBy;
+
+            const pagingParams = {
+              firstResult: $scope.pages.size * ($scope.pages.current - 1),
+              maxResults: $scope.pages.size
+            };
+            const queryParams = $scope.query;
+            const sortParams = $scope.sortBy;
+            const countParams = angular.extend({}, queryParams);
+            const params = angular.extend(
+              {},
+              pagingParams,
+              sortParams,
+              queryParams
+            );
+
+            saveLocal(sortParams);
+
+            return PluginProcessDefinitionResource.statisticsCount(countParams)
+              .$promise.then(res => {
+                $scope.total = res.count;
+
+                PluginProcessDefinitionResource.queryStatistics(params)
+                  .$promise.then(statistics => {
+                    $scope.processDefinitionData = statistics;
+                    $scope.loadingState = res.count ? 'LOADED' : 'EMPTY';
+                    return statistics;
+                  })
+                  .catch(angular.noop);
+
+                return $scope.total;
+              })
+              .catch(angular.noop);
+          }
+
           $scope.definitionVars = {read: ['pd']};
 
-          var removeActionDeleteListener = $scope.$on(
+          const removeActionDeleteListener = $scope.$on(
             'processes.action.delete',
-            function(event, definitionId) {
-              var definitions = $scope.processDefinitionData;
-
-              for (var i = 0; i < definitions.length; i++) {
-                if (definitions[i].id === definitionId) {
-                  definitions.splice(i, 1);
-                  break;
-                }
-              }
-
-              $scope.processDefinitionsCount = definitions.length;
+            () => {
+              countProcessDefinitions();
+              updateView();
             }
           );
 
@@ -176,10 +156,32 @@ module.exports = [
             removeActionDeleteListener();
           });
 
-          $scope.incidentsLink =
-            '#/processes?searchQuery=%5B%7B%22type%22:%22PIincidentStatus%22,%22operator%22:' +
-            '%22eq%22,%22value%22:%22open%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIprocessDefinitionKey%22,' +
-            '%22operator%22:%22eq%22,%22value%22:%22PD_KEY%22,%22name%22:%22%22%7D%5D#search-section';
+          $scope.onIncidentsClick = pdKey => {
+            const pdSearchQuery = $location.search().pdSearchQuery;
+            const pdPage = $location.search().pdPage;
+            const searchQuery = [
+              {
+                type: 'PIincidentStatus',
+                operator: 'eq',
+                value: 'open',
+                name: ''
+              },
+              {
+                type: 'PIprocessDefinitionKey',
+                operator: 'eq',
+                value: pdKey,
+                name: ''
+              }
+            ];
+
+            $location.search({
+              searchQuery: JSON.stringify(searchQuery),
+              pdSearchQuery,
+              pdPage
+            });
+            $location.hash('search-section');
+            $location.replace();
+          };
 
           $scope.activeTab = 'list';
 
@@ -191,27 +193,22 @@ module.exports = [
             'processesDashboardActive',
             true
           );
-          // if tab is not active, it's enough to only get the count of process definitions
-          $scope.activeSection
-            ? listProcessDefinitions()
-            : countProcessDefinitions();
 
           $scope.toggleSection = function toggleSection() {
             $scope.activeSection = !$scope.activeSection;
-
-            // if tab is not active, it's enough to only get the count of process definitions
-            $scope.activeSection
-              ? listProcessDefinitions()
-              : countProcessDefinitions();
             localConf.set('processesDashboardActive', $scope.activeSection);
+
+            if ($scope.activeSection) updateView();
           };
 
-          function saveLocal(sortObj) {
-            localConf.set('sortProcessDefTab', sortObj);
+          function saveLocal(sortBy) {
+            localConf.set('sortProcessDefTab', sortBy);
           }
           function loadLocal(defaultValue) {
             return localConf.get('sortProcessDefTab', defaultValue);
           }
+
+          countProcessDefinitions();
         }
       ],
 

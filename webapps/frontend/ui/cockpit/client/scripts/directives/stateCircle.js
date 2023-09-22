@@ -27,6 +27,10 @@ module.exports = function() {
         updateStateCircle();
       });
 
+      scope.$watch(attrs.incidentscount, function() {
+        updateStateCircle();
+      });
+
       scope.$watch(attrs.running, function() {
         updateStateCircle();
       });
@@ -35,9 +39,15 @@ module.exports = function() {
         var incidents = scope.$eval(attrs.incidents);
         var running = scope.$eval(attrs.running);
         var incidentsForTypes = scope.$eval(attrs.incidentsForTypes) || [];
+        var incidentsCount = scope.$eval(attrs.incidentscount) || null;
 
         if (running) {
           return setStateToBlue();
+        }
+
+        if (incidentsCount > 0) {
+          setStateToRed();
+          return;
         }
 
         if (!!incidents && incidents.length > 0) {
