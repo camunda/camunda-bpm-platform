@@ -32,7 +32,7 @@
     <version.camunda.connect>1.6.0</version.camunda.connect>
     <version.camunda.spin>1.22.0</version.camunda.spin>
     <version.camunda.freemarker.template.engine>2.2.0</version.camunda.freemarker.template.engine>
-    <version.feel-scala>1.15.3</version.feel-scala>
+    <version.feel-scala>1.16.3</version.feel-scala>
   </properties>
 
   <build>
