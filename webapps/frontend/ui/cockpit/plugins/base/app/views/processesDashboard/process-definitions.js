@@ -202,10 +202,10 @@ module.exports = [
           };
 
           function saveLocal(sortBy) {
-            localConf.set('sortProcessDefTab', sortBy);
+            localConf.set('sortProcDefTab', sortBy);
           }
           function loadLocal(defaultValue) {
-            return localConf.get('sortProcessDefTab', defaultValue);
+            return localConf.get('sortProcDefTab', defaultValue);
           }
 
           countProcessDefinitions();
