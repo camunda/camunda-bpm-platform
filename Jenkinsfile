@@ -206,7 +206,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMaven('quarkus-extension/', 'clean install', jdkVersion: 'jdk-17-latest')
+                cambpmRunMaven('quarkus-extension/', 'clean install -Pquarkus-tests', jdkVersion: 'jdk-17-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
