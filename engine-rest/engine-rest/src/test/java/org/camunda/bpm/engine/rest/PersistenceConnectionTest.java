@@ -19,7 +19,8 @@ package org.camunda.bpm.engine.rest;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.engine.rest.PersistenceConnectionTest.UserQueryFactory.createFailingQueryStub;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.PERSISTENCE_EXCEPTION_MESSAGE;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.wrapPersistenceException;
 import static org.camunda.bpm.engine.rest.exception.ExceptionLogger.REST_API;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_USER_FIRST_NAME;
 import static org.hamcrest.Matchers.equalTo;
@@ -74,9 +75,9 @@ public class PersistenceConnectionTest extends AbstractRestServiceTest {
 
   @Test
   public void shouldLogError() {
-    createFailingQueryStub(subclass);
+    stubFailingUserQuery(subclass);
 
-    String expectedMessage = "This is an exception originating from the engine persistence layer";
+    String expectedMessage = PERSISTENCE_EXCEPTION_MESSAGE;
 
     given().queryParam("firstName", EXAMPLE_USER_FIRST_NAME)
         .then().expect()
@@ -97,27 +98,19 @@ public class PersistenceConnectionTest extends AbstractRestServiceTest {
     assertThat(logs.get(0).getMessage()).containsIgnoringCase(message);
   }
 
-  static class UserQueryFactory {
+  protected void stubFailingUserQuery(ConnectionSubclass subclass) {
+    UserQuery result = mock(UserQuery.class);
 
-    static void createFailingQueryStub(ConnectionSubclass subclass) {
-      UserQuery result = mock(UserQuery.class);
 
-      when(result.list()).thenThrow(ProcessEnginePersistenceExceptionFactory.create("list", subclass));
-      when(processEngine.getIdentityService().createUserQuery()).thenReturn(result);
-    }
+    when(result.list()).thenThrow(createPersistenceException("list", subclass));
+    when(processEngine.getIdentityService().createUserQuery()).thenReturn(result);
   }
 
-  static class ProcessEnginePersistenceExceptionFactory {
+  private ProcessEnginePersistenceException createPersistenceException(String operation, ConnectionSubclass subclass) {
+    SQLException sqlException = new SQLException(subclass.message(), subclass.sqlState());
+    PersistenceException persistenceException = new PersistenceException("Failed to execute " + operation, sqlException);
 
-    public static ProcessEnginePersistenceException create(String operation, ConnectionSubclass sqlSubclass) {
-      SQLException rootCause = new SQLException(sqlSubclass.message(), sqlSubclass.sqlState());
-
-      return new ProcessEnginePersistenceException(
-          "This is an exception originating from the engine persistence layer",
-          new PersistenceException("Failed to execute " + operation, rootCause)
-      );
-    }
-
+    return wrapPersistenceException(persistenceException);
   }
 
   public enum ConnectionSubclass {
