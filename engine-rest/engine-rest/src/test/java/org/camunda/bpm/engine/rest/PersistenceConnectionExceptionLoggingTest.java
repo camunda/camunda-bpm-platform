@@ -46,8 +46,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+/**
+ * Test for Connection Exceptions that originate from the persistence layer.
+ */
 @RunWith(Parameterized.class)
-public class PersistenceConnectionTest extends AbstractRestServiceTest {
+public class PersistenceConnectionExceptionLoggingTest extends AbstractRestServiceTest {
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
@@ -60,7 +63,7 @@ public class PersistenceConnectionTest extends AbstractRestServiceTest {
 
   private final ConnectionSubclass subclass;
 
-  public PersistenceConnectionTest(ConnectionSubclass subclass) {
+  public PersistenceConnectionExceptionLoggingTest(ConnectionSubclass subclass) {
     this.subclass = subclass;
   }
 

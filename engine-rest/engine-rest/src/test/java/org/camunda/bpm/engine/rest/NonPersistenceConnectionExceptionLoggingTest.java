@@ -40,7 +40,10 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class PersistenceExceptionTest extends AbstractRestServiceTest {
+/**
+ * Tests Connection Exceptions that do not originate from persistence layer but are still connection exceptions.
+ */
+public class NonPersistenceConnectionExceptionLoggingTest extends AbstractRestServiceTest {
 
   protected static final String USER_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/user";
 
