@@ -52,7 +52,7 @@ public class PersistenceExceptionTest extends AbstractRestServiceTest {
       .watch(REST_API);
 
   @Test
-  public void shouldLogWarning() {
+  public void shouldLogNonPersistenceExceptionOnWarning() {
     stubFailingUserQuery(new SQLNonTransientConnectionException());
 
     String expectedMessage = PERSISTENCE_EXCEPTION_MESSAGE;
