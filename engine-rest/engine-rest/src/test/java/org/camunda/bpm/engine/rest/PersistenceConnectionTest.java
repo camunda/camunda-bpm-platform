@@ -74,7 +74,7 @@ public class PersistenceConnectionTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void shouldLogError() {
+  public void shouldLogPersistenceConnectionExceptionOnError() {
     stubFailingUserQuery(subclass);
 
     String expectedMessage = PERSISTENCE_EXCEPTION_MESSAGE;
