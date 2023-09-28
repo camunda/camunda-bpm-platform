@@ -48,7 +48,10 @@ async function generateDocs() {
         body {
             padding: 0;
             margin: 0;
-            font-family: 'IBM Plex Sans', Helvetica, Arial, Verdana, sans-serif;
+        }
+
+        * {
+            font-family: 'IBM Plex Sans', Helvetica, Arial, Verdana, sans-serif!important;
         }
     </style>
 
