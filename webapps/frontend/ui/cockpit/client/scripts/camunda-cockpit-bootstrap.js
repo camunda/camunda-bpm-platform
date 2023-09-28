@@ -280,6 +280,18 @@ define('camunda-cockpit-bootstrap', function() {
         }
 
         function initCockpitUi(pluginDependencies) {
+          /**
+           * Clearing AMD globals is necessary so third-party AMD scripts users
+           * register via script tag are prevented from registration via RequireJS
+           * and made global on the window object.
+           */
+          function clearAmdGlobals() {
+            window.define = undefined;
+            window.require = undefined;
+          }
+
+          clearAmdGlobals();
+
           // now that we loaded the plugins and the additional modules, we can finally
           // initialize Cockpit
           camundaCockpitUi.init(pluginDependencies);
