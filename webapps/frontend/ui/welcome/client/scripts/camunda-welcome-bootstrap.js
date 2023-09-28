@@ -160,6 +160,8 @@ define('camunda-welcome-bootstrap', function() {
             // directives, controllers, services and all when loaded
             angular.module('cam.welcome.custom', custom.ngDeps);
 
+            clearAmdGlobals();
+
             // now that we loaded the plugins and the additional modules, we can finally
             // initialize Welcome
             camundaWelcomeUi.init(pluginDependencies);
@@ -176,8 +178,19 @@ define('camunda-welcome-bootstrap', function() {
           // not have been defined yet. Placing a new require call here will put
           // the bootstrapping of the angular app at the end of the queue
           rjsrequire([], function() {
+            clearAmdGlobals();
             camundaWelcomeUi.init(pluginDependencies);
           });
+        }
+
+        /**
+         * Clearing AMD globals is necessary so third-party AMD scripts users
+         * register via script tag are prevented from registration via RequireJS
+         * and made global on the window object.
+         */
+        function clearAmdGlobals() {
+          window.define = undefined;
+          window.require = undefined;
         }
       });
     });

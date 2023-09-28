@@ -159,6 +159,8 @@ define('camunda-admin-bootstrap', function() {
             // directives, controllers, services and all when loaded
             angular.module('cam.admin.custom', custom.ngDeps);
 
+            clearAmdGlobals();
+
             // now that we loaded the plugins and the additional modules, we can finally
             // initialize Admin
             camundaAdminUi.init(pluginDependencies);
@@ -175,8 +177,19 @@ define('camunda-admin-bootstrap', function() {
           // not have been defined yet. Placing a new require call here will put
           // the bootstrapping of the angular app at the end of the queue
           rjsrequire([], function() {
+            clearAmdGlobals();
             camundaAdminUi.init(pluginDependencies);
           });
+        }
+
+        /**
+         * Clearing AMD globals is necessary so third-party AMD scripts users
+         * register via script tag are prevented from registration via RequireJS
+         * and made global on the window object.
+         */
+        function clearAmdGlobals() {
+          window.define = undefined;
+          window.require = undefined;
         }
       });
     });
