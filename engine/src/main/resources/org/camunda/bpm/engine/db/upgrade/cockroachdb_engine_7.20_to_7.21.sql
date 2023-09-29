@@ -16,4 +16,4 @@
 --
 
 insert into ACT_GE_SCHEMA_LOG
-values ('1000', CURRENT_TIMESTAMP, '7.20.0');
+values ('1000', CURRENT_TIMESTAMP, '7.21.0');
