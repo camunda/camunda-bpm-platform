@@ -1,6 +1,6 @@
 {
   "name": "ui",
-  "version": "7.20.0",
+  "version": "7.21.0-SNAPSHOT",
   "private": true,
   "scripts": {
     "prebuild": "node ./tasks/license.js",
