@@ -35,6 +35,7 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <skipTests>true</skipTests>
             <systemPropertyVariables>
               <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
             </systemPropertyVariables>
@@ -57,14 +58,14 @@
     </profile>
 
     <profile>
-      <id>distro</id>
+      <id>quarkus-tests</id>
       <build>
         <pluginManagement>
           <plugins>
             <plugin>
               <artifactId>maven-surefire-plugin</artifactId>
               <configuration>
-                <skipTests>true</skipTests>
+                <skipTests>false</skipTests>
               </configuration>
             </plugin>
           </plugins>
