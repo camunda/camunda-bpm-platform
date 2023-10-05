@@ -1,0 +1,11 @@
+name: Java Dependency Check
+
+on:
+  pull_request:
+
+jobs:
+  call-reusable-flow:
+    uses: camunda/automation-platform-github-actions/.github/workflows/java-dependency-check.yml@2781-dependency-updates
+    with:
+      ref: 2781-dependency-updates
+    secrets: inherit
