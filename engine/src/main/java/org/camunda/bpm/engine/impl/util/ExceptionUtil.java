@@ -219,7 +219,7 @@ public class ExceptionUtil {
     }
 
     String message = sqlException.getMessage().toLowerCase();
-    String sqlState = sqlException.getSQLState().toUpperCase();
+    String sqlState = sqlException.getSQLState();
     int errorCode = sqlException.getErrorCode();
 
     // MySQL & MariaDB
