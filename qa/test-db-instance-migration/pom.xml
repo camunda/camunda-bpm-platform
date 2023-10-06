@@ -41,6 +41,7 @@
     <module>test-fixture-718</module>
     <module>test-fixture-719</module>
     <module>test-fixture-720</module>
+    <module>test-fixture-721</module>
     <module>test-migration</module>
   </modules>
 

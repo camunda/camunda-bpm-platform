@@ -121,5 +121,16 @@
     <tagDatabase tag="7.20.0"/>
   </changeSet>
 
+  <changeSet author="Camunda" id="7.20-to-7.21">
+    <sqlFile path="upgrade/${db.name}_engine_7.20_to_7.21.sql"
+             encoding="UTF-8"
+             relativeToChangelogFile="true"
+             splitStatements="true"
+             stripComments="true"/>
+  </changeSet>
+
+  <changeSet author="Camunda" id="7.21.0-tag">
+    <tagDatabase tag="7.21.0"/>
+  </changeSet>
 
 </databaseChangeLog>
