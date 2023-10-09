@@ -104,98 +104,102 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     super(commandExecutor);
   }
 
-  public ProcessDefinitionQueryImpl processDefinitionId(String processDefinitionId) {
+  public ProcessDefinitionQuery processDefinitionId(String processDefinitionId) {
     this.id = processDefinitionId;
     return this;
   }
 
-  public ProcessDefinitionQueryImpl processDefinitionIdIn(String... ids) {
+  public ProcessDefinitionQuery processDefinitionIdIn(String... ids) {
     this.ids = ids;
     return this;
   }
 
-  public ProcessDefinitionQueryImpl processDefinitionCategory(String category) {
+  public ProcessDefinitionQuery processDefinitionCategory(String category) {
     ensureNotNull("category", category);
     this.category = category;
     return this;
   }
 
-  public ProcessDefinitionQueryImpl processDefinitionCategoryLike(String categoryLike) {
+  public ProcessDefinitionQuery processDefinitionCategoryLike(String categoryLike) {
     ensureNotNull("categoryLike", categoryLike);
     this.categoryLike = categoryLike;
     return this;
   }
 
-  public ProcessDefinitionQueryImpl processDefinitionName(String name) {
+  public ProcessDefinitionQuery processDefinitionName(String name) {
     ensureNotNull("name", name);
     this.name = name;
     return this;
   }
 
-  public ProcessDefinitionQueryImpl processDefinitionNameLike(String nameLike) {
+  public ProcessDefinitionQuery processDefinitionNameLike(String nameLike) {
     ensureNotNull("nameLike", nameLike);
     this.nameLike = nameLike;
     return this;
   }
 
-  public ProcessDefinitionQueryImpl deploymentId(String deploymentId) {
+  public ProcessDefinitionQuery deploymentId(String deploymentId) {
     ensureNotNull("deploymentId", deploymentId);
     this.deploymentId = deploymentId;
     return this;
   }
 
-  public ProcessDefinitionQueryImpl deployedAfter(Date deployedAfter) {
+  public ProcessDefinitionQuery deployedAfter(Date deployedAfter) {
     ensureNotNull("deployedAfter", deployedAfter);
     shouldJoinDeploymentTable = true;
     this.deployedAfter = deployedAfter;
     return this;
   }
 
-  public ProcessDefinitionQueryImpl deployedAt(Date deployedAt) {
+  public ProcessDefinitionQuery deployedAt(Date deployedAt) {
     ensureNotNull("deployedAt", deployedAt);
     shouldJoinDeploymentTable = true;
     this.deployedAt = deployedAt;
     return this;
   }
 
-  public ProcessDefinitionQueryImpl processDefinitionKey(String key) {
+  public ProcessDefinitionQuery processDefinitionKey(String key) {
     ensureNotNull("key", key);
     this.key = key;
     return this;
   }
 
-  public ProcessDefinitionQueryImpl processDefinitionKeysIn(String... keys) {
-    ensureNotNull("keys", (Object[]) keys);
-    this.keys = keys;
+  public ProcessDefinitionQueryImpl processDefinitionKeysIn(String... processDefinitionKeys) {
+    return (ProcessDefinitionQueryImpl) processDefinitionKeyIn(processDefinitionKeys);
+  }
+
+  public ProcessDefinitionQuery processDefinitionKeyIn(String... processDefinitionKeys) {
+    ensureNotNull("keys", (Object[]) processDefinitionKeys);
+    this.keys = processDefinitionKeys;
     return this;
   }
 
-  public ProcessDefinitionQueryImpl processDefinitionKeyLike(String keyLike) {
+  public ProcessDefinitionQuery processDefinitionKeyLike(String keyLike) {
     ensureNotNull("keyLike", keyLike);
     this.keyLike = keyLike;
     return this;
   }
 
-  public ProcessDefinitionQueryImpl processDefinitionResourceName(String resourceName) {
+  public ProcessDefinitionQuery processDefinitionResourceName(String resourceName) {
     ensureNotNull("resourceName", resourceName);
     this.resourceName = resourceName;
     return this;
   }
 
-  public ProcessDefinitionQueryImpl processDefinitionResourceNameLike(String resourceNameLike) {
+  public ProcessDefinitionQuery processDefinitionResourceNameLike(String resourceNameLike) {
     ensureNotNull("resourceNameLike", resourceNameLike);
     this.resourceNameLike = resourceNameLike;
     return this;
   }
 
-  public ProcessDefinitionQueryImpl processDefinitionVersion(Integer version) {
+  public ProcessDefinitionQuery processDefinitionVersion(Integer version) {
     ensureNotNull("version", version);
     ensurePositive("version", version.longValue());
     this.version = version;
     return this;
   }
 
-  public ProcessDefinitionQueryImpl latestVersion() {
+  public ProcessDefinitionQuery latestVersion() {
     this.latest = true;
     return this;
   }
@@ -255,12 +259,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return this;
   }
 
-  @Override
-  protected boolean hasExcludingConditions() {
-    return super.hasExcludingConditions() || CompareUtil.elementIsNotContainedInArray(id, ids);
-  }
-
-  public ProcessDefinitionQueryImpl tenantIdIn(String... tenantIds) {
+  public ProcessDefinitionQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
     isTenantIdSet = true;
@@ -353,6 +352,19 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   public ProcessDefinitionQuery orderByVersionTag() {
     return orderBy(ProcessDefinitionQueryProperty.VERSION_TAG);
   }
+
+  public ProcessDefinitionQuery startableByUser(String userId) {
+    ensureNotNull("userId", userId);
+    this.authorizationUserId = userId;
+
+    return this;
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    return super.hasExcludingConditions() || CompareUtil.elementIsNotContainedInArray(id, ids);
+  }
+
 
   //results ////////////////////////////////////////////
 
@@ -524,7 +536,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   public List<PermissionCheck> getProcessDefinitionCreatePermissionChecks() {
     return processDefinitionCreatePermissionChecks;
   }
-  
+
   public boolean isShouldJoinDeploymentTable() {
     return shouldJoinDeploymentTable;
   }
@@ -550,10 +562,4 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return cachedCandidateGroups;
   }
 
-  public ProcessDefinitionQueryImpl startableByUser(String userId) {
-    ensureNotNull("userId", userId);
-    this.authorizationUserId = userId;
-
-    return this;
-  }
 }

@@ -164,9 +164,8 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
   }
 
   public List<ProcessDefinition> findProcessDefinitionsByKey(String processDefinitionKey) {
-    ProcessDefinitionQueryImpl processDefinitionQuery = new ProcessDefinitionQueryImpl()
-      .processDefinitionKey(processDefinitionKey);
-    return  findProcessDefinitionsByQueryCriteria(processDefinitionQuery, null);
+    ProcessDefinitionQueryImpl processDefinitionQuery = new ProcessDefinitionQueryImpl().processDefinitionKeysIn(processDefinitionKey);
+    return findProcessDefinitionsByQueryCriteria(processDefinitionQuery, null);
   }
 
   public List<ProcessDefinition> findProcessDefinitionsStartableByUser(String user) {
