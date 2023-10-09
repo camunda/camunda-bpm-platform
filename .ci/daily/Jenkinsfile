@@ -147,6 +147,34 @@ pipeline {
             }
           }
         }
+        stage('platform-DISTRO-maven-central') {
+          when {
+            expression {
+              // trigger docker CE build only on the master branch
+              env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'h2_perf32',
+              runSteps: {
+                cambpmRunMaven('.',
+                  "deploy source:jar source:test-jar javadoc:javadoc -Dskip-zip-frontend-sources=true",
+                  withNpm: true,
+                  jdkVersion: 'jdk-17-latest')
+                sh(label: 'Change staging from Nexus to Maven Central snapshots',
+                   script: "sed -i 's@:camunda-nexus:.*$@:central:https://oss.sonatype.org/content/repositories/snapshots@g' staging/deferred/.index")
+                cambpmRunMaven('.',
+                  "org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true  -B",
+                  withNpm: true,
+                  jdkVersion: 'jdk-17-latest')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+              }
+            ])
+          }
+        }
       }
     }
     stage('Standalone QA tests') {
