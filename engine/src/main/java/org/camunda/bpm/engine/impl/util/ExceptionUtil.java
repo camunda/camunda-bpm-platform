@@ -144,13 +144,17 @@ public class ExceptionUtil {
 
   public static boolean checkValueTooLongException(SQLException sqlException) {
     String message = sqlException.getMessage();
+    if (message != null) {
+      message = message.toLowerCase();
+    } else {
+      return false;
+    }
     return message.contains("too long") ||
         message.contains("too large") ||
-        message.contains("TOO LARGE") ||
-        message.contains("ORA-01461") ||
-        message.contains("ORA-01401") ||
+        message.contains("ora-01461") ||
+        message.contains("ora-01401") ||
         message.contains("data would be truncated") ||
-        message.contains("SQLCODE=-302, SQLSTATE=22001");
+        message.contains("sqlcode=-302, sqlstate=22001");
   }
 
   public static boolean checkValueTooLongException(ProcessEngineException genericPersistenceException) {
@@ -171,11 +175,17 @@ public class ExceptionUtil {
     }
 
     String message = sqlException.getMessage();
+    if (message != null) {
+      message = message.toLowerCase();
+    } else {
+      return false;
+    }
+
     return message.contains("constraint") ||
         message.contains("violat") ||
-        message.toLowerCase().contains("duplicate") ||
-        message.contains("ORA-00001") ||
-        message.contains("SQLCODE=-803, SQLSTATE=23505");
+        message.contains("duplicate") ||
+        message.contains("ora-00001") ||
+        message.contains("sqlcode=-803, sqlstate=23505");
   }
 
   public static boolean checkForeignKeyConstraintViolation(PersistenceException persistenceException) {
@@ -189,7 +199,13 @@ public class ExceptionUtil {
   }
 
   public static boolean checkForeignKeyConstraintViolation(SQLException sqlException) {
-    String message = sqlException.getMessage().toLowerCase();
+    String message = sqlException.getMessage();
+    if (message != null) {
+      message = message.toLowerCase();
+    } else {
+      return false;
+    }
+
     String sqlState = sqlException.getSQLState();
     int errorCode = sqlException.getErrorCode();
 
@@ -218,7 +234,13 @@ public class ExceptionUtil {
       return false;
     }
 
-    String message = sqlException.getMessage().toLowerCase();
+    String message = sqlException.getMessage();
+    if (message != null) {
+      message = message.toLowerCase();
+    } else {
+      return false;
+    }
+
     String sqlState = sqlException.getSQLState();
     int errorCode = sqlException.getErrorCode();
 
