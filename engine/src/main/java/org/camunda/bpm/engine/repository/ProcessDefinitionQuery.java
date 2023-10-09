@@ -80,7 +80,7 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   /**
    * Only select process definitions with the given keys
    */
-  ProcessDefinitionQueryImpl processDefinitionKeysIn(String... processDefinitionKeys);
+  ProcessDefinitionQuery processDefinitionKeysIn(String... processDefinitionKeys);
 
   /**
    * Only select process definitions where the key matches the given parameter.

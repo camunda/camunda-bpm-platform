@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.AbstractResourceDefinitionManager;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.runtime.Job;
 
 import java.util.ArrayList;
@@ -164,9 +165,8 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
   }
 
   public List<ProcessDefinition> findProcessDefinitionsByKey(String processDefinitionKey) {
-    ProcessDefinitionQueryImpl processDefinitionQuery = new ProcessDefinitionQueryImpl()
-      .processDefinitionKey(processDefinitionKey);
-    return  findProcessDefinitionsByQueryCriteria(processDefinitionQuery, null);
+    ProcessDefinitionQueryImpl processDefinitionQuery = new ProcessDefinitionQueryImpl().processDefinitionKeyAsImpl(processDefinitionKey);
+    return findProcessDefinitionsByQueryCriteria(processDefinitionQuery, null);
   }
 
   public List<ProcessDefinition> findProcessDefinitionsStartableByUser(String user) {
