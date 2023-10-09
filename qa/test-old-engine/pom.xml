@@ -404,6 +404,7 @@
                 <!-- Exclude test classes because resources are not available in the old-engine classpath -->
                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
                 <exclude>**/ProcessDiagramParseTest.java</exclude>
+                <exclude>**/ConnectionPersistenceExceptionTest.java</exclude>
 
                 <!-- Exclude test class because old-engine tests old engine version with new db schema version -->
                 <exclude>**/SchemaLogEnsureSqlScriptTest.java</exclude>
