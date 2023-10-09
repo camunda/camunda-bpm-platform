@@ -16,12 +16,11 @@
     <#assign requestMethod="GET"/>
     <#assign last = false >
     <#include "/lib/commons/variable-instance-query-params.ftl" >
+    <#assign last = true >
     <@lib.parameters
         object = params
-        last = false
+        last = last
     />
-    <#assign last = true >
-    <#include "/lib/commons/sort-params.ftl" >
 
   ],
 
