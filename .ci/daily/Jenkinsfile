@@ -175,6 +175,29 @@ pipeline {
             ])
           }
         }
+        stage('platform-public-nexus') {
+          when {
+            expression {
+              // trigger docker CE build only on the master branch
+              env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'h2_perf32',
+              runSteps: {
+                cambpmRunMaven('.',
+                  "install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2 -B",
+                  withNpm: true,
+                  jdkVersion: 'jdk-17-latest'
+                  // TODO provide correct maven settings: PUBLIC_NEXUS_SETTINGS)
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+              }
+            ])
+          }
+        }
       }
     }
     stage('Standalone QA tests') {
