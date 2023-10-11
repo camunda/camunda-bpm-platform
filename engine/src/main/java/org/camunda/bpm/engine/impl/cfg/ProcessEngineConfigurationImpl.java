@@ -940,7 +940,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * Specifies how often a cleanup job will be executed before an incident is raised.
    * This property overrides the global {@code defaultNumberOfRetries} property which has a default value of {@code 3}.
    */
-  protected Integer historyCleanupDefaultNumberOfRetries;
+  protected int historyCleanupDefaultNumberOfRetries = Integer.MIN_VALUE;
 
   /**
    * Time to live for historic job log entries written by history cleanup jobs.
@@ -4024,11 +4024,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public Integer getHistoryCleanupDefaultNumberOfRetries() {
+  public int getHistoryCleanupDefaultNumberOfRetries() {
     return this.historyCleanupDefaultNumberOfRetries;
   }
 
-  public ProcessEngineConfigurationImpl setHistoryCleanupDefaultNumberOfRetries(Integer historyCleanupDefaultNumberOfRetries) {
+  public ProcessEngineConfigurationImpl setHistoryCleanupDefaultNumberOfRetries(int historyCleanupDefaultNumberOfRetries) {
     this.historyCleanupDefaultNumberOfRetries = historyCleanupDefaultNumberOfRetries;
     return this;
   }
