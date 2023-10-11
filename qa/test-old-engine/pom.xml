@@ -72,28 +72,6 @@
     </profile>
 
     <profile>
-      <id>cockroachdb</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <failIfNoTests>false</failIfNoTests>
-              <trimStackTrace>false</trimStackTrace>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <excludes combine.children="append">
-                <!-- One test method here is known to cause timeout issues.
-                     Can be removed with 7.21.0 as the method in question is removed
-                     in 7.20.0. -->
-                <exclude>**/BatchMigrationTest.java</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
       <id>mariadb</id>
       <build>
         <plugins>
@@ -132,6 +110,13 @@
             <type>pom</type>
             <scope>import</scope>
           </dependency>
+          <dependency>
+            <groupId>jakarta.platform</groupId>
+            <artifactId>jakarta.jakartaee-bom</artifactId>
+            <version>${version.jakarta-ee-spec}</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
         </dependencies>
       </dependencyManagement>
 
@@ -166,17 +151,11 @@
           <scope>test</scope>
         </dependency>
 
-        <!-- TODO replace with below after 7.20 release -->
         <dependency>
-          <groupId>org.apache.openjpa</groupId>
-          <artifactId>openjpa</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <!-- <dependency>
           <groupId>commons-collections</groupId>
           <artifactId>commons-collections</artifactId>
           <scope>test</scope>
-        </dependency> -->
+        </dependency>
 
         <dependency>
           <groupId>org.apache.commons</groupId>
@@ -266,6 +245,18 @@
         <dependency>
           <groupId>org.graalvm.js</groupId>
           <artifactId>js-scriptengine</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>jakarta.transaction</groupId>
+          <artifactId>jakarta.transaction-api</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.apache.geronimo.specs</groupId>
+          <artifactId>geronimo-jta_1.1_spec</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -421,50 +412,6 @@
         </plugins>
       </build>
     </profile>
-    <profile>
-      <id>below-java11</id> <!-- TODO removed after 7.20 is released-->
-      <activation>
-        <jdk>(,11)</jdk>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                <!-- Jakarta EE 10 libraries are not part of the runs before Java 11 -->
-                <excludes combine.children="append">
-                  <exclude>**/Jakarta*.java</exclude>
-                </excludes>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-    <profile>
-      <id>java11</id> <!-- TODO add dependencies by default without profile after 7.20 is released-->
-      <activation>
-        <jdk>[11,)</jdk>
-      </activation>
-      <dependencyManagement>
-        <dependencies>
-          <dependency>
-            <groupId>jakarta.platform</groupId>
-            <artifactId>jakarta.jakartaee-bom</artifactId>
-            <version>${version.jakarta-ee-spec}</version>
-            <type>pom</type>
-            <scope>import</scope>
-          </dependency>
-        </dependencies>
-      </dependencyManagement>
-      <dependencies>
-        <dependency>
-          <groupId>jakarta.transaction</groupId>
-          <artifactId>jakarta.transaction-api</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
   </profiles>
+
 </project>
