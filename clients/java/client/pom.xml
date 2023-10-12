@@ -45,6 +45,13 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
+      <dependency>
+        <groupId>jakarta.platform</groupId>
+        <artifactId>jakarta.jakartaee-bom</artifactId>
+        <version>${version.jakarta-ee-spec}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -150,9 +157,8 @@
     </dependency>
 
     <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
-      <version>${version.xml.jaxb-impl}</version>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
       <scope>provided</scope>
     </dependency>
 
