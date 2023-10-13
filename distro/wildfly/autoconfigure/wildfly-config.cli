@@ -1,0 +1,34 @@
+set jdbcUrl=${jdbcUrl}
+set username=${username}
+set password=${password}
+set driverName=${driverName}
+set driverPath=${driverPath}
+set module=${module}
+set dataSourceName=ProcessEngine
+
+echo install driver module
+if (outcome != success) of /core-service=module-loading/:list-resource-loader-paths(module=$module)
+    module add --name=$module --resources=$driverPath --dependencies=javax.api,javax.transaction.api
+	echo module $module installed
+else
+    echo module $module already installed
+end-if
+
+if (outcome == success) of /subsystem=datasources/data-source=$dataSourceName/:read-resource
+    echo data-source $dataSourceName already exists and will be updated
+	data-source remove --name=$dataSourceName
+end-if
+
+echo install driver
+if (outcome != success) of /subsystem=datasources/:get-installed-driver(driver-name=$driverName)
+    /subsystem=datasources/jdbc-driver=$driverName:add(driver-name=$driverName,driver-module-name=$module)
+    echo driver $driverName installed
+else
+    echo driver $driverName already installed
+end-if
+
+echo install data-source
+data-source add --jndi-name=java:jboss/datasources/$dataSourceName --name=$dataSourceName --connection-url=$jdbcUrl --driver-name=$driverName --user-name=$username --password=$password
+echo data-source $dataSourceName installed
+
+shutdown
