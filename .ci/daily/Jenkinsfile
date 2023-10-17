@@ -159,11 +159,14 @@ pipeline {
               agentLabel: 'h2_perf32',
               runSteps: {
                 cambpmRunMaven('.',
-                  "deploy source:jar source:test-jar javadoc:javadoc -Dskip-zip-frontend-sources=true",
+                  "deploy source:jar source:test-jar javadoc:javadoc -Dskip-zip-frontend-sources=true -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -B",
                   withNpm: true,
                   jdkVersion: 'jdk-17-latest')
-                sh(label: 'Change staging from Nexus to Maven Central snapshots',
-                   script: "sed -i 's@:camunda-nexus:.*$@:central:https://oss.sonatype.org/content/repositories/snapshots@g' staging/deferred/.index")
+                script {
+                  str = 's@:camunda-nexus:.*$@:central:https://oss.sonatype.org/content/repositories/snapshots@g'
+                  sh(label: 'Change staging from Nexus to Maven Central snapshots', script: 'sed -i ' + str + ' staging/deferred/.index')
+                }
+
                 cambpmRunMaven('.',
                   "org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true  -B",
                   withNpm: true,
@@ -189,7 +192,7 @@ pipeline {
                 cambpmRunMaven('.',
                   "install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2 -B",
                   withNpm: true,
-                  jdkVersion: 'jdk-17-latest'
+                  jdkVersion: 'jdk-17-latest')
                   // TODO provide correct maven settings: PUBLIC_NEXUS_SETTINGS)
               },
               postFailure: {
