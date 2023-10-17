@@ -76,8 +76,8 @@ pipeline {
                 cambpmRunMaven('.',
                   "install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2 -B",
                   withNpm: true,
-                  jdkVersion: 'jdk-17-latest')
-                  // TODO provide correct maven settings: PUBLIC_NEXUS_SETTINGS)
+                  jdkVersion: 'jdk-17-latest',
+                  settingsXml: 'pub-repo')
               },
               postFailure: {
                 cambpmPublishTestResult()
