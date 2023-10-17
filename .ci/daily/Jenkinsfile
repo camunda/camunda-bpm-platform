@@ -47,7 +47,7 @@ pipeline {
                   withNpm: true,
                   jdkVersion: 'jdk-17-latest')
                 script {
-                  str = 's@:camunda-nexus:.*$@:central:https://oss.sonatype.org/content/repositories/snapshots@g'
+                  str = 's@:camunda-nexus:.*\$@:central:https://oss.sonatype.org/content/repositories/snapshots@g'
                   sh(label: 'Change staging from Nexus to Maven Central snapshots', script: 'sed -i ' + str + ' staging/deferred/.index')
                 }
 
