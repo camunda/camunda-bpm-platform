@@ -48,12 +48,13 @@ public abstract class HistoryCleanupHelper {
    */
   public static int getMaxRetries() {
     ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
+    boolean isConfiguredByUser = (config.getHistoryCleanupDefaultNumberOfRetries() != Integer.MIN_VALUE);
 
-    Integer historyCleanupRetries = config.getHistoryCleanupDefaultNumberOfRetries();
-    int defaultRetries = config.getDefaultNumberOfRetries();
+    if (!isConfiguredByUser) {
+      return config.getDefaultNumberOfRetries();
+    }
 
-    return Optional.ofNullable(historyCleanupRetries)
-        .orElse(defaultRetries);
+    return config.getHistoryCleanupDefaultNumberOfRetries();
   }
 
   /**
