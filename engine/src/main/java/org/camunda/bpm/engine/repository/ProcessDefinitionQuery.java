@@ -78,18 +78,20 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   ProcessDefinitionQuery processDefinitionKey(String processDefinitionKey);
 
   /**
-   * Only select process definitions with the given keys
-   */
-  /**
-   * Only select process definitions with the given keys
+   * Only select process definitions with the given keys.
    * <p><b>Deprecated</b>: use {@link #processDefinitionKeyIn(String...)}</p>
    */
+  @Deprecated(since = "7.20.1")
   ProcessDefinitionQueryImpl processDefinitionKeysIn(String... processDefinitionKeys);
 
   /**
-   * Only select process definitions with the given keys
+   * Only select process definitions with the given keys.
+   * @param processDefinitionKeys keys to look for during query.
+   * @return query builder.
    */
-  ProcessDefinitionQuery processDefinitionKeyIn(String... processDefinitionKeys);
+  default ProcessDefinitionQuery processDefinitionKeyIn(String... processDefinitionKeys) {
+   return processDefinitionKeysIn(processDefinitionKeys);
+  }
 
   /**
    * Only select process definitions where the key matches the given parameter.
@@ -99,7 +101,7 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
 
   /**
    * Only select process definition with a certain version.
-   * Particulary useful when used in combination with {@link #processDefinitionKey(String)}
+   * Particularly useful when used in combination with {@link #processDefinitionKey(String)}
    */
   ProcessDefinitionQuery processDefinitionVersion(Integer processDefinitionVersion);
 

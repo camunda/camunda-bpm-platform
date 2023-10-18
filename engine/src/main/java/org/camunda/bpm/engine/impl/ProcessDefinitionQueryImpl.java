@@ -164,9 +164,13 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return this;
   }
 
-  public ProcessDefinitionQuery processDefinitionKeysIn(String... keys) {
-    ensureNotNull("keys", (Object[]) keys);
-    this.keys = keys;
+  public ProcessDefinitionQueryImpl processDefinitionKeysIn(String... processDefinitionKeys) {
+    return (ProcessDefinitionQueryImpl)processDefinitionKeyIn(processDefinitionKeys);
+  }
+
+  public ProcessDefinitionQuery processDefinitionKeyIn(String... processDefinitionKeys) {
+    ensureNotNull("keys", (Object[]) processDefinitionKeys);
+    this.keys = processDefinitionKeys;
     return this;
   }
 
@@ -309,13 +313,6 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     this.startablePermissionCheck = true;
     return this;
   }
-
-  public ProcessDefinitionQueryImpl processDefinitionKeyAsImpl(String key) {
-    ensureNotNull("key", key);
-    this.key = key;
-    return this;
-  }
-
 
   //sorting ////////////////////////////////////////////
 
