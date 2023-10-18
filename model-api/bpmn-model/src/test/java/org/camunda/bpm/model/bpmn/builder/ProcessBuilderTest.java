@@ -103,7 +103,20 @@ public class ProcessBuilderTest {
       .hasSize(1);
 
     Process process = (Process) processes.iterator().next();
+
     assertThat(process.getId()).isNotNull();
+  }
+
+  @Test
+  public void emptyProcessShouldHaveDefaultHTTL() {
+    modelInstance = Bpmn.createProcess().done();
+
+    var process = (Process) modelInstance.getModelElementsByType(processType)
+        .iterator()
+        .next();
+
+    assertThat(process.getCamundaHistoryTimeToLiveString())
+        .isEqualTo("P180D");
   }
 
   @Test
