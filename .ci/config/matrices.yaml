@@ -4,10 +4,12 @@
 #   stages: [LIST; REQUIRED; Doc: defines the stage types to be used in the matrix generation ]
 #   databases: [LIST; OPTIONAL; Doc: defines the databases to be used in the stage generation ]
 engine-webapp-unit:
+# engine-webapp-unit.databases should include all supported database versions
   databases:
   - 'postgresql_132'
   - 'postgresql_142'
   - 'postgresql_150'
+  - 'postgresql_160'
   - 'aws_aurora_postgresql_13'
   - 'aws_aurora_postgresql_14'
   - 'mariadb_106'
@@ -28,7 +30,8 @@ engine-rest:
   - 'engine-rest-jakarta-unit-compatibility-wildfly'
 daily-stages:
   databases:
-  - 'postgresql_150'
+# daily-stages.databases should include the latest version for each supported database
+  - 'postgresql_160'
   - 'aws_aurora_postgresql_14'
   - 'mariadb_106'
   - 'mysql_80'
