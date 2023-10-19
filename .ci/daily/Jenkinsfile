@@ -168,7 +168,7 @@ pipeline {
                 }
 
                 cambpmRunMaven('.',
-                  "org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true  -B",
+                  "org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true -B",
                   withNpm: true,
                   jdkVersion: 'jdk-17-latest')
               },
