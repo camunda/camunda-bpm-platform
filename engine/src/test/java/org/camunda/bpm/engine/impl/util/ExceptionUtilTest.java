@@ -23,8 +23,11 @@ import static org.mockito.Mockito.mock;
 import java.sql.SQLException;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.junit.Test;
 
+@RequiredDatabase(includes = {DbSqlSessionFactory.H2})
 public class ExceptionUtilTest {
 
   // Several tests here make sure there are no NPE because of null SQL state (already
