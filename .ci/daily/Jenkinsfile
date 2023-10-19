@@ -32,6 +32,12 @@ pipeline {
     stage('Misc') {
       parallel {
         stage('platform-DISTRO-maven-central') {
+          when {
+            expression {
+              // trigger docker CE build only on the master branch
+              env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
+            }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2_perf32',
@@ -62,7 +68,7 @@ pipeline {
               agentLabel: 'h2_perf32',
               runSteps: {
                 cambpmRunMaven('.',
-                  "install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2 -B",
+                  "install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -B",
                   withNpm: true,
                   jdkVersion: 'jdk-17-latest',
                   settingsXml: 'pub-repo')
