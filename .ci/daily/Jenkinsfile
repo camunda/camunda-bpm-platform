@@ -32,12 +32,6 @@ pipeline {
     stage('Misc') {
       parallel {
         stage('platform-DISTRO-maven-central') {
-          when {
-            expression {
-              // trigger docker CE build only on the master branch
-              env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2_perf32',
@@ -63,12 +57,6 @@ pipeline {
           }
         }
         stage('platform-public-nexus') {
-          when {
-            expression {
-              // trigger docker CE build only on the master branch
-              env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2_perf32',
