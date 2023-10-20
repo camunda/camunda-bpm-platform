@@ -27,9 +27,6 @@ import org.junit.Test;
 
 public class ExceptionUtilTest {
 
-  // Several tests here make sure there are no NPE because of null SQL state (already
-  // happened) or message (who knows?). This would only clobber the real problem.
-
   @Test
   public void checkValueTooLongException() {
     assertThat(ExceptionUtil.checkValueTooLongException(mock(SQLException.class))).isFalse();
