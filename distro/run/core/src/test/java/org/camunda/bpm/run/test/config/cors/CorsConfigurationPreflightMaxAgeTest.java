@@ -45,8 +45,7 @@ public class CorsConfigurationPreflightMaxAgeTest extends AbstractRestTest {
   @Test
   public void shouldUseACustomPreflightAge() {
     // given
-    // same origin
-    String origin = "http://localhost:" + localPort;
+    String origin = "http://other.origin";
 
     HttpHeaders headers = new HttpHeaders();
     headers.add(HttpHeaders.ORIGIN, origin);
