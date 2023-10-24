@@ -27,7 +27,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -46,8 +45,7 @@ public class CorsConfigAllowedHeadersTest extends AbstractRestTest {
   @Test
   public void shouldContainPreflightWithAllowedHeaders() {
     // given
-    // same origin
-    String origin = "http://localhost:" + localPort;
+    String origin = "http://other.origin";
 
     HttpHeaders headers = new HttpHeaders();
     headers.add(HttpHeaders.ORIGIN, origin);

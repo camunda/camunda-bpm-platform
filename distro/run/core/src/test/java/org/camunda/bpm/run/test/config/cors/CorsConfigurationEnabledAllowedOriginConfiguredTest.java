@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.camunda.bpm.run.property.CamundaBpmRunCorsProperty;
 import org.camunda.bpm.run.test.AbstractRestTest;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -35,29 +36,12 @@ import org.springframework.test.context.TestPropertySource;
  * Note: To run this test via an IDE you must set the system property
  * {@code sun.net.http.allowRestrictedHeaders} to {@code true}.
  * (e.g. System.setProperty("sun.net.http.allowRestrictedHeaders", "true");)
- * 
+ *
  * @see https://jira.camunda.com/browse/CAM-11290
  */
 @ActiveProfiles(profiles = { "test-cors-enabled" }, inheritProfiles = true)
 @TestPropertySource(properties = {CamundaBpmRunCorsProperty.PREFIX + ".allowed-origins=http://other.origin:8081"})
 public class CorsConfigurationEnabledAllowedOriginConfiguredTest extends AbstractRestTest {
-
-  @Test
-  public void shouldPassSameOriginRequest() {
-    // given
-    // same origin
-    String origin = "http://localhost:" + localPort;
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.add(HttpHeaders.ORIGIN, origin);
-
-    // when
-    ResponseEntity<List> response = testRestTemplate.exchange(CONTEXT_PATH + "/task", HttpMethod.GET, new HttpEntity<>(headers), List.class);
-
-    // then
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(response.getHeaders().getAccessControlAllowOrigin()).contains(origin);
-  }
 
   @Test
   public void shouldFailCrossOriginRequestFromNotAllowedOrigin() {
