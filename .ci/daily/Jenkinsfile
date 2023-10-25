@@ -193,7 +193,7 @@ pipeline {
                   "install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -B",
                   withNpm: true,
                   jdkVersion: 'jdk-17-latest',
-                  settingsXml: 'pub-repo')
+                  settingsXml: 'public-repo')
               },
               postFailure: {
                 cambpmPublishTestResult()
