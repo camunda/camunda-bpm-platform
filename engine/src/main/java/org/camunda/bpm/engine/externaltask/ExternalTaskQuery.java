@@ -178,4 +178,8 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    */
   ExternalTaskQuery orderByPriority();
 
+  /**
+   * Order by creation date (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
+  ExternalTaskQuery orderByCreationDate();
 }
