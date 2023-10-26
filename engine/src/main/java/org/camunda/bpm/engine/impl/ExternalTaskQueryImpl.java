@@ -222,6 +222,12 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
   public ExternalTaskQuery orderByPriority() {
     return orderBy(ExternalTaskQueryProperty.PRIORITY);
   }
+
+  @Override
+  public ExternalTaskQuery orderByCreationDate() {
+    return orderBy(ExternalTaskQueryProperty.CREATION_DATE);
+  }
+
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
