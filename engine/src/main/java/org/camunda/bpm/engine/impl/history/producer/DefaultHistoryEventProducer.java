@@ -1226,7 +1226,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   protected HistoricExternalTaskLogEntity initHistoricExternalTaskLog(ExternalTaskEntity entity, ExternalTaskState state) {
     HistoricExternalTaskLogEntity event = new HistoricExternalTaskLogEntity();
-    event.setTimestamp(ClockUtil.getCurrentTime());
+
+    event.setTimestamp(getTimestamp(entity, state));
     event.setExternalTaskId(entity.getId());
     event.setTopicName(entity.getTopicName());
     event.setWorkerId(entity.getWorkerId());
@@ -1254,6 +1255,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     }
 
     return event;
+  }
+
+  protected Date getTimestamp(ExternalTaskEntity entity, ExternalTaskState state) {
+    return state == ExternalTaskState.CREATED ? entity.getCreationDate() : ClockUtil.getCurrentTime();
   }
 
   protected boolean isRootProcessInstance(HistoricProcessInstanceEventEntity evt) {
