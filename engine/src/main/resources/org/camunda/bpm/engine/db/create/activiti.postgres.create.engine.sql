@@ -327,6 +327,7 @@ create table ACT_RU_EXT_TASK (
   ERROR_MSG_ varchar(4000),
   ERROR_DETAILS_ID_ varchar(64),
   LOCK_EXP_TIME_ timestamp,
+  CREATION_DATE_ timestamp,
   SUSPENSION_STATE_ integer,
   EXECUTION_ID_ varchar(64),
   PROC_INST_ID_ varchar(64),
