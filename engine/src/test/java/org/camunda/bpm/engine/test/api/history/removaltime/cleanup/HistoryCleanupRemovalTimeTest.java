@@ -244,9 +244,10 @@ public class HistoryCleanupRemovalTimeTest {
     .endEvent().done();
 
   protected final BpmnModelInstance CALLING_PROCESS_WO_TTL = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
+      .camundaHistoryTimeToLiveString(null)
       .startEvent()
-        .callActivity()
-          .calledElement(PROCESS_KEY)
+      .callActivity()
+      .calledElement(PROCESS_KEY)
       .endEvent().done();
 
   protected final String CALLING_PROCESS_CALLS_DMN_KEY = "callingProcessCallsDmn";
