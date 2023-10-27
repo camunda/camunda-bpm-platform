@@ -92,9 +92,9 @@ public abstract class AbstractProcessBuilder<B extends AbstractProcessBuilder<B>
   }
 
   /**
-   * Sets the camunda history time to live string
+   * Sets the camunda history time to live string.
    *
-   * @param historyTimeToLive string value of history time to live, can be null or a
+   * @param historyTimeToLive string value of history time to live, can be null or a valid ISO-8601 value.
    * @return the builder object
    */
   public B camundaHistoryTimeToLiveString(String historyTimeToLive) {
