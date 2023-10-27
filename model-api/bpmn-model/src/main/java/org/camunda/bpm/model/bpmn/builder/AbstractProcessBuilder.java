@@ -18,7 +18,6 @@ package org.camunda.bpm.model.bpmn.builder;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.ProcessType;
-import org.camunda.bpm.model.bpmn.impl.instance.ProcessImpl;
 import org.camunda.bpm.model.bpmn.instance.Process;
 
 /**
@@ -28,7 +27,6 @@ public abstract class AbstractProcessBuilder<B extends AbstractProcessBuilder<B>
 
   protected AbstractProcessBuilder(BpmnModelInstance modelInstance, Process element, Class<?> selfType) {
     super(modelInstance, element, selfType);
-    camundaHistoryTimeToLiveString(ProcessImpl.DEFAULT_HISTORY_TIME_TO_LIVE);
   }
 
   /**

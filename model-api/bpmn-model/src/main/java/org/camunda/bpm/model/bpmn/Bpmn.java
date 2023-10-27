@@ -208,8 +208,18 @@ public class Bpmn {
     return process.builder();
   }
 
+  public static ProcessBuilder createProcess(String processId, boolean skipDefaultHistoryTimeToLive) {
+    var builder = createProcess().id(processId);
+
+    if (!skipDefaultHistoryTimeToLive) {
+      builder.camundaHistoryTimeToLiveString(ProcessImpl.DEFAULT_HISTORY_TIME_TO_LIVE);
+    }
+
+    return builder;
+  }
+
   public static ProcessBuilder createProcess(String processId) {
-    return createProcess().id(processId);
+    return createProcess(processId, false);
   }
 
   public static ProcessBuilder createExecutableProcess() {
@@ -217,7 +227,11 @@ public class Bpmn {
   }
 
   public static ProcessBuilder createExecutableProcess(String processId) {
-    return createProcess(processId).executable();
+    return createProcess(processId, false).executable();
+  }
+
+  public static ProcessBuilder createExecutableProcess(String processId, boolean skipDefaultHistoryTimeToLive) {
+    return createProcess(processId, skipDefaultHistoryTimeToLive).executable();
   }
 
 
