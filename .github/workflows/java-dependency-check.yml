@@ -9,5 +9,5 @@ jobs:
     uses: camunda/automation-platform-github-actions/.github/workflows/java-dependency-check.yml@add-gpl-cp-license
     if: ${{ github.event.label.name == 'bot:java-dependency-check' }}
     with:
-      ref: main
+      ref: add-gpl-cp-license
     secrets: inherit
