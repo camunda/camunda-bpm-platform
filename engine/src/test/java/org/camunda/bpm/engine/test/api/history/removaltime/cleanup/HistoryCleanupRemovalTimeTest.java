@@ -219,52 +219,46 @@ public class HistoryCleanupRemovalTimeTest {
   }
 
   protected final String PROCESS_KEY = "process";
-
   protected final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess(PROCESS_KEY)
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-      .userTask("userTask")
-      .name("userTask")
-      .endEvent()
-      .done();
+    .camundaHistoryTimeToLive(5)
+    .startEvent()
+      .userTask("userTask").name("userTask")
+    .endEvent().done();
+
 
   protected final BpmnModelInstance CALLED_PROCESS_INCIDENT = Bpmn.createExecutableProcess(PROCESS_KEY, true)
-      .startEvent()
+    .startEvent()
       .scriptTask()
-      .camundaAsyncBefore()
-      .scriptFormat("groovy")
-      .scriptText("if(execution.getIncidents().size() == 0) throw new RuntimeException(\"I'm supposed to fail!\")")
+        .camundaAsyncBefore()
+        .scriptFormat("groovy")
+        .scriptText("if(execution.getIncidents().size() == 0) throw new RuntimeException(\"I'm supposed to fail!\")")
       .userTask("userTask")
-      .endEvent()
-      .done();
+    .endEvent().done();
 
   protected final String CALLING_PROCESS_KEY = "callingProcess";
 
   protected final BpmnModelInstance CALLING_PROCESS = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
+    .camundaHistoryTimeToLive(5)
+    .startEvent()
       .callActivity()
-      .calledElement(PROCESS_KEY)
-      .endEvent()
-      .done();
+        .calledElement(PROCESS_KEY)
+    .endEvent().done();
 
   protected final BpmnModelInstance CALLING_PROCESS_WO_TTL = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY, true)
       .startEvent()
-      .callActivity()
-      .calledElement(PROCESS_KEY)
-      .endEvent()
-      .done();
+        .callActivity()
+          .calledElement(PROCESS_KEY)
+      .endEvent().done();
 
   protected final String CALLING_PROCESS_CALLS_DMN_KEY = "callingProcessCallsDmn";
 
   protected final BpmnModelInstance CALLING_PROCESS_CALLS_DMN = Bpmn.createExecutableProcess(CALLING_PROCESS_CALLS_DMN_KEY)
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
+    .camundaHistoryTimeToLive(5)
+    .startEvent()
       .businessRuleTask()
-      .camundaAsyncAfter()
-      .camundaDecisionRef("dish-decision")
-      .endEvent()
-      .done();
+        .camundaAsyncAfter()
+        .camundaDecisionRef("dish-decision")
+    .endEvent().done();
 
   protected final Date END_DATE = new Date(1363608000000L);
 
@@ -537,9 +531,7 @@ public class HistoryCleanupRemovalTimeTest {
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String taskId = historyService.createHistoricTaskInstanceQuery()
-        .singleResult()
-        .getId();
+    String taskId = historyService.createHistoricTaskInstanceQuery().singleResult().getId();
 
     ClockUtil.setCurrentTime(END_DATE);
 
