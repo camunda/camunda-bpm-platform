@@ -18,7 +18,42 @@ package org.camunda.bpm.model.bpmn.builder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.*;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.BOUNDARY_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CALL_ACTIVITY_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CATCH_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CONDITION_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.EXTERNAL_TASK_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.FORM_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.PROCESS_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SERVICE_TASK_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.START_EVENT_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SUB_PROCESS_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TASK_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CLASS_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CONDITION;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CONDITIONAL_VARIABLE_EVENTS;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CONDITIONAL_VARIABLE_EVENTS_LIST;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CONDITIONAL_VARIABLE_NAME;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_DELEGATE_EXPRESSION_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_DUE_DATE_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_EXPRESSION_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_EXTERNAL_TASK_TOPIC;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_FOLLOW_UP_DATE_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_LIST_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_HISTORY_TIME_TO_LIVE;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PRIORITY_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PROCESS_TASK_PRIORITY;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_SERVICE_TASK_PRIORITY;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_STARTABLE_IN_TASKLIST;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_STRING_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_STRING_FORM_REF_BINDING;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_STRING_FORM_REF_VERSION;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_VERSION_TAG;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TRANSACTION_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.USER_TASK_ID;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
 import static org.junit.Assert.assertEquals;
 
@@ -26,12 +61,55 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.camunda.bpm.model.bpmn.*;
-
-import org.camunda.bpm.model.bpmn.instance.*;
+import org.camunda.bpm.model.bpmn.AssociationDirection;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelException;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.GatewayDirection;
+import org.camunda.bpm.model.bpmn.TransactionMethod;
+import org.camunda.bpm.model.bpmn.instance.Activity;
+import org.camunda.bpm.model.bpmn.instance.Association;
+import org.camunda.bpm.model.bpmn.instance.BaseElement;
+import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
+import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
+import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
+import org.camunda.bpm.model.bpmn.instance.CallActivity;
+import org.camunda.bpm.model.bpmn.instance.CompensateEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.ConditionalEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.Definitions;
+import org.camunda.bpm.model.bpmn.instance.Documentation;
+import org.camunda.bpm.model.bpmn.instance.EndEvent;
 import org.camunda.bpm.model.bpmn.instance.Error;
+import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.Escalation;
+import org.camunda.bpm.model.bpmn.instance.EscalationEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.Event;
+import org.camunda.bpm.model.bpmn.instance.EventDefinition;
+import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
+import org.camunda.bpm.model.bpmn.instance.FlowElement;
+import org.camunda.bpm.model.bpmn.instance.FlowNode;
+import org.camunda.bpm.model.bpmn.instance.Gateway;
+import org.camunda.bpm.model.bpmn.instance.InclusiveGateway;
+import org.camunda.bpm.model.bpmn.instance.Message;
+import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.MultiInstanceLoopCharacteristics;
 import org.camunda.bpm.model.bpmn.instance.Process;
+import org.camunda.bpm.model.bpmn.instance.ReceiveTask;
+import org.camunda.bpm.model.bpmn.instance.ScriptTask;
+import org.camunda.bpm.model.bpmn.instance.SendTask;
+import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
+import org.camunda.bpm.model.bpmn.instance.ServiceTask;
+import org.camunda.bpm.model.bpmn.instance.Signal;
+import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.StartEvent;
+import org.camunda.bpm.model.bpmn.instance.SubProcess;
+import org.camunda.bpm.model.bpmn.instance.Task;
+import org.camunda.bpm.model.bpmn.instance.TimeCycle;
+import org.camunda.bpm.model.bpmn.instance.TimeDate;
+import org.camunda.bpm.model.bpmn.instance.TimeDuration;
+import org.camunda.bpm.model.bpmn.instance.TimerEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.Transaction;
+import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaErrorEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFailedJobRetryTimeCycle;
@@ -117,6 +195,50 @@ public class ProcessBuilderTest {
 
     assertThat(process.getCamundaHistoryTimeToLiveString())
         .isEqualTo("P180D");
+  }
+
+  @Test
+  public void shouldHaveDefaultHTTLValueOnSkipDefaultHistoryTimeToLiveFalse() {
+    modelInstance = Bpmn.createProcess(false).done();
+
+    var process = (Process) modelInstance.getModelElementsByType(processType)
+        .iterator()
+        .next();
+
+    assertThat(process.getCamundaHistoryTimeToLiveString())
+        .isEqualTo("P180D");
+  }
+
+  @Test
+  public void shouldHaveNullHTTLValueOnCreateProcessWithSkipHTTL() {
+    modelInstance = Bpmn.createProcess(true).done();
+
+    var process = (Process) modelInstance.getModelElementsByType(processType)
+        .iterator()
+        .next();
+
+    assertThat(process.getCamundaHistoryTimeToLiveString())
+        .isNull();
+  }
+
+  @Test
+  public void shouldHaveNullHTTLValueOnCreateProcessIdWithoutSkipHTTL(){
+    modelInstance = Bpmn.createProcess(PROCESS_ID, false).done();
+
+    var process = (Process) modelInstance.getModelElementById(PROCESS_ID);
+
+    assertThat(process.getCamundaHistoryTimeToLiveString())
+        .isEqualTo("P180D");
+  }
+
+  @Test
+  public void shouldHaveNullHTTLValueOnCreateProcessIdWithSkipHTTL(){
+    modelInstance = Bpmn.createProcess(PROCESS_ID, true).done();
+
+    var process = (Process) modelInstance.getModelElementById(PROCESS_ID);
+
+    assertThat(process.getCamundaHistoryTimeToLiveString())
+        .isNull();
   }
 
   @Test
