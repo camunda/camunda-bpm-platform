@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.test.api.externaltask;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Date;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
@@ -27,11 +28,14 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,7 +60,7 @@ public class ExternalTaskQueryByCreationDateTest {
   protected CaseService caseService;
 
   @Before
-  public void initServices() {
+  public void init() {
     engine = engineRule.getProcessEngine();
     repositoryService = engineRule.getRepositoryService();
     runtimeService = engineRule.getRuntimeService();
@@ -71,27 +75,29 @@ public class ExternalTaskQueryByCreationDateTest {
 
   @Test
   public void shouldHaveNonNullCreationDate() {
-    // when
+    // given
     runtimeService.startProcessInstanceByKey("process1");
 
-    // then
+    // when
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
         .list();
 
+    // then
     assertThat(result.size()).isEqualTo(1);
     assertThat(result.get(0).getCreationDate()).isNotNull();
   }
 
   @Test
   public void shouldProduceEventWithCreationDateValue() {
-    // when
+    // given
     runtimeService.startProcessInstanceByKey("process1");
 
     var extTask = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
         .singleResult();
 
+    // when
     var result = historyService.createHistoricExternalTaskLogQuery().list();
 
     assertThat(result.size()).isEqualTo(1);
@@ -104,12 +110,13 @@ public class ExternalTaskQueryByCreationDateTest {
 
   @Test
   public void shouldReturnTasksInDescOrder() {
-    // when
-    runtimeService.startProcessInstanceByKey("process1");
-    runtimeService.startProcessInstanceByKey("process2");
+    // given
+    startProcessInstanceAfter("process1", 1);
+    startProcessInstanceAfter("process2", 1);
 
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
+        // when
         .orderByCreationDate().desc()
         .list();
 
@@ -124,13 +131,14 @@ public class ExternalTaskQueryByCreationDateTest {
   }
 
   @Test
-  public void shouldReturnTasksInAScOrder() {
-    // when
-    runtimeService.startProcessInstanceByKey("process1");
-    runtimeService.startProcessInstanceByKey("process2");
+  public void shouldReturnTasksInAscOrder() {
+    // given
+    startProcessInstanceAfter("process1", 1);
+    startProcessInstanceAfter("process2", 1);
 
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
+        // when
         .orderByCreationDate().asc()
         .list();
 
@@ -144,20 +152,140 @@ public class ExternalTaskQueryByCreationDateTest {
         .isBefore(extTask2.getCreationDate());
   }
 
+  // Multi-Level Sorting with CreationDate & Priority
+
+  @Test
+  public void shouldReturnTasksInCreationDateAscOrderOnPriorityEquality() {
+    // given
+    startProcessInstanceAfter("process1", 1);
+    startProcessInstanceAfter("process2", 1);
+    startProcessInstanceAfter("process3", 1);
+    startProcessInstanceAfter("process4", 1);
+
+    var result = engineRule.getExternalTaskService()
+        .createExternalTaskQuery()
+        // when
+        .orderByPriority().desc()
+        .orderByCreationDate().asc()
+
+        .list();
+
+    assertThat(result.size()).isEqualTo(4);
+
+    // then
+    assertThat(result.get(0).getActivityId()).isEqualTo("task1");
+    assertThat(result.get(1).getActivityId()).isEqualTo("task2");
+    assertThat(result.get(2).getActivityId()).isEqualTo("task3");
+    assertThat(result.get(3).getActivityId()).isEqualTo("task4");
+  }
+
+  @Test
+  public void shouldReturnTasksInCreationDateDescOrderOnPriorityEquality() {
+    // given
+    startProcessInstanceAfter("process1", 1);
+    startProcessInstanceAfter("process2", 1);
+    startProcessInstanceAfter("process3", 1);
+    startProcessInstanceAfter("process4", 1);
+
+    var result = engineRule.getExternalTaskService()
+        .createExternalTaskQuery()
+        // when
+        .orderByPriority().desc()
+        .orderByCreationDate().desc()
+
+        .list();
+
+    assertThat(result.size()).isEqualTo(4);
+
+    // then
+    assertThat(result.get(0).getActivityId()).isEqualTo("task1"); // due to priority DESC
+    assertThat(result.get(1).getActivityId()).isEqualTo("task2");
+    assertThat(result.get(2).getActivityId()).isEqualTo("task4"); // due to creationDate DESC
+    assertThat(result.get(3).getActivityId()).isEqualTo("task3");
+  }
+
+  @Test
+  public void shouldReturnTasksInPriorityAscOnCreationDateEquality() {
+    var now = ClockTestUtil.setClockToDateWithoutMilliseconds();
+
+    // given
+    startProcessInstanceWithDate("process1", now);
+    startProcessInstanceWithDate("process2", now);
+
+    startProcessInstanceAfter("process3", 1);
+    startProcessInstanceAfter("process4", 1);
+
+    var result = engineRule.getExternalTaskService()
+        .createExternalTaskQuery()
+        // when
+        .orderByCreationDate().asc()
+        .orderByPriority().asc()
+
+        .list();
+
+    assertThat(result.size()).isEqualTo(4);
+
+    // then
+    assertThat(result.get(0).getActivityId()).isEqualTo("task2"); // due to creationDate Equality, priority ASC
+    assertThat(result.get(1).getActivityId()).isEqualTo("task1");
+
+    assertThat(result.get(2).getActivityId()).isEqualTo("task3");
+    assertThat(result.get(3).getActivityId()).isEqualTo("task4");
+  }
+
+  @Test
+  public void shouldReturnTasksInPriorityDescOnCreationDateEquality() {
+    var now = ClockTestUtil.setClockToDateWithoutMilliseconds();
+
+    // given
+    startProcessInstanceWithDate("process1", now);
+    startProcessInstanceWithDate("process2", now);
+
+    startProcessInstanceAfter("process3", 1);
+    startProcessInstanceAfter("process4", 1);
+
+    var result = engineRule.getExternalTaskService()
+        .createExternalTaskQuery()
+        // when
+        .orderByCreationDate().asc()
+        .orderByPriority().desc()
+
+        .list();
+
+    assertThat(result.size()).isEqualTo(4);
+
+    // then
+    assertThat(result.get(0).getActivityId()).isEqualTo("task1"); // due to creationDate equality, priority DESC
+    assertThat(result.get(1).getActivityId()).isEqualTo("task2");
+
+    assertThat(result.get(2).getActivityId()).isEqualTo("task3");
+    assertThat(result.get(3).getActivityId()).isEqualTo("task4");
+  }
+
   private void deployProcessesWithExternalTasks() {
-    var processWithExtTask = Bpmn.createExecutableProcess("process1")
+    var process1 = createProcessWithTask("process1", "task1", "topic1", "4");
+    var process2 = createProcessWithTask("process2", "task2", "topic2", "3");
+    var process3 = createProcessWithTask("process3", "task3", "topic3", "0");
+    var process4 = createProcessWithTask("process4", "task4", "topic4", "0");
+
+    testHelper.deploy(process1, process2, process3, process4);
+  }
+
+  private void startProcessInstanceWithDate(String processKey, Date fixedDate) {
+    ClockUtil.setCurrentTime(fixedDate);
+    runtimeService.startProcessInstanceByKey(processKey);
+  }
+
+  private void startProcessInstanceAfter(String processKey, long minutes) {
+    ClockTestUtil.incrementClock(minutes * 60_000);
+    runtimeService.startProcessInstanceByKey(processKey);
+  }
+
+  private BpmnModelInstance createProcessWithTask(String processId, String taskId, String topic, String priority) {
+    return Bpmn.createExecutableProcess(processId)
         .startEvent()
-        .serviceTask().camundaExternalTask("external-task-topic1")
+        .serviceTask(taskId).camundaExternalTask(topic).camundaTaskPriority(priority)
         .endEvent()
         .done();
-
-    var process2WithExtTask = Bpmn.createExecutableProcess("process2")
-        .startEvent()
-        .serviceTask().camundaExternalTask("external-task-topic2")
-        .endEvent()
-        .done();
-
-    testHelper.deploy(processWithExtTask);
-    testHelper.deploy(process2WithExtTask);
   }
 }
