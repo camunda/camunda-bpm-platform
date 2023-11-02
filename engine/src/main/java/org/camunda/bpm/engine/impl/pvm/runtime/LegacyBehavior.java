@@ -530,7 +530,7 @@ public class LegacyBehavior {
       if (activityId != null) {
         ActivityImpl activity = processDefinition.findActivity(jobDefinition.getActivityId());
 
-        if (!isAsync(activity) && isActivityWrappedInMultiInstanceBody(activity) && isAsyncJobDefinition(jobDefinition)) {
+        if (activity != null && !isAsync(activity) && isActivityWrappedInMultiInstanceBody(activity) && isAsyncJobDefinition(jobDefinition)) {
           jobDefinition.setActivityId(activity.getFlowScope().getId());
         }
       }
