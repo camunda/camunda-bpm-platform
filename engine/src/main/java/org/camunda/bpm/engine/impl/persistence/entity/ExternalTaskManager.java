@@ -16,29 +16,31 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.ArrayList;
+import static org.camunda.bpm.engine.impl.Direction.ASCENDING;
+import static org.camunda.bpm.engine.impl.Direction.DESCENDING;
+import static org.camunda.bpm.engine.impl.ExternalTaskQueryProperty.CREATION_DATE;
+import static org.camunda.bpm.engine.impl.ExternalTaskQueryProperty.PRIORITY;
+import static org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory.CRDB;
+import static org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory.POSTGRES;
+import static org.camunda.bpm.engine.impl.util.DatabaseUtil.checkDatabaseType;
+
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.externaltask.ExternalTask;
-import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.ExternalTaskQueryImpl;
-import org.camunda.bpm.engine.impl.ExternalTaskQueryProperty;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
-import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.externaltask.TopicFetchInstruction;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.impl.util.DatabaseUtil;
 import org.camunda.bpm.engine.impl.util.ImmutablePair;
 
 /**
@@ -46,8 +48,6 @@ import org.camunda.bpm.engine.impl.util.ImmutablePair;
  *
  */
 public class ExternalTaskManager extends AbstractManager {
-
-  public static QueryOrderingProperty EXT_TASK_PRIORITY_ORDERING_PROPERTY = new QueryOrderingProperty(ExternalTaskQueryProperty.PRIORITY, Direction.DESCENDING);
 
   public ExternalTaskEntity findExternalTaskById(String id) {
     return getDbEntityManager().selectById(ExternalTaskEntity.class, id);
@@ -73,25 +73,24 @@ public class ExternalTaskManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<TopicFetchInstruction> queryFilters, int maxResults, boolean usePriority) {
+  public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<TopicFetchInstruction> queryFilters, int maxResults,
+                                                               boolean usePriority, boolean userCreationDate) {
     if (queryFilters.isEmpty()) {
-      return new ArrayList<>();
+      return Collections.emptyList();
     }
 
-    Map<String, Object> parameters = new HashMap<>();
-    parameters.put("topics", queryFilters);
-    parameters.put("now", ClockUtil.getCurrentTime());
-    parameters.put("applyOrdering", usePriority);
-    List<QueryOrderingProperty> orderingProperties = new ArrayList<>();
-    orderingProperties.add(EXT_TASK_PRIORITY_ORDERING_PROPERTY);
-    parameters.put("orderingProperties", orderingProperties);
-    parameters.put("usesPostgres",
-        DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES, DbSqlSessionFactory.CRDB));
+    var parameters = Map.of(
+        "topics", queryFilters,
+        "now", ClockUtil.getCurrentTime(),
+        "applyOrdering", applyOrdering(usePriority, userCreationDate),
+        "orderingProperties", orderingProperties(usePriority, userCreationDate),
+        "usesPostgres", checkDatabaseType(POSTGRES, CRDB)
+    );
 
-    ListQueryParameterObject parameter = new ListQueryParameterObject(parameters, 0, maxResults);
+    var parameter = new ListQueryParameterObject(parameters, 0, maxResults);
     configureQuery(parameter);
 
-    DbEntityManager manager = getDbEntityManager();
+    var manager = getDbEntityManager();
     return manager.selectList("selectExternalTasksForTopics", parameter);
   }
 
@@ -125,7 +124,7 @@ public class ExternalTaskManager extends AbstractManager {
   }
 
   protected void updateExternalTaskSuspensionState(String processInstanceId,
-    String processDefinitionId, String processDefinitionKey, SuspensionState suspensionState) {
+                                                   String processDefinitionId, String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("processDefinitionId", processDefinitionId);
@@ -170,15 +169,29 @@ public class ExternalTaskManager extends AbstractManager {
     return getTenantManager().configureQuery(parameter);
   }
 
+  protected boolean applyOrdering(boolean usePriority, boolean useCreationDate) {
+    return usePriority || useCreationDate;
+  }
+
+  protected List<QueryOrderingProperty> orderingProperties(boolean usePriority, boolean useCreationDate) {
+    var priorityDirection =  usePriority ? DESCENDING : ASCENDING;
+    var creationDateDirection =  useCreationDate ? DESCENDING : ASCENDING;
+
+    return List.of(
+        new QueryOrderingProperty(PRIORITY, priorityDirection),
+        new QueryOrderingProperty(CREATION_DATE, creationDateDirection)
+    );
+  }
+
   public void fireExternalTaskAvailableEvent() {
     Context.getCommandContext()
-      .getTransactionContext()
-      .addTransactionListener(TransactionState.COMMITTED, new TransactionListener() {
-        @Override
-        public void execute(CommandContext commandContext) {
-          ProcessEngineImpl.EXT_TASK_CONDITIONS.signalAll();
-        }
-      });
+        .getTransactionContext()
+        .addTransactionListener(TransactionState.COMMITTED, new TransactionListener() {
+          @Override
+          public void execute(CommandContext commandContext) {
+            ProcessEngineImpl.EXT_TASK_CONDITIONS.signalAll();
+          }
+        });
   }
 }
 

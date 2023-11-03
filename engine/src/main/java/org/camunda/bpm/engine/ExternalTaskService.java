@@ -46,7 +46,7 @@ public interface ExternalTaskService {
    * @param maxTasks the maximum number of tasks to return
    * @param workerId the id of the worker to lock the tasks for
    * @return a builder to define and execute an external task fetching operation
-   * @see {@link ExternalTaskService#fetchAndLock(int, java.lang.String, boolean)}.
+   * @see {@link ExternalTaskService#fetchAndLock(int, java.lang.String, boolean, boolean)}.
    */
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId);
 
@@ -89,9 +89,10 @@ public interface ExternalTaskService {
    * @param maxTasks the maximum number of tasks to return
    * @param workerId the id of the worker to lock the tasks for
    * @param usePriority the flag to enable the priority fetching mechanism
+   * @param useCreationDate the flag to enable the creationDate fetching mechanism
    * @return a builder to define and execute an external task fetching operation
    */
-  public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority);
+  public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority, boolean useCreationDate);
 
   /**
    * <p>Lock an external task on behalf of a worker.

@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.cmd.FetchExternalTasksCmd;
@@ -42,22 +41,25 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
    * Indicates that priority is enabled.
    */
   protected boolean usePriority;
+  protected boolean useCreationDate;
 
   protected Map<String, TopicFetchInstruction> instructions;
 
   protected TopicFetchInstruction currentInstruction;
 
-  public ExternalTaskQueryTopicBuilderImpl(CommandExecutor commandExecutor, String workerId, int maxTasks, boolean usePriority) {
+  public ExternalTaskQueryTopicBuilderImpl(CommandExecutor commandExecutor, String workerId, int maxTasks,
+                                           boolean usePriority, boolean useCreationDate) {
     this.commandExecutor = commandExecutor;
     this.workerId = workerId;
     this.maxTasks = maxTasks;
     this.usePriority = usePriority;
-    this.instructions = new HashMap<String, TopicFetchInstruction>();
+    this.useCreationDate = useCreationDate;
+    this.instructions = new HashMap<>();
   }
 
   public List<LockedExternalTask> execute() {
     submitCurrentInstruction();
-    return commandExecutor.execute(new FetchExternalTasksCmd(workerId, maxTasks, instructions, usePriority));
+    return commandExecutor.execute(new FetchExternalTasksCmd(workerId, maxTasks, instructions, usePriority, useCreationDate));
   }
 
   public ExternalTaskQueryTopicBuilder topic(String topicName, long lockDuration) {
