@@ -515,12 +515,12 @@ public class HistoricExternalTaskLogQuerySortingTest {
   }
 
   protected void completeExternalTaskWithWorker(String externalTaskId, String workerId) {
-    completeExternalTask(externalTaskId, DEFAULT_TOPIC, workerId, false);
+    completeExternalTask(externalTaskId, DEFAULT_TOPIC, workerId, false, false);
 
   }
 
-  protected void completeExternalTask(String externalTaskId, String topic, String workerId, boolean usePriority) {
-    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority)
+  protected void completeExternalTask(String externalTaskId, String topic, String workerId, boolean usePriority, boolean useCreationDate) {
+    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, useCreationDate)
       .topic(topic, LOCK_DURATION)
       .execute();
     externalTaskService.complete(externalTaskId, workerId);
@@ -534,12 +534,13 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
   protected void reportExternalTaskFailure(List<ExternalTask> taskLIst) {
     for (Integer i=0; i<taskLIst.size(); i++) {
-      reportExternalTaskFailure(taskLIst.get(i).getId(), DEFAULT_TOPIC, WORKER_ID, i+1, false, "foo");
+      reportExternalTaskFailure(taskLIst.get(i).getId(), DEFAULT_TOPIC, WORKER_ID, i+1, false, false, "foo");
     }
   }
 
-  protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId, Integer retries, boolean usePriority, String errorMessage) {
-    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority)
+  protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId, Integer retries,
+                                           boolean usePriority, boolean userCreationDate, String errorMessage) {
+    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, userCreationDate)
       .topic(topic, LOCK_DURATION)
       .execute();
     externalTaskService.handleFailure(externalTaskId, workerId, errorMessage, retries, 0L);

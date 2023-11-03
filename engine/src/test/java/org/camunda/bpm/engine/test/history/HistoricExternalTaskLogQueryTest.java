@@ -879,16 +879,16 @@ public class HistoricExternalTaskLogQueryTest {
   }
 
   protected void completeExternalTaskWithWorker(String externalTaskId, String workerId) {
-    completeExternalTask(externalTaskId, DEFAULT_TOPIC, workerId, false);
+    completeExternalTask(externalTaskId, DEFAULT_TOPIC, workerId, false, false);
 
   }
 
   protected void completeExternalTask(String externalTaskId) {
-    completeExternalTask(externalTaskId, DEFAULT_TOPIC, WORKER_ID, false);
+    completeExternalTask(externalTaskId, DEFAULT_TOPIC, WORKER_ID, false, false);
   }
 
-  protected void completeExternalTask(String externalTaskId, String topic, String workerId, boolean usePriority) {
-    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority)
+  protected void completeExternalTask(String externalTaskId, String topic, String workerId, boolean usePriority, boolean useCreationDate) {
+    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, useCreationDate)
       .topic(topic, LOCK_DURATION)
       .execute();
     externalTaskService.complete(externalTaskId, workerId);
@@ -901,11 +901,12 @@ public class HistoricExternalTaskLogQueryTest {
   }
 
   protected void reportExternalTaskFailure(String externalTaskId, String errorMessage) {
-    reportExternalTaskFailure(externalTaskId, DEFAULT_TOPIC, WORKER_ID, 1, false, errorMessage);
+    reportExternalTaskFailure(externalTaskId, DEFAULT_TOPIC, WORKER_ID, 1, false, false, errorMessage);
   }
 
-  protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId, Integer retries, boolean usePriority, String errorMessage) {
-    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority)
+  protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId, Integer retries,
+                                           boolean usePriority, boolean useCreationDate, String errorMessage) {
+    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, useCreationDate)
       .topic(topic, LOCK_DURATION)
       .execute();
     externalTaskService.handleFailure(externalTaskId, workerId, errorMessage, retries, 0L);

@@ -353,7 +353,7 @@ public class MultiTenancyHistoricExternalTaskLogTest {
   // helper methods
 
   protected void completeExternalTask(String externalTaskId) {
-    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, WORKER_ID, true)
+    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, WORKER_ID, true, false)
       .topic(DEFAULT_TOPIC, LOCK_DURATION)
       .execute();
     externalTaskService.complete(externalTaskId, WORKER_ID);
@@ -382,11 +382,12 @@ public class MultiTenancyHistoricExternalTaskLogTest {
   }
 
   protected void reportExternalTaskFailure(String externalTaskId) {
-    reportExternalTaskFailure(externalTaskId, DEFAULT_TOPIC, WORKER_ID, 1, false, "This is an error!");
+    reportExternalTaskFailure(externalTaskId, DEFAULT_TOPIC, WORKER_ID, 1, false, false, "This is an error!");
   }
 
-  protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId, Integer retries, boolean usePriority, String errorMessage) {
-    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority)
+  protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId, Integer retries,
+                                           boolean usePriority, boolean useCreationDate, String errorMessage) {
+    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, useCreationDate)
       .topic(topic, LOCK_DURATION)
       .execute();
     externalTaskService.handleFailure(externalTaskId, workerId, errorMessage, ERROR_DETAILS, retries, 0L);
