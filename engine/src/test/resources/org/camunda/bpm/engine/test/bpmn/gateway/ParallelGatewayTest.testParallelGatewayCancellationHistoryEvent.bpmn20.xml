@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+                  id="Definitions_0i3ym7l"
+                  targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.8.0">
+  <bpmn:process id="plaincamunda" name="Plain Camunda" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_16l9n9h</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_16l9n9h" sourceRef="StartEvent_1" targetRef="Gateway_in"/>
+    <bpmn:endEvent id="Event_1ekhux4" name="Ende" camunda:asyncBefore="true">
+      <bpmn:incoming>Flow_1njyg0d</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:parallelGateway id="Gateway_in">
+      <bpmn:incoming>Flow_16l9n9h</bpmn:incoming>
+      <bpmn:outgoing>Flow_1dzo4v8</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0aic3ay</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_1njyg0d" sourceRef="Gateway_out" targetRef="Event_1ekhux4"/>
+    <bpmn:sequenceFlow id="Flow_1dzo4v8" sourceRef="Gateway_in" targetRef="Gateway_out"/>
+    <bpmn:intermediateCatchEvent id="Event_Wait" name="Wait">
+      <bpmn:incoming>Flow_0aic3ay</bpmn:incoming>
+      <bpmn:outgoing>Flow_087392g</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0f9uwdw" messageRef="Message_2isn1rr"/>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_0aic3ay" sourceRef="Gateway_in" targetRef="Event_Wait"/>
+    <bpmn:sequenceFlow id="Flow_087392g" sourceRef="Event_Wait" targetRef="Gateway_out"/>
+    <bpmn:parallelGateway id="Gateway_out">
+      <bpmn:incoming>Flow_1dzo4v8</bpmn:incoming>
+      <bpmn:incoming>Flow_087392g</bpmn:incoming>
+      <bpmn:outgoing>Flow_1njyg0d</bpmn:outgoing>
+    </bpmn:parallelGateway>
+  </bpmn:process>
+  <bpmn:message id="Message_2isn1rr" name="message"/>
+</bpmn:definitions>

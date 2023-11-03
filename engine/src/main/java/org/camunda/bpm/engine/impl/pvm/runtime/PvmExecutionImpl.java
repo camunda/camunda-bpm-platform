@@ -359,7 +359,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
 
     // fire activity end on active activity
     PvmActivity activity = getActivity();
-    if (isActive && activity != null) {
+    if ((isActive || externallyTerminated) && activity != null) {
       // set activity instance state to cancel
       if (activityInstanceState != ENDING.getStateCode() || activityInstanceEndListenersFailed) {
         setCanceled(true);

@@ -373,4 +373,31 @@ public class ParallelGatewayTest extends PluggableProcessEngineTest {
     // then
     assertEquals(3, taskService.createTaskQuery().count());
   }
+
+  @Deployment
+  @Test
+  public void testParallelGatewayCancellationHistoryEvent() {
+    // given
+    var pi = runtimeService.startProcessInstanceByKey("plaincamunda");
+
+    // when
+    this.runtimeService.createProcessInstanceModification(pi.getId())
+        .cancelAllForActivity("Event_Wait")
+        .cancelAllForActivity("Gateway_out")
+        .execute();
+
+    // then
+    assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult()).isNull();
+    assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(pi.getId()).singleResult()).isNotNull();
+
+    var hiaiWait = this.historyService.createHistoricActivityInstanceQuery()
+        .activityId("Event_Wait")
+        .singleResult();
+    assertThat(hiaiWait.getEndTime()).isNotNull();
+
+    var hiaiGateway = this.historyService.createHistoricActivityInstanceQuery()
+        .activityId("Gateway_out")
+        .singleResult();
+    assertThat(hiaiGateway.getEndTime()).isNotNull();
+  }
 }
