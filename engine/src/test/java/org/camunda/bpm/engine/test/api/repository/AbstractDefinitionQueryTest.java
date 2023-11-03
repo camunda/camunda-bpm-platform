@@ -80,7 +80,7 @@ public abstract class AbstractDefinitionQueryTest {
 
   protected void verifyQueryResults(Query query, int countExpected) {
     assertThat(query.list()).hasSize(countExpected);
-    assertThat(query.count()).isEqualTo(new Long(countExpected));
+    assertThat(query.count()).isEqualTo(Long.valueOf(countExpected));
 
     if (countExpected == 1) {
       assertThat(query.singleResult()).isNotNull();

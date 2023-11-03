@@ -339,7 +339,7 @@ public class CallActivityTest extends PluggableProcessEngineTest {
     assertEquals("Hello from sub process.", taskService.getVariable(taskAfterSubProcess.getId(), "superVariable"));
 
     vars.clear();
-    vars.put("x", new Long(5));
+    vars.put("x", 5L);
 
     // Completing this task ends the super process which leads to a task in the super process
     taskService.complete(taskAfterSubProcess.getId(), vars);

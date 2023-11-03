@@ -82,7 +82,7 @@ public class TaskQueryDisabledAdhocExpressionsTest extends PluggableProcessEngin
     filterService.saveFilter(filter);
 
     // it is possible to execute the stored query with an expression
-    assertEquals(new Long(0), filterService.count(filter.getId()));
+    assertEquals(Long.valueOf(0), filterService.count(filter.getId()));
     assertEquals(0, filterService.list(filter.getId()).size());
 
     // but it is not possible to executed the filter with an extended query that uses expressions
@@ -101,11 +101,11 @@ public class TaskQueryDisabledAdhocExpressionsTest extends PluggableProcessEngin
     filterService.saveFilter(filter);
 
     // it is possible to execute the stored query with an expression
-    assertEquals(new Long(0), filterService.count(filter.getId()));
+    assertEquals(Long.valueOf(0), filterService.count(filter.getId()));
     assertEquals(0, filterService.list(filter.getId()).size());
 
     // and it is possible to extend the filter query when not using an expression
-    assertEquals(new Long(0), filterService.count(filter.getId(), taskService.createTaskQuery().dueAfter(new Date())));
+    assertEquals(Long.valueOf(0), filterService.count(filter.getId(), taskService.createTaskQuery().dueAfter(new Date())));
     assertEquals(0, filterService.list(filter.getId(), taskService.createTaskQuery().dueAfter(new Date())).size());
 
     // cleanup

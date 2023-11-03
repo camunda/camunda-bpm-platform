@@ -409,7 +409,7 @@ public class IncidentTest extends PluggableProcessEngineTest {
     assertNotNull(incident);
 
     // set execution variable from "true" to "false"
-    runtimeService.setVariable(processInstance.getId(), "fail", new Boolean(false));
+    runtimeService.setVariable(processInstance.getId(), "fail", Boolean.valueOf(false));
 
     // set retries of failed job to 1, with the change of the fail variable the job
     // will be executed successfully
