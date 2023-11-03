@@ -16,39 +16,8 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import io.restassured.http.ContentType;
-import org.camunda.bpm.engine.ExternalTaskService;
-import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
-import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.identity.Tenant;
-import org.camunda.bpm.engine.impl.identity.Authentication;
-import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
-import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto.FetchExternalTaskTopicDto;
-import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.helper.MockProvider;
-import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import javax.servlet.ServletContextEvent;
-import javax.ws.rs.core.Response.Status;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static io.restassured.RestAssured.given;
+import static org.camunda.bpm.engine.externaltask.CreationDateConfig.EMPTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -67,6 +36,39 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+
+import io.restassured.http.ContentType;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.servlet.ServletContextEvent;
+import javax.ws.rs.core.Response.Status;
+import org.camunda.bpm.engine.ExternalTaskService;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.externaltask.CreationDateConfig;
+import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
+import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.Tenant;
+import org.camunda.bpm.engine.impl.identity.Authentication;
+import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
+import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto.CreationDateConfigDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto.FetchExternalTaskTopicDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Tassilo Weidner
@@ -99,7 +101,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
       .thenReturn(externalTaskService);
 
     lockedExternalTaskMock = MockProvider.createMockLockedExternalTask();
-    when(externalTaskService.fetchAndLock(anyInt(), any(String.class), any(Boolean.class)))
+    when(externalTaskService.fetchAndLock(anyInt(), any(String.class), any(Boolean.class), any(CreationDateConfig.class)))
       .thenReturn(fetchTopicBuilder);
 
     when(fetchTopicBuilder.topic(any(String.class), anyLong()))
@@ -162,7 +164,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     .when().post(FETCH_EXTERNAL_TASK_URL);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true, EMPTY);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).variables(Collections.singletonList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
     inOrder.verify(fetchTopicBuilder).execute();
@@ -186,7 +188,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
       .post(FETCH_EXTERNAL_TASK_URL);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false, EMPTY);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).execute();
     verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
@@ -208,7 +210,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
       .post(FETCH_EXTERNAL_TASK_URL);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false, EMPTY);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).variables(Collections.singletonList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
     inOrder.verify(fetchTopicBuilder).enableCustomObjectDeserialization();
@@ -362,10 +364,15 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
   // helper /////////////////////////
 
   private FetchExternalTasksExtendedDto createDto(Long responseTimeout) {
-    return createDto(responseTimeout, false, false, false);
+    return createDto(responseTimeout, false, new CreationDateConfigDto(), false, false);
+  }
+
+  private FetchExternalTasksExtendedDto createDto(Long responseTimeout, boolean usePriority, boolean withVariables, boolean withDeserialization) {
+    return createDto(responseTimeout, usePriority, new CreationDateConfigDto(), withVariables, withDeserialization);
   }
   
-  private FetchExternalTasksExtendedDto createDto(Long responseTimeout, boolean usePriority, boolean withVariables, boolean withDeserialization) {
+  private FetchExternalTasksExtendedDto createDto(Long responseTimeout, boolean usePriority, CreationDateConfigDto config,
+                                                  boolean withVariables, boolean withDeserialization) {
     FetchExternalTasksExtendedDto fetchExternalTasksDto = new FetchExternalTasksExtendedDto();
     if (responseTimeout != null) {
       fetchExternalTasksDto.setAsyncResponseTimeout(responseTimeout);
@@ -373,6 +380,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     fetchExternalTasksDto.setMaxTasks(5);
     fetchExternalTasksDto.setWorkerId("aWorkerId");
     fetchExternalTasksDto.setUsePriority(usePriority);
+    fetchExternalTasksDto.setCreationDateConfig(config);
     FetchExternalTasksExtendedDto.FetchExternalTaskTopicDto topicDto = new FetchExternalTasksExtendedDto.FetchExternalTaskTopicDto();
     fetchExternalTasksDto.setTopics(Collections.singletonList(topicDto));
     topicDto.setTopicName("aTopicName");

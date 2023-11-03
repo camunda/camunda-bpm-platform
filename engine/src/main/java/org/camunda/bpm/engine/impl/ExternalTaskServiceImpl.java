@@ -16,10 +16,13 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.externaltask.CreationDateConfig.EMPTY;
+
 import java.util.List;
 import java.util.Map;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.externaltask.CreationDateConfig;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesSelectBuilder;
@@ -45,12 +48,15 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
 
   @Override
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId) {
-    return fetchAndLock(maxTasks, workerId, false, false);
+    return fetchAndLock(maxTasks, workerId, false, EMPTY);
   }
 
   @Override
-  public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority, boolean useCreationDate) {
-    return new ExternalTaskQueryTopicBuilderImpl(commandExecutor, workerId, maxTasks, usePriority, useCreationDate);
+  public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority, CreationDateConfig creationDateConfig) {
+    boolean userCreationDate = creationDateConfig != null && creationDateConfig != EMPTY;
+    var direction = userCreationDate ? Direction.findByNameIgnoreCase(creationDateConfig.name()) : null;
+
+    return new ExternalTaskQueryTopicBuilderImpl(commandExecutor, workerId, maxTasks, usePriority, userCreationDate, direction);
   }
 
   @Override

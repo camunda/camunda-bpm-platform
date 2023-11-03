@@ -50,4 +50,12 @@ public class Direction {
   public static Direction findByName(String directionName) {
     return directions.get(directionName);
   }
+
+  public static Direction findByNameIgnoreCase(String directionName) {
+    if (directionName == null) {
+      return null;
+    }
+
+    return directions.get(directionName.toLowerCase());
+  }
 }

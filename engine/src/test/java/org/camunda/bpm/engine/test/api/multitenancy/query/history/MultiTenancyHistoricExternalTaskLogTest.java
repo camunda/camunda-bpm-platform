@@ -25,7 +25,6 @@ import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.D
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -34,6 +33,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.externaltask.CreationDateConfig;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
@@ -353,7 +353,7 @@ public class MultiTenancyHistoricExternalTaskLogTest {
   // helper methods
 
   protected void completeExternalTask(String externalTaskId) {
-    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, WORKER_ID, true, false)
+    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, WORKER_ID, true, null)
       .topic(DEFAULT_TOPIC, LOCK_DURATION)
       .execute();
     externalTaskService.complete(externalTaskId, WORKER_ID);
@@ -382,12 +382,12 @@ public class MultiTenancyHistoricExternalTaskLogTest {
   }
 
   protected void reportExternalTaskFailure(String externalTaskId) {
-    reportExternalTaskFailure(externalTaskId, DEFAULT_TOPIC, WORKER_ID, 1, false, false, "This is an error!");
+    reportExternalTaskFailure(externalTaskId, DEFAULT_TOPIC, WORKER_ID, 1, false, null, "This is an error!");
   }
 
   protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId, Integer retries,
-                                           boolean usePriority, boolean useCreationDate, String errorMessage) {
-    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, useCreationDate)
+                                           boolean usePriority, CreationDateConfig creationDateConfig, String errorMessage) {
+    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, creationDateConfig)
       .topic(topic, LOCK_DURATION)
       .execute();
     externalTaskService.handleFailure(externalTaskId, workerId, errorMessage, ERROR_DETAILS, retries, 0L);

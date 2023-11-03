@@ -16,14 +16,16 @@
  */
 package org.camunda.bpm.engine.rest.dto.externaltask;
 
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
-import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
-
 import static java.lang.Boolean.TRUE;
+import static org.camunda.bpm.engine.externaltask.CreationDateConfig.DESC;
+import static org.camunda.bpm.engine.externaltask.CreationDateConfig.EMPTY;
 
 import java.util.HashMap;
 import java.util.List;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.externaltask.CreationDateConfig;
+import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
+import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 
 /**
  * @author Thorben Lindhauer
@@ -34,24 +36,30 @@ public class FetchExternalTasksDto {
   protected int maxTasks;
   protected String workerId;
   protected boolean usePriority = false;
+  protected CreationDateConfigDto creationDateConfig;
   protected List<FetchExternalTaskTopicDto> topics;
   protected boolean includeExtensionProperties = false;
 
   public int getMaxTasks() {
     return maxTasks;
   }
+
   public void setMaxTasks(int maxTasks) {
     this.maxTasks = maxTasks;
   }
+
   public String getWorkerId() {
     return workerId;
   }
+
   public void setWorkerId(String workerId) {
     this.workerId = workerId;
   }
+
   public List<FetchExternalTaskTopicDto> getTopics() {
     return topics;
   }
+
   public void setTopics(List<FetchExternalTaskTopicDto> topics) {
     this.topics = topics;
   }
@@ -64,12 +72,46 @@ public class FetchExternalTasksDto {
     this.usePriority = usePriority;
   }
 
+  public CreationDateConfigDto getCreationDateConfig() {
+    return creationDateConfig;
+  }
+
+  public void setCreationDateConfig(CreationDateConfigDto creationDateConfigDto) {
+    this.creationDateConfig = creationDateConfigDto;
+  }
+
   public boolean isIncludeExtensionProperties() {
     return includeExtensionProperties;
   }
 
   public void setIncludeExtensionProperties(boolean includeExtensionProperties) {
     this.includeExtensionProperties = includeExtensionProperties;
+  }
+
+  public static class CreationDateConfigDto {
+
+    private boolean useCreationDate;
+    private Direction direction;
+
+    public boolean isUseCreationDate() {
+      return useCreationDate;
+    }
+
+    public void setUseCreationDate(boolean useCreationDate) {
+      this.useCreationDate = useCreationDate;
+    }
+
+    public Direction getDirection() {
+      return direction;
+    }
+
+    public void setDirection(Direction direction) {
+      this.direction = direction;
+    }
+
+    public enum Direction {
+      ASC, DESC
+    }
   }
 
   public static class FetchExternalTaskTopicDto {
@@ -183,9 +225,13 @@ public class FetchExternalTasksDto {
   }
 
   public ExternalTaskQueryBuilder buildQuery(ProcessEngine processEngine) {
+
+    var configDto = getCreationDateConfig();
+    var config = getConfigFromDto(configDto);
+
     ExternalTaskQueryBuilder fetchBuilder = processEngine
       .getExternalTaskService()
-      .fetchAndLock(getMaxTasks(), getWorkerId(), isUsePriority());
+      .fetchAndLock(getMaxTasks(), getWorkerId(), isUsePriority(), config);
 
     if (getTopics() != null) {
       for (FetchExternalTaskTopicDto topicDto : getTopics()) {
@@ -249,6 +295,18 @@ public class FetchExternalTasksDto {
     }
 
     return fetchBuilder;
+  }
+
+  protected CreationDateConfig getConfigFromDto(CreationDateConfigDto dto) {
+    if (dto == null || !dto.isUseCreationDate()) {
+      return EMPTY;
+    }
+
+    if (dto.getDirection() == null) {
+      return DESC;
+    }
+
+    return CreationDateConfig.valueOf(dto.getDirection().name());
   }
 
 }

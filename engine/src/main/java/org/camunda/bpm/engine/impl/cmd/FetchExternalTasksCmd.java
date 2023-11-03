@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
@@ -50,20 +50,24 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
   protected String workerId;
   protected int maxResults;
   protected boolean usePriority;
+
   protected boolean useCreationDate;
+  protected Direction creationDateDirection;
+
   protected Map<String, TopicFetchInstruction> fetchInstructions = new HashMap<>();
 
   public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions) {
-    this(workerId, maxResults, instructions, false, false);
+    this(workerId, maxResults, instructions, false, false, null);
   }
 
   public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions,
-                               boolean usePriority, boolean useCreationDate) {
+                               boolean usePriority, boolean useCreationDate, Direction creationDateDirection) {
     this.workerId = workerId;
     this.maxResults = maxResults;
     this.fetchInstructions = instructions;
     this.usePriority = usePriority;
     this.useCreationDate = useCreationDate;
+    this.creationDateDirection = creationDateDirection;
   }
 
   @Override
@@ -76,7 +80,7 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
 
     List<ExternalTaskEntity> externalTasks = commandContext
       .getExternalTaskManager()
-      .selectExternalTasksForTopics(new ArrayList<>(fetchInstructions.values()), maxResults, usePriority, useCreationDate);
+      .selectExternalTasksForTopics(new ArrayList<>(fetchInstructions.values()), maxResults, usePriority, useCreationDate, creationDateDirection);
 
     final List<LockedExternalTask> result = new ArrayList<>();
 

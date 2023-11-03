@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import static org.camunda.bpm.engine.impl.Direction.ASCENDING;
 import static org.camunda.bpm.engine.impl.Direction.DESCENDING;
 import static org.camunda.bpm.engine.impl.ExternalTaskQueryProperty.CREATION_DATE;
 import static org.camunda.bpm.engine.impl.ExternalTaskQueryProperty.PRIORITY;
@@ -24,12 +23,14 @@ import static org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory.CRDB;
 import static org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory.POSTGRES;
 import static org.camunda.bpm.engine.impl.util.DatabaseUtil.checkDatabaseType;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.ExternalTaskQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.QueryOrderingProperty;
@@ -74,7 +75,7 @@ public class ExternalTaskManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<TopicFetchInstruction> queryFilters, int maxResults,
-                                                               boolean usePriority, boolean userCreationDate) {
+                                                               boolean usePriority, boolean useCreationDate, Direction useCreationDateDirection) {
     if (queryFilters.isEmpty()) {
       return Collections.emptyList();
     }
@@ -82,8 +83,8 @@ public class ExternalTaskManager extends AbstractManager {
     var parameters = Map.of(
         "topics", queryFilters,
         "now", ClockUtil.getCurrentTime(),
-        "applyOrdering", applyOrdering(usePriority, userCreationDate),
-        "orderingProperties", orderingProperties(usePriority, userCreationDate),
+        "applyOrdering", applyOrdering(usePriority, useCreationDate),
+        "orderingProperties", orderingProperties(usePriority, useCreationDate, useCreationDateDirection),
         "usesPostgres", checkDatabaseType(POSTGRES, CRDB)
     );
 
@@ -173,14 +174,18 @@ public class ExternalTaskManager extends AbstractManager {
     return usePriority || useCreationDate;
   }
 
-  protected List<QueryOrderingProperty> orderingProperties(boolean usePriority, boolean useCreationDate) {
-    var priorityDirection =  usePriority ? DESCENDING : ASCENDING;
-    var creationDateDirection =  useCreationDate ? DESCENDING : ASCENDING;
+  protected List<QueryOrderingProperty> orderingProperties(boolean usePriority, boolean useCreationDate, Direction creationDateDirection) {
+    var result = new ArrayList<QueryOrderingProperty>();
 
-    return List.of(
-        new QueryOrderingProperty(PRIORITY, priorityDirection),
-        new QueryOrderingProperty(CREATION_DATE, creationDateDirection)
-    );
+    if (usePriority) {
+      result.add(new QueryOrderingProperty(PRIORITY, DESCENDING));
+    }
+
+    if (useCreationDate) {
+      result.add(new QueryOrderingProperty(CREATION_DATE, creationDateDirection));
+    }
+
+    return result;
   }
 
   public void fireExternalTaskAvailableEvent() {

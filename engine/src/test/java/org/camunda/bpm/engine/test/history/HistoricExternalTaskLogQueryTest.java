@@ -27,12 +27,12 @@ import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.D
 
 import java.util.LinkedList;
 import java.util.List;
-
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.externaltask.CreationDateConfig;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
@@ -293,8 +293,8 @@ public class HistoricExternalTaskLogQueryTest {
     // given
     List<ExternalTask> taskList = startExternalTaskProcesses(2);
     String errorMessage = "This is an important error!";
-    reportExternalTaskFailure(taskList.get(0).getId(), "Dummy error message");
-    reportExternalTaskFailure(taskList.get(1).getId(), errorMessage);
+    reportExternalTaskFailure(taskList.get(0).getId(), "Dummy error message", null);
+    reportExternalTaskFailure(taskList.get(1).getId(), errorMessage, null);
 
     // when
     HistoricExternalTaskLog log = historyService
@@ -743,7 +743,7 @@ public class HistoricExternalTaskLogQueryTest {
   public void testQueryByFailureLog() {
     // given
     ExternalTask task = startExternalTaskProcess();
-    reportExternalTaskFailure(task.getId(), "Dummy error message!");
+    reportExternalTaskFailure(task.getId(), "Dummy error message!", null);
 
     // when
     HistoricExternalTaskLog log = historyService
@@ -879,16 +879,16 @@ public class HistoricExternalTaskLogQueryTest {
   }
 
   protected void completeExternalTaskWithWorker(String externalTaskId, String workerId) {
-    completeExternalTask(externalTaskId, DEFAULT_TOPIC, workerId, false, false);
+    completeExternalTask(externalTaskId, DEFAULT_TOPIC, workerId, false, null);
 
   }
 
   protected void completeExternalTask(String externalTaskId) {
-    completeExternalTask(externalTaskId, DEFAULT_TOPIC, WORKER_ID, false, false);
+    completeExternalTask(externalTaskId, DEFAULT_TOPIC, WORKER_ID, false, null);
   }
 
-  protected void completeExternalTask(String externalTaskId, String topic, String workerId, boolean usePriority, boolean useCreationDate) {
-    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, useCreationDate)
+  protected void completeExternalTask(String externalTaskId, String topic, String workerId, boolean usePriority, CreationDateConfig config) {
+    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, config)
       .topic(topic, LOCK_DURATION)
       .execute();
     externalTaskService.complete(externalTaskId, workerId);
@@ -900,13 +900,13 @@ public class HistoricExternalTaskLogQueryTest {
     }
   }
 
-  protected void reportExternalTaskFailure(String externalTaskId, String errorMessage) {
-    reportExternalTaskFailure(externalTaskId, DEFAULT_TOPIC, WORKER_ID, 1, false, false, errorMessage);
+  protected void reportExternalTaskFailure(String externalTaskId, String errorMessage, CreationDateConfig config) {
+    reportExternalTaskFailure(externalTaskId, DEFAULT_TOPIC, WORKER_ID, 1, false, config, errorMessage);
   }
 
   protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId, Integer retries,
-                                           boolean usePriority, boolean useCreationDate, String errorMessage) {
-    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, useCreationDate)
+                                           boolean usePriority, CreationDateConfig config, String errorMessage) {
+    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, config)
       .topic(topic, LOCK_DURATION)
       .execute();
     externalTaskService.handleFailure(externalTaskId, workerId, errorMessage, retries, 0L);

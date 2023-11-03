@@ -52,6 +52,7 @@ import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.externaltask.CreationDateConfig;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
@@ -140,7 +141,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     // fetching
     fetchTopicBuilder = mock(ExternalTaskQueryTopicBuilder.class);
     when(externalTaskService.fetchAndLock(anyInt(), any())).thenReturn(fetchTopicBuilder);
-    when(externalTaskService.fetchAndLock(anyInt(), any(), anyBoolean())).thenReturn(fetchTopicBuilder);
+    when(externalTaskService.fetchAndLock(anyInt(), any(), anyBoolean(), any(CreationDateConfig.class))).thenReturn(fetchTopicBuilder);
 
     when(fetchTopicBuilder.topic(any(), anyLong())).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.variables(Mockito.<List<String>>any())).thenReturn(fetchTopicBuilder);
@@ -201,7 +202,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     executePost(parameters);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true, null);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
     inOrder.verify(fetchTopicBuilder).execute();
@@ -229,7 +230,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     executePost(parameters);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true, null);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).businessKey(EXAMPLE_BUSINESS_KEY);
     inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
@@ -260,7 +261,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     executePost(parameters);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true, null);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
     inOrder.verify(fetchTopicBuilder).processDefinitionIdIn(EXAMPLE_PROCESS_DEFINITION_ID);
@@ -296,7 +297,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     executePost(parameters);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true, null);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).businessKey(EXAMPLE_BUSINESS_KEY);
     inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
@@ -332,7 +333,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
       .post(FETCH_EXTERNAL_TASK_URL);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false, null);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).execute();
     verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
@@ -360,7 +361,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     executePost(parameters);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true, null);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).withoutTenantId();
     inOrder.verify(fetchTopicBuilder).tenantIdIn("tenant2");
@@ -387,7 +388,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     executePost(parameters);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false, null);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).processDefinitionVersionTag("versionTag");
     inOrder.verify(fetchTopicBuilder).execute();
@@ -414,7 +415,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     // then
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false, null);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).includeExtensionProperties();
     inOrder.verify(fetchTopicBuilder).execute();
@@ -449,7 +450,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
       .post(FETCH_EXTERNAL_TASK_URL);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false, null);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
     inOrder.verify(fetchTopicBuilder).enableCustomObjectDeserialization();
@@ -485,7 +486,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
       .post(FETCH_EXTERNAL_TASK_URL);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false, null);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
     inOrder.verify(fetchTopicBuilder).localVariables();
