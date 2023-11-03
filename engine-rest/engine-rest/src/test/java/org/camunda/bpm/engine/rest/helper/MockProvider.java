@@ -906,7 +906,7 @@ public abstract class MockProvider {
   public static final String EXTERNAL_TASK_ID_LIST = EXTERNAL_TASK_ID + "," + EXTERNAL_TASK_ANOTHER_ID;
   public static final String EXTERNAL_TASK_ERROR_MESSAGE = "some error";
   public static final String EXTERNAL_TASK_LOCK_EXPIRATION_TIME = withTimezone("2015-10-05T13:25:00");
-  public static final Integer EXTERNAL_TASK_RETRIES = Integer.valueOf(5);
+  public static final Integer EXTERNAL_TASK_RETRIES = 5;
   public static final boolean EXTERNAL_TASK_SUSPENDED = true;
   public static final String EXTERNAL_TASK_TOPIC_NAME = "aTopic";
   public static final String EXTERNAL_TASK_WORKER_ID = "aWorkerId";

@@ -75,7 +75,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
 
     assertEquals("duplicateFilterEnabled", userOperationLogEntry.getProperty());
     assertNull(userOperationLogEntry.getOrgValue());
-    assertFalse(Boolean.valueOf(userOperationLogEntry.getNewValue()));
+    assertFalse(Boolean.parseBoolean(userOperationLogEntry.getNewValue()));
 
     assertEquals(USER_ID, userOperationLogEntry.getUserId());
     
@@ -112,7 +112,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
 
     assertEquals("duplicateFilterEnabled", userOperationLogEntry.getProperty());
     assertNull(userOperationLogEntry.getOrgValue());
-    assertFalse(Boolean.valueOf(userOperationLogEntry.getNewValue()));
+    assertFalse(Boolean.parseBoolean(userOperationLogEntry.getNewValue()));
 
     assertEquals(USER_ID, userOperationLogEntry.getUserId());
     
@@ -157,7 +157,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
 
     assertEquals("duplicateFilterEnabled", logDuplicateFilterEnabledProperty.getProperty());
     assertNull(logDuplicateFilterEnabledProperty.getOrgValue());
-    assertTrue(Boolean.valueOf(logDuplicateFilterEnabledProperty.getNewValue()));
+    assertTrue(Boolean.parseBoolean(logDuplicateFilterEnabledProperty.getNewValue()));
 
     // (2): deploy changed only
     UserOperationLogEntry logDeployChangedOnlyProperty = query.property("deployChangedOnly").singleResult();
@@ -172,7 +172,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
 
     assertEquals("deployChangedOnly", logDeployChangedOnlyProperty.getProperty());
     assertNull(logDeployChangedOnlyProperty.getOrgValue());
-    assertFalse(Boolean.valueOf(logDeployChangedOnlyProperty.getNewValue()));
+    assertFalse(Boolean.parseBoolean(logDeployChangedOnlyProperty.getNewValue()));
 
     // (3): operation id
     assertEquals(logDuplicateFilterEnabledProperty.getOperationId(), logDeployChangedOnlyProperty.getOperationId());
@@ -207,7 +207,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
 
     assertEquals("duplicateFilterEnabled", logDuplicateFilterEnabledProperty.getProperty());
     assertNull(logDuplicateFilterEnabledProperty.getOrgValue());
-    assertTrue(Boolean.valueOf(logDuplicateFilterEnabledProperty.getNewValue()));
+    assertTrue(Boolean.parseBoolean(logDuplicateFilterEnabledProperty.getNewValue()));
 
     // (2): deploy changed only
     UserOperationLogEntry logDeployChangedOnlyProperty = query.property("deployChangedOnly").singleResult();
@@ -222,7 +222,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
 
     assertEquals("deployChangedOnly", logDeployChangedOnlyProperty.getProperty());
     assertNull(logDeployChangedOnlyProperty.getOrgValue());
-    assertTrue(Boolean.valueOf(logDeployChangedOnlyProperty.getNewValue()));
+    assertTrue(Boolean.parseBoolean(logDeployChangedOnlyProperty.getNewValue()));
 
     // (3): operation id
     assertEquals(logDuplicateFilterEnabledProperty.getOperationId(), logDeployChangedOnlyProperty.getOperationId());
@@ -301,7 +301,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
 
     assertEquals("cascade", log.getProperty());
     assertNull(log.getOrgValue());
-    assertFalse(Boolean.valueOf(log.getNewValue()));
+    assertFalse(Boolean.parseBoolean(log.getNewValue()));
 
     assertEquals(USER_ID, log.getUserId());
     
@@ -344,7 +344,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
 
     assertEquals("cascade", log.getProperty());
     assertNull(log.getOrgValue());
-    assertTrue(Boolean.valueOf(log.getNewValue()));
+    assertTrue(Boolean.parseBoolean(log.getNewValue()));
 
     assertEquals(USER_ID, log.getUserId());
     
@@ -444,8 +444,8 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_DELETE, log.getOperationType());
 
     assertEquals("cascade", log.getProperty());
-    assertFalse(Boolean.valueOf(log.getOrgValue()));
-    assertFalse(Boolean.valueOf(log.getNewValue()));
+    assertFalse(Boolean.parseBoolean(log.getOrgValue()));
+    assertFalse(Boolean.parseBoolean(log.getNewValue()));
 
     assertEquals(USER_ID, log.getUserId());
     
@@ -491,8 +491,8 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_DELETE, log.getOperationType());
 
     assertEquals("cascade", log.getProperty());
-    assertFalse(Boolean.valueOf(log.getOrgValue()));
-    assertTrue(Boolean.valueOf(log.getNewValue()));
+    assertFalse(Boolean.parseBoolean(log.getOrgValue()));
+    assertTrue(Boolean.parseBoolean(log.getNewValue()));
 
     assertEquals(USER_ID, log.getUserId());
     

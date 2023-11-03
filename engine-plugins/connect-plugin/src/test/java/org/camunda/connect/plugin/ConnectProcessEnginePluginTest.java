@@ -243,7 +243,7 @@ public class ConnectProcessEnginePluginTest extends PluggableProcessEngineTestCa
     assertThat(task.getName(), is("User Task"));
 
     // no job is created
-    assertThat(Long.valueOf(managementService.createJobQuery().count()), is(0l));
+    assertThat(managementService.createJobQuery().count(), is(0l));
   }
 
   @Deployment

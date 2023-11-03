@@ -860,7 +860,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
 
   protected Date fromMillis(String milliseconds) {
     Calendar calendar = Calendar.getInstance();
-    calendar.setTimeInMillis(Long.valueOf(milliseconds));
+    calendar.setTimeInMillis(Long.parseLong(milliseconds));
 
     return calendar.getTime();
   }
