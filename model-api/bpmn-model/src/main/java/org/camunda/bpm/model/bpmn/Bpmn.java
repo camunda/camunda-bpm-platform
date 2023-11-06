@@ -357,10 +357,6 @@ public class Bpmn {
   }
 
   public static ProcessBuilder createProcess() {
-    return createProcess(false);
-  }
-
-  public static ProcessBuilder createProcess(boolean skipDefaultHistoryTimeToLive) {
     BpmnModelInstance modelInstance = INSTANCE.doCreateEmptyModel();
     Definitions definitions = modelInstance.newInstance(Definitions.class);
     definitions.setTargetNamespace(BPMN20_NS);
@@ -377,21 +373,11 @@ public class Bpmn {
     bpmnDiagram.addChildElement(bpmnPlane);
     definitions.addChildElement(bpmnDiagram);
 
-    var builder = process.builder();
-
-    if (!skipDefaultHistoryTimeToLive) {
-      builder.camundaHistoryTimeToLiveString(DEFAULT_HISTORY_TIME_TO_LIVE);
-    }
-
-    return builder;
-  }
-
-  public static ProcessBuilder createProcess(String processId, boolean skipDefaultHistoryTimeToLive) {
-    return createProcess(skipDefaultHistoryTimeToLive).id(processId);
+    return process.builder().camundaHistoryTimeToLiveString(DEFAULT_HISTORY_TIME_TO_LIVE);
   }
 
   public static ProcessBuilder createProcess(String processId) {
-    return createProcess(processId, false);
+    return createProcess().id(processId);
   }
 
   public static ProcessBuilder createExecutableProcess() {
@@ -399,11 +385,7 @@ public class Bpmn {
   }
 
   public static ProcessBuilder createExecutableProcess(String processId) {
-    return createProcess(processId, false).executable();
-  }
-
-  public static ProcessBuilder createExecutableProcess(String processId, boolean skipDefaultHistoryTimeToLive) {
-    return createProcess(processId, skipDefaultHistoryTimeToLive).executable();
+    return createProcess(processId).executable();
   }
 
 

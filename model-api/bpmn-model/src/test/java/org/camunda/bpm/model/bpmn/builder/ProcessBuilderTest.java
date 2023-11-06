@@ -199,7 +199,7 @@ public class ProcessBuilderTest {
 
   @Test
   public void shouldHaveDefaultHTTLValueOnSkipDefaultHistoryTimeToLiveFalse() {
-    modelInstance = Bpmn.createProcess(false).done();
+    modelInstance = Bpmn.createProcess().done();
 
     var process = (Process) modelInstance.getModelElementsByType(processType)
         .iterator()
@@ -211,7 +211,7 @@ public class ProcessBuilderTest {
 
   @Test
   public void shouldHaveNullHTTLValueOnCreateProcessWithSkipHTTL() {
-    modelInstance = Bpmn.createProcess(true).done();
+    modelInstance = Bpmn.createProcess().camundaHistoryTimeToLive(null).done();
 
     var process = (Process) modelInstance.getModelElementsByType(processType)
         .iterator()
@@ -223,7 +223,7 @@ public class ProcessBuilderTest {
 
   @Test
   public void shouldHaveNullHTTLValueOnCreateProcessIdWithoutSkipHTTL(){
-    modelInstance = Bpmn.createProcess(PROCESS_ID, false).done();
+    modelInstance = Bpmn.createProcess(PROCESS_ID).done();
 
     var process = (Process) modelInstance.getModelElementById(PROCESS_ID);
 
@@ -233,7 +233,7 @@ public class ProcessBuilderTest {
 
   @Test
   public void shouldHaveNullHTTLValueOnCreateProcessIdWithSkipHTTL(){
-    modelInstance = Bpmn.createProcess(PROCESS_ID, true).done();
+    modelInstance = Bpmn.createProcess(PROCESS_ID).camundaHistoryTimeToLive(null).done();
 
     var process = (Process) modelInstance.getModelElementById(PROCESS_ID);
 

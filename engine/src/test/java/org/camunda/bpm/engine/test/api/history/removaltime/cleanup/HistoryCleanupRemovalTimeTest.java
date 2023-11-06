@@ -226,7 +226,8 @@ public class HistoryCleanupRemovalTimeTest {
     .endEvent().done();
 
 
-  protected final BpmnModelInstance CALLED_PROCESS_INCIDENT = Bpmn.createExecutableProcess(PROCESS_KEY, true)
+  protected final BpmnModelInstance CALLED_PROCESS_INCIDENT = Bpmn.createExecutableProcess(PROCESS_KEY)
+    .camundaHistoryTimeToLive(null)
     .startEvent()
       .scriptTask()
         .camundaAsyncBefore()
@@ -244,7 +245,8 @@ public class HistoryCleanupRemovalTimeTest {
         .calledElement(PROCESS_KEY)
     .endEvent().done();
 
-  protected final BpmnModelInstance CALLING_PROCESS_WO_TTL = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY, true)
+  protected final BpmnModelInstance CALLING_PROCESS_WO_TTL = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
+      .camundaHistoryTimeToLive(null)
       .startEvent()
         .callActivity()
           .calledElement(PROCESS_KEY)

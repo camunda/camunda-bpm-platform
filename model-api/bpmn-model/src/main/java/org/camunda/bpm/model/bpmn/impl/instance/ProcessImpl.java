@@ -321,7 +321,8 @@ public class ProcessImpl extends CallableElementImpl implements Process {
 
   @Override
   public void setCamundaHistoryTimeToLive(Integer historyTimeToLive) {
-    setCamundaHistoryTimeToLiveString(String.valueOf(historyTimeToLive));
+    var value = historyTimeToLive == null ? null : String.valueOf(historyTimeToLive);
+    setCamundaHistoryTimeToLiveString(value);
   }
 
   @Override
@@ -331,7 +332,11 @@ public class ProcessImpl extends CallableElementImpl implements Process {
 
   @Override
   public void setCamundaHistoryTimeToLiveString(String historyTimeToLive) {
-    camundaHistoryTimeToLiveAttribute.setValue(this, historyTimeToLive);
+    if (historyTimeToLive == null) {
+      camundaHistoryTimeToLiveAttribute.removeAttribute(this);
+    } else {
+      camundaHistoryTimeToLiveAttribute.setValue(this, historyTimeToLive);
+    }
   }
 
   @Override
