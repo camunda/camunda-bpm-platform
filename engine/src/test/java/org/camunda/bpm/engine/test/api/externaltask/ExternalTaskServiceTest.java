@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.camunda.bpm.engine.externaltask.CreationDateConfig.ASC;
 import static org.camunda.bpm.engine.externaltask.CreationDateConfig.DESC;
+import static org.camunda.bpm.engine.externaltask.CreationDateConfig.EMPTY;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
@@ -313,6 +314,62 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     assertThat(result.size()).isEqualTo(5);
 
     // then
+    assertThat(result.get(0).getCreationDate()).isAfterOrEqualsTo(result.get(1).getCreationDate());
+    assertThat(result.get(1).getCreationDate()).isAfterOrEqualsTo(result.get(2).getCreationDate());
+    assertThat(result.get(2).getCreationDate()).isAfterOrEqualsTo(result.get(3).getCreationDate());
+    assertThat(result.get(3).getCreationDate()).isAfterOrEqualsTo(result.get(4).getCreationDate());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml"
+  })
+  @Test
+  public void shouldFetchWithDefaultDESCOrderWhenCreationDateOrderIsEmpty() {
+    // given
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
+
+    // when
+    var result = externalTaskService.fetchAndLock(6, WORKER_ID, false, EMPTY)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    assertThat(result.size()).isEqualTo(5);
+
+    // then
+    // DESC order will be used as a 'sensible' default order
+    assertThat(result.get(0).getCreationDate()).isAfterOrEqualsTo(result.get(1).getCreationDate());
+    assertThat(result.get(1).getCreationDate()).isAfterOrEqualsTo(result.get(2).getCreationDate());
+    assertThat(result.get(2).getCreationDate()).isAfterOrEqualsTo(result.get(3).getCreationDate());
+    assertThat(result.get(3).getCreationDate()).isAfterOrEqualsTo(result.get(4).getCreationDate());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml"
+  })
+  @Test
+  public void shouldFetchWithDefaultDESCOrderWhenCreationDateOrderIsNull() {
+    // given
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
+
+    // when
+    var result = externalTaskService.fetchAndLock(6, WORKER_ID, false, null)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    assertThat(result.size()).isEqualTo(5);
+
+    // then
+    // DESC order will be used as a 'sensible' default order
     assertThat(result.get(0).getCreationDate()).isAfterOrEqualsTo(result.get(1).getCreationDate());
     assertThat(result.get(1).getCreationDate()).isAfterOrEqualsTo(result.get(2).getCreationDate());
     assertThat(result.get(2).getCreationDate()).isAfterOrEqualsTo(result.get(3).getCreationDate());

@@ -53,10 +53,9 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
 
   @Override
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority, CreationDateConfig creationDateConfig) {
-    boolean userCreationDate = creationDateConfig != null && creationDateConfig != EMPTY;
-    var direction = userCreationDate ? Direction.findByNameIgnoreCase(creationDateConfig.name()) : null;
+    var direction = getDirection(creationDateConfig);
 
-    return new ExternalTaskQueryTopicBuilderImpl(commandExecutor, workerId, maxTasks, usePriority, userCreationDate, direction);
+    return new ExternalTaskQueryTopicBuilderImpl(commandExecutor, workerId, maxTasks, usePriority, true, direction);
   }
 
   @Override
@@ -170,5 +169,15 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
   public void extendLock(String externalTaskId, String workerId, long lockDuration) {
     commandExecutor.execute(new ExtendLockOnExternalTaskCmd(externalTaskId, workerId, lockDuration));
   }
+
+  protected Direction getDirection(CreationDateConfig config) {
+    if (config == null || config == EMPTY) {
+      return Direction.DESCENDING; // default order in case of null or empty config
+    }
+
+    return Direction.findByNameIgnoreCase(config.name());
+  }
+
+
 
 }
