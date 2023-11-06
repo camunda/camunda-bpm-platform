@@ -39,6 +39,7 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
   protected String topicName;
   protected String workerId;
   protected Date lockExpirationTime;
+  protected Date creationDate;
   protected Integer retries;
   protected String errorMessage;
   protected String errorDetails;
@@ -69,6 +70,10 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
 
   public Date getLockExpirationTime() {
     return lockExpirationTime;
+  }
+
+  public Date getCreationDate() {
+    return creationDate;
   }
 
   public Integer getRetries() {
@@ -155,6 +160,7 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
     result.topicName = externalTaskEntity.getTopicName();
     result.workerId = externalTaskEntity.getWorkerId();
     result.lockExpirationTime = externalTaskEntity.getLockExpirationTime();
+    result.creationDate = externalTaskEntity.getCreationDate();
     result.retries = externalTaskEntity.getRetries();
     result.errorMessage = externalTaskEntity.getErrorMessage();
     result.errorDetails = externalTaskEntity.getErrorDetails();

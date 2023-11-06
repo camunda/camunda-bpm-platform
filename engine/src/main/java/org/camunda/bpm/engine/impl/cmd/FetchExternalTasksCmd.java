@@ -93,8 +93,14 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
 
       if (execution != null) {
         entity.lock(workerId, fetchInstruction.getLockDuration());
-        LockedExternalTaskImpl resultTask = LockedExternalTaskImpl.fromEntity(entity, fetchInstruction.getVariablesToFetch(), fetchInstruction.isLocalVariables(),
-              fetchInstruction.isDeserializeVariables(), fetchInstruction.isIncludeExtensionProperties());
+        var resultTask = LockedExternalTaskImpl.fromEntity(
+            entity,
+            fetchInstruction.getVariablesToFetch(),
+            fetchInstruction.isLocalVariables(),
+            fetchInstruction.isDeserializeVariables(),
+            fetchInstruction.isIncludeExtensionProperties()
+        );
+
         result.add(resultTask);
       } else {
         LOG.logTaskWithoutExecution(workerId);

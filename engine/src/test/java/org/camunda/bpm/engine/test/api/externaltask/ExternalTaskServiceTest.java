@@ -158,7 +158,6 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     assertEquals(WORKER_ID, task.getWorkerId());
   }
 
-
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml")
   @Test
   public void testFetchWithPriority() {
@@ -195,51 +194,129 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml"
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml"
   })
   @Test
-  public void testFetchWithCreationDateASC() {
+  public void shouldFetchWithCreationDateDESCAndPriority() {
     // given
-    var processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
     ClockTestUtil.incrementClock(60_000);
-    var processInstance2 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
     ClockTestUtil.incrementClock(60_000);
-    var processInstance3 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
     // when
-    var result = externalTaskService.fetchAndLock(4, WORKER_ID, false, ASC)
+    var result = externalTaskService.fetchAndLock(6, WORKER_ID, true, DESC)
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
-    assertThat(result.size()).isEqualTo(3);
+    assertThat(result.size()).isEqualTo(5);
 
-    assertExternalTaskProcessInstance(result.get(0), processInstance1);
-    assertExternalTaskProcessInstance(result.get(1), processInstance2);
-    assertExternalTaskProcessInstance(result.get(2), processInstance3);
+    // then
+    assertThat(result.get(0).getPriority()).isEqualTo(7);
+    assertThat(result.get(1).getPriority()).isEqualTo(7);
+    assertThat(result.get(2).getPriority()).isEqualTo(0);
+    assertThat(result.get(3).getPriority()).isEqualTo(0);
+    assertThat(result.get(4).getPriority()).isEqualTo(0);
+
+
+    // given the same priority, DESC date is applied
+    assertThat(result.get(0).getCreationDate()).isAfterOrEqualsTo(result.get(1).getCreationDate());
+
+    // given the rest of priorities, DESC date should apply between them
+    assertThat(result.get(2).getCreationDate()).isAfterOrEqualsTo(result.get(3).getCreationDate());
+    assertThat(result.get(3).getCreationDate()).isAfterOrEqualsTo(result.get(4).getCreationDate());
   }
 
   @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml"
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml"
   })
   @Test
-  public void testFetchWithCreationDateDESC() {
+  public void shouldFetchWithCreationDateASCAndPriority() {
     // given
-    var processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
     ClockTestUtil.incrementClock(60_000);
-    var processInstance2 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
     ClockTestUtil.incrementClock(60_000);
-    var processInstance3 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
     // when
-    var result = externalTaskService.fetchAndLock(4, WORKER_ID, false, DESC)
+    var result = externalTaskService.fetchAndLock(6, WORKER_ID, true, ASC)
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
-    assertThat(result.size()).isEqualTo(3);
+    assertThat(result.size()).isEqualTo(5);
 
-    assertExternalTaskProcessInstance(result.get(0), processInstance3);
-    assertExternalTaskProcessInstance(result.get(1), processInstance2);
-    assertExternalTaskProcessInstance(result.get(2), processInstance1);
+    // then
+    assertThat(result.get(0).getPriority()).isEqualTo(7);
+    assertThat(result.get(1).getPriority()).isEqualTo(7);
+    assertThat(result.get(2).getPriority()).isEqualTo(0);
+    assertThat(result.get(3).getPriority()).isEqualTo(0);
+    assertThat(result.get(4).getPriority()).isEqualTo(0);
+
+
+    // given the same priority, ASC date is applied
+    assertThat(result.get(0).getCreationDate()).isBeforeOrEqualsTo(result.get(1).getCreationDate());
+
+    // given the rest of priorities, ASC date should apply between them
+    assertThat(result.get(2).getCreationDate()).isBeforeOrEqualsTo(result.get(3).getCreationDate());
+    assertThat(result.get(3).getCreationDate()).isBeforeOrEqualsTo(result.get(4).getCreationDate());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml"
+  })
+  @Test
+  public void shouldFetchWithCreationDateASCWithoutPriority() {
+    // given
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
+
+    // when
+    var result = externalTaskService.fetchAndLock(6, WORKER_ID, false, ASC)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    assertThat(result.size()).isEqualTo(5);
+
+    // then
+    assertThat(result.get(0).getCreationDate()).isBeforeOrEqualsTo(result.get(1).getCreationDate());
+    assertThat(result.get(1).getCreationDate()).isBeforeOrEqualsTo(result.get(2).getCreationDate());
+    assertThat(result.get(2).getCreationDate()).isBeforeOrEqualsTo(result.get(3).getCreationDate());
+    assertThat(result.get(3).getCreationDate()).isBeforeOrEqualsTo(result.get(4).getCreationDate());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml"
+  })
+  @Test
+  public void shouldFetchWithCreationDateDESCWithoutPriority() {
+    // given
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
+
+    // when
+    var result = externalTaskService.fetchAndLock(6, WORKER_ID, false, DESC)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    assertThat(result.size()).isEqualTo(5);
+
+    // then
+    assertThat(result.get(0).getCreationDate()).isAfterOrEqualsTo(result.get(1).getCreationDate());
+    assertThat(result.get(1).getCreationDate()).isAfterOrEqualsTo(result.get(2).getCreationDate());
+    assertThat(result.get(2).getCreationDate()).isAfterOrEqualsTo(result.get(3).getCreationDate());
+    assertThat(result.get(3).getCreationDate()).isAfterOrEqualsTo(result.get(4).getCreationDate());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityProcess.bpmn20.xml")
