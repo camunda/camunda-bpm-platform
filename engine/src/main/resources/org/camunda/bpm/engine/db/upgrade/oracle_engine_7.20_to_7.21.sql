@@ -19,4 +19,4 @@ insert into ACT_GE_SCHEMA_LOG
 values ('1000', CURRENT_TIMESTAMP, '7.21.0');
 
 alter table ACT_RU_EXT_TASK
-  add CREATION_DATE_ timestamp(6);
+  add CREATE_TIME_ timestamp(6);
