@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import static org.camunda.bpm.engine.impl.Direction.DESCENDING;
-import static org.camunda.bpm.engine.impl.ExternalTaskQueryProperty.CREATION_DATE;
+import static org.camunda.bpm.engine.impl.ExternalTaskQueryProperty.CREATE_TIME;
 import static org.camunda.bpm.engine.impl.ExternalTaskQueryProperty.PRIORITY;
 import static org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory.CRDB;
 import static org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory.POSTGRES;
@@ -75,7 +75,7 @@ public class ExternalTaskManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<TopicFetchInstruction> queryFilters, int maxResults,
-                                                               boolean usePriority, boolean useCreationDate, Direction useCreationDateDirection) {
+                                                               boolean usePriority, boolean useCreateTime, Direction useCreateTimeDirection) {
     if (queryFilters.isEmpty()) {
       return Collections.emptyList();
     }
@@ -83,8 +83,8 @@ public class ExternalTaskManager extends AbstractManager {
     var parameters = Map.of(
         "topics", queryFilters,
         "now", ClockUtil.getCurrentTime(),
-        "applyOrdering", applyOrdering(usePriority, useCreationDate),
-        "orderingProperties", orderingProperties(usePriority, useCreationDate, useCreationDateDirection),
+        "applyOrdering", applyOrdering(usePriority, useCreateTime),
+        "orderingProperties", orderingProperties(usePriority, useCreateTime, useCreateTimeDirection),
         "usesPostgres", checkDatabaseType(POSTGRES, CRDB)
     );
 
@@ -170,19 +170,19 @@ public class ExternalTaskManager extends AbstractManager {
     return getTenantManager().configureQuery(parameter);
   }
 
-  protected boolean applyOrdering(boolean usePriority, boolean useCreationDate) {
-    return usePriority || useCreationDate;
+  protected boolean applyOrdering(boolean usePriority, boolean useCreateTime) {
+    return usePriority || useCreateTime;
   }
 
-  protected List<QueryOrderingProperty> orderingProperties(boolean usePriority, boolean useCreationDate, Direction creationDateDirection) {
+  protected List<QueryOrderingProperty> orderingProperties(boolean usePriority, boolean useCreateTime, Direction useCreateTimeDirection) {
     var result = new ArrayList<QueryOrderingProperty>();
 
     if (usePriority) {
       result.add(new QueryOrderingProperty(PRIORITY, DESCENDING));
     }
 
-    if (useCreationDate) {
-      result.add(new QueryOrderingProperty(CREATION_DATE, creationDateDirection));
+    if (useCreateTime) {
+      result.add(new QueryOrderingProperty(CREATE_TIME, useCreateTimeDirection));
     }
 
     return result;

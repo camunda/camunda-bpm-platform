@@ -18,10 +18,10 @@
 package org.camunda.bpm.engine.externaltask;
 
 /**
- * Configuration of CreationDate, passed to {@link org.camunda.bpm.engine.ExternalTaskService#fetchAndLock} to control
- * the order of fetching of the external tasks, based on their creation date.
+ * Configuration of CreateTime, passed to {@link org.camunda.bpm.engine.ExternalTaskService#fetchAndLock} to control
+ * the order of fetching of the external tasks, based on their time of creation.
  * EMPTY configuration means ignoring the field at all.
  */
-public enum CreationDateConfig {
+public enum CreateTimeConfig {
   ASC, DESC, EMPTY
 }

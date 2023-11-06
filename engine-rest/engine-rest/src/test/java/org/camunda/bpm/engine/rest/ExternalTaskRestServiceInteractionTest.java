@@ -52,7 +52,7 @@ import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.externaltask.CreationDateConfig;
+import org.camunda.bpm.engine.externaltask.CreateTimeConfig;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
@@ -141,7 +141,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     // fetching
     fetchTopicBuilder = mock(ExternalTaskQueryTopicBuilder.class);
     when(externalTaskService.fetchAndLock(anyInt(), any())).thenReturn(fetchTopicBuilder);
-    when(externalTaskService.fetchAndLock(anyInt(), any(), anyBoolean(), any(CreationDateConfig.class))).thenReturn(fetchTopicBuilder);
+    when(externalTaskService.fetchAndLock(anyInt(), any(), anyBoolean(), any(CreateTimeConfig.class))).thenReturn(fetchTopicBuilder);
 
     when(fetchTopicBuilder.topic(any(), anyLong())).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.variables(Mockito.<List<String>>any())).thenReturn(fetchTopicBuilder);

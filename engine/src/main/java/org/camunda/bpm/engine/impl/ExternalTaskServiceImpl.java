@@ -16,13 +16,13 @@
  */
 package org.camunda.bpm.engine.impl;
 
-import static org.camunda.bpm.engine.externaltask.CreationDateConfig.EMPTY;
+import static org.camunda.bpm.engine.externaltask.CreateTimeConfig.EMPTY;
 
 import java.util.List;
 import java.util.Map;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.externaltask.CreationDateConfig;
+import org.camunda.bpm.engine.externaltask.CreateTimeConfig;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesSelectBuilder;
@@ -52,8 +52,8 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
   }
 
   @Override
-  public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority, CreationDateConfig creationDateConfig) {
-    var direction = getDirection(creationDateConfig);
+  public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority, CreateTimeConfig createTimeConfig) {
+    var direction = getDirection(createTimeConfig);
 
     return new ExternalTaskQueryTopicBuilderImpl(commandExecutor, workerId, maxTasks, usePriority, true, direction);
   }
@@ -170,7 +170,7 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
     commandExecutor.execute(new ExtendLockOnExternalTaskCmd(externalTaskId, workerId, lockDuration));
   }
 
-  protected Direction getDirection(CreationDateConfig config) {
+  protected Direction getDirection(CreateTimeConfig config) {
     if (config == null || config == EMPTY) {
       return Direction.DESCENDING; // default order in case of null or empty config
     }

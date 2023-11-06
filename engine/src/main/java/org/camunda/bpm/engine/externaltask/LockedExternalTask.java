@@ -52,7 +52,7 @@ public interface LockedExternalTask {
   /**
    * @return the absolute time at which the task was created
    */
-  Date getCreationDate();
+  Date getCreateTime();
 
   /**
    * @return the id of the process instance the task exists in

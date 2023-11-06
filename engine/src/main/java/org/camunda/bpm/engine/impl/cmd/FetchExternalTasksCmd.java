@@ -51,8 +51,8 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
   protected int maxResults;
   protected boolean usePriority;
 
-  protected boolean useCreationDate;
-  protected Direction creationDateDirection;
+  protected boolean useCreateTime;
+  protected Direction createTimeDirection;
 
   protected Map<String, TopicFetchInstruction> fetchInstructions = new HashMap<>();
 
@@ -61,13 +61,13 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
   }
 
   public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions,
-                               boolean usePriority, boolean useCreationDate, Direction creationDateDirection) {
+                               boolean usePriority, boolean useCreateTime, Direction createTimeDirection) {
     this.workerId = workerId;
     this.maxResults = maxResults;
     this.fetchInstructions = instructions;
     this.usePriority = usePriority;
-    this.useCreationDate = useCreationDate;
-    this.creationDateDirection = creationDateDirection;
+    this.useCreateTime = useCreateTime;
+    this.createTimeDirection = createTimeDirection;
   }
 
   @Override
@@ -80,7 +80,8 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
 
     List<ExternalTaskEntity> externalTasks = commandContext
       .getExternalTaskManager()
-      .selectExternalTasksForTopics(new ArrayList<>(fetchInstructions.values()), maxResults, usePriority, useCreationDate, creationDateDirection);
+      .selectExternalTasksForTopics(new ArrayList<>(fetchInstructions.values()), maxResults, usePriority,
+          useCreateTime, createTimeDirection);
 
     final List<LockedExternalTask> result = new ArrayList<>();
 

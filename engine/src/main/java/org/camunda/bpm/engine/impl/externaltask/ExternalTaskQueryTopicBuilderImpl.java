@@ -42,21 +42,21 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
    * Indicates that priority is enabled.
    */
   protected boolean usePriority;
-  protected boolean useCreationDate;
-  protected Direction creationDateDirection;
+  protected boolean useCreateTime;
+  protected Direction createTimeDirection;
 
   protected Map<String, TopicFetchInstruction> instructions;
 
   protected TopicFetchInstruction currentInstruction;
 
   public ExternalTaskQueryTopicBuilderImpl(CommandExecutor commandExecutor, String workerId, int maxTasks,
-                                           boolean usePriority, boolean useCreationDate, Direction creationDateDirection) {
+                                           boolean usePriority, boolean useCreateTime, Direction createTimeDirection) {
     this.commandExecutor = commandExecutor;
     this.workerId = workerId;
     this.maxTasks = maxTasks;
     this.usePriority = usePriority;
-    this.useCreationDate = useCreationDate;
-    this.creationDateDirection = creationDateDirection;
+    this.useCreateTime = useCreateTime;
+    this.createTimeDirection = createTimeDirection;
     this.instructions = new HashMap<>();
   }
 
@@ -67,8 +67,8 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
         maxTasks,
         instructions,
         usePriority,
-        useCreationDate,
-        creationDateDirection
+        useCreateTime,
+        createTimeDirection
     ));
   }
 

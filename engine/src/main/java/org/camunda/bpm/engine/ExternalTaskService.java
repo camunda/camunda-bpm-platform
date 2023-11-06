@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.externaltask.CreationDateConfig;
+import org.camunda.bpm.engine.externaltask.CreateTimeConfig;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
@@ -46,7 +46,7 @@ public interface ExternalTaskService {
    * @param maxTasks the maximum number of tasks to return
    * @param workerId the id of the worker to lock the tasks for
    * @return a builder to define and execute an external task fetching operation
-   * @see {@link ExternalTaskService#fetchAndLock(int, java.lang.String, boolean, CreationDateConfig)}.
+   * @see {@link ExternalTaskService#fetchAndLock(int, java.lang.String, boolean, CreateTimeConfig)}.
    */
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId);
 
@@ -89,11 +89,11 @@ public interface ExternalTaskService {
    * @param maxTasks the maximum number of tasks to return
    * @param workerId the id of the worker to lock the tasks for
    * @param usePriority the flag to enable the priority fetching mechanism
-   * @param creationDateConfig the config to control fetching by creation date
+   * @param createTimeConfig the config to control fetching by creation date
    * @return a builder to define and execute an external task fetching operation
    */
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority,
-                                               CreationDateConfig creationDateConfig);
+                                               CreateTimeConfig createTimeConfig);
 
   /**
    * <p>Lock an external task on behalf of a worker.

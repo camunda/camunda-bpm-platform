@@ -17,13 +17,13 @@
 package org.camunda.bpm.engine.rest.dto.externaltask;
 
 import static java.lang.Boolean.TRUE;
-import static org.camunda.bpm.engine.externaltask.CreationDateConfig.DESC;
-import static org.camunda.bpm.engine.externaltask.CreationDateConfig.EMPTY;
+import static org.camunda.bpm.engine.externaltask.CreateTimeConfig.DESC;
+import static org.camunda.bpm.engine.externaltask.CreateTimeConfig.EMPTY;
 
 import java.util.HashMap;
 import java.util.List;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.externaltask.CreationDateConfig;
+import org.camunda.bpm.engine.externaltask.CreateTimeConfig;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 
@@ -36,7 +36,7 @@ public class FetchExternalTasksDto {
   protected int maxTasks;
   protected String workerId;
   protected boolean usePriority = false;
-  protected CreationDateConfigDto creationDateConfig;
+  protected CreateTimeConfigDto createTimeConfig;
   protected List<FetchExternalTaskTopicDto> topics;
   protected boolean includeExtensionProperties = false;
 
@@ -72,12 +72,12 @@ public class FetchExternalTasksDto {
     this.usePriority = usePriority;
   }
 
-  public CreationDateConfigDto getCreationDateConfig() {
-    return creationDateConfig;
+  public CreateTimeConfigDto getCreateTimeConfig() {
+    return createTimeConfig;
   }
 
-  public void setCreationDateConfig(CreationDateConfigDto creationDateConfigDto) {
-    this.creationDateConfig = creationDateConfigDto;
+  public void setCreateTimeConfig(CreateTimeConfigDto createTimeConfig) {
+    this.createTimeConfig = createTimeConfig;
   }
 
   public boolean isIncludeExtensionProperties() {
@@ -88,17 +88,17 @@ public class FetchExternalTasksDto {
     this.includeExtensionProperties = includeExtensionProperties;
   }
 
-  public static class CreationDateConfigDto {
+  public static class CreateTimeConfigDto {
 
-    private boolean useCreationDate;
+    private boolean useCreateTime;
     private Direction direction;
 
-    public boolean isUseCreationDate() {
-      return useCreationDate;
+    public boolean isUseCreateTime() {
+      return useCreateTime;
     }
 
-    public void setUseCreationDate(boolean useCreationDate) {
-      this.useCreationDate = useCreationDate;
+    public void setUseCreateTime(boolean useCreateTime) {
+      this.useCreateTime = useCreateTime;
     }
 
     public Direction getDirection() {
@@ -226,7 +226,7 @@ public class FetchExternalTasksDto {
 
   public ExternalTaskQueryBuilder buildQuery(ProcessEngine processEngine) {
 
-    var configDto = getCreationDateConfig();
+    var configDto = getCreateTimeConfig();
     var config = getConfigFromDto(configDto);
 
     ExternalTaskQueryBuilder fetchBuilder = processEngine
@@ -297,8 +297,8 @@ public class FetchExternalTasksDto {
     return fetchBuilder;
   }
 
-  protected CreationDateConfig getConfigFromDto(CreationDateConfigDto dto) {
-    if (dto == null || !dto.isUseCreationDate()) {
+  protected CreateTimeConfig getConfigFromDto(CreateTimeConfigDto dto) {
+    if (dto == null || !dto.isUseCreateTime()) {
       return EMPTY;
     }
 
@@ -306,7 +306,7 @@ public class FetchExternalTasksDto {
       return DESC;
     }
 
-    return CreationDateConfig.valueOf(dto.getDirection().name());
+    return CreateTimeConfig.valueOf(dto.getDirection().name());
   }
 
 }

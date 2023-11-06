@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import static io.restassured.RestAssured.given;
-import static org.camunda.bpm.engine.externaltask.CreationDateConfig.EMPTY;
+import static org.camunda.bpm.engine.externaltask.CreateTimeConfig.EMPTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -47,14 +47,14 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.externaltask.CreationDateConfig;
+import org.camunda.bpm.engine.externaltask.CreateTimeConfig;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
-import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto.CreationDateConfigDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto.CreateTimeConfigDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto.FetchExternalTaskTopicDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -101,7 +101,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
       .thenReturn(externalTaskService);
 
     lockedExternalTaskMock = MockProvider.createMockLockedExternalTask();
-    when(externalTaskService.fetchAndLock(anyInt(), any(String.class), any(Boolean.class), any(CreationDateConfig.class)))
+    when(externalTaskService.fetchAndLock(anyInt(), any(String.class), any(Boolean.class), any(CreateTimeConfig.class)))
       .thenReturn(fetchTopicBuilder);
 
     when(fetchTopicBuilder.topic(any(String.class), anyLong()))
@@ -364,14 +364,14 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
   // helper /////////////////////////
 
   private FetchExternalTasksExtendedDto createDto(Long responseTimeout) {
-    return createDto(responseTimeout, false, new CreationDateConfigDto(), false, false);
+    return createDto(responseTimeout, false, new CreateTimeConfigDto(), false, false);
   }
 
   private FetchExternalTasksExtendedDto createDto(Long responseTimeout, boolean usePriority, boolean withVariables, boolean withDeserialization) {
-    return createDto(responseTimeout, usePriority, new CreationDateConfigDto(), withVariables, withDeserialization);
+    return createDto(responseTimeout, usePriority, new CreateTimeConfigDto(), withVariables, withDeserialization);
   }
   
-  private FetchExternalTasksExtendedDto createDto(Long responseTimeout, boolean usePriority, CreationDateConfigDto config,
+  private FetchExternalTasksExtendedDto createDto(Long responseTimeout, boolean usePriority, CreateTimeConfigDto config,
                                                   boolean withVariables, boolean withDeserialization) {
     FetchExternalTasksExtendedDto fetchExternalTasksDto = new FetchExternalTasksExtendedDto();
     if (responseTimeout != null) {
@@ -380,7 +380,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     fetchExternalTasksDto.setMaxTasks(5);
     fetchExternalTasksDto.setWorkerId("aWorkerId");
     fetchExternalTasksDto.setUsePriority(usePriority);
-    fetchExternalTasksDto.setCreationDateConfig(config);
+    fetchExternalTasksDto.setCreateTimeConfig(config);
     FetchExternalTasksExtendedDto.FetchExternalTaskTopicDto topicDto = new FetchExternalTasksExtendedDto.FetchExternalTaskTopicDto();
     fetchExternalTasksDto.setTopics(Collections.singletonList(topicDto));
     topicDto.setTopicName("aTopicName");

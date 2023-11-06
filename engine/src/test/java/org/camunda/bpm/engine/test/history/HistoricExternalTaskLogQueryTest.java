@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.externaltask.CreationDateConfig;
+import org.camunda.bpm.engine.externaltask.CreateTimeConfig;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
@@ -887,7 +887,7 @@ public class HistoricExternalTaskLogQueryTest {
     completeExternalTask(externalTaskId, DEFAULT_TOPIC, WORKER_ID, false, null);
   }
 
-  protected void completeExternalTask(String externalTaskId, String topic, String workerId, boolean usePriority, CreationDateConfig config) {
+  protected void completeExternalTask(String externalTaskId, String topic, String workerId, boolean usePriority, CreateTimeConfig config) {
     List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, config)
       .topic(topic, LOCK_DURATION)
       .execute();
@@ -900,12 +900,12 @@ public class HistoricExternalTaskLogQueryTest {
     }
   }
 
-  protected void reportExternalTaskFailure(String externalTaskId, String errorMessage, CreationDateConfig config) {
+  protected void reportExternalTaskFailure(String externalTaskId, String errorMessage, CreateTimeConfig config) {
     reportExternalTaskFailure(externalTaskId, DEFAULT_TOPIC, WORKER_ID, 1, false, config, errorMessage);
   }
 
   protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId, Integer retries,
-                                           boolean usePriority, CreationDateConfig config, String errorMessage) {
+                                           boolean usePriority, CreateTimeConfig config, String errorMessage) {
     List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, config)
       .topic(topic, LOCK_DURATION)
       .execute();

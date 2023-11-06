@@ -40,7 +40,7 @@ import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.externaltask.CreationDateConfig;
+import org.camunda.bpm.engine.externaltask.CreateTimeConfig;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
@@ -519,8 +519,8 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
   }
 
-  protected void completeExternalTask(String externalTaskId, String topic, String workerId, boolean usePriority, CreationDateConfig creationDateConfig) {
-    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, creationDateConfig)
+  protected void completeExternalTask(String externalTaskId, String topic, String workerId, boolean usePriority, CreateTimeConfig createTimeConfig) {
+    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, createTimeConfig)
       .topic(topic, LOCK_DURATION)
       .execute();
     externalTaskService.complete(externalTaskId, workerId);
@@ -539,8 +539,8 @@ public class HistoricExternalTaskLogQuerySortingTest {
   }
 
   protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId, Integer retries,
-                                           boolean usePriority, CreationDateConfig creationDateConfig, String errorMessage) {
-    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, creationDateConfig)
+                                           boolean usePriority, CreateTimeConfig createTimeConfig, String errorMessage) {
+    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, createTimeConfig)
       .topic(topic, LOCK_DURATION)
       .execute();
     externalTaskService.handleFailure(externalTaskId, workerId, errorMessage, retries, 0L);

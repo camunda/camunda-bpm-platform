@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.externaltask.CreationDateConfig;
+import org.camunda.bpm.engine.externaltask.CreateTimeConfig;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
@@ -386,8 +386,8 @@ public class MultiTenancyHistoricExternalTaskLogTest {
   }
 
   protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId, Integer retries,
-                                           boolean usePriority, CreationDateConfig creationDateConfig, String errorMessage) {
-    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, creationDateConfig)
+                                           boolean usePriority, CreateTimeConfig createTimeConfig, String errorMessage) {
+    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, createTimeConfig)
       .topic(topic, LOCK_DURATION)
       .execute();
     externalTaskService.handleFailure(externalTaskId, workerId, errorMessage, ERROR_DETAILS, retries, 0L);
