@@ -31,6 +31,6 @@ public interface ExternalTaskQueryProperty {
   QueryProperty PROCESS_DEFINITION_KEY = new QueryPropertyImpl("PROC_DEF_KEY_");
   QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
   QueryProperty PRIORITY = new QueryPropertyImpl("PRIORITY_");
-  QueryProperty CREATION_DATE = new QueryPropertyImpl("CREATION_DATE_");
+  QueryProperty CREATE_TIME = new QueryPropertyImpl("CREATE_TIME_");
 
 }

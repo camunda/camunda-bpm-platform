@@ -22,7 +22,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -224,8 +223,8 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
   }
 
   @Override
-  public ExternalTaskQuery orderByCreationDate() {
-    return orderBy(ExternalTaskQueryProperty.CREATION_DATE);
+  public ExternalTaskQuery orderByCreateTime() {
+    return orderBy(ExternalTaskQueryProperty.CREATE_TIME);
   }
 
   @Override
