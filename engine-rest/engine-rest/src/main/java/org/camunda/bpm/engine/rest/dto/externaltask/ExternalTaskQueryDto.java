@@ -47,7 +47,7 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
       "processDefinitionKey", ExternalTaskQuery::orderByProcessDefinitionKey,
       "tenantId", ExternalTaskQuery::orderByTenantId,
       "taskPriority", ExternalTaskQuery::orderByPriority,
-      "creationDate", ExternalTaskQuery::orderByCreationDate
+      "createTime", ExternalTaskQuery::orderByCreateTime
   );
 
   protected String externalTaskId;
