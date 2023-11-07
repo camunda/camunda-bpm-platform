@@ -72,7 +72,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity,
   protected String topicName;
   protected String workerId;
   protected Date lockExpirationTime;
-  protected Date creationDate;
+  protected Date createTime;
   protected Integer retries;
   protected String errorMessage;
 
@@ -130,12 +130,12 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity,
   }
 
   @Override
-  public Date getCreationDate() {
-    return creationDate;
+  public Date getCreateTime() {
+    return createTime;
   }
 
-  public void setCreationDate(Date creationDate) {
-    this.creationDate = creationDate;
+  public void setCreateTime(Date createTime) {
+    this.createTime = createTime;
   }
 
   @Override
@@ -576,7 +576,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity,
     externalTask.setActivityInstanceId(execution.getActivityInstanceId());
     externalTask.setTenantId(execution.getTenantId());
     externalTask.setPriority(priority);
-    externalTask.setCreationDate(ClockUtil.getCurrentTime());
+    externalTask.setCreateTime(ClockUtil.getCurrentTime());
 
     ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
     externalTask.setProcessDefinitionKey(processDefinition.getKey());
