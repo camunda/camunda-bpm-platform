@@ -16,11 +16,35 @@
  */
 package org.camunda.bpm.model.bpmn.impl.instance;
 
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ATTRIBUTE_IS_CLOSED;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ATTRIBUTE_IS_EXECUTABLE;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ATTRIBUTE_PROCESS_TYPE;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_PROCESS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CANDIDATE_STARTER_GROUPS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CANDIDATE_STARTER_USERS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_HISTORY_TIME_TO_LIVE;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_IS_STARTABLE_IN_TASKLIST;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_JOB_PRIORITY;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_TASK_PRIORITY;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_VERSION_TAG;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+
+import java.util.Collection;
+import java.util.List;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.ProcessType;
 import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
-import org.camunda.bpm.model.bpmn.instance.*;
+import org.camunda.bpm.model.bpmn.instance.Artifact;
+import org.camunda.bpm.model.bpmn.instance.Auditing;
+import org.camunda.bpm.model.bpmn.instance.CallableElement;
+import org.camunda.bpm.model.bpmn.instance.CorrelationSubscription;
+import org.camunda.bpm.model.bpmn.instance.FlowElement;
+import org.camunda.bpm.model.bpmn.instance.LaneSet;
+import org.camunda.bpm.model.bpmn.instance.Monitoring;
 import org.camunda.bpm.model.bpmn.instance.Process;
+import org.camunda.bpm.model.bpmn.instance.Property;
+import org.camunda.bpm.model.bpmn.instance.ResourceRole;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.impl.util.StringUtil;
@@ -32,11 +56,6 @@ import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
 
-import java.util.Collection;
-import java.util.List;
-
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.*;
-
 /**
  * The BPMN process element
  *
@@ -44,6 +63,8 @@ import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.*;
  * @author Sebastian Menski
  */
 public class ProcessImpl extends CallableElementImpl implements Process {
+
+  public static final String DEFAULT_HISTORY_TIME_TO_LIVE = "P180D";
 
   protected static Attribute<ProcessType> processTypeAttribute;
   protected static Attribute<Boolean> isClosedAttribute;
@@ -300,7 +321,8 @@ public class ProcessImpl extends CallableElementImpl implements Process {
 
   @Override
   public void setCamundaHistoryTimeToLive(Integer historyTimeToLive) {
-    setCamundaHistoryTimeToLiveString(String.valueOf(historyTimeToLive));
+    var value = historyTimeToLive == null ? null : String.valueOf(historyTimeToLive);
+    setCamundaHistoryTimeToLiveString(value);
   }
 
   @Override
@@ -310,7 +332,11 @@ public class ProcessImpl extends CallableElementImpl implements Process {
 
   @Override
   public void setCamundaHistoryTimeToLiveString(String historyTimeToLive) {
-    camundaHistoryTimeToLiveAttribute.setValue(this, historyTimeToLive);
+    if (historyTimeToLive == null) {
+      camundaHistoryTimeToLiveAttribute.removeAttribute(this);
+    } else {
+      camundaHistoryTimeToLiveAttribute.setValue(this, historyTimeToLive);
+    }
   }
 
   @Override
