@@ -139,7 +139,7 @@
 
     <#assign last = true>
     <#assign sortByValues = [ '"id"', '"lockExpirationTime"', '"processInstanceId"', '"processDefinitionId"',
-                              '"processDefinitionKey"', '"taskPriority"', '"tenantId"' ] >
+                              '"processDefinitionKey"', '"taskPriority"', '"createTime"', '"tenantId"' ] >
     <#include "/lib/commons/sort-props.ftl" >
     }
 
