@@ -54,7 +54,7 @@ public interface ExternalTask {
    * @return the absolute time at which the task was created
    * @return
    */
-  Date getCreationDate();
+  Date getCreateTime();
 
   /**
    * @return the id of the process instance the task exists in

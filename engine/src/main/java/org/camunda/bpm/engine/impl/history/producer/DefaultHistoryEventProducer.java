@@ -1258,7 +1258,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   }
 
   protected Date getTimestamp(ExternalTaskEntity entity, ExternalTaskState state) {
-    return state == ExternalTaskState.CREATED ? entity.getCreationDate() : ClockUtil.getCurrentTime();
+    return state == ExternalTaskState.CREATED ? entity.getCreateTime() : ClockUtil.getCurrentTime();
   }
 
   protected boolean isRootProcessInstance(HistoricProcessInstanceEventEntity evt) {

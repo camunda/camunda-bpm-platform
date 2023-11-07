@@ -42,7 +42,7 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class ExternalTaskQueryByCreationDateTest {
+public class ExternalTaskQueryByCreateTimeTest {
 
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
@@ -74,7 +74,7 @@ public class ExternalTaskQueryByCreationDateTest {
   }
 
   @Test
-  public void shouldHaveNonNullCreationDate() {
+  public void shouldHaveNonNullCreateTime() {
     // given
     runtimeService.startProcessInstanceByKey("process1");
 
@@ -85,11 +85,11 @@ public class ExternalTaskQueryByCreationDateTest {
 
     // then
     assertThat(result.size()).isEqualTo(1);
-    assertThat(result.get(0).getCreationDate()).isNotNull();
+    assertThat(result.get(0).getCreateTime()).isNotNull();
   }
 
   @Test
-  public void shouldProduceEventWithCreationDateValue() {
+  public void shouldProduceEventWithCreateTimeValue() {
     // given
     runtimeService.startProcessInstanceByKey("process1");
 
@@ -105,7 +105,7 @@ public class ExternalTaskQueryByCreationDateTest {
     var historyEventTimestamp = result.get(0).getTimestamp();
 
     // then
-    assertThat(extTask.getCreationDate()).isEqualTo(historyEventTimestamp);
+    assertThat(extTask.getCreateTime()).isEqualTo(historyEventTimestamp);
   }
 
   @Test
@@ -117,7 +117,7 @@ public class ExternalTaskQueryByCreationDateTest {
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
         // when
-        .orderByCreationDate().desc()
+        .orderByCreateTime().desc()
         .list();
 
     assertThat(result.size()).isEqualTo(2);
@@ -126,8 +126,8 @@ public class ExternalTaskQueryByCreationDateTest {
     var extTask2 = result.get(1);
 
     // then
-    assertThat(extTask2.getCreationDate())
-        .isBefore(extTask1.getCreationDate());
+    assertThat(extTask2.getCreateTime())
+        .isBefore(extTask1.getCreateTime());
   }
 
   @Test
@@ -139,7 +139,7 @@ public class ExternalTaskQueryByCreationDateTest {
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
         // when
-        .orderByCreationDate().asc()
+        .orderByCreateTime().asc()
         .list();
 
     assertThat(result.size()).isEqualTo(2);
@@ -148,14 +148,14 @@ public class ExternalTaskQueryByCreationDateTest {
     var extTask2 = result.get(1);
 
     // then
-    assertThat(extTask1.getCreationDate())
-        .isBefore(extTask2.getCreationDate());
+    assertThat(extTask1.getCreateTime())
+        .isBefore(extTask2.getCreateTime());
   }
 
-  // Multi-Level Sorting with CreationDate & Priority
+  // Multi-Level Sorting with CreateTime & Priority
 
   @Test
-  public void shouldReturnTasksInCreationDateAscOrderOnPriorityEquality() {
+  public void shouldReturnTasksInCreateTimeAscOrderOnPriorityEquality() {
     // given
     startProcessInstanceAfter("process1", 1);
     startProcessInstanceAfter("process2", 1);
@@ -166,7 +166,7 @@ public class ExternalTaskQueryByCreationDateTest {
         .createExternalTaskQuery()
         // when
         .orderByPriority().desc()
-        .orderByCreationDate().asc()
+        .orderByCreateTime().asc()
 
         .list();
 
@@ -180,7 +180,7 @@ public class ExternalTaskQueryByCreationDateTest {
   }
 
   @Test
-  public void shouldReturnTasksInCreationDateDescOrderOnPriorityEquality() {
+  public void shouldReturnTasksInCreateTimeDescOrderOnPriorityEquality() {
     // given
     startProcessInstanceAfter("process1", 1);
     startProcessInstanceAfter("process2", 1);
@@ -191,7 +191,7 @@ public class ExternalTaskQueryByCreationDateTest {
         .createExternalTaskQuery()
         // when
         .orderByPriority().desc()
-        .orderByCreationDate().desc()
+        .orderByCreateTime().desc()
 
         .list();
 
@@ -200,12 +200,12 @@ public class ExternalTaskQueryByCreationDateTest {
     // then
     assertThat(result.get(0).getActivityId()).isEqualTo("task1"); // due to priority DESC
     assertThat(result.get(1).getActivityId()).isEqualTo("task2");
-    assertThat(result.get(2).getActivityId()).isEqualTo("task4"); // due to creationDate DESC
+    assertThat(result.get(2).getActivityId()).isEqualTo("task4"); // due to CreateTime DESC
     assertThat(result.get(3).getActivityId()).isEqualTo("task3");
   }
 
   @Test
-  public void shouldReturnTasksInPriorityAscOnCreationDateEquality() {
+  public void shouldReturnTasksInPriorityAscOnCreateTimeEquality() {
     var now = ClockTestUtil.setClockToDateWithoutMilliseconds();
 
     // given
@@ -218,7 +218,7 @@ public class ExternalTaskQueryByCreationDateTest {
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
         // when
-        .orderByCreationDate().asc()
+        .orderByCreateTime().asc()
         .orderByPriority().asc()
 
         .list();
@@ -226,7 +226,7 @@ public class ExternalTaskQueryByCreationDateTest {
     assertThat(result.size()).isEqualTo(4);
 
     // then
-    assertThat(result.get(0).getActivityId()).isEqualTo("task2"); // due to creationDate Equality, priority ASC
+    assertThat(result.get(0).getActivityId()).isEqualTo("task2"); // due to CreateTime Equality, priority ASC
     assertThat(result.get(1).getActivityId()).isEqualTo("task1");
 
     assertThat(result.get(2).getActivityId()).isEqualTo("task3");
@@ -234,7 +234,7 @@ public class ExternalTaskQueryByCreationDateTest {
   }
 
   @Test
-  public void shouldReturnTasksInPriorityDescOnCreationDateEquality() {
+  public void shouldReturnTasksInPriorityDescOnCreateTimeEquality() {
     var now = ClockTestUtil.setClockToDateWithoutMilliseconds();
 
     // given
@@ -247,7 +247,7 @@ public class ExternalTaskQueryByCreationDateTest {
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
         // when
-        .orderByCreationDate().asc()
+        .orderByCreateTime().asc()
         .orderByPriority().desc()
 
         .list();
@@ -255,7 +255,7 @@ public class ExternalTaskQueryByCreationDateTest {
     assertThat(result.size()).isEqualTo(4);
 
     // then
-    assertThat(result.get(0).getActivityId()).isEqualTo("task1"); // due to creationDate equality, priority DESC
+    assertThat(result.get(0).getActivityId()).isEqualTo("task1"); // due to CreateTime equality, priority DESC
     assertThat(result.get(1).getActivityId()).isEqualTo("task2");
 
     assertThat(result.get(2).getActivityId()).isEqualTo("task3");
