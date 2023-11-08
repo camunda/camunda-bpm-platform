@@ -325,7 +325,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
       "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml"
   })
   @Test
-  public void shouldFetchWithDefaultDESCOrderWhenCreateTimeOrderIsEmpty() {
+  public void shouldIgnoreCreateTimeConfigWhenOrderIsEmpty() {
     // given
     runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
     ClockTestUtil.incrementClock(60_000);
@@ -334,18 +334,18 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
     // when
-    var result = externalTaskService.fetchAndLock(6, WORKER_ID, false, EMPTY)
+    var result = externalTaskService.fetchAndLock(6, WORKER_ID, true, EMPTY)
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
     assertThat(result.size()).isEqualTo(5);
 
     // then
-    // DESC order will be used as a 'sensible' default order
-    assertThat(result.get(0).getCreateTime()).isAfterOrEqualsTo(result.get(1).getCreateTime());
-    assertThat(result.get(1).getCreateTime()).isAfterOrEqualsTo(result.get(2).getCreateTime());
-    assertThat(result.get(2).getCreateTime()).isAfterOrEqualsTo(result.get(3).getCreateTime());
-    assertThat(result.get(3).getCreateTime()).isAfterOrEqualsTo(result.get(4).getCreateTime());
+    // create time ordering will be ignored, only priority will be used
+    assertThat(result.get(0).getPriority()).isGreaterThanOrEqualTo(result.get(1).getPriority());
+    assertThat(result.get(1).getPriority()).isGreaterThanOrEqualTo(result.get(2).getPriority());
+    assertThat(result.get(2).getPriority()).isGreaterThanOrEqualTo(result.get(3).getPriority());
+    assertThat(result.get(3).getPriority()).isGreaterThanOrEqualTo(result.get(4).getPriority());
   }
 
   @Deployment(resources = {
@@ -353,7 +353,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
       "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml"
   })
   @Test
-  public void shouldFetchWithDefaultDESCOrderWhenCreateTimeOrderIsNull() {
+  public void shouldIgnoreCreateTimeConfigWhenOrderIsNull() {
     // given
     runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
     ClockTestUtil.incrementClock(60_000);
@@ -362,18 +362,18 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
     // when
-    var result = externalTaskService.fetchAndLock(6, WORKER_ID, false, null)
+    var result = externalTaskService.fetchAndLock(6, WORKER_ID, true, null)
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
     assertThat(result.size()).isEqualTo(5);
 
     // then
-    // DESC order will be used as a 'sensible' default order
-    assertThat(result.get(0).getCreateTime()).isAfterOrEqualsTo(result.get(1).getCreateTime());
-    assertThat(result.get(1).getCreateTime()).isAfterOrEqualsTo(result.get(2).getCreateTime());
-    assertThat(result.get(2).getCreateTime()).isAfterOrEqualsTo(result.get(3).getCreateTime());
-    assertThat(result.get(3).getCreateTime()).isAfterOrEqualsTo(result.get(4).getCreateTime());
+    // create time ordering will be ignored, only priority will be used
+    assertThat(result.get(0).getPriority()).isGreaterThanOrEqualTo(result.get(1).getPriority());
+    assertThat(result.get(1).getPriority()).isGreaterThanOrEqualTo(result.get(2).getPriority());
+    assertThat(result.get(2).getPriority()).isGreaterThanOrEqualTo(result.get(3).getPriority());
+    assertThat(result.get(3).getPriority()).isGreaterThanOrEqualTo(result.get(4).getPriority());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityProcess.bpmn20.xml")

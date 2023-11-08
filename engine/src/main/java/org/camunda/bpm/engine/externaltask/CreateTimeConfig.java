@@ -23,5 +23,9 @@ package org.camunda.bpm.engine.externaltask;
  * EMPTY configuration means ignoring the field at all.
  */
 public enum CreateTimeConfig {
-  ASC, DESC, EMPTY
+  ASC, DESC, EMPTY;
+
+  public boolean isEmpty() {
+    return this == EMPTY;
+  }
 }

@@ -53,9 +53,10 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
 
   @Override
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority, CreateTimeConfig createTimeConfig) {
-    var direction = getDirection(createTimeConfig);
+    var useCreateTime = useCreateTime(createTimeConfig);
+    var direction = useCreateTime ? getDirection(createTimeConfig) : null;
 
-    return new ExternalTaskQueryTopicBuilderImpl(commandExecutor, workerId, maxTasks, usePriority, true, direction);
+    return new ExternalTaskQueryTopicBuilderImpl(commandExecutor, workerId, maxTasks, usePriority, useCreateTime, direction);
   }
 
   @Override
@@ -171,11 +172,15 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
   }
 
   protected Direction getDirection(CreateTimeConfig config) {
-    if (config == null || config == EMPTY) {
+    if (config == null || config.isEmpty()) {
       return Direction.DESCENDING; // default order in case of null or empty config
     }
 
     return Direction.findByNameIgnoreCase(config.name());
+  }
+
+  protected boolean useCreateTime(CreateTimeConfig config) {
+    return config != null && !config.isEmpty();
   }
 
 

@@ -225,9 +225,7 @@ public class FetchExternalTasksDto {
   }
 
   public ExternalTaskQueryBuilder buildQuery(ProcessEngine processEngine) {
-
-    var configDto = getCreateTimeConfig();
-    var config = getConfigFromDto(configDto);
+    var config = getConfigFromDto();
 
     ExternalTaskQueryBuilder fetchBuilder = processEngine
       .getExternalTaskService()
@@ -297,7 +295,9 @@ public class FetchExternalTasksDto {
     return fetchBuilder;
   }
 
-  protected CreateTimeConfig getConfigFromDto(CreateTimeConfigDto dto) {
+  protected CreateTimeConfig getConfigFromDto() {
+    var dto = getCreateTimeConfig();
+
     if (dto == null || !dto.isUseCreateTime()) {
       return EMPTY;
     }
