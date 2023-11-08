@@ -33,6 +33,7 @@ public abstract class PvmAtomicOperationCreateScope implements PvmAtomicOperatio
     // reset activity instance id before creating the scope
     execution.setActivityInstanceId(execution.getParentActivityInstanceId());
 
+    //reset scope listeners?
     PvmExecutionImpl propagatingExecution = null;
     PvmActivity activity = execution.getActivity();
     if (activity.isScope()) {

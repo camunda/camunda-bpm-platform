@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.delegate;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.runtime.Incident;
 
@@ -93,6 +95,10 @@ public interface DelegateExecution extends BaseDelegateExecution, BpmnModelExecu
    * @return the super execution or null.
    */
   DelegateExecution getSuperExecution();
+
+  DelegateExecution getParent();
+
+  Map<String, Map<String, Object>> getVariablesPerActivity();
 
   /**
    * Returns whether this execution has been canceled.

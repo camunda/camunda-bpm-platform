@@ -36,7 +36,7 @@ public class ConditionalEventHandler implements EventHandler {
   }
 
   @Override
-  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, Object localPayload, String businessKey, CommandContext commandContext) {
+  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, Object localPayload,Object newScopePayload, String businessKey, CommandContext commandContext) {
     VariableEvent variableEvent;
     if (payload == null || payload instanceof VariableEvent) {
       variableEvent = (VariableEvent) payload;

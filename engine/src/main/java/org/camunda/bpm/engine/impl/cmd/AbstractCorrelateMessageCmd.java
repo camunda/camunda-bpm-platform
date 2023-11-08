@@ -66,7 +66,7 @@ public abstract class AbstractCorrelateMessageCmd {
   protected void triggerExecution(CommandContext commandContext, CorrelationHandlerResult correlationResult) {
     String executionId = correlationResult.getExecutionEntity().getId();
 
-    MessageEventReceivedCmd command = new MessageEventReceivedCmd(messageName, executionId, builder.getPayloadProcessInstanceVariables(), builder.getPayloadProcessInstanceVariablesLocal(), builder.isExclusiveCorrelation());
+    MessageEventReceivedCmd command = new MessageEventReceivedCmd(messageName, executionId, builder.getPayloadProcessInstanceVariables(), builder.getPayloadProcessInstanceVariablesLocal(),builder.getPayloadNewScopeVariableLocal(), builder.isExclusiveCorrelation());
     command.execute(commandContext);
   }
 

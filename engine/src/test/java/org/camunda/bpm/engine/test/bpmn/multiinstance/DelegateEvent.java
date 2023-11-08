@@ -355,4 +355,14 @@ public class DelegateEvent implements DelegateExecution {
   public void setProcessBusinessKey(String businessKey) {
     throw notYetImplemented();
   }
+
+  @Override
+  public DelegateExecution getParent() {
+    throw notYetImplemented();
+  }
+
+  @Override
+  public Map<String, Map<String, Object>> getVariablesPerActivity() {
+    throw notYetImplemented();
+  }
 }

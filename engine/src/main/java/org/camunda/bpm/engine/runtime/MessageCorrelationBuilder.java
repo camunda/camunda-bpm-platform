@@ -143,6 +143,7 @@ public interface MessageCorrelationBuilder {
    * @return the builder
    */
   MessageCorrelationBuilder setVariablesLocal(Map<String, Object> variables);
+  MessageCorrelationBuilder setNewScopeVariablesLocal(Map<String, Object> variables);
 
   /**
    * Specify a tenant to deliver the message to. The message can only be

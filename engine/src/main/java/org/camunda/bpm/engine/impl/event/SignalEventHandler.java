@@ -59,12 +59,12 @@ public class SignalEventHandler extends EventHandlerImpl {
   }
 
   @Override
-  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, Object payloadLocal, String businessKey, CommandContext commandContext) {
+  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, Object payloadLocal,Object newScopePayload, String businessKey, CommandContext commandContext) {
     if (eventSubscription.getExecutionId() != null) {
-      handleIntermediateEvent(eventSubscription, payload, payloadLocal, commandContext);
+      handleIntermediateEvent(eventSubscription, payload, payloadLocal,newScopePayload, commandContext);
     }
     else {
-      handleStartEvent(eventSubscription, (Map<String, Object>) payload, businessKey, commandContext);
+      handleStartEvent(eventSubscription, (Map<String, Object>) payload, businessKey, commandContext); // TODO
     }
   }
 

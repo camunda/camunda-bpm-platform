@@ -46,7 +46,6 @@ import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandling;
 import org.camunda.bpm.engine.impl.persistence.entity.DelayedVariableEvent;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
@@ -173,6 +172,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
   protected int activityInstanceState = ActivityInstanceState.DEFAULT.getStateCode();
 
   protected boolean activityInstanceEndListenersFailed = false;
+
+  protected Map<String, Map<String, Object>> variablesPerActivity;
 
   // sequence counter ////////////////////////////////////////////////////////
   protected long sequenceCounter = 0;
@@ -2310,5 +2311,13 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
    */
   public boolean isAsyncAfterScopeWithoutTransition() {
     return activityInstanceId == null && activity.isScope() && !isActive;
+  }
+
+  public Map<String, Map<String, Object>> getVariablesPerActivity() {
+    return variablesPerActivity;
+  }
+
+  public void setVariablesPerActivity(Map<String, Map<String, Object>> variablesPerActivity) {
+    this.variablesPerActivity = variablesPerActivity;
   }
 }
