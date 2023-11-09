@@ -54,6 +54,7 @@ public abstract class AbstractDeleteProcessInstanceCmd {
   protected boolean skipCustomListeners;
   protected boolean skipSubprocesses;
   protected boolean failIfNotExists = true;
+  protected boolean skipIoMappings;
 
   protected void checkDeleteProcessInstance(ExecutionEntity execution, CommandContext commandContext) {
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
@@ -68,7 +69,8 @@ public abstract class AbstractDeleteProcessInstanceCmd {
       final boolean skipCustomListeners,
       final boolean externallyTerminated,
       final boolean skipIoMappings,
-      boolean skipSubprocesses) {
+      boolean skipSubprocesses
+  ) {
     ensureNotNull(BadUserRequestException.class, "processInstanceId is null", "processInstanceId", processInstanceId);
 
     // fetch process instance
@@ -87,7 +89,8 @@ public abstract class AbstractDeleteProcessInstanceCmd {
     // delete process instance
     commandContext
         .getExecutionManager()
-        .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners, externallyTerminated, skipIoMappings, skipSubprocesses);
+        .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners,
+            externallyTerminated, skipIoMappings, skipSubprocesses);
 
     if (skipSubprocesses) {
       List<ProcessInstance> superProcesslist = commandContext.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery()

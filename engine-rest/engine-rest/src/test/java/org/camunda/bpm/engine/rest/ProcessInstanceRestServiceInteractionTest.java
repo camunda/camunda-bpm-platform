@@ -450,7 +450,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
       any(),
       any(),
       anyBoolean(),
-      anyBoolean()))
+      anyBoolean(),
+      anyBoolean()
+    ))
     .thenReturn(new BatchEntity());
 
     HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQueryImpl.class);
@@ -472,7 +474,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
         mockedHistoricProcessInstanceQuery,
         null,
         false,
-        false);
+        false,
+        false
+    );
   }
 
   @Test
@@ -483,7 +487,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
       eq((HistoricProcessInstanceQuery)null),
       any(),
       anyBoolean(),
-      anyBoolean()))
+      anyBoolean(),
+      anyBoolean()
+    ))
     .thenReturn(new BatchEntity());
 
     DeleteProcessInstancesDto body = new DeleteProcessInstancesDto();
@@ -502,7 +508,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
       null,
       null,
       false,
-      false);
+      false,
+      false
+    );
   }
 
   @Test
@@ -513,7 +521,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
       any(),
       any(),
       anyBoolean(),
-      anyBoolean()))
+      anyBoolean(),
+      anyBoolean()
+    ))
     .thenReturn(new BatchEntity());
 
     HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQueryImpl.class);
@@ -536,7 +546,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
       mockedHistoricProcessInstanceQuery,
       null,
       false,
-      false);
+      false,
+      false
+    );
   }
 
   @Test
@@ -547,6 +559,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
         eq((ProcessInstanceQuery)null),
         eq((HistoricProcessInstanceQuery)null),
         any(),
+        anyBoolean(),
         anyBoolean(),
         anyBoolean());
 
@@ -563,7 +576,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
         null,
         null,
         false,
-        false);
+        false,
+        false
+    );
   }
 
   @Test
@@ -574,7 +589,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
       any(),
       any(),
       anyBoolean(),
-      anyBoolean()))
+      anyBoolean(),
+      anyBoolean()
+    ))
     .thenReturn(new BatchEntity());
 
     DeleteProcessInstancesDto body = new DeleteProcessInstancesDto();
@@ -593,7 +610,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
         null,
         MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_DELETE_REASON,
         false,
-        false);
+        false,
+        false
+    );
   }
 
   @Test
@@ -604,7 +623,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
       any(),
       any(),
       anyBoolean(),
-      anyBoolean()))
+      anyBoolean(),
+      anyBoolean()
+    ))
     .thenReturn(new BatchEntity());
 
     DeleteProcessInstancesDto body = new DeleteProcessInstancesDto();
@@ -623,7 +644,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
       null,
       null,
       true,
-      false);
+      false,
+      false
+    );
   }
 
   @Test
@@ -634,7 +657,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
       eq((HistoricProcessInstanceQuery)null),
       any(),
       anyBoolean(),
-      anyBoolean()))
+      anyBoolean(),
+      anyBoolean()
+    ))
     .thenReturn(new BatchEntity());
 
     DeleteProcessInstancesDto body = new DeleteProcessInstancesDto();
@@ -653,7 +678,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
       null,
       null,
       false,
-      true);
+      true,
+      false
+    );
   }
 
   @Test

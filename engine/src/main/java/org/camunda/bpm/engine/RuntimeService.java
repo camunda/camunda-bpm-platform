@@ -670,6 +670,7 @@ public interface RuntimeService {
    * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
    * @param skipCustomListeners skips custom execution listeners when removing instances
    * @param skipSubprocesses skips subprocesses when removing instances
+   * @param skipIoMappings specifies whether input/output mappings for tasks should be invoked
    *
    * @throws BadUserRequestException
    *          when no process instance is found with the given queries or ids.
@@ -682,7 +683,8 @@ public interface RuntimeService {
                                     HistoricProcessInstanceQuery historicProcessInstanceQuery,
                                     String deleteReason,
                                     boolean skipCustomListeners,
-                                    boolean skipSubprocesses);
+                                    boolean skipSubprocesses,
+                                    boolean skipIoMappings);
 
   /**
    * Delete an existing runtime process instances asynchronously using Batch operation.
@@ -799,7 +801,7 @@ public interface RuntimeService {
    * @param externallyTerminated indicator if deletion triggered from external context, for instance
    *                             REST API call
    * @param skipSubprocesses specifies whether subprocesses should be deleted
-   *
+   * @param skipIoMappings specifies whether input/output mappings for tasks should be invoked
    *
    * @throws BadUserRequestException
    *          when a processInstanceId is null.
@@ -810,7 +812,7 @@ public interface RuntimeService {
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteProcessInstances(List<String> processInstanceIds, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated,
-  boolean skipSubprocesses);
+                              boolean skipSubprocesses, boolean skipIoMappings);
 
   /**
    * Delete existing runtime process instances.

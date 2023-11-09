@@ -265,7 +265,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
 
     // when
     Batch batch = runtimeService.deleteProcessInstancesAsync(null, null,
-        historicProcessInstanceQuery, "", false, false);
+        historicProcessInstanceQuery, "", false, false, false);
 
     completeSeedJobs(batch);
     executeBatchJobs(batch);
@@ -292,7 +292,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
 
     // when
     Batch batch = runtimeService.deleteProcessInstancesAsync(null, processInstanceQuery,
-        historicProcessInstanceQuery, "", false, false);
+        historicProcessInstanceQuery, "", false, false, false);
 
     completeSeedJobs(batch);
     executeBatchJobs(batch);
