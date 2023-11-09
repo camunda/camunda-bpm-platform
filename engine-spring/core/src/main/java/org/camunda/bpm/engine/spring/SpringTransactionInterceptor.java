@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.TransactionSystemException;
@@ -79,7 +80,7 @@ public class SpringTransactionInterceptor extends CommandInterceptor {
         throw ProcessEngineLogger.PERSISTENCE_LOGGER.crdbTransactionRetryExceptionOnCommit(cause);
 
       } else {
-        throw ex;
+        throw ExceptionUtil.wrapPersistenceException(ex);
 
       }
     }
