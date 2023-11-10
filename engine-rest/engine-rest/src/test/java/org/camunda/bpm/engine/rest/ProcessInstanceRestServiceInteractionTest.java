@@ -684,6 +684,56 @@ public class ProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
+  public void testDeleteAsyncHistoricQueryBasedWithSkipIoMappingsTrue() {
+    when(runtimeServiceMock.deleteProcessInstancesAsync(
+        eq((List<String>)null),
+        eq((ProcessInstanceQuery)null),
+        eq((HistoricProcessInstanceQuery)null),
+        any(),
+        anyBoolean(),
+        anyBoolean(),
+        eq(true)
+    ))
+        .thenReturn(new BatchEntity());
+
+    DeleteProcessInstancesDto body = new DeleteProcessInstancesDto();
+    body.setSkipIoMappings(true);
+
+    given()
+        .contentType(ContentType.JSON).body(body)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when().post(DELETE_PROCESS_INSTANCES_ASYNC_HIST_QUERY_URL);
+
+    verify(runtimeServiceMock, times(1)).deleteProcessInstancesAsync(null, null, null, null, false, false, true);
+  }
+
+  @Test
+  public void testDeleteAsyncHistoricQueryBasedWithSkipIoMappingsFalse() {
+    when(runtimeServiceMock.deleteProcessInstancesAsync(
+        eq((List<String>)null),
+        eq((ProcessInstanceQuery)null),
+        eq((HistoricProcessInstanceQuery)null),
+        any(),
+        anyBoolean(),
+        anyBoolean(),
+        eq(false)
+    ))
+        .thenReturn(new BatchEntity());
+
+    DeleteProcessInstancesDto body = new DeleteProcessInstancesDto();
+    body.setSkipIoMappings(false);
+
+    given()
+        .contentType(ContentType.JSON).body(body)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when().post(DELETE_PROCESS_INSTANCES_ASYNC_HIST_QUERY_URL);
+
+    verify(runtimeServiceMock, times(1)).deleteProcessInstancesAsync(null, null, null, null, false, false, false);
+  }
+
+  @Test
   public void testGetVariablesWithNullValue() {
     Response response = given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID_WITH_NULL_VALUE_AS_VARIABLE)
       .then().expect().statusCode(Status.OK.getStatusCode())
