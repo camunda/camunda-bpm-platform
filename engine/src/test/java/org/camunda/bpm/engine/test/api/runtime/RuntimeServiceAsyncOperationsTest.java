@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -390,6 +389,54 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
 
     ProcessInstance subInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("called").singleResult();
     assertNotNull(subInstance);
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/api/oneTaskProcessWithIoMappings.bpmn20.xml")
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
+  public void shouldApplySkipIoMappingOnDeleteProcessInstancesAsync() {
+    // given a process instance
+    var instanceId1 = runtimeService.startProcessInstanceByKey("ioMappingProcess").getProcessInstanceId();
+    var instanceId2 = runtimeService.startProcessInstanceByKey("ioMappingProcess").getProcessInstanceId();
+    var instanceIds = List.of(instanceId1, instanceId2);
+
+    // when
+    Batch batch = runtimeService.deleteProcessInstancesAsync(instanceIds, null, null, null, true, false, true);
+
+    completeSeedJobs(batch);
+    executeBatchJobs(batch);
+
+    // then
+    testRule.assertProcessEnded(instanceId1);
+    testRule.assertProcessEnded(instanceId2);
+
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().processInstanceId(instanceId1).list().size());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().processInstanceId(instanceId2).list().size());
+    assertEquals(2, historyService.createHistoricVariableInstanceQuery().variableName("inputMappingExecuted").count());
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/api/oneTaskProcessWithIoMappings.bpmn20.xml")
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
+  public void shouldNotApplySkipIoMappingOnDeleteProcessInstancesAsyncFalse() {
+    // given a process instance
+    var instanceId1 = runtimeService.startProcessInstanceByKey("ioMappingProcess").getProcessInstanceId();
+    var instanceId2 = runtimeService.startProcessInstanceByKey("ioMappingProcess").getProcessInstanceId();
+    var instanceIds = List.of(instanceId1, instanceId2);
+
+    // when
+    Batch batch = runtimeService.deleteProcessInstancesAsync(instanceIds, null, null, null, true, false, false);
+
+    completeSeedJobs(batch);
+    executeBatchJobs(batch);
+
+    // then
+    testRule.assertProcessEnded(instanceId1);
+    testRule.assertProcessEnded(instanceId2);
+
+    assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(instanceId1).list().size()).isEqualTo(2);
+    assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(instanceId2).list().size()).isEqualTo(2);
+    assertEquals(2, historyService.createHistoricVariableInstanceQuery().variableName("inputMappingExecuted").count());
   }
 
   @Test
