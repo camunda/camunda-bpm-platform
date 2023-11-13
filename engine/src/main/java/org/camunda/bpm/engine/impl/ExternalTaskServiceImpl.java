@@ -16,15 +16,13 @@
  */
 package org.camunda.bpm.engine.impl;
 
-import static org.camunda.bpm.engine.externaltask.CreateTimeConfig.EMPTY;
-
 import java.util.List;
 import java.util.Map;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.externaltask.CreateTimeConfig;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
+import org.camunda.bpm.engine.impl.externaltask.FetchAndLockBuilderImpl;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesSelectBuilder;
 import org.camunda.bpm.engine.impl.cmd.CompleteExternalTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.ExtendLockOnExternalTaskCmd;
@@ -48,15 +46,17 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
 
   @Override
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId) {
-    return fetchAndLock(maxTasks, workerId, false, EMPTY);
+    return fetchAndLock(maxTasks, workerId, false);
   }
 
   @Override
-  public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority, CreateTimeConfig createTimeConfig) {
-    var useCreateTime = useCreateTime(createTimeConfig);
-    var direction = useCreateTime ? getDirection(createTimeConfig) : null;
+  public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority) {
+    return new ExternalTaskQueryTopicBuilderImpl(commandExecutor, workerId, maxTasks, usePriority);
+  }
 
-    return new ExternalTaskQueryTopicBuilderImpl(commandExecutor, workerId, maxTasks, usePriority, useCreateTime, direction);
+  @Override
+  public FetchAndLockBuilderImpl fetchAndLock() {
+    return new FetchAndLockBuilderImpl(commandExecutor);
   }
 
   @Override
@@ -170,19 +170,5 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
   public void extendLock(String externalTaskId, String workerId, long lockDuration) {
     commandExecutor.execute(new ExtendLockOnExternalTaskCmd(externalTaskId, workerId, lockDuration));
   }
-
-  protected Direction getDirection(CreateTimeConfig config) {
-    if (config == null || config.isEmpty()) {
-      return Direction.DESCENDING; // default order in case of null or empty config
-    }
-
-    return Direction.findByNameIgnoreCase(config.name());
-  }
-
-  protected boolean useCreateTime(CreateTimeConfig config) {
-    return config != null && !config.isEmpty();
-  }
-
-
 
 }

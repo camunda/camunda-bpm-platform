@@ -330,7 +330,7 @@ public class HistoricExternalTaskLogTest {
   }
 
   protected void completeExternalTask(String externalTaskId) {
-    externalTaskService.fetchAndLock(100, WORKER_ID, false, null)
+    externalTaskService.fetchAndLock(100, WORKER_ID, false)
       .topic(DEFAULT_TOPIC, LOCK_DURATION)
       .execute();
     externalTaskService.complete(externalTaskId, WORKER_ID);
@@ -341,7 +341,7 @@ public class HistoricExternalTaskLogTest {
   }
 
   protected void reportExternalTaskFailure(String externalTaskId, String errorMessage, String errorDetails) {
-    externalTaskService.fetchAndLock(100, WORKER_ID, false, null)
+    externalTaskService.fetchAndLock(100, WORKER_ID, false)
       .topic(DEFAULT_TOPIC, LOCK_DURATION)
       .execute();
     externalTaskService.handleFailure(externalTaskId, WORKER_ID, errorMessage, errorDetails, 1, 0L);

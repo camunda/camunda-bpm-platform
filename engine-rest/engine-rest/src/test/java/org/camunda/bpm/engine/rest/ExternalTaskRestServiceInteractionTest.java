@@ -17,42 +17,43 @@
 package org.camunda.bpm.engine.rest;
 
 import static io.restassured.RestAssured.given;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.anyLong;
-import static org.mockito.hamcrest.MockitoHamcrest.argThat;
-import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.never;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
+import io.restassured.http.ContentType;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.ServletContextEvent;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.externaltask.CreateTimeConfig;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
@@ -64,6 +65,7 @@ import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.HistoryServiceImpl;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
+import org.camunda.bpm.engine.impl.externaltask.FetchAndLockBuilderImpl;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskQueryDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
@@ -84,8 +86,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
-
-import io.restassured.http.ContentType;
 
 /**
  * @author Thorben Lindhauer
@@ -118,6 +118,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
   protected LockedExternalTask lockedExternalTaskMock;
   protected ExternalTaskQueryTopicBuilder fetchTopicBuilder;
+  protected FetchAndLockBuilderImpl fetchAndLockBuilder;
 
   protected ExternalTask externalTaskMock;
   protected ExternalTaskQuery externalTaskQueryMock;
@@ -141,7 +142,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     // fetching
     fetchTopicBuilder = mock(ExternalTaskQueryTopicBuilder.class);
     when(externalTaskService.fetchAndLock(anyInt(), any())).thenReturn(fetchTopicBuilder);
-    when(externalTaskService.fetchAndLock(anyInt(), any(), anyBoolean(), any(CreateTimeConfig.class))).thenReturn(fetchTopicBuilder);
+    when(externalTaskService.fetchAndLock(anyInt(), any(), anyBoolean())).thenReturn(fetchTopicBuilder);
 
     when(fetchTopicBuilder.topic(any(), anyLong())).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.variables(Mockito.<List<String>>any())).thenReturn(fetchTopicBuilder);
@@ -159,6 +160,31 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     when(fetchTopicBuilder.withoutTenantId()).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.tenantIdIn(Mockito.<String>any())).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.includeExtensionProperties()).thenReturn(fetchTopicBuilder);
+
+    fetchAndLockBuilder = mock(FetchAndLockBuilderImpl.class);
+
+    when(fetchAndLockBuilder.workerId(anyString())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.maxTasks(anyInt())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.usePriority(anyBoolean())).thenReturn(fetchAndLockBuilder);
+
+    when(fetchAndLockBuilder.topic(any(), anyLong())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.variables(Mockito.<List<String>>any())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.variables(Mockito.<String[]>any())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.enableCustomObjectDeserialization()).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.localVariables()).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.topic(any(), anyLong())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.businessKey(any())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.processDefinitionId(any())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.processDefinitionIdIn(Mockito.<String>any())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.processDefinitionKey(any())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.processDefinitionKeyIn(Mockito.<String>any())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.processInstanceVariableEquals(any())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.processDefinitionVersionTag(any())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.withoutTenantId()).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.tenantIdIn(Mockito.<String>any())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.includeExtensionProperties()).thenReturn(fetchAndLockBuilder);
+
+    when(externalTaskService.fetchAndLock()).thenReturn(fetchAndLockBuilder);
 
     Batch batch = createMockBatch();
     updateRetriesBuilder = mock(UpdateExternalTaskRetriesBuilder.class);
@@ -185,7 +211,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   @Test
   public void testFetchAndLock() {
     // given
-    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+    when(fetchAndLockBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
 
     // when
     Map<String, Object> parameters = new HashMap<>();
@@ -201,18 +227,21 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     executePost(parameters);
 
-    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true, null);
-    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
-    inOrder.verify(fetchTopicBuilder).execute();
+    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+
+    inOrder.verify(externalTaskService).fetchAndLock();
+
+    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchAndLockBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchAndLockBuilder).execute();
+
     verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
   }
 
   @Test
   public void testFetchAndLockWithBusinessKey() {
     // given
-    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+    when(fetchAndLockBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
 
     // when
     Map<String, Object> parameters = new HashMap<>();
@@ -229,19 +258,26 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     executePost(parameters);
 
-    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true, null);
-    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchTopicBuilder).businessKey(EXAMPLE_BUSINESS_KEY);
-    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
-    inOrder.verify(fetchTopicBuilder).execute();
-    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+
+    inOrder.verify(externalTaskService).fetchAndLock();
+
+    inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
+    inOrder.verify(fetchAndLockBuilder).maxTasks(5);
+    inOrder.verify(fetchAndLockBuilder).usePriority(true);
+
+    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchAndLockBuilder).businessKey(EXAMPLE_BUSINESS_KEY);
+    inOrder.verify(fetchAndLockBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchAndLockBuilder).execute();
+
+    verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
   }
 
   @Test
   public void testFetchAndLockWithProcessDefinition() {
     // given
-    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+    when(fetchAndLockBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
 
     // when
     Map<String, Object> parameters = new HashMap<>();
@@ -260,21 +296,27 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     executePost(parameters);
 
-    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true, null);
-    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchTopicBuilder).processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
-    inOrder.verify(fetchTopicBuilder).processDefinitionIdIn(EXAMPLE_PROCESS_DEFINITION_ID);
-    inOrder.verify(fetchTopicBuilder).processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY);
-    inOrder.verify(fetchTopicBuilder).processDefinitionKeyIn(EXAMPLE_PROCESS_DEFINITION_KEY);
-    inOrder.verify(fetchTopicBuilder).execute();
-    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+
+    inOrder.verify(externalTaskService).fetchAndLock();
+
+    inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
+    inOrder.verify(fetchAndLockBuilder).maxTasks(5);
+    inOrder.verify(fetchAndLockBuilder).usePriority(true);
+    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchAndLockBuilder).processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
+    inOrder.verify(fetchAndLockBuilder).processDefinitionIdIn(EXAMPLE_PROCESS_DEFINITION_ID);
+    inOrder.verify(fetchAndLockBuilder).processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY);
+    inOrder.verify(fetchAndLockBuilder).processDefinitionKeyIn(EXAMPLE_PROCESS_DEFINITION_KEY);
+    inOrder.verify(fetchAndLockBuilder).execute();
+
+    verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
   }
 
   @Test
   public void testFetchAndLockWithVariableValue() {
     // given
-    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+    when(fetchAndLockBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
 
     // when
     Map<String, Object> parameters = new HashMap<>();
@@ -296,20 +338,27 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     executePost(parameters);
 
-    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true, null);
-    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchTopicBuilder).businessKey(EXAMPLE_BUSINESS_KEY);
-    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
-    inOrder.verify(fetchTopicBuilder).processInstanceVariableEquals(variableValueParameter);
-    inOrder.verify(fetchTopicBuilder).execute();
-    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+
+    inOrder.verify(externalTaskService).fetchAndLock();
+
+    inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
+    inOrder.verify(fetchAndLockBuilder).maxTasks(5);
+    inOrder.verify(fetchAndLockBuilder).usePriority(true);
+
+    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchAndLockBuilder).businessKey(EXAMPLE_BUSINESS_KEY);
+    inOrder.verify(fetchAndLockBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchAndLockBuilder).processInstanceVariableEquals(variableValueParameter);
+    inOrder.verify(fetchAndLockBuilder).execute();
+
+    verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
   }
 
   @Test
   public void testFetchWithoutVariables() {
     // given
-    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+    when(fetchAndLockBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
 
     // when
     Map<String, Object> parameters = new HashMap<>();
@@ -332,17 +381,24 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(FETCH_EXTERNAL_TASK_URL);
 
-    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false, null);
-    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchTopicBuilder).execute();
+    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+
+    inOrder.verify(externalTaskService).fetchAndLock();
+
+    inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
+    inOrder.verify(fetchAndLockBuilder).maxTasks(5);
+    inOrder.verify(fetchAndLockBuilder).usePriority(false);
+
+    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchAndLockBuilder).execute();
+
     verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
   }
 
   @Test
   public void testFetchAndLockWithTenant() {
     // given
-    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+    when(fetchAndLockBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
 
     // when
     Map<String, Object> parameters = new HashMap<>();
@@ -360,19 +416,26 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     executePost(parameters);
 
-    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true, null);
-    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchTopicBuilder).withoutTenantId();
-    inOrder.verify(fetchTopicBuilder).tenantIdIn("tenant2");
-    inOrder.verify(fetchTopicBuilder).execute();
-    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+
+    inOrder.verify(externalTaskService).fetchAndLock();
+
+    inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
+    inOrder.verify(fetchAndLockBuilder).maxTasks(5);
+    inOrder.verify(fetchAndLockBuilder).usePriority(true);
+
+    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchAndLockBuilder).withoutTenantId();
+    inOrder.verify(fetchAndLockBuilder).tenantIdIn("tenant2");
+    inOrder.verify(fetchAndLockBuilder).execute();
+
+    verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
   }
 
   @Test
   public void testFetchAndLockByProcessDefinitionVersionTag() {
     // given
-    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+    when(fetchAndLockBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
 
     // when
     Map<String, Object> parameters = new HashMap<>();
@@ -387,18 +450,25 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     executePost(parameters);
 
-    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false, null);
-    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchTopicBuilder).processDefinitionVersionTag("versionTag");
-    inOrder.verify(fetchTopicBuilder).execute();
-    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+
+    inOrder.verify(externalTaskService).fetchAndLock();
+
+    inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
+    inOrder.verify(fetchAndLockBuilder).maxTasks(5);
+    inOrder.verify(fetchAndLockBuilder).usePriority(false);
+
+    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchAndLockBuilder).processDefinitionVersionTag("versionTag");
+    inOrder.verify(fetchAndLockBuilder).execute();
+
+    verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
   }
 
   @Test
   public void testFetchAndLockIncludeExtensionProperties() {
     // given
-    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+    when(fetchAndLockBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
 
     // when
     Map<String, Object> parameters = new HashMap<>();
@@ -414,18 +484,24 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     executePost(parameters);
 
     // then
-    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false, null);
-    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchTopicBuilder).includeExtensionProperties();
-    inOrder.verify(fetchTopicBuilder).execute();
-    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+
+    inOrder.verify(externalTaskService).fetchAndLock();
+    inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
+    inOrder.verify(fetchAndLockBuilder).maxTasks(5);
+    inOrder.verify(fetchAndLockBuilder).usePriority(false);
+
+    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchAndLockBuilder).includeExtensionProperties();
+    inOrder.verify(fetchAndLockBuilder).execute();
+
+    verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
   }
 
   @Test
   public void testEnableCustomObjectDeserialization() {
     // given
-    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+    when(fetchAndLockBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
 
     // when
     Map<String, Object> parameters = new HashMap<>();
@@ -440,28 +516,35 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("topics", Arrays.asList(topicParameter));
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .header("accept", MediaType.APPLICATION_JSON)
-    .then()
-      .expect()
-      .statusCode(Status.OK.getStatusCode())
-    .when()
-      .post(FETCH_EXTERNAL_TASK_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(FETCH_EXTERNAL_TASK_URL);
 
-    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false, null);
-    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
-    inOrder.verify(fetchTopicBuilder).enableCustomObjectDeserialization();
-    inOrder.verify(fetchTopicBuilder).execute();
-    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+
+    inOrder.verify(externalTaskService).fetchAndLock();
+
+    inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
+    inOrder.verify(fetchAndLockBuilder).maxTasks(5);
+    inOrder.verify(fetchAndLockBuilder).usePriority(false);
+    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
+
+    inOrder.verify(fetchAndLockBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchAndLockBuilder).enableCustomObjectDeserialization();
+    inOrder.verify(fetchAndLockBuilder).execute();
+
+    verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
   }
 
   @Test
   public void testLocalVariables() {
     // given
-    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+    when(fetchAndLockBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
 
     // when
     Map<String, Object> parameters = new HashMap<>();
@@ -476,21 +559,23 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("topics", Arrays.asList(topicParameter));
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .header("accept", MediaType.APPLICATION_JSON)
-    .then()
-      .expect()
-      .statusCode(Status.OK.getStatusCode())
-    .when()
-      .post(FETCH_EXTERNAL_TASK_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(FETCH_EXTERNAL_TASK_URL);
 
-    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false, null);
-    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
-    inOrder.verify(fetchTopicBuilder).localVariables();
-    inOrder.verify(fetchTopicBuilder).execute();
+    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+    inOrder.verify(externalTaskService).fetchAndLock();
+
+    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchAndLockBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchAndLockBuilder).localVariables();
+    inOrder.verify(fetchAndLockBuilder).execute();
+
     verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
   }
 
@@ -501,14 +586,14 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("workerId", "aWorkerId");
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .post(COMPLETE_EXTERNAL_TASK_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .post(COMPLETE_EXTERNAL_TASK_URL);
 
     verify(externalTaskService).complete("anExternalTaskId", "aWorkerId", null, null);
     verifyNoMoreInteractions(externalTaskService);
@@ -528,27 +613,27 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("variables", variables);
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .post(COMPLETE_EXTERNAL_TASK_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .post(COMPLETE_EXTERNAL_TASK_URL);
 
     verify(externalTaskService).complete(
         eq("anExternalTaskId"),
         eq("aWorkerId"),
         argThat(EqualsVariableMap.matches()
-          .matcher("var1", EqualsUntypedValue.matcher().value("val1"))
-          .matcher("var2", EqualsPrimitiveValue.stringValue("val2"))
-          .matcher("var3",
-              EqualsObjectValue.objectValueMatcher()
-                .type(ValueType.OBJECT)
-                .serializedValue("val3")
-                .serializationFormat("aFormat")
-                .objectTypeName("aRootType"))),
+            .matcher("var1", EqualsUntypedValue.matcher().value("val1"))
+            .matcher("var2", EqualsPrimitiveValue.stringValue("val2"))
+            .matcher("var3",
+                EqualsObjectValue.objectValueMatcher()
+                    .type(ValueType.OBJECT)
+                    .serializedValue("val3")
+                    .serializationFormat("aFormat")
+                    .objectTypeName("aRootType"))),
         eq((Map<String, Object>) null));
 
     verifyNoMoreInteractions(externalTaskService);
@@ -568,28 +653,28 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("localVariables", variables);
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .post(COMPLETE_EXTERNAL_TASK_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .post(COMPLETE_EXTERNAL_TASK_URL);
 
     verify(externalTaskService).complete(
         eq("anExternalTaskId"),
         eq("aWorkerId"),
         eq((Map<String, Object>) null),
         argThat(EqualsVariableMap.matches()
-          .matcher("var1", EqualsUntypedValue.matcher().value("val1"))
-          .matcher("var2", EqualsPrimitiveValue.stringValue("val2"))
-          .matcher("var3",
-              EqualsObjectValue.objectValueMatcher()
-                .type(ValueType.OBJECT)
-                .serializedValue("val3")
-                .serializationFormat("aFormat")
-                .objectTypeName("aRootType"))));
+            .matcher("var1", EqualsUntypedValue.matcher().value("val1"))
+            .matcher("var2", EqualsPrimitiveValue.stringValue("val2"))
+            .matcher("var3",
+                EqualsObjectValue.objectValueMatcher()
+                    .type(ValueType.OBJECT)
+                    .serializedValue("val3")
+                    .serializationFormat("aFormat")
+                    .objectTypeName("aRootType"))));
 
     verifyNoMoreInteractions(externalTaskService);
   }
@@ -597,78 +682,78 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   @Test
   public void testCompleteNonExistingTask() {
     doThrow(new NotFoundException())
-      .when(externalTaskService)
-      .complete(any(), any(), any(), any());
+        .when(externalTaskService)
+        .complete(any(), any(), any(), any());
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NOT_FOUND.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("External task with id anExternalTaskId does not exist"))
-    .when()
-      .post(COMPLETE_EXTERNAL_TASK_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", equalTo("External task with id anExternalTaskId does not exist"))
+        .when()
+        .post(COMPLETE_EXTERNAL_TASK_URL);
   }
 
   @Test
   public void testCompleteThrowsAuthorizationException() {
     doThrow(new AuthorizationException("aMessage"))
-      .when(externalTaskService)
-      .complete(any(), any(), any(), any());
+        .when(externalTaskService)
+        .complete(any(), any(), any(), any());
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.FORBIDDEN.getStatusCode())
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo("aMessage"))
-    .when()
-      .post(COMPLETE_EXTERNAL_TASK_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo("aMessage"))
+        .when()
+        .post(COMPLETE_EXTERNAL_TASK_URL);
   }
 
   @Test
   public void testCompleteThrowsBadUserRequestException() {
     doThrow(new BadUserRequestException("aMessage"))
-      .when(externalTaskService)
-      .complete(any(), any(), any(), any());
+        .when(externalTaskService)
+        .complete(any(), any(), any(), any());
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("aMessage"))
-    .when()
-      .post(COMPLETE_EXTERNAL_TASK_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", equalTo("aMessage"))
+        .when()
+        .post(COMPLETE_EXTERNAL_TASK_URL);
   }
 
   @Test
   public void testUnlock() {
     given()
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .post(UNLOCK_EXTERNAL_TASK_URL);
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .post(UNLOCK_EXTERNAL_TASK_URL);
 
     verify(externalTaskService).unlock("anExternalTaskId");
     verifyNoMoreInteractions(externalTaskService);
@@ -679,14 +764,14 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     doThrow(new NotFoundException()).when(externalTaskService).unlock(any(String.class));
 
     given()
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NOT_FOUND.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("External task with id anExternalTaskId does not exist"))
-    .when()
-      .post(UNLOCK_EXTERNAL_TASK_URL);
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", equalTo("External task with id anExternalTaskId does not exist"))
+        .when()
+        .post(UNLOCK_EXTERNAL_TASK_URL);
 
     verify(externalTaskService).unlock("anExternalTaskId");
     verifyNoMoreInteractions(externalTaskService);
@@ -697,14 +782,14 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     doThrow(new AuthorizationException("aMessage")).when(externalTaskService).unlock(any(String.class));
 
     given()
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.FORBIDDEN.getStatusCode())
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo("aMessage"))
-    .when()
-      .post(UNLOCK_EXTERNAL_TASK_URL);
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo("aMessage"))
+        .when()
+        .post(UNLOCK_EXTERNAL_TASK_URL);
 
     verify(externalTaskService).unlock("anExternalTaskId");
     verifyNoMoreInteractions(externalTaskService);
@@ -713,12 +798,12 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   @Test
   public void testGetErrorDetails() {
     given()
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .get(GET_EXTERNAL_TASK_ERROR_DETAILS_URL);
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .get(GET_EXTERNAL_TASK_ERROR_DETAILS_URL);
 
     verify(externalTaskService).getExternalTaskErrorDetails("anExternalTaskId");
     verifyNoMoreInteractions(externalTaskService);
@@ -729,14 +814,14 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     doThrow(new NotFoundException()).when(externalTaskService).getExternalTaskErrorDetails(any(String.class));
 
     given()
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NOT_FOUND.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("External task with id anExternalTaskId does not exist"))
-    .when()
-      .get(GET_EXTERNAL_TASK_ERROR_DETAILS_URL);
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", equalTo("External task with id anExternalTaskId does not exist"))
+        .when()
+        .get(GET_EXTERNAL_TASK_ERROR_DETAILS_URL);
 
     verify(externalTaskService).getExternalTaskErrorDetails("anExternalTaskId");
     verifyNoMoreInteractions(externalTaskService);
@@ -747,14 +832,14 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     doThrow(new AuthorizationException("aMessage")).when(externalTaskService).getExternalTaskErrorDetails(any(String.class));
 
     given()
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.FORBIDDEN.getStatusCode())
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo("aMessage"))
-    .when()
-      .get(GET_EXTERNAL_TASK_ERROR_DETAILS_URL);
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo("aMessage"))
+        .when()
+        .get(GET_EXTERNAL_TASK_ERROR_DETAILS_URL);
 
     verify(externalTaskService).getExternalTaskErrorDetails("anExternalTaskId");
     verifyNoMoreInteractions(externalTaskService);
@@ -769,14 +854,14 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("retryTimeout", 12345);
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .post(HANDLE_EXTERNAL_TASK_FAILURE_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .post(HANDLE_EXTERNAL_TASK_FAILURE_URL);
 
     verify(externalTaskService).handleFailure("anExternalTaskId", "aWorkerId", "anErrorMessage", null, 5, 12345, null, null);
     verifyNoMoreInteractions(externalTaskService);
@@ -808,8 +893,8 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   @Test
   public void testHandleFailureNonExistingTask() {
     doThrow(new NotFoundException())
-      .when(externalTaskService)
-      .handleFailure(any(), any(), any(), any(), anyInt(), anyLong(), any(), any());
+        .when(externalTaskService)
+        .handleFailure(any(), any(), any(), any(), anyInt(), anyLong(), any(), any());
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
@@ -818,23 +903,23 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("retryTimeout", 12345);
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NOT_FOUND.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("External task with id anExternalTaskId does not exist"))
-    .when()
-      .post(HANDLE_EXTERNAL_TASK_FAILURE_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", equalTo("External task with id anExternalTaskId does not exist"))
+        .when()
+        .post(HANDLE_EXTERNAL_TASK_FAILURE_URL);
   }
 
   @Test
   public void testHandleFailureThrowsAuthorizationException() {
     doThrow(new AuthorizationException("aMessage"))
-      .when(externalTaskService)
-      .handleFailure(any(), any(), any(),any(), anyInt(), anyLong(), any(), any());
+        .when(externalTaskService)
+        .handleFailure(any(), any(), any(),any(), anyInt(), anyLong(), any(), any());
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
@@ -843,23 +928,23 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("retryTimeout", 12345);
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.FORBIDDEN.getStatusCode())
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo("aMessage"))
-    .when()
-      .post(HANDLE_EXTERNAL_TASK_FAILURE_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo("aMessage"))
+        .when()
+        .post(HANDLE_EXTERNAL_TASK_FAILURE_URL);
   }
 
   @Test
   public void testHandleFailureThrowsBadUserRequestException() {
     doThrow(new BadUserRequestException("aMessage"))
-      .when(externalTaskService)
-      .handleFailure(any(), any(), any(),any(), anyInt(), anyLong(), any(), any());
+        .when(externalTaskService)
+        .handleFailure(any(), any(), any(),any(), anyInt(), anyLong(), any(), any());
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
@@ -868,16 +953,16 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("retryTimeout", 12345);
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("aMessage"))
-    .when()
-      .post(HANDLE_EXTERNAL_TASK_FAILURE_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", equalTo("aMessage"))
+        .when()
+        .post(HANDLE_EXTERNAL_TASK_FAILURE_URL);
   }
 
   @Test
@@ -891,14 +976,14 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("variables", variables);
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .post(HANDLE_EXTERNAL_TASK_FAILURE_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .post(HANDLE_EXTERNAL_TASK_FAILURE_URL);
 
     verify(externalTaskService).handleFailure(
         eq("anExternalTaskId"),
@@ -924,14 +1009,14 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("localVariables", localVariables);
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .post(HANDLE_EXTERNAL_TASK_FAILURE_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .post(HANDLE_EXTERNAL_TASK_FAILURE_URL);
 
     verify(externalTaskService).handleFailure(
         eq("anExternalTaskId"),
@@ -953,14 +1038,14 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("errorCode", "anErrorCode");
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
 
     verify(externalTaskService).handleBpmnError("anExternalTaskId", "aWorkerId", "anErrorCode", null, null);
     verifyNoMoreInteractions(externalTaskService);
@@ -981,14 +1066,14 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("variables", variables);
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
 
     verify(externalTaskService).handleBpmnError(
         eq("anExternalTaskId"),
@@ -996,84 +1081,84 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
         eq("anErrorCode"),
         eq("anErrorMessage"),
         argThat(EqualsVariableMap.matches()
-          .matcher("var1", EqualsUntypedValue.matcher().value("val1"))
-          .matcher("var2", EqualsPrimitiveValue.stringValue("val2"))
-          .matcher("var3",
-            EqualsObjectValue.objectValueMatcher()
-              .type(ValueType.OBJECT)
-              .serializedValue("val3")
-              .serializationFormat("aFormat")
-              .objectTypeName("aRootType"))));
+            .matcher("var1", EqualsUntypedValue.matcher().value("val1"))
+            .matcher("var2", EqualsPrimitiveValue.stringValue("val2"))
+            .matcher("var3",
+                EqualsObjectValue.objectValueMatcher()
+                    .type(ValueType.OBJECT)
+                    .serializedValue("val3")
+                    .serializationFormat("aFormat")
+                    .objectTypeName("aRootType"))));
     verifyNoMoreInteractions(externalTaskService);
   }
 
   @Test
   public void testHandleBpmnErrorNonExistingTask() {
     doThrow(new NotFoundException())
-      .when(externalTaskService)
-      .handleBpmnError(any(), any(), any(), any(), any());
+        .when(externalTaskService)
+        .handleBpmnError(any(), any(), any(), any(), any());
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
     parameters.put("errorCode", "errorCode");
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NOT_FOUND.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("External task with id anExternalTaskId does not exist"))
-    .when()
-      .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", equalTo("External task with id anExternalTaskId does not exist"))
+        .when()
+        .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
   }
 
   @Test
   public void testHandleBpmnErrorThrowsAuthorizationException() {
     doThrow(new AuthorizationException("aMessage"))
-      .when(externalTaskService)
-      .handleBpmnError(any(), any(), any(), any(), any());
+        .when(externalTaskService)
+        .handleBpmnError(any(), any(), any(), any(), any());
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
     parameters.put("errorCode", "errorCode");
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.FORBIDDEN.getStatusCode())
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo("aMessage"))
-    .when()
-      .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo("aMessage"))
+        .when()
+        .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
   }
 
   @Test
   public void testHandleBpmnErrorThrowsBadUserRequestException() {
     doThrow(new BadUserRequestException("aMessage"))
-      .when(externalTaskService)
-      .handleBpmnError(any(), any(), any(), any(), any());
+        .when(externalTaskService)
+        .handleBpmnError(any(), any(), any(), any(), any());
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
     parameters.put("errorCode", "errorCode");
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("aMessage"))
-    .when()
-      .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", equalTo("aMessage"))
+        .when()
+        .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
   }
 
 
@@ -1083,14 +1168,14 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("retries", "5");
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .put(RETRIES_EXTERNAL_TASK_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .put(RETRIES_EXTERNAL_TASK_URL);
 
     verify(externalTaskService).setRetries("anExternalTaskId", 5);
     verifyNoMoreInteractions(externalTaskService);
@@ -1104,16 +1189,16 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("retries", "5");
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NOT_FOUND.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("External task with id anExternalTaskId does not exist"))
-    .when()
-      .put(RETRIES_EXTERNAL_TASK_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", equalTo("External task with id anExternalTaskId does not exist"))
+        .when()
+        .put(RETRIES_EXTERNAL_TASK_URL);
   }
 
   @Test
@@ -1124,16 +1209,16 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("retries", "5");
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.FORBIDDEN.getStatusCode())
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo("aMessage"))
-    .when()
-      .put(RETRIES_EXTERNAL_TASK_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo("aMessage"))
+        .when()
+        .put(RETRIES_EXTERNAL_TASK_URL);
   }
 
 
@@ -1144,14 +1229,14 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("priority", "5");
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .put(PRIORITY_EXTERNAL_TASK_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .put(PRIORITY_EXTERNAL_TASK_URL);
 
     verify(externalTaskService).setPriority("anExternalTaskId", 5);
     verifyNoMoreInteractions(externalTaskService);
@@ -1165,16 +1250,16 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("priority", "5");
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NOT_FOUND.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("External task with id anExternalTaskId does not exist"))
-    .when()
-      .put(PRIORITY_EXTERNAL_TASK_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", equalTo("External task with id anExternalTaskId does not exist"))
+        .when()
+        .put(PRIORITY_EXTERNAL_TASK_URL);
   }
 
   @Test
@@ -1185,16 +1270,16 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("priority", "5");
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.FORBIDDEN.getStatusCode())
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo("aMessage"))
-    .when()
-      .put(PRIORITY_EXTERNAL_TASK_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo("aMessage"))
+        .when()
+        .put(PRIORITY_EXTERNAL_TASK_URL);
   }
 
   @Test
@@ -1202,28 +1287,28 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     when(externalTaskQueryMock.singleResult()).thenReturn(externalTaskMock);
 
     given()
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.OK.getStatusCode())
-      .body("activityId", equalTo(MockProvider.EXAMPLE_ACTIVITY_ID))
-      .body("activityInstanceId", equalTo(MockProvider.EXAMPLE_ACTIVITY_INSTANCE_ID))
-      .body("errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
-      .body("executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
-      .body("id", equalTo(MockProvider.EXTERNAL_TASK_ID))
-      .body("lockExpirationTime", equalTo(MockProvider.EXTERNAL_TASK_LOCK_EXPIRATION_TIME))
-      .body("processDefinitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
-      .body("processDefinitionKey", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY))
-      .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
-      .body("retries", equalTo(MockProvider.EXTERNAL_TASK_RETRIES))
-      .body("suspended", equalTo(MockProvider.EXTERNAL_TASK_SUSPENDED))
-      .body("topicName", equalTo(MockProvider.EXTERNAL_TASK_TOPIC_NAME))
-      .body("workerId", equalTo(MockProvider.EXTERNAL_TASK_WORKER_ID))
-      .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
-      .body("priority", equalTo(MockProvider.EXTERNAL_TASK_PRIORITY))
-      .body("businessKey", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
-    .when()
-      .get(SINGLE_EXTERNAL_TASK_URL);
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("activityId", equalTo(MockProvider.EXAMPLE_ACTIVITY_ID))
+        .body("activityInstanceId", equalTo(MockProvider.EXAMPLE_ACTIVITY_INSTANCE_ID))
+        .body("errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
+        .body("executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
+        .body("id", equalTo(MockProvider.EXTERNAL_TASK_ID))
+        .body("lockExpirationTime", equalTo(MockProvider.EXTERNAL_TASK_LOCK_EXPIRATION_TIME))
+        .body("processDefinitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+        .body("processDefinitionKey", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY))
+        .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+        .body("retries", equalTo(MockProvider.EXTERNAL_TASK_RETRIES))
+        .body("suspended", equalTo(MockProvider.EXTERNAL_TASK_SUSPENDED))
+        .body("topicName", equalTo(MockProvider.EXTERNAL_TASK_TOPIC_NAME))
+        .body("workerId", equalTo(MockProvider.EXTERNAL_TASK_WORKER_ID))
+        .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
+        .body("priority", equalTo(MockProvider.EXTERNAL_TASK_PRIORITY))
+        .body("businessKey", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
+        .when()
+        .get(SINGLE_EXTERNAL_TASK_URL);
   }
 
   @Test
@@ -1231,14 +1316,14 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     when(externalTaskQueryMock.singleResult()).thenReturn(null);
 
     given()
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.NOT_FOUND.getStatusCode())
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("External task with id anExternalTaskId does not exist"))
-    .when()
-      .get(SINGLE_EXTERNAL_TASK_URL);
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", equalTo("External task with id anExternalTaskId does not exist"))
+        .when()
+        .get(SINGLE_EXTERNAL_TASK_URL);
   }
 
   @Test
@@ -1249,13 +1334,13 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("externalTaskIds", externalTaskIds);
 
     given()
-     .contentType(POST_JSON_CONTENT_TYPE)
-     .body(parameters)
-    .then()
-     .expect()
-     .statusCode(Status.OK.getStatusCode())
-    .when()
-     .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
 
     verify(externalTaskService).updateRetries();
     verifyNoMoreInteractions(externalTaskService);
@@ -1277,13 +1362,13 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("externalTaskIds", externalTaskIds);
 
     given()
-     .contentType(POST_JSON_CONTENT_TYPE)
-     .body(parameters)
-    .then()
-     .expect()
-     .statusCode(Status.OK.getStatusCode())
-    .when()
-     .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
 
     verify(externalTaskService).updateRetries();
     verifyNoMoreInteractions(externalTaskService);
@@ -1305,13 +1390,13 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("processInstanceIds", processInstanceIds);
 
     given()
-     .contentType(POST_JSON_CONTENT_TYPE)
-     .body(parameters)
-    .then()
-     .expect()
-     .statusCode(Status.OK.getStatusCode())
-    .when()
-     .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
 
     verify(externalTaskService).updateRetries();
     verifyNoMoreInteractions(externalTaskService);
@@ -1333,13 +1418,13 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("processInstanceIds", processInstanceIds);
 
     given()
-     .contentType(POST_JSON_CONTENT_TYPE)
-     .body(parameters)
-    .then()
-     .expect()
-     .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-     .put(RETRIES_EXTERNAL_TASK_SYNC_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .put(RETRIES_EXTERNAL_TASK_SYNC_URL);
 
     verify(externalTaskService).updateRetries();
     verifyNoMoreInteractions(externalTaskService);
@@ -1363,13 +1448,13 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("externalTaskIds", externalTaskIds);
 
     given()
-     .contentType(POST_JSON_CONTENT_TYPE)
-     .body(parameters)
-    .then()
-     .expect()
-     .statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when()
-     .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when()
+        .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
 
     verify(externalTaskService).updateRetries();
     verifyNoMoreInteractions(externalTaskService);
@@ -1393,13 +1478,13 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("externalTaskIds", externalTaskIds);
 
     given()
-     .contentType(POST_JSON_CONTENT_TYPE)
-     .body(parameters)
-    .then()
-     .expect()
-     .statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when()
-     .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when()
+        .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
 
     verify(externalTaskService).updateRetries();
     verifyNoMoreInteractions(externalTaskService);
@@ -1422,38 +1507,38 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     // test set retries to null synchronous
     given()
-    .contentType(POST_JSON_CONTENT_TYPE)
-    .body(parameters)
-    .then()
-    .expect()
-    .statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when()
-    .put(RETRIES_EXTERNAL_TASK_SYNC_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when()
+        .put(RETRIES_EXTERNAL_TASK_SYNC_URL);
 
     verify(updateRetriesBuilder, never()).set(anyInt());
 
     // test set retries to null asynchronous
     given()
-    .contentType(POST_JSON_CONTENT_TYPE)
-    .body(parameters)
-    .then()
-    .expect()
-    .statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when()
-    .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when()
+        .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
 
     verify(updateRetriesBuilder, never()).setAsync(anyInt());
 
     // test set retries to null on single task
     given()
-    .contentType(POST_JSON_CONTENT_TYPE)
-    .body(parameters)
-    .pathParam("id", "anExternalTaskId")
-    .then()
-    .expect()
-    .statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when()
-    .put(RETRIES_EXTERNAL_TASK_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when()
+        .put(RETRIES_EXTERNAL_TASK_URL);
 
     verify(externalTaskService, never()).setRetries(anyString() ,anyInt());
   }
@@ -1470,13 +1555,13 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("processInstanceQuery", processInstanceQuery);
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .then()
-      .expect()
-      .statusCode(Status.OK.getStatusCode())
-      .when()
-      .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
 
     ArgumentCaptor<ProcessInstanceQuery> queryCapture = ArgumentCaptor.forClass(ProcessInstanceQuery.class);
 
@@ -1508,13 +1593,13 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("historicProcessInstanceQuery", query);
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-    .then()
-      .expect()
-      .statusCode(Status.OK.getStatusCode())
-    .when()
-      .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
 
     ArgumentCaptor<HistoricProcessInstanceQuery> queryCapture = ArgumentCaptor.forClass(HistoricProcessInstanceQuery.class);
 
@@ -1546,13 +1631,13 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("processInstanceQuery", processInstanceQuery);
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-    .then()
-      .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .put(RETRIES_EXTERNAL_TASK_SYNC_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .put(RETRIES_EXTERNAL_TASK_SYNC_URL);
 
     ArgumentCaptor<ProcessInstanceQuery> queryCapture = ArgumentCaptor.forClass(ProcessInstanceQuery.class);
 
@@ -1584,13 +1669,13 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("historicProcessInstanceQuery", query);
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-    .then()
-      .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .put(RETRIES_EXTERNAL_TASK_SYNC_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .put(RETRIES_EXTERNAL_TASK_SYNC_URL);
 
     ArgumentCaptor<HistoricProcessInstanceQuery> queryCapture = ArgumentCaptor.forClass(HistoricProcessInstanceQuery.class);
 
@@ -1622,13 +1707,13 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("externalTaskQuery", query);
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-    .then()
-      .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .put(RETRIES_EXTERNAL_TASK_SYNC_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .put(RETRIES_EXTERNAL_TASK_SYNC_URL);
 
     ArgumentCaptor<ExternalTaskQuery> queryCapture = ArgumentCaptor.forClass(ExternalTaskQuery.class);
 
@@ -1661,13 +1746,13 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("externalTaskQuery", query);
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-    .then()
-      .expect()
-      .statusCode(Status.OK.getStatusCode())
-    .when()
-      .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
 
     ArgumentCaptor<ExternalTaskQuery> queryCapture = ArgumentCaptor.forClass(ExternalTaskQuery.class);
 
@@ -1699,10 +1784,10 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
         .pathParam("id", MockProvider.EXTERNAL_TASK_ID)
         .contentType(ContentType.JSON)
         .body(parameters)
-    .then()
+        .then()
         .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
+        .when()
         .post(LOCK_EXTERNAL_TASK);
 
     verify(externalTaskService).lock(MockProvider.EXTERNAL_TASK_ID, "workerId", 1000);
@@ -1721,10 +1806,10 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
         .pathParam("id", MockProvider.EXTERNAL_TASK_ID)
         .contentType(ContentType.JSON)
         .body(parameters)
-    .then()
+        .then()
         .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when()
+        .when()
         .post(LOCK_EXTERNAL_TASK);
 
   }
@@ -1741,10 +1826,10 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
         .pathParam("id", MockProvider.EXTERNAL_TASK_ID)
         .contentType(ContentType.JSON)
         .body(json)
-    .then()
+        .then()
         .expect()
         .statusCode(Status.NOT_FOUND.getStatusCode())
-    .when()
+        .when()
         .post(LOCK_EXTERNAL_TASK);
   }
 
@@ -1785,36 +1870,36 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   @Test
   public void shouldReturnErrorCodeWhenCompleting() {
     doThrow(new ProcessEngineException("foo", 123))
-      .when(externalTaskService)
-      .complete(any(), any(), any(), any());
+        .when(externalTaskService)
+        .complete(any(), any(), any(), any());
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .pathParam("id", "anExternalTaskId")
-    .then()
-      .expect()
-      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-      .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
-      .body("message", equalTo("foo"))
-      .body("code", equalTo(123))
-    .when()
-      .post(COMPLETE_EXTERNAL_TASK_URL);
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+        .body("message", equalTo("foo"))
+        .body("code", equalTo(123))
+        .when()
+        .post(COMPLETE_EXTERNAL_TASK_URL);
   }
 
   protected void validateExtendLockRequest(Map json, int statusCode) {
     given()
-      .pathParam("id", MockProvider.EXTERNAL_TASK_ID)
-      .contentType(ContentType.JSON)
-      .body(json)
-    .then()
-      .expect()
-      .statusCode(statusCode)
-    .when()
-      .post(EXTEND_LOCK_ON_EXTERNAL_TASK);
+        .pathParam("id", MockProvider.EXTERNAL_TASK_ID)
+        .contentType(ContentType.JSON)
+        .body(json)
+        .then()
+        .expect()
+        .statusCode(statusCode)
+        .when()
+        .post(EXTEND_LOCK_ON_EXTERNAL_TASK);
   }
 
   protected void executePost(Map<String, Object> parameters) {
@@ -1823,6 +1908,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
         .body(parameters)
         .header("accept", MediaType.APPLICATION_JSON)
         .then().expect().statusCode(Status.OK.getStatusCode())
+
         .body("[0].id", equalTo(MockProvider.EXTERNAL_TASK_ID))
         .body("[0].topicName", equalTo(MockProvider.EXTERNAL_TASK_TOPIC_NAME))
         .body("[0].workerId", equalTo(MockProvider.EXTERNAL_TASK_WORKER_ID))
@@ -1837,12 +1923,10 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
         .body("[0].retries", equalTo(MockProvider.EXTERNAL_TASK_RETRIES))
         .body("[0].errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
         .body("[0].priority", equalTo(MockProvider.EXTERNAL_TASK_PRIORITY))
-        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME,
-            notNullValue())
-        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".value",
-            equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
-        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".type",
-            equalTo("String"))
+        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME, notNullValue())
+        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".value", equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
+        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".type", equalTo("String"))
+
         .when().post(FETCH_EXTERNAL_TASK_URL);
   }
 

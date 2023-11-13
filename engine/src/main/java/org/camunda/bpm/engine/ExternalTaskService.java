@@ -23,10 +23,10 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.externaltask.CreateTimeConfig;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
+import org.camunda.bpm.engine.externaltask.FetchAndLockBuilder;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesBuilder;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesSelectBuilder;
 
@@ -46,7 +46,7 @@ public interface ExternalTaskService {
    * @param maxTasks the maximum number of tasks to return
    * @param workerId the id of the worker to lock the tasks for
    * @return a builder to define and execute an external task fetching operation
-   * @see {@link ExternalTaskService#fetchAndLock(int, java.lang.String, boolean, CreateTimeConfig)}.
+   * @see {@link ExternalTaskService#fetchAndLock(int, java.lang.String, boolean)}.
    */
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId);
 
@@ -89,11 +89,17 @@ public interface ExternalTaskService {
    * @param maxTasks the maximum number of tasks to return
    * @param workerId the id of the worker to lock the tasks for
    * @param usePriority the flag to enable the priority fetching mechanism
-   * @param createTimeConfig the config to control fetching by creation date
    * @return a builder to define and execute an external task fetching operation
    */
-  public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority,
-                                               CreateTimeConfig createTimeConfig);
+  public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority);
+
+  /**
+   * Fetch and Lock method which allows the configuration of all parameters through a Fluent API.
+   * Configuration options of the builder allow for extra sorting options such as sorting by createTime.
+   *
+   * @return a builder to define and execute an external task fetching operation
+   */
+  public FetchAndLockBuilder fetchAndLock();
 
   /**
    * <p>Lock an external task on behalf of a worker.

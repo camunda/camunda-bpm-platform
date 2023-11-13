@@ -19,9 +19,6 @@ package org.camunda.bpm.engine.test.api.externaltask;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
-import static org.camunda.bpm.engine.externaltask.CreateTimeConfig.ASC;
-import static org.camunda.bpm.engine.externaltask.CreateTimeConfig.DESC;
-import static org.camunda.bpm.engine.externaltask.CreateTimeConfig.EMPTY;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
@@ -166,7 +163,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess");
 
     // when
-    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID, true, null)
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID, true)
       .topic(TOPIC_NAME, LOCK_TIME)
       .execute();
 
@@ -208,8 +205,11 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
     // when
-    var result = externalTaskService.fetchAndLock(6, WORKER_ID, true, DESC)
+    var result = externalTaskService.fetchAndLock().maxTasks(6).workerId(WORKER_ID)
         .topic(TOPIC_NAME, LOCK_TIME)
+        .usePriority(true)
+        .orderByCreateTime().desc()
+
         .execute();
 
     assertThat(result.size()).isEqualTo(5);
@@ -244,7 +244,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
     // when
-    var result = externalTaskService.fetchAndLock(6, WORKER_ID, true, ASC)
+    var result = externalTaskService.fetchAndLock(6, WORKER_ID, true)
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
@@ -280,7 +280,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
     // when
-    var result = externalTaskService.fetchAndLock(6, WORKER_ID, false, ASC)
+    var result = externalTaskService.fetchAndLock(6, WORKER_ID, false)
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
@@ -307,8 +307,11 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
     // when
-    var result = externalTaskService.fetchAndLock(6, WORKER_ID, false, DESC)
+    var result = externalTaskService.fetchAndLock().maxTasks(5).workerId(WORKER_ID)
         .topic(TOPIC_NAME, LOCK_TIME)
+        .usePriority(false)
+        .orderByCreateTime().desc()
+
         .execute();
 
     assertThat(result.size()).isEqualTo(5);
@@ -334,7 +337,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
     // when
-    var result = externalTaskService.fetchAndLock(6, WORKER_ID, true, EMPTY)
+    var result = externalTaskService.fetchAndLock(6, WORKER_ID, true)
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
@@ -362,7 +365,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
     // when
-    var result = externalTaskService.fetchAndLock(6, WORKER_ID, true, null)
+    var result = externalTaskService.fetchAndLock(6, WORKER_ID, true)
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
@@ -383,7 +386,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess");
 
     // when
-    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(2, WORKER_ID, true, null)
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(2, WORKER_ID, true)
       .topic(TOPIC_NAME, LOCK_TIME)
       .execute();
     assertEquals(2, externalTasks.size());
@@ -403,7 +406,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
                                              Variables.createVariables().putValue("priority", 18));
 
     // when
-    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(2, WORKER_ID, true, null)
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(2, WORKER_ID, true)
       .topic(TOPIC_NAME, LOCK_TIME)
       .execute();
     assertEquals(2, externalTasks.size());
@@ -422,7 +425,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess",
                                                         Variables.createVariables().putValue("priority", 18));
     // when
-    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID, true, null)
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID, true)
       .topic(TOPIC_NAME, LOCK_TIME)
       .execute();
 
@@ -457,7 +460,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess");
 
     // when
-    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(2, WORKER_ID, true, null)
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(2, WORKER_ID, true)
       .topic(TOPIC_NAME, LOCK_TIME)
       .execute();
 
@@ -473,7 +476,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess");
 
     // when
-    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID, true, null)
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID, true)
       .topic(TOPIC_NAME, LOCK_TIME)
       .execute();
 
@@ -485,7 +488,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     AssertUtil.assertEqualsSecondPrecision(nowPlus(LOCK_TIME), task.getLockExpirationTime());
 
     // another task with next higher priority can be claimed
-    externalTasks = externalTaskService.fetchAndLock(1, "anotherWorkerId", true, null)
+    externalTasks = externalTaskService.fetchAndLock(1, "anotherWorkerId", true)
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
     assertEquals(1, externalTasks.size());
@@ -495,7 +498,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     ClockUtil.setCurrentTime(new DateTime(ClockUtil.getCurrentTime()).plus(LOCK_TIME * 2).toDate());
 
     //first can be claimed
-    externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID, true, null)
+    externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID, true)
       .topic(TOPIC_NAME, LOCK_TIME)
       .execute();
     assertEquals(1, externalTasks.size());
@@ -3032,7 +3035,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess");
 
     // when
-    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(2, WORKER_ID, true, null)
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(2, WORKER_ID, true)
       .topic(TOPIC_NAME, LOCK_TIME)
       .execute();
     assertEquals(2, externalTasks.size());
@@ -3043,7 +3046,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     ClockUtil.setCurrentTime(new DateTime(ClockUtil.getCurrentTime()).plus(LOCK_TIME * 2).toDate());
 
     // then
-    externalTasks = externalTaskService.fetchAndLock(1, "anotherWorkerId", true, null)
+    externalTasks = externalTaskService.fetchAndLock(1, "anotherWorkerId", true)
       .topic(TOPIC_NAME, LOCK_TIME)
       .execute();
     assertEquals(externalTasks.get(0).getPriority(), 9);
@@ -3066,7 +3069,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     // then the priority can be set
     externalTaskService.setPriority(externalTasks.get(0).getId(), 9);
 
-    externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID, true, null)
+    externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID, true)
       .topic(TOPIC_NAME, LOCK_TIME)
       .execute();
     assertEquals(1, externalTasks.size());

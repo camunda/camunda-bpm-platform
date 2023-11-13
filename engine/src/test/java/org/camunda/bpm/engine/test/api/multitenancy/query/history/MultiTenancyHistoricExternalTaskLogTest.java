@@ -33,7 +33,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.externaltask.CreateTimeConfig;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
@@ -353,7 +352,7 @@ public class MultiTenancyHistoricExternalTaskLogTest {
   // helper methods
 
   protected void completeExternalTask(String externalTaskId) {
-    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, WORKER_ID, true, null)
+    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, WORKER_ID, true)
       .topic(DEFAULT_TOPIC, LOCK_DURATION)
       .execute();
     externalTaskService.complete(externalTaskId, WORKER_ID);
@@ -382,12 +381,12 @@ public class MultiTenancyHistoricExternalTaskLogTest {
   }
 
   protected void reportExternalTaskFailure(String externalTaskId) {
-    reportExternalTaskFailure(externalTaskId, DEFAULT_TOPIC, WORKER_ID, 1, false, null, "This is an error!");
+    reportExternalTaskFailure(externalTaskId, DEFAULT_TOPIC, WORKER_ID, 1, false, "This is an error!");
   }
 
   protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId, Integer retries,
-                                           boolean usePriority, CreateTimeConfig createTimeConfig, String errorMessage) {
-    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority, createTimeConfig)
+                                           boolean usePriority, String errorMessage) {
+    List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority)
       .topic(topic, LOCK_DURATION)
       .execute();
     externalTaskService.handleFailure(externalTaskId, workerId, errorMessage, ERROR_DETAILS, retries, 0L);

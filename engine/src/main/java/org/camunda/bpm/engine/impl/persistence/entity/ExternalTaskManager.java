@@ -74,8 +74,11 @@ public class ExternalTaskManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<TopicFetchInstruction> queryFilters, int maxResults,
-                                                               boolean usePriority, boolean useCreateTime, Direction useCreateTimeDirection) {
+  public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<TopicFetchInstruction> queryFilters,
+                                                               int maxResults,
+                                                               boolean usePriority,
+                                                               boolean useCreateTime,
+                                                               Direction createTimeDirection) {
     if (queryFilters.isEmpty()) {
       return Collections.emptyList();
     }
@@ -84,7 +87,7 @@ public class ExternalTaskManager extends AbstractManager {
         "topics", queryFilters,
         "now", ClockUtil.getCurrentTime(),
         "applyOrdering", applyOrdering(usePriority, useCreateTime),
-        "orderingProperties", orderingProperties(usePriority, useCreateTime, useCreateTimeDirection),
+        "orderingProperties", orderingProperties(usePriority, useCreateTime, createTimeDirection),
         "usesPostgres", checkDatabaseType(POSTGRES, CRDB)
     );
 
@@ -125,7 +128,9 @@ public class ExternalTaskManager extends AbstractManager {
   }
 
   protected void updateExternalTaskSuspensionState(String processInstanceId,
-                                                   String processDefinitionId, String processDefinitionKey, SuspensionState suspensionState) {
+                                                   String processDefinitionId,
+                                                   String processDefinitionKey,
+                                                   SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("processDefinitionId", processDefinitionId);

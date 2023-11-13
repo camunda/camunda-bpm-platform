@@ -17,15 +17,17 @@
 package org.camunda.bpm.engine.rest.dto.externaltask;
 
 import static java.lang.Boolean.TRUE;
-import static org.camunda.bpm.engine.externaltask.CreateTimeConfig.DESC;
-import static org.camunda.bpm.engine.externaltask.CreateTimeConfig.EMPTY;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.externaltask.CreateTimeConfig;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
+import org.camunda.bpm.engine.externaltask.FetchAndLockBuilder;
+import org.camunda.bpm.engine.rest.dto.SortingDto;
 
 /**
  * @author Thorben Lindhauer
@@ -33,12 +35,20 @@ import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
  */
 public class FetchExternalTasksDto {
 
+  protected Map<String, BiConsumer<SortingDto, FetchAndLockBuilder>> SORT_BY_FIELD = Map.of(
+      "createTime", this::configureCreateTime
+  );
+
+  public static final String SORT_ORDER_ASC_VALUE = "asc";
+  public static final String SORT_ORDER_DESC_VALUE = "desc";
+
   protected int maxTasks;
   protected String workerId;
   protected boolean usePriority = false;
-  protected CreateTimeConfigDto createTimeConfig;
   protected List<FetchExternalTaskTopicDto> topics;
   protected boolean includeExtensionProperties = false;
+
+  protected List<SortingDto> sortings;
 
   public int getMaxTasks() {
     return maxTasks;
@@ -72,12 +82,12 @@ public class FetchExternalTasksDto {
     this.usePriority = usePriority;
   }
 
-  public CreateTimeConfigDto getCreateTimeConfig() {
-    return createTimeConfig;
+  public void setSortings(List<SortingDto> sortings) {
+    this.sortings = sortings;
   }
 
-  public void setCreateTimeConfig(CreateTimeConfigDto createTimeConfig) {
-    this.createTimeConfig = createTimeConfig;
+  public List<SortingDto> getSortings() {
+    return this.sortings;
   }
 
   public boolean isIncludeExtensionProperties() {
@@ -86,32 +96,6 @@ public class FetchExternalTasksDto {
 
   public void setIncludeExtensionProperties(boolean includeExtensionProperties) {
     this.includeExtensionProperties = includeExtensionProperties;
-  }
-
-  public static class CreateTimeConfigDto {
-
-    private boolean useCreateTime;
-    private Direction direction;
-
-    public boolean isUseCreateTime() {
-      return useCreateTime;
-    }
-
-    public void setUseCreateTime(boolean useCreateTime) {
-      this.useCreateTime = useCreateTime;
-    }
-
-    public Direction getDirection() {
-      return direction;
-    }
-
-    public void setDirection(Direction direction) {
-      this.direction = direction;
-    }
-
-    public enum Direction {
-      ASC, DESC
-    }
   }
 
   public static class FetchExternalTaskTopicDto {
@@ -225,11 +209,7 @@ public class FetchExternalTasksDto {
   }
 
   public ExternalTaskQueryBuilder buildQuery(ProcessEngine processEngine) {
-    var config = getConfigFromDto();
-
-    ExternalTaskQueryBuilder fetchBuilder = processEngine
-      .getExternalTaskService()
-      .fetchAndLock(getMaxTasks(), getWorkerId(), isUsePriority(), config);
+    ExternalTaskQueryBuilder fetchBuilder = getBuilder(processEngine);
 
     if (getTopics() != null) {
       for (FetchExternalTaskTopicDto topicDto : getTopics()) {
@@ -295,18 +275,37 @@ public class FetchExternalTasksDto {
     return fetchBuilder;
   }
 
-  protected CreateTimeConfig getConfigFromDto() {
-    var dto = getCreateTimeConfig();
+  protected void configureSorting(FetchAndLockBuilder builder, List<SortingDto> sortings) {
+    sortings = (sortings == null) ? Collections.emptyList() : sortings;
 
-    if (dto == null || !dto.isUseCreateTime()) {
-      return EMPTY;
+    for (SortingDto sorting : sortings) {
+      String sortBy = sorting.getSortBy();
+      if (sortBy != null) {
+        SORT_BY_FIELD.get(sortBy).accept(sorting, builder);
+      }
     }
+  }
 
-    if (dto.getDirection() == null) {
-      return DESC;
+  protected FetchAndLockBuilder getBuilder(ProcessEngine engine) {
+    FetchAndLockBuilder builder = engine
+        .getExternalTaskService()
+        .fetchAndLock()
+        .workerId(workerId)
+        .maxTasks(maxTasks)
+        .usePriority(usePriority);
+
+    configureSorting(builder, sortings);
+
+    return builder;
+  }
+
+  protected void configureCreateTime(SortingDto dto, FetchAndLockBuilder builder) {
+    switch (dto.getSortBy()) {
+    case SORT_ORDER_ASC_VALUE:
+      builder.orderByCreateTime().asc();
+    case SORT_ORDER_DESC_VALUE:
+      builder.orderByCreateTime().desc();
     }
-
-    return CreateTimeConfig.valueOf(dto.getDirection().name());
   }
 
 }

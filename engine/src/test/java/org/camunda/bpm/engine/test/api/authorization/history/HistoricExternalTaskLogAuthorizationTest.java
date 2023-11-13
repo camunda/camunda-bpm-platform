@@ -369,7 +369,7 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
   }
 
   protected void completeExternalTaskWithFailure(String externalTaskId) {
-    List<LockedExternalTask> list = externalTaskService.fetchAndLock(5, WORKER_ID, false, null)
+    List<LockedExternalTask> list = externalTaskService.fetchAndLock(5, WORKER_ID, false)
       .topic(DEFAULT_TOPIC, LOCK_DURATION)
       .execute();
     externalTaskService.handleFailure(externalTaskId, WORKER_ID, "This is an error!", ERROR_DETAILS, 1, 0L);
