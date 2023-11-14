@@ -790,13 +790,13 @@ public class BoundaryTimerNonInterruptingEventTest {
     // then a job is due in 2 hours
     assertThat(jobQuery.count()).isEqualTo(1);
     assertThat(jobQuery.singleResult().getDuedate())
-        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + TWO_HOURS));
+      .isCloseTo(new Date(ClockUtil.getCurrentTime().getTime() + TWO_HOURS), 5000);
 
     moveByHours(2); // execute first job of the new cycle
 
     // then a job is due in 2 hours
     assertThat(jobQuery.singleResult().getDuedate())
-        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + TWO_HOURS));
+      .isCloseTo(new Date(ClockUtil.getCurrentTime().getTime() + TWO_HOURS), 5000);
     assertThat(jobQuery.count()).isEqualTo(1);
 
     moveByHours(2);  // execute second job of the new cycle => no more jobs
@@ -827,13 +827,13 @@ public class BoundaryTimerNonInterruptingEventTest {
     // then one more job is left due in 1 hours
     assertThat(jobQuery.count()).isEqualTo(1);
     assertThat(jobQuery.singleResult().getDuedate())
-        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + ONE_HOUR));
+      .isCloseTo(new Date(ClockUtil.getCurrentTime().getTime() + ONE_HOUR), 5000);
 
     moveByHours(1); // execute first job of the new cycle
 
      // then a job is due in 1 hours
     assertThat(jobQuery.singleResult().getDuedate())
-        .isEqualToIgnoringMinutes(new Date(ClockUtil.getCurrentTime().getTime() + ONE_HOUR));
+      .isCloseTo(new Date(ClockUtil.getCurrentTime().getTime() + ONE_HOUR), 5000);
     assertThat(jobQuery.count()).isEqualTo(1);
 
     moveByHours(1); // execute second job of the new cycle => no more jobs
