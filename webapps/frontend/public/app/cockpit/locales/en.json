@@ -386,6 +386,8 @@
     "PLGN_ACTIVITY_INSTANCE_PERIOD_TIME_PERIOD": "Instance Start Time:",
     "PLGN_ACTIVITY_INSTANCE_PERIOD_TODAY": "Last 24 hours",
     "PLGN_ACTIVITY_INSTANCE_PERIOD_WEEK": "Last 7 days",
+    "PLGN_ACTIVITY_INSTANCE_PERIOD_5MIN": "Last 5 minutes",
+    "PLGN_ACTIVITY_INSTANCE_PERIOD_HOUR": "Last 1 hour",
     "PLGN_ADJ_BACK": "Back",
     "PLGN_ADJ_CANCEL": "Cancel",
     "PLGN_ADJ_DELETE_DECISION_INSTANCES": "Delete decision instances",

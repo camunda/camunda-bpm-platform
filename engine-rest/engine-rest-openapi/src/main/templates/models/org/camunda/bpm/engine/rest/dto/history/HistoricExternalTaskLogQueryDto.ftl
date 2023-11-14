@@ -3,7 +3,7 @@
 <@lib.dto desc = "A Historic External Task Log instance query which defines a list of Historic External Task Log instances">
     
     <#include "/lib/commons/historic-external-task-log-query-params.ftl">
-    <@lib.properties params/>    
+    <@lib.properties params/>
     "sorting": {
        "type": "array",
        "nullable": true,

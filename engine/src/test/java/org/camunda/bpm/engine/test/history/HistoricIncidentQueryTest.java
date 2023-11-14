@@ -25,7 +25,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -497,6 +496,50 @@ public class HistoricIncidentQueryTest {
     try {
       query.configuration(null);
       fail("It was possible to set a null value as configuration.");
+    } catch (ProcessEngineException e) { }
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  public void testQueryByHistoryConfiguration() {
+    startProcessInstance(PROCESS_DEFINITION_KEY);
+
+    // get the latest historic job log id
+    Integer latestJobLogId = historyService.createHistoricJobLogQuery().list()
+        .stream()
+        .map(hjl -> Integer.parseInt(hjl.getId()))
+        .max(Integer::compare)
+        .get();
+
+    HistoricIncidentQuery query = historyService.createHistoricIncidentQuery()
+        .historyConfiguration(latestJobLogId.toString());
+
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  public void testQueryByNotExistingHistoryConfiguration() {
+    startProcessInstance(PROCESS_DEFINITION_KEY);
+
+    HistoricIncidentQuery query = historyService.createHistoricIncidentQuery()
+        .historyConfiguration("-1");
+
+    assertEquals(0, query.list().size());
+    assertEquals(0, query.count());
+  }
+
+  @Test
+  public void testQueryByInvalidHistoryConfigurationId() {
+    HistoricIncidentQuery query = historyService.createHistoricIncidentQuery();
+
+    assertEquals(0, query.historyConfiguration("invalid").list().size());
+    assertEquals(0, query.historyConfiguration("invalid").count());
+
+    try {
+      query.historyConfiguration(null);
+      fail("It was possible to set a null value as history configuration.");
     } catch (ProcessEngineException e) { }
   }
 

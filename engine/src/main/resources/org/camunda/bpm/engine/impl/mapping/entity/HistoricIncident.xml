@@ -488,6 +488,9 @@
       <if test="configuration != null">
         and RES.CONFIGURATION_ = #{configuration}
       </if>
+      <if test="historyConfiguration != null">
+        and RES.HISTORY_CONFIGURATION_ = #{historyConfiguration}
+      </if>
       <if test="incidentState != null">
         and RES.INCIDENT_STATE_ = #{incidentState.stateCode}
       </if>

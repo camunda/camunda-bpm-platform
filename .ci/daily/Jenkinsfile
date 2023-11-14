@@ -147,6 +147,60 @@ pipeline {
             }
           }
         }
+        stage('platform-DISTRO-maven-central') {
+          when {
+            expression {
+              // trigger stage only on the master branch
+              env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'h2_perf32',
+              runSteps: {
+                cambpmRunMaven('.',
+                  "deploy source:jar source:test-jar javadoc:javadoc -Dskip-zip-frontend-sources=true -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -B",
+                  withNpm: true,
+                  jdkVersion: 'jdk-17-latest')
+                script {
+                  str = 's@:camunda-nexus:.*\\\$@:central:https://oss.sonatype.org/content/repositories/snapshots@g'
+                  sh(label: 'Change staging from Nexus to Maven Central snapshots', script: 'sed -i ' + str + ' staging/deferred/.index')
+                }
+
+                cambpmRunMaven('.',
+                  "org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true -B",
+                  withNpm: true,
+                  jdkVersion: 'jdk-17-latest')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+              }
+            ])
+          }
+        }
+        stage('platform-public-nexus') {
+          when {
+            expression {
+              // trigger stage only on the master branch
+              env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'h2_perf32',
+              runSteps: {
+                cambpmRunMaven('.',
+                  "install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -B",
+                  withNpm: true,
+                  jdkVersion: 'jdk-17-latest',
+                  settingsXml: 'public-repo')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+              }
+            ])
+          }
+        }
       }
     }
     stage('Standalone QA tests') {

@@ -386,6 +386,8 @@
     "PLGN_ACTIVITY_INSTANCE_PERIOD_TIME_PERIOD": "Zeitraum:",
     "PLGN_ACTIVITY_INSTANCE_PERIOD_TODAY": "Innerhalb von 24 Stunden",
     "PLGN_ACTIVITY_INSTANCE_PERIOD_WEEK": "Innerhalb von 7 Tagen",
+    "PLGN_ACTIVITY_INSTANCE_PERIOD_5MIN": "Innerhalb von 5 Minuten",
+    "PLGN_ACTIVITY_INSTANCE_PERIOD_HOUR": "Innerhalb von 1 Stunde",
     "PLGN_ADJ_BACK": "Zurück",
     "PLGN_ADJ_CANCEL": "Schließen",
     "PLGN_ADJ_DELETE_DECISION_INSTANCES": "Decision-Instanzen löschen",

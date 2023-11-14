@@ -33,28 +33,11 @@ import org.springframework.test.context.ActiveProfiles;
  * Note: To run this test via an IDE you must set the system property
  * {@code sun.net.http.allowRestrictedHeaders} to {@code true}.
  * (e.g. System.setProperty("sun.net.http.allowRestrictedHeaders", "true");)
- * 
+ *
  * @see https://jira.camunda.com/browse/CAM-11290
  */
 @ActiveProfiles(profiles = { "test-cors-enabled" }, inheritProfiles = true)
 public class CorsConfigurationEnabledWildcardTest extends AbstractRestTest {
-
-  @Test
-  public void shouldPassSameOriginRequest() {
-    // given
-    // same origin
-    String origin = "http://localhost:" + localPort;
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.add(HttpHeaders.ORIGIN, origin);
-
-    // when
-    ResponseEntity<List> response = testRestTemplate.exchange(CONTEXT_PATH + "/task", HttpMethod.GET, new HttpEntity<>(headers), List.class);
-
-    // then
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(response.getHeaders().getAccessControlAllowOrigin()).contains("*");
-  }
 
   @Test
   public void shouldPassCrossOriginRequest() {

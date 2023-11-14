@@ -15,12 +15,11 @@
 
     <#assign last = false >
     <#include "/lib/commons/historic-incident-query-params.ftl" >
+    <#assign last = true >
     <@lib.parameters
         object = params
         last = last
     />
-    <#assign last = true >
-    <#include "/lib/commons/sort-params.ftl">
 
   ],
 

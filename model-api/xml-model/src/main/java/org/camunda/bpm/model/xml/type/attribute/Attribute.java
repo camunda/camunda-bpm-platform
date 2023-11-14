@@ -53,6 +53,8 @@ public interface Attribute<T> {
 
   T getDefaultValue();
 
+  void removeAttribute(ModelElementInstance modelElement);
+
   boolean isRequired();
 
   /**

@@ -47,8 +47,7 @@ public class CorsConfigAllowCredentialsTest extends AbstractRestTest {
   @Test
   public void shouldRespondWithSupportedCredentials() {
     // given
-    // same origin
-    String origin = "http://localhost:" + localPort;
+    String origin = "http://other.origin:8081";
 
     HttpHeaders headers = new HttpHeaders();
     headers.add(HttpHeaders.ORIGIN, origin);
