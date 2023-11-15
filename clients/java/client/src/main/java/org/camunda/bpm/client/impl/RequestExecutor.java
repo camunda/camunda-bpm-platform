@@ -19,21 +19,21 @@ package org.camunda.bpm.client.impl;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.AbstractResponseHandler;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.StatusLine;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.ResponseHandler;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.core5.http.io.support.BasicRequestBuilder;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.apache.hc.core5.http.impl.io.AbstractResponseHandler;
+import org.apache.hc.client5.http.impl.sync.HttpClientBuilder;
+import org.apache.hc.client5.http.sync.HttpClients;
+import org.apache.hc.core5.http.message.BasicHeader;
+import org.apache.hc.core5.util.EntityUtils;
 import org.camunda.bpm.client.exception.EngineException;
 import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
@@ -65,7 +65,7 @@ public class RequestExecutor {
 
   protected <T> T postRequest(String resourceUrl, RequestDto requestDto, Class<T> responseClass) {
     ByteArrayEntity serializedRequest = serializeRequest(requestDto);
-    HttpUriRequest httpRequest = RequestBuilder.post(resourceUrl)
+    HttpUriRequest httpRequest = ClassicRequestBuilder.post(resourceUrl)
       .addHeader(HEADER_USER_AGENT)
       .addHeader(HEADER_CONTENT_TYPE_JSON)
       .setEntity(serializedRequest)

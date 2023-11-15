@@ -14,8 +14,8 @@
   </parent>
 
   <properties>
-    <version.httpclient>4.5.13</version.httpclient>
-
+    <version.httpclient>5.2.1</version.httpclient>
+    <version.httpmime>4.5.13</version.httpmime>
     <engine.runtime>${project.build.directory}/camunda-tomcat</engine.runtime>
     <tomcat.runtime>${engine.runtime}/server/apache-tomcat-${version.tomcat}</tomcat.runtime>
     <http.port>${tomcat.connector.http.port}</http.port>
@@ -63,8 +63,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
       <version>${version.httpclient}</version>
     </dependency>
 
@@ -102,7 +102,7 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpmime</artifactId>
-      <version>${version.httpclient}</version>
+      <version>${version.httpmime}</version>
       <scope>test</scope>
     </dependency>
 
