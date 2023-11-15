@@ -44,6 +44,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.util.StringUtil;
@@ -2158,6 +2159,317 @@ public class MessageCorrelationTest {
     } catch (BadUserRequestException e){
       testRule.assertTextPresent("Cannot specify correlation variables ", e.getMessage());
     }
+  }
+
+  @Test
+  public void testCorrelationNonInterruptingLocalVariablesNewScopeCondition() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("Process_1")
+        .startEvent()
+        .userTask("UserTask_1")
+          .boundaryEvent("messageB")
+          .cancelActivity(false)
+          .message("1")
+            .exclusiveGateway("gateway")
+            .condition("outputValue", "${testLocalVar == 'outputValue'}")
+              .userTask("afterMessage")
+              .endEvent("happyEnd")
+            .moveToLastGateway()
+            .condition("outputValue", "${testLocalVar != 'outputValue'}")
+              .userTask("wrongOutcome")
+              .endEvent("unhappyEnd")
+        .done();
+
+    System.out.println(Bpmn.convertToString(model));
+    testRule.deploy(model);
+
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("processInstanceVar", "processInstanceVarValue");
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
+
+    Map<String, Object> messageLocalPayload = new HashMap<>();
+    String outpuValue = "outputValue";
+    String localVarName = "testLocalVar";
+    messageLocalPayload.put(localVarName, outpuValue);
+
+    // when
+    runtimeService
+        .createMessageCorrelation("1")
+//        .setVariablesLocal(messageLocalPayload)
+        .setNewScopeVariablesLocal(messageLocalPayload)
+        .correlateWithResultAndVariables(true);
+
+    // then
+    //TODO is it better to check the history instead of using user task?
+    Execution activityInstance = runtimeService.createExecutionQuery().activityId("afterMessage").singleResult();
+    assertThat(activityInstance).isNotNull();
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstance.getId())
+        .variableName(localVarName)
+        .variableScopeIdIn(activityInstance.getId())
+        .singleResult();
+    assertNotNull(variable);
+    assertEquals(outpuValue, variable.getValue());
+    assertEquals(activityInstance.getId(), variable.getExecutionId());
+  }
+
+  @Test
+  public void testCorrelationNonInterruptingLocalVariablesNewScope() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("Process_1")
+        .startEvent()
+          .userTask("UserTask_1")
+            .boundaryEvent("messageB")
+            .cancelActivity(false)
+            .message("1")
+            .userTask("after_message")
+        .endEvent()
+        .done();
+
+    System.out.println(Bpmn.convertToString(model));
+    testRule.deploy(model);
+
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("processInstanceVar", "processInstanceVarValue");
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
+
+    Map<String, Object> messageLocalPayload = new HashMap<>();
+    String outpuValue = "outputValue";
+    String localVarName = "testLocalVar";
+    messageLocalPayload.put(localVarName, outpuValue);
+
+    // when
+    runtimeService
+        .createMessageCorrelation("1")
+        .setNewScopeVariablesLocal(messageLocalPayload)
+//        .setVariablesLocal(messageLocalPayload)
+        .correlateWithResultAndVariables(true);
+
+    // then
+    Execution activityInstance = runtimeService.createExecutionQuery().activityId("after_message").singleResult();
+    assertThat(activityInstance).isNotNull();
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstance.getId())
+        .variableName(localVarName)
+        .variableScopeIdIn(activityInstance.getId())
+        .singleResult();
+    assertNotNull(variable);
+    assertEquals(outpuValue, variable.getValue());
+    assertEquals(activityInstance.getId(), variable.getExecutionId());
+  }
+
+  @Test
+  public void testCorrelationInterruptingLocalVariablesNewScopeCondition() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("Process_1")
+        .startEvent()
+        .userTask("UserTask_1")
+          .boundaryEvent("messageB")
+          .cancelActivity(true)
+          .message("1")
+            .exclusiveGateway("gateway")
+            .condition("outputValue", "${testLocalVar == 'outputValue'}")
+              .userTask("afterMessage")
+              .endEvent("happyEnd")
+            .moveToLastGateway()
+            .condition("outputValue", "${testLocalVar != 'outputValue'}")
+              .userTask("wrongOutcome")
+              .endEvent("unhappyEnd")
+        .done();
+
+    System.out.println(Bpmn.convertToString(model));
+    testRule.deploy(model);
+
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("processInstanceVar", "processInstanceVarValue");
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
+
+    Map<String, Object> messageLocalPayload = new HashMap<>();
+    String outpuValue = "outputValue";
+    String localVarName = "testLocalVar";
+    messageLocalPayload.put(localVarName, outpuValue);
+
+    // when
+    runtimeService
+        .createMessageCorrelation("1")
+//        .setVariablesLocal(messageLocalPayload)
+        .setNewScopeVariablesLocal(messageLocalPayload)
+        .correlateWithResultAndVariables(true);
+
+    // then
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstance.getId())
+        .variableName(localVarName)
+        .singleResult();
+    assertNotNull(variable);
+    assertEquals(outpuValue, variable.getValue());
+    assertEquals(processInstance.getId(), variable.getExecutionId());
+  }
+
+  @Test
+  public void testCorrelationInterruptingLocalVariablesNewScope() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("Process_1")
+        .startEvent()
+        .userTask("UserTask_1")
+        .boundaryEvent("messageB")
+        .cancelActivity(true)
+        .message("1")
+        .userTask("after_message")
+        .endEvent()
+        .done();
+
+    System.out.println(Bpmn.convertToString(model));
+    testRule.deploy(model);
+
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("processInstanceVar", "processInstanceVarValue");
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
+
+    Map<String, Object> messageLocalPayload = new HashMap<>();
+    String outpuValue = "outputValue";
+    String localVarName = "testLocalVar";
+    messageLocalPayload.put(localVarName, outpuValue);
+
+    // when
+    runtimeService
+        .createMessageCorrelation("1")
+        .setNewScopeVariablesLocal(messageLocalPayload)
+        .correlateWithResultAndVariables(true);
+
+    // then
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstance.getId())
+        .variableName(localVarName)
+        .singleResult();
+    assertNotNull(variable);
+    assertEquals(outpuValue, variable.getValue());
+    assertEquals(processInstance.getId(), variable.getExecutionId());
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.shouldReturn1.bpmn20.xml")
+  public void testCorrelationEventSubInterruptingLocalVariablesNewScope() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("processInstanceVar", "processInstanceVarValue");
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
+
+    Map<String, Object> messageLocalPayload = new HashMap<>();
+    String outpuValue = "outputValue";
+    String localVarName = "testLocalVar";
+    messageLocalPayload.put(localVarName, outpuValue);
+
+    // when
+    runtimeService
+        .createMessageCorrelation("1")
+        .setNewScopeVariablesLocal(messageLocalPayload)
+//        .setVariablesLocal(messageLocalPayload)
+        .correlateWithResultAndVariables(true);
+
+    // then
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstance.getId())
+        .variableName(localVarName)
+        .singleResult();
+    assertNotNull(variable);
+
+    Execution activityInstance = runtimeService.createExecutionQuery()
+        .executionId(variable.getExecutionId())
+        .activityId("after_message")
+        .singleResult();
+    assertThat(activityInstance).isNotNull();
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.shouldReturn2.bpmn20.xml")
+  public void testCorrelationEventSubNonInterruptingLocalVariablesNewScope() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("processInstanceVar", "processInstanceVarValue");
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
+
+    Map<String, Object> messageLocalPayload = new HashMap<>();
+    String outpuValue = "outputValue";
+    String localVarName = "testLocalVar";
+    messageLocalPayload.put(localVarName, outpuValue);
+
+    // when
+    runtimeService
+        .createMessageCorrelation("1")
+        .setNewScopeVariablesLocal(messageLocalPayload)
+//        .setVariablesLocal(messageLocalPayload)
+        .correlateWithResultAndVariables(true);
+
+    // then
+  //TODO compare with the right id
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstance.getId())
+        .variableName(localVarName)
+        .singleResult();
+    assertNotNull(variable);
+
+    Execution activityInstance = runtimeService.createExecutionQuery()
+        .executionId(variable.getExecutionId())
+        .activityId("after_message")
+        .singleResult();
+    assertThat(activityInstance).isNotNull();
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.shouldReturn3.bpmn20.xml")
+  public void testCorrelationEventSubNonInterruptingLocalVariablesNewScopeCondition() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("processInstanceVar", "processInstanceVarValue");
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
+
+    Map<String, Object> messageLocalPayload = new HashMap<>();
+    String outpuValue = "outputValue";
+    String localVarName = "testLocalVar";
+    messageLocalPayload.put(localVarName, outpuValue);
+
+    // when
+    runtimeService
+        .createMessageCorrelation("1")
+        .setNewScopeVariablesLocal(messageLocalPayload)
+//        .setVariablesLocal(messageLocalPayload)
+        .correlateWithResultAndVariables(true);
+
+    // then
+    HistoricActivityInstance singleResult = engineRule.getHistoryService().createHistoricActivityInstanceQuery().activityId("happyEnd").singleResult();
+    assertThat(singleResult).isNotNull();
+  }
+
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.shouldReturn4.bpmn20.xml")
+  public void testCorrelationEventSubInterruptingLocalVariablesNewScopeCondition() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("processInstanceVar", "processInstanceVarValue");
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
+
+    Map<String, Object> messageLocalPayload = new HashMap<>();
+    String outpuValue = "outputValue";
+    String localVarName = "testLocalVar";
+    messageLocalPayload.put(localVarName, outpuValue);
+
+    // when
+    runtimeService
+        .createMessageCorrelation("1")
+        .setNewScopeVariablesLocal(messageLocalPayload)
+        .correlateWithResultAndVariables(true);
+
+    // then
+    HistoricActivityInstance singleResult = engineRule.getHistoryService().createHistoricActivityInstanceQuery().activityId("happyEnd").singleResult();
+    assertThat(singleResult).isNotNull();
   }
 
   protected void deployTwoVersionsWithStartMessageEvent() {

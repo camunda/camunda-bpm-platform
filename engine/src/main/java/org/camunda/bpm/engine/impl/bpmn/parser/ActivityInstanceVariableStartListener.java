@@ -14,18 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.event;
+package org.camunda.bpm.engine.impl.bpmn.parser;
 
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
+import java.util.Map;
 
-/**
- * @author Daniel Meyer
- */
-public interface EventHandler {
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 
-  public String getEventHandlerType();
+public class ActivityInstanceVariableStartListener implements ExecutionListener {
 
-  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, Object localPayload, Object newScopePayload, String businessKey, CommandContext commandContext);
+  protected Map<String, Object> payload;
+
+  public ActivityInstanceVariableStartListener(Map<String, Object> payload) {
+    this.payload = payload;
+  }
+
+  @Override
+  public void notify(DelegateExecution execution) throws Exception {
+    execution.setVariablesLocal(payload);
+  }
 
 }
