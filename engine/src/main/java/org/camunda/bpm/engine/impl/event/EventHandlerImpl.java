@@ -58,7 +58,9 @@ public class EventHandlerImpl implements EventHandler {
     }
     //add temporary listener to right activity that doesn't have the scope yet
     if (newScopePayload instanceof Map) {
-      activity.addBuiltInListener(ExecutionListener.EVENTNAME_START, new ActivityInstanceVariableStartListener((Map<String, Object>)newScopePayload));
+//      activity.addBuiltInListener(ExecutionListener.EVENTNAME_START, new ActivityInstanceVariableStartListener((Map<String, Object>)newScopePayload));
+//      activity.addExecutionListener(ExecutionListener.EVENTNAME_START, new ActivityInstanceVariableStartListener((Map<String, Object>)newScopePayload));
+      activity.addListener(ExecutionListener.EVENTNAME_START, new ActivityInstanceVariableStartListener((Map<String, Object>)newScopePayload));
     }
 
     if(activity.equals(execution.getActivity())) {
