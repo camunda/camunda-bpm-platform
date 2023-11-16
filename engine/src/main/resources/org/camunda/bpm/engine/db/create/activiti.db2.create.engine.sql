@@ -112,6 +112,7 @@ create table ACT_RU_JOB (
     LOCK_OWNER_ varchar(255),
     EXCLUSIVE_ smallint check(EXCLUSIVE_ in (1,0)),
     EXECUTION_ID_ varchar(64),
+    ROOT_PROCESS_INSTANCE_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
     PROCESS_DEF_ID_ varchar(64),
     PROCESS_DEF_KEY_ varchar(255),

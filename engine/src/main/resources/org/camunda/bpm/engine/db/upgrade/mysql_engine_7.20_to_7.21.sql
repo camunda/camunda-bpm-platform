@@ -20,3 +20,6 @@ values ('1000', CURRENT_TIMESTAMP, '7.21.0');
 
 alter table ACT_RU_EXT_TASK
   add column CREATE_TIME_ datetime;
+
+ALTER TABLE ACT_RU_JOB
+  ADD ROOT_PROCESS_INSTANCE_ID_ varchar(64);
