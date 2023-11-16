@@ -72,7 +72,10 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
       lockJob(job);
 
       if(job.isExclusive()) {
-        List<String> list = exclusiveJobsByProcessInstance.computeIfAbsent(job.getRootProcessInstanceId(), key -> new ArrayList<>());
+        // TODO check engine config
+        String processInstanceId = job.getRootProcessInstanceId() != null ?
+            job.getRootProcessInstanceId() : job.getProcessInstanceId();
+        List<String> list = exclusiveJobsByProcessInstance.computeIfAbsent(processInstanceId, key -> new ArrayList<>());
         list.add(job.getId());
       }
       else {
