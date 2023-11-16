@@ -26,7 +26,6 @@ import static org.junit.Assert.fail;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
@@ -44,7 +43,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
   public void testProcessDefinitionStatisticsQueryWithFailedJobs() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
 
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("fail", true);
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
@@ -68,7 +67,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
   public void testProcessDefinitionStatisticsQueryWithIncidents() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
 
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("fail", true);
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
@@ -98,7 +97,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
   public void testProcessDefinitionStatisticsQueryWithIncidentType() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
 
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("fail", true);
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
@@ -128,7 +127,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
   public void testProcessDefinitionStatisticsQueryWithInvalidIncidentType() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
 
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("fail", true);
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
@@ -153,7 +152,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
   public void testProcessDefinitionStatisticsQueryWithIncidentsAndFailedJobs() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
 
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("fail", true);
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
@@ -337,7 +336,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
         .processDefinitionKey("ExampleProcess")
         .list();
 
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("fail", true);
 
     for (ProcessDefinition definition : definitions) {
@@ -681,19 +680,20 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
 
     ProcessDefinitionStatistics processDefinitionStatistics = managementService.createProcessDefinitionStatisticsQuery().singleResult();
 
-    assertEquals("testProcess", processDefinitionStatistics.getKey());
-    assertEquals("process name", processDefinitionStatistics.getName());
-    assertEquals("Examples", processDefinitionStatistics.getCategory());
-    assertEquals(null, processDefinitionStatistics.getDescription()); // it is not parsed for the statistics query
-    assertEquals("tenant1", processDefinitionStatistics.getTenantId());
-    assertEquals("v0.1.0", processDefinitionStatistics.getVersionTag());
-    assertEquals(deploymentId, processDefinitionStatistics.getDeploymentId());
-    assertEquals(resourceName, processDefinitionStatistics.getResourceName());
-    assertEquals(null, processDefinitionStatistics.getDiagramResourceName());
-    assertEquals(1, processDefinitionStatistics.getVersion());
-    assertEquals(0, processDefinitionStatistics.getInstances());
-    assertEquals(0, processDefinitionStatistics.getFailedJobs());
-    assertTrue(processDefinitionStatistics.getIncidentStatistics().isEmpty());
+    assertThat(processDefinitionStatistics.getKey()).isEqualTo("testProcess");
+    assertThat(processDefinitionStatistics.getName()).isEqualTo("process name");
+    assertThat(processDefinitionStatistics.getCategory()).isEqualTo("Examples");
+    assertThat(processDefinitionStatistics.getDescription()).isNull(); // it is not parsed for the statistics query
+    assertThat(processDefinitionStatistics.getTenantId()).isEqualTo("tenant1");
+    assertThat(processDefinitionStatistics.getVersionTag()).isEqualTo("v0.1.0");
+    assertThat(processDefinitionStatistics.getDeploymentId()).isEqualTo(deploymentId);
+    assertThat(processDefinitionStatistics.getResourceName()).isEqualTo(resourceName);
+    assertThat(processDefinitionStatistics.getDiagramResourceName()).isNull();
+    assertThat(processDefinitionStatistics.getVersion()).isEqualTo(1);
+    assertThat(processDefinitionStatistics.getInstances()).isEqualTo(0);
+    assertThat(processDefinitionStatistics.getFailedJobs()).isEqualTo(0);
+    assertThat(processDefinitionStatistics.getIncidentStatistics()).isEmpty();
+    assertThat(processDefinitionStatistics.isStartableInTasklist()).isTrue();
   }
 
 }

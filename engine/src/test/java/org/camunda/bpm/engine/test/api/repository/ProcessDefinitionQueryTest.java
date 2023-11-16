@@ -27,7 +27,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -90,6 +89,7 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     assertThat(processDefinition.getDescription()).isEqualTo("Desc one");
     assertThat(processDefinition.getId()).startsWith("one:1");
     assertThat(processDefinition.getCategory()).isEqualTo("Examples");
+    assertThat(processDefinition.isStartableInTasklist()).isEqualTo(true);
 
     processDefinition = processDefinitions.get(1);
     assertThat(processDefinition.getKey()).isEqualTo("one");
@@ -97,6 +97,7 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     assertThat(processDefinition.getDescription()).isEqualTo("Desc one");
     assertThat(processDefinition.getId()).startsWith("one:2");
     assertThat(processDefinition.getCategory()).isEqualTo("Examples");
+    assertThat(processDefinition.isStartableInTasklist()).isEqualTo(true);
 
     processDefinition = processDefinitions.get(2);
     assertThat(processDefinition.getKey()).isEqualTo("two");
@@ -104,6 +105,15 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     assertThat(processDefinition.getDescription()).isNull();
     assertThat(processDefinition.getId().startsWith("two:1"));
     assertThat(processDefinition.getCategory()).isEqualTo("Examples2");
+    assertThat(processDefinition.isStartableInTasklist()).isEqualTo(true);
+
+    processDefinition = processDefinitions.get(3);
+    assertThat(processDefinition.getKey()).isEqualTo("xyz_");
+    assertThat(processDefinition.getName()).isEqualTo("Xyz_");
+    assertThat(processDefinition.getDescription()).isNull();
+    assertThat(processDefinition.getId().startsWith("xyz_:1"));
+    assertThat(processDefinition.getCategory()).isEqualTo("xyz_");
+    assertThat(processDefinition.isStartableInTasklist()).isEqualTo(false);
   }
 
   @Test
@@ -855,7 +865,19 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
   @Test
   public void testQueryByStartableInTasklist() {
-    assertThat(repositoryService.createProcessDefinitionQuery().startableInTasklist().count()).isEqualTo(4);
+    // given
+    // three definitions with startableInTasklist=true
+    // one definition with startableInTasklist=false
+
+    // when
+    List<ProcessDefinition> startable = repositoryService.createProcessDefinitionQuery().startableInTasklist().list();
+    List<ProcessDefinition> notStartable = repositoryService.createProcessDefinitionQuery().notStartableInTasklist().list();
+
+    // then
+    assertThat(startable).hasSize(3);
+    assertThat(startable).extracting("key").containsExactlyInAnyOrder("one", "one", "two");
+    assertThat(notStartable).hasSize(1);
+    assertThat(notStartable.get(0).getKey()).isEqualTo("xyz_");
   }
 
   @Test
