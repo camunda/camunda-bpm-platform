@@ -867,7 +867,7 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
   public void testQueryByStartableInTasklist() {
     // given
     // three definitions with startableInTasklist=true
-    // one definition with startableInTasklist=true
+    // one definition with startableInTasklist=false
 
     // when
     List<ProcessDefinition> startable = repositoryService.createProcessDefinitionQuery().startableInTasklist().list();
