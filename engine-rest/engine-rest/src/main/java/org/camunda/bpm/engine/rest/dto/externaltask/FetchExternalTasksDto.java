@@ -23,10 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.FetchAndLockBuilder;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.rest.dto.SortingDto;
 
 /**
@@ -208,71 +209,76 @@ public class FetchExternalTasksDto {
     }
   }
 
-  public ExternalTaskQueryBuilder buildQuery(ProcessEngine processEngine) {
-    ExternalTaskQueryBuilder fetchBuilder = getBuilder(processEngine);
+  public FetchAndLockBuilder buildQuery(ProcessEngine processEngine) {
+    FetchAndLockBuilder fetchAndLockBuilder = getBuilder(processEngine);
 
-    if (getTopics() != null) {
-      for (FetchExternalTaskTopicDto topicDto : getTopics()) {
-        ExternalTaskQueryTopicBuilder topicFetchBuilder =
-          fetchBuilder.topic(topicDto.getTopicName(), topicDto.getLockDuration());
-
-        if (topicDto.getBusinessKey() != null) {
-          topicFetchBuilder = topicFetchBuilder.businessKey(topicDto.getBusinessKey());
-        }
-
-        if (topicDto.getProcessDefinitionId() != null) {
-          topicFetchBuilder.processDefinitionId(topicDto.getProcessDefinitionId());
-        }
-
-        if (topicDto.getProcessDefinitionIdIn() != null) {
-          topicFetchBuilder.processDefinitionIdIn(topicDto.getProcessDefinitionIdIn());
-        }
-
-        if (topicDto.getProcessDefinitionKey() != null) {
-          topicFetchBuilder.processDefinitionKey(topicDto.getProcessDefinitionKey());
-        }
-
-        if (topicDto.getProcessDefinitionKeyIn() != null) {
-          topicFetchBuilder.processDefinitionKeyIn(topicDto.getProcessDefinitionKeyIn());
-        }
-
-        if (topicDto.getVariables() != null) {
-          topicFetchBuilder = topicFetchBuilder.variables(topicDto.getVariables());
-        }
-
-        if (topicDto.getProcessVariables() != null) {
-          topicFetchBuilder = topicFetchBuilder.processInstanceVariableEquals(topicDto.getProcessVariables());
-        }
-
-        if (topicDto.isDeserializeValues()) {
-          topicFetchBuilder = topicFetchBuilder.enableCustomObjectDeserialization();
-        }
-
-        if (topicDto.isLocalVariables()) {
-          topicFetchBuilder = topicFetchBuilder.localVariables();
-        }
-
-        if (TRUE.equals(topicDto.isWithoutTenantId())) {
-          topicFetchBuilder = topicFetchBuilder.withoutTenantId();
-        }
-
-        if (topicDto.getTenantIdIn() != null) {
-          topicFetchBuilder = topicFetchBuilder.tenantIdIn(topicDto.getTenantIdIn());
-        }
-
-        if(topicDto.getProcessDefinitionVersionTag() != null) {
-          topicFetchBuilder = topicFetchBuilder.processDefinitionVersionTag(topicDto.getProcessDefinitionVersionTag());
-        }
-
-        if(topicDto.isIncludeExtensionProperties()) {
-          topicFetchBuilder = topicFetchBuilder.includeExtensionProperties();
-        }
-
-        fetchBuilder = topicFetchBuilder;
-      }
+    if (CollectionUtil.isEmpty(topics)) {
+      return fetchAndLockBuilder;
     }
 
-    return fetchBuilder;
+    return configureTopics(fetchAndLockBuilder);
+  }
+
+  protected FetchAndLockBuilder configureTopics(FetchAndLockBuilder builder) {
+    ExternalTaskQueryTopicBuilder topicBuilder = builder.subscribe();
+
+    topics.forEach(topic -> {
+      topicBuilder.topic(topic.getTopicName(), topic.getLockDuration());
+
+      if (topic.getBusinessKey() != null) {
+        topicBuilder.businessKey(topic.getBusinessKey());
+      }
+
+      if (topic.getProcessDefinitionId() != null) {
+        topicBuilder.processDefinitionId(topic.getProcessDefinitionId());
+      }
+
+      if (topic.getProcessDefinitionIdIn() != null) {
+        topicBuilder.processDefinitionIdIn(topic.getProcessDefinitionIdIn());
+      }
+
+      if (topic.getProcessDefinitionKey() != null) {
+        topicBuilder.processDefinitionKey(topic.getProcessDefinitionKey());
+      }
+
+      if (topic.getProcessDefinitionKeyIn() != null) {
+        topicBuilder.processDefinitionKeyIn(topic.getProcessDefinitionKeyIn());
+      }
+
+      if (topic.getVariables() != null) {
+        topicBuilder.variables(topic.getVariables());
+      }
+
+      if (topic.getProcessVariables() != null) {
+        topicBuilder.processInstanceVariableEquals(topic.getProcessVariables());
+      }
+
+      if (topic.isDeserializeValues()) {
+        topicBuilder.enableCustomObjectDeserialization();
+      }
+
+      if (topic.isLocalVariables()) {
+        topicBuilder.localVariables();
+      }
+
+      if (TRUE.equals(topic.isWithoutTenantId())) {
+        topicBuilder.withoutTenantId();
+      }
+
+      if (topic.getTenantIdIn() != null) {
+        topicBuilder.tenantIdIn(topic.getTenantIdIn());
+      }
+
+      if(topic.getProcessDefinitionVersionTag() != null) {
+        topicBuilder.processDefinitionVersionTag(topic.getProcessDefinitionVersionTag());
+      }
+
+      if(topic.isIncludeExtensionProperties()) {
+        topicBuilder.includeExtensionProperties();
+      }
+    });
+
+    return builder;
   }
 
   protected void configureSorting(FetchAndLockBuilder builder, List<SortingDto> sortings) {
@@ -287,9 +293,9 @@ public class FetchExternalTasksDto {
   }
 
   protected FetchAndLockBuilder getBuilder(ProcessEngine engine) {
-    FetchAndLockBuilder builder = engine
-        .getExternalTaskService()
-        .fetchAndLock()
+    ExternalTaskService service = engine.getExternalTaskService();
+
+    FetchAndLockBuilder builder = service.fetchAndLock()
         .workerId(workerId)
         .maxTasks(maxTasks)
         .usePriority(usePriority);

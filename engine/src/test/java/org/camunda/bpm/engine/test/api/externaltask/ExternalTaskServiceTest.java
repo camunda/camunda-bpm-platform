@@ -212,6 +212,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
         .orderByCreateTime().desc()
         .usePriority(true)
 
+        .subscribe()
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
@@ -254,6 +255,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
         .orderByCreateTime().asc()
         .usePriority(true)
 
+        .subscribe()
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
@@ -296,6 +298,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
         .orderByCreateTime().asc()
         .usePriority(false)
 
+        .subscribe()
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
@@ -329,6 +332,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
         .orderByCreateTime().desc()
         .usePriority(false)
 
+        .subscribe()
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
@@ -362,6 +366,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
         // create time ordering is omitted
         .usePriority(true)
 
+        .subscribe()
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 

@@ -27,13 +27,11 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -41,7 +39,6 @@ import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
 import io.restassured.http.ContentType;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -167,22 +164,24 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     when(fetchAndLockBuilder.maxTasks(anyInt())).thenReturn(fetchAndLockBuilder);
     when(fetchAndLockBuilder.usePriority(anyBoolean())).thenReturn(fetchAndLockBuilder);
 
-    when(fetchAndLockBuilder.topic(any(), anyLong())).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.variables(Mockito.<List<String>>any())).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.variables(Mockito.<String[]>any())).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.enableCustomObjectDeserialization()).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.localVariables()).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.topic(any(), anyLong())).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.businessKey(any())).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.processDefinitionId(any())).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.processDefinitionIdIn(Mockito.<String>any())).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.processDefinitionKey(any())).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.processDefinitionKeyIn(Mockito.<String>any())).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.processInstanceVariableEquals(any())).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.processDefinitionVersionTag(any())).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.withoutTenantId()).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.tenantIdIn(Mockito.<String>any())).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.includeExtensionProperties()).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.subscribe()).thenReturn(fetchTopicBuilder);
+
+    when(fetchTopicBuilder.topic(any(), anyLong())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.variables(Mockito.<List<String>>any())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.variables(Mockito.<String[]>any())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.enableCustomObjectDeserialization()).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.localVariables()).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.topic(any(), anyLong())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.businessKey(any())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processDefinitionId(any())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processDefinitionIdIn(Mockito.<String>any())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processDefinitionKey(any())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processDefinitionKeyIn(Mockito.<String>any())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processInstanceVariableEquals(any())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processDefinitionVersionTag(any())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.withoutTenantId()).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.tenantIdIn(Mockito.<String>any())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.includeExtensionProperties()).thenReturn(fetchTopicBuilder);
 
     when(externalTaskService.fetchAndLock()).thenReturn(fetchAndLockBuilder);
 
@@ -227,15 +226,20 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     executePost(parameters);
 
-    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
 
     inOrder.verify(externalTaskService).fetchAndLock();
 
-    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchAndLockBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
+    inOrder.verify(fetchAndLockBuilder).maxTasks(5);
+    inOrder.verify(fetchAndLockBuilder).usePriority(true);
+    inOrder.verify(fetchAndLockBuilder).subscribe();
+
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
     inOrder.verify(fetchAndLockBuilder).execute();
 
-    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+    verifyNoMoreInteractions(fetchTopicBuilder, fetchTopicBuilder, externalTaskService);
   }
 
   @Test
@@ -258,20 +262,21 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     executePost(parameters);
 
-    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
 
     inOrder.verify(externalTaskService).fetchAndLock();
 
     inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
     inOrder.verify(fetchAndLockBuilder).maxTasks(5);
     inOrder.verify(fetchAndLockBuilder).usePriority(true);
+    inOrder.verify(fetchAndLockBuilder).subscribe();
 
-    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchAndLockBuilder).businessKey(EXAMPLE_BUSINESS_KEY);
-    inOrder.verify(fetchAndLockBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).businessKey(EXAMPLE_BUSINESS_KEY);
+    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
     inOrder.verify(fetchAndLockBuilder).execute();
 
-    verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
+    verifyNoMoreInteractions(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
   }
 
   @Test
@@ -296,21 +301,23 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     executePost(parameters);
 
-    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
 
     inOrder.verify(externalTaskService).fetchAndLock();
 
     inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
     inOrder.verify(fetchAndLockBuilder).maxTasks(5);
     inOrder.verify(fetchAndLockBuilder).usePriority(true);
-    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchAndLockBuilder).processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
-    inOrder.verify(fetchAndLockBuilder).processDefinitionIdIn(EXAMPLE_PROCESS_DEFINITION_ID);
-    inOrder.verify(fetchAndLockBuilder).processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY);
-    inOrder.verify(fetchAndLockBuilder).processDefinitionKeyIn(EXAMPLE_PROCESS_DEFINITION_KEY);
+    inOrder.verify(fetchAndLockBuilder).subscribe();
+
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
+    inOrder.verify(fetchTopicBuilder).processDefinitionIdIn(EXAMPLE_PROCESS_DEFINITION_ID);
+    inOrder.verify(fetchTopicBuilder).processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY);
+    inOrder.verify(fetchTopicBuilder).processDefinitionKeyIn(EXAMPLE_PROCESS_DEFINITION_KEY);
     inOrder.verify(fetchAndLockBuilder).execute();
 
-    verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
+    verifyNoMoreInteractions(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
   }
 
   @Test
@@ -338,21 +345,22 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     executePost(parameters);
 
-    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
 
     inOrder.verify(externalTaskService).fetchAndLock();
 
     inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
     inOrder.verify(fetchAndLockBuilder).maxTasks(5);
     inOrder.verify(fetchAndLockBuilder).usePriority(true);
+    inOrder.verify(fetchAndLockBuilder).subscribe();
 
-    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchAndLockBuilder).businessKey(EXAMPLE_BUSINESS_KEY);
-    inOrder.verify(fetchAndLockBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
-    inOrder.verify(fetchAndLockBuilder).processInstanceVariableEquals(variableValueParameter);
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).businessKey(EXAMPLE_BUSINESS_KEY);
+    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchTopicBuilder).processInstanceVariableEquals(variableValueParameter);
     inOrder.verify(fetchAndLockBuilder).execute();
 
-    verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
+    verifyNoMoreInteractions(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
   }
 
   @Test
@@ -381,18 +389,19 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(FETCH_EXTERNAL_TASK_URL);
 
-    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
 
     inOrder.verify(externalTaskService).fetchAndLock();
 
     inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
     inOrder.verify(fetchAndLockBuilder).maxTasks(5);
     inOrder.verify(fetchAndLockBuilder).usePriority(false);
+    inOrder.verify(fetchAndLockBuilder).subscribe();
 
-    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchAndLockBuilder).execute();
 
-    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+    verifyNoMoreInteractions(fetchTopicBuilder, fetchTopicBuilder, externalTaskService);
   }
 
   @Test
@@ -416,20 +425,21 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     executePost(parameters);
 
-    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
 
     inOrder.verify(externalTaskService).fetchAndLock();
 
     inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
     inOrder.verify(fetchAndLockBuilder).maxTasks(5);
     inOrder.verify(fetchAndLockBuilder).usePriority(true);
+    inOrder.verify(fetchAndLockBuilder).subscribe();
 
-    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchAndLockBuilder).withoutTenantId();
-    inOrder.verify(fetchAndLockBuilder).tenantIdIn("tenant2");
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).withoutTenantId();
+    inOrder.verify(fetchTopicBuilder).tenantIdIn("tenant2");
     inOrder.verify(fetchAndLockBuilder).execute();
 
-    verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
+    verifyNoMoreInteractions(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
   }
 
   @Test
@@ -450,19 +460,20 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     executePost(parameters);
 
-    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
 
     inOrder.verify(externalTaskService).fetchAndLock();
 
     inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
     inOrder.verify(fetchAndLockBuilder).maxTasks(5);
     inOrder.verify(fetchAndLockBuilder).usePriority(false);
+    inOrder.verify(fetchAndLockBuilder).subscribe();
 
-    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchAndLockBuilder).processDefinitionVersionTag("versionTag");
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).processDefinitionVersionTag("versionTag");
     inOrder.verify(fetchAndLockBuilder).execute();
 
-    verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
+    verifyNoMoreInteractions(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
   }
 
   @Test
@@ -484,18 +495,19 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     executePost(parameters);
 
     // then
-    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
 
     inOrder.verify(externalTaskService).fetchAndLock();
     inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
     inOrder.verify(fetchAndLockBuilder).maxTasks(5);
     inOrder.verify(fetchAndLockBuilder).usePriority(false);
+    inOrder.verify(fetchAndLockBuilder).subscribe();
 
-    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchAndLockBuilder).includeExtensionProperties();
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).includeExtensionProperties();
     inOrder.verify(fetchAndLockBuilder).execute();
 
-    verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
+    verifyNoMoreInteractions(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
   }
 
   @Test
@@ -525,17 +537,19 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
         .when()
         .post(FETCH_EXTERNAL_TASK_URL);
 
-    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
 
     inOrder.verify(externalTaskService).fetchAndLock();
 
     inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
     inOrder.verify(fetchAndLockBuilder).maxTasks(5);
     inOrder.verify(fetchAndLockBuilder).usePriority(false);
-    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchAndLockBuilder).subscribe();
 
-    inOrder.verify(fetchAndLockBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
-    inOrder.verify(fetchAndLockBuilder).enableCustomObjectDeserialization();
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+
+    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchTopicBuilder).enableCustomObjectDeserialization();
     inOrder.verify(fetchAndLockBuilder).execute();
 
     verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
@@ -568,15 +582,23 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
         .when()
         .post(FETCH_EXTERNAL_TASK_URL);
 
-    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+    var topicBuilder = fetchAndLockBuilder.subscribe();
+
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
     inOrder.verify(externalTaskService).fetchAndLock();
 
-    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchAndLockBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
-    inOrder.verify(fetchAndLockBuilder).localVariables();
+    inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
+    inOrder.verify(fetchAndLockBuilder).maxTasks(5);
+    inOrder.verify(fetchAndLockBuilder).usePriority(false);
+    inOrder.verify(fetchAndLockBuilder).subscribe();
+
+    inOrder.verify(topicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(topicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(topicBuilder).localVariables();
+
     inOrder.verify(fetchAndLockBuilder).execute();
 
-    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+    verifyNoMoreInteractions(fetchTopicBuilder, fetchTopicBuilder, externalTaskService);
   }
 
 

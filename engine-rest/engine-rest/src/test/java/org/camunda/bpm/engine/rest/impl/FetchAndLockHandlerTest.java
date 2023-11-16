@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.FetchAndLockBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -76,6 +77,9 @@ public class FetchAndLockHandlerTest {
   protected ExternalTaskService externalTaskService;
 
   @Mock
+  protected ExternalTaskQueryTopicBuilder externalTaskQueryTopicBuilder;
+
+  @Mock
   protected FetchAndLockBuilder fetchAndLockBuilder;
 
   @Spy
@@ -96,7 +100,10 @@ public class FetchAndLockHandlerTest {
     when(processEngine.getName()).thenReturn("default");
 
     when(externalTaskService.fetchAndLock()).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.topic(any(String.class), anyLong())).thenReturn(fetchAndLockBuilder);
+
+    when(fetchAndLockBuilder.subscribe()).thenReturn(externalTaskQueryTopicBuilder);
+
+    when(externalTaskQueryTopicBuilder.topic(any(String.class), anyLong())).thenReturn(externalTaskQueryTopicBuilder);
 
     doNothing().when(handler).suspend(anyLong());
     doReturn(processEngine).when(handler).getProcessEngine(any(FetchAndLockRequest.class));

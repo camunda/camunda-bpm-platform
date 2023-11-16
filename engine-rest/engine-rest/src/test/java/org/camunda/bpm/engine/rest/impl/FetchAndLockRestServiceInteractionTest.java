@@ -99,8 +99,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
 
   @Before
   public void setUpRuntimeData() {
-    when(processEngine.getExternalTaskService())
-      .thenReturn(externalTaskService);
+    when(processEngine.getExternalTaskService()).thenReturn(externalTaskService);
 
     lockedExternalTaskMock = MockProvider.createMockLockedExternalTask();
 
@@ -113,27 +112,19 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     when(fetchAndLockBuilder.workerId(anyString())).thenReturn(fetchAndLockBuilder);
     when(fetchAndLockBuilder.maxTasks(anyInt())).thenReturn(fetchAndLockBuilder);
     when(fetchAndLockBuilder.usePriority(anyBoolean())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.orderByCreateTime()).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.asc()).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.desc()).thenReturn(fetchAndLockBuilder);
 
-    when(fetchAndLockBuilder.topic(any(String.class), anyLong())).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.variables(anyList())).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.enableCustomObjectDeserialization()).thenReturn(fetchAndLockBuilder);
-    when(fetchAndLockBuilder.processDefinitionVersionTag(anyString())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.subscribe()).thenReturn(fetchTopicBuilder);
 
-    when(fetchTopicBuilder.topic(any(String.class), anyLong()))
-      .thenReturn(fetchTopicBuilder);
-
-    when(fetchTopicBuilder.variables(anyList()))
-      .thenReturn(fetchTopicBuilder);
-
-    when(fetchTopicBuilder.enableCustomObjectDeserialization())
-      .thenReturn(fetchTopicBuilder);
-
-    when(fetchTopicBuilder.processDefinitionVersionTag(anyString()))
-    .thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.topic(any(String.class), anyLong())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.variables(anyList())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.enableCustomObjectDeserialization()).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processDefinitionVersionTag(anyString())).thenReturn(fetchTopicBuilder);
 
     // for authentication
-    when(processEngine.getIdentityService())
-      .thenReturn(identityServiceMock);
+    when(processEngine.getIdentityService()).thenReturn(identityServiceMock);
 
     List<Group> groupMocks = MockProvider.createMockGroups();
     groupIds = groupMocks.stream().map(Group::getId).collect(Collectors.toList());
@@ -174,15 +165,18 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
       .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".type", equalTo("String"))
     .when().post(FETCH_EXTERNAL_TASK_URL);
 
-    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
 
     inOrder.verify(externalTaskService, times(1)).fetchAndLock();
 
     inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
     inOrder.verify(fetchAndLockBuilder).maxTasks(5);
     inOrder.verify(fetchAndLockBuilder).usePriority(true);
-    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchAndLockBuilder).variables(Collections.singletonList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+
+    inOrder.verify(fetchAndLockBuilder).subscribe();
+
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).variables(Collections.singletonList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
     inOrder.verify(fetchAndLockBuilder).execute();
 
     verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
@@ -203,15 +197,16 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(FETCH_EXTERNAL_TASK_URL);
 
-    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
 
-    inOrder.verify(externalTaskService).fetchAndLock();
+    inOrder.verify(externalTaskService, times(1)).fetchAndLock();
 
     inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
-
     inOrder.verify(fetchAndLockBuilder).maxTasks(5);
     inOrder.verify(fetchAndLockBuilder).usePriority(false);
-    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchAndLockBuilder).subscribe();
+
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchAndLockBuilder).execute();
 
     verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
@@ -232,20 +227,22 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(FETCH_EXTERNAL_TASK_URL);
 
-    InOrder inOrder = inOrder(fetchAndLockBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
 
     inOrder.verify(externalTaskService).fetchAndLock();
 
     inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
     inOrder.verify(fetchAndLockBuilder).maxTasks(5);
     inOrder.verify(fetchAndLockBuilder).usePriority(false);
-    inOrder.verify(fetchAndLockBuilder).topic("aTopicName", 12354L);
 
-    inOrder.verify(fetchAndLockBuilder).variables(Collections.singletonList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
-    inOrder.verify(fetchAndLockBuilder).enableCustomObjectDeserialization();
+    inOrder.verify(fetchAndLockBuilder).subscribe();
+
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).variables(Collections.singletonList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchTopicBuilder).enableCustomObjectDeserialization();
     inOrder.verify(fetchAndLockBuilder).execute();
 
-    verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
+    verifyNoMoreInteractions(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
   }
 
   @Test
@@ -388,7 +385,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
   .when()
     .post(FETCH_EXTERNAL_TASK_URL);
 
-    verify(fetchAndLockBuilder).processDefinitionVersionTag("version");
+    verify(fetchTopicBuilder).processDefinitionVersionTag("version");
   }
 
   // helper /////////////////////////

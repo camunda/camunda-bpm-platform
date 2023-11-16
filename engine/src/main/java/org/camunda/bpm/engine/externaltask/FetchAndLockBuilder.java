@@ -17,147 +17,73 @@
 package org.camunda.bpm.engine.externaltask;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Fetch And Lock Builder used to enable a Fluent API that exposes all parameters for fetch and Lock operation.
  */
-public interface FetchAndLockBuilder extends ExternalTaskQueryTopicBuilder {
+public interface FetchAndLockBuilder {
 
   /**
-   * Define variables to fetch with all tasks for the current topic. Calling
-   * this method multiple times overrides the previously specified variables.
+   * Configures the workerId that will be used during the Fetch and Lock operation.
    *
-   * @param variables the variable names to fetch, if null all variables will be fetched
-   * @return this builder
+   * @param workerId the given workerId
+   * @return the builder
    */
-  FetchAndLockBuilder variables(String... variables);
-
-  /**
-   * Define variables to fetch with all tasks for the current topic. Calling
-   * this method multiple times overrides the previously specified variables.
-   *
-   * @param variables the variable names to fetch, if null all variables will be fetched
-   * @return this builder
-   */
-  FetchAndLockBuilder variables(List<String> variables);
-
-  /**
-   * Define a HashMap of variables and their values to filter correlated tasks.
-   * Calling this method multiple times overrides the previously specified variables.
-   *
-   * @param variables a HashMap of the variable names (keys) and the values to filter by
-   * @return this builder
-   */
-  FetchAndLockBuilder processInstanceVariableEquals(Map<String, Object> variables);
-
-  /**
-   * Define a single variable and its name to filter tasks in a topic. Multiple calls to
-   * this method add to the existing "variable filters".
-   *
-   * @param name the name of the variable you want to fetch and query by
-   * @param value the value of the variable which you want to filter
-   * @return this builder
-   */
-  FetchAndLockBuilder processInstanceVariableEquals(String name, Object value);
-
-  /**
-   * Define business key value to filter external tasks by (Process Instance) Business Key.
-   *
-   * @param businessKey the value of the Business Key to filter by
-   * @return this builder
-   */
-  FetchAndLockBuilder businessKey(String businessKey);
-
-  /**
-   * Define process definition id to filter external tasks by.
-   *
-   * @param processDefinitionId the definition id to filter by
-   * @return this builder
-   */
-  FetchAndLockBuilder processDefinitionId(String processDefinitionId);
-
-  /**
-   * Define process definition ids to filter external tasksb by.
-   *
-   * @param processDefinitionIds the definition ids to filter by
-   * @return this builder
-   */
-  FetchAndLockBuilder processDefinitionIdIn(String... processDefinitionIds);
-
-  /**
-   * Define process definition key to filter external tasks by.
-   *
-   * @param processDefinitionKey the definition key to filter by
-   * @return this builder
-   */
-  FetchAndLockBuilder processDefinitionKey(String processDefinitionKey);
-
-  /**
-   * Define process definition keys to filter external tasks by.
-   *
-   * @param processDefinitionKeys the definition keys to filter by
-   * @return this builder
-   */
-  FetchAndLockBuilder processDefinitionKeyIn(String... processDefinitionKeys);
-
-
-  /**
-   * Define a process definition version tag to filter external tasks by.
-   * 
-   * @param versionTag the version tag to filter by
-   * @return this builder
-   */
-  FetchAndLockBuilder processDefinitionVersionTag(String versionTag);
-
-  /**
-   * Filter external tasks only with null tenant id.
-   *
-   * @return this builder
-   */
-  FetchAndLockBuilder withoutTenantId();
-
-  /**
-   * Define tenant ids to filter external tasks by.
-   *
-   * @param tenantIds the tenant ids to filter by
-   * @return this builder
-   */
-  FetchAndLockBuilder tenantIdIn(String... tenantIds);
-
-  /**
-   * Enable deserialization of variable values that are custom objects. By default, the query
-   * will not attempt to deserialize the value of these variables.
-   *
-   * @return this builder
-   */
-  FetchAndLockBuilder enableCustomObjectDeserialization();
-
-  /**
-   * Define whether only local variables will be fetched with all tasks for the current topic.
-   *
-   * @return this builder
-   */
-  FetchAndLockBuilder localVariables();
-
-  /**
-   * Configure the query to include custom extension properties, if available, for all fetched tasks.
-   * 
-   * @return this builder
-   */
-  FetchAndLockBuilder includeExtensionProperties();
-
   FetchAndLockBuilder workerId(String workerId);
 
-  FetchAndLockBuilder topic(String topicName, long lockDuration);
-
+  /**
+   * Configures the max tasks fetching that will be used during the Fetch and Lock operation.
+   *
+   * @param maxTasks the given number of max tasks
+   * @return the builder
+   */
   FetchAndLockBuilder maxTasks(int maxTasks);
 
+  /**
+   * Configures fetching to consider (or not) priority during the Fetch and Lock operation.
+   *
+   * @param usePriority the given usePriority flag. If true, tasks will be fetched in a descending order.
+   * @return the builder
+   */
   FetchAndLockBuilder usePriority(boolean usePriority);
 
+  /**
+   * Configures the fetching during the Fetch and Lock Operation to include ordering by create time of the external tasks.
+   * This method can be combined with asc() and desc() methods to define an ascending or descending order respectively.
+   * If no specific order is defined, the effective order will be desc as a sensible default since it will likely be
+   * more valuable to bring the most recently-created tasks first.
+   * To have explicit control, you can specify the order.
+   *
+   * @return the builder
+   */
   FetchAndLockBuilder orderByCreateTime();
 
+  /**
+   * Configures the order to be ascending.
+   *
+   * @return the builder
+   */
   FetchAndLockBuilder asc();
 
+  /**
+   * Configures the order to be descending.
+   *
+   * @return the builder
+   */
   FetchAndLockBuilder desc();
+
+  /**
+   * Returns the {@link ExternalTaskQueryTopicBuilder} to handle all the configuration that applies per topic
+   * @return
+   */
+  ExternalTaskQueryTopicBuilder subscribe();
+
+  /**
+   * Performs the fetching. Locks candidate tasks of the given topics
+   * for the specified duration.
+   *
+   * @return fetched external tasks that match the topic and that can be
+   *   successfully locked
+   */
+  List<LockedExternalTask> execute();
 }

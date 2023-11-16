@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.cmd.FetchExternalTasksCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
@@ -42,16 +43,49 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
    */
   protected boolean usePriority;
 
+  protected boolean useCreateTime;
+  protected Direction createTimeDirection;
+
   protected Map<String, TopicFetchInstruction> instructions;
 
   protected TopicFetchInstruction currentInstruction;
 
-  public ExternalTaskQueryTopicBuilderImpl(CommandExecutor commandExecutor, String workerId, int maxTasks, boolean usePriority) {
+  public ExternalTaskQueryTopicBuilderImpl(CommandExecutor commandExecutor,
+                                           String workerId,
+                                           int maxTasks,
+                                           boolean usePriority,
+                                           boolean useCreateTime,
+                                           Direction createTimeDirection,
+                                           Map<String, TopicFetchInstruction> instructions) {
     this.commandExecutor = commandExecutor;
     this.workerId = workerId;
     this.maxTasks = maxTasks;
     this.usePriority = usePriority;
-    this.instructions = new HashMap<>();
+    this.useCreateTime = useCreateTime;
+    this.createTimeDirection = createTimeDirection;
+    this.instructions = instructions;
+  }
+
+  public ExternalTaskQueryTopicBuilderImpl(CommandExecutor commandExecutor,
+                                           String workerId,
+                                           int maxTasks,
+                                           boolean usePriority) {
+    this(commandExecutor, workerId, maxTasks, usePriority, false, null, new HashMap<>());
+  }
+
+  /**
+   * Copy constructor
+   */
+  public ExternalTaskQueryTopicBuilderImpl(ExternalTaskQueryTopicBuilderImpl builder) {
+    this(
+        builder.commandExecutor,
+        builder.workerId,
+        builder.maxTasks,
+        builder.usePriority,
+        builder.useCreateTime,
+        builder.createTimeDirection,
+        builder.instructions
+    );
   }
 
   public ExternalTaskQueryTopicBuilderImpl(CommandExecutor commandExecutor) {
@@ -61,7 +95,8 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
 
   public List<LockedExternalTask> execute() {
     submitCurrentInstruction();
-    return commandExecutor.execute(new FetchExternalTasksCmd(workerId, maxTasks, instructions, usePriority, false, null));
+    return commandExecutor.execute(
+        new FetchExternalTasksCmd(workerId, maxTasks, instructions, usePriority, useCreateTime, createTimeDirection));
   }
 
   public ExternalTaskQueryTopicBuilder topic(String topicName, long lockDuration) {
