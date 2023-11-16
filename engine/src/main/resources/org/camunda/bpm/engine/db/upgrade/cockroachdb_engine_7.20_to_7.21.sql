@@ -20,5 +20,10 @@
 alter table ACT_RU_EXT_TASK
   add column CREATE_TIME_ timestamp;
 
+alter table ACT_RU_JOB
+  add ROOT_PROCESS_INSTANCE_ID_ varchar(64);
+
+create index ACT_IDX_JOB_ROOT_PROCINST on ACT_RU_JOB(ROOT_PROCESS_INSTANCE_ID_);
+
 insert into ACT_GE_SCHEMA_LOG
 values ('1000', CURRENT_TIMESTAMP, '7.21.0');

@@ -204,9 +204,11 @@ public class JobManager extends AbstractManager {
 
     Map<String,Object> params = new HashMap<>();
     Date now = ClockUtil.getCurrentTime();
+
     params.put("now", now);
     params.put("alwaysSetDueDate", isEnsureJobDueDateNotNull());
     params.put("deploymentAware", engineConfiguration.isJobExecutorDeploymentAware());
+
     if (engineConfiguration.isJobExecutorDeploymentAware()) {
       Set<String> registeredDeployments = engineConfiguration.getRegisteredDeployments();
       if (!registeredDeployments.isEmpty()) {
@@ -217,12 +219,14 @@ public class JobManager extends AbstractManager {
     boolean jobExecutorAcquireByPriority = engineConfiguration.isJobExecutorAcquireByPriority();
     long jobExecutorPriorityRangeMin = engineConfiguration.getJobExecutorPriorityRangeMin();
     long jobExecutorPriorityRangeMax = engineConfiguration.getJobExecutorPriorityRangeMax();
+
     params.put("jobPriorityMin", jobExecutorAcquireByPriority && jobExecutorPriorityRangeMin != Long.MIN_VALUE ? jobExecutorPriorityRangeMin : null);
     params.put("jobPriorityMax", jobExecutorAcquireByPriority && jobExecutorPriorityRangeMax != Long.MAX_VALUE ? jobExecutorPriorityRangeMax : null);
 
     params.put("historyCleanupEnabled", engineConfiguration.isHistoryCleanupEnabled());
 
     List<QueryOrderingProperty> orderingProperties = new ArrayList<>();
+
     if (engineConfiguration.isJobExecutorAcquireByPriority()) {
       orderingProperties.add(JOB_PRIORITY_ORDERING_PROPERTY);
     }
@@ -236,6 +240,7 @@ public class JobManager extends AbstractManager {
     params.put("orderingProperties", orderingProperties);
     // don't apply default sorting
     params.put("applyOrdering", !orderingProperties.isEmpty());
+    params.put("applyExclusiveOverProcessHierarchies", engineConfiguration.isJobExecutorAcquireExclusiveOverProcessHierarchies());
 
     return getDbEntityManager().selectList("selectNextJobsToExecute", params, page);
   }
