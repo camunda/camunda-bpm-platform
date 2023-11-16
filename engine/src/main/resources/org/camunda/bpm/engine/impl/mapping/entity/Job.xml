@@ -237,9 +237,15 @@
     RES.EXCLUSIVE_ = ${trueConstant}
           and not exists(
             select J2.ID_ from ${prefix}ACT_RU_JOB J2
-            where J2.ROOT_PROCESS_INSTANCE_ID_ = RES.ROOT_PROCESS_INSTANCE_ID_                                 -- from the same proc. inst.
-            and (J2.EXCLUSIVE_ = ${trueConstant})                                                              -- also exclusive
-            and (J2.LOCK_OWNER_ is not null and J2.LOCK_EXP_TIME_ &gt;= #{parameter.now, jdbcType=TIMESTAMP})  -- in progress
+            where
+              -- from the same root proc. inst. if not null
+              (RES.ROOT_PROCESS_INSTANCE_ID_ is not null and J2.ROOT_PROCESS_INSTANCE_ID_ = RES.ROOT_PROCESS_INSTANCE_ID_
+              -- otherwise from the same proc. inst.
+              or RES.ROOT_PROCESS_INSTANCE_ID_ is null and J2.PROCESS_INSTANCE_ID_ = RES.PROCESS_INSTANCE_ID_)
+              -- also exclusive
+              and (J2.EXCLUSIVE_ = ${trueConstant})
+              -- in progress
+              and (J2.LOCK_OWNER_ is not null and J2.LOCK_EXP_TIME_ &gt;= #{parameter.now, jdbcType=TIMESTAMP})
             )
   </sql>
 
@@ -329,6 +335,9 @@
       </if>
       <if test="activityId != null">
       	JD.ACT_ID_ = #{activityId}
+      </if>
+      <if test="rootProcessInstanceId != null">
+        and RES.ROOT_PROCESS_INSTANCE_ID_ = #{rootProcessInstanceId}
       </if>
       <if test="processInstanceId != null">
         and RES.PROCESS_INSTANCE_ID_ = #{processInstanceId}

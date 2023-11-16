@@ -16,6 +16,25 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import org.assertj.core.api.Assertions;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ProcessEngines;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.ThreadPoolJobExecutor;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.text.DateFormat.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,20 +43,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Supplier;
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.ProcessEngines;
-import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.jobexecutor.ThreadPoolJobExecutor;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
-
+import java.util.stream.Collectors;
 
 /**
  *
@@ -87,14 +93,11 @@ public class SequentialJobAcquisitionTest {
 
     createdProcessEngines.add(engine);
 
-    engine.getRepositoryService().createDeployment()
-      .addClasspathResource(PROCESS_RESOURCE)
-      .deploy();
+    engine.getRepositoryService().createDeployment().addClasspathResource(PROCESS_RESOURCE).deploy();
 
     jobExecutor.shutdown();
 
-    engine.getRuntimeService()
-      .startProcessInstanceByKey("intermediateTimerEventExample");
+    engine.getRuntimeService().startProcessInstanceByKey("intermediateTimerEventExample");
 
     Assert.assertEquals(1, engine.getManagementService().createJobQuery().count());
 
@@ -138,13 +141,9 @@ public class SequentialJobAcquisitionTest {
 
     // deploy the processes
 
-    engine1.getRepositoryService().createDeployment()
-      .addClasspathResource(PROCESS_RESOURCE)
-      .deploy();
+    engine1.getRepositoryService().createDeployment().addClasspathResource(PROCESS_RESOURCE).deploy();
 
-    engine2.getRepositoryService().createDeployment()
-     .addClasspathResource(PROCESS_RESOURCE)
-     .deploy();
+    engine2.getRepositoryService().createDeployment().addClasspathResource(PROCESS_RESOURCE).deploy();
 
     // start one instance for each engine:
 
@@ -170,10 +169,9 @@ public class SequentialJobAcquisitionTest {
     Assert.assertEquals(0, engine2.getManagementService().createJobQuery().count());
   }
 
-
   @Test
   public void testJobAddedGuardForTwoEnginesSameAcquisition() throws InterruptedException {
-   // configure and build a process engine
+    // configure and build a process engine
     StandaloneProcessEngineConfiguration engineConfiguration1 = new StandaloneInMemProcessEngineConfiguration();
     engineConfiguration1.setProcessEngineName(getClass().getName() + "-engine1");
     engineConfiguration1.setJdbcUrl("jdbc:h2:mem:activiti1");
@@ -200,13 +198,9 @@ public class SequentialJobAcquisitionTest {
 
     // deploy the processes
 
-    engine1.getRepositoryService().createDeployment()
-      .addClasspathResource(PROCESS_RESOURCE)
-      .deploy();
+    engine1.getRepositoryService().createDeployment().addClasspathResource(PROCESS_RESOURCE).deploy();
 
-    engine2.getRepositoryService().createDeployment()
-     .addClasspathResource(PROCESS_RESOURCE)
-     .deploy();
+    engine2.getRepositoryService().createDeployment().addClasspathResource(PROCESS_RESOURCE).deploy();
 
     // start one instance for each engine:
 
@@ -238,12 +232,13 @@ public class SequentialJobAcquisitionTest {
     Assert.assertEquals(0, engine2.getManagementService().createJobQuery().count());
   }
 
-
   ////////// helper methods ////////////////////////////
 
-
-  protected void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis, JobExecutor jobExecutor,
-      ManagementService managementService, boolean shutdown) {
+  protected void waitForJobExecutorToProcessAllJobs(long maxMillisToWait,
+                                                    long intervalMillis,
+                                                    JobExecutor jobExecutor,
+                                                    ManagementService managementService,
+                                                    boolean shutdown) {
     try {
       waitForCondition(maxMillisToWait, intervalMillis, () -> !areJobsAvailable(managementService));
     } finally {
@@ -253,7 +248,9 @@ public class SequentialJobAcquisitionTest {
     }
   }
 
-  protected void waitForJobExecutionRunnablesToFinish(long maxMillisToWait, long intervalMillis, JobExecutor jobExecutor) {
+  protected void waitForJobExecutionRunnablesToFinish(long maxMillisToWait,
+                                                      long intervalMillis,
+                                                      JobExecutor jobExecutor) {
     waitForCondition(maxMillisToWait, intervalMillis,
         () -> ((ThreadPoolJobExecutor) jobExecutor).getThreadPoolExecutor().getActiveCount() == 0);
   }
@@ -278,27 +275,196 @@ public class SequentialJobAcquisitionTest {
   }
 
   protected boolean areJobsAvailable(ManagementService managementService) {
-    return !managementService
-      .createJobQuery()
-      .executable()
-      .list()
-      .isEmpty();
+    return !managementService.createJobQuery().executable().list().isEmpty();
   }
 
   private static class InteruptTask extends TimerTask {
     protected boolean timeLimitExceeded = false;
     protected Thread thread;
+
     public InteruptTask(Thread thread) {
       this.thread = thread;
     }
+
     public boolean isTimeLimitExceeded() {
       return timeLimitExceeded;
     }
+
     @Override
     public void run() {
       timeLimitExceeded = true;
       thread.interrupt();
     }
+  }
+
+  protected List<String> assertProcessInstanceJobs(ProcessEngine engine, ProcessInstance pi, int nJobs, String pdKey) {
+    var jobs = engine.getManagementService().createJobQuery().rootProcessInstanceId(pi.getId()).list();
+    Assertions.assertThat(jobs).hasSize(nJobs);
+    jobs.forEach(job -> {
+      Assertions.assertThat(job.getProcessDefinitionKey()).isEqualTo(pdKey);
+      Assertions.assertThat(job.getRootProcessInstanceId()).isEqualTo(pi.getId());
+    });
+    return jobs.stream().map(Job::getId).collect(Collectors.toList());
+  }
+
+  public static class AssertJobExecutor extends DefaultJobExecutor {
+
+    final List<List<String>> jobGroups = new ArrayList<>();
+
+    @SafeVarargs
+    public final void assertJobGroup(List<String>... jobIds) {
+      // FIXME order of nested lists could make this fail
+      Assertions.assertThat(jobGroups).containsExactlyInAnyOrder(jobIds);
+    }
+
+    @Override
+    public void executeJobs(List<String> jobIds, ProcessEngineImpl processEngine) {
+      super.executeJobs(jobIds, processEngine);
+      System.out.println("jobIds = " + jobIds);
+      jobGroups.add(jobIds);
+    }
+  }
+
+  @Test
+  public void testJobAcquisitionWithCallActivitySubProcesses() {
+
+    // configure job executor
+    var jobExecutor = new AssertJobExecutor();
+    jobExecutor.setMaxJobsPerAcquisition(10);
+    // configure and build a process engine
+    StandaloneProcessEngineConfiguration engineConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    engineConfiguration.setProcessEngineName(getClass().getName() + "-engine");
+    engineConfiguration.setJdbcUrl("jdbc:h2:mem:activiti1");
+    engineConfiguration.setJobExecutorActivate(false);
+    engineConfiguration.setJobExecutor(jobExecutor);
+    engineConfiguration.setDbMetricsReporterActivate(false);
+
+    ProcessEngine engine = engineConfiguration.buildProcessEngine();
+    createdProcessEngines.add(engine);
+    jobExecutor.registerProcessEngine((ProcessEngineImpl) engine);
+
+    // given
+    var subModel = Bpmn.createExecutableProcess("subProcess")
+        .startEvent()
+          .scriptTask("scriptTask")
+            .camundaAsyncBefore()
+            .camundaExclusive(true)
+            .scriptFormat("javascript")
+            .scriptText("console.log(execution.getJobs())")
+        .endEvent()
+        .done();
+
+    var rootModel = Bpmn.createExecutableProcess("rootProcess")
+        .startEvent()
+          .callActivity("callActivity")
+            .calledElement("subProcess")
+            .multiInstance()
+              .parallel()
+              .cardinality("2")
+            .multiInstanceDone()
+        .endEvent()
+        .done();
+
+    var deployment = engine.getRepositoryService()
+        .createDeployment()
+        .addModelInstance("subProcess.bpmn", subModel)
+        .addModelInstance("rootProcess.bpmn", rootModel)
+        .deploy();
+
+    // when
+    var pi1 = engine.getRuntimeService().startProcessInstanceByKey("rootProcess");
+    var pi2 = engine.getRuntimeService().startProcessInstanceByKey("rootProcess");
+
+    // then
+    Assertions.assertThat(engine.getManagementService().createJobQuery().list()).hasSize(4);
+    var pi1Jobs = assertProcessInstanceJobs(engine, pi1, 2, "subProcess");
+    var pi2Jobs = assertProcessInstanceJobs(engine, pi2, 2, "subProcess");
+
+    // when
+    jobExecutor.start();
+    waitForJobExecutorToProcessAllJobs(10000, 100, jobExecutor, engine.getManagementService(), true);
+
+    // then
+    jobExecutor.assertJobGroup(pi1Jobs, pi2Jobs);
+
+    // cleanup
+    engine.getRepositoryService().deleteDeployment(deployment.getId(), true);
+  }
+
+  @Test
+  public void testJobAcquisitionWithMultiHierarchySubProcesses() {
+    // configure job executor
+    var jobExecutor = new AssertJobExecutor();
+    jobExecutor.setMaxJobsPerAcquisition(10);
+    // configure and build a process engine
+    StandaloneProcessEngineConfiguration engineConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    engineConfiguration.setProcessEngineName(getClass().getName() + "-engine");
+    engineConfiguration.setJdbcUrl("jdbc:h2:mem:activiti1");
+    engineConfiguration.setJobExecutorActivate(false);
+    engineConfiguration.setJobExecutor(jobExecutor);
+    engineConfiguration.setDbMetricsReporterActivate(false);
+
+    ProcessEngine engine = engineConfiguration.buildProcessEngine();
+    createdProcessEngines.add(engine);
+
+    // given
+    var subSubModel = Bpmn.createExecutableProcess("subSubProcess")
+        .startEvent()
+          .scriptTask("scriptTask")
+            .camundaAsyncBefore()
+            .camundaExclusive(true)
+            .scriptFormat("javascript")
+            .scriptText("console.log(execution.getJobs())")
+        .endEvent()
+        .done();
+
+    var subModel = Bpmn.createExecutableProcess("subProcess")
+        .startEvent()
+          .callActivity("callActivity")
+            .calledElement("subSubProcess")
+            .multiInstance()
+              .parallel()
+              .cardinality("2")
+            .multiInstanceDone()
+        .endEvent()
+        .done();
+
+    var rootModel = Bpmn.createExecutableProcess("rootProcess")
+        .startEvent()
+          .callActivity("callActivity")
+            .calledElement("subProcess")
+            .multiInstance()
+              .parallel()
+              .cardinality("2")
+            .multiInstanceDone()
+        .endEvent()
+        .done();
+
+    var deployment = engine.getRepositoryService()
+        .createDeployment()
+        .addModelInstance("subSubProcess.bpmn", subSubModel)
+        .addModelInstance("subProcess.bpmn", subModel)
+        .addModelInstance("rootProcess.bpmn", rootModel)
+        .deploy();
+
+    // when
+    var pi1 = engine.getRuntimeService().startProcessInstanceByKey("rootProcess");
+    var pi2 = engine.getRuntimeService().startProcessInstanceByKey("rootProcess");
+
+    // then
+    // 4 jobs of subSubProcess are waiting with the rootProcess's id as rootProcessInstanceId
+    Assertions.assertThat(engine.getManagementService().createJobQuery().list()).hasSize(8);
+    var pi1Jobs = assertProcessInstanceJobs(engine, pi1, 4, "subSubProcess");
+    var pi2Jobs = assertProcessInstanceJobs(engine, pi2, 4, "subSubProcess");
+
+    jobExecutor.start();
+    waitForJobExecutorToProcessAllJobs(10000, 100, jobExecutor, engine.getManagementService(), true);
+
+    // then
+    jobExecutor.assertJobGroup(pi1Jobs, pi2Jobs);
+
+    // cleanup
+    engine.getRepositoryService().deleteDeployment(deployment.getId(), true);
   }
 
 }
