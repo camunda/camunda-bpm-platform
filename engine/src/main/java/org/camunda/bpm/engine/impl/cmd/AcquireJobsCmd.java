@@ -72,11 +72,7 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
       lockJob(job);
 
       if(job.isExclusive()) {
-        List<String> list = exclusiveJobsByProcessInstance.get(job.getProcessInstanceId());
-        if (list == null) {
-          list = new ArrayList<String>();
-          exclusiveJobsByProcessInstance.put(job.getProcessInstanceId(), list);
-        }
+        List<String> list = exclusiveJobsByProcessInstance.computeIfAbsent(job.getRootProcessInstanceId(), key -> new ArrayList<>());
         list.add(job.getId());
       }
       else {
@@ -140,7 +136,7 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
     if (operation instanceof DbEntityOperation) {
 
       DbEntityOperation entityOperation = (DbEntityOperation) operation;
-      
+
       // could not lock the job -> remove it from list of acquired jobs
       acquiredJobs.removeJobId(entityOperation.getEntity().getId());
 
