@@ -34,14 +34,15 @@ IF "x%JAVA_HOME%" == "x" (
       GOTO :EOF
     )
     ECHO Setting JAVA property to "%JAVA_HOME%\bin\java"
-    SET JAVA="%JAVA_HOME%\bin\java"
+    SET "JAVA="%JAVA_HOME%\bin\java"
   )
 )
 
 SET EXPECTED_JAVA_VERSION=17
-FOR /f "tokens=3" %%g IN ('JAVA -version 2^>^&1 ^| findstr /i "version"') DO (
+FOR /f "tokens=3" %%g IN ('%JAVA% -version 2^>^&1 ^| findstr /i "version"') DO (
   SET JAVA_VERSION=%%g
 )
+REM Remove the surrounding quotes
 SET JAVA_VERSION=%JAVA_VERSION:"=%
 ECHO Java version is %JAVA_VERSION%
 FOR /f "delims=. tokens=1" %%v in ("%JAVA_VERSION%") do (
