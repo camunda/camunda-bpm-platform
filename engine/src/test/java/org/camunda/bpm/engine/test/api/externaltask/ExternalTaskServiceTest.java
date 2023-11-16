@@ -204,12 +204,15 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     ClockTestUtil.incrementClock(60_000);
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
-    // when
-    var result = externalTaskService.fetchAndLock().maxTasks(6).workerId(WORKER_ID)
-        .topic(TOPIC_NAME, LOCK_TIME)
-        .usePriority(true)
-        .orderByCreateTime().desc()
+    var result = externalTaskService.fetchAndLock()
+        .maxTasks(5)
+        .workerId(WORKER_ID)
 
+        // when
+        .orderByCreateTime().desc()
+        .usePriority(true)
+
+        .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
     assertThat(result.size()).isEqualTo(5);
@@ -243,8 +246,14 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     ClockTestUtil.incrementClock(60_000);
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
-    // when
-    var result = externalTaskService.fetchAndLock(6, WORKER_ID, true)
+    var result = externalTaskService.fetchAndLock()
+        .maxTasks(5)
+        .workerId(WORKER_ID)
+
+        // when
+        .orderByCreateTime().asc()
+        .usePriority(true)
+
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
@@ -279,8 +288,14 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     ClockTestUtil.incrementClock(60_000);
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
-    // when
-    var result = externalTaskService.fetchAndLock(6, WORKER_ID, false)
+    var result = externalTaskService.fetchAndLock()
+        .maxTasks(5)
+        .workerId(WORKER_ID)
+
+        // when
+        .orderByCreateTime().asc()
+        .usePriority(false)
+
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
@@ -306,12 +321,15 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     ClockTestUtil.incrementClock(60_000);
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
-    // when
-    var result = externalTaskService.fetchAndLock().maxTasks(5).workerId(WORKER_ID)
-        .topic(TOPIC_NAME, LOCK_TIME)
-        .usePriority(false)
-        .orderByCreateTime().desc()
+    var result = externalTaskService.fetchAndLock()
+        .maxTasks(5)
+        .workerId(WORKER_ID)
 
+        // when
+        .orderByCreateTime().desc()
+        .usePriority(false)
+
+        .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
     assertThat(result.size()).isEqualTo(5);
@@ -328,7 +346,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
       "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml"
   })
   @Test
-  public void shouldIgnoreCreateTimeConfigWhenOrderIsEmpty() {
+  public void shouldIgnoreCreateOrderingWhenCreateTimeIsNotConfigured() {
     // given
     runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
     ClockTestUtil.incrementClock(60_000);
@@ -336,8 +354,14 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     ClockTestUtil.incrementClock(60_000);
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
-    // when
-    var result = externalTaskService.fetchAndLock(6, WORKER_ID, true)
+    var result = externalTaskService.fetchAndLock()
+        .maxTasks(5)
+        .workerId(WORKER_ID)
+
+        // when
+        // create time ordering is omitted
+        .usePriority(true)
+
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
