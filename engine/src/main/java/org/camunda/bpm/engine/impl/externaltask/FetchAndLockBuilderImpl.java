@@ -17,7 +17,6 @@
 
 package org.camunda.bpm.engine.impl.externaltask;
 
-import java.util.HashMap;
 import java.util.List;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.FetchAndLockBuilder;
@@ -75,7 +74,7 @@ public class FetchAndLockBuilderImpl implements FetchAndLockBuilder {
   @Override
   public ExternalTaskQueryTopicBuilder subscribe() {
     topicsConfigBuilder = new ExternalTaskQueryTopicBuilderImpl(commandExecutor, workerId, maxTasks, usePriority,
-        useCreateTime, createTimeDirection, new HashMap<>());
+        useCreateTime, createTimeDirection);
 
     return topicsConfigBuilder;
   }

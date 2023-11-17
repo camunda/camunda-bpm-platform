@@ -50,13 +50,17 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
 
   protected TopicFetchInstruction currentInstruction;
 
+  /**
+   * All args constructor.
+   */
   public ExternalTaskQueryTopicBuilderImpl(CommandExecutor commandExecutor,
                                            String workerId,
                                            int maxTasks,
                                            boolean usePriority,
                                            boolean useCreateTime,
                                            Direction createTimeDirection,
-                                           Map<String, TopicFetchInstruction> instructions) {
+                                           Map<String, TopicFetchInstruction> instructions,
+                                           TopicFetchInstruction currentInstruction) {
     this.commandExecutor = commandExecutor;
     this.workerId = workerId;
     this.maxTasks = maxTasks;
@@ -64,13 +68,29 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
     this.useCreateTime = useCreateTime;
     this.createTimeDirection = createTimeDirection;
     this.instructions = instructions;
+    this.currentInstruction = currentInstruction;
   }
 
+  /**
+   * Constructor using priority & createTime.
+   */
+  public ExternalTaskQueryTopicBuilderImpl(CommandExecutor commandExecutor,
+                                           String workerId,
+                                           int maxTasks,
+                                           boolean usePriority,
+                                           boolean useCreateTime,
+                                           Direction createTimeDirection) {
+    this(commandExecutor, workerId, maxTasks, usePriority, useCreateTime, createTimeDirection, new HashMap<>(), null);
+  }
+
+  /**
+   * Constructor using priority.
+   */
   public ExternalTaskQueryTopicBuilderImpl(CommandExecutor commandExecutor,
                                            String workerId,
                                            int maxTasks,
                                            boolean usePriority) {
-    this(commandExecutor, workerId, maxTasks, usePriority, false, null, new HashMap<>());
+    this(commandExecutor, workerId, maxTasks, usePriority, false, null, new HashMap<>(), null);
   }
 
   /**
@@ -84,13 +104,9 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
         builder.usePriority,
         builder.useCreateTime,
         builder.createTimeDirection,
-        builder.instructions
+        builder.instructions,
+        builder.currentInstruction
     );
-  }
-
-  public ExternalTaskQueryTopicBuilderImpl(CommandExecutor commandExecutor) {
-    this.commandExecutor = commandExecutor;
-    this.instructions = new HashMap<>();
   }
 
   public List<LockedExternalTask> execute() {
