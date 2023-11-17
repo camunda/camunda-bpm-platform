@@ -17,7 +17,10 @@
 
 package org.camunda.bpm.engine.impl.externaltask;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNull;
+
 import java.util.List;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.FetchAndLockBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
@@ -63,10 +66,17 @@ public class FetchAndLockBuilderImpl implements FetchAndLockBuilder {
   }
 
   public FetchAndLockBuilderImpl asc() {
+    validateFieldIsSet();
+    validateOrderIsNotSetYet();
+
     createTimeDirection = Direction.ASCENDING;
     return this;
   }
+
   public FetchAndLockBuilderImpl desc() {
+    validateFieldIsSet();
+    validateOrderIsNotSetYet();
+
     createTimeDirection = Direction.DESCENDING;
     return this;
   }
@@ -85,4 +95,13 @@ public class FetchAndLockBuilderImpl implements FetchAndLockBuilder {
     return builder.execute();
   }
 
+  protected void validateFieldIsSet() {
+    if (!useCreateTime) {
+      throw new NotValidException("Invalid query: call asc() or desc() after using orderByCreateTime()");
+    }
+  }
+
+  protected void validateOrderIsNotSetYet() {
+    ensureNull(NotValidException.class, "Invalid query: can specify only one direction desc() or asc() for an ordering constraint", "createTimeDirection", createTimeDirection);
+  }
 }

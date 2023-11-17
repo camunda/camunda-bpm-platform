@@ -22,7 +22,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
+import java.util.Optional;
+import java.util.function.Consumer;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
@@ -35,13 +36,6 @@ import org.camunda.bpm.engine.rest.dto.SortingDto;
  *
  */
 public class FetchExternalTasksDto {
-
-  protected Map<String, BiConsumer<SortingDto, FetchAndLockBuilder>> SORT_BY_FIELD = Map.of(
-      "createTime", this::configureCreateTime
-  );
-
-  public static final String SORT_ORDER_ASC_VALUE = "asc";
-  public static final String SORT_ORDER_DESC_VALUE = "desc";
 
   protected int maxTasks;
   protected String workerId;
@@ -281,17 +275,6 @@ public class FetchExternalTasksDto {
     return builder;
   }
 
-  protected void configureSorting(FetchAndLockBuilder builder, List<SortingDto> sortings) {
-    sortings = (sortings == null) ? Collections.emptyList() : sortings;
-
-    for (SortingDto sorting : sortings) {
-      String sortBy = sorting.getSortBy();
-      if (sortBy != null) {
-        SORT_BY_FIELD.get(sortBy).accept(sorting, builder);
-      }
-    }
-  }
-
   protected FetchAndLockBuilder getBuilder(ProcessEngine engine) {
     ExternalTaskService service = engine.getExternalTaskService();
 
@@ -300,17 +283,56 @@ public class FetchExternalTasksDto {
         .maxTasks(maxTasks)
         .usePriority(usePriority);
 
-    configureSorting(builder, sortings);
+    SortMapper mapper = new SortMapper(sortings, builder);
 
-    return builder;
+    return mapper.getBuilderWithSortConfigs();
   }
 
-  protected void configureCreateTime(SortingDto dto, FetchAndLockBuilder builder) {
-    switch (dto.getSortBy()) {
-    case SORT_ORDER_ASC_VALUE:
-      builder.orderByCreateTime().asc();
-    case SORT_ORDER_DESC_VALUE:
-      builder.orderByCreateTime().desc();
+  /**
+   * Encapsulates the mapping of sorting configurations (field, order) to the respective methods builder config methods
+   * and applies them.
+   * <p>
+   * To achieve that, maps are used internally to map fields and orders to the corresponding builder method.
+   * It works with case-insensitive orders (e.g will work with "asc", "ASC").
+   * Fields need are case-sensitive.
+   */
+  static class SortMapper {
+
+    protected static Map<String, Consumer<FetchAndLockBuilder>> FIELD_MAPPINGS = Map.of(
+        "createTime", FetchAndLockBuilder::orderByCreateTime
+    );
+
+    protected static Map<String, Consumer<FetchAndLockBuilder>> ORDER_MAPPINGS = Map.of(
+        "asc", FetchAndLockBuilder::asc,
+        "desc", FetchAndLockBuilder::desc
+    );
+
+    protected final List<SortingDto> sortings;
+    protected final FetchAndLockBuilder builder;
+
+    protected SortMapper(List<SortingDto> sortings, FetchAndLockBuilder builder) {
+      this.sortings = (sortings == null) ? Collections.emptyList() : sortings;
+      this.builder = builder;
+    }
+
+    /**
+     * Applies the sorting field mappings to the builder and returns it.
+     */
+    protected FetchAndLockBuilder getBuilderWithSortConfigs() {
+      sortings.forEach(dto -> {
+        fieldMappingKey(dto).ifPresent(key -> FIELD_MAPPINGS.get(key).accept(builder));
+        orderMappingKey(dto).ifPresent(key -> ORDER_MAPPINGS.get(key).accept(builder));
+      });
+
+      return builder;
+    }
+
+    protected Optional<String> fieldMappingKey(SortingDto dto) {
+      return Optional.ofNullable(dto.getSortBy());
+    }
+
+    protected Optional<String> orderMappingKey(SortingDto dto) {
+      return Optional.ofNullable(dto.getSortOrder());
     }
   }
 

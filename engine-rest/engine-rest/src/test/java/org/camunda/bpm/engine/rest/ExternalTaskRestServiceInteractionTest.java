@@ -18,6 +18,8 @@ package org.camunda.bpm.engine.rest;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -32,6 +34,7 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -63,6 +66,7 @@ import org.camunda.bpm.engine.impl.HistoryServiceImpl;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.externaltask.FetchAndLockBuilderImpl;
+import org.camunda.bpm.engine.rest.dto.SortingDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskQueryDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
@@ -159,30 +163,15 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     when(fetchTopicBuilder.includeExtensionProperties()).thenReturn(fetchTopicBuilder);
 
     fetchAndLockBuilder = mock(FetchAndLockBuilderImpl.class);
+    when(fetchAndLockBuilder.orderByCreateTime()).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.asc()).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.desc()).thenReturn(fetchAndLockBuilder);
 
     when(fetchAndLockBuilder.workerId(anyString())).thenReturn(fetchAndLockBuilder);
     when(fetchAndLockBuilder.maxTasks(anyInt())).thenReturn(fetchAndLockBuilder);
     when(fetchAndLockBuilder.usePriority(anyBoolean())).thenReturn(fetchAndLockBuilder);
 
     when(fetchAndLockBuilder.subscribe()).thenReturn(fetchTopicBuilder);
-
-    when(fetchTopicBuilder.topic(any(), anyLong())).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.variables(Mockito.<List<String>>any())).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.variables(Mockito.<String[]>any())).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.enableCustomObjectDeserialization()).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.localVariables()).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.topic(any(), anyLong())).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.businessKey(any())).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.processDefinitionId(any())).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.processDefinitionIdIn(Mockito.<String>any())).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.processDefinitionKey(any())).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.processDefinitionKeyIn(Mockito.<String>any())).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.processInstanceVariableEquals(any())).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.processDefinitionVersionTag(any())).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.withoutTenantId()).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.tenantIdIn(Mockito.<String>any())).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.includeExtensionProperties()).thenReturn(fetchTopicBuilder);
-
     when(externalTaskService.fetchAndLock()).thenReturn(fetchAndLockBuilder);
 
     Batch batch = createMockBatch();
@@ -221,7 +210,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     Map<String, Object> topicParameter = new HashMap<>();
     topicParameter.put("topicName", "aTopicName");
     topicParameter.put("lockDuration", 12354L);
-    topicParameter.put("variables", Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    topicParameter.put("variables", Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
     parameters.put("topics", Arrays.asList(topicParameter));
 
     executePost(parameters);
@@ -236,7 +225,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     inOrder.verify(fetchAndLockBuilder).subscribe();
 
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
     inOrder.verify(fetchAndLockBuilder).execute();
 
     verifyNoMoreInteractions(fetchTopicBuilder, fetchTopicBuilder, externalTaskService);
@@ -257,7 +246,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     topicParameter.put("topicName", "aTopicName");
     topicParameter.put("businessKey", EXAMPLE_BUSINESS_KEY);
     topicParameter.put("lockDuration", 12354L);
-    topicParameter.put("variables", Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    topicParameter.put("variables", Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
     parameters.put("topics", Arrays.asList(topicParameter));
 
     executePost(parameters);
@@ -273,7 +262,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).businessKey(EXAMPLE_BUSINESS_KEY);
-    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
     inOrder.verify(fetchAndLockBuilder).execute();
 
     verifyNoMoreInteractions(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
@@ -335,10 +324,10 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     topicParameter.put("topicName", "aTopicName");
     topicParameter.put("businessKey", EXAMPLE_BUSINESS_KEY);
     topicParameter.put("lockDuration", 12354L);
-    topicParameter.put("variables", Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    topicParameter.put("variables", Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
 
     Map<String, Object> variableValueParameter = new HashMap<>();
-    variableValueParameter.put(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME, MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue());
+    variableValueParameter.put(EXAMPLE_VARIABLE_INSTANCE_NAME, EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue());
     topicParameter.put("processVariables", variableValueParameter);
 
     parameters.put("topics", Arrays.asList(topicParameter));
@@ -356,7 +345,151 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).businessKey(EXAMPLE_BUSINESS_KEY);
-    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchTopicBuilder).processInstanceVariableEquals(variableValueParameter);
+    inOrder.verify(fetchAndLockBuilder).execute();
+
+    verifyNoMoreInteractions(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
+  }
+
+  @Test
+  public void testFetchAndLockWithCreateTimeAsc() {
+    // given
+    when(fetchAndLockBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("maxTasks", 5);
+    parameters.put("workerId", "aWorkerId");
+    parameters.put("usePriority", false);
+    parameters.put("sortings", List.of(SortingDtoFactory.create("createTime", "asc")));
+
+    Map<String, Object> topicParameter = new HashMap<>();
+    topicParameter.put("topicName", "aTopicName");
+    topicParameter.put("businessKey", EXAMPLE_BUSINESS_KEY);
+    topicParameter.put("lockDuration", 12354L);
+    topicParameter.put("variables", Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
+
+    Map<String, Object> variableValueParameter = new HashMap<>();
+    variableValueParameter.put(EXAMPLE_VARIABLE_INSTANCE_NAME, EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue());
+    topicParameter.put("processVariables", variableValueParameter);
+
+    parameters.put("topics", Arrays.asList(topicParameter));
+
+    // when
+    executePost(parameters);
+
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
+
+    inOrder.verify(externalTaskService).fetchAndLock();
+
+    inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
+    inOrder.verify(fetchAndLockBuilder).maxTasks(5);
+    inOrder.verify(fetchAndLockBuilder).usePriority(false);
+
+    // then
+    inOrder.verify(fetchAndLockBuilder).orderByCreateTime();
+    inOrder.verify(fetchAndLockBuilder).asc();
+
+    inOrder.verify(fetchAndLockBuilder).subscribe();
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).businessKey(EXAMPLE_BUSINESS_KEY);
+    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchTopicBuilder).processInstanceVariableEquals(variableValueParameter);
+    inOrder.verify(fetchAndLockBuilder).execute();
+
+    verifyNoMoreInteractions(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
+  }
+
+  @Test
+  public void testFetchAndLockWithCreateTimeDesc() {
+    // given
+    when(fetchAndLockBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("maxTasks", 5);
+    parameters.put("workerId", "aWorkerId");
+    parameters.put("usePriority", false);
+    parameters.put("sortings", List.of(SortingDtoFactory.create("createTime", "desc")));
+
+    Map<String, Object> topicParameter = new HashMap<>();
+    topicParameter.put("topicName", "aTopicName");
+    topicParameter.put("businessKey", EXAMPLE_BUSINESS_KEY);
+    topicParameter.put("lockDuration", 12354L);
+    topicParameter.put("variables", Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
+
+    Map<String, Object> variableValueParameter = new HashMap<>();
+    variableValueParameter.put(EXAMPLE_VARIABLE_INSTANCE_NAME, EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue());
+    topicParameter.put("processVariables", variableValueParameter);
+
+    parameters.put("topics", Arrays.asList(topicParameter));
+
+    // when
+    executePost(parameters);
+
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
+
+    inOrder.verify(externalTaskService).fetchAndLock();
+
+    inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
+    inOrder.verify(fetchAndLockBuilder).maxTasks(5);
+    inOrder.verify(fetchAndLockBuilder).usePriority(false);
+
+    // then
+    inOrder.verify(fetchAndLockBuilder).orderByCreateTime();
+    inOrder.verify(fetchAndLockBuilder).desc();
+
+    inOrder.verify(fetchAndLockBuilder).subscribe();
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).businessKey(EXAMPLE_BUSINESS_KEY);
+    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchTopicBuilder).processInstanceVariableEquals(variableValueParameter);
+    inOrder.verify(fetchAndLockBuilder).execute();
+
+    verifyNoMoreInteractions(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
+  }
+
+  @Test
+  public void testFetchAndLockWithCreateTimeWithoutOrder() {
+    // given
+    when(fetchAndLockBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("maxTasks", 5);
+    parameters.put("workerId", "aWorkerId");
+    parameters.put("usePriority", false);
+    parameters.put("sortings", List.of(SortingDtoFactory.create("createTime", null)));
+
+    Map<String, Object> topicParameter = new HashMap<>();
+    topicParameter.put("topicName", "aTopicName");
+    topicParameter.put("businessKey", EXAMPLE_BUSINESS_KEY);
+    topicParameter.put("lockDuration", 12354L);
+    topicParameter.put("variables", Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
+
+    Map<String, Object> variableValueParameter = new HashMap<>();
+    variableValueParameter.put(EXAMPLE_VARIABLE_INSTANCE_NAME, EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue());
+    topicParameter.put("processVariables", variableValueParameter);
+
+    parameters.put("topics", Arrays.asList(topicParameter));
+
+    // when
+    executePost(parameters);
+
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
+
+    // then
+    inOrder.verify(externalTaskService).fetchAndLock();
+
+    inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
+    inOrder.verify(fetchAndLockBuilder).maxTasks(5);
+    inOrder.verify(fetchAndLockBuilder).usePriority(false);
+    inOrder.verify(fetchAndLockBuilder).orderByCreateTime();
+    inOrder.verify(fetchAndLockBuilder, times(0)).desc(); // no order call on builder
+    inOrder.verify(fetchAndLockBuilder, times(0)).asc();
+    inOrder.verify(fetchAndLockBuilder).subscribe();
+
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).businessKey(EXAMPLE_BUSINESS_KEY);
+    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
     inOrder.verify(fetchTopicBuilder).processInstanceVariableEquals(variableValueParameter);
     inOrder.verify(fetchAndLockBuilder).execute();
 
@@ -523,7 +656,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     Map<String, Object> topicParameter = new HashMap<>();
     topicParameter.put("topicName", "aTopicName");
     topicParameter.put("lockDuration", 12354L);
-    topicParameter.put("variables", Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    topicParameter.put("variables", Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
     topicParameter.put("deserializeValues", true);
     parameters.put("topics", Arrays.asList(topicParameter));
 
@@ -548,7 +681,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
 
-    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
     inOrder.verify(fetchTopicBuilder).enableCustomObjectDeserialization();
     inOrder.verify(fetchAndLockBuilder).execute();
 
@@ -568,7 +701,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     Map<String, Object> topicParameter = new HashMap<>();
     topicParameter.put("topicName", "aTopicName");
     topicParameter.put("lockDuration", 12354L);
-    topicParameter.put("variables", Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    topicParameter.put("variables", Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
     topicParameter.put("localVariables", true);
     parameters.put("topics", Arrays.asList(topicParameter));
 
@@ -593,14 +726,13 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     inOrder.verify(fetchAndLockBuilder).subscribe();
 
     inOrder.verify(topicBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(topicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(topicBuilder).variables(Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
     inOrder.verify(topicBuilder).localVariables();
 
     inOrder.verify(fetchAndLockBuilder).execute();
 
     verifyNoMoreInteractions(fetchTopicBuilder, fetchTopicBuilder, externalTaskService);
   }
-
 
   @Test
   public void testComplete() {
@@ -1945,11 +2077,20 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
         .body("[0].retries", equalTo(MockProvider.EXTERNAL_TASK_RETRIES))
         .body("[0].errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
         .body("[0].priority", equalTo(MockProvider.EXTERNAL_TASK_PRIORITY))
-        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME, notNullValue())
-        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".value", equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
-        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".type", equalTo("String"))
+        .body("[0].variables." + EXAMPLE_VARIABLE_INSTANCE_NAME, notNullValue())
+        .body("[0].variables." + EXAMPLE_VARIABLE_INSTANCE_NAME + ".value", equalTo(EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
+        .body("[0].variables." + EXAMPLE_VARIABLE_INSTANCE_NAME + ".type", equalTo("String"))
 
         .when().post(FETCH_EXTERNAL_TASK_URL);
+  }
+
+  static class SortingDtoFactory {
+    public static SortingDto create(String sortBy, String sortOrder) {
+      var result = new SortingDto();
+      result.setSortOrder(sortOrder);
+      result.setSortBy(sortBy);
+      return result;
+    }
   }
 
 }
