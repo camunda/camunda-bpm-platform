@@ -40,6 +40,7 @@ public abstract class CoreModelElement implements Serializable {
   protected String id;
   protected String name;
   protected Properties properties = new Properties();
+  protected Map<String, Object> payload;
 
   /** contains built-in listeners */
   protected Map<String, List<DelegateListener<? extends BaseDelegateExecution>>> builtInListeners = new HashMap<String, List<DelegateListener<? extends BaseDelegateExecution>>>();
@@ -195,6 +196,14 @@ public abstract class CoreModelElement implements Serializable {
 
   public Map<String, List<VariableListener<?>>> getVariableListeners() {
     return variableListeners;
+  }
+
+  public Map<String, Object> getPayload() {
+    return payload;
+  }
+
+  public void setPayload(Map<String, Object> payload) {
+    this.payload = payload;
   }
 
 }
