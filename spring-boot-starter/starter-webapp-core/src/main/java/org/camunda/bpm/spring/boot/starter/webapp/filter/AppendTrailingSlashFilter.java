@@ -24,31 +24,20 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
 /**
- * Servlet filter to ensure app paths always have a trailing slash. Before Spring Boot 3, missing trailing slashes
- * were handled automatically. This filter ensures the pre Spring Boot 3 behavior.
+ * Servlet filter to ensure request paths always have a trailing slash. Before Spring Boot 3, missing trailing slashes were
+ * handled automatically. This filter implements the Spring Boot 2 behavior for the registered request patterns.
  *
  * @see https://github.com/spring-projects/spring-framework/issues/28552
  */
-public class MapTrailingSlashFilter implements Filter {
-
-  public static final List<String> REDIRECT_PATHS = List.of("/app", "/app/cockpit", "/app/admin", "/app/tasklist", "/app/welcome");
+public class AppendTrailingSlashFilter implements Filter {
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {
     String requestURI = ((HttpServletRequest) request).getRequestURI();
-
-    for (String path : REDIRECT_PATHS) {
-      if(requestURI.endsWith(path)) {
-        requestURI += "/";
-        ((HttpServletResponse) response).sendRedirect(requestURI);
-        return;
-      }
-    }
-    chain.doFilter(request, response);
+    ((HttpServletResponse) response).sendRedirect(requestURI + "/");
   }
 
 }

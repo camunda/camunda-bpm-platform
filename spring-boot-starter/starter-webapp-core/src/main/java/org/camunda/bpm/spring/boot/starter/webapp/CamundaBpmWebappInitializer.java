@@ -36,9 +36,9 @@ import org.camunda.bpm.engine.rest.filter.CacheControlFilter;
 import org.camunda.bpm.engine.rest.filter.EmptyBodyFilter;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.camunda.bpm.spring.boot.starter.property.WebappProperty;
+import org.camunda.bpm.spring.boot.starter.webapp.filter.AppendTrailingSlashFilter;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.LazyProcessEnginesFilter;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.LazySecurityFilter;
-import org.camunda.bpm.spring.boot.starter.webapp.filter.MapTrailingSlashFilter;
 import org.camunda.bpm.tasklist.impl.web.TasklistApplication;
 import org.camunda.bpm.tasklist.impl.web.bootstrap.TasklistContainerBootstrap;
 import org.camunda.bpm.webapp.impl.engine.EngineRestApplication;
@@ -91,8 +91,14 @@ public class CamundaBpmWebappInitializer implements ServletContextInitializer {
 
     ServletContextUtil.setAppPath(applicationPath, servletContext);
 
-    registerFilter("MapTrailingSlashFilter", MapTrailingSlashFilter.class,
-        applicationPath + "/*");
+    // make sure that trailing slashes are added for the registered patterns
+    // see AppendTrailingSlashFilter for details
+    registerFilter("AppendTrailingSlashFilter", AppendTrailingSlashFilter.class,
+        applicationPath + "/app",
+        applicationPath + "/app/cockpit",
+        applicationPath + "/app/admin",
+        applicationPath + "/app/tasklist",
+        applicationPath + "/app/welcome");
     registerFilter("Authentication Filter", AuthenticationFilter.class,
         Collections.singletonMap("cacheTimeToLive", getAuthCacheTTL(webapp)),
         applicationPath + "/api/*", applicationPath + "/app/*");

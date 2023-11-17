@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.camunda.bpm.spring.boot.starter.webapp.TestApplication;
-import org.camunda.bpm.spring.boot.starter.webapp.filter.MapTrailingSlashFilter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,40 +37,27 @@ import org.springframework.test.context.junit4.SpringRunner;
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RequestTrailingSlashIT {
 
+  public static final List<String> REDIRECT_PATHS = List.of("/app", "/app/cockpit", "/app/admin", "/app/tasklist", "/app/welcome");
+
   TestRestTemplate client = new TestRestTemplate();
 
   @LocalServerPort
   public int port;
 
   @Test
-  public void shouldResolvePathWithMissingTrailingSlash() throws IOException {
+  public void shouldRedirectPathWithMissingTrailingSlash() throws IOException {
     // given
     List<ResponseEntity<String>> responses = new ArrayList<>();
 
-    // when
-    for (String path : MapTrailingSlashFilter.REDIRECT_PATHS) {
-      responses.add(client.getForEntity(buildURL(path, false), String.class));
+    // when calling different paths with and without trailing slashes
+    for (String path : REDIRECT_PATHS) {
+      String url = "http://localhost:" + port + "/camunda" + path;
+      responses.add(client.getForEntity(url, String.class));
+      responses.add(client.getForEntity(url + "/", String.class));
     }
 
-    // then
+    // then all paths should be found
     assertThat(responses).extracting("statusCode").containsOnly(HttpStatus.OK);
   }
 
-  @Test
-  public void shouldResolvePathWithTrailingSlash() throws IOException {
-    // given
-    List<ResponseEntity<String>> responses = new ArrayList<>();
-
-    // when
-    for (String path : MapTrailingSlashFilter.REDIRECT_PATHS) {
-      responses.add(client.getForEntity(buildURL(path, true), String.class));
-    }
-
-    // then
-    assertThat(responses).extracting("statusCode").containsOnly(HttpStatus.OK);
-  }
-
-  private String buildURL(String appPath, boolean trailingSlash) {
-    return "http://localhost:" + port + "/camunda" + appPath + (trailingSlash ? "/" : "");
-  }
 }
