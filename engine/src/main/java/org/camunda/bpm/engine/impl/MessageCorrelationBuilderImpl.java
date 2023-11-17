@@ -59,6 +59,7 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   protected VariableMap correlationLocalVariables;
   protected VariableMap payloadProcessInstanceVariables;
   protected VariableMap payloadProcessInstanceVariablesLocal;
+  protected VariableMap payloadNewScopeVariableLocal;
 
   protected String tenantId = null;
   protected boolean isTenantIdSet = false;
@@ -175,6 +176,15 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
     return this;
   }
 
+  public MessageCorrelationBuilder setNewScopeVariablesLocal(Map<String, Object> variables) {
+    if (variables != null) {
+      ensurePayloadNewScopeVariablesLocalInitialized();
+      payloadNewScopeVariableLocal.putAll(variables);
+    }
+    return this;
+  }
+
+
   protected void ensurePayloadProcessInstanceVariablesInitialized() {
     if (payloadProcessInstanceVariables == null) {
       payloadProcessInstanceVariables = new VariableMapImpl();
@@ -184,6 +194,12 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   protected void ensurePayloadProcessInstanceVariablesLocalInitialized() {
     if (payloadProcessInstanceVariablesLocal == null) {
       payloadProcessInstanceVariablesLocal = new VariableMapImpl();
+    }
+  }
+
+  protected void ensurePayloadNewScopeVariablesLocalInitialized() {
+    if (payloadNewScopeVariableLocal == null) {
+      payloadNewScopeVariableLocal = new VariableMapImpl();
     }
   }
 
@@ -365,6 +381,10 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
 
   public VariableMap getPayloadProcessInstanceVariablesLocal() {
     return payloadProcessInstanceVariablesLocal;
+  }
+
+  public VariableMap getPayloadNewScopeVariableLocal() {
+    return payloadNewScopeVariableLocal;
   }
 
   public boolean isExclusiveCorrelation() {

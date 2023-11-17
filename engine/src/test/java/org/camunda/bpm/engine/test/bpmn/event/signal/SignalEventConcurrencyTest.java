@@ -103,7 +103,7 @@ public class SignalEventConcurrencyTest extends ConcurrencyTestHelper {
       sendSignalCommand.getMonitor().sync();
 
       return invocation.callRealMethod();
-    }).when(evSpy).handleEvent(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+    }).when(evSpy).handleEvent(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
 
     // send the signal in a separate thread & wait until it reaches our breakpoint (sync()) in the SignalEventHandler
     ThreadControl signalThread = executeControllableCommand(sendSignalCommand);

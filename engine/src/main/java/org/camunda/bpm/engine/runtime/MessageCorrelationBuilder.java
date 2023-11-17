@@ -144,6 +144,8 @@ public interface MessageCorrelationBuilder {
    */
   MessageCorrelationBuilder setVariablesLocal(Map<String, Object> variables);
 
+  MessageCorrelationBuilder setNewScopeVariablesLocal(Map<String, Object> variables);
+
   /**
    * Specify a tenant to deliver the message to. The message can only be
    * received on executions or process definitions which belongs to the given
