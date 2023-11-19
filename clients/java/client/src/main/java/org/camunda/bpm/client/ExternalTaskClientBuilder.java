@@ -20,6 +20,7 @@ import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.backoff.ExponentialBackoffStrategy;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
+import org.camunda.bpm.client.topic.impl.TopicSubscriptionManager;
 
 /**
  * <p>A fluent builder to configure the Camunda client</p>
@@ -140,6 +141,8 @@ public interface ExternalTaskClientBuilder {
    * @return the builder
    */
   ExternalTaskClientBuilder disableBackoffStrategy();
+
+  ExternalTaskClientBuilder topicSubscriptionManager(TopicSubscriptionManager topicSubscriptionManager);
 
   /**
    * Bootstraps the Camunda client

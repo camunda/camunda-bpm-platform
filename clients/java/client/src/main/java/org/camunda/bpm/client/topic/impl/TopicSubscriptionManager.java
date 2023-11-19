@@ -71,6 +71,13 @@ public class TopicSubscriptionManager implements Runnable {
 
   protected long clientLockDuration;
 
+  public TopicSubscriptionManager(){
+    this.subscriptions = new CopyOnWriteArrayList<>();
+    this.taskTopicRequests = new ArrayList<>();
+    this.externalTaskHandlers = new HashMap<>();
+    this.isBackoffStrategyDisabled = new AtomicBoolean(false);
+  }
+
   public TopicSubscriptionManager(EngineClient engineClient, TypedValues typedValues, long clientLockDuration) {
     this.engineClient = engineClient;
     this.subscriptions = new CopyOnWriteArrayList<>();
@@ -207,6 +214,22 @@ public class TopicSubscriptionManager implements Runnable {
 
   public void setBackoffStrategy(BackoffStrategy backOffStrategy) {
     this.backoffStrategy = backOffStrategy;
+  }
+
+  public void setEngineClient(EngineClient engineClient) {
+    this.engineClient = engineClient;
+  }
+
+  public void setTypedValues(TypedValues typedValues) {
+    this.typedValues = typedValues;
+  }
+
+  public void setClientLockDuration(long clientLockDuration) {
+    this.clientLockDuration = clientLockDuration;
+  }
+
+  public void setExternalTaskService(ExternalTaskServiceImpl externalTaskService) {
+    this.externalTaskService = externalTaskService;
   }
 
   protected void runBackoffStrategy(FetchAndLockResponseDto fetchAndLockResponse) {

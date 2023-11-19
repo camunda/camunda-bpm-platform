@@ -25,6 +25,7 @@ import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 
 import org.camunda.bpm.client.spring.impl.client.util.ClientLoggerUtil;
+import org.camunda.bpm.client.topic.impl.TopicSubscriptionManager;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ public class ClientFactory
   protected ClientConfiguration clientConfiguration;
 
   protected BackoffStrategy backoffStrategy;
+  protected TopicSubscriptionManager topicSubscriptionManager;
   protected List<ClientRequestInterceptor> requestInterceptors = new ArrayList<>();
 
   protected ExternalTaskClient client;
@@ -89,6 +91,9 @@ public class ClientFactory
       if (backoffStrategy != null) {
         clientBuilder.backoffStrategy(backoffStrategy);
       }
+      if (topicSubscriptionManager!=null){
+        clientBuilder.topicSubscriptionManager(topicSubscriptionManager);
+      }
       client = clientBuilder.build();
     }
 
@@ -113,6 +118,12 @@ public class ClientFactory
   public void setClientBackoffStrategy(BackoffStrategy backoffStrategy) {
     this.backoffStrategy = backoffStrategy;
     LOG.backoffStrategyFound();
+  }
+
+  @Autowired(required = false)
+  public void setClientTopicSubscriptionManager(TopicSubscriptionManager topicSubscriptionManager){
+    this.topicSubscriptionManager = topicSubscriptionManager;
+    LOG.topicSubscriptionManagerFound();
   }
 
   @Override
