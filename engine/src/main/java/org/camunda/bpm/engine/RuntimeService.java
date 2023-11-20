@@ -670,6 +670,32 @@ public interface RuntimeService {
    * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
    * @param skipCustomListeners skips custom execution listeners when removing instances
    * @param skipSubprocesses skips subprocesses when removing instances
+   *
+   * @throws BadUserRequestException
+   *          when no process instance is found with the given queries or ids.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES} permission on {@link Resources#BATCH}.
+   */
+  Batch deleteProcessInstancesAsync(List<String> processInstanceIds,
+                                    ProcessInstanceQuery processInstanceQuery,
+                                    HistoricProcessInstanceQuery historicProcessInstanceQuery,
+                                    String deleteReason,
+                                    boolean skipCustomListeners,
+                                    boolean skipSubprocesses);
+
+  /**
+   * Delete an existing runtime process instances asynchronously using Batch operation.
+   *
+   * Deletion propagates upward as far as necessary.
+   *
+   * @param processInstanceIds id's of process instances to delete.
+   * @param processInstanceQuery query that will be used to fetch affected process instances.
+   * @param historicProcessInstanceQuery query that will be used to fetch affected
+   *                                     process instances based on history data.
+   * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
+   * @param skipCustomListeners skips custom execution listeners when removing instances
+   * @param skipSubprocesses skips subprocesses when removing instances
    * @param skipIoMappings specifies whether input/output mappings for tasks should be invoked
    *
    * @throws BadUserRequestException
@@ -801,6 +827,31 @@ public interface RuntimeService {
    * @param externallyTerminated indicator if deletion triggered from external context, for instance
    *                             REST API call
    * @param skipSubprocesses specifies whether subprocesses should be deleted
+   *
+   *
+   * @throws BadUserRequestException
+   *          when a processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with a given processInstanceId.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void deleteProcessInstances(List<String> processInstanceIds, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated,
+                              boolean skipSubprocesses);
+
+  /**
+   * Delete existing runtime process instances.
+   *
+   * Deletion propagates upward as far as necessary.
+   *
+   * @param processInstanceIds ids of process instance to delete, cannot be null.
+   * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
+   * @param skipCustomListeners if true, only the built-in {@link ExecutionListener}s
+   * are notified with the {@link ExecutionListener#EVENTNAME_END} event.
+   * @param externallyTerminated indicator if deletion triggered from external context, for instance
+   *                             REST API call
+   * @param skipSubprocesses specifies whether subprocesses should be deleted
    * @param skipIoMappings specifies whether input/output mappings for tasks should be invoked
    *
    * @throws BadUserRequestException
@@ -837,7 +888,7 @@ public interface RuntimeService {
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteProcessInstancesIfExists(List<String> processInstanceIds, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated,
-      boolean skipSubprocesses);
+                                      boolean skipSubprocesses);
 
   /**
    * Delete an existing runtime process instance.
@@ -887,7 +938,7 @@ public interface RuntimeService {
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated, boolean skipIoMappings,
-      boolean skipSubprocesses);
+                             boolean skipSubprocesses);
 
   /**
    * Delete an existing runtime process instance.
@@ -913,7 +964,7 @@ public interface RuntimeService {
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteProcessInstanceIfExists(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated, boolean skipIoMappings,
-      boolean skipSubprocesses);
+                                     boolean skipSubprocesses);
 
   /**
    * Finds the activity ids for all executions that are waiting in activities.

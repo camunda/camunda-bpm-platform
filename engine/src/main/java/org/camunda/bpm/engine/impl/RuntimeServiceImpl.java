@@ -218,6 +218,17 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
                                            HistoricProcessInstanceQuery historicProcessInstanceQuery,
                                            String deleteReason,
                                            boolean skipCustomListeners,
+                                           boolean skipSubprocesses) {
+    return deleteProcessInstancesAsync(processInstanceIds, processInstanceQuery, historicProcessInstanceQuery,
+        deleteReason, skipCustomListeners, skipSubprocesses, false);
+  }
+
+  @Override
+  public Batch deleteProcessInstancesAsync(List<String> processInstanceIds,
+                                           ProcessInstanceQuery processInstanceQuery,
+                                           HistoricProcessInstanceQuery historicProcessInstanceQuery,
+                                           String deleteReason,
+                                           boolean skipCustomListeners,
                                            boolean skipSubprocesses,
                                            boolean skipIoMappings
   ) {
@@ -260,6 +271,16 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   @Override
   public void deleteProcessInstances(List<String> processInstanceIds, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated){
     deleteProcessInstances(processInstanceIds, deleteReason, skipCustomListeners, externallyTerminated, false, false);
+  }
+
+  @Override
+  public void deleteProcessInstances(List<String> processInstanceIds,
+                                     String deleteReason,
+                                     boolean skipCustomListeners,
+                                     boolean externallyTerminated,
+                                     boolean skipSubprocesses) {
+    deleteProcessInstances(processInstanceIds, deleteReason, skipCustomListeners, externallyTerminated,
+        skipSubprocesses, false);
   }
 
   @Override
