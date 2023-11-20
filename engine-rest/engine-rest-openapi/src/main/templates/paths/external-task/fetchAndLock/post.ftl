@@ -18,10 +18,12 @@
                          "workerId": "aWorkerId",
                          "maxTasks": 2,
                          "usePriority": true,
-                         "createTimeConfig":{
-                            "useCreateTime":"false",
-                            "direction":"ASC"
-                         },
+                         "sorting": [
+                             {
+                                "sortBy":"createTime",
+                                "sortOrder":"ASC"
+                             }
+                         ],
                          "topics": [
                            {
                              "topicName": "createOrder",
@@ -40,10 +42,12 @@
                          "workerId": "aWorkerId",
                          "maxTasks": 2,
                          "usePriority": true,
-                         "createTimeConfig":{
-                            "useCreateTime":"false",
-                            "direction":"ASC"
-                         },
+                         "sorting": [
+                             {
+                                "sortBy":"createTime",
+                                "sortOrder":"ASC"
+                             }
+                         ],
                          "topics": [
                            {
                              "topicName": "createOrder",
@@ -61,10 +65,12 @@
                         "workerId":"aWorkerId",
                         "maxTasks":1,
                         "usePriority":true,
-                        "createTimeConfig":{
-                            "useCreateTime":"false",
-                            "direction":"ASC"
-                        },
+                         "sorting": [
+                             {
+                                "sortBy":"createTime",
+                                "sortOrder":"ASC"
+                             }
+                         ],
                         "topics":
                             [{"topicName": "createOrder",
                             "lockDuration": 10000,
@@ -79,10 +85,12 @@
                          "workerId": "aWorkerId",
                          "maxTasks": 2,
                          "usePriority": true,
-                         "createTimeConfig":{
-                            "useCreateTime":"true",
-                            "direction":"ASC"
-                         }
+                         "sorting": [
+                             {
+                                "sortBy":"createTime",
+                                "sortOrder":"ASC"
+                             }
+                         ],
                        }
                      }'
       ] />
