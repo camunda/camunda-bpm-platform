@@ -40,6 +40,7 @@ public abstract class CoreModelElement implements Serializable {
   protected String id;
   protected String name;
   protected Properties properties = new Properties();
+  protected boolean isMessage = false;
 
   /** contains built-in listeners */
   protected Map<String, List<DelegateListener<? extends BaseDelegateExecution>>> builtInListeners = new HashMap<String, List<DelegateListener<? extends BaseDelegateExecution>>>();
@@ -197,4 +198,11 @@ public abstract class CoreModelElement implements Serializable {
     return variableListeners;
   }
 
+  public void setMessage(boolean isMessage) {
+    this.isMessage = isMessage;
+  }
+
+  public boolean isMessage() {
+    return isMessage;
+  }
 }

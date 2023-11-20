@@ -56,17 +56,10 @@ public class EventHandlerImpl implements EventHandler {
       execution.setVariablesLocal((Map<String, Object>) localPayload);
     }
     if (newScopePayload instanceof Map) {
+      activity.setMessage(true);
       Map<String, Map<String, Object>> dsf = new HashMap<>();
       dsf.put(activity.getId(), ((Map<String, Object>) newScopePayload));
-      System.out.println("handleIntermediateEvent");
-      System.out.println(execution);
-      PvmExecutionImpl parent = execution.getParent();
-      System.out.println(parent);
-      if (parent != null) {
-        execution.getParent().setVariablesPerActivity(dsf);
-      } else {
-        System.out.println("parent null");
-      }
+      execution.getProcessInstance().setVariablesPerActivity(dsf);
     }
     if(activity.equals(execution.getActivity())) {
       execution.signal("signal", null);

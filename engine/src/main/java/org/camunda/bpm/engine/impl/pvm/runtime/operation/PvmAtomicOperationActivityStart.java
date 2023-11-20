@@ -16,7 +16,10 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
@@ -38,7 +41,13 @@ public class PvmAtomicOperationActivityStart extends PvmAtomicOperationActivityI
   }
 
   protected ScopeImpl getScope(PvmExecutionImpl execution) {
-    return execution.getActivity();
+    ActivityImpl activity = execution.getActivity();
+    Map<String, Map<String, Object>> variablesPerActivity = execution.getProcessInstance().getVariablesPerActivity();
+    if (activity.isMessage() && variablesPerActivity != null) {
+      execution.setVariablesLocal(variablesPerActivity.get(activity.getId()));
+      variablesPerActivity.remove(activity.getId());
+    }
+    return activity;
   }
 
   public String getCanonicalName() {

@@ -117,7 +117,6 @@ import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
 import org.camunda.bpm.engine.impl.bpmn.parser.DefaultFailedJobParseListener;
-import org.camunda.bpm.engine.impl.bpmn.parser.VariableParseListener;
 import org.camunda.bpm.engine.impl.calendar.BusinessCalendarManager;
 import org.camunda.bpm.engine.impl.calendar.CycleBusinessCalendar;
 import org.camunda.bpm.engine.impl.calendar.DueDateBusinessCalendar;
@@ -2233,8 +2232,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (!HistoryLevel.HISTORY_LEVEL_NONE.equals(historyLevel)) {
       defaultListeners.add(new HistoryParseListener(historyEventProducer));
     }
-    // if flag? do we need it
-    defaultListeners.add(new VariableParseListener());
     if (isMetricsEnabled) {
       defaultListeners.add(new MetricsBpmnParseListener());
     }
