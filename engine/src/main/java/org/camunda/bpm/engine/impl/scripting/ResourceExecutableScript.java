@@ -17,8 +17,8 @@
 package org.camunda.bpm.engine.impl.scripting;
 
 import javax.script.Bindings;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
-
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
@@ -43,6 +43,9 @@ public class ResourceExecutableScript extends SourceExecutableScript {
     if (scriptSource == null) {
       loadScriptSource();
     }
+
+    engine.getContext().setAttribute(ScriptEngine.FILENAME, "TODO: find filename", ScriptContext.ENGINE_SCOPE);
+
     return super.evaluate(engine, variableScope, bindings);
   }
 
