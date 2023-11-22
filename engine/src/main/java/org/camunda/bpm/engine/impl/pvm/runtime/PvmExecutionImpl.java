@@ -75,7 +75,6 @@ import org.camunda.bpm.engine.impl.tree.ScopeExecutionCollector;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.runtime.Incident;
-import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Daniel Meyer
@@ -173,6 +172,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
   protected int activityInstanceState = ActivityInstanceState.DEFAULT.getStateCode();
 
   protected boolean activityInstanceEndListenersFailed = false;
+
+  protected ActivityNewScopeVariablesTuple payloadForTriggeredScope;
 
   // sequence counter ////////////////////////////////////////////////////////
   protected long sequenceCounter = 0;
@@ -1924,6 +1925,14 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
 
   public void setNextActivity(PvmActivity nextActivity) {
     this.nextActivity = nextActivity;
+  }
+
+  public ActivityNewScopeVariablesTuple getPayloadForTriggeredScope() {
+    return payloadForTriggeredScope;
+  }
+
+  public void setPayloadForTriggeredScope(ActivityNewScopeVariablesTuple payloadForTriggeredScope) {
+    this.payloadForTriggeredScope = payloadForTriggeredScope;
   }
 
   public PvmExecutionImpl getParentScopeExecution(boolean considerSuperExecution) {
