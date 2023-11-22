@@ -17,14 +17,20 @@
 package org.camunda.bpm.spring.boot.starter.configuration.impl.custom;
 
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.camunda.bpm.spring.boot.starter.test.helper.StandaloneInMemoryTestConfiguration;
+import org.camunda.bpm.spring.boot.starter.util.SpringBootProcessEngineLogger;
+import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,10 +53,28 @@ public class CreateAdminUserConfigurationTest {
   @Rule
   public final ProcessEngineRule processEngineRule = new ProcessEngineRule(processEngineConfiguration.buildProcessEngine());
 
+  @Rule
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule()
+      .watch(SpringBootProcessEngineLogger.PACKAGE);
+
   @Test
-  public void createAdminUser() throws Exception {
+  public void createAdminUser() {
     User user = processEngineRule.getIdentityService().createUserQuery().userId("admin").singleResult();
     assertThat(user).isNotNull();
     assertThat(user.getEmail()).isEqualTo("admin@localhost");
   }
+
+  @Test
+  public void shouldLogInitialAdminUserCreationOnDebug() {
+    processEngineConfiguration.buildProcessEngine();
+    verifyLogs(Level.DEBUG, "STARTER-SB010 Creating initial Admin User: AdminUserProperty[id=admin, firstName=Admin, lastName=Admin, email=admin@localhost, password=******]");
+  }
+
+  protected void verifyLogs(Level logLevel, String message) {
+    List<ILoggingEvent> logs = loggingRule.getLog();
+    assertThat(logs).hasSize(1);
+    assertThat(logs.get(0).getLevel()).isEqualTo(logLevel);
+    assertThat(logs.get(0).getFormattedMessage()).containsIgnoringCase(message);
+  }
+
 }
