@@ -3303,7 +3303,7 @@ public class BpmnParse extends Parse {
 
       // except escalation, by default is assumed to abort the activity
       String cancelActivityAttr = boundaryEventElement.attribute("cancelActivity", TRUE);
-      boolean isCancelActivity = Boolean.valueOf(cancelActivityAttr);
+      boolean isCancelActivity = Boolean.parseBoolean(cancelActivityAttr);
 
       // determine start behavior
       if (isCancelActivity) {

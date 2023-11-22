@@ -457,8 +457,8 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     assertEquals(humanTaskId, entry.getCaseExecutionId());
     assertEquals(caseDefinition.getDeploymentId(), entry.getDeploymentId());
 
-    assertFalse(Boolean.valueOf(entry.getOrgValue()));
-    assertTrue(Boolean.valueOf(entry.getNewValue()));
+    assertFalse(Boolean.parseBoolean(entry.getOrgValue()));
+    assertTrue(Boolean.parseBoolean(entry.getNewValue()));
     assertEquals(DELETE, entry.getProperty());
     assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, entry.getCategory());
 

@@ -40,7 +40,7 @@ public class ShortValueSerializer extends PrimitiveValueSerializer<ShortValue> {
     Short shortValue = null;
 
     if(longValue != null) {
-      shortValue = Short.valueOf(longValue.shortValue());
+      shortValue = longValue.shortValue();
     }
 
     return Variables.shortValue(shortValue, asTransientValue);

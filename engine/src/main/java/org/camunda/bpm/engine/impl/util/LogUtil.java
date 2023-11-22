@@ -124,7 +124,7 @@ public class LogUtil {
     }
 
     protected static String getThreadIndent(int threadId) {
-      Integer threadIdInteger = Integer.valueOf(threadId);
+      Integer threadIdInteger = threadId;
       if (threadLogMode==ThreadLogMode.NONE) {
         return "";
       }

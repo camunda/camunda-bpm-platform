@@ -121,7 +121,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
 
       // reset collected dynamic data
       if ((databaseTelemetryProperty == null && processEngineConfiguration.isInitializeTelemetry())
-          || Boolean.valueOf(databaseTelemetryProperty.getValue())) {
+          || Boolean.parseBoolean(databaseTelemetryProperty.getValue())) {
         TelemetryUtil.toggleLocalTelemetry(true,
             processEngineConfiguration.getTelemetryRegistry(),
             processEngineConfiguration.getMetricsRegistry());

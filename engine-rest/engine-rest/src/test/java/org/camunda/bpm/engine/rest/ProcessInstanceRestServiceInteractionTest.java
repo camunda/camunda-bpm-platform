@@ -1532,7 +1532,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testPutSingleVariableWithTypeLong() {
     String variableKey = "aVariableKey";
-    Long variableValue = Long.valueOf(123);
+    Long variableValue = 123L;
     String type = "Long";
 
     Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);

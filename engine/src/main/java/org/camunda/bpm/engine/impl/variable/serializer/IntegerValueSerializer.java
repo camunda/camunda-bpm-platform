@@ -52,7 +52,7 @@ public class IntegerValueSerializer extends PrimitiveValueSerializer<IntegerValu
     Integer intValue = null;
 
     if(valueFields.getLongValue() != null) {
-      intValue = Integer.valueOf(valueFields.getLongValue().intValue());
+      intValue = valueFields.getLongValue().intValue();
     }
 
     return Variables.integerValue(intValue, asTransientValue);

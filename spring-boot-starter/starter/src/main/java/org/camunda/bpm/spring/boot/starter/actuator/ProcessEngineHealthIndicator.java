@@ -26,7 +26,7 @@ public class ProcessEngineHealthIndicator extends AbstractHealthIndicator {
   private final ProcessEngine processEngine;
 
   public ProcessEngineHealthIndicator(ProcessEngine processEngine) {
-    Assert.notNull(processEngine);
+    Assert.notNull(processEngine, "processEngine must not be null");
     this.processEngine = processEngine;
   }
 
