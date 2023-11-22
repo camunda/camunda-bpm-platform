@@ -66,7 +66,12 @@ public abstract class AbstractCorrelateMessageCmd {
   protected void triggerExecution(CommandContext commandContext, CorrelationHandlerResult correlationResult) {
     String executionId = correlationResult.getExecutionEntity().getId();
 
-    MessageEventReceivedCmd command = new MessageEventReceivedCmd(messageName, executionId, builder.getPayloadProcessInstanceVariables(), builder.getPayloadProcessInstanceVariablesLocal(), builder.isExclusiveCorrelation());
+    MessageEventReceivedCmd command = new MessageEventReceivedCmd(messageName,
+                                                                  executionId,
+                                                                  builder.getPayloadProcessInstanceVariables(),
+                                                                  builder.getPayloadProcessInstanceVariablesLocal(),
+                                                                  builder.getPayloadProcessInstanceVariablesToTriggeredScope(),
+                                                                  builder.isExclusiveCorrelation());
     command.execute(commandContext);
   }
 
@@ -132,6 +137,8 @@ public abstract class AbstractCorrelateMessageCmd {
     VariableMap mergedVariables = Variables.createVariables();
     mergedVariables.putAll(builder.getPayloadProcessInstanceVariables());
     mergedVariables.putAll(builder.getPayloadProcessInstanceVariablesLocal());
+    // TODO write a test case
+    mergedVariables.putAll(builder.getPayloadProcessInstanceVariablesToTriggeredScope());
     return mergedVariables;
   }
 

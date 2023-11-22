@@ -55,7 +55,7 @@ public class ThrowSignalEventActivityBehavior extends AbstractBpmnActivityBehavi
 
     for (EventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
       if (isActiveEventSubscription(signalEventSubscription)) {
-        signalEventSubscription.eventReceived(variableMap, null, businessKey, signalDefinition.isAsync());
+        signalEventSubscription.eventReceived(variableMap, null, null, businessKey, signalDefinition.isAsync());
       }
     }
     leave(execution);

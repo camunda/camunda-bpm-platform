@@ -84,34 +84,34 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
 
   // processing /////////////////////////////
   public void eventReceived(Object payload, boolean processASync) {
-    eventReceived(payload, null, null, processASync);
+    eventReceived(payload, null, null, null, processASync);
   }
 
-  public void eventReceived(Object payload, Object payloadLocal, String businessKey, boolean processASync) {
+  public void eventReceived(Object payload, Object payloadLocal, Object payloadToTriggeredScope, String businessKey, boolean processASync) {
     if(processASync) {
-      scheduleEventAsync(payload, payloadLocal, businessKey);
+      scheduleEventAsync(payload, payloadLocal, payloadToTriggeredScope, businessKey);
     } else {
-      processEventSync(payload, payloadLocal, businessKey);
+      processEventSync(payload, payloadLocal, payloadToTriggeredScope, businessKey);
     }
   }
 
   protected void processEventSync(Object payload) {
-    this.processEventSync(payload, null, null);
+    this.processEventSync(payload, null, null, null);
   }
 
-  protected void processEventSync(Object payload, Object payloadLocal, String businessKey) {
+  protected void processEventSync(Object payload, Object payloadLocal, Object payloadToTriggeredScope, String businessKey) {
     EventHandler eventHandler = Context.getProcessEngineConfiguration().getEventHandler(eventType);
     ensureNotNull("Could not find eventhandler for event of type '" + eventType + "'", "eventHandler", eventHandler);
-    eventHandler.handleEvent(this, payload, payloadLocal, businessKey, Context.getCommandContext());
+    eventHandler.handleEvent(this, payload, payloadLocal, payloadToTriggeredScope, businessKey, Context.getCommandContext());
   }
 
-  protected void scheduleEventAsync(Object payload, Object payloadLocal, String businessKey) {
+  protected void scheduleEventAsync(Object payload, Object payloadLocal, Object payloadToTriggeredScope, String businessKey) {
 
     EventSubscriptionJobDeclaration asyncDeclaration = getJobDeclaration();
 
     if (asyncDeclaration == null) {
       // fallback to sync if we couldn't find a job declaration
-      processEventSync(payload, payloadLocal, businessKey);
+      processEventSync(payload, payloadLocal, payloadToTriggeredScope, businessKey);
     }
     else {
       MessageEntity message = asyncDeclaration.createJobInstance(this);
@@ -212,7 +212,7 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
   public ProcessDefinitionEntity getProcessDefinition() {
     if (executionId != null) {
       ExecutionEntity execution = getExecution();
-      return (ProcessDefinitionEntity) execution.getProcessDefinition();
+      return execution.getProcessDefinition();
     }
     else {
       // this assumes that start event subscriptions have the process definition id

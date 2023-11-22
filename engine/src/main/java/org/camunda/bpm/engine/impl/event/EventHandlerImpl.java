@@ -39,7 +39,11 @@ public class EventHandlerImpl implements EventHandler {
     this.eventType = eventType;
   }
 
-  public void handleIntermediateEvent(EventSubscriptionEntity eventSubscription, Object payload, Object localPayload, CommandContext commandContext) {
+  public void handleIntermediateEvent(EventSubscriptionEntity eventSubscription,
+                                      Object payload,
+                                      Object localPayload,
+                                      Object payloadToTriggeredScope,
+                                      CommandContext commandContext) {
 
     PvmExecutionImpl execution = eventSubscription.getExecution();
     ActivityImpl activity = eventSubscription.getActivity();
@@ -53,6 +57,10 @@ public class EventHandlerImpl implements EventHandler {
 
     if (localPayload instanceof Map) {
       execution.setVariablesLocal((Map<String, Object>) localPayload);
+    }
+
+    if (payloadToTriggeredScope instanceof Map) {
+      // TODO
     }
 
     if(activity.equals(execution.getActivity())) {
@@ -70,8 +78,13 @@ public class EventHandlerImpl implements EventHandler {
   }
 
   @Override
-  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, Object localPayload, String businessKey, CommandContext commandContext) {
-    handleIntermediateEvent(eventSubscription, payload, localPayload, commandContext);
+  public void handleEvent(EventSubscriptionEntity eventSubscription,
+                          Object payload,
+                          Object localPayload,
+                          Object payloadToTriggeredScope,
+                          String businessKey,
+                          CommandContext commandContext) {
+    handleIntermediateEvent(eventSubscription, payload, localPayload, payloadToTriggeredScope, commandContext);
   }
 
   @Override
