@@ -38,6 +38,7 @@ public abstract class AbstractEventAtomicOperation<T extends CoreExecution> impl
   @Override
   public void execute(T execution) {
     CoreModelElement scope = getScope(execution);
+    setDelayedPayloadToNewScope(execution, scope);
     List<DelegateListener<? extends BaseDelegateExecution>> listeners = execution.hasFailedOnEndListeners()
         ? getBuiltinListeners(scope)
         : getListeners(scope, execution);

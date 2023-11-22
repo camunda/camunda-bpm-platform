@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.core.operation;
 
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
+import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 
 /**
  *
@@ -34,4 +35,5 @@ public interface CoreAtomicOperation<T extends CoreExecution> {
 
   String getCanonicalName();
 
+  default void setDelayedPayloadToNewScope(T execution, CoreModelElement scope) { }
 }
