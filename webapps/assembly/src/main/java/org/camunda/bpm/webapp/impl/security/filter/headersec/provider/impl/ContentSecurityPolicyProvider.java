@@ -61,7 +61,7 @@ public class ContentSecurityPolicyProvider extends HeaderSecurityProvider {
       setDisabled(false);
 
     } else {
-      setDisabled(Boolean.valueOf(disabled));
+      setDisabled(Boolean.parseBoolean(disabled));
 
     }
 

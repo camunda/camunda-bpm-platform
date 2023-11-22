@@ -143,7 +143,7 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
     if (value instanceof Number) {
       return ((Number) value).intValue();
     } else if (value instanceof String) {
-      return Integer.valueOf((String) value);
+      return Integer.parseInt((String) value);
     } else {
       throw LOG.expressionNotANumberException("loopCardinality", loopCardinalityExpression.getExpressionText());
     }

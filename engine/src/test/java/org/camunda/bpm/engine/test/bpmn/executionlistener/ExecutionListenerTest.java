@@ -511,7 +511,7 @@ public class ExecutionListenerTest {
           .singleResult();
       assertNotNull(endVariable);
       assertNotNull(endVariable.getValue());
-      assertTrue(Boolean.valueOf(String.valueOf(endVariable.getValue())));
+      assertTrue(Boolean.parseBoolean(String.valueOf(endVariable.getValue())));
     }
   }
 
@@ -536,7 +536,7 @@ public class ExecutionListenerTest {
           .singleResult();
       assertNotNull(endVariable);
       assertNotNull(endVariable.getValue());
-      assertTrue(Boolean.valueOf(String.valueOf(endVariable.getValue())));
+      assertTrue(Boolean.parseBoolean(String.valueOf(endVariable.getValue())));
     }
   }
 

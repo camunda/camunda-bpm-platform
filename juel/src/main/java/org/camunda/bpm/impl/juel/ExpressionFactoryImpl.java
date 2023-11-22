@@ -294,7 +294,7 @@ public class ExpressionFactoryImpl extends jakarta.el.ExpressionFactory {
 	}
 
 	private boolean getFeatureProperty(Profile profile, Properties properties, Builder.Feature feature, String property) {
-		return Boolean.valueOf(properties.getProperty(property, String.valueOf(profile.contains(feature))));
+		return Boolean.parseBoolean(properties.getProperty(property, String.valueOf(profile.contains(feature))));
 	}
 
 	/**

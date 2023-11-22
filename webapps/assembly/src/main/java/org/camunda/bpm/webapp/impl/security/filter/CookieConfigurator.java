@@ -40,7 +40,7 @@ public class CookieConfigurator {
 
     String enableSecureCookie = filterConfig.getInitParameter(ENABLE_SECURE_PARAM);
     if (!ServletFilterUtil.isEmpty(enableSecureCookie)) {
-      isSecureCookieEnabled = Boolean.valueOf(enableSecureCookie);
+      isSecureCookieEnabled = Boolean.parseBoolean(enableSecureCookie);
     }
 
     String cookieNameInput = filterConfig.getInitParameter("cookieName");
@@ -50,7 +50,7 @@ public class CookieConfigurator {
 
     String enableSameSiteCookie = filterConfig.getInitParameter(ENABLE_SAME_SITE_PARAM);
     if (!ServletFilterUtil.isEmpty(enableSameSiteCookie)) {
-      isSameSiteCookieEnabled = Boolean.valueOf(enableSameSiteCookie);
+      isSameSiteCookieEnabled = Boolean.parseBoolean(enableSameSiteCookie);
     } else {
       isSameSiteCookieEnabled = true; // default
     }
