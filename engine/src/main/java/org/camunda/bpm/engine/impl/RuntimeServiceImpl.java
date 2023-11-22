@@ -230,8 +230,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
                                            String deleteReason,
                                            boolean skipCustomListeners,
                                            boolean skipSubprocesses,
-                                           boolean skipIoMappings
-  ) {
+                                           boolean skipIoMappings) {
     return commandExecutor.execute(new DeleteProcessInstanceBatchCmd(
         processInstanceIds,
         processInstanceQuery,
