@@ -410,9 +410,9 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     testRule.assertProcessEnded(instanceId1);
     testRule.assertProcessEnded(instanceId2);
 
-    assertEquals(1, historyService.createHistoricVariableInstanceQuery().processInstanceId(instanceId1).list().size());
-    assertEquals(1, historyService.createHistoricVariableInstanceQuery().processInstanceId(instanceId2).list().size());
-    assertEquals(2, historyService.createHistoricVariableInstanceQuery().variableName("inputMappingExecuted").count());
+    assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(instanceId1).list().size()).isOne();
+    assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(instanceId2).list().size()).isOne();
+    assertThat(historyService.createHistoricVariableInstanceQuery().variableName("inputMappingExecuted").count()).isEqualTo(2);
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/api/oneTaskProcessWithIoMappings.bpmn20.xml")
@@ -436,7 +436,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
 
     assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(instanceId1).list().size()).isEqualTo(2);
     assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(instanceId2).list().size()).isEqualTo(2);
-    assertEquals(2, historyService.createHistoricVariableInstanceQuery().variableName("inputMappingExecuted").count());
+    assertThat(historyService.createHistoricVariableInstanceQuery().variableName("inputMappingExecuted").count()).isEqualTo(2);
   }
 
   @Test

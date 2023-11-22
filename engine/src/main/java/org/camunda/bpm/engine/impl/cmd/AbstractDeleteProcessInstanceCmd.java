@@ -62,15 +62,11 @@ public abstract class AbstractDeleteProcessInstanceCmd {
     }
   }
 
-  protected void deleteProcessInstance(
-      final CommandContext commandContext,
-      String processInstanceId,
-      final String deleteReason,
-      final boolean skipCustomListeners,
-      final boolean externallyTerminated,
-      final boolean skipIoMappings,
-      boolean skipSubprocesses
-  ) {
+  protected void deleteProcessInstances(final CommandContext commandContext, List<String> processInstanceIds) {
+    processInstanceIds.forEach(processInstance -> deleteProcessInstance(commandContext, processInstance));
+  }
+
+  protected void deleteProcessInstance(final CommandContext commandContext, String processInstanceId) {
     ensureNotNull(BadUserRequestException.class, "processInstanceId is null", "processInstanceId", processInstanceId);
 
     // fetch process instance
@@ -99,14 +95,13 @@ public abstract class AbstractDeleteProcessInstanceCmd {
     }
 
     final ExecutionEntity superExecution = execution.getSuperExecution();
+
     if (superExecution != null) {
-      commandContext.runWithoutAuthorization(new Callable<Void>() {
-        public Void call() {
-          ProcessInstanceModificationBuilderImpl builder = (ProcessInstanceModificationBuilderImpl) new ProcessInstanceModificationBuilderImpl(commandContext, superExecution.getProcessInstanceId(), deleteReason)
-            .cancellationSourceExternal(externallyTerminated).cancelActivityInstance(superExecution.getActivityInstanceId());
-          builder.execute(false, skipCustomListeners, skipIoMappings);
-          return null;
-        }
+      commandContext.runWithoutAuthorization((Callable<Void>) () -> {
+        ProcessInstanceModificationBuilderImpl builder = (ProcessInstanceModificationBuilderImpl) new ProcessInstanceModificationBuilderImpl(commandContext, superExecution.getProcessInstanceId(), deleteReason)
+          .cancellationSourceExternal(externallyTerminated).cancelActivityInstance(superExecution.getActivityInstanceId());
+        builder.execute(false, skipCustomListeners, skipIoMappings);
+        return null;
       });
 
     }
