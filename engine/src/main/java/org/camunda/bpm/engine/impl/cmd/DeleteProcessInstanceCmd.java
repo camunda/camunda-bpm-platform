@@ -29,7 +29,6 @@ public class DeleteProcessInstanceCmd extends AbstractDeleteProcessInstanceCmd i
   private static final long serialVersionUID = 1L;
 
   protected String processInstanceId;
-  protected boolean skipSubprocesses;
 
   public DeleteProcessInstanceCmd(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated,
       boolean skipIoMappings, boolean skipSubprocesses, boolean failIfNotExists) {

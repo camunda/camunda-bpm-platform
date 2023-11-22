@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 public class DeleteProcessInstancesCmd extends AbstractDeleteProcessInstanceCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
+
   protected List<String> processInstanceIds;
 
   public DeleteProcessInstancesCmd(List<String> processInstanceIds, String deleteReason, boolean skipCustomListeners,
