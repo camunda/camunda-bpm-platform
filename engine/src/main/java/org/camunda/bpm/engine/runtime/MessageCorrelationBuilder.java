@@ -157,7 +157,7 @@ public interface MessageCorrelationBuilder {
   MessageCorrelationBuilder setVariablesLocal(Map<String, Object> variables);
 
   /**
-   * <p>Pass a map of local variables to the new scope triggered by message correlation. Use this method
+   * <p>Pass a map of variables to the new scope triggered by message correlation. Use this method
    * for passing the message's payload.</p>
    *
    * @param variables the map of variables

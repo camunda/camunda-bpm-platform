@@ -137,7 +137,6 @@ public abstract class AbstractCorrelateMessageCmd {
     VariableMap mergedVariables = Variables.createVariables();
     mergedVariables.putAll(builder.getPayloadProcessInstanceVariables());
     mergedVariables.putAll(builder.getPayloadProcessInstanceVariablesLocal());
-    // TODO write a test case
     mergedVariables.putAll(builder.getPayloadProcessInstanceVariablesToTriggeredScope());
     return mergedVariables;
   }

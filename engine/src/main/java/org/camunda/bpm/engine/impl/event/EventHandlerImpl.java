@@ -61,7 +61,8 @@ public class EventHandlerImpl implements EventHandler {
     }
 
     if (payloadToTriggeredScope instanceof Map) {
-      ActivityNewScopeVariablesTuple tuple = new ActivityNewScopeVariablesTuple(activity.getId(), (Map<String, Object>) payloadToTriggeredScope);
+      ActivityNewScopeVariablesTuple tuple = new ActivityNewScopeVariablesTuple(activity.getId(),
+                                                                                (Map<String, Object>) payloadToTriggeredScope);
       execution.getProcessInstance().setPayloadForTriggeredScope(tuple);
     }
 
