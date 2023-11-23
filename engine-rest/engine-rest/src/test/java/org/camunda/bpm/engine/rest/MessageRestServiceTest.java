@@ -102,6 +102,10 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     when(messageCorrelationBuilderMock.processInstanceVariableEquals(anyString(), any())).thenReturn(messageCorrelationBuilderMock);
     when(messageCorrelationBuilderMock.setVariables(Mockito.any())).thenReturn(messageCorrelationBuilderMock);
     when(messageCorrelationBuilderMock.setVariable(anyString(), any())).thenReturn(messageCorrelationBuilderMock);
+    when(messageCorrelationBuilderMock.setVariablesLocal(Mockito.any())).thenReturn(messageCorrelationBuilderMock);
+    when(messageCorrelationBuilderMock.setVariableLocal(anyString(), any())).thenReturn(messageCorrelationBuilderMock);
+    when(messageCorrelationBuilderMock.setVariablesToTriggeredScope(Mockito.any())).thenReturn(messageCorrelationBuilderMock);
+    when(messageCorrelationBuilderMock.setVariableToTriggeredScope(anyString(), any())).thenReturn(messageCorrelationBuilderMock);
 
     executionResult = MockProvider.createMessageCorrelationResult(MessageCorrelationResultType.Execution);
     procInstanceResult = MockProvider.createMessageCorrelationResult(MessageCorrelationResultType.ProcessDefinition);
@@ -122,6 +126,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     String businessKey = "aBusinessKey";
     Map<String, Object> variables = VariablesBuilder.create().variable("aKey", "aValue").getVariables();
     Map<String, Object> variablesLocal = VariablesBuilder.create().variable("aKeyLocal", "aValueLocal").getVariables();
+    Map<String, Object> variablesToTriggeredScope = VariablesBuilder.create().variable("aKeyToTriggeredScope", "aValueToTriggeredScope").getVariables();
 
     Map<String, Object> correlationKeys = VariablesBuilder.create()
         .variable("aKey", "aValue")
@@ -139,6 +144,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     messageParameters.put("localCorrelationKeys", localCorrelationKeys);
     messageParameters.put("processVariables", variables);
     messageParameters.put("processVariablesLocal", variablesLocal);
+    messageParameters.put("processVariablesToTriggeredScope", variablesToTriggeredScope);
     messageParameters.put("businessKey", businessKey);
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
@@ -159,11 +165,14 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     expectedVariables.put("aKey", "aValue");
     Map<String, Object> expectedVariablesLocal = new HashMap<>();
     expectedVariablesLocal.put("aKeyLocal", "aValueLocal");
+    Map<String, Object> expectedVariablesToTriggeredScope = new HashMap<>();
+    expectedVariablesToTriggeredScope.put("aKeyToTriggeredScope", "aValueToTriggeredScope");
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
     verify(messageCorrelationBuilderMock).processInstanceBusinessKey(eq(businessKey));
     verify(messageCorrelationBuilderMock).setVariables(argThat(new EqualsMap(expectedVariables)));
     verify(messageCorrelationBuilderMock).setVariablesLocal(argThat(new EqualsMap(expectedVariablesLocal)));
+    verify(messageCorrelationBuilderMock).setVariablesToTriggeredScope(argThat(new EqualsMap(expectedVariablesToTriggeredScope)));
 
     for (Entry<String, Object> expectedKey : expectedCorrelationKeys.entrySet()) {
       String name = expectedKey.getKey();
@@ -178,9 +187,6 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     }
 
     verify(messageCorrelationBuilderMock).correlateWithResult();
-
-//    verify(runtimeServiceMock).correlateMessage(eq(messageName), eq(businessKey),
-//        argThat(new EqualsMap(expectedCorrelationKeys)), argThat(new EqualsMap(expectedVariables)));
   }
 
   @Test
@@ -266,6 +272,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     String businessKey = "aBusinessKey";
     Map<String, Object> variables = VariablesBuilder.create().variable("aKey", "aValue").getVariables();
     Map<String, Object> variablesLocal = VariablesBuilder.create().variable("aKeyLocal", "aValueLocal").getVariables();
+    Map<String, Object> variablesToTriggeredScope = VariablesBuilder.create().variable("aKeyToTriggeredScope", "aValueToTriggeredScope").getVariables();
 
     Map<String, Object> correlationKeys = VariablesBuilder.create()
         .variable("aKey", "aValue")
@@ -283,6 +290,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     messageParameters.put("localCorrelationKeys", localCorrelationKeys);
     messageParameters.put("processVariables", variables);
     messageParameters.put("processVariablesLocal", variablesLocal);
+    messageParameters.put("processVariablesToTriggeredScope", variablesToTriggeredScope);
     messageParameters.put("businessKey", businessKey);
     messageParameters.put("all", true);
 
@@ -304,11 +312,14 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     expectedVariables.put("aKey", "aValue");
     Map<String, Object> expectedVariablesLocal = new HashMap<>();
     expectedVariablesLocal.put("aKeyLocal", "aValueLocal");
+    Map<String, Object> expectedVariablesToTriggeredScope = new HashMap<>();
+    expectedVariablesToTriggeredScope.put("aKeyToTriggeredScope", "aValueToTriggeredScope");
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
     verify(messageCorrelationBuilderMock).processInstanceBusinessKey(eq(businessKey));
     verify(messageCorrelationBuilderMock).setVariables(argThat(new EqualsMap(expectedVariables)));
     verify(messageCorrelationBuilderMock).setVariablesLocal(argThat(new EqualsMap(expectedVariablesLocal)));
+    verify(messageCorrelationBuilderMock).setVariablesToTriggeredScope(argThat(new EqualsMap(expectedVariablesToTriggeredScope)));
 
     for (Entry<String, Object> expectedKey : expectedCorrelationKeys.entrySet()) {
       String name = expectedKey.getKey();
@@ -323,7 +334,6 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     }
 
     verify(messageCorrelationBuilderMock).correlateAllWithResult();
-
   }
 
   @Test
@@ -489,9 +499,6 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(MESSAGE_URL);
-
-//    verify(runtimeServiceMock).correlateMessage(eq(messageName), eq(businessKey),
-//        argThat(new EqualsMap(null)), argThat(new EqualsMap(null)));
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
     verify(messageCorrelationBuilderMock).processInstanceBusinessKey(eq(businessKey));
@@ -1069,6 +1076,72 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("processVariablesLocal", variableLocalJson);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver message: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Date.class)))
+    .when().post(MESSAGE_URL);
+  }
+
+  @Test
+  public void testFailingDueToUnparseableIntegerInProcessVariablesToTriggeredScope() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Integer";
+
+    Map<String, Object> variableToTriggeredScopeJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+
+    String messageName = "aMessageName";
+
+    Map<String, Object> messageParameters = new HashMap<>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("processVariablesToTriggeredScope", variableToTriggeredScopeJson);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver message: "
+        + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Integer.class)))
+    .when().post(MESSAGE_URL);
+  }
+
+
+  @Test
+  public void testFailingDueToNotSupportedTypeInProcessVariablesToTriggeredScope() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "X";
+
+    Map<String, Object> variableToTriggeredScopeJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+
+    String messageName = "aMessageName";
+
+    Map<String, Object> messageParameters = new HashMap<>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("processVariablesToTriggeredScope", variableToTriggeredScopeJson);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver message: Unsupported value type 'X'"))
+    .when().post(MESSAGE_URL);
+  }
+
+  @Test
+  public void testFailingDueToUnparseableDateInProcessVariablesToTriggeredScope() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Date";
+
+    Map<String, Object> variableToTriggeredScopeJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+
+    String messageName = "aMessageName";
+
+    Map<String, Object> messageParameters = new HashMap<>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("processVariablesToTriggeredScope", variableToTriggeredScopeJson);
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())

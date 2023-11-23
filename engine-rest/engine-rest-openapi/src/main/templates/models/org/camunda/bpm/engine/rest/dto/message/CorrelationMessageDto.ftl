@@ -71,6 +71,15 @@
                 with the following properties."/>
 
     <@lib.property
+        name = "processVariablesToTriggeredScope"
+        type = "object"
+        additionalProperties = true
+        dto = "VariableValueDto"
+        desc = "A map of variables that is injected into the new scope triggered by message correlation.
+                Each key is a variable name and each value a JSON variable value object
+                with the following properties."/>
+
+    <@lib.property
         name = "all"
         type = "boolean"
         defaultValue = 'false'
