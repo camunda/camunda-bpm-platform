@@ -721,6 +721,7 @@ CamundaForm.prototype.parseVariables = function() {
 
     var val = vars[v].value;
 
+    // TODO (1) send default vars
     // We want implicit type conversion in this case, the defaultValue is always a string
     if (varManager.isDirty(v) || vars[v].defaultValue != val) {
       // if variable is JSON, serialize
