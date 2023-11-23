@@ -22,4 +22,4 @@ alter table ACT_RU_EXT_TASK
   add column CREATE_TIME_ timestamp;
 
 ALTER TABLE ACT_RU_JOB
-  ADD ROOT_PROCESS_INSTANCE_ID_ varchar(64);
+  ADD COLUMN ROOT_PROCESS_INSTANCE_ID_ varchar(64);

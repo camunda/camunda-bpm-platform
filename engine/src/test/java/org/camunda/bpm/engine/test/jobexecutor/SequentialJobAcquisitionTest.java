@@ -93,11 +93,14 @@ public class SequentialJobAcquisitionTest {
 
     createdProcessEngines.add(engine);
 
-    engine.getRepositoryService().createDeployment().addClasspathResource(PROCESS_RESOURCE).deploy();
+    engine.getRepositoryService().createDeployment()
+      .addClasspathResource(PROCESS_RESOURCE)
+      .deploy();
 
     jobExecutor.shutdown();
 
-    engine.getRuntimeService().startProcessInstanceByKey("intermediateTimerEventExample");
+    engine.getRuntimeService()
+      .startProcessInstanceByKey("intermediateTimerEventExample");
 
     Assert.assertEquals(1, engine.getManagementService().createJobQuery().count());
 
@@ -141,9 +144,13 @@ public class SequentialJobAcquisitionTest {
 
     // deploy the processes
 
-    engine1.getRepositoryService().createDeployment().addClasspathResource(PROCESS_RESOURCE).deploy();
+    engine1.getRepositoryService().createDeployment()
+      .addClasspathResource(PROCESS_RESOURCE)
+      .deploy();
 
-    engine2.getRepositoryService().createDeployment().addClasspathResource(PROCESS_RESOURCE).deploy();
+    engine2.getRepositoryService().createDeployment()
+     .addClasspathResource(PROCESS_RESOURCE)
+     .deploy();
 
     // start one instance for each engine:
 
@@ -198,9 +205,13 @@ public class SequentialJobAcquisitionTest {
 
     // deploy the processes
 
-    engine1.getRepositoryService().createDeployment().addClasspathResource(PROCESS_RESOURCE).deploy();
+    engine1.getRepositoryService().createDeployment()
+      .addClasspathResource(PROCESS_RESOURCE)
+      .deploy();
 
-    engine2.getRepositoryService().createDeployment().addClasspathResource(PROCESS_RESOURCE).deploy();
+    engine2.getRepositoryService().createDeployment()
+     .addClasspathResource(PROCESS_RESOURCE)
+     .deploy();
 
     // start one instance for each engine:
 
@@ -234,11 +245,9 @@ public class SequentialJobAcquisitionTest {
 
   ////////// helper methods ////////////////////////////
 
-  protected void waitForJobExecutorToProcessAllJobs(long maxMillisToWait,
-                                                    long intervalMillis,
-                                                    JobExecutor jobExecutor,
-                                                    ManagementService managementService,
-                                                    boolean shutdown) {
+
+  protected void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis, JobExecutor jobExecutor,
+      ManagementService managementService, boolean shutdown) {
     try {
       waitForCondition(maxMillisToWait, intervalMillis, () -> !areJobsAvailable(managementService));
     } finally {
@@ -248,9 +257,7 @@ public class SequentialJobAcquisitionTest {
     }
   }
 
-  protected void waitForJobExecutionRunnablesToFinish(long maxMillisToWait,
-                                                      long intervalMillis,
-                                                      JobExecutor jobExecutor) {
+  protected void waitForJobExecutionRunnablesToFinish(long maxMillisToWait, long intervalMillis, JobExecutor jobExecutor) {
     waitForCondition(maxMillisToWait, intervalMillis,
         () -> ((ThreadPoolJobExecutor) jobExecutor).getThreadPoolExecutor().getActiveCount() == 0);
   }
@@ -275,7 +282,11 @@ public class SequentialJobAcquisitionTest {
   }
 
   protected boolean areJobsAvailable(ManagementService managementService) {
-    return !managementService.createJobQuery().executable().list().isEmpty();
+    return !managementService
+      .createJobQuery()
+      .executable()
+      .list()
+      .isEmpty();
   }
 
   private static class InteruptTask extends TimerTask {

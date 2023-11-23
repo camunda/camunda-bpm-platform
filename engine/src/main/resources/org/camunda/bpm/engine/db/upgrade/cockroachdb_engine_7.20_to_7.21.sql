@@ -21,7 +21,7 @@ alter table ACT_RU_EXT_TASK
   add column CREATE_TIME_ timestamp;
 
 ALTER TABLE ACT_RU_JOB
-  ADD ROOT_PROCESS_INSTANCE_ varchar(64);
+  ADD ROOT_PROCESS_INSTANCE_ID_ varchar(64);
 
 insert into ACT_GE_SCHEMA_LOG
 values ('1000', CURRENT_TIMESTAMP, '7.21.0');
