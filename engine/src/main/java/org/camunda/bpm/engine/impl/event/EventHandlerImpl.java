@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl.event;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.ActivityTypes;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -61,9 +62,14 @@ public class EventHandlerImpl implements EventHandler {
     }
 
     if (payloadToTriggeredScope instanceof Map) {
-      ActivityNewScopeVariablesTuple tuple = new ActivityNewScopeVariablesTuple(activity.getId(),
-                                                                                (Map<String, Object>) payloadToTriggeredScope);
-      execution.getProcessInstance().setPayloadForTriggeredScope(tuple);
+      if (ActivityTypes.INTERMEDIATE_EVENT_MESSAGE.equals(activity.getProperty("type"))) {
+        execution.setVariablesLocal((Map<String, Object>) payloadToTriggeredScope);
+      } else {
+        ActivityNewScopeVariablesTuple tuple = new ActivityNewScopeVariablesTuple(activity.getId(),
+                                                                                  (Map<String, Object>) payloadToTriggeredScope);
+        execution.getProcessInstance().setPayloadForTriggeredScope(tuple);
+      }
+
     }
 
     if(activity.equals(execution.getActivity())) {
