@@ -626,6 +626,8 @@
     "PLGN_BTCH_DEL_RUN_PROCINST_SEARCH_PLEASE_NOTE": "Bitte beachten Sie, dass nur ",
     "PLGN_BTCH_DEL_RUN_PROCINST_SKIP_CUSTOM_LISTENERS": "Custom-Listener überspringen",
     "PLGN_BTCH_DEL_RUN_PROCINST_SKIP_CUSTOM_LISTENERS_TOOLTIP": "Bei Aktivierung werden nur integrierte Listener mit einem Endereignis benachrichtigt.",
+    "PLGN_BTCH_DEL_RUN_PROCINST_SKIP_IO_MAPPINGS": "IO-Mappings überspringen",
+    "PLGN_BTCH_DEL_RUN_PROCINST_SKIP_IO_MAPPINGS_TOOLTIP": "Bei Aktivierung dieser Option werden IO-Mappings während des Löschens der Prozessinstanz übersprungen",
     "PLGN_BTCH_DEL_RUN_PROCINST_WHY": "Aus welchem Grund wollen Sie die Operation ausführen?",
     "PLGN_BTCH_INSTANCES_PROCESSED": "Instanzen werden verarbeitet. Bitte warten Sie einen Moment.",
     "PLGN_BTCH_OPERATION_EXECUTED": "Operation wird ausgeführt.\nEin neuer Stapel mit der ID {{id}} wurde angelegt.",
