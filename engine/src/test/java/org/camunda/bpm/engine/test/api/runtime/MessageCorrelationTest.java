@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -44,6 +45,8 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.util.StringUtil;
@@ -2190,8 +2193,8 @@ public class MessageCorrelationTest {
         .variableName(variableName)
         .variableScopeIdIn(activityInstance.getId())
         .singleResult();
-    assertNotNull(variable);
-    assertEquals(outpuValue, variable.getValue());
+    assertThat(variable).isNotNull();
+    assertThat(variable.getValue()).isEqualTo(outpuValue);
   }
 
   @Test
@@ -2222,8 +2225,8 @@ public class MessageCorrelationTest {
         .variableName(variableName)
         .variableScopeIdIn(processInstance.getId())
         .singleResult();
-    assertNotNull(variable);
-    assertEquals(outpuValue, variable.getValue());
+    assertThat(variable).isNotNull();
+    assertThat(variable.getValue()).isEqualTo(outpuValue);
   }
 
   @Test
@@ -2252,33 +2255,39 @@ public class MessageCorrelationTest {
         .variableName(variableName)
         .variableScopeIdIn(activityInstance.getId())
         .singleResult();
-    assertNotNull(variable);
-    assertEquals(outpuValue, variable.getValue());
+    assertThat(variable).isNotNull();
+    assertThat(variable.getValue()).isEqualTo(outpuValue);
   }
 
   @Test
   public void shouldCorrelateEventSubprocessInterruptingWithVariablesInNewScope() {
     // given
     BpmnModelInstance targetModel = createModelWithEventSubprocess(true);
+    System.out.println(Bpmn.convertToString(targetModel));
     testRule.deploy(targetModel);
     Map<String, Object> variables = new HashMap<>();
     variables.put("processInstanceVar", "processInstanceVarValue");
     engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
 
     String outpuValue = "outputValue";
+    String variableName = "testVar";
 
-    try {
-      // when
-      runtimeService
-          .createMessageCorrelation("1")
-          .setVariableToTriggeredScope(null, outpuValue)
-          .correlate();
-      fail("Variable name is null");
-    }
-    catch (Exception e) {
-      assertTrue(e instanceof NullValueException);
-      testRule.assertTextPresent("null", e.getMessage());
-    }
+    // when
+    runtimeService
+        .createMessageCorrelation("1")
+        .setVariableToTriggeredScope(variableName, outpuValue)
+        .correlate();
+
+    // then the scope is "afterMessage" activity
+    Execution activityInstance = runtimeService.createExecutionQuery().activityId("afterMessage").singleResult();
+    assertThat(activityInstance).isNotNull();
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .variableName(variableName)
+        .variableScopeIdIn(activityInstance.getId())
+        .singleResult();
+    assertThat(variable).isNotNull();
+    assertThat(variable.getValue()).isEqualTo(outpuValue);
   }
 
   @Test
@@ -2313,18 +2322,18 @@ public class MessageCorrelationTest {
         .variableScopeIdIn(result.getProcessInstance().getId())
         .variableName(variableName)
         .singleResult();
-    assertNotNull(variable);
-    assertEquals(outpuValue, variable.getValue());
+    assertThat(variable).isNotNull();
+    assertThat(variable.getValue()).isEqualTo(outpuValue);
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void shouldCorrelateIntermediateCatchMessageWithVariablesInNewScope() {
-    // TODO what is the expected behavior?
     // given
     BpmnModelInstance model = Bpmn.createExecutableProcess("Process_1")
         .startEvent()
         .intermediateCatchEvent("Message_1")
-        .message("1")
+            .message("1")
         .userTask("afterMessage")
         .endEvent()
         .done();
@@ -2333,7 +2342,7 @@ public class MessageCorrelationTest {
 
     Map<String, Object> variables = new HashMap<>();
     variables.put("processInstanceVar", "processInstanceVarValue");
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
+    engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
 
     Map<String, Object> messagePayload = new HashMap<>();
     String outpuValue = "outputValue";
@@ -2346,14 +2355,17 @@ public class MessageCorrelationTest {
         .setVariablesToTriggeredScope(messagePayload)
         .correlate();
 
-    // then the scope is the PI
-    VariableInstance variable = runtimeService
-        .createVariableInstanceQuery()
-        .variableScopeIdIn(processInstance.getId())
+    // the scope was "Message" activity
+    HistoryService historyService = engineRule.getHistoryService();
+    HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery()
         .variableName(variableName)
         .singleResult();
-    assertNotNull(variable);
-    assertEquals(outpuValue, variable.getValue());
+    assertThat(historicVariable).isNotNull();
+    HistoricActivityInstance historicActivity = historyService.createHistoricActivityInstanceQuery()
+        .activityId("Message_1").singleResult();
+    assertThat(historicActivity).isNotNull();
+    assertThat(historicVariable.getActivityInstanceId()).isEqualTo(historicActivity.getId());
+
   }
 
   @Test
@@ -2367,12 +2379,13 @@ public class MessageCorrelationTest {
 
     String outpuValue = "outputValue";
 
-    // when
-    runtimeService
+    // when/then
+    assertThatThrownBy(() ->  runtimeService
         .createMessageCorrelation("1")
         .setVariableToTriggeredScope(null, outpuValue)
-        .correlate();
-
+        .correlate())
+    .isInstanceOf(NullValueException.class)
+    .hasMessageContaining("variableName");
   }
 
   // helpers ------------------------------------------------------------------
