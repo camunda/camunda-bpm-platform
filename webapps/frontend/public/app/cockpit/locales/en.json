@@ -626,6 +626,8 @@
     "PLGN_BTCH_DEL_RUN_PROCINST_SEARCH_PLEASE_NOTE": "Please note that only ",
     "PLGN_BTCH_DEL_RUN_PROCINST_SKIP_CUSTOM_LISTENERS": "Skip Custom Listeners",
     "PLGN_BTCH_DEL_RUN_PROCINST_SKIP_CUSTOM_LISTENERS_TOOLTIP": "If the value is enabled, only built-in listeners will be notified with the end event",
+    "PLGN_BTCH_DEL_RUN_PROCINST_SKIP_IO_MAPPINGS": "Skip IO Mappings",
+    "PLGN_BTCH_DEL_RUN_PROCINST_SKIP_IO_MAPPINGS_TOOLTIP": "If the value is enabled IO mappings will be skipped during process deletion",
     "PLGN_BTCH_DEL_RUN_PROCINST_WHY": "Why would you do that?",
     "PLGN_BTCH_INSTANCES_PROCESSED": "Instances are being processed… Please wait.",
     "PLGN_BTCH_OPERATION_EXECUTED": "Operation is being executed.\nA new batch with ID {{id}} has been created.",
