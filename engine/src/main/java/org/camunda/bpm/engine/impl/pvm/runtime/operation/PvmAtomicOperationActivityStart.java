@@ -57,7 +57,8 @@ public class PvmAtomicOperationActivityStart extends PvmAtomicOperationActivityI
   @Override
   public void setDelayedPayloadToNewScope(PvmExecutionImpl execution, CoreModelElement scope) {
     String activityType = (String) scope.getProperty(BpmnProperties.TYPE.getName());
-    if (ActivityTypes.BOUNDARY_MESSAGE.equals(activityType)) {
+    if (ActivityTypes.START_EVENT_MESSAGE.equals(activityType) // Event subprocess message start event
+        || ActivityTypes.BOUNDARY_MESSAGE.equals(activityType)) {
       PvmExecutionImpl processInstance = execution.getProcessInstance();
       ActivityNewScopeVariablesTuple tuple = processInstance.getPayloadForTriggeredScope();
       if (tuple != null && tuple.getActivityId().equals(scope.getId())) {
