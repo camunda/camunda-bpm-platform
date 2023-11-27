@@ -28,6 +28,7 @@ public class CorrelationMessageDto {
   private Map<String, VariableValueDto> localCorrelationKeys;
   private Map<String, VariableValueDto> processVariables;
   private Map<String, VariableValueDto> processVariablesLocal;
+  private Map<String, VariableValueDto> processVariablesToTriggeredScope;
   private String tenantId;
   private boolean withoutTenantId;
   private String processInstanceId;
@@ -82,6 +83,14 @@ public class CorrelationMessageDto {
 
   public void setProcessVariablesLocal(Map<String, VariableValueDto> processVariablesLocal) {
     this.processVariablesLocal = processVariablesLocal;
+  }
+
+  public Map<String, VariableValueDto> getProcessVariablesToTriggeredScope() {
+    return processVariablesToTriggeredScope;
+  }
+
+  public void setProcessVariablesToTriggeredScope(Map<String, VariableValueDto> processVariablesToTriggeredScope) {
+    this.processVariablesToTriggeredScope = processVariablesToTriggeredScope;
   }
 
   public boolean isAll() {

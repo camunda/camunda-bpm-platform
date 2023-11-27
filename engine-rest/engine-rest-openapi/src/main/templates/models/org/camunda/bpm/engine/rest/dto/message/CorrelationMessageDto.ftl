@@ -66,8 +66,17 @@
         type = "object"
         additionalProperties = true
         dto = "VariableValueDto"
-        desc = "A map of local variables that is injected into the triggered execution or process instance after the
-                message has been delivered. Each key is a variable name and each value a JSON variable value object
+        desc = "A map of local variables that is injected into the execution waiting on the message.
+                Each key is a variable name and each value a JSON variable value object
+                with the following properties."/>
+
+    <@lib.property
+        name = "processVariablesToTriggeredScope"
+        type = "object"
+        additionalProperties = true
+        dto = "VariableValueDto"
+        desc = "A map of variables that is injected into the new scope triggered by message correlation.
+                Each key is a variable name and each value a JSON variable value object
                 with the following properties."/>
 
     <@lib.property
