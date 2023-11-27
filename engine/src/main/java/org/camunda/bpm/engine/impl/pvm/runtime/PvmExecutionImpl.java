@@ -853,12 +853,16 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
       default:
         setActivity(activityImpl);
         setActivityInstanceId(null);
-      setDelayedPayloadToNewScope(activity);
+        setDelayedPayloadToNewScope(activity);
         performOperation(PvmAtomicOperation.ACTIVITY_START_CREATE_SCOPE);
         break;
     }
   }
 
+  /*
+   * TODO: Move out setDelayedPayloadToNewScope from PvmExecution to PVM Operations
+   * check  https://github.com/camunda/camunda-bpm-platform/issues/3979
+   */
   protected void setDelayedPayloadToNewScope(PvmActivity activity) {
     String activityType = (String) activity.getProperty(BpmnProperties.TYPE.getName());
     if (ActivityTypes.START_EVENT_MESSAGE.equals(activityType) // Event subprocess message start event

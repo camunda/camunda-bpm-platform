@@ -114,5 +114,4 @@ public abstract class AbstractEventAtomicOperation<T extends CoreExecution> impl
       throw new PvmException("couldn't execute event listener : " + exception.getMessage(), exception);
     }
   }
-
 }

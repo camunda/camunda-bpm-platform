@@ -49,5 +49,4 @@ public class PvmAtomicOperationActivityStart extends PvmAtomicOperationActivityI
   public boolean shouldHandleFailureAsBpmnError() {
     return true;
   }
-
 }
