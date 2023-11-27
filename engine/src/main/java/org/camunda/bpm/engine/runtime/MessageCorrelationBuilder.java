@@ -127,6 +127,18 @@ public interface MessageCorrelationBuilder {
   MessageCorrelationBuilder setVariableLocal(String variableName, Object variableValue);
 
   /**
+   * <p>Pass a variable to the new scope triggered by message correlation. Use this method for passing the
+   * message's payload.</p>
+   *
+   * <p>Invoking this method multiple times allows passing multiple variables.</p>
+   *
+   * @param variableName the name of the variable to set
+   * @param variableValue the value of the variable to set
+   * @return the builder
+   */
+  MessageCorrelationBuilder setVariableToTriggeredScope(String variableName, Object variableValue);
+
+  /**
    * <p>Pass a map of variables to the execution waiting on the message. Use this method
    * for passing the message's payload</p>
    *
@@ -143,6 +155,15 @@ public interface MessageCorrelationBuilder {
    * @return the builder
    */
   MessageCorrelationBuilder setVariablesLocal(Map<String, Object> variables);
+
+  /**
+   * <p>Pass a map of variables to the new scope triggered by message correlation. Use this method
+   * for passing the message's payload.</p>
+   *
+   * @param variables the map of variables
+   * @return the builder
+   */
+  MessageCorrelationBuilder setVariablesToTriggeredScope(Map<String, Object> variables);
 
   /**
    * Specify a tenant to deliver the message to. The message can only be

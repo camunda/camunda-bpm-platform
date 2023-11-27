@@ -18,7 +18,9 @@ package org.camunda.bpm.engine.impl.event;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.ActivityTypes;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -39,7 +41,11 @@ public class EventHandlerImpl implements EventHandler {
     this.eventType = eventType;
   }
 
-  public void handleIntermediateEvent(EventSubscriptionEntity eventSubscription, Object payload, Object localPayload, CommandContext commandContext) {
+  public void handleIntermediateEvent(EventSubscriptionEntity eventSubscription,
+                                      Object payload,
+                                      Object localPayload,
+                                      Object payloadToTriggeredScope,
+                                      CommandContext commandContext) {
 
     PvmExecutionImpl execution = eventSubscription.getExecution();
     ActivityImpl activity = eventSubscription.getActivity();
@@ -53,6 +59,15 @@ public class EventHandlerImpl implements EventHandler {
 
     if (localPayload instanceof Map) {
       execution.setVariablesLocal((Map<String, Object>) localPayload);
+    }
+
+    if (payloadToTriggeredScope instanceof Map) {
+      if (ActivityTypes.INTERMEDIATE_EVENT_MESSAGE.equals(activity.getProperty(BpmnProperties.TYPE.getName()))) {
+        execution.setVariablesLocal((Map<String, Object>) payloadToTriggeredScope);
+      } else {
+        execution.getProcessInstance().setPayloadForTriggeredScope((Map<String, Object>) payloadToTriggeredScope);
+      }
+
     }
 
     if(activity.equals(execution.getActivity())) {
@@ -70,8 +85,13 @@ public class EventHandlerImpl implements EventHandler {
   }
 
   @Override
-  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, Object localPayload, String businessKey, CommandContext commandContext) {
-    handleIntermediateEvent(eventSubscription, payload, localPayload, commandContext);
+  public void handleEvent(EventSubscriptionEntity eventSubscription,
+                          Object payload,
+                          Object localPayload,
+                          Object payloadToTriggeredScope,
+                          String businessKey,
+                          CommandContext commandContext) {
+    handleIntermediateEvent(eventSubscription, payload, localPayload, payloadToTriggeredScope, commandContext);
   }
 
   @Override

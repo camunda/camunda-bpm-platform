@@ -59,6 +59,7 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   protected VariableMap correlationLocalVariables;
   protected VariableMap payloadProcessInstanceVariables;
   protected VariableMap payloadProcessInstanceVariablesLocal;
+  protected VariableMap payloadProcessInstanceVariablesToTriggeredScope;
 
   protected String tenantId = null;
   protected boolean isTenantIdSet = false;
@@ -158,6 +159,14 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
     return this;
   }
 
+  @Override
+  public MessageCorrelationBuilder setVariableToTriggeredScope(String variableName, Object variableValue) {
+    ensureNotNull("variableName", variableName);
+    ensurePayloadProcessInstanceVariablesToTriggeredScopeInitialized();
+    payloadProcessInstanceVariablesToTriggeredScope.put(variableName, variableValue);
+    return this;
+  }
+
   public MessageCorrelationBuilder setVariables(Map<String, Object> variables) {
     if (variables != null) {
       ensurePayloadProcessInstanceVariablesInitialized();
@@ -175,6 +184,15 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
     return this;
   }
 
+  @Override
+  public MessageCorrelationBuilder setVariablesToTriggeredScope(Map<String, Object> variables) {
+    if (variables != null) {
+      ensurePayloadProcessInstanceVariablesToTriggeredScopeInitialized();
+      payloadProcessInstanceVariablesToTriggeredScope.putAll(variables);
+    }
+    return this;
+  }
+
   protected void ensurePayloadProcessInstanceVariablesInitialized() {
     if (payloadProcessInstanceVariables == null) {
       payloadProcessInstanceVariables = new VariableMapImpl();
@@ -184,6 +202,12 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   protected void ensurePayloadProcessInstanceVariablesLocalInitialized() {
     if (payloadProcessInstanceVariablesLocal == null) {
       payloadProcessInstanceVariablesLocal = new VariableMapImpl();
+    }
+  }
+
+  protected void ensurePayloadProcessInstanceVariablesToTriggeredScopeInitialized() {
+    if (payloadProcessInstanceVariablesToTriggeredScope == null) {
+      payloadProcessInstanceVariablesToTriggeredScope = new VariableMapImpl();
     }
   }
 
@@ -365,6 +389,10 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
 
   public VariableMap getPayloadProcessInstanceVariablesLocal() {
     return payloadProcessInstanceVariablesLocal;
+  }
+
+  public VariableMap getPayloadProcessInstanceVariablesToTriggeredScope() {
+    return payloadProcessInstanceVariablesToTriggeredScope;
   }
 
   public boolean isExclusiveCorrelation() {
