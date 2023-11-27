@@ -203,18 +203,18 @@ public class FetchExternalTasksDto {
     }
   }
 
-  public FetchAndLockBuilder buildQuery(ProcessEngine processEngine) {
+  public ExternalTaskQueryTopicBuilder buildQuery(ProcessEngine processEngine) {
     FetchAndLockBuilder fetchAndLockBuilder = getBuilder(processEngine);
-
-    if (CollectionUtil.isEmpty(topics)) {
-      return fetchAndLockBuilder;
-    }
 
     return configureTopics(fetchAndLockBuilder);
   }
 
-  protected FetchAndLockBuilder configureTopics(FetchAndLockBuilder builder) {
+  protected ExternalTaskQueryTopicBuilder configureTopics(FetchAndLockBuilder builder) {
     ExternalTaskQueryTopicBuilder topicBuilder = builder.subscribe();
+
+    if (CollectionUtil.isEmpty(topics)) {
+      return topicBuilder;
+    }
 
     topics.forEach(topic -> {
       topicBuilder.topic(topic.getTopicName(), topic.getLockDuration());
@@ -272,7 +272,7 @@ public class FetchExternalTasksDto {
       }
     });
 
-    return builder;
+    return topicBuilder;
   }
 
   protected FetchAndLockBuilder getBuilder(ProcessEngine engine) {

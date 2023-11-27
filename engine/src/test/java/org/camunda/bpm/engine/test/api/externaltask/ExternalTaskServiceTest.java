@@ -29,6 +29,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -49,6 +50,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
@@ -264,6 +266,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     // then
     assertThat(result.get(0).getPriority()).isEqualTo(7);
     assertThat(result.get(1).getPriority()).isEqualTo(7);
+
     assertThat(result.get(2).getPriority()).isEqualTo(0);
     assertThat(result.get(3).getPriority()).isEqualTo(0);
     assertThat(result.get(4).getPriority()).isEqualTo(0);
@@ -408,6 +411,21 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     assertThat(result.get(3).getPriority()).isGreaterThanOrEqualTo(result.get(4).getPriority());
   }
 
+  @Test
+  public void shouldThrowExceptionOnSubscribeWithInvalidOrderConfig() {
+    assertThrows(NotValidException.class, () -> externalTaskService.fetchAndLock()
+        .orderByCreateTime()
+        .subscribe()
+        .execute());
+  }
+
+  @Test
+  public void shouldThrowExceptionOnChainedSortingConfigs() {
+    assertThrows(NotValidException.class, () -> externalTaskService.fetchAndLock()
+        .desc()
+        .desc());
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityProcess.bpmn20.xml")
   @Test
   public void testFetchProcessWithPriority() {
@@ -418,6 +436,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(2, WORKER_ID, true)
       .topic(TOPIC_NAME, LOCK_TIME)
       .execute();
+
     assertEquals(2, externalTasks.size());
 
     // then
@@ -438,6 +457,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(2, WORKER_ID, true)
       .topic(TOPIC_NAME, LOCK_TIME)
       .execute();
+
     assertEquals(2, externalTasks.size());
 
     // then

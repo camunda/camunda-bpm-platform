@@ -16,14 +16,18 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.Direction.DESCENDING;
+import static org.camunda.bpm.engine.impl.ExternalTaskQueryProperty.PRIORITY;
+
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
@@ -51,23 +55,24 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
   protected int maxResults;
   protected boolean usePriority;
 
-  protected boolean useCreateTime;
-  protected Direction createTimeDirection;
+  protected Collection<QueryOrderingProperty> orderingProperties;
 
-  protected Map<String, TopicFetchInstruction> fetchInstructions = new HashMap<>();
+  protected Map<String, TopicFetchInstruction> fetchInstructions;
 
   public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions) {
-    this(workerId, maxResults, instructions, false, false, null);
+    this(workerId, maxResults, instructions, false, Collections.emptyList());
   }
 
-  public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions,
-                               boolean usePriority, boolean useCreateTime, Direction createTimeDirection) {
+  public FetchExternalTasksCmd(String workerId,
+                               int maxResults,
+                               Map<String, TopicFetchInstruction> instructions,
+                               boolean usePriority,
+                               List<QueryOrderingProperty> orderingProperties) {
     this.workerId = workerId;
     this.maxResults = maxResults;
     this.fetchInstructions = instructions;
     this.usePriority = usePriority;
-    this.useCreateTime = useCreateTime;
-    this.createTimeDirection = createTimeDirection;
+    this.orderingProperties = orderingProperties;
   }
 
   @Override
@@ -78,10 +83,12 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
       instruction.ensureVariablesInitialized();
     }
 
+    List<QueryOrderingProperty> orderingProperties = orderingPropertiesWithPriority();
+
     List<ExternalTaskEntity> externalTasks = commandContext
       .getExternalTaskManager()
       .selectExternalTasksForTopics(new ArrayList<>(fetchInstructions.values()), maxResults, usePriority,
-          useCreateTime, createTimeDirection);
+          orderingProperties);
 
     final List<LockedExternalTask> result = new ArrayList<>();
 
@@ -94,7 +101,8 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
 
       if (execution != null) {
         entity.lock(workerId, fetchInstruction.getLockDuration());
-        var resultTask = LockedExternalTaskImpl.fromEntity(
+
+        LockedExternalTaskImpl resultTask = LockedExternalTaskImpl.fromEntity(
             entity,
             fetchInstruction.getVariablesToFetch(),
             fetchInstruction.isLocalVariables(),
@@ -185,5 +193,17 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
       EnsureUtil.ensureNotNull("topicName", instruction.getTopicName());
       EnsureUtil.ensurePositive("lockTime", instruction.getLockDuration());
     }
+  }
+
+  protected List<QueryOrderingProperty> orderingPropertiesWithPriority() {
+    List<QueryOrderingProperty> results = new ArrayList<>();
+
+    if (usePriority) {
+      results.add(new QueryOrderingProperty(PRIORITY, DESCENDING));
+    }
+
+    results.addAll(orderingProperties);
+
+    return results;
   }
 }

@@ -16,21 +16,17 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import static org.camunda.bpm.engine.impl.Direction.DESCENDING;
 import static org.camunda.bpm.engine.impl.ExternalTaskQueryProperty.CREATE_TIME;
-import static org.camunda.bpm.engine.impl.ExternalTaskQueryProperty.PRIORITY;
 import static org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory.CRDB;
 import static org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory.POSTGRES;
 import static org.camunda.bpm.engine.impl.util.DatabaseUtil.checkDatabaseType;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
-import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.ExternalTaskQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.QueryOrderingProperty;
@@ -38,6 +34,7 @@ import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.externaltask.TopicFetchInstruction;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
@@ -77,24 +74,25 @@ public class ExternalTaskManager extends AbstractManager {
   public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<TopicFetchInstruction> queryFilters,
                                                                int maxResults,
                                                                boolean usePriority,
-                                                               boolean useCreateTime,
-                                                               Direction createTimeDirection) {
+                                                               List<QueryOrderingProperty> orderingProperties) {
     if (queryFilters.isEmpty()) {
       return Collections.emptyList();
     }
 
-    var parameters = Map.of(
+    boolean useCreateTime = useCreateTime(orderingProperties);
+
+    Map<String, Object> parameters = Map.of(
         "topics", queryFilters,
         "now", ClockUtil.getCurrentTime(),
-        "applyOrdering", applyOrdering(usePriority, useCreateTime),
-        "orderingProperties", orderingProperties(usePriority, useCreateTime, createTimeDirection),
+        "applyOrdering", shouldApplyOrdering(usePriority, useCreateTime),
+        "orderingProperties", orderingProperties,
         "usesPostgres", checkDatabaseType(POSTGRES, CRDB)
     );
 
-    var parameter = new ListQueryParameterObject(parameters, 0, maxResults);
+    ListQueryParameterObject parameter = new ListQueryParameterObject(parameters, 0, maxResults);
     configureQuery(parameter);
 
-    var manager = getDbEntityManager();
+    DbEntityManager manager = getDbEntityManager();
     return manager.selectList("selectExternalTasksForTopics", parameter);
   }
 
@@ -175,22 +173,13 @@ public class ExternalTaskManager extends AbstractManager {
     return getTenantManager().configureQuery(parameter);
   }
 
-  protected boolean applyOrdering(boolean usePriority, boolean useCreateTime) {
+  protected boolean shouldApplyOrdering(boolean usePriority, boolean useCreateTime) {
     return usePriority || useCreateTime;
   }
 
-  protected List<QueryOrderingProperty> orderingProperties(boolean usePriority, boolean useCreateTime, Direction useCreateTimeDirection) {
-    var result = new ArrayList<QueryOrderingProperty>();
-
-    if (usePriority) {
-      result.add(new QueryOrderingProperty(PRIORITY, DESCENDING));
-    }
-
-    if (useCreateTime) {
-      result.add(new QueryOrderingProperty(CREATE_TIME, useCreateTimeDirection));
-    }
-
-    return result;
+  protected boolean useCreateTime(List<QueryOrderingProperty> orderingProperties) {
+    return orderingProperties.stream()
+        .anyMatch(orderingProperty -> CREATE_TIME.getName().equals(orderingProperty.getQueryProperty().getName()));
   }
 
   public void fireExternalTaskAvailableEvent() {
