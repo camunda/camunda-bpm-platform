@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ActivityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
@@ -46,7 +47,6 @@ import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandling;
 import org.camunda.bpm.engine.impl.persistence.entity.DelayedVariableEvent;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
@@ -853,8 +853,21 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
       default:
         setActivity(activityImpl);
         setActivityInstanceId(null);
+        setDelayedPayloadToNewScope(activity);
         performOperation(PvmAtomicOperation.ACTIVITY_START_CREATE_SCOPE);
         break;
+    }
+  }
+
+  protected void setDelayedPayloadToNewScope(PvmActivity activity) {
+    String activityType = (String) activity.getProperty(BpmnProperties.TYPE.getName());
+    if (ActivityTypes.START_EVENT_MESSAGE.equals(activityType) // Event subprocess message start event
+        || ActivityTypes.BOUNDARY_MESSAGE.equals(activityType)) {
+      if (getProcessInstance().getPayloadForTriggeredScope() != null) {
+        this.setVariablesLocal(getProcessInstance().getPayloadForTriggeredScope().getVariables());
+        // clear the process instance
+        getProcessInstance().setPayloadForTriggeredScope(null);
+      }
     }
   }
 

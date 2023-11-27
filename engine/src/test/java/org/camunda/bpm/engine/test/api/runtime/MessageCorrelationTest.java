@@ -52,6 +52,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResultType;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResultWithVariables;
@@ -75,7 +76,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -1781,7 +1781,6 @@ public class MessageCorrelationTest {
   }
 
   @Test
-  @Ignore("CAM-10198")
   public void testMessageStartEventCorrelationWithLocalVariables() {
     // given
     BpmnModelInstance model = Bpmn.createExecutableProcess("Process_1")
@@ -2166,7 +2165,7 @@ public class MessageCorrelationTest {
   @Test
   public void shouldCorrelateNonInterruptingWithVariablesInNewScope() {
     // given
-    BpmnModelInstance model = createModelWithBoundaryEvent(false);
+    BpmnModelInstance model = createModelWithBoundaryEvent(false, false);
 
     testRule.deploy(model);
 
@@ -2200,7 +2199,7 @@ public class MessageCorrelationTest {
   @Test
   public void shouldCorrelateInterruptingWithVariablesInNewScope() {
     // given
-    BpmnModelInstance model = createModelWithBoundaryEvent(true);
+    BpmnModelInstance model = createModelWithBoundaryEvent(true, false);
 
     testRule.deploy(model);
 
@@ -2232,7 +2231,7 @@ public class MessageCorrelationTest {
   @Test
   public void shouldCorrelateEventSubprocessNonInterruptingWithVariablesInNewScope() {
     // given
-    BpmnModelInstance targetModel = createModelWithEventSubprocess(false);
+    BpmnModelInstance targetModel = createModelWithEventSubprocess(false, false);
     testRule.deploy(targetModel);
     Map<String, Object> variables = new HashMap<>();
     variables.put("processInstanceVar", "processInstanceVarValue");
@@ -2262,8 +2261,7 @@ public class MessageCorrelationTest {
   @Test
   public void shouldCorrelateEventSubprocessInterruptingWithVariablesInNewScope() {
     // given
-    BpmnModelInstance targetModel = createModelWithEventSubprocess(true);
-    System.out.println(Bpmn.convertToString(targetModel));
+    BpmnModelInstance targetModel = createModelWithEventSubprocess(true, false);
     testRule.deploy(targetModel);
     Map<String, Object> variables = new HashMap<>();
     variables.put("processInstanceVar", "processInstanceVarValue");
@@ -2371,7 +2369,7 @@ public class MessageCorrelationTest {
   @Test
   public void shouldFailCorrelateWithNullVariableNameInNewScope() {
     // given
-    BpmnModelInstance targetModel = createModelWithBoundaryEvent(true);
+    BpmnModelInstance targetModel = createModelWithBoundaryEvent(true, false);
     testRule.deploy(targetModel);
     Map<String, Object> variables = new HashMap<>();
     variables.put("processInstanceVar", "processInstanceVarValue");
@@ -2386,6 +2384,192 @@ public class MessageCorrelationTest {
         .correlate())
     .isInstanceOf(NullValueException.class)
     .hasMessageContaining("variableName");
+  }
+
+  @Test
+  public void shouldCorrelateAsyncNonInterruptingWithVariablesInNewScope() {
+    // given
+    BpmnModelInstance model = createModelWithBoundaryEvent(false, true);
+
+    testRule.deploy(model);
+
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("processInstanceVar", "processInstanceVarValue");
+    engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
+
+    Map<String, Object> messagePayload = new HashMap<>();
+    String outpuValue = "outputValue";
+    String variableName = "testVar";
+    messagePayload.put(variableName, outpuValue);
+
+
+    // when
+    runtimeService
+        .createMessageCorrelation("1")
+        .setVariablesToTriggeredScope(messagePayload)
+        .correlate();
+    Job asyncJob = engineRule.getManagementService().createJobQuery().list().get(0);
+    assertNotNull(asyncJob);
+    engineRule.getManagementService().executeJob(asyncJob.getId());
+
+    // then the scope is "afterMessage" activity
+    Execution activityInstance = runtimeService.createExecutionQuery().activityId("afterMessage").singleResult();
+    assertThat(activityInstance).isNotNull();
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .variableName(variableName)
+        .variableScopeIdIn(activityInstance.getId())
+        .singleResult();
+    assertThat(variable).isNotNull();
+    assertThat(variable.getValue()).isEqualTo(outpuValue);
+  }
+
+  @Test
+  public void shouldCorrelateAsyncInterruptingWithVariablesInNewScope() {
+    // given
+    BpmnModelInstance model = createModelWithBoundaryEvent(true, true);
+
+    testRule.deploy(model);
+
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("processInstanceVar", "processInstanceVarValue");
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
+
+    Map<String, Object> messagePayload = new HashMap<>();
+    String outpuValue = "outputValue";
+    String variableName = "testVar";
+    messagePayload.put(variableName, outpuValue);
+
+    // when
+    runtimeService
+        .createMessageCorrelation("1")
+        .setVariablesToTriggeredScope(messagePayload)
+        .correlate();
+    Job asyncJob = engineRule.getManagementService().createJobQuery().singleResult();
+    assertNotNull(asyncJob);
+    engineRule.getManagementService().executeJob(asyncJob.getId());
+
+    // then the scope is the PI
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .variableName(variableName)
+        .variableScopeIdIn(processInstance.getId())
+        .singleResult();
+    assertThat(variable).isNotNull();
+    assertThat(variable.getValue()).isEqualTo(outpuValue);
+  }
+
+  @Test
+  public void shouldCorrelateEventSubprocessAsyncNonInterruptingWithVariablesInNewScope() {
+    // given
+    BpmnModelInstance targetModel = createModelWithEventSubprocess(false, true);
+    testRule.deploy(targetModel);
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("processInstanceVar", "processInstanceVarValue");
+    engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
+
+    String outpuValue = "outputValue";
+    String variableName = "testVar";
+
+    // when
+    runtimeService
+        .createMessageCorrelation("1")
+        .setVariableToTriggeredScope(variableName, outpuValue)
+        .correlate();
+    Job asyncJob = engineRule.getManagementService().createJobQuery().singleResult();
+    assertNotNull(asyncJob);
+    engineRule.getManagementService().executeJob(asyncJob.getId());
+
+    // then the scope is "afterMessage" activity
+    Execution activityInstance = runtimeService.createExecutionQuery().activityId("afterMessage").singleResult();
+    assertThat(activityInstance).isNotNull();
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .variableName(variableName)
+        .variableScopeIdIn(activityInstance.getId())
+        .singleResult();
+    assertThat(variable).isNotNull();
+    assertThat(variable.getValue()).isEqualTo(outpuValue);
+  }
+
+  @Test
+  public void shouldCorrelateEventSubprocessAsyncInterruptingWithVariablesInNewScope() {
+    // given
+    BpmnModelInstance targetModel = createModelWithEventSubprocess(true, true);
+    testRule.deploy(targetModel);
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("processInstanceVar", "processInstanceVarValue");
+    engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
+
+    String outpuValue = "outputValue";
+    String variableName = "testVar";
+
+    // when
+    runtimeService
+        .createMessageCorrelation("1")
+        .setVariableToTriggeredScope(variableName, outpuValue)
+        .correlate();
+    Job asyncJob = engineRule.getManagementService().createJobQuery().singleResult();
+    assertNotNull(asyncJob);
+    engineRule.getManagementService().executeJob(asyncJob.getId());
+
+    // then the scope is "afterMessage" activity
+    Execution activityInstance = runtimeService.createExecutionQuery().activityId("afterMessage").singleResult();
+    assertThat(activityInstance).isNotNull();
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .variableName(variableName)
+        .variableScopeIdIn(activityInstance.getId())
+        .singleResult();
+    assertThat(variable).isNotNull();
+    assertThat(variable.getValue()).isEqualTo(outpuValue);
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void shouldCorrelateAsyncIntermediateCatchMessageWithVariablesInNewScope() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("Process_1")
+        .startEvent()
+        .intermediateCatchEvent("Message_1")
+          .camundaAsyncBefore(true)
+            .message("1")
+        .userTask("afterMessage")
+        .endEvent()
+        .done();
+
+    testRule.deploy(model);
+
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("processInstanceVar", "processInstanceVarValue");
+    engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
+
+    Map<String, Object> messagePayload = new HashMap<>();
+    String outpuValue = "outputValue";
+    String variableName = "testVar";
+    messagePayload.put(variableName, outpuValue);
+
+    Job asyncJob = engineRule.getManagementService().createJobQuery().singleResult();
+    assertNotNull(asyncJob);
+    engineRule.getManagementService().executeJob(asyncJob.getId());
+
+    // when
+    runtimeService
+        .createMessageCorrelation("1")
+        .setVariablesToTriggeredScope(messagePayload)
+        .correlate();
+
+    // the scope was "Message" activity
+    HistoryService historyService = engineRule.getHistoryService();
+    HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery()
+        .variableName(variableName)
+        .singleResult();
+    assertThat(historicVariable).isNotNull();
+    HistoricActivityInstance historicActivity = historyService.createHistoricActivityInstanceQuery()
+        .activityId("Message_1").singleResult();
+    assertThat(historicActivity).isNotNull();
+    assertThat(historicVariable.getActivityInstanceId()).isEqualTo(historicActivity.getId());
+
   }
 
   // helpers ------------------------------------------------------------------
@@ -2419,7 +2603,7 @@ public class MessageCorrelationTest {
         .isEqualTo(1);
   }
 
-  protected BpmnModelInstance createModelWithEventSubprocess(boolean isInterrupting) {
+  protected BpmnModelInstance createModelWithEventSubprocess(boolean isInterrupting, boolean isAsync) {
     BpmnModelInstance targetModel = modify(Bpmn.createExecutableProcess("Process_1")
         .startEvent()
         .subProcess("Subprocess_1")
@@ -2434,6 +2618,7 @@ public class MessageCorrelationTest {
         .triggerByEvent()
         .embeddedSubProcess()
           .startEvent("Message_1")
+          .camundaAsyncBefore(isAsync)
           .interrupting(isInterrupting)
           .message("1")
           .exclusiveGateway("Gateway_1")
@@ -2448,11 +2633,12 @@ public class MessageCorrelationTest {
     return targetModel;
   }
 
-  protected BpmnModelInstance createModelWithBoundaryEvent(Boolean isInterrupting) {
+  protected BpmnModelInstance createModelWithBoundaryEvent(boolean isInterrupting, boolean isAsync) {
     return Bpmn.createExecutableProcess("Process_1")
         .startEvent()
         .userTask("UserTask_1")
           .boundaryEvent("Message_1")
+          .camundaAsyncBefore(isAsync)
           .cancelActivity(isInterrupting)
           .message("1")
             .exclusiveGateway("Gateway_1")
@@ -2465,6 +2651,7 @@ public class MessageCorrelationTest {
               .endEvent("unhappyEnd")
         .done();
   }
+
 
   public static class ChangeVariableDelegate implements JavaDelegate {
     @Override

@@ -16,7 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
+import org.camunda.bpm.engine.ActivityTypes;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
+import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.runtime.ActivityNewScopeVariablesTuple;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
@@ -42,6 +46,7 @@ public abstract class PvmAtomicOperationCreateConcurrentExecution implements Pvm
 
     // set next activity on propagating execution
     propagatingExecution.setActivity(activityToStart);
+    setDelayedPayloadToNewScope(propagatingExecution, (CoreModelElement) activityToStart);
     concurrentExecutionCreated(propagatingExecution);
   }
 
@@ -49,6 +54,20 @@ public abstract class PvmAtomicOperationCreateConcurrentExecution implements Pvm
 
   public boolean isAsync(PvmExecutionImpl execution) {
     return false;
+  }
+
+  protected void setDelayedPayloadToNewScope(PvmExecutionImpl execution, CoreModelElement scope) {
+    String activityType = (String) scope.getProperty(BpmnProperties.TYPE.getName());
+    if (ActivityTypes.START_EVENT_MESSAGE.equals(activityType) // Event subprocess message start event
+        || ActivityTypes.BOUNDARY_MESSAGE.equals(activityType)) {
+      PvmExecutionImpl processInstance = execution.getProcessInstance();
+      ActivityNewScopeVariablesTuple tuple = processInstance.getPayloadForTriggeredScope();
+      if (tuple != null) {
+        execution.setVariablesLocal(tuple.getVariables());
+        // clear the process instance
+        processInstance.setPayloadForTriggeredScope(null);
+      }
+    }
   }
 
 }
