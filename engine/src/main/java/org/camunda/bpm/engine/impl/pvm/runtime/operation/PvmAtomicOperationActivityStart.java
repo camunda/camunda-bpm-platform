@@ -61,7 +61,7 @@ public class PvmAtomicOperationActivityStart extends PvmAtomicOperationActivityI
         || ActivityTypes.BOUNDARY_MESSAGE.equals(activityType)) {
       PvmExecutionImpl processInstance = execution.getProcessInstance();
       ActivityNewScopeVariablesTuple tuple = processInstance.getPayloadForTriggeredScope();
-      if (tuple != null && tuple.getActivityId().equals(scope.getId())) {
+      if (tuple != null) {
         execution.setVariablesLocal(tuple.getVariables());
         // clear the process instance
         processInstance.setPayloadForTriggeredScope(null);
