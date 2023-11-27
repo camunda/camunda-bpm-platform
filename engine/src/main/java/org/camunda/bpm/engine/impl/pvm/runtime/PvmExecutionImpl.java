@@ -174,7 +174,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
 
   protected boolean activityInstanceEndListenersFailed = false;
 
-  protected ActivityNewScopeVariablesTuple payloadForTriggeredScope;
+  protected Map<String, Object> payloadForTriggeredScope;
 
   // sequence counter ////////////////////////////////////////////////////////
   protected long sequenceCounter = 0;
@@ -853,7 +853,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
       default:
         setActivity(activityImpl);
         setActivityInstanceId(null);
-        setDelayedPayloadToNewScope(activity);
+      setDelayedPayloadToNewScope(activity);
         performOperation(PvmAtomicOperation.ACTIVITY_START_CREATE_SCOPE);
         break;
     }
@@ -864,7 +864,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
     if (ActivityTypes.START_EVENT_MESSAGE.equals(activityType) // Event subprocess message start event
         || ActivityTypes.BOUNDARY_MESSAGE.equals(activityType)) {
       if (getProcessInstance().getPayloadForTriggeredScope() != null) {
-        this.setVariablesLocal(getProcessInstance().getPayloadForTriggeredScope().getVariables());
+        this.setVariablesLocal(getProcessInstance().getPayloadForTriggeredScope());
         // clear the process instance
         getProcessInstance().setPayloadForTriggeredScope(null);
       }
@@ -1941,11 +1941,11 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
     this.nextActivity = nextActivity;
   }
 
-  public ActivityNewScopeVariablesTuple getPayloadForTriggeredScope() {
+  public Map<String, Object> getPayloadForTriggeredScope() {
     return payloadForTriggeredScope;
   }
 
-  public void setPayloadForTriggeredScope(ActivityNewScopeVariablesTuple payloadForTriggeredScope) {
+  public void setPayloadForTriggeredScope(Map<String, Object> payloadForTriggeredScope) {
     this.payloadForTriggeredScope = payloadForTriggeredScope;
   }
 

@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.ActivityNewScopeVariablesTuple;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -66,9 +65,7 @@ public class EventHandlerImpl implements EventHandler {
       if (ActivityTypes.INTERMEDIATE_EVENT_MESSAGE.equals(activity.getProperty(BpmnProperties.TYPE.getName()))) {
         execution.setVariablesLocal((Map<String, Object>) payloadToTriggeredScope);
       } else {
-        ActivityNewScopeVariablesTuple tuple = new ActivityNewScopeVariablesTuple(activity.getId(),
-                                                                                  (Map<String, Object>) payloadToTriggeredScope);
-        execution.getProcessInstance().setPayloadForTriggeredScope(tuple);
+        execution.getProcessInstance().setPayloadForTriggeredScope((Map<String, Object>) payloadToTriggeredScope);
       }
 
     }

@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.ActivityTypes;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
-import org.camunda.bpm.engine.impl.pvm.runtime.ActivityNewScopeVariablesTuple;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
@@ -61,9 +60,8 @@ public abstract class PvmAtomicOperationCreateConcurrentExecution implements Pvm
     if (ActivityTypes.START_EVENT_MESSAGE.equals(activityType) // Event subprocess message start event
         || ActivityTypes.BOUNDARY_MESSAGE.equals(activityType)) {
       PvmExecutionImpl processInstance = execution.getProcessInstance();
-      ActivityNewScopeVariablesTuple tuple = processInstance.getPayloadForTriggeredScope();
-      if (tuple != null) {
-        execution.setVariablesLocal(tuple.getVariables());
+      if (processInstance.getPayloadForTriggeredScope() != null) {
+        execution.setVariablesLocal(processInstance.getPayloadForTriggeredScope());
         // clear the process instance
         processInstance.setPayloadForTriggeredScope(null);
       }
