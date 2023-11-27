@@ -66,7 +66,7 @@
         type = "object"
         additionalProperties = true
         dto = "VariableValueDto"
-        desc = "A map of local variables that is injected to the execution waiting on the message.
+        desc = "A map of local variables that is injected into the execution waiting on the message.
                 Each key is a variable name and each value a JSON variable value object
                 with the following properties."/>
 
