@@ -25,7 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.UUID;
+import java.util.function.Consumer;
 
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
 import org.camunda.bpm.client.backoff.BackoffStrategy;
@@ -81,6 +84,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   protected TypedValues typedValues;
   protected EngineClient engineClient;
   protected TopicSubscriptionManager topicSubscriptionManager;
+  protected HttpClientBuilder httpClientBuilder;
 
   protected List<ClientRequestInterceptor> interceptors;
   protected boolean isAutoFetchingEnabled;
@@ -97,6 +101,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     this.isAutoFetchingEnabled = true;
     this.backoffStrategy = new ExponentialBackoffStrategy();
     this.isBackoffStrategyDisabled = false;
+    this.httpClientBuilder = HttpClients.custom().useSystemProperties();
   }
 
   public ExternalTaskClientBuilder baseUrl(String baseUrl) {
@@ -156,6 +161,11 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   public ExternalTaskClientBuilder dateFormat(String dateFormat) {
     this.dateFormat = dateFormat;
+    return this;
+  }
+
+  public ExternalTaskClientBuilder customizeHttpClient(Consumer<HttpClientBuilder> httpClientConsumer) {
+    httpClientConsumer.accept(httpClientBuilder);
     return this;
   }
 
@@ -262,7 +272,8 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   protected void initEngineClient() {
     RequestInterceptorHandler requestInterceptorHandler = new RequestInterceptorHandler(interceptors);
-    RequestExecutor requestExecutor = new RequestExecutor(requestInterceptorHandler, objectMapper);
+    httpClientBuilder.addRequestInterceptorLast(requestInterceptorHandler);
+    RequestExecutor requestExecutor = new RequestExecutor(httpClientBuilder.build(), objectMapper);
     engineClient = new EngineClient(workerId, maxTasks, asyncResponseTimeout, baseUrl, requestExecutor, usePriority);
   }
 
