@@ -44,7 +44,7 @@ public class ResourceExecutableScript extends SourceExecutableScript {
       loadScriptSource();
     }
 
-    engine.getContext().setAttribute(ScriptEngine.FILENAME, "TODO: find filename", ScriptContext.ENGINE_SCOPE);
+    engine.getContext().setAttribute(ScriptEngine.FILENAME, scriptResource, ScriptContext.ENGINE_SCOPE);
 
     return super.evaluate(engine, variableScope, bindings);
   }
