@@ -17,16 +17,25 @@
 
 package org.camunda.bpm.engine.impl.externaltask;
 
+import static org.camunda.bpm.engine.impl.Direction.ASCENDING;
+import static org.camunda.bpm.engine.impl.Direction.DESCENDING;
+import static org.camunda.bpm.engine.impl.ExternalTaskQueryProperty.CREATE_TIME;
+import static org.camunda.bpm.engine.impl.util.CollectionUtil.getLastElement;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.FetchAndLockBuilder;
-import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.Direction;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
+/**
+ * Implementation of {@link FetchAndLockBuilder}.
+ */
 public class FetchAndLockBuilderImpl implements FetchAndLockBuilder {
 
   protected final CommandExecutor commandExecutor;
@@ -36,10 +45,7 @@ public class FetchAndLockBuilderImpl implements FetchAndLockBuilder {
 
   protected boolean usePriority;
 
-  protected Direction createTimeDirection;
-  protected boolean useCreateTime;
-
-  protected ExternalTaskQueryTopicBuilderImpl topicsConfigBuilder;
+  protected List<QueryOrderingProperty> orderingProperties = new ArrayList<>();
 
   public FetchAndLockBuilderImpl(CommandExecutor commandExecutor) {
     this.commandExecutor = commandExecutor;
@@ -61,47 +67,48 @@ public class FetchAndLockBuilderImpl implements FetchAndLockBuilder {
   }
 
   public FetchAndLockBuilderImpl orderByCreateTime() {
-    useCreateTime = true;
+    orderingProperties.add(new QueryOrderingProperty(CREATE_TIME, null));
     return this;
   }
 
-  public FetchAndLockBuilderImpl asc() {
-    validateFieldIsSet();
-    validateOrderIsNotSetYet();
-
-    createTimeDirection = Direction.ASCENDING;
+  public FetchAndLockBuilderImpl asc() throws NotValidException {
+    configureLastOrderingPropertyDirection(ASCENDING);
     return this;
   }
 
-  public FetchAndLockBuilderImpl desc() {
-    validateFieldIsSet();
-    validateOrderIsNotSetYet();
-
-    createTimeDirection = Direction.DESCENDING;
+  public FetchAndLockBuilderImpl desc() throws NotValidException {
+    configureLastOrderingPropertyDirection(DESCENDING);
     return this;
   }
 
   @Override
   public ExternalTaskQueryTopicBuilder subscribe() {
-    topicsConfigBuilder = new ExternalTaskQueryTopicBuilderImpl(commandExecutor, workerId, maxTasks, usePriority,
-        useCreateTime, createTimeDirection);
-
-    return topicsConfigBuilder;
+    checkQueryOk();
+    return new ExternalTaskQueryTopicBuilderImpl(commandExecutor, workerId, maxTasks, usePriority, orderingProperties);
   }
 
-  @Override
-  public List<LockedExternalTask> execute() {
-    var builder = new ExternalTaskQueryTopicBuilderImpl(topicsConfigBuilder);
-    return builder.execute();
-  }
+  protected void configureLastOrderingPropertyDirection(Direction direction) {
+    QueryOrderingProperty lastProperty = tryFetchLastProperty();
 
-  protected void validateFieldIsSet() {
-    if (!useCreateTime) {
-      throw new NotValidException("Invalid query: call asc() or desc() after using orderByCreateTime()");
+    ensureNotNull(NotValidException.class, "You should call any of the orderBy methods first before specifying a direction", "currentOrderingProperty", lastProperty);
+
+    if (lastProperty.getDirection() != null) {
+      ensureNull(NotValidException.class, "Invalid query: can specify only one direction desc() or asc() for an ordering constraint", "direction", direction);
     }
+
+    lastProperty.setDirection(direction);
   }
 
-  protected void validateOrderIsNotSetYet() {
-    ensureNull(NotValidException.class, "Invalid query: can specify only one direction desc() or asc() for an ordering constraint", "createTimeDirection", createTimeDirection);
+  protected QueryOrderingProperty tryFetchLastProperty() {
+    QueryOrderingProperty property = !orderingProperties.isEmpty() ? getLastElement(orderingProperties) : null;
+    ensureNotNull(NotValidException.class, "You should call any of the orderBy methods first before specifying a direction", "currentOrderingProperty", property);
+
+    return property;
+  }
+
+  protected void checkQueryOk() {
+    for (QueryOrderingProperty orderingProperty : orderingProperties) {
+      ensureNotNull(NotValidException.class, "Invalid query: call asc() or desc() after using orderByXX()", "direction", orderingProperty.getDirection());
+    }
   }
 }

@@ -131,7 +131,10 @@ public class FetchAndLockHandlerTest {
     // given
     List<LockedExternalTask> tasks = new ArrayList<LockedExternalTask>();
     tasks.add(lockedExternalTaskMock);
-    doReturn(tasks).when(fetchAndLockBuilder).execute();
+
+    when(fetchAndLockBuilder.subscribe()).thenReturn(externalTaskQueryTopicBuilder);
+    when(externalTaskQueryTopicBuilder.execute()).thenReturn(tasks);
+
 
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
     handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
@@ -148,7 +151,8 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldNotResumeAsyncResponseDueToNoAvailableTasks() {
     // given
-    doReturn(Collections.emptyList()).when(fetchAndLockBuilder).execute();
+    when(fetchAndLockBuilder.subscribe()).thenReturn(externalTaskQueryTopicBuilder);
+    when(externalTaskQueryTopicBuilder.execute()).thenReturn(Collections.emptyList());
 
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
     handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
@@ -165,7 +169,8 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldResumeAsyncResponseDueToTimeoutExpired_1() {
     // given
-    doReturn(Collections.emptyList()).when(fetchAndLockBuilder).execute();
+    when(fetchAndLockBuilder.subscribe()).thenReturn(externalTaskQueryTopicBuilder);
+    when(externalTaskQueryTopicBuilder.execute()).thenReturn(Collections.emptyList());
 
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
     handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
@@ -177,7 +182,8 @@ public class FetchAndLockHandlerTest {
 
     List<LockedExternalTask> tasks = new ArrayList<LockedExternalTask>();
     tasks.add(lockedExternalTaskMock);
-    doReturn(tasks).when(fetchAndLockBuilder).execute();
+
+    when(externalTaskQueryTopicBuilder.execute()).thenReturn(tasks);
 
     addSecondsToClock(5);
 
@@ -193,7 +199,8 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldResumeAsyncResponseDueToTimeoutExpired_2() {
     // given
-    doReturn(Collections.emptyList()).when(fetchAndLockBuilder).execute();
+    when(fetchAndLockBuilder.subscribe()).thenReturn(externalTaskQueryTopicBuilder);
+    when(externalTaskQueryTopicBuilder.execute()).thenReturn(Collections.emptyList());
 
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
     handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
@@ -219,7 +226,8 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldResumeAsyncResponseDueToTimeoutExpired_3() {
     // given
-    doReturn(Collections.emptyList()).when(fetchAndLockBuilder).execute();
+    when(fetchAndLockBuilder.subscribe()).thenReturn(externalTaskQueryTopicBuilder);
+    when(externalTaskQueryTopicBuilder.execute()).thenReturn(Collections.emptyList());
 
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
     handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
@@ -246,7 +254,8 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldResumeAsyncResponseImmediatelyDueToProcessEngineException() {
     // given
-    doThrow(new ProcessEngineException()).when(fetchAndLockBuilder).execute();
+    when(fetchAndLockBuilder.subscribe()).thenReturn(externalTaskQueryTopicBuilder);
+    when(externalTaskQueryTopicBuilder.execute()).thenThrow(new ProcessEngineException());
 
     // when
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
@@ -261,7 +270,8 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldResumeAsyncResponseAfterBackoffDueToProcessEngineException() {
     // given
-    doReturn(Collections.emptyList()).when(fetchAndLockBuilder).execute();
+    when(fetchAndLockBuilder.subscribe()).thenReturn(externalTaskQueryTopicBuilder);
+    when(externalTaskQueryTopicBuilder.execute()).thenReturn(Collections.emptyList());
 
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
     handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
@@ -272,7 +282,7 @@ public class FetchAndLockHandlerTest {
     verify(handler).suspend(5000L);
 
     // when
-    doThrow(new ProcessEngineException()).when(fetchAndLockBuilder).execute();
+    doThrow(new ProcessEngineException()).when(externalTaskQueryTopicBuilder).execute();
     handler.acquire();
 
     // then
@@ -305,7 +315,7 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldPollPeriodicallyWhenRequestPending() {
     // given
-    doReturn(Collections.emptyList()).when(fetchAndLockBuilder).execute();
+    doReturn(Collections.emptyList()).when(externalTaskQueryTopicBuilder).execute();
 
     // when
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
@@ -328,7 +338,7 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldCancelPreviousPendingRequestWhenWorkerIdsEqual() {
     // given
-    doReturn(Collections.emptyList()).when(fetchAndLockBuilder).execute();
+    doReturn(Collections.emptyList()).when(externalTaskQueryTopicBuilder).execute();
 
     handler.parseUniqueWorkerRequestParam("true");
 
@@ -349,7 +359,7 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldNotCancelPreviousPendingRequestWhenWorkerIdsDiffer() {
     // given
-    doReturn(Collections.emptyList()).when(fetchAndLockBuilder).execute();
+    doReturn(Collections.emptyList()).when(externalTaskQueryTopicBuilder).execute();
 
     handler.parseUniqueWorkerRequestParam("true");
 

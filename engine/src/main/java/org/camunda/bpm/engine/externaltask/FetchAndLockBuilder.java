@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.engine.externaltask;
 
-import java.util.List;
-
 /**
  * Fetch And Lock Builder used to enable a Fluent API that exposes all parameters for fetch and Lock operation.
  */
@@ -42,17 +40,14 @@ public interface FetchAndLockBuilder {
   /**
    * Configures fetching to consider (or not) priority during the Fetch and Lock operation.
    *
-   * @param usePriority the given usePriority flag. If true, tasks will be fetched in a descending order.
+   * @param usePriority the given usePriority flag. If true, tasks will be fetched in descending order.
    * @return the builder
    */
   FetchAndLockBuilder usePriority(boolean usePriority);
 
   /**
    * Configures the fetching during the Fetch and Lock Operation to include ordering by create time of the external tasks.
-   * This method can be combined with asc() and desc() methods to define an ascending or descending order respectively.
-   * If no specific order is defined, the effective order will be desc as a sensible default since it will likely be
-   * more valuable to bring the most recently-created tasks first.
-   * To have explicit control, you can specify the order.
+   * This method can be combined by calling asc() or desc() afterwards to define an ascending or descending order respectively.
    *
    * @return the builder
    */
@@ -73,17 +68,9 @@ public interface FetchAndLockBuilder {
   FetchAndLockBuilder desc();
 
   /**
-   * Returns the {@link ExternalTaskQueryTopicBuilder} to handle all the configuration that applies per topic
-   * @return
+   * Returns the {@link ExternalTaskQueryTopicBuilder} to handle all the configuration that applies per topic.
+   *
+   * @return the builder
    */
   ExternalTaskQueryTopicBuilder subscribe();
-
-  /**
-   * Performs the fetching. Locks candidate tasks of the given topics
-   * for the specified duration.
-   *
-   * @return fetched external tasks that match the topic and that can be
-   *   successfully locked
-   */
-  List<LockedExternalTask> execute();
 }

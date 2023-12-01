@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
+import org.camunda.bpm.engine.externaltask.FetchAndLockBuilder;
 import org.camunda.bpm.engine.impl.externaltask.FetchAndLockBuilderImpl;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesSelectBuilder;
 import org.camunda.bpm.engine.impl.cmd.CompleteExternalTaskCmd;
@@ -55,7 +56,7 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
   }
 
   @Override
-  public FetchAndLockBuilderImpl fetchAndLock() {
+  public FetchAndLockBuilder fetchAndLock() {
     return new FetchAndLockBuilderImpl(commandExecutor);
   }
 

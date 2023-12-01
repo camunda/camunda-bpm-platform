@@ -137,7 +137,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
 
   @Test
   public void shouldFetchAndLock() {
-    when(fetchAndLockBuilder.execute()).thenReturn(new ArrayList<>(Collections.singleton(lockedExternalTaskMock)));
+    when(fetchTopicBuilder.execute()).thenReturn(new ArrayList<>(Collections.singleton(lockedExternalTaskMock)));
     FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(null, true, true, false);
 
     given()
@@ -177,14 +177,14 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
 
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).variables(Collections.singletonList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
-    inOrder.verify(fetchAndLockBuilder).execute();
+    inOrder.verify(fetchTopicBuilder).execute();
 
     verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
   }
 
   @Test
   public void shouldFetchWithoutVariables() {
-    when(fetchAndLockBuilder.execute()).thenReturn(new ArrayList<>(Collections.singleton(lockedExternalTaskMock)));
+    when(fetchTopicBuilder.execute()).thenReturn(new ArrayList<>(Collections.singleton(lockedExternalTaskMock)));
     FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(null);
 
     given()
@@ -207,15 +207,15 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     inOrder.verify(fetchAndLockBuilder).subscribe();
 
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchAndLockBuilder).execute();
+    inOrder.verify(fetchTopicBuilder).execute();
 
     verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
   }
 
   @Test
   public void shouldFetchWithCustomObjectDeserializationEnabled() {
-    when(fetchAndLockBuilder.execute())
-      .thenReturn(new ArrayList<LockedExternalTask>(Collections.singleton(lockedExternalTaskMock)));
+    when(fetchTopicBuilder.execute())
+      .thenReturn(new ArrayList<>(Collections.singleton(lockedExternalTaskMock)));
     FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(null, false, true, true);
 
     given()
@@ -240,7 +240,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).variables(Collections.singletonList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
     inOrder.verify(fetchTopicBuilder).enableCustomObjectDeserialization();
-    inOrder.verify(fetchAndLockBuilder).execute();
+    inOrder.verify(fetchTopicBuilder).execute();
 
     verifyNoMoreInteractions(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
   }
@@ -265,7 +265,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
   public void shouldThrowProcessEngineExceptionDuringTimeout() {
     FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(500L);
 
-    when(fetchAndLockBuilder.execute())
+    when(fetchTopicBuilder.execute())
       .thenReturn(Collections.<LockedExternalTask>emptyList())
       .thenReturn(Collections.<LockedExternalTask>emptyList())
       .thenThrow(new ProcessEngineException("anExceptionMessage"));
@@ -281,14 +281,14 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(FETCH_EXTERNAL_TASK_URL);
 
-    verify(fetchAndLockBuilder, atLeastOnce()).execute();
+    verify(fetchTopicBuilder, atLeastOnce()).execute();
   }
 
   @Test
   public void shouldThrowProcessEngineExceptionNotDuringTimeout() {
     FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(500L);
 
-    when(fetchAndLockBuilder.execute())
+    when(fetchTopicBuilder.execute())
       .thenThrow(new ProcessEngineException("anExceptionMessage"));
 
     given()
@@ -302,12 +302,12 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(FETCH_EXTERNAL_TASK_URL);
 
-    verify(fetchAndLockBuilder, times(1)).execute();
+    verify(fetchTopicBuilder, times(1)).execute();
   }
 
   @Test
   public void shouldResponseImmediatelyDueToAvailableTasks() {
-    when(fetchAndLockBuilder.execute())
+    when(fetchTopicBuilder.execute())
       .thenReturn(new ArrayList<>(Collections.singleton(lockedExternalTaskMock)));
 
     FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(500L);
@@ -349,7 +349,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
   public void shouldReturnInternalServerErrorResponseJsonWithTypeAndMessage() {
     FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(500L);
 
-    when(fetchAndLockBuilder.execute())
+    when(fetchTopicBuilder.execute())
       .thenThrow(new IllegalArgumentException("anExceptionMessage"));
 
     given()
@@ -363,12 +363,12 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(FETCH_EXTERNAL_TASK_URL);
 
-    verify(fetchAndLockBuilder, times(1)).execute();
+    verify(fetchTopicBuilder, times(1)).execute();
   }
 
   @Test
   public void shouldFetchAndLockByProcessDefinitionVersionTag() {
-    when(fetchAndLockBuilder.execute())
+    when(fetchTopicBuilder.execute())
     .thenReturn(new ArrayList<LockedExternalTask>(Collections.singleton(lockedExternalTaskMock)));
 
     FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(500L);
