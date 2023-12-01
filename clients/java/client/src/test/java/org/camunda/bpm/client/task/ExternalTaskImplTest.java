@@ -50,6 +50,7 @@ public class ExternalTaskImplTest {
         + "executionId=null, "
         + "id=null, "
         + "lockExpirationTime=null, "
+        + "createTime=null, "
         + "priority=0, "
         + "processDefinitionId=null, "
         + "processDefinitionKey=null, "
@@ -77,6 +78,7 @@ public class ExternalTaskImplTest {
     task.setExecutionId("ei");
     task.setId("i");
     task.setLockExpirationTime(date);
+    task.setCreateTime(date);
     task.setPriority(3L);
     task.setProcessDefinitionId("pdi");
     task.setProcessDefinitionKey("pdk");
@@ -95,6 +97,7 @@ public class ExternalTaskImplTest {
         + "executionId=ei, "
         + "id=i, "
         + "lockExpirationTime=" + DateFormat.getDateTimeInstance().format(date) + ", "
+        + "createTime=" + DateFormat.getDateTimeInstance().format(date) + ", "
         + "priority=3, "
         + "processDefinitionId=pdi, "
         + "processDefinitionKey=pdk, "
@@ -124,6 +127,7 @@ public class ExternalTaskImplTest {
     task.setExecutionId("ei");
     task.setId("i");
     task.setLockExpirationTime(date);
+    task.setCreateTime(date);
     task.setPriority(3L);
     task.setProcessDefinitionId("pdi");
     task.setProcessDefinitionKey("pdk");
@@ -152,6 +156,7 @@ public class ExternalTaskImplTest {
         + "executionId=ei, "
         + "id=i, "
         + "lockExpirationTime=" + DateFormat.getDateTimeInstance().format(date) + ", "
+        + "createTime=" + DateFormat.getDateTimeInstance().format(date) + ", "
         + "priority=3, "
         + "processDefinitionId=pdi, "
         + "processDefinitionKey=pdk, "
