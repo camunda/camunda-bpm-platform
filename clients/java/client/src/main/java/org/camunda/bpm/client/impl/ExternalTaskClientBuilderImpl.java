@@ -128,7 +128,6 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     return this;
   }
 
-  @Override
   public ExternalTaskClientBuilder useCreateTime(boolean useCreateTime) {
     if (useCreateTime) {
       orderingConfig.configureField(CREATE_TIME);
@@ -137,19 +136,16 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     return this;
   }
 
-  @Override
   public ExternalTaskClientBuilder orderByCreateTime() {
     orderingConfig.configureField(CREATE_TIME);
     return this;
   }
 
-  @Override
   public ExternalTaskClientBuilder asc() {
     orderingConfig.configureDirectionOnLastField(ASC);
     return this;
   }
 
-  @Override
   public ExternalTaskClientBuilder desc() {
     orderingConfig.configureDirectionOnLastField(DESC);
     return this;
@@ -215,6 +211,8 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     initEngineClient();
     initVariableMappers();
     initTopicSubscriptionManager();
+
+    orderingConfig.validateOrderingProperties();
 
     return new ExternalTaskClientImpl(topicSubscriptionManager);
   }

@@ -23,6 +23,7 @@ import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
 import static org.camunda.bpm.client.util.ProcessModels.TWO_PRIORITISED_EXTERNAL_TASKS_PROCESS;
 import static org.camunda.bpm.client.util.PropertyUtil.DEFAULT_PROPERTIES_PATH;
 import static org.camunda.bpm.client.util.PropertyUtil.loadProperties;
+import static org.junit.Assert.assertThrows;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -1066,6 +1067,30 @@ public class ClientIT {
         client.stop();
       }
     }
+  }
+
+  @Test
+  public void shouldThrowExceptionOnSubscribeWithNullOrderConfig() {
+    assertThrows(ExternalTaskClientException.class, () -> ExternalTaskClient.create()
+            .orderByCreateTime()
+            .build()
+    );
+  }
+
+  @Test
+  public void shouldThrowExceptionOnInvalidOrderConfig() {
+    assertThrows(ExternalTaskClientException.class, () -> ExternalTaskClient.create()
+        .orderByCreateTime()
+        .desc()
+        .desc()
+    );
+  }
+
+  @Test
+  public void shouldThrowExceptionOnMissingOrderbyConfig() {
+    assertThrows(ExternalTaskClientException.class, () -> ExternalTaskClient.create()
+        .asc()
+    );
   }
 
   static class MyPojo {

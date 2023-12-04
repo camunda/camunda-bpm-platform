@@ -17,62 +17,99 @@
 
 package org.camunda.bpm.client.task;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
 
 /**
  * Class that encapsulates the client's configuration of createTime ordering.
  */
 public class OrderingConfig {
 
-  protected final Map<String, Direction> propertyByConfig;
+  protected final List<OrderingProperty> orderingProperties;
 
-  protected OrderingConfig(Map<String, Direction> configuration) {
-    this.propertyByConfig = configuration;
+  /**
+   * Constructor using a list of ordering properties
+   *
+   * @param orderingProperties the list of ordering properties
+   */
+  protected OrderingConfig(List<OrderingProperty> orderingProperties) {
+    this.orderingProperties = orderingProperties;
   }
 
   /**
    * Returns an empty config.
    */
   public static OrderingConfig empty() {
-    return new OrderingConfig(new LinkedHashMap<>());
+    return new OrderingConfig(new ArrayList<>());
   }
 
+  /**
+   * Configures the given field.
+   *
+   * @param field the sorting field to configure
+   */
   public void configureField(SortingField field) {
-    propertyByConfig.putIfAbsent(field.getName(), null);
+    orderingProperties.add(OrderingProperty.of(field, null));
   }
 
   /**
    * Configures the {@link Direction} for the last configured field on this {@link OrderingConfig}.
+   *
    * @param direction the given direction, nullable.
    */
   public void configureDirectionOnLastField(Direction direction) {
-    String lastField = getLastField();
-    propertyByConfig.put(lastField, direction);
+    OrderingProperty lastConfiguredProperty = validateAndGetLastConfiguredProperty();
+
+    if (lastConfiguredProperty.getDirection() != null) {
+      throw new ExternalTaskClientException(
+          "Invalid query: can specify only one direction desc() or asc() for an ordering constraint");
+    }
+
+    lastConfiguredProperty.setDirection(direction);
+    orderingProperties.add(lastConfiguredProperty);
+  }
+
+  /**
+   * Validates the last configured field for its direction and retrieves it.
+   */
+  protected OrderingProperty validateAndGetLastConfiguredProperty() {
+    OrderingProperty lastConfiguredProperty = getLastConfiguredProperty();
+
+    if (lastConfiguredProperty == null) {
+      throw new ExternalTaskClientException(
+          "You should call any of the orderBy methods first before specifying a direction");
+    }
+
+    return lastConfiguredProperty;
+  }
+
+  /**
+   * Validates ordering properties all have a non-null direction.
+   */
+  public void validateOrderingProperties() {
+    for (OrderingProperty orderingProperty : orderingProperties) {
+      if (orderingProperty.getDirection() == null) {
+        throw new ExternalTaskClientException("Invalid query: call asc() or desc() after using orderByXX()");
+      }
+    }
   }
 
   /**
    * Converts this {@link OrderingConfig} to a list of {@link SortingDto}s.
    */
   public List<SortingDto> toSortingDtos() {
-    return propertyByConfig.entrySet().stream()
-        .map(SortingDto::fromMapEntry)
+    return orderingProperties.stream()
+        .map(SortingDto::fromOrderingProperty)
         .collect(Collectors.toList());
   }
 
   /**
    * Returns the last configured field in this {@link OrderingConfig}.
    */
-  protected String getLastField() {
-    String lastElement = null;
-
-    for (String element : propertyByConfig.keySet()) {
-      lastElement = element;
-    }
-
-    return lastElement;
+  protected OrderingProperty getLastConfiguredProperty() {
+    return !orderingProperties.isEmpty() ? orderingProperties.get(orderingProperties.size() - 1) : null;
   }
 
   /**
@@ -101,6 +138,42 @@ public class OrderingConfig {
 
     public String asString() {
       return super.name().toLowerCase();
+    }
+  }
+
+  /**
+   * Static Class that encapsulates an ordering property with a field and its direction.
+   */
+  public static class OrderingProperty {
+
+    protected SortingField field;
+    protected Direction direction;
+
+    /**
+     * Static factory method to create {@link OrderingProperty} out of a field and its corresponding {@link Direction}.
+     */
+    public static OrderingProperty of(SortingField field, Direction direction) {
+      OrderingProperty result = new OrderingProperty();
+      result.setField(field);
+      result.setDirection(direction);
+
+      return result;
+    }
+
+    public void setField(SortingField field) {
+      this.field = field;
+    }
+
+    public SortingField getField() {
+      return this.field;
+    }
+
+    public void setDirection(Direction direction) {
+      this.direction = direction;
+    }
+
+    public Direction getDirection() {
+      return this.direction;
     }
   }
 

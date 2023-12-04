@@ -17,7 +17,7 @@
 
 package org.camunda.bpm.client.task;
 
-import java.util.Map;
+import org.camunda.bpm.client.task.OrderingConfig.OrderingProperty;
 
 /**
  * DTO that encapsulates the sorting parameters used for making requests against the fetch and lock API.
@@ -52,20 +52,20 @@ public class SortingDto {
    */
   public static SortingDto of(String sortBy, String sortOrder) {
     SortingDto result = new SortingDto();
-    result.setSortOrder(sortOrder);
     result.setSortBy(sortBy);
+    result.setSortOrder(sortOrder);
 
     return result;
   }
 
   /**
-   * Static factory method from create time config.
+   * Static factory method to create a {@link SortingDto} from a given {@link OrderingProperty}.
    */
-  protected static SortingDto fromMapEntry(Map.Entry<String, OrderingConfig.Direction> entry) {
-    String key = entry.getKey();
-    String value = entry.getValue() != null ? entry.getValue().asString() : null;
+  protected static SortingDto fromOrderingProperty(OrderingProperty property) {
+    String sortBy = property.getField().getName();
+    String sortOrder = property.getDirection() != null ? property.getDirection().asString() : null;
 
-    return SortingDto.of(key, value);
+    return SortingDto.of(sortBy, sortOrder);
   }
 
 }
