@@ -20,7 +20,8 @@
                          "startedBefore": "2017-04-28T11:24:37.765+0200"
                        },
                        "skipCustomListeners" : true,
-                       "skipSubprocesses" : true
+                       "skipSubprocesses" : true,
+                       "skipIoMappings" : false
                      }
                    }'
                 ] />
