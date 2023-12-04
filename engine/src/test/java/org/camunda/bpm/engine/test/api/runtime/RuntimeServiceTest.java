@@ -531,7 +531,7 @@ public class RuntimeServiceTest {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     try {
-      runtimeService.deleteProcessInstances(Arrays.asList(instance.getId(), "aFake"), "test", false, false, false);
+      runtimeService.deleteProcessInstances(Arrays.asList(instance.getId(), "aFake"), "test", false, false, false, false);
       fail("ProcessEngineException expected");
     }catch (ProcessEngineException e) {
       //expected
@@ -3255,7 +3255,7 @@ public class RuntimeServiceTest {
     subprocessList.addAll(runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance2.getId()).list());
 
     // when
-    runtimeService.deleteProcessInstances(Arrays.asList(processInstance.getId(), processInstance2.getId()), null, false, false, true);
+    runtimeService.deleteProcessInstances(Arrays.asList(processInstance.getId(), processInstance2.getId()), null, false, false, true, false);
 
     // then
     testRule.assertProcessEnded(processInstance.getId());
@@ -3281,7 +3281,7 @@ public class RuntimeServiceTest {
     subprocessList.addAll(runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance2.getId()).list());
 
     // when
-    runtimeService.deleteProcessInstances(Arrays.asList(processInstance.getId(), processInstance2.getId()), null, false, false, false);
+    runtimeService.deleteProcessInstances(Arrays.asList(processInstance.getId(), processInstance2.getId()), null, false, false, false, false);
 
     // then
     testRule.assertProcessEnded(processInstance.getId());

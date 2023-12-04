@@ -18,14 +18,13 @@ package org.camunda.bpm.engine.impl.batch.deletion;
 
 import java.util.HashSet;
 import java.util.List;
-
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
+import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
-import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
 import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstancesCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
@@ -55,7 +54,15 @@ public class DeleteProcessInstancesJobHandler extends AbstractBatchJobHandler<De
 
   @Override
   protected DeleteProcessInstanceBatchConfiguration createJobConfiguration(DeleteProcessInstanceBatchConfiguration configuration, List<String> processIdsForJob) {
-    return new DeleteProcessInstanceBatchConfiguration(processIdsForJob, null, configuration.getDeleteReason(), configuration.isSkipCustomListeners(), configuration.isSkipSubprocesses(), configuration.isFailIfNotExists());
+    return new DeleteProcessInstanceBatchConfiguration(
+        processIdsForJob,
+        null,
+        configuration.getDeleteReason(),
+        configuration.isSkipCustomListeners(),
+        configuration.isSkipSubprocesses(),
+        configuration.isFailIfNotExists(),
+        configuration.isSkipIoMappings()
+    );
   }
 
   @Override
@@ -71,7 +78,9 @@ public class DeleteProcessInstancesJobHandler extends AbstractBatchJobHandler<De
             batchConfiguration.isSkipCustomListeners(),
             true,
             batchConfiguration.isSkipSubprocesses(),
-            batchConfiguration.isFailIfNotExists()));
+            batchConfiguration.isFailIfNotExists(),
+            batchConfiguration.isSkipIoMappings()
+        ));
   }
 
   @Override

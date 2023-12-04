@@ -31,6 +31,7 @@ public class DeleteProcessInstancesDto {
   protected boolean skipCustomListeners;
   protected HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
   protected boolean skipSubprocesses;
+  protected boolean skipIoMappings;
 
   public List<String> getProcessInstanceIds() {
     return processInstanceIds;
@@ -78,6 +79,14 @@ public class DeleteProcessInstancesDto {
 
   public void setSkipSubprocesses(Boolean skipSubprocesses) {
     this.skipSubprocesses = skipSubprocesses;
+  }
+
+  public boolean isSkipIoMappings() {
+    return skipIoMappings;
+  }
+
+  public void setSkipIoMappings(boolean skipIoMappings) {
+    this.skipIoMappings = skipIoMappings;
   }
 
 }
