@@ -49,6 +49,9 @@ public @interface EnableExternalTaskClient {
   long LONG_NULL_VALUE = Long.MIN_VALUE;
   int INT_NULL_VALUE = Integer.MIN_VALUE;
 
+  String STRING_ORDER_BY_ASC_VALUE = "asc";
+  String STRING_ORDER_BY_DESC_VALUE = "desc";
+
   /**
    * Base url of the Camunda Runtime Platform REST API. This information is mandatory.
    * Alias of {@link #baseUrl()}.
@@ -93,6 +96,22 @@ public @interface EnableExternalTaskClient {
    * @return usePriority when fetching and locking tasks
    */
   boolean usePriority() default true;
+
+  /**
+   * Specifies whether tasks should be fetches based on their createTime or arbitrarily.
+   * This information is optional. Default is <code>false</code>.
+   *
+   * @return useCreateTime when fetching and locking tasks
+   */
+  boolean useCreateTime() default false;
+
+  /**
+   * Specifies whether tasks should be fetched based on their createTime with a configured order ()
+   * This information is optional.
+   *
+   * @return useCreateTime when fetching and locking tasks
+   */
+  String orderByCreateTime() default STRING_NULL_VALUE;
 
   /**
    * Asynchronous response (long polling) is enabled if a timeout is given.

@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.client.spring.impl.client;
 
+import static org.camunda.bpm.client.spring.annotation.EnableExternalTaskClient.STRING_ORDER_BY_ASC_VALUE;
+import static org.camunda.bpm.client.spring.annotation.EnableExternalTaskClient.STRING_ORDER_BY_DESC_VALUE;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,6 +92,9 @@ public class ClientFactory
       if (backoffStrategy != null) {
         clientBuilder.backoffStrategy(backoffStrategy);
       }
+
+      tryConfigureCreateTimeOrder(clientBuilder);
+
       client = clientBuilder.build();
     }
 
@@ -99,6 +105,51 @@ public class ClientFactory
 
   protected void addClientRequestInterceptors(ExternalTaskClientBuilder taskClientBuilder) {
     requestInterceptors.forEach(taskClientBuilder::addInterceptor);
+  }
+
+  protected void tryConfigureCreateTimeOrder(ExternalTaskClientBuilder builder) {
+    checkForCreateTimeMisconfiguration();
+
+    if (isUseCreateTimeEnabled()) {
+      builder.orderByCreateTime().desc();
+      return;
+    }
+
+    if (isOrderByCreateTimeEnabled()) {
+      handleOrderByCreateTimeConfig(builder);
+    }
+  }
+
+  protected void handleOrderByCreateTimeConfig(ExternalTaskClientBuilder builder) {
+    String orderByCreateTime = clientConfiguration.getOrderByCreateTime();
+
+    if (STRING_ORDER_BY_ASC_VALUE.equals(orderByCreateTime)) {
+      builder.orderByCreateTime().asc();
+      return;
+    }
+
+    if (STRING_ORDER_BY_DESC_VALUE.equals(orderByCreateTime)) {
+      builder.orderByCreateTime().desc();
+      return;
+    }
+
+    throw new IllegalArgumentException("Invalid value " + clientConfiguration.getOrderByCreateTime()
+        + ". Please use either \"asc\" or \"desc\" value for configuring \"orderByCreateTime\" on the client");
+  }
+
+  protected boolean isOrderByCreateTimeEnabled() {
+    return clientConfiguration.getOrderByCreateTime() != null;
+  }
+
+  protected boolean isUseCreateTimeEnabled() {
+    return clientConfiguration.getUseCreateTime() != null && clientConfiguration.getUseCreateTime();
+  }
+
+  protected void checkForCreateTimeMisconfiguration() {
+    if (isUseCreateTimeEnabled() && isOrderByCreateTimeEnabled()) {
+      throw new IllegalStateException(
+          "Both \"useCreateTime\" and \"orderByCreateTime\" are enabled. Please use one or the other");
+    }
   }
 
   @Autowired(required = false)
