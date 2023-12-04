@@ -31,24 +31,28 @@ import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
  * @see org.camunda.bpm.engine.impl.batch.deletion.DeleteProcessInstanceBatchConfigurationJsonConverter
  */
 public class DeleteProcessInstanceBatchConfiguration extends BatchConfiguration {
+
   protected String deleteReason;
   protected boolean skipCustomListeners;
   protected boolean skipSubprocesses;
+  protected boolean skipIoMappings;
 
   public DeleteProcessInstanceBatchConfiguration(List<String> ids, DeploymentMappings mappings, boolean skipCustomListeners, boolean skipSubprocesses) {
-    this(ids, mappings, null, skipCustomListeners, skipSubprocesses, true);
+    this(ids, mappings, null, skipCustomListeners, skipSubprocesses, true, false);
   }
 
   public DeleteProcessInstanceBatchConfiguration(List<String> ids, DeploymentMappings mappings, String deleteReason, boolean skipCustomListeners) {
-    this(ids, mappings, deleteReason, skipCustomListeners, true, true);
+    this(ids, mappings, deleteReason, skipCustomListeners, true, true, false);
   }
 
-  public DeleteProcessInstanceBatchConfiguration(List<String> ids, DeploymentMappings mappings, String deleteReason, boolean skipCustomListeners, boolean skipSubprocesses, boolean failIfNotExists) {
+  public DeleteProcessInstanceBatchConfiguration(List<String> ids, DeploymentMappings mappings, String deleteReason, boolean skipCustomListeners,
+                                                 boolean skipSubprocesses, boolean failIfNotExists, boolean skipIoMappings) {
     super(ids, mappings);
     this.deleteReason = deleteReason;
     this.skipCustomListeners = skipCustomListeners;
     this.skipSubprocesses = skipSubprocesses;
     this.failIfNotExists = failIfNotExists;
+    this.skipIoMappings = skipIoMappings;
   }
 
   public String getDeleteReason() {
@@ -69,6 +73,14 @@ public class DeleteProcessInstanceBatchConfiguration extends BatchConfiguration 
 
   public void setSkipSubprocesses(boolean skipSubprocesses) {
     this.skipSubprocesses = skipSubprocesses;
+  }
+
+  public boolean isSkipIoMappings() {
+    return skipIoMappings;
+  }
+
+  public void setSkipIoMappings(boolean skipIoMappings) {
+    this.skipIoMappings = skipIoMappings;
   }
 
 }
