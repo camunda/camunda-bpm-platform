@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.engine.externaltask;
 
-import org.camunda.bpm.engine.exception.NotValidException;
-
 /**
  * Fetch And Lock Builder used to enable a Fluent API that exposes all parameters for fetch and Lock operation.
  */
@@ -50,8 +48,6 @@ public interface FetchAndLockBuilder {
   /**
    * Configures the fetching during the Fetch and Lock Operation to include ordering by create time of the external tasks.
    * This method can be combined by calling asc() or desc() afterwards to define an ascending or descending order respectively.
-   * If no specific order is defined, the effective order will be decided by the db. To have explicit control, you can
-   * specify the order.
    *
    * @return the builder
    */
@@ -61,8 +57,6 @@ public interface FetchAndLockBuilder {
    * Configures the order to be ascending.
    *
    * @return the builder
-   * @throws NotValidException in case a field ordering method has not been called before calling this method
-   *                           or the last ordering field has already been configured with order.
    */
   FetchAndLockBuilder asc();
 
@@ -70,14 +64,13 @@ public interface FetchAndLockBuilder {
    * Configures the order to be descending.
    *
    * @return the builder
-   * @throws NotValidException in case a field ordering method has not been called before calling this method
-   *                           or the last ordering field has already been configured with order.
    */
-  FetchAndLockBuilder desc() throws NotValidException;
+  FetchAndLockBuilder desc();
 
   /**
-   * Returns the {@link ExternalTaskQueryTopicBuilder} to handle all the configuration that applies per topic
-   * @return
+   * Returns the {@link ExternalTaskQueryTopicBuilder} to handle all the configuration that applies per topic.
+   *
+   * @return the builder
    */
   ExternalTaskQueryTopicBuilder subscribe();
 }
