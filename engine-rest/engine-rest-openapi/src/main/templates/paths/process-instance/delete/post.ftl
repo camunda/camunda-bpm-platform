@@ -17,7 +17,8 @@
                        "deleteReason" : "aReason",
                        "processInstanceIds": ["aProcess","secondProcess"],
                        "skipCustomListeners" : true,
-                       "skipSubprocesses" : true
+                       "skipSubprocesses" : true,
+                       "skipIoMappings" : false
                      }
                    }'
                 ] />
