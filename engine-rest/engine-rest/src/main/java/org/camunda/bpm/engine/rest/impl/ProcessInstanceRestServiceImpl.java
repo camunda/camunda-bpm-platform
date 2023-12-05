@@ -136,18 +136,24 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
 
     ProcessInstanceQuery processInstanceQuery = null;
+
     if (dto.getProcessInstanceQuery() != null) {
       processInstanceQuery = dto.getProcessInstanceQuery().toQuery(getProcessEngine());
     }
 
-    Batch batch = null;
-
     try {
-      batch = runtimeService.deleteProcessInstancesAsync(dto.getProcessInstanceIds(), processInstanceQuery, dto.getDeleteReason(), dto.isSkipCustomListeners(),
-          dto.isSkipSubprocesses());
+      Batch batch = runtimeService.deleteProcessInstancesAsync(
+          dto.getProcessInstanceIds(),
+          processInstanceQuery,
+          null,
+          dto.getDeleteReason(),
+          dto.isSkipCustomListeners(),
+          dto.isSkipSubprocesses(),
+          dto.isSkipIoMappings()
+      );
+
       return BatchDto.fromBatch(batch);
-    }
-    catch (BadUserRequestException e) {
+    } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
   }
@@ -164,12 +170,14 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
     try {
       Batch batch = runtimeService.deleteProcessInstancesAsync(
-        deleteProcessInstancesDto.getProcessInstanceIds(),
-        null,
-        historicProcessInstanceQuery,
-        deleteProcessInstancesDto.getDeleteReason(),
-        deleteProcessInstancesDto.isSkipCustomListeners(),
-        deleteProcessInstancesDto.isSkipSubprocesses());
+          deleteProcessInstancesDto.getProcessInstanceIds(),
+          null,
+          historicProcessInstanceQuery,
+          deleteProcessInstancesDto.getDeleteReason(),
+          deleteProcessInstancesDto.isSkipCustomListeners(),
+          deleteProcessInstancesDto.isSkipSubprocesses(),
+          deleteProcessInstancesDto.isSkipIoMappings()
+      );
 
       return BatchDto.fromBatch(batch);
     } catch (BadUserRequestException e) {

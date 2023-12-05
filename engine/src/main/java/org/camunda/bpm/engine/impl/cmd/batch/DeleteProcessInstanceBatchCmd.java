@@ -49,20 +49,24 @@ public class DeleteProcessInstanceBatchCmd implements Command<Batch> {
   protected HistoricProcessInstanceQuery historicProcessInstanceQuery;
   protected boolean skipCustomListeners;
   protected boolean skipSubprocesses;
+  protected boolean skipIoMappings;
 
   public DeleteProcessInstanceBatchCmd(List<String> processInstances,
                                        ProcessInstanceQuery processInstanceQuery,
                                        HistoricProcessInstanceQuery historicProcessInstanceQuery,
                                        String deleteReason,
                                        boolean skipCustomListeners,
-                                       boolean skipSubprocesses) {
+                                       boolean skipSubprocesses,
+                                       boolean skipIoMappings) {
     super();
+
     this.processInstanceIds = processInstances;
     this.processInstanceQuery = processInstanceQuery;
     this.historicProcessInstanceQuery = historicProcessInstanceQuery;
     this.deleteReason = deleteReason;
     this.skipCustomListeners = skipCustomListeners;
     this.skipSubprocesses = skipSubprocesses;
+    this.skipIoMappings = skipIoMappings;
   }
 
   @Override
@@ -124,7 +128,7 @@ public class DeleteProcessInstanceBatchCmd implements Command<Batch> {
 
   public BatchConfiguration getConfiguration(BatchElementConfiguration elementConfiguration) {
     return new DeleteProcessInstanceBatchConfiguration(elementConfiguration.getIds(), elementConfiguration.getMappings(),
-        deleteReason, skipCustomListeners, skipSubprocesses, false);
+        deleteReason, skipCustomListeners, skipSubprocesses, false, skipIoMappings);
   }
 
 }
