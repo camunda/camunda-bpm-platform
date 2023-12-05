@@ -21,12 +21,11 @@ import static org.camunda.bpm.client.spring.annotation.EnableExternalTaskClient.
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
 import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
-
+import org.camunda.bpm.client.spring.exception.SpringExternalTaskClientException;
 import org.camunda.bpm.client.spring.impl.client.util.ClientLoggerUtil;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -133,7 +132,7 @@ public class ClientFactory
       return;
     }
 
-    throw new IllegalArgumentException("Invalid value " + clientConfiguration.getOrderByCreateTime()
+    throw new SpringExternalTaskClientException("Invalid value " + clientConfiguration.getOrderByCreateTime()
         + ". Please use either \"asc\" or \"desc\" value for configuring \"orderByCreateTime\" on the client");
   }
 
@@ -147,7 +146,7 @@ public class ClientFactory
 
   protected void checkForCreateTimeMisconfiguration() {
     if (isUseCreateTimeEnabled() && isOrderByCreateTimeEnabled()) {
-      throw new IllegalStateException(
+      throw new SpringExternalTaskClientException(
           "Both \"useCreateTime\" and \"orderByCreateTime\" are enabled. Please use one or the other");
     }
   }
