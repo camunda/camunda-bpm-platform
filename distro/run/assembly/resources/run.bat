@@ -34,7 +34,7 @@ IF "x%JAVA_HOME%" == "x" (
       GOTO :EOF
     )
     ECHO Setting JAVA property to "%JAVA_HOME%\bin\java"
-    SET "JAVA="%JAVA_HOME%\bin\java"
+    SET "JAVA=%JAVA_HOME%\bin\java"
     SET "TEMP_PATH=%PATH%"
     REM add temp the JAVA_HOME so this java is used in the java version check
     SET "PATH=%JAVA_HOME%\bin;%PATH%"
