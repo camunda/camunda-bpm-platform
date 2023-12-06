@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.run.qa.webapps;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Locale;
 import org.camunda.bpm.util.SeleniumScreenshotRule;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -27,11 +31,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Locale;
 
 /**
  * NOTE: copied from
@@ -64,7 +63,7 @@ public class AbstractWebappUiIT extends AbstractWebIT {
         .build();
 
     ChromeOptions chromeOptions = new ChromeOptions()
-        .setHeadless(true)
+        .addArguments("--headless=new")
         .addArguments("--window-size=1920,1200")
         .addArguments("--remote-allow-origins=*");
 
