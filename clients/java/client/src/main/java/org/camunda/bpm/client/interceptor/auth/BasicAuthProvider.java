@@ -23,7 +23,7 @@ import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 import java.nio.charset.Charset;
 import java.util.Base64;
 
-import static org.apache.http.HttpHeaders.AUTHORIZATION;
+import static org.apache.hc.core5.http.HttpHeaders.AUTHORIZATION;
 
 /**
  * <p>Provides HTTP Basic Authentication by using the request interceptor api</p>

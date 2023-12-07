@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.client.impl;
 
-import org.apache.http.HttpRequest;
+import org.apache.hc.core5.http.HttpRequest;
 import org.camunda.bpm.client.exception.RestException;
 
 import java.io.IOException;

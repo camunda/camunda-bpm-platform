@@ -18,23 +18,24 @@ package org.camunda.bpm.client.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.AbstractResponseHandler;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.util.EntityUtils;
-import org.camunda.bpm.client.exception.EngineException;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.client5.http.impl.classic.AbstractHttpClientResponseHandler;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
+import org.apache.hc.core5.http.message.BasicHeader;
+import org.apache.hc.core5.http.message.StatusLine;
 import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
 import org.camunda.commons.utils.IoUtil;
@@ -65,25 +66,25 @@ public class RequestExecutor {
 
   protected <T> T postRequest(String resourceUrl, RequestDto requestDto, Class<T> responseClass) {
     ByteArrayEntity serializedRequest = serializeRequest(requestDto);
-    HttpUriRequest httpRequest = RequestBuilder.post(resourceUrl)
+    ClassicHttpRequest httpRequest = ClassicRequestBuilder.post(URI.create(resourceUrl).normalize())
       .addHeader(HEADER_USER_AGENT)
       .addHeader(HEADER_CONTENT_TYPE_JSON)
       .setEntity(serializedRequest)
       .build();
-    
+
     return executeRequest(httpRequest, responseClass);
   }
 
   protected byte[] getRequest(String resourceUrl)  {
-    HttpUriRequest httpRequest = RequestBuilder.get(resourceUrl)
+    ClassicHttpRequest httpRequest = ClassicRequestBuilder.get(URI.create(resourceUrl).normalize())
       .addHeader(HEADER_USER_AGENT)
       .addHeader(HEADER_CONTENT_TYPE_JSON)
       .build();
-    
+
     return executeRequest(httpRequest, byte[].class);
   }
 
-  protected <T> T executeRequest(HttpUriRequest httpRequest, Class<T> responseClass) {
+  protected <T> T executeRequest(ClassicHttpRequest httpRequest, Class<T> responseClass) {
     try {
       return httpClient.execute(httpRequest, handleResponse(responseClass));
 
@@ -96,9 +97,8 @@ public class RequestExecutor {
     }
   }
 
-  protected <T> ResponseHandler<T> handleResponse(final Class<T> responseClass) {
-    return new AbstractResponseHandler<T>() {
-      @SuppressWarnings("unchecked")
+  protected <T> HttpClientResponseHandler<T> handleResponse(final Class<T> responseClass) {
+    return new AbstractHttpClientResponseHandler<>() {
       public T handleEntity(HttpEntity responseEntity) throws IOException {
         T response = null;
         if (responseClass.isAssignableFrom(byte[].class)) {
@@ -125,8 +125,8 @@ public class RequestExecutor {
       }
 
       @Override
-      public T handleResponse(HttpResponse response) throws IOException {
-        final StatusLine statusLine = response.getStatusLine();
+      public T handleResponse(ClassicHttpResponse response) throws IOException {
+        final StatusLine statusLine = new StatusLine(response);
         final HttpEntity entity = response.getEntity();
         if (statusLine.getStatusCode() >= 300) {
           try {
@@ -168,7 +168,7 @@ public class RequestExecutor {
   }
 
   protected ByteArrayEntity serializeRequest(RequestDto dto)  {
-    byte[] serializedRequest = null;
+    byte[] serializedRequest;
 
     try {
       serializedRequest = objectMapper.writeValueAsBytes(dto);
@@ -178,7 +178,7 @@ public class RequestExecutor {
 
     ByteArrayEntity byteArrayEntity = null;
     if (serializedRequest != null) {
-      byteArrayEntity = new ByteArrayEntity(serializedRequest);
+      byteArrayEntity = new ByteArrayEntity(serializedRequest, ContentType.APPLICATION_JSON);
     }
 
     return byteArrayEntity;
@@ -187,7 +187,7 @@ public class RequestExecutor {
   protected void initHttpClient(RequestInterceptorHandler requestInterceptorHandler) {
     HttpClientBuilder httpClientBuilder = HttpClients.custom()
       .useSystemProperties()
-      .addInterceptorLast(requestInterceptorHandler);
+      .addRequestInterceptorLast(requestInterceptorHandler);
 
     this.httpClient = httpClientBuilder.build();
   }
