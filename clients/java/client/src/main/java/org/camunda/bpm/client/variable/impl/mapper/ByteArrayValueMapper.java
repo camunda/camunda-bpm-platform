@@ -18,7 +18,7 @@ package org.camunda.bpm.client.variable.impl.mapper;
 
 import java.io.InputStream;
 
-import org.apache.commons.codec.binary.Base64;
+import org.apache.hc.client5.http.utils.Base64;
 import org.camunda.bpm.client.variable.impl.TypedValueField;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
@@ -38,7 +38,7 @@ public class ByteArrayValueMapper extends PrimitiveValueMapper<BytesValue> {
   }
 
   public BytesValue convertToTypedValue(UntypedValueImpl untypedValue) {
-    byte[] byteArr = null;
+    byte[] byteArr;
 
     Object value = untypedValue.getValue();
     if (value instanceof byte[]) {
@@ -63,7 +63,7 @@ public class ByteArrayValueMapper extends PrimitiveValueMapper<BytesValue> {
   }
 
   public void writeValue(BytesValue byteValue, TypedValueField typedValueField) {
-    byte[] bytes = (byte[]) byteValue.getValue();
+    byte[] bytes = byteValue.getValue();
 
     if (bytes != null) {
       typedValueField.setValue(Base64.encodeBase64String(bytes));

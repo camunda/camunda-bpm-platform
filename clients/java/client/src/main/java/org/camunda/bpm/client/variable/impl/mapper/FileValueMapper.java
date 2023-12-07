@@ -24,7 +24,7 @@ import static org.camunda.bpm.engine.variable.type.ValueType.FILE;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.codec.binary.Base64;
+import org.apache.hc.client5.http.utils.Base64;
 import org.camunda.bpm.client.impl.EngineClient;
 import org.camunda.bpm.client.variable.impl.AbstractTypedValueMapper;
 import org.camunda.bpm.client.variable.impl.TypedValueField;
