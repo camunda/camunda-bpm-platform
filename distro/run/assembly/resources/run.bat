@@ -35,7 +35,7 @@ IF "x%JAVA_HOME%" == "x" (
     )
     ECHO Setting JAVA property to "%JAVA_HOME%\bin\java"
     SET "JAVA=%JAVA_HOME%\bin\java"
-    SET "TEMP_PATH=%PATH%"
+    SET "RESTORE_PATH=%PATH%"
     REM add temp the JAVA_HOME so this java is used in the java version check
     SET "PATH=%JAVA_HOME%\bin;%PATH%"
   )
@@ -55,7 +55,7 @@ FOR /f "delims=. tokens=1" %%v in ("%JAVA_VERSION%") do (
   )
 )
 REM revert PATH variable to its initial value
-SET "PATH=%TEMP_PATH%"
+SET "PATH=%RESTORE_PATH%"
 
 IF NOT "x%JAVA_OPTS%" == "x" (
   ECHO JAVA_OPTS: %JAVA_OPTS%
