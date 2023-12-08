@@ -34,14 +34,18 @@ IF "x%JAVA_HOME%" == "x" (
       GOTO :EOF
     )
     ECHO Setting JAVA property to "%JAVA_HOME%\bin\java"
-    SET JAVA="%JAVA_HOME%\bin\java"
+    SET "JAVA=%JAVA_HOME%\bin\java"
+    SET "RESTORE_PATH=%PATH%"
+    REM add temp the JAVA_HOME so this java is used in the java version check
+    SET "PATH=%JAVA_HOME%\bin;%PATH%"
   )
 )
 
 SET EXPECTED_JAVA_VERSION=17
-FOR /f "tokens=3" %%g IN ('JAVA -version 2^>^&1 ^| findstr /i "version"') DO (
+FOR /f "tokens=3" %%g IN ('java -version 2^>^&1 ^| findstr /i "version"') DO (
   SET JAVA_VERSION=%%g
 )
+REM Remove the surrounding quotes
 SET JAVA_VERSION=%JAVA_VERSION:"=%
 ECHO Java version is %JAVA_VERSION%
 FOR /f "delims=. tokens=1" %%v in ("%JAVA_VERSION%") do (
@@ -50,6 +54,8 @@ FOR /f "delims=. tokens=1" %%v in ("%JAVA_VERSION%") do (
     GOTO :EOF
   )
 )
+REM revert PATH variable to its initial value
+SET "PATH=%RESTORE_PATH%"
 
 IF NOT "x%JAVA_OPTS%" == "x" (
   ECHO JAVA_OPTS: %JAVA_OPTS%
