@@ -59,7 +59,7 @@ public class AbstractWebappUiIntegrationTest extends AbstractWebIntegrationTest 
         .build();
 
     ChromeOptions chromeOptions = new ChromeOptions()
-        .setHeadless(true)
+        .addArguments("--headless=new")
         .addArguments("--window-size=1920,1200")
         .addArguments("--disable-gpu")
         .addArguments("--no-sandbox")

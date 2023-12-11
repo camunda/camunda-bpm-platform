@@ -36,7 +36,7 @@
       </activation>
 
       <properties>
-        <os.type>win32</os.type>
+        <os.type>win64</os.type>
       </properties>
     </profile>
 
@@ -50,7 +50,7 @@
       </activation>
 
       <properties>
-        <os.type>mac64</os.type>
+        <os.type>mac-arm64</os.type>
       </properties>
     </profile>
 
