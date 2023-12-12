@@ -18,7 +18,7 @@
     <version.jaxb-api>2.3.1</version.jaxb-api>
     <version.jersey-apache-client>1.15</version.jersey-apache-client>
     <version.junit>4.12</version.junit>
-    <version.chromedriver>120.0.6099.71</version.chromedriver>
+    <version.chromedriver>112.0.5615.49</version.chromedriver>
     <version.selenium>4.10.0</version.selenium>
 
 
@@ -193,29 +193,11 @@
                   <goal>wget</goal>
                 </goals>
                 <configuration>
-                  <url>https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/${version.chromedriver}/${os.type}/chromedriver-${os.type}.zip</url>
+                  <url>https://chromedriver.storage.googleapis.com/${version.chromedriver}/chromedriver_${os.type}.zip</url>
                   <outputFileName>chromedriver.zip</outputFileName>
                   <unpack>true</unpack>
-                  <outputDirectory>${project.build.directory}</outputDirectory>
+                  <outputDirectory>${project.build.directory}/chromedriver</outputDirectory>
                 </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>process-resources</phase>
-                <configuration>
-                  <target>
-                    <move file="${project.build.directory}/chromedriver-${os.type}/chromedriver"
-                          todir="${project.build.directory}/chromedriver" />
-                  </target>
-                </configuration>
-                <goals>
-                  <goal>run</goal>
-                </goals>
               </execution>
             </executions>
           </plugin>

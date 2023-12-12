@@ -21,7 +21,7 @@
     <version.jersey-apache-client>1.15</version.jersey-apache-client>
     <version.httpcomponents>4.5.10</version.httpcomponents>
     <version.junit>4.13.1</version.junit>
-    <version.chromedriver>120.0.6099.71</version.chromedriver>
+    <version.chromedriver>112.0.5615.49</version.chromedriver>
   </properties>
 
   <dependencyManagement>

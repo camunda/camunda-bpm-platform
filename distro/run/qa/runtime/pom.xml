@@ -214,29 +214,11 @@
                   <goal>wget</goal>
                 </goals>
                 <configuration>
-                  <url>https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/${version.chromedriver}/${os.type}/chromedriver-${os.type}.zip</url>
+                  <url>https://chromedriver.storage.googleapis.com/${version.chromedriver}/chromedriver_${os.type}.zip</url>
                   <outputFileName>chromedriver.zip</outputFileName>
                   <unpack>true</unpack>
-                  <outputDirectory>${project.build.directory}</outputDirectory>
+                  <outputDirectory>${project.build.directory}/chromedriver</outputDirectory>
                 </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>process-resources</phase>
-                <configuration>
-                  <target>
-                    <move file="${project.build.directory}/chromedriver-${os.type}/chromedriver"
-                          todir="${project.build.directory}/chromedriver" />
-                  </target>
-                </configuration>
-                <goals>
-                  <goal>run</goal>
-                </goals>
               </execution>
             </executions>
           </plugin>
@@ -251,7 +233,7 @@
         </os>
       </activation>
       <properties>
-        <os.type>win64</os.type>
+        <os.type>win32</os.type>
       </properties>
     </profile>
     <profile>
@@ -262,7 +244,7 @@
         </os>
       </activation>
       <properties>
-        <os.type>mac-arm64</os.type>
+        <os.type>mac64</os.type>
       </properties>
     </profile>
   </profiles>
