@@ -16,13 +16,18 @@
  */
 package org.camunda.bpm.quarkus.engine.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.impl.test.TestHelper.waitForJobExecutorToProcessAllJobs;
+
 import io.quarkus.test.QuarkusUnitTest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Inject;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
@@ -34,12 +39,6 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Produces;
-import jakarta.inject.Inject;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class ManagedJobExecutorTest {
 
@@ -129,6 +128,7 @@ public class ManagedJobExecutorTest {
   @Deployment
   public void shouldExecuteJob() {
     // given
+    processEngineConfiguration.getJobExecutor().shutdown();
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncTaskProcess");
 
     // when
@@ -137,14 +137,16 @@ public class ManagedJobExecutorTest {
         .processInstanceId(processInstance.getId())
         .count();
 
-    TestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, 5000l, 25l);
-
     // then
     assertThat(jobCount).isOne();
+
+    waitForJobExecutorToProcessAllJobs(processEngineConfiguration, 5000L, 25L);
+
     jobCount = managementService
         .createJobQuery()
         .processInstanceId(processInstance.getId())
         .count();
+
     assertThat(jobCount).isZero();
   }
 
