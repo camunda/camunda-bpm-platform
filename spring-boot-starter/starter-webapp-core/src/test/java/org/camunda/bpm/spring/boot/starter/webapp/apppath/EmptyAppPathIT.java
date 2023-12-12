@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.spring.boot.starter.webapp.apppath;
 
-import org.camunda.bpm.spring.boot.starter.webapp.TestApplication;
+import org.camunda.bpm.spring.boot.starter.webapp.WebappTestApp;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HttpClientRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
-    classes = { TestApplication.class },
+    classes = { WebappTestApp.class },
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
     "camunda.bpm.webapp.applicationPath=" + EmptyAppPathIT.MY_APP_PATH

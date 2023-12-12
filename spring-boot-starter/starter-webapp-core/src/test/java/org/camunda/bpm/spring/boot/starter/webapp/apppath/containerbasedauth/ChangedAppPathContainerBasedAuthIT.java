@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
-    classes = { TestApplication.class },
+    classes = { ContainerBasedAuthTestApp.class },
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
     "camunda.bpm.webapp.applicationPath=" + ChangedAppPathContainerBasedAuthIT.MY_APP_PATH
