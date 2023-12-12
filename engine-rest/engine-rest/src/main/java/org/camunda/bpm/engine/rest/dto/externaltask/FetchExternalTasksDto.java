@@ -294,7 +294,6 @@ public class FetchExternalTasksDto {
    * <p>
    * To achieve that, maps are used internally to map fields and orders to the corresponding builder method.
    * It works with case-insensitive orders (e.g will work with "asc", "ASC").
-   * Fields need are case-sensitive.
    */
   static class SortMapper {
 

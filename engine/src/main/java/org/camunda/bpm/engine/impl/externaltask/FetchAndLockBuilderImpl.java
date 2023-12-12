@@ -88,7 +88,7 @@ public class FetchAndLockBuilderImpl implements FetchAndLockBuilder {
   }
 
   protected void configureLastOrderingPropertyDirection(Direction direction) {
-    QueryOrderingProperty lastProperty = tryFetchLastProperty();
+    QueryOrderingProperty lastProperty = !orderingProperties.isEmpty() ? getLastElement(orderingProperties) : null;
 
     ensureNotNull(NotValidException.class, "You should call any of the orderBy methods first before specifying a direction", "currentOrderingProperty", lastProperty);
 
@@ -97,13 +97,6 @@ public class FetchAndLockBuilderImpl implements FetchAndLockBuilder {
     }
 
     lastProperty.setDirection(direction);
-  }
-
-  protected QueryOrderingProperty tryFetchLastProperty() {
-    QueryOrderingProperty property = !orderingProperties.isEmpty() ? getLastElement(orderingProperties) : null;
-    ensureNotNull(NotValidException.class, "You should call any of the orderBy methods first before specifying a direction", "currentOrderingProperty", property);
-
-    return property;
   }
 
   protected void checkQueryOk() {

@@ -118,7 +118,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
 
     when(fetchAndLockBuilder.subscribe()).thenReturn(fetchTopicBuilder);
 
-    when(fetchTopicBuilder.topic(any(String.class), anyLong())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.topic(anyString(), anyLong())).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.variables(anyList())).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.enableCustomObjectDeserialization()).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.processDefinitionVersionTag(anyString())).thenReturn(fetchTopicBuilder);
