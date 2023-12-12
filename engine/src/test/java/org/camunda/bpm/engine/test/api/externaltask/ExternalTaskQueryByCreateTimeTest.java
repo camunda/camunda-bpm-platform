@@ -120,9 +120,10 @@ public class ExternalTaskQueryByCreateTimeTest {
     startProcessInstanceAfter("process1", 1);
     startProcessInstanceAfter("process2", 1);
 
+    // when
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
-        // when
+
         .orderByCreateTime().desc()
         .list();
 
@@ -142,9 +143,10 @@ public class ExternalTaskQueryByCreateTimeTest {
     startProcessInstanceAfter("process1", 1);
     startProcessInstanceAfter("process2", 1);
 
+    // when
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
-        // when
+
         .orderByCreateTime().asc()
         .list();
 
@@ -168,9 +170,10 @@ public class ExternalTaskQueryByCreateTimeTest {
     startProcessInstanceAfter("process3", 1);
     startProcessInstanceAfter("process4", 1);
 
+    // when
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
-        // when
+
         .orderByPriority().desc()
         .orderByCreateTime().asc()
 
@@ -193,9 +196,10 @@ public class ExternalTaskQueryByCreateTimeTest {
     startProcessInstanceAfter("process3", 1);
     startProcessInstanceAfter("process4", 1);
 
+    // when
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
-        // when
+
         .orderByPriority().desc()
         .orderByCreateTime().desc()
 
@@ -221,9 +225,10 @@ public class ExternalTaskQueryByCreateTimeTest {
     startProcessInstanceAfter("process3", 1);
     startProcessInstanceAfter("process4", 1);
 
+    // when
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
-        // when
+
         .orderByCreateTime().asc()
         .orderByPriority().asc()
 
@@ -250,9 +255,10 @@ public class ExternalTaskQueryByCreateTimeTest {
     startProcessInstanceAfter("process3", 1);
     startProcessInstanceAfter("process4", 1);
 
+    // when
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
-        // when
+
         .orderByCreateTime().asc()
         .orderByPriority().desc()
 
