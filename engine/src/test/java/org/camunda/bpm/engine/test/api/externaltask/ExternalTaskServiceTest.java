@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.externaltask;
 
+import static java.util.Comparator.reverseOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
@@ -39,9 +40,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.ibatis.jdbc.RuntimeSqlException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ParseException;
@@ -50,6 +50,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
@@ -70,6 +71,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.AssertUtil;
+import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -156,7 +158,6 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     assertEquals(WORKER_ID, task.getWorkerId());
   }
 
-
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml")
   @Test
   public void testFetchWithPriority() {
@@ -192,6 +193,242 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     assertEquals(WORKER_ID, task.getWorkerId());
   }
 
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml"
+  })
+  @Test
+  public void shouldFetchWithCreateTimeDESCAndPriority() {
+    // given
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
+
+    // when
+    var result = externalTaskService.fetchAndLock()
+        .maxTasks(5)
+        .workerId(WORKER_ID)
+
+        .orderByCreateTime().desc()
+        .usePriority(true)
+
+        .subscribe()
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    // then
+    assertThat(result.size()).isEqualTo(5);
+
+    assertThat(result.get(0).getPriority()).isEqualTo(7);
+    assertThat(result.get(1).getPriority()).isEqualTo(7);
+    assertThat(result.get(2).getPriority()).isEqualTo(0);
+    assertThat(result.get(3).getPriority()).isEqualTo(0);
+    assertThat(result.get(4).getPriority()).isEqualTo(0);
+
+
+    // given the same priority, DESC date is applied
+    assertThat(result.get(0).getCreateTime()).isAfterOrEqualsTo(result.get(1).getCreateTime());
+
+    // given the rest of priorities, DESC date should apply between them
+    assertThat(result.get(2).getCreateTime()).isAfterOrEqualsTo(result.get(3).getCreateTime());
+    assertThat(result.get(3).getCreateTime()).isAfterOrEqualsTo(result.get(4).getCreateTime());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml"
+  })
+  @Test
+  public void shouldFetchWithCreateTimeASCAndPriority() {
+    // given
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
+
+    // when
+    var result = externalTaskService.fetchAndLock()
+        .maxTasks(5)
+        .workerId(WORKER_ID)
+
+        .orderByCreateTime().asc()
+        .usePriority(true)
+
+        .subscribe()
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    // then
+    assertThat(result.size()).isEqualTo(5);
+
+    assertThat(result.get(0).getPriority()).isEqualTo(7);
+    assertThat(result.get(1).getPriority()).isEqualTo(7);
+
+    assertThat(result.get(2).getPriority()).isEqualTo(0);
+    assertThat(result.get(3).getPriority()).isEqualTo(0);
+    assertThat(result.get(4).getPriority()).isEqualTo(0);
+
+
+    // given the same priority, ASC date is applied
+    assertThat(result.get(0).getCreateTime()).isBeforeOrEqualsTo(result.get(1).getCreateTime());
+
+    // given the rest of priorities, ASC date should apply between them
+    assertThat(result.get(2).getCreateTime()).isBeforeOrEqualsTo(result.get(3).getCreateTime());
+    assertThat(result.get(3).getCreateTime()).isBeforeOrEqualsTo(result.get(4).getCreateTime());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml"
+  })
+  @Test
+  public void shouldFetchWithCreateTimeASCWithoutPriority() {
+    // given
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
+
+    // when
+    var result = externalTaskService.fetchAndLock()
+        .maxTasks(5)
+        .workerId(WORKER_ID)
+
+        .orderByCreateTime().asc()
+        .usePriority(false)
+
+        .subscribe()
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    // then
+    assertThat(result.size()).isEqualTo(5);
+    assertThat(result).extracting("createTime", Date.class).isSorted();
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml"
+  })
+  @Test
+  public void shouldFetchWithCreateTimeDESCWithoutPriority() {
+    // given
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
+
+    // when
+    var result = externalTaskService.fetchAndLock()
+        .maxTasks(5)
+        .workerId(WORKER_ID)
+
+        .orderByCreateTime().desc()
+        .usePriority(false)
+
+        .subscribe()
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    // then
+    assertThat(result.size()).isEqualTo(5);
+    assertThat(result).extracting("createTime", Date.class).isSortedAccordingTo(reverseOrder());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml"
+  })
+  @Test
+  public void shouldIgnoreCreateOrderingWhenCreateTimeIsNotConfigured() {
+    // given
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
+
+    // when
+    var result = externalTaskService.fetchAndLock()
+        .maxTasks(5)
+        .workerId(WORKER_ID)
+
+        // create time ordering is omitted
+        .usePriority(true)
+
+        .subscribe()
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    // then
+    assertThat(result.size()).isEqualTo(5);
+    // create time ordering will be ignored, only priority will be used
+    assertThat(result).extracting("priority", Long.class).isSortedAccordingTo(reverseOrder());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml"
+  })
+  @Test
+  public void shouldIgnoreCreateTimeConfigWhenOrderIsNull() {
+    // given
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess"); // priority 7 & null
+    ClockTestUtil.incrementClock(60_000);
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
+
+    // when
+    var result = externalTaskService.fetchAndLock(6, WORKER_ID, true)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    // then
+    assertThat(result.size()).isEqualTo(5);
+    // create time ordering will be ignored, only priority will be used
+    assertThat(result).extracting("priority", Long.class).isSortedAccordingTo(reverseOrder());
+  }
+
+  @Test
+  public void shouldThrowExceptionOnSubscribeWithInvalidOrderConfig() {
+    // when
+    assertThatThrownBy(() -> externalTaskService.fetchAndLock()
+        .orderByCreateTime()
+        .subscribe()
+        .execute())
+        // then
+        .isInstanceOf(NotValidException.class)
+        .hasMessage("Invalid query: call asc() or desc() after using orderByXX(): direction is null");
+  }
+
+  @Test
+  public void shouldThrowExceptionOnChainedSortingConfigs() {
+    // when
+    assertThatThrownBy(() -> externalTaskService.fetchAndLock()
+        .orderByCreateTime()
+        .desc()
+        .desc())
+        // then
+        .isInstanceOf(NotValidException.class)
+        .hasMessage("Invalid query: can specify only one direction desc() or asc() for an ordering constraint: direction is not null");
+  }
+
+  @Test
+  public void shouldThrowExceptionOnUnspecifiedSortingField() {
+    // when
+    assertThatThrownBy(() -> externalTaskService.fetchAndLock()
+        .desc())
+        // then
+        .isInstanceOf(NotValidException.class)
+        .hasMessage("You should call any of the orderBy methods first before specifying a direction: currentOrderingProperty is null");
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityProcess.bpmn20.xml")
   @Test
   public void testFetchProcessWithPriority() {
@@ -202,9 +439,10 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(2, WORKER_ID, true)
       .topic(TOPIC_NAME, LOCK_TIME)
       .execute();
-    assertEquals(2, externalTasks.size());
 
     // then
+    assertEquals(2, externalTasks.size());
+
     //task with no prio gets prio defined by process
     assertEquals(9, externalTasks.get(0).getPriority());
     //task with own prio overrides prio defined by process
@@ -222,6 +460,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(2, WORKER_ID, true)
       .topic(TOPIC_NAME, LOCK_TIME)
       .execute();
+
     assertEquals(2, externalTasks.size());
 
     // then
@@ -4254,8 +4493,6 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     assertThat(lockedExternalTasks).hasSize(1);
     assertThat(lockedExternalTasks.get(0).getExtensionProperties()).isEmpty();
   }
-
-
 
   protected Date nowPlus(long millis) {
     return new Date(ClockUtil.getCurrentTime().getTime() + millis);

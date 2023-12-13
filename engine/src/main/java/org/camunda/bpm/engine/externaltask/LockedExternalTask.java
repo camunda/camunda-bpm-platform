@@ -50,6 +50,11 @@ public interface LockedExternalTask {
   Date getLockExpirationTime();
 
   /**
+   * @return the absolute time at which the task was created
+   */
+  Date getCreateTime();
+
+  /**
    * @return the id of the process instance the task exists in
    */
   String getProcessInstanceId();
@@ -138,12 +143,12 @@ public interface LockedExternalTask {
   /**
    * Returns a map of custom extension properties if the fetch instructions
    * indicate to include extension properties.
-   * 
+   *
    * If extension properties are included, the returned map contains any
    * extension property that is defined in the model definition of the external
    * task. If extension properties not included or no properties are defined for
    * the external task, the map will be empty.
-   * 
+   *
    * @return a map with all defined custom extension properties, never
    *         <code>null</code>
    */

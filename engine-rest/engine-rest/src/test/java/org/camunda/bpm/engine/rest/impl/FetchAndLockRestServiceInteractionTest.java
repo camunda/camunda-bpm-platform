@@ -16,11 +16,39 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
 import io.restassured.http.ContentType;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.servlet.ServletContextEvent;
+import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
+import org.camunda.bpm.engine.externaltask.FetchAndLockBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
@@ -41,33 +69,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.servlet.ServletContextEvent;
-import javax.ws.rs.core.Response.Status;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anyList;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
 /**
  * @author Tassilo Weidner
  */
@@ -86,6 +87,9 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
   private ExternalTaskQueryTopicBuilder fetchTopicBuilder;
 
   @Mock
+  private FetchAndLockBuilder fetchAndLockBuilder;
+
+  @Mock
   private IdentityService identityServiceMock;
 
   private LockedExternalTask lockedExternalTaskMock;
@@ -95,28 +99,32 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
 
   @Before
   public void setUpRuntimeData() {
-    when(processEngine.getExternalTaskService())
-      .thenReturn(externalTaskService);
+    when(processEngine.getExternalTaskService()).thenReturn(externalTaskService);
 
     lockedExternalTaskMock = MockProvider.createMockLockedExternalTask();
+
     when(externalTaskService.fetchAndLock(anyInt(), any(String.class), any(Boolean.class)))
       .thenReturn(fetchTopicBuilder);
 
-    when(fetchTopicBuilder.topic(any(String.class), anyLong()))
-      .thenReturn(fetchTopicBuilder);
+    when(externalTaskService.fetchAndLock()).thenReturn(fetchAndLockBuilder);
 
-    when(fetchTopicBuilder.variables(anyList()))
-      .thenReturn(fetchTopicBuilder);
+    // fetch and lock builder
+    when(fetchAndLockBuilder.workerId(anyString())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.maxTasks(anyInt())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.usePriority(anyBoolean())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.orderByCreateTime()).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.asc()).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.desc()).thenReturn(fetchAndLockBuilder);
 
-    when(fetchTopicBuilder.enableCustomObjectDeserialization())
-      .thenReturn(fetchTopicBuilder);
+    when(fetchAndLockBuilder.subscribe()).thenReturn(fetchTopicBuilder);
 
-    when(fetchTopicBuilder.processDefinitionVersionTag(anyString()))
-    .thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.topic(anyString(), anyLong())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.variables(anyList())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.enableCustomObjectDeserialization()).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processDefinitionVersionTag(anyString())).thenReturn(fetchTopicBuilder);
 
     // for authentication
-    when(processEngine.getIdentityService())
-      .thenReturn(identityServiceMock);
+    when(processEngine.getIdentityService()).thenReturn(identityServiceMock);
 
     List<Group> groupMocks = MockProvider.createMockGroups();
     groupIds = groupMocks.stream().map(Group::getId).collect(Collectors.toList());
@@ -129,8 +137,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
 
   @Test
   public void shouldFetchAndLock() {
-    when(fetchTopicBuilder.execute())
-      .thenReturn(new ArrayList<LockedExternalTask>(Collections.singleton(lockedExternalTaskMock)));
+    when(fetchTopicBuilder.execute()).thenReturn(new ArrayList<>(Collections.singleton(lockedExternalTaskMock)));
     FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(null, true, true, false);
 
     given()
@@ -153,26 +160,31 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
       .body("[0].errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
       .body("[0].errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
       .body("[0].priority", equalTo(MockProvider.EXTERNAL_TASK_PRIORITY))
-      .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME,
-        notNullValue())
-      .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".value",
-        equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
-      .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".type",
-        equalTo("String"))
+      .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME, notNullValue())
+      .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".value", equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
+      .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".type", equalTo("String"))
     .when().post(FETCH_EXTERNAL_TASK_URL);
 
-    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
+
+    inOrder.verify(externalTaskService, times(1)).fetchAndLock();
+
+    inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
+    inOrder.verify(fetchAndLockBuilder).maxTasks(5);
+    inOrder.verify(fetchAndLockBuilder).usePriority(true);
+
+    inOrder.verify(fetchAndLockBuilder).subscribe();
+
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).variables(Collections.singletonList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
     inOrder.verify(fetchTopicBuilder).execute();
-    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+
+    verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
   }
 
   @Test
   public void shouldFetchWithoutVariables() {
-    when(fetchTopicBuilder.execute())
-      .thenReturn(new ArrayList<LockedExternalTask>(Collections.singleton(lockedExternalTaskMock)));
+    when(fetchTopicBuilder.execute()).thenReturn(new ArrayList<>(Collections.singleton(lockedExternalTaskMock)));
     FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(null);
 
     given()
@@ -185,17 +197,25 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(FETCH_EXTERNAL_TASK_URL);
 
-    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
+
+    inOrder.verify(externalTaskService, times(1)).fetchAndLock();
+
+    inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
+    inOrder.verify(fetchAndLockBuilder).maxTasks(5);
+    inOrder.verify(fetchAndLockBuilder).usePriority(false);
+    inOrder.verify(fetchAndLockBuilder).subscribe();
+
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).execute();
-    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+
+    verifyNoMoreInteractions(fetchAndLockBuilder, externalTaskService);
   }
 
   @Test
   public void shouldFetchWithCustomObjectDeserializationEnabled() {
     when(fetchTopicBuilder.execute())
-      .thenReturn(new ArrayList<LockedExternalTask>(Collections.singleton(lockedExternalTaskMock)));
+      .thenReturn(new ArrayList<>(Collections.singleton(lockedExternalTaskMock)));
     FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(null, false, true, true);
 
     given()
@@ -207,13 +227,22 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(FETCH_EXTERNAL_TASK_URL);
 
-    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false);
+    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
+
+    inOrder.verify(externalTaskService).fetchAndLock();
+
+    inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
+    inOrder.verify(fetchAndLockBuilder).maxTasks(5);
+    inOrder.verify(fetchAndLockBuilder).usePriority(false);
+
+    inOrder.verify(fetchAndLockBuilder).subscribe();
+
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).variables(Collections.singletonList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
     inOrder.verify(fetchTopicBuilder).enableCustomObjectDeserialization();
     inOrder.verify(fetchTopicBuilder).execute();
-    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+
+    verifyNoMoreInteractions(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
   }
 
   @Test
@@ -279,7 +308,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
   @Test
   public void shouldResponseImmediatelyDueToAvailableTasks() {
     when(fetchTopicBuilder.execute())
-      .thenReturn(new ArrayList<LockedExternalTask>(Collections.singleton(lockedExternalTaskMock)));
+      .thenReturn(new ArrayList<>(Collections.singleton(lockedExternalTaskMock)));
 
     FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(500L);
 
@@ -364,7 +393,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
   private FetchExternalTasksExtendedDto createDto(Long responseTimeout) {
     return createDto(responseTimeout, false, false, false);
   }
-  
+
   private FetchExternalTasksExtendedDto createDto(Long responseTimeout, boolean usePriority, boolean withVariables, boolean withDeserialization) {
     FetchExternalTasksExtendedDto fetchExternalTasksDto = new FetchExternalTasksExtendedDto();
     if (responseTimeout != null) {

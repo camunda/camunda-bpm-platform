@@ -16,14 +16,17 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.Direction.DESCENDING;
+import static org.camunda.bpm.engine.impl.ExternalTaskQueryProperty.PRIORITY;
+
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
@@ -49,18 +52,23 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
 
   protected String workerId;
   protected int maxResults;
-  protected boolean usePriority;
-  protected Map<String, TopicFetchInstruction> fetchInstructions = new HashMap<>();
+  protected List<QueryOrderingProperty> orderingProperties;
+
+  protected Map<String, TopicFetchInstruction> fetchInstructions;
 
   public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions) {
-    this(workerId, maxResults, instructions, false);
+    this(workerId, maxResults, instructions, false, Collections.emptyList());
   }
 
-  public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions, boolean usePriority) {
+  public FetchExternalTasksCmd(String workerId,
+                               int maxResults,
+                               Map<String, TopicFetchInstruction> instructions,
+                               boolean usePriority,
+                               List<QueryOrderingProperty> orderingProperties) {
     this.workerId = workerId;
     this.maxResults = maxResults;
     this.fetchInstructions = instructions;
-    this.usePriority = usePriority;
+    this.orderingProperties = orderingPropertiesWithPriority(usePriority, orderingProperties);
   }
 
   @Override
@@ -73,7 +81,7 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
 
     List<ExternalTaskEntity> externalTasks = commandContext
       .getExternalTaskManager()
-      .selectExternalTasksForTopics(new ArrayList<>(fetchInstructions.values()), maxResults, usePriority);
+      .selectExternalTasksForTopics(new ArrayList<>(fetchInstructions.values()), maxResults, orderingProperties);
 
     final List<LockedExternalTask> result = new ArrayList<>();
 
@@ -86,8 +94,15 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
 
       if (execution != null) {
         entity.lock(workerId, fetchInstruction.getLockDuration());
-        LockedExternalTaskImpl resultTask = LockedExternalTaskImpl.fromEntity(entity, fetchInstruction.getVariablesToFetch(), fetchInstruction.isLocalVariables(),
-              fetchInstruction.isDeserializeVariables(), fetchInstruction.isIncludeExtensionProperties());
+
+        LockedExternalTaskImpl resultTask = LockedExternalTaskImpl.fromEntity(
+            entity,
+            fetchInstruction.getVariablesToFetch(),
+            fetchInstruction.isLocalVariables(),
+            fetchInstruction.isDeserializeVariables(),
+            fetchInstruction.isIncludeExtensionProperties()
+        );
+
         result.add(resultTask);
       } else {
         LOG.logTaskWithoutExecution(workerId);
@@ -171,5 +186,20 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
       EnsureUtil.ensureNotNull("topicName", instruction.getTopicName());
       EnsureUtil.ensurePositive("lockTime", instruction.getLockDuration());
     }
+  }
+
+  protected List<QueryOrderingProperty> orderingPropertiesWithPriority(boolean usePriority,
+                                                                       List<QueryOrderingProperty> queryOrderingProperties) {
+    List<QueryOrderingProperty> results = new ArrayList<>();
+
+    // Priority needs to be the first item in the list because it takes precedence over other sorting options
+    // Multi level ordering works by going through the list of ordering properties from first to last item
+    if (usePriority) {
+      results.add(new QueryOrderingProperty(PRIORITY, DESCENDING));
+    }
+
+    results.addAll(queryOrderingProperties);
+
+    return results;
   }
 }

@@ -16,11 +16,35 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
+import org.camunda.bpm.engine.externaltask.FetchAndLockBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
@@ -36,28 +60,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.core.Response.Status;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
 /**
  * @author Tassilo Weidner
@@ -75,7 +77,10 @@ public class FetchAndLockHandlerTest {
   protected ExternalTaskService externalTaskService;
 
   @Mock
-  protected ExternalTaskQueryTopicBuilder fetchTopicBuilder;
+  protected ExternalTaskQueryTopicBuilder externalTaskQueryTopicBuilder;
+
+  @Mock
+  protected FetchAndLockBuilder fetchAndLockBuilder;
 
   @Spy
   protected FetchAndLockHandlerImpl handler;
@@ -86,14 +91,19 @@ public class FetchAndLockHandlerTest {
 
   @Before
   public void initMocks() {
+    when(fetchAndLockBuilder.workerId(anyString())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.maxTasks(anyInt())).thenReturn(fetchAndLockBuilder);
+    when(fetchAndLockBuilder.usePriority(anyBoolean())).thenReturn(fetchAndLockBuilder);
+
     when(processEngine.getIdentityService()).thenReturn(identityService);
     when(processEngine.getExternalTaskService()).thenReturn(externalTaskService);
     when(processEngine.getName()).thenReturn("default");
 
-    when(externalTaskService.fetchAndLock(anyInt(), any(String.class), any(Boolean.class)))
-      .thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.topic(any(String.class), anyLong()))
-      .thenReturn(fetchTopicBuilder);
+    when(externalTaskService.fetchAndLock()).thenReturn(fetchAndLockBuilder);
+
+    when(fetchAndLockBuilder.subscribe()).thenReturn(externalTaskQueryTopicBuilder);
+
+    when(externalTaskQueryTopicBuilder.topic(any(String.class), anyLong())).thenReturn(externalTaskQueryTopicBuilder);
 
     doNothing().when(handler).suspend(anyLong());
     doReturn(processEngine).when(handler).getProcessEngine(any(FetchAndLockRequest.class));
@@ -121,7 +131,10 @@ public class FetchAndLockHandlerTest {
     // given
     List<LockedExternalTask> tasks = new ArrayList<LockedExternalTask>();
     tasks.add(lockedExternalTaskMock);
-    doReturn(tasks).when(fetchTopicBuilder).execute();
+
+    when(fetchAndLockBuilder.subscribe()).thenReturn(externalTaskQueryTopicBuilder);
+    when(externalTaskQueryTopicBuilder.execute()).thenReturn(tasks);
+
 
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
     handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
@@ -138,7 +151,8 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldNotResumeAsyncResponseDueToNoAvailableTasks() {
     // given
-    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
+    when(fetchAndLockBuilder.subscribe()).thenReturn(externalTaskQueryTopicBuilder);
+    when(externalTaskQueryTopicBuilder.execute()).thenReturn(Collections.emptyList());
 
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
     handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
@@ -155,7 +169,8 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldResumeAsyncResponseDueToTimeoutExpired_1() {
     // given
-    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
+    when(fetchAndLockBuilder.subscribe()).thenReturn(externalTaskQueryTopicBuilder);
+    when(externalTaskQueryTopicBuilder.execute()).thenReturn(Collections.emptyList());
 
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
     handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
@@ -167,7 +182,8 @@ public class FetchAndLockHandlerTest {
 
     List<LockedExternalTask> tasks = new ArrayList<LockedExternalTask>();
     tasks.add(lockedExternalTaskMock);
-    doReturn(tasks).when(fetchTopicBuilder).execute();
+
+    when(externalTaskQueryTopicBuilder.execute()).thenReturn(tasks);
 
     addSecondsToClock(5);
 
@@ -183,7 +199,8 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldResumeAsyncResponseDueToTimeoutExpired_2() {
     // given
-    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
+    when(fetchAndLockBuilder.subscribe()).thenReturn(externalTaskQueryTopicBuilder);
+    when(externalTaskQueryTopicBuilder.execute()).thenReturn(Collections.emptyList());
 
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
     handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
@@ -209,7 +226,8 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldResumeAsyncResponseDueToTimeoutExpired_3() {
     // given
-    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
+    when(fetchAndLockBuilder.subscribe()).thenReturn(externalTaskQueryTopicBuilder);
+    when(externalTaskQueryTopicBuilder.execute()).thenReturn(Collections.emptyList());
 
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
     handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
@@ -236,7 +254,8 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldResumeAsyncResponseImmediatelyDueToProcessEngineException() {
     // given
-    doThrow(new ProcessEngineException()).when(fetchTopicBuilder).execute();
+    when(fetchAndLockBuilder.subscribe()).thenReturn(externalTaskQueryTopicBuilder);
+    when(externalTaskQueryTopicBuilder.execute()).thenThrow(new ProcessEngineException());
 
     // when
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
@@ -251,7 +270,8 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldResumeAsyncResponseAfterBackoffDueToProcessEngineException() {
     // given
-    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
+    when(fetchAndLockBuilder.subscribe()).thenReturn(externalTaskQueryTopicBuilder);
+    when(externalTaskQueryTopicBuilder.execute()).thenReturn(Collections.emptyList());
 
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
     handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
@@ -262,7 +282,7 @@ public class FetchAndLockHandlerTest {
     verify(handler).suspend(5000L);
 
     // when
-    doThrow(new ProcessEngineException()).when(fetchTopicBuilder).execute();
+    doThrow(new ProcessEngineException()).when(externalTaskQueryTopicBuilder).execute();
     handler.acquire();
 
     // then
@@ -295,7 +315,7 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldPollPeriodicallyWhenRequestPending() {
     // given
-    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
+    doReturn(Collections.emptyList()).when(externalTaskQueryTopicBuilder).execute();
 
     // when
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
@@ -318,7 +338,7 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldCancelPreviousPendingRequestWhenWorkerIdsEqual() {
     // given
-    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
+    doReturn(Collections.emptyList()).when(externalTaskQueryTopicBuilder).execute();
 
     handler.parseUniqueWorkerRequestParam("true");
 
@@ -339,7 +359,7 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldNotCancelPreviousPendingRequestWhenWorkerIdsDiffer() {
     // given
-    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
+    doReturn(Collections.emptyList()).when(externalTaskQueryTopicBuilder).execute();
 
     handler.parseUniqueWorkerRequestParam("true");
 
@@ -402,6 +422,7 @@ public class FetchAndLockHandlerTest {
 
     // then
     ArgumentCaptor<RestException> argumentCaptor = ArgumentCaptor.forClass(RestException.class);
+
     verify(asyncResponse).resume(argumentCaptor.capture());
     assertThat(argumentCaptor.getValue().getStatus(), is(Status.INTERNAL_SERVER_ERROR));
     assertThat(argumentCaptor.getValue().getMessage(), is("Request rejected due to shutdown of application server."));

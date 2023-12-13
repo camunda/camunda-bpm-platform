@@ -27,7 +27,6 @@ import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.D
 
 import java.util.LinkedList;
 import java.util.List;
-
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -904,7 +903,8 @@ public class HistoricExternalTaskLogQueryTest {
     reportExternalTaskFailure(externalTaskId, DEFAULT_TOPIC, WORKER_ID, 1, false, errorMessage);
   }
 
-  protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId, Integer retries, boolean usePriority, String errorMessage) {
+  protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId, Integer retries,
+                                           boolean usePriority, String errorMessage) {
     List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority)
       .topic(topic, LOCK_DURATION)
       .execute();
