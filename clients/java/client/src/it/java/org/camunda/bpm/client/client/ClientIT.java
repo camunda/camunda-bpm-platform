@@ -17,13 +17,13 @@
 package org.camunda.bpm.client.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.client.util.ProcessModels.BPMN_ERROR_EXTERNAL_TASK_PROCESS;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_PRIORITY;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
 import static org.camunda.bpm.client.util.ProcessModels.TWO_PRIORITISED_EXTERNAL_TASKS_PROCESS;
 import static org.camunda.bpm.client.util.PropertyUtil.DEFAULT_PROPERTIES_PATH;
 import static org.camunda.bpm.client.util.PropertyUtil.loadProperties;
-import static org.junit.Assert.assertThrows;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -1071,26 +1071,39 @@ public class ClientIT {
 
   @Test
   public void shouldThrowExceptionOnSubscribeWithNullOrderConfig() {
-    assertThrows(ExternalTaskClientException.class, () -> ExternalTaskClient.create()
-            .orderByCreateTime()
-            .build()
-    );
+    // when
+    assertThatThrownBy(() -> ExternalTaskClient.create()
+        .baseUrl("baseUrl")
+        .orderByCreateTime()
+        .build()
+    ) // then
+        .isInstanceOf(ExternalTaskClientException.class)
+        .hasMessage("Invalid query: call asc() or desc() after using orderByXX()");
   }
 
   @Test
   public void shouldThrowExceptionOnInvalidOrderConfig() {
-    assertThrows(ExternalTaskClientException.class, () -> ExternalTaskClient.create()
+    // when
+    assertThatThrownBy(() -> ExternalTaskClient.create()
+        .baseUrl("baseUrl")
         .orderByCreateTime()
         .desc()
         .desc()
-    );
+        .build()
+    ) // then
+        .isInstanceOf(ExternalTaskClientException.class)
+        .hasMessage("Invalid query: can specify only one direction desc() or asc() for an ordering constraint");
   }
 
   @Test
   public void shouldThrowExceptionOnMissingOrderbyConfig() {
-    assertThrows(ExternalTaskClientException.class, () -> ExternalTaskClient.create()
+    // when
+    assertThatThrownBy(() -> ExternalTaskClient.create()
+        .baseUrl("baseUrl")
         .asc()
-    );
+    ) // then
+        .isInstanceOf(ExternalTaskClientException.class)
+        .hasMessage("You should call any of the orderBy methods first before specifying a direction");
   }
 
   static class MyPojo {
