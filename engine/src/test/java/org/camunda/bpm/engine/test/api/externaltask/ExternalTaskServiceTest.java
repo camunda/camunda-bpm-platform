@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.externaltask;
 
+import static java.util.Comparator.reverseOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
@@ -206,11 +207,11 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     ClockTestUtil.incrementClock(60_000);
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
+    // when
     var result = externalTaskService.fetchAndLock()
         .maxTasks(5)
         .workerId(WORKER_ID)
 
-        // when
         .orderByCreateTime().desc()
         .usePriority(true)
 
@@ -218,9 +219,9 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
+    // then
     assertThat(result.size()).isEqualTo(5);
 
-    // then
     assertThat(result.get(0).getPriority()).isEqualTo(7);
     assertThat(result.get(1).getPriority()).isEqualTo(7);
     assertThat(result.get(2).getPriority()).isEqualTo(0);
@@ -249,11 +250,11 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     ClockTestUtil.incrementClock(60_000);
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
+    // when
     var result = externalTaskService.fetchAndLock()
         .maxTasks(5)
         .workerId(WORKER_ID)
 
-        // when
         .orderByCreateTime().asc()
         .usePriority(true)
 
@@ -261,9 +262,9 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
+    // then
     assertThat(result.size()).isEqualTo(5);
 
-    // then
     assertThat(result.get(0).getPriority()).isEqualTo(7);
     assertThat(result.get(1).getPriority()).isEqualTo(7);
 
@@ -293,11 +294,11 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     ClockTestUtil.incrementClock(60_000);
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
+    // when
     var result = externalTaskService.fetchAndLock()
         .maxTasks(5)
         .workerId(WORKER_ID)
 
-        // when
         .orderByCreateTime().asc()
         .usePriority(false)
 
@@ -305,13 +306,9 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
-    assertThat(result.size()).isEqualTo(5);
-
     // then
-    assertThat(result.get(0).getCreateTime()).isBeforeOrEqualsTo(result.get(1).getCreateTime());
-    assertThat(result.get(1).getCreateTime()).isBeforeOrEqualsTo(result.get(2).getCreateTime());
-    assertThat(result.get(2).getCreateTime()).isBeforeOrEqualsTo(result.get(3).getCreateTime());
-    assertThat(result.get(3).getCreateTime()).isBeforeOrEqualsTo(result.get(4).getCreateTime());
+    assertThat(result.size()).isEqualTo(5);
+    assertThat(result).extracting("createTime", Date.class).isSorted();
   }
 
   @Deployment(resources = {
@@ -327,11 +324,11 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     ClockTestUtil.incrementClock(60_000);
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
+    // when
     var result = externalTaskService.fetchAndLock()
         .maxTasks(5)
         .workerId(WORKER_ID)
 
-        // when
         .orderByCreateTime().desc()
         .usePriority(false)
 
@@ -339,13 +336,9 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
-    assertThat(result.size()).isEqualTo(5);
-
     // then
-    assertThat(result.get(0).getCreateTime()).isAfterOrEqualsTo(result.get(1).getCreateTime());
-    assertThat(result.get(1).getCreateTime()).isAfterOrEqualsTo(result.get(2).getCreateTime());
-    assertThat(result.get(2).getCreateTime()).isAfterOrEqualsTo(result.get(3).getCreateTime());
-    assertThat(result.get(3).getCreateTime()).isAfterOrEqualsTo(result.get(4).getCreateTime());
+    assertThat(result.size()).isEqualTo(5);
+    assertThat(result).extracting("createTime", Date.class).isSortedAccordingTo(reverseOrder());
   }
 
   @Deployment(resources = {
@@ -361,11 +354,11 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     ClockTestUtil.incrementClock(60_000);
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // null priority
 
+    // when
     var result = externalTaskService.fetchAndLock()
         .maxTasks(5)
         .workerId(WORKER_ID)
 
-        // when
         // create time ordering is omitted
         .usePriority(true)
 
@@ -373,14 +366,10 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
-    assertThat(result.size()).isEqualTo(5);
-
     // then
+    assertThat(result.size()).isEqualTo(5);
     // create time ordering will be ignored, only priority will be used
-    assertThat(result.get(0).getPriority()).isGreaterThanOrEqualTo(result.get(1).getPriority());
-    assertThat(result.get(1).getPriority()).isGreaterThanOrEqualTo(result.get(2).getPriority());
-    assertThat(result.get(2).getPriority()).isGreaterThanOrEqualTo(result.get(3).getPriority());
-    assertThat(result.get(3).getPriority()).isGreaterThanOrEqualTo(result.get(4).getPriority());
+    assertThat(result).extracting("priority", Long.class).isSortedAccordingTo(reverseOrder());
   }
 
   @Deployment(resources = {
@@ -401,29 +390,44 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
-    assertThat(result.size()).isEqualTo(5);
-
     // then
+    assertThat(result.size()).isEqualTo(5);
     // create time ordering will be ignored, only priority will be used
-    assertThat(result.get(0).getPriority()).isGreaterThanOrEqualTo(result.get(1).getPriority());
-    assertThat(result.get(1).getPriority()).isGreaterThanOrEqualTo(result.get(2).getPriority());
-    assertThat(result.get(2).getPriority()).isGreaterThanOrEqualTo(result.get(3).getPriority());
-    assertThat(result.get(3).getPriority()).isGreaterThanOrEqualTo(result.get(4).getPriority());
+    assertThat(result).extracting("priority", Long.class).isSortedAccordingTo(reverseOrder());
   }
 
   @Test
   public void shouldThrowExceptionOnSubscribeWithInvalidOrderConfig() {
-    assertThrows(NotValidException.class, () -> externalTaskService.fetchAndLock()
+    // when
+    assertThatThrownBy(() -> externalTaskService.fetchAndLock()
         .orderByCreateTime()
         .subscribe()
-        .execute());
+        .execute())
+        // then
+        .isInstanceOf(NotValidException.class)
+        .hasMessage("Invalid query: call asc() or desc() after using orderByXX(): direction is null");
   }
 
   @Test
   public void shouldThrowExceptionOnChainedSortingConfigs() {
-    assertThrows(NotValidException.class, () -> externalTaskService.fetchAndLock()
+    // when
+    assertThatThrownBy(() -> externalTaskService.fetchAndLock()
+        .orderByCreateTime()
         .desc()
-        .desc());
+        .desc())
+        // then
+        .isInstanceOf(NotValidException.class)
+        .hasMessage("Invalid query: can specify only one direction desc() or asc() for an ordering constraint: direction is not null");
+  }
+
+  @Test
+  public void shouldThrowExceptionOnUnspecifiedSortingField() {
+    // when
+    assertThatThrownBy(() -> externalTaskService.fetchAndLock()
+        .desc())
+        // then
+        .isInstanceOf(NotValidException.class)
+        .hasMessage("You should call any of the orderBy methods first before specifying a direction: currentOrderingProperty is null");
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityProcess.bpmn20.xml")
@@ -437,9 +441,9 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
       .topic(TOPIC_NAME, LOCK_TIME)
       .execute();
 
+    // then
     assertEquals(2, externalTasks.size());
 
-    // then
     //task with no prio gets prio defined by process
     assertEquals(9, externalTasks.get(0).getPriority());
     //task with own prio overrides prio defined by process
@@ -4489,10 +4493,6 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     // then
     assertThat(lockedExternalTasks).hasSize(1);
     assertThat(lockedExternalTasks.get(0).getExtensionProperties()).isEmpty();
-  }
-
-  private static void assertExternalTaskProcessInstance(LockedExternalTask task, ProcessInstance processInstance) {
-    assertThat(task.getProcessInstanceId()).isEqualTo(processInstance.getProcessInstanceId());
   }
 
   protected Date nowPlus(long millis) {

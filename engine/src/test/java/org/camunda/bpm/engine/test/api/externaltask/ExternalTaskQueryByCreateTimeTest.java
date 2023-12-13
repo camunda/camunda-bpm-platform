@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,7 +61,7 @@ public class ExternalTaskQueryByCreateTimeTest {
   protected CaseService caseService;
 
   @Before
-  public void init() {
+  public void setup() {
     engine = engineRule.getProcessEngine();
     repositoryService = engineRule.getRepositoryService();
     runtimeService = engineRule.getRuntimeService();
@@ -69,8 +70,13 @@ public class ExternalTaskQueryByCreateTimeTest {
     taskService = engineRule.getTaskService();
     caseService = engineRule.getCaseService();
 
-    // given
+    // given four process definitions with one external task each, external tasks have priorities 4, 3, 0, and 0
     deployProcessesWithExternalTasks();
+  }
+
+  @After
+  public void tearDown() {
+    ClockUtil.reset();
   }
 
   @Test
@@ -84,7 +90,7 @@ public class ExternalTaskQueryByCreateTimeTest {
         .list();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(result).hasSize(1);
     assertThat(result.get(0).getCreateTime()).isNotNull();
   }
 
@@ -100,11 +106,11 @@ public class ExternalTaskQueryByCreateTimeTest {
     // when
     var result = historyService.createHistoricExternalTaskLogQuery().list();
 
+    // then
     assertThat(result.size()).isEqualTo(1);
 
     var historyEventTimestamp = result.get(0).getTimestamp();
 
-    // then
     assertThat(extTask.getCreateTime()).isEqualTo(historyEventTimestamp);
   }
 
@@ -114,18 +120,19 @@ public class ExternalTaskQueryByCreateTimeTest {
     startProcessInstanceAfter("process1", 1);
     startProcessInstanceAfter("process2", 1);
 
+    // when
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
-        // when
+
         .orderByCreateTime().desc()
         .list();
 
+    // then
     assertThat(result.size()).isEqualTo(2);
 
     var extTask1 = result.get(0);
     var extTask2 = result.get(1);
 
-    // then
     assertThat(extTask2.getCreateTime())
         .isBefore(extTask1.getCreateTime());
   }
@@ -136,18 +143,19 @@ public class ExternalTaskQueryByCreateTimeTest {
     startProcessInstanceAfter("process1", 1);
     startProcessInstanceAfter("process2", 1);
 
+    // when
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
-        // when
+
         .orderByCreateTime().asc()
         .list();
 
+    // then
     assertThat(result.size()).isEqualTo(2);
 
     var extTask1 = result.get(0);
     var extTask2 = result.get(1);
 
-    // then
     assertThat(extTask1.getCreateTime())
         .isBefore(extTask2.getCreateTime());
   }
@@ -162,17 +170,18 @@ public class ExternalTaskQueryByCreateTimeTest {
     startProcessInstanceAfter("process3", 1);
     startProcessInstanceAfter("process4", 1);
 
+    // when
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
-        // when
+
         .orderByPriority().desc()
         .orderByCreateTime().asc()
 
         .list();
 
+    // then
     assertThat(result.size()).isEqualTo(4);
 
-    // then
     assertThat(result.get(0).getActivityId()).isEqualTo("task1");
     assertThat(result.get(1).getActivityId()).isEqualTo("task2");
     assertThat(result.get(2).getActivityId()).isEqualTo("task3");
@@ -187,17 +196,18 @@ public class ExternalTaskQueryByCreateTimeTest {
     startProcessInstanceAfter("process3", 1);
     startProcessInstanceAfter("process4", 1);
 
+    // when
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
-        // when
+
         .orderByPriority().desc()
         .orderByCreateTime().desc()
 
         .list();
 
+    // then
     assertThat(result.size()).isEqualTo(4);
 
-    // then
     assertThat(result.get(0).getActivityId()).isEqualTo("task1"); // due to priority DESC
     assertThat(result.get(1).getActivityId()).isEqualTo("task2");
     assertThat(result.get(2).getActivityId()).isEqualTo("task4"); // due to CreateTime DESC
@@ -215,17 +225,18 @@ public class ExternalTaskQueryByCreateTimeTest {
     startProcessInstanceAfter("process3", 1);
     startProcessInstanceAfter("process4", 1);
 
+    // when
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
-        // when
+
         .orderByCreateTime().asc()
         .orderByPriority().asc()
 
         .list();
 
+    // then
     assertThat(result.size()).isEqualTo(4);
 
-    // then
     assertThat(result.get(0).getActivityId()).isEqualTo("task2"); // due to CreateTime Equality, priority ASC
     assertThat(result.get(1).getActivityId()).isEqualTo("task1");
 
@@ -244,17 +255,18 @@ public class ExternalTaskQueryByCreateTimeTest {
     startProcessInstanceAfter("process3", 1);
     startProcessInstanceAfter("process4", 1);
 
+    // when
     var result = engineRule.getExternalTaskService()
         .createExternalTaskQuery()
-        // when
+
         .orderByCreateTime().asc()
         .orderByPriority().desc()
 
         .list();
 
+    // then
     assertThat(result.size()).isEqualTo(4);
 
-    // then
     assertThat(result.get(0).getActivityId()).isEqualTo("task1"); // due to CreateTime equality, priority DESC
     assertThat(result.get(1).getActivityId()).isEqualTo("task2");
 

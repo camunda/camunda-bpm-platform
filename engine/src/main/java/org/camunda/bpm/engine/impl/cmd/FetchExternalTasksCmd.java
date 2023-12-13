@@ -20,7 +20,6 @@ import static org.camunda.bpm.engine.impl.Direction.DESCENDING;
 import static org.camunda.bpm.engine.impl.ExternalTaskQueryProperty.PRIORITY;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -53,9 +52,7 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
 
   protected String workerId;
   protected int maxResults;
-  protected boolean usePriority;
-
-  protected Collection<QueryOrderingProperty> orderingProperties;
+  protected List<QueryOrderingProperty> orderingProperties;
 
   protected Map<String, TopicFetchInstruction> fetchInstructions;
 
@@ -71,8 +68,7 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
     this.workerId = workerId;
     this.maxResults = maxResults;
     this.fetchInstructions = instructions;
-    this.usePriority = usePriority;
-    this.orderingProperties = orderingProperties;
+    this.orderingProperties = orderingPropertiesWithPriority(usePriority, orderingProperties);
   }
 
   @Override
@@ -87,8 +83,7 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
 
     List<ExternalTaskEntity> externalTasks = commandContext
       .getExternalTaskManager()
-      .selectExternalTasksForTopics(new ArrayList<>(fetchInstructions.values()), maxResults, usePriority,
-          orderingProperties);
+      .selectExternalTasksForTopics(new ArrayList<>(fetchInstructions.values()), maxResults, orderingProperties);
 
     final List<LockedExternalTask> result = new ArrayList<>();
 
@@ -195,14 +190,17 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
     }
   }
 
-  protected List<QueryOrderingProperty> orderingPropertiesWithPriority() {
+  protected List<QueryOrderingProperty> orderingPropertiesWithPriority(boolean usePriority,
+                                                                       List<QueryOrderingProperty> queryOrderingProperties) {
     List<QueryOrderingProperty> results = new ArrayList<>();
 
+    // Priority needs to be the first item in the list because it takes precedence over other sorting options
+    // Multi level ordering works by going through the list of ordering properties from first to last item
     if (usePriority) {
       results.add(new QueryOrderingProperty(PRIORITY, DESCENDING));
     }
 
-    results.addAll(orderingProperties);
+    results.addAll(queryOrderingProperties);
 
     return results;
   }
