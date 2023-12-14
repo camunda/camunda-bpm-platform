@@ -205,14 +205,14 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
     checkInterceptors();
 
+    orderingConfig.validateOrderingProperties();
+
     initBaseUrl();
     initWorkerId();
     initObjectMapper();
     initEngineClient();
     initVariableMappers();
     initTopicSubscriptionManager();
-
-    orderingConfig.validateOrderingProperties();
 
     return new ExternalTaskClientImpl(topicSubscriptionManager);
   }

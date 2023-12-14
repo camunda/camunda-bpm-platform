@@ -98,8 +98,8 @@ public @interface EnableExternalTaskClient {
   boolean usePriority() default true;
 
   /**
-   * Specifies whether tasks should be fetches based on their createTime or arbitrarily.
-   * This information is optional. Default is <code>false</code>.
+   * Specifies whether tasks should be fetched based on their createTime.
+   * This is optional. The default is <code>false</code>.
    *
    * @return useCreateTime when fetching and locking tasks
    */

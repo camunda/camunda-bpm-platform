@@ -141,7 +141,7 @@ public class ClientFactory
   }
 
   protected boolean isUseCreateTimeEnabled() {
-    return clientConfiguration.getUseCreateTime() != null && clientConfiguration.getUseCreateTime();
+    return Boolean.TRUE.equals(clientConfiguration.getUseCreateTime());
   }
 
   protected void checkForCreateTimeMisconfiguration() {

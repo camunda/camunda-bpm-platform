@@ -20,12 +20,14 @@ package org.camunda.bpm.client.task;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.camunda.bpm.client.exception.ExternalTaskClientException;
+import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 
 /**
  * Class that encapsulates the client's configuration of createTime ordering.
  */
 public class OrderingConfig {
+
+  protected static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
 
   protected final List<OrderingProperty> orderingProperties;
 
@@ -63,8 +65,7 @@ public class OrderingConfig {
     OrderingProperty lastConfiguredProperty = validateAndGetLastConfiguredProperty();
 
     if (lastConfiguredProperty.getDirection() != null) {
-      throw new ExternalTaskClientException(
-          "Invalid query: can specify only one direction desc() or asc() for an ordering constraint");
+      throw LOG.doubleDirectionConfigException();
     }
 
     lastConfiguredProperty.setDirection(direction);
@@ -78,8 +79,7 @@ public class OrderingConfig {
     OrderingProperty lastConfiguredProperty = getLastConfiguredProperty();
 
     if (lastConfiguredProperty == null) {
-      throw new ExternalTaskClientException(
-          "You should call any of the orderBy methods first before specifying a direction");
+      throw LOG.unspecifiedOrderByMethodException();
     }
 
     return lastConfiguredProperty;
@@ -89,10 +89,11 @@ public class OrderingConfig {
    * Validates ordering properties all have a non-null direction.
    */
   public void validateOrderingProperties() {
-    for (OrderingProperty orderingProperty : orderingProperties) {
-      if (orderingProperty.getDirection() == null) {
-        throw new ExternalTaskClientException("Invalid query: call asc() or desc() after using orderByXX()");
-      }
+    boolean hasMissingDirection = orderingProperties.stream()
+        .anyMatch(p -> p.getDirection() == null);
+
+    if (hasMissingDirection) {
+      throw LOG.missingDirectionException();
     }
   }
 
