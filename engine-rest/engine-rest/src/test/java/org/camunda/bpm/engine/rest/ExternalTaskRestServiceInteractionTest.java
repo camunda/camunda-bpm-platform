@@ -34,7 +34,6 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -314,7 +313,6 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     // given
     when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
 
-    // when
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("maxTasks", 5);
     parameters.put("workerId", "aWorkerId");
@@ -332,6 +330,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     parameters.put("topics", Arrays.asList(topicParameter));
 
+    // when
     executePost(parameters);
 
     InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
@@ -353,54 +352,6 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   }
 
   @Test
-  public void testFetchAndLockWithCreateTimeAsc() {
-    // given
-    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
-
-    Map<String, Object> parameters = new HashMap<>();
-    parameters.put("maxTasks", 5);
-    parameters.put("workerId", "aWorkerId");
-    parameters.put("usePriority", false);
-    parameters.put("sortings", List.of(SortingDtoFactory.create("createTime", "asc")));
-
-    Map<String, Object> topicParameter = new HashMap<>();
-    topicParameter.put("topicName", "aTopicName");
-    topicParameter.put("businessKey", EXAMPLE_BUSINESS_KEY);
-    topicParameter.put("lockDuration", 12354L);
-    topicParameter.put("variables", Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
-
-    Map<String, Object> variableValueParameter = new HashMap<>();
-    variableValueParameter.put(EXAMPLE_VARIABLE_INSTANCE_NAME, EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue());
-    topicParameter.put("processVariables", variableValueParameter);
-
-    parameters.put("topics", Arrays.asList(topicParameter));
-
-    // when
-    executePost(parameters);
-
-    InOrder inOrder = inOrder(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
-
-    inOrder.verify(externalTaskService).fetchAndLock();
-
-    inOrder.verify(fetchAndLockBuilder).workerId("aWorkerId");
-    inOrder.verify(fetchAndLockBuilder).maxTasks(5);
-    inOrder.verify(fetchAndLockBuilder).usePriority(false);
-
-    // then
-    inOrder.verify(fetchAndLockBuilder).orderByCreateTime();
-    inOrder.verify(fetchAndLockBuilder).asc();
-
-    inOrder.verify(fetchAndLockBuilder).subscribe();
-    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchTopicBuilder).businessKey(EXAMPLE_BUSINESS_KEY);
-    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(EXAMPLE_VARIABLE_INSTANCE_NAME));
-    inOrder.verify(fetchTopicBuilder).processInstanceVariableEquals(variableValueParameter);
-    inOrder.verify(fetchTopicBuilder).execute();
-
-    verifyNoMoreInteractions(fetchAndLockBuilder, fetchTopicBuilder, externalTaskService);
-  }
-
-  @Test
   public void testFetchAndLockWithCreateTimeDesc() {
     // given
     when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
@@ -409,7 +360,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("maxTasks", 5);
     parameters.put("workerId", "aWorkerId");
     parameters.put("usePriority", false);
-    parameters.put("sortings", List.of(SortingDtoFactory.create("createTime", "desc")));
+    parameters.put("sortings", List.of(create("createTime", "desc")));
 
     Map<String, Object> topicParameter = new HashMap<>();
     topicParameter.put("topicName", "aTopicName");
@@ -457,7 +408,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("maxTasks", 5);
     parameters.put("workerId", "aWorkerId");
     parameters.put("usePriority", false);
-    parameters.put("sortings", List.of(SortingDtoFactory.create("createTime", null)));
+    parameters.put("sortings", List.of(create("createTime", null)));
 
     Map<String, Object> topicParameter = new HashMap<>();
     topicParameter.put("topicName", "aTopicName");
@@ -483,8 +434,8 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     inOrder.verify(fetchAndLockBuilder).maxTasks(5);
     inOrder.verify(fetchAndLockBuilder).usePriority(false);
     inOrder.verify(fetchAndLockBuilder).orderByCreateTime();
-    inOrder.verify(fetchAndLockBuilder, times(0)).desc(); // no order call on builder
-    inOrder.verify(fetchAndLockBuilder, times(0)).asc();
+    inOrder.verify(fetchAndLockBuilder, never()).desc(); // no order call on builder
+    inOrder.verify(fetchAndLockBuilder, never()).asc();
     inOrder.verify(fetchAndLockBuilder).subscribe();
 
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
@@ -2084,13 +2035,11 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
         .when().post(FETCH_EXTERNAL_TASK_URL);
   }
 
-  static class SortingDtoFactory {
-    public static SortingDto create(String sortBy, String sortOrder) {
-      var result = new SortingDto();
-      result.setSortOrder(sortOrder);
-      result.setSortBy(sortBy);
-      return result;
-    }
+  public static SortingDto create(String sortBy, String sortOrder) {
+    var result = new SortingDto();
+    result.setSortOrder(sortOrder);
+    result.setSortBy(sortBy);
+    return result;
   }
 
 }

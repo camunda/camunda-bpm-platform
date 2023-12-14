@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import static org.camunda.bpm.engine.impl.ExternalTaskQueryProperty.CREATE_TIME;
 import static org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory.CRDB;
 import static org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory.POSTGRES;
 import static org.camunda.bpm.engine.impl.util.DatabaseUtil.checkDatabaseType;
@@ -73,18 +72,17 @@ public class ExternalTaskManager extends AbstractManager {
   @SuppressWarnings("unchecked")
   public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<TopicFetchInstruction> queryFilters,
                                                                int maxResults,
-                                                               boolean usePriority,
                                                                List<QueryOrderingProperty> orderingProperties) {
     if (queryFilters.isEmpty()) {
       return Collections.emptyList();
     }
 
-    boolean useCreateTime = useCreateTime(orderingProperties);
+    boolean shouldApplyOrdering = !orderingProperties.isEmpty();
 
     Map<String, Object> parameters = Map.of(
         "topics", queryFilters,
         "now", ClockUtil.getCurrentTime(),
-        "applyOrdering", shouldApplyOrdering(usePriority, useCreateTime),
+        "applyOrdering", shouldApplyOrdering,
         "orderingProperties", orderingProperties,
         "usesPostgres", checkDatabaseType(POSTGRES, CRDB)
     );
