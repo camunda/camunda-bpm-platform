@@ -18,12 +18,6 @@
                          "workerId": "aWorkerId",
                          "maxTasks": 2,
                          "usePriority": true,
-                         "sorting": [
-                             {
-                                "sortBy":"createTime",
-                                "sortOrder":"ASC"
-                             }
-                         ],
                          "topics": [
                            {
                              "topicName": "createOrder",
@@ -42,12 +36,6 @@
                          "workerId": "aWorkerId",
                          "maxTasks": 2,
                          "usePriority": true,
-                         "sorting": [
-                             {
-                                "sortBy":"createTime",
-                                "sortOrder":"ASC"
-                             }
-                         ],
                          "topics": [
                            {
                              "topicName": "createOrder",
@@ -65,12 +53,6 @@
                         "workerId":"aWorkerId",
                         "maxTasks":1,
                         "usePriority":true,
-                         "sorting": [
-                             {
-                                "sortBy":"createTime",
-                                "sortOrder":"ASC"
-                             }
-                         ],
                         "topics":
                             [{"topicName": "createOrder",
                             "lockDuration": 10000,
@@ -79,7 +61,7 @@
                       }
                     }',
                     '"example-4": {
-                       "summary": "POST /external-task/fetchAndLock (2)",
+                       "summary": "POST /external-task/fetchAndLock (4)",
                        "description": "Request with order by priority & createTime",
                        "value": {
                          "workerId": "aWorkerId",
@@ -90,7 +72,7 @@
                                 "sortBy":"createTime",
                                 "sortOrder":"ASC"
                              }
-                         ],
+                         ]
                        }
                      }'
       ] />
