@@ -171,6 +171,15 @@ public class ExternalTaskManager extends AbstractManager {
     return getTenantManager().configureQuery(parameter);
   }
 
+  protected boolean shouldApplyOrdering(boolean usePriority, boolean useCreateTime) {
+    return usePriority || useCreateTime;
+  }
+
+  protected boolean useCreateTime(List<QueryOrderingProperty> orderingProperties) {
+    return orderingProperties.stream()
+        .anyMatch(orderingProperty -> CREATE_TIME.getName().equals(orderingProperty.getQueryProperty().getName()));
+  }
+
   public void fireExternalTaskAvailableEvent() {
     Context.getCommandContext()
         .getTransactionContext()

@@ -43,6 +43,7 @@ public class ExternalTaskImpl implements ExternalTask {
   protected String executionId;
   protected String id;
   protected Date lockExpirationTime;
+  protected Date createTime;
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected String processDefinitionVersionTag;
@@ -86,6 +87,10 @@ public class ExternalTaskImpl implements ExternalTask {
 
   public void setLockExpirationTime(Date lockExpirationTime) {
     this.lockExpirationTime = lockExpirationTime;
+  }
+
+  public void setCreateTime(Date createTime) {
+    this.createTime = createTime;
   }
 
   public void setProcessDefinitionId(String processDefinitionId) {
@@ -175,6 +180,11 @@ public class ExternalTaskImpl implements ExternalTask {
   @Override
   public Date getLockExpirationTime() {
     return lockExpirationTime;
+  }
+
+  @Override
+  public Date getCreateTime() {
+    return createTime;
   }
 
   @Override
@@ -318,7 +328,8 @@ public class ExternalTaskImpl implements ExternalTask {
         + "errorMessage=" + errorMessage + ", "
         + "executionId=" + executionId + ", "
         + "id=" + id + ", "
-        + "lockExpirationTime=" + (lockExpirationTime == null ? null : DateFormat.getDateTimeInstance().format(lockExpirationTime)) + ", "
+        + formatTimeField("lockExpirationTime", lockExpirationTime) + ", "
+        + formatTimeField("createTime", createTime) + ", "
         + "priority=" + priority + ", "
         + "processDefinitionId=" + processDefinitionId + ", "
         + "processDefinitionKey=" + processDefinitionKey + ", "
@@ -330,6 +341,10 @@ public class ExternalTaskImpl implements ExternalTask {
         + "topicName=" + topicName + ", "
         + "variables=" + variables + ", "
         + "workerId=" + workerId + "]";
+  }
+
+  protected String formatTimeField(String timeField, Date time) {
+    return timeField + "=" + (time == null ? null : DateFormat.getDateTimeInstance().format(time));
   }
 
 }

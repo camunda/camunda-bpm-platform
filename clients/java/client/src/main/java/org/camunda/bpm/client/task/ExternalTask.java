@@ -62,9 +62,14 @@ public interface ExternalTask {
   String getId();
 
   /**
-   * @return the date that the task's most recent lock expires or has expired
+   * @return the time that the task's most recent lock expires or has expired
    */
   Date getLockExpirationTime();
+
+  /**
+   * @return the time that the task was created.
+   */
+  Date getCreateTime();
 
   /**
    * @return the id of the process definition the external task is defined in
