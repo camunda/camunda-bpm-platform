@@ -37,7 +37,6 @@ import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
 import org.apache.hc.core5.http.message.BasicHeader;
 import org.apache.hc.core5.http.message.StatusLine;
 import org.camunda.bpm.client.exception.RestException;
-import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
 import org.camunda.commons.utils.IoUtil;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -58,10 +57,9 @@ public class RequestExecutor {
   protected HttpClient httpClient;
   protected ObjectMapper objectMapper;
 
-  protected RequestExecutor(RequestInterceptorHandler requestInterceptorHandler, ObjectMapper objectMapper) {
+  protected RequestExecutor(HttpClient httpClient, ObjectMapper objectMapper) {
+    this.httpClient = httpClient;
     this.objectMapper = objectMapper;
-
-    initHttpClient(requestInterceptorHandler);
   }
 
   protected <T> T postRequest(String resourceUrl, RequestDto requestDto, Class<T> responseClass) {
@@ -182,14 +180,6 @@ public class RequestExecutor {
     }
 
     return byteArrayEntity;
-  }
-
-  protected void initHttpClient(RequestInterceptorHandler requestInterceptorHandler) {
-    HttpClientBuilder httpClientBuilder = HttpClients.custom()
-      .useSystemProperties()
-      .addRequestInterceptorLast(requestInterceptorHandler);
-
-    this.httpClient = httpClientBuilder.build();
   }
 
 }
