@@ -29,6 +29,9 @@
     <property name="dbMetricsReporterActivate" value="false" />
 
     <property name="jdbcBatchProcessing" value="false"/>
+
+    <!-- telemetry configuration -->
+    <property name="telemetryReporterActivate" value="false"/>
   </bean>
 
 </beans>

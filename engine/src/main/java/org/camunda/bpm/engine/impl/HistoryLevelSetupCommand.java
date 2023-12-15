@@ -81,7 +81,7 @@ public final class HistoryLevelSetupCommand implements Command<Void> {
 
     try {
       PropertyEntity historyLevelProperty =  commandContext.getPropertyManager().findPropertyById("historyLevel");
-      return historyLevelProperty != null ? new Integer(historyLevelProperty.getValue()) : null;
+      return historyLevelProperty != null ? Integer.valueOf(historyLevelProperty.getValue()) : null;
     }
     catch (Exception e) {
       LOG.couldNotSelectHistoryLevel(e.getMessage());

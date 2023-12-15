@@ -126,7 +126,7 @@ public class TaskDecorator {
       if (priority != null) {
         if (priority instanceof String) {
           try {
-            task.setPriority(Integer.valueOf((String) priority));
+            task.setPriority(Integer.parseInt((String) priority));
 
           } catch (NumberFormatException e) {
             throw new ProcessEngineException("Priority does not resolve to a number: " + priority, e);

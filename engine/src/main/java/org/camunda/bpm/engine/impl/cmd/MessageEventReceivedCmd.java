@@ -43,22 +43,29 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
   protected final String executionId;
   protected final Map<String, Object> processVariables;
   protected final Map<String, Object> processVariablesLocal;
+  protected final Map<String, Object> processVariablesToTriggeredScope;
   protected final String messageName;
   protected boolean exclusive = false;
 
   public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables) {
-    this(messageName, executionId, processVariables, null);
+    this(messageName, executionId, processVariables, null, null);
   }
 
-  public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables, Map<String, Object> processVariablesLocal) {
+  public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables,
+                                                                         Map<String, Object> processVariablesLocal,
+                                                                         Map<String, Object> processVariablesToTriggeredScope) {
     this.executionId = executionId;
     this.messageName = messageName;
     this.processVariables = processVariables;
     this.processVariablesLocal = processVariablesLocal;
+    this.processVariablesToTriggeredScope = processVariablesToTriggeredScope;
   }
 
-  public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables, Map<String, Object> processVariablesLocal, boolean exclusive) {
-    this(messageName, executionId, processVariables, processVariablesLocal);
+  public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables,
+                                                                         Map<String, Object> processVariablesLocal,
+                                                                         Map<String, Object> processVariablesToTriggeredScope,
+                                                                         boolean exclusive) {
+    this(messageName, executionId, processVariables, processVariablesLocal, processVariablesToTriggeredScope);
     this.exclusive = exclusive;
   }
 
@@ -88,7 +95,7 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
       checker.checkUpdateProcessInstanceById(processInstanceId);
     }
 
-    eventSubscriptionEntity.eventReceived(processVariables, processVariablesLocal, null, false);
+    eventSubscriptionEntity.eventReceived(processVariables, processVariablesLocal, processVariablesToTriggeredScope, null, false);
 
     return null;
   }

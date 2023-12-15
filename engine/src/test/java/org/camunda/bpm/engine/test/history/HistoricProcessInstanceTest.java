@@ -154,7 +154,7 @@ public class HistoricProcessInstanceTest {
     assertEquals(processInstance.getProcessDefinitionId(), historicProcessInstance.getProcessDefinitionId());
     assertEquals(noon, historicProcessInstance.getStartTime());
     assertEquals(twentyFiveSecsAfterNoon, historicProcessInstance.getEndTime());
-    assertEquals(new Long(25 * 1000), historicProcessInstance.getDurationInMillis());
+    assertEquals(Long.valueOf(25 * 1000), historicProcessInstance.getDurationInMillis());
     assertTrue(((HistoricProcessInstanceEventEntity) historicProcessInstance).getDurationRaw() >= 25000);
     assertNull(historicProcessInstance.getCaseInstanceId());
 

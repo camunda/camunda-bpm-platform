@@ -128,7 +128,7 @@ public class CsrfPreventionFilter implements Filter {
 
       String customDenyStatus = filterConfig.getInitParameter("denyStatus");
       if (!isBlank(customDenyStatus)) {
-        setDenyStatus(Integer.valueOf(customDenyStatus));
+        setDenyStatus(Integer.parseInt(customDenyStatus));
       }
 
       String customEntryPoints = filterConfig.getInitParameter("entryPoints");

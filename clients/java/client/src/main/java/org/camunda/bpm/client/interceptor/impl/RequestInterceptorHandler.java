@@ -16,11 +16,12 @@
  */
 package org.camunda.bpm.client.interceptor.impl;
 
-import org.apache.http.HttpException;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.protocol.HttpContext;
+import org.apache.hc.core5.http.EntityDetails;
+import org.apache.hc.core5.http.HttpException;
+import org.apache.hc.core5.http.HttpRequest;
+import org.apache.hc.core5.http.HttpRequestInterceptor;
+import org.apache.hc.core5.http.message.BasicHeader;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.camunda.bpm.client.impl.EngineClientLogger;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
@@ -43,7 +44,7 @@ public class RequestInterceptorHandler implements HttpRequestInterceptor {
   }
 
   @Override
-  public void process(HttpRequest httpRequest, HttpContext context) throws HttpException, IOException {
+  public void process(HttpRequest httpRequest, EntityDetails details, HttpContext context) throws HttpException, IOException {
     ClientRequestContextImpl interceptedRequest = new ClientRequestContextImpl();
     interceptors.forEach((ClientRequestInterceptor requestInterceptor) -> {
       try {

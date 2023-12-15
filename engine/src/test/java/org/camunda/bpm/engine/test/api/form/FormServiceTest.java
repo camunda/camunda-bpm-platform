@@ -288,7 +288,7 @@ public class FormServiceTest {
     Map<String, Object> expectedVariables = new HashMap<>();
     expectedVariables.put("room", "5b");
     expectedVariables.put("SpeakerName", "Mike");
-    expectedVariables.put("duration", new Long(45));
+    expectedVariables.put("duration", 45L);
     expectedVariables.put("free", Boolean.TRUE);
 
     Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
@@ -347,7 +347,7 @@ public class FormServiceTest {
     expectedVariables = new HashMap<>();
     expectedVariables.put("room", "5b");
     expectedVariables.put("SpeakerName", "Mike");
-    expectedVariables.put("duration", new Long(45));
+    expectedVariables.put("duration", 45L);
     expectedVariables.put("free", Boolean.TRUE);
 
     variables = runtimeService.getVariables(processInstanceId);
@@ -371,7 +371,7 @@ public class FormServiceTest {
     Map<String, Object> expectedVariables = new HashMap<>();
     expectedVariables.put("room", "5b");
     expectedVariables.put("SpeakerName", "Mike");
-    expectedVariables.put("duration", new Long(45));
+    expectedVariables.put("duration", 45L);
     expectedVariables.put("free", Boolean.TRUE);
 
     Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
@@ -430,7 +430,7 @@ public class FormServiceTest {
     expectedVariables = new HashMap<>();
     expectedVariables.put("room", "5b");
     expectedVariables.put("SpeakerName", "Mike");
-    expectedVariables.put("duration", new Long(45));
+    expectedVariables.put("duration", 45L);
     expectedVariables.put("free", Boolean.TRUE);
 
     variables = runtimeService.getVariables(processInstanceId);

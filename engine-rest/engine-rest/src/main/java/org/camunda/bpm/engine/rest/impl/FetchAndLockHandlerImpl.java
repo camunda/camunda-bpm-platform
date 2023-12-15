@@ -350,7 +350,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
 
   protected void parseUniqueWorkerRequestParam(String uniqueWorkerRequestParam) {
     if (uniqueWorkerRequestParam != null) {
-      isUniqueWorkerRequest = Boolean.valueOf(uniqueWorkerRequestParam);
+      isUniqueWorkerRequest = Boolean.parseBoolean(uniqueWorkerRequestParam);
     } else {
       isUniqueWorkerRequest = false; // default configuration
     }

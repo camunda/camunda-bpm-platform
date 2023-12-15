@@ -32,10 +32,10 @@ import org.camunda.bpm.engine.query.Query;
  */
 public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, ProcessDefinition> {
 
-  /** Only select process definiton with the given id.  */
+  /** Only select process definition with the given id.  */
   ProcessDefinitionQuery processDefinitionId(String processDefinitionId);
 
-  /** Only select process definiton with the given id.  */
+  /** Only select process definition with the given id.  */
   ProcessDefinitionQuery processDefinitionIdIn(String... ids);
 
   /** Only select process definitions with the given category. */
@@ -78,9 +78,18 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   ProcessDefinitionQuery processDefinitionKey(String processDefinitionKey);
 
   /**
-   * Only select process definitions with the given keys
+   * Only select process definitions with the given keys.
+   * <p><b>Deprecated</b>: use {@link #processDefinitionKeyIn(String...)}</p>
    */
+  @Deprecated
   ProcessDefinitionQueryImpl processDefinitionKeysIn(String... processDefinitionKeys);
+
+  /**
+   * Only select process definitions with the given keys.
+   * @param processDefinitionKeys keys to look for during query.
+   * @return query builder.
+   */
+  ProcessDefinitionQuery processDefinitionKeyIn(String... processDefinitionKeys);
 
   /**
    * Only select process definitions where the key matches the given parameter.
@@ -90,7 +99,7 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
 
   /**
    * Only select process definition with a certain version.
-   * Particulary useful when used in combination with {@link #processDefinitionKey(String)}
+   * Particularly useful when used in combination with {@link #processDefinitionKey(String)}
    */
   ProcessDefinitionQuery processDefinitionVersion(Integer processDefinitionVersion);
 

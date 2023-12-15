@@ -425,8 +425,8 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
       assertEquals(UserOperationLogEntry.OPERATION_TYPE_DELETE, userOperationLogEntry.getOperationType());
 
       assertEquals("cascade", userOperationLogEntry.getProperty());
-      assertFalse(Boolean.valueOf(userOperationLogEntry.getOrgValue()));
-      assertTrue(Boolean.valueOf(userOperationLogEntry.getNewValue()));
+      assertFalse(Boolean.parseBoolean(userOperationLogEntry.getOrgValue()));
+      assertTrue(Boolean.parseBoolean(userOperationLogEntry.getNewValue()));
 
       assertEquals(USER_ID, userOperationLogEntry.getUserId());
       

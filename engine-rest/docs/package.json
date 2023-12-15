@@ -3,7 +3,7 @@
   "version": "7.21.0-SNAPSHOT",
   "private": true,
   "scripts": {
-    "build": "./build.js"
+    "build": "node build"
   },
   "dependencies": {
     "redoc": "2.1.1"

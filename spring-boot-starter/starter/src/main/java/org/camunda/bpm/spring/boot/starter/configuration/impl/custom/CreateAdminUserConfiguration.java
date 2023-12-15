@@ -105,8 +105,4 @@ public class CreateAdminUserConfiguration extends AbstractCamundaConfiguration {
     return newUser;
   }
 
-  @Override
-  public String toString() {
-    return createToString(Collections.singletonMap("adminUser", adminUser));
-  }
 }

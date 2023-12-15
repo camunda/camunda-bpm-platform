@@ -39,28 +39,28 @@ public class DemoDelegate implements JavaDelegate {
     
     insertVariable("stringVar", "Demo-Value");
     insertVariable("longVar", 1L);
-    insertVariable("longObjectVar", new Long(1));
+    insertVariable("longObjectVar", Long.valueOf(1));
     insertVariable("intVar", 1);
-    insertVariable("intObjectVar", new Integer(1));
+    insertVariable("intObjectVar", Integer.valueOf(1));
     insertVariable("shortVar", (short) 1);
-    insertVariable("shortObjectVar", new Short("1"));
+    insertVariable("shortObjectVar", Short.valueOf("1"));
     insertVariable("byteVar", (byte) 1);
-    insertVariable("byteObjectVar", new Byte("1"));
+    insertVariable("byteObjectVar", Byte.valueOf("1"));
     insertVariable("booleanVar", true);
     insertVariable("booleanObjectVar", Boolean.TRUE);
     insertVariable("floatVar", 1.5f);
-    insertVariable("floatObjectVar", new Float(1.5f));
+    insertVariable("floatObjectVar", Float.valueOf(1.5f));
     insertVariable("doubleVar", 1.5d);
-    insertVariable("doubleObjectVar", new Double(1.5d));
+    insertVariable("doubleObjectVar", Double.valueOf(1.5d));
     insertVariable("charVar", 'a');
-    insertVariable("charObjectVar", new Character('a'));
+    insertVariable("charObjectVar", Character.valueOf('a'));
     insertVariable("dateObjectVar", new Date());
     insertVariable("nullable", null);
-    insertVariable("random", new Double(Math.random() * 100).intValue());
+    insertVariable("random", Double.valueOf(Math.random() * 100).intValue());
     
     char[] charArray = {'a','b','c','D'};
     insertVariable("charArrayVar", charArray);
-    Character[] characterObjectArray = { new Character('a'), new Character('b'), new Character('c'), new Character('D') };
+    Character[] characterObjectArray = { Character.valueOf('a'), Character.valueOf('b'), Character.valueOf('c'), Character.valueOf('D') };
     insertVariable("characterObjectArray", characterObjectArray);
     
     String byteString = "mycooltextcontentasbyteyesyes!!!";
@@ -70,24 +70,24 @@ public class DemoDelegate implements JavaDelegate {
 
     for (int i = 0; i < bytes.length; i++) {
       byte b = bytes[i];
-      ByteArray[i] = new Byte(b);
+      ByteArray[i] = Byte.valueOf(b);
     }
     insertVariable("ByteArrayVariable", ByteArray);
     
     DemoVariableClass demoVariableClass = new DemoVariableClass();
     
-    demoVariableClass.setBooleanObjectProperty(new Boolean(true));
+    demoVariableClass.setBooleanObjectProperty(Boolean.valueOf(true));
     demoVariableClass.setBooleanProperty(false);
-    demoVariableClass.setByteObjectProperty(new Byte(Byte.MAX_VALUE));
+    demoVariableClass.setByteObjectProperty(Byte.valueOf(Byte.MAX_VALUE));
     demoVariableClass.setCharProperty('z');
-    demoVariableClass.setDoubleObjectProperty(new Double(2.25d));
+    demoVariableClass.setDoubleObjectProperty(Double.valueOf(2.25d));
     demoVariableClass.setDoubleProperty(1.75d);
-    demoVariableClass.setFloatObjectProperty(new Float(4.34f));
+    demoVariableClass.setFloatObjectProperty(Float.valueOf(4.34f));
     demoVariableClass.setFloatProperty(100.005f);
     demoVariableClass.setIntArrayProperty(new int[]{1,2,3});
     demoVariableClass.setIntegerObjectProperty(null);
     demoVariableClass.setIntProperty(-10);
-    demoVariableClass.setLongObjectProperty(new Long(Long.MIN_VALUE));
+    demoVariableClass.setLongObjectProperty(Long.valueOf(Long.MIN_VALUE));
     demoVariableClass.setLongProperty(Long.MAX_VALUE);
     
     HashMap<Object,Object> demoHashMap= new HashMap<Object,Object>();
@@ -95,7 +95,7 @@ public class DemoDelegate implements JavaDelegate {
     demoHashMap.put("key2", "value2");
     demoVariableClass.setMapProperty(demoHashMap);
     
-    demoVariableClass.setShortObjectProperty(new Short(Short.MAX_VALUE));
+    demoVariableClass.setShortObjectProperty(Short.valueOf(Short.MAX_VALUE));
     demoVariableClass.setShortProperty(Short.MIN_VALUE);
     demoVariableClass.setStringProperty("cockpit rulez");
     
@@ -111,6 +111,6 @@ public class DemoDelegate implements JavaDelegate {
   }
   
   private void insertVariable(String varName, Object value) {
-    execution.setVariable(varName + new Double(Math.random() * 10).intValue(), value);
+    execution.setVariable(varName + Double.valueOf(Math.random() * 10).intValue(), value);
   }
 }

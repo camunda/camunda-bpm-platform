@@ -44,7 +44,7 @@ public class LongFormType extends SimpleFormFieldType {
         return Variables.longValue(null, propertyValue.isTransient());
       }
       else if((value instanceof Number) || (value instanceof String)) {
-        return Variables.longValue(new Long(value.toString()), propertyValue.isTransient());
+        return Variables.longValue(Long.valueOf(value.toString()), propertyValue.isTransient());
       }
       else {
         throw new ProcessEngineException("Value '"+value+"' is not of type Long.");
@@ -58,7 +58,7 @@ public class LongFormType extends SimpleFormFieldType {
     if (propertyValue==null || "".equals(propertyValue)) {
       return null;
     }
-    return new Long(propertyValue.toString());
+    return Long.valueOf(propertyValue.toString());
   }
 
   public String convertModelValueToFormValue(Object modelValue) {

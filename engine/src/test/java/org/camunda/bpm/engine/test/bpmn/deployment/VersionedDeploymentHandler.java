@@ -134,7 +134,7 @@ public class VersionedDeploymentHandler implements DeploymentHandler {
         .iterator().next();
 
     return process.getCamundaVersionTag() != null ?
-        Integer.valueOf(process.getCamundaVersionTag()) :
+        Integer.parseInt(process.getCamundaVersionTag()) :
         0;
   }
 

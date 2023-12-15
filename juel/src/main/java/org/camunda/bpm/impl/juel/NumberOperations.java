@@ -26,7 +26,7 @@ import java.math.RoundingMode;
  * @author Christoph Beck
  */
 public class NumberOperations {
-	private final static Long LONG_ZERO = Long.valueOf(0L);
+	private final static Long LONG_ZERO = 0L;
 
 	private final static boolean isDotEe(String value) {
 		int length = value.length();
@@ -151,28 +151,28 @@ public class NumberOperations {
 			return ((BigInteger)value).negate();
 		}
 		if (value instanceof Double) {
-			return Double.valueOf(-((Double)value).doubleValue());
+			return -((Double) value).doubleValue();
 		}
 		if (value instanceof Float) {
-			return Float.valueOf(-((Float)value).floatValue());
+			return -((Float) value).floatValue();
 		}
 		if (value instanceof String) {
 			if (isDotEe((String)value)) {
-				return Double.valueOf(-converter.convert(value, Double.class).doubleValue());
+				return -converter.convert(value, Double.class).doubleValue();
 			}
-			return Long.valueOf(-converter.convert(value, Long.class).longValue());
+			return -converter.convert(value, Long.class).longValue();
 		}
 		if (value instanceof Long) {
-			return Long.valueOf(-((Long)value).longValue());
+			return -((Long) value).longValue();
 		}
 		if (value instanceof Integer) {
-			return Integer.valueOf(-((Integer)value).intValue());
+			return -((Integer) value).intValue();
 		}
 		if (value instanceof Short) {
-			return Short.valueOf((short)-((Short)value).shortValue());
+			return (short) -((Short) value).shortValue();
 		}
 		if (value instanceof Byte) {
-			return Byte.valueOf((byte)-((Byte)value).byteValue());
+			return (byte) -((Byte) value).byteValue();
 		}
 		throw new ELException(LocalMessages.get("error.negate", value.getClass()));
 	}

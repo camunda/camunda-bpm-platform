@@ -345,7 +345,7 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertEquals(job.getJobDefinitionId(), entry.getJobDefinitionId());
     assertEquals("duedate", entry.getProperty());
     assertNull(entry.getOrgValue());
-    assertEquals(newDate, new Date(Long.valueOf(entry.getNewValue())));
+    assertEquals(newDate, new Date(Long.parseLong(entry.getNewValue())));
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/timer/TimerRecalculationTest.testFinishedJob.bpmn20.xml"})
@@ -374,8 +374,8 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertEquals(job.getDeploymentId(), entry.getDeploymentId());
     assertEquals(job.getJobDefinitionId(), entry.getJobDefinitionId());
     assertEquals("duedate", entry.getProperty());
-    assertTrue(DateUtils.truncatedEquals(duedate, new Date(Long.valueOf(entry.getOrgValue())), Calendar.SECOND));
-    assertTrue(DateUtils.truncatedEquals(duedate, new Date(Long.valueOf(entry.getNewValue())), Calendar.SECOND));
+    assertTrue(DateUtils.truncatedEquals(duedate, new Date(Long.parseLong(entry.getOrgValue())), Calendar.SECOND));
+    assertTrue(DateUtils.truncatedEquals(duedate, new Date(Long.parseLong(entry.getNewValue())), Calendar.SECOND));
     
     entry = query.property("creationDateBased").singleResult();
     assertEquals(job.getId(), entry.getJobId());
@@ -383,7 +383,7 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertEquals(job.getJobDefinitionId(), entry.getJobDefinitionId());
     assertEquals("creationDateBased", entry.getProperty());
     assertNull(entry.getOrgValue());
-    assertFalse(Boolean.valueOf(entry.getNewValue()));
+    assertFalse(Boolean.parseBoolean(entry.getNewValue()));
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})

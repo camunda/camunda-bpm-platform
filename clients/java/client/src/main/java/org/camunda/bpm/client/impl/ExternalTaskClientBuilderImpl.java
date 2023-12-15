@@ -85,6 +85,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   protected TypedValues typedValues;
   protected EngineClient engineClient;
   protected TopicSubscriptionManager topicSubscriptionManager;
+  protected HttpClientBuilder httpClientBuilder;
 
   protected List<ClientRequestInterceptor> interceptors;
   protected boolean isAutoFetchingEnabled;
@@ -101,6 +102,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     this.isAutoFetchingEnabled = true;
     this.backoffStrategy = new ExponentialBackoffStrategy();
     this.isBackoffStrategyDisabled = false;
+    this.httpClientBuilder = HttpClients.custom().useSystemProperties();
   }
 
   public ExternalTaskClientBuilder baseUrl(String baseUrl) {
@@ -183,6 +185,11 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   public ExternalTaskClientBuilder dateFormat(String dateFormat) {
     this.dateFormat = dateFormat;
+    return this;
+  }
+
+  public ExternalTaskClientBuilder customizeHttpClient(Consumer<HttpClientBuilder> httpClientConsumer) {
+    httpClientConsumer.accept(httpClientBuilder);
     return this;
   }
 
