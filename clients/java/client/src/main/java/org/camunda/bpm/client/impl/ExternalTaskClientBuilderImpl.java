@@ -38,6 +38,7 @@ import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
 import org.camunda.bpm.client.spi.DataFormat;
 import org.camunda.bpm.client.spi.DataFormatConfigurator;
 import org.camunda.bpm.client.spi.DataFormatProvider;
+import org.camunda.bpm.client.task.impl.ExternalTaskServiceImpl;
 import org.camunda.bpm.client.topic.impl.TopicSubscriptionManager;
 import org.camunda.bpm.client.variable.impl.DefaultValueMappers;
 import org.camunda.bpm.client.variable.impl.TypedValues;
@@ -151,6 +152,11 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   public ExternalTaskClientBuilder disableBackoffStrategy() {
     this.isBackoffStrategyDisabled = true;
+    return this;
+  }
+
+  public ExternalTaskClientBuilder topicSubscriptionManager(TopicSubscriptionManager topicSubscriptionManager) {
+    this.topicSubscriptionManager = topicSubscriptionManager;
     return this;
   }
 
@@ -278,7 +284,14 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   }
 
   protected void initTopicSubscriptionManager() {
-    topicSubscriptionManager = new TopicSubscriptionManager(engineClient, typedValues, lockDuration);
+    if (topicSubscriptionManager!=null){
+      topicSubscriptionManager.setClientLockDuration(lockDuration);
+      topicSubscriptionManager.setEngineClient(engineClient);
+      topicSubscriptionManager.setTypedValues(typedValues);
+      topicSubscriptionManager.setExternalTaskService(new ExternalTaskServiceImpl(engineClient));
+    }else {
+      topicSubscriptionManager = new TopicSubscriptionManager(engineClient, typedValues, lockDuration);
+    }
     topicSubscriptionManager.setBackoffStrategy(getBackoffStrategy());
 
     if (isBackoffStrategyDisabled) {

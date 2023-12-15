@@ -21,6 +21,7 @@ import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.backoff.ExponentialBackoffStrategy;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
+import org.camunda.bpm.client.topic.impl.TopicSubscriptionManager;
 
 import java.util.function.Consumer;
 
@@ -143,6 +144,8 @@ public interface ExternalTaskClientBuilder {
    * @return the builder
    */
   ExternalTaskClientBuilder disableBackoffStrategy();
+
+  ExternalTaskClientBuilder topicSubscriptionManager(TopicSubscriptionManager topicSubscriptionManager);
 
   /**
    * Exposes the internal Apache {@link HttpClientBuilder} for custom client configurations.

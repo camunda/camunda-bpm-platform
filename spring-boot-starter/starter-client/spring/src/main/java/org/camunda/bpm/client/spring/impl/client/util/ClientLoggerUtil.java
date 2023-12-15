@@ -55,4 +55,8 @@ public class ClientLoggerUtil extends LoggerUtil {
             "when only one matching client annotation was expected."));
   }
 
+  public void topicSubscriptionManagerFound(){
+    logDebug("008", "Client topic subscription manager found");
+  }
+
 }
