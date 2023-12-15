@@ -59,7 +59,22 @@
                             "includeExtensionProperties": true
                             }]
                       }
-                    }'
+                    }',
+                    '"example-4": {
+                       "summary": "POST /external-task/fetchAndLock (4)",
+                       "description": "Request with order by priority & createTime",
+                       "value": {
+                         "workerId": "aWorkerId",
+                         "maxTasks": 2,
+                         "usePriority": true,
+                         "sorting": [
+                             {
+                                "sortBy":"createTime",
+                                "sortOrder":"ASC"
+                             }
+                         ]
+                       }
+                     }'
       ] />
 
   "responses" : {
@@ -81,6 +96,7 @@
                            "executionId": "anExecutionId",
                            "id": "anExternalTaskId",
                            "lockExpirationTime": "2015-10-06T16:34:42.000+0200",
+                           "createTime": "2015-10-06T16:34:42.000+0200",
                            "processDefinitionId": "aProcessDefinitionId",
                            "processDefinitionKey": "aProcessDefinitionKey",
                            "processInstanceId": "aProcessInstanceId",
@@ -105,6 +121,7 @@
                            "executionId": "anExecutionId",
                            "id": "anExternalTaskId",
                            "lockExpirationTime": "2015-10-06T16:34:42.000+0200",
+                           "createTime": "2015-10-06T16:34:42.000+0200",
                            "processDefinitionId": "aProcessDefinitionId",
                            "processDefinitionKey": "aProcessDefinitionKey",
                            "processInstanceId": "aProcessInstanceId",
@@ -135,6 +152,7 @@
                            "executionId": "anExecutionId",
                            "id": "anExternalTaskId",
                            "lockExpirationTime": "2015-10-06T16:34:42.00+0200",
+                           "createTime": "2015-10-06T16:34:42.000+0200",
                            "processDefinitionId": "aProcessDefinitionId",
                            "processDefinitionKey": "aProcessDefinitionKey",
                            "processInstanceId": "aProcessInstanceId",
@@ -160,6 +178,7 @@
                            "executionId": "anExecutionId",
                            "id": "anExternalTaskId",
                            "lockExpirationTime": "2015-10-06T16:34:42.000+0200",
+                           "createTime": "2015-10-06T16:34:42.000+0200",
                            "processDefinitionId": "aProcessDefinitionId",
                            "processDefinitionKey": "aProcessDefinitionKey",
                            "processInstanceId": "aProcessInstanceId",
@@ -190,6 +209,7 @@
                          "executionId": "anExecutionId",
                          "id": "anExternalTaskId",
                          "lockExpirationTime": "2015-10-06T16:34:42.000+0200",
+                         "createTime": "2015-10-06T16:34:42.000+0200",
                          "processDefinitionId": "aProcessDefinitionId",
                          "processDefinitionKey": "aProcessDefinitionKey",
                          "processInstanceId": "aProcessInstanceId",

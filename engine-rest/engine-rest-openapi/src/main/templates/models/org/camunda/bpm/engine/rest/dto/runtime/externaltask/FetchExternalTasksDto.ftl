@@ -35,9 +35,19 @@
         name = "topics"
         type = "array"
         dto = "FetchExternalTaskTopicDto"
-        last = true
         desc = "A JSON array of topic objects for which external tasks should be fetched. The returned tasks may be
                 arbitrarily distributed among these topics. Each topic object has the following properties:" />
+
+    "sorting": {
+      "type": "array",
+      "nullable": true,
+      "description": "Apply sorting of the result",
+      "items":
+
+        <#assign last = true >
+        <#assign sortByValues = [ '"createTime"' ] >
+        <#include "/lib/commons/sort-props.ftl" >
+    }
 
 </@lib.dto>
 
