@@ -16,10 +16,13 @@
  */
 package org.camunda.bpm.client;
 
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.backoff.ExponentialBackoffStrategy;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
+
+import java.util.function.Consumer;
 
 /**
  * <p>A fluent builder to configure the Camunda client</p>
@@ -39,7 +42,7 @@ public interface ExternalTaskClientBuilder {
   /**
    * A custom worker id the Workflow Engine is aware of. This information is optional.
    * Note: make sure to choose a unique worker id
-   *
+   * <p>
    * If not given or null, a worker id is generated automatically which consists of the
    * hostname as well as a random and unique 128 bit string (UUID).
    *
@@ -133,13 +136,23 @@ public interface ExternalTaskClientBuilder {
 
   /**
    * Disables the client-side backoff strategy. On invocation, the configuration option {@link #backoffStrategy} is ignored.
-   *
+   * <p>
    * NOTE: Please bear in mind that disabling the client-side backoff can lead to heavy load situations on engine side.
    *       To avoid this, please specify an appropriate {@link #asyncResponseTimeout(long)}.
    *
    * @return the builder
    */
   ExternalTaskClientBuilder disableBackoffStrategy();
+
+  /**
+   * Exposes the internal Apache {@link HttpClientBuilder} for custom client configurations.
+   * <p>
+   * Interceptors added via {@link #addInterceptor(ClientRequestInterceptor)} are added as last in the {@link #build()} method.
+   *
+   * @param httpClientConsumer the parameter that accepts the {@link HttpClientBuilder}
+   * @return the builder
+   */
+  ExternalTaskClientBuilder customizeHttpClient(Consumer<HttpClientBuilder> httpClientConsumer);
 
   /**
    * Bootstraps the Camunda client
