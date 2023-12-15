@@ -79,8 +79,6 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
       instruction.ensureVariablesInitialized();
     }
 
-    List<QueryOrderingProperty> orderingProperties = orderingPropertiesWithPriority();
-
     List<ExternalTaskEntity> externalTasks = commandContext
       .getExternalTaskManager()
       .selectExternalTasksForTopics(new ArrayList<>(fetchInstructions.values()), maxResults, orderingProperties);
