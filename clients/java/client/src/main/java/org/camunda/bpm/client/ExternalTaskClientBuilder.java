@@ -79,6 +79,42 @@ public interface ExternalTaskClientBuilder {
   ExternalTaskClientBuilder usePriority(boolean usePriority);
 
   /**
+   * Specifies whether tasks should be fetched based on their create time.
+   * If useCreateTime is passed using <code>true</code>, the tasks are going to be fetched in Descending order,
+   * otherwise <code>false</code> will not consider create time.
+   *
+   * @param useCreateTime the flag to control whether create time should be considered
+   *                      as a desc sorting criterion (newer tasks will be returned first)
+   * @return the builder
+   */
+  ExternalTaskClientBuilder useCreateTime(boolean useCreateTime);
+
+  /**
+   * Fluent API method for configuring createTime as a sorting criterion for fetching of the tasks. Can be used in
+   * conjunction with asc or desc methods to configure the respective order for createTime.
+   * The method needs to be called first before specifying the order.
+   *
+   * @return the builder
+   */
+  ExternalTaskClientBuilder orderByCreateTime();
+
+  /**
+   * Fluent API method to configure Ascending order on the associated field. Used in conjunction with an orderBy method
+   * such as orderByCreateTime.
+   *
+   * @return the builder
+   */
+  ExternalTaskClientBuilder asc();
+
+  /**
+   * Fluent API method to configure Descending order on the associated field. Used in conjunction with an orderBy method
+   * such as orderByCreateTime.
+   *
+   * @return the builder
+   */
+  ExternalTaskClientBuilder desc();
+
+  /**
    * Specifies the serialization format that is used to serialize objects when no specific
    * format is requested. This option defaults to application/json.
    *

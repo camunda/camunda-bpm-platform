@@ -48,6 +48,8 @@ public class DefaultConfigurationTest extends MockedTest {
     verify(clientBuilder, never()).workerId(anyString());
     verify(clientBuilder, never()).maxTasks(anyInt());
     verify(clientBuilder, never()).usePriority(anyBoolean());
+    verify(clientBuilder, never()).useCreateTime(anyBoolean());
+    verify(clientBuilder, never()).orderByCreateTime();
     verify(clientBuilder, never()).asyncResponseTimeout(anyLong());
     verify(clientBuilder, never()).disableAutoFetching();
     verify(clientBuilder, never()).disableBackoffStrategy();

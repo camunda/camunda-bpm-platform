@@ -37,6 +37,7 @@ public class LockedExternalTaskDto {
   protected String executionId;
   protected String id;
   protected Date lockExpirationTime;
+  private Date createTime;
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected String processDefinitionVersionTag;
@@ -68,6 +69,9 @@ public class LockedExternalTaskDto {
   }
   public Date getLockExpirationTime() {
     return lockExpirationTime;
+  }
+  public Date getCreateTime () {
+    return createTime;
   }
   public String getProcessDefinitionId() {
     return processDefinitionId;
@@ -125,6 +129,7 @@ public class LockedExternalTaskDto {
     dto.executionId = task.getExecutionId();
     dto.id = task.getId();
     dto.lockExpirationTime = task.getLockExpirationTime();
+    dto.createTime = task.getCreateTime();
     dto.processDefinitionId = task.getProcessDefinitionId();
     dto.processDefinitionKey = task.getProcessDefinitionKey();
     dto.processDefinitionVersionTag = task.getProcessDefinitionVersionTag();
@@ -160,6 +165,7 @@ public class LockedExternalTaskDto {
         + ", executionId=" + executionId
         + ", id=" + id
         + ", lockExpirationTime=" + lockExpirationTime
+        + ", createTime=" + createTime
         + ", processDefinitionId=" + processDefinitionId
         + ", processDefinitionKey=" + processDefinitionKey
         + ", processDefinitionVersionTag=" + processDefinitionVersionTag

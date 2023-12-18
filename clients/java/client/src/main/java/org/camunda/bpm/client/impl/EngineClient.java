@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.client.task.OrderingConfig;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.camunda.bpm.client.task.impl.dto.BpmnErrorRequestDto;
@@ -60,25 +61,30 @@ public class EngineClient {
   protected String workerId;
   protected int maxTasks;
   protected boolean usePriority;
+  protected OrderingConfig orderingConfig;
   protected Long asyncResponseTimeout;
   protected RequestExecutor engineInteraction;
   protected TypedValues typedValues;
 
   public EngineClient(String workerId, int maxTasks, Long asyncResponseTimeout, String baseUrl, RequestExecutor engineInteraction) {
-    this(workerId, maxTasks, asyncResponseTimeout, baseUrl, engineInteraction, true);
+    this(workerId, maxTasks, asyncResponseTimeout, baseUrl, engineInteraction, true, OrderingConfig.empty());
   }
 
-  public EngineClient(String workerId, int maxTasks, Long asyncResponseTimeout, String baseUrl, RequestExecutor engineInteraction, boolean usePriority) {
+  public EngineClient(String workerId, int maxTasks, Long asyncResponseTimeout, String baseUrl, RequestExecutor engineInteraction,
+                      boolean usePriority, OrderingConfig orderingConfig) {
     this.workerId = workerId;
     this.asyncResponseTimeout = asyncResponseTimeout;
     this.maxTasks = maxTasks;
     this.usePriority = usePriority;
     this.engineInteraction = engineInteraction;
     this.baseUrl = baseUrl;
+    this.orderingConfig = orderingConfig;
   }
 
   public List<ExternalTask> fetchAndLock(List<TopicRequestDto> topics)  {
-    FetchAndLockRequestDto payload = new FetchAndLockRequestDto(workerId, maxTasks, asyncResponseTimeout, topics, usePriority);
+    FetchAndLockRequestDto payload = new FetchAndLockRequestDto(workerId, maxTasks, asyncResponseTimeout,
+        topics, usePriority, orderingConfig);
+
     String resourceUrl = baseUrl + FETCH_AND_LOCK_RESOURCE_PATH;
     ExternalTask[] externalTasks = engineInteraction.postRequest(resourceUrl, payload, ExternalTaskImpl[].class);
     return Arrays.asList(externalTasks);

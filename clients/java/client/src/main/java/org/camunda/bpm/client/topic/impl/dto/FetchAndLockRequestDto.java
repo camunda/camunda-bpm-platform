@@ -17,10 +17,10 @@
 package org.camunda.bpm.client.topic.impl.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.camunda.bpm.client.impl.RequestDto;
-
-import java.util.ArrayList;
 import java.util.List;
+import org.camunda.bpm.client.impl.RequestDto;
+import org.camunda.bpm.client.task.OrderingConfig;
+import org.camunda.bpm.client.task.SortingDto;
 
 /**
  * @author Tassilo Weidner
@@ -31,18 +31,26 @@ public class FetchAndLockRequestDto extends RequestDto {
   protected int maxTasks;
   protected boolean usePriority;
   protected Long asyncResponseTimeout;
-  protected List<TopicRequestDto> topics = new ArrayList<>();
+  protected List<TopicRequestDto> topics;
+  protected List<SortingDto> sortings;
 
   public FetchAndLockRequestDto(String workerId, int maxTasks, Long asyncResponseTimeout, List<TopicRequestDto> topics) {
     this(workerId, maxTasks, asyncResponseTimeout, topics, true);
   }
 
-  public FetchAndLockRequestDto(String workerId, int maxTasks, Long asyncResponseTimeout, List<TopicRequestDto> topics, boolean usePriority) {
+  public FetchAndLockRequestDto(String workerId, int maxTasks, Long asyncResponseTimeout, List<TopicRequestDto> topics,
+                                boolean usePriority) {
+    this(workerId, maxTasks, asyncResponseTimeout, topics, usePriority, OrderingConfig.empty());
+  }
+
+  public FetchAndLockRequestDto(String workerId, int maxTasks, Long asyncResponseTimeout, List<TopicRequestDto> topics,
+                                boolean usePriority, OrderingConfig orderingConfig) {
     super(workerId);
     this.maxTasks = maxTasks;
     this.usePriority = usePriority;
     this.asyncResponseTimeout = asyncResponseTimeout;
     this.topics = topics;
+    this.sortings = orderingConfig.toSortingDtos();
   }
 
   public int getMaxTasks() {
@@ -59,6 +67,14 @@ public class FetchAndLockRequestDto extends RequestDto {
 
   public Long getAsyncResponseTimeout() {
     return asyncResponseTimeout;
+  }
+
+  public List<SortingDto> getSortings() {
+    return sortings;
+  }
+
+  public void setSortings(List<SortingDto> sortings) {
+    this.sortings = sortings;
   }
 
 }

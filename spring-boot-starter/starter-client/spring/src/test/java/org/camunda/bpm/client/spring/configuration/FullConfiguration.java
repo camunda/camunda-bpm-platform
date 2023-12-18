@@ -30,6 +30,8 @@ import static org.camunda.bpm.client.spring.annotation.ExternalTaskSubscription.
     maxTasks = 1111,
     workerId = "worker-id",
     usePriority = false,
+    useCreateTime = false,
+    orderByCreateTime = "asc",
     asyncResponseTimeout = 5555,
     disableAutoFetching = true,
     disableBackoffStrategy = true,

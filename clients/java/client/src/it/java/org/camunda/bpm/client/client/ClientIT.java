@@ -16,6 +16,26 @@
  */
 package org.camunda.bpm.client.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.camunda.bpm.client.util.ProcessModels.BPMN_ERROR_EXTERNAL_TASK_PROCESS;
+import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_PRIORITY;
+import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
+import static org.camunda.bpm.client.util.ProcessModels.TWO_PRIORITISED_EXTERNAL_TASKS_PROCESS;
+import static org.camunda.bpm.client.util.PropertyUtil.DEFAULT_PROPERTIES_PATH;
+import static org.camunda.bpm.client.util.PropertyUtil.loadProperties;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
 import org.camunda.bpm.client.backoff.BackoffStrategy;
@@ -30,6 +50,7 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.topic.TopicSubscription;
 import org.camunda.bpm.client.util.PropertyUtil;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -39,26 +60,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.client.util.ProcessModels.BPMN_ERROR_EXTERNAL_TASK_PROCESS;
-import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_PRIORITY;
-import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
-import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
-import static org.camunda.bpm.client.util.ProcessModels.TWO_PRIORITISED_EXTERNAL_TASKS_PROCESS;
-import static org.camunda.bpm.client.util.PropertyUtil.DEFAULT_PROPERTIES_PATH;
-import static org.camunda.bpm.client.util.PropertyUtil.loadProperties;
 
 /**
  * @author Tassilo Weidner
@@ -113,7 +114,7 @@ public class ClientIT {
       clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().size() == 1);
 
       // then
-      assertThat(handler.getHandledTasks().size()).isEqualTo(1);
+      assertThat(handler.getHandledTasks()).hasSize(1);
     }
     finally {
       if (client != null) {
@@ -142,7 +143,7 @@ public class ClientIT {
       clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().size() == 1);
 
       // then
-      assertThat(handler.getHandledTasks().size()).isEqualTo(1);
+      assertThat(handler.getHandledTasks()).hasSize(1);
     }
     finally {
       if (client != null) {
@@ -708,11 +709,9 @@ public class ClientIT {
     // then
     clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().size() == 2);
 
-    assertThat(handler.getHandledTasks().size()).isEqualTo(2);
-    assertThat(handler.getHandledTasks().get(0).getPriority())
-        .isGreaterThan(EXTERNAL_TASK_PRIORITY);
-    assertThat(handler.getHandledTasks().get(1).getPriority())
-        .isEqualTo(EXTERNAL_TASK_PRIORITY);
+    assertThat(handler.getHandledTasks()).hasSize(2);
+    assertThat(handler.getHandledTasks().get(0).getPriority()).isGreaterThan(EXTERNAL_TASK_PRIORITY);
+    assertThat(handler.getHandledTasks().get(1).getPriority()).isEqualTo(EXTERNAL_TASK_PRIORITY);
   }
 
   @Test
@@ -739,17 +738,372 @@ public class ClientIT {
 
       // then tasks are fetched in an arbitrary order
       // and a first low priority task can't be guaranteed
-      assertThat(handler.getHandledTasks().size()).isEqualTo(2);
-      assertThat(handler.getHandledTasks().get(0).getPriority())
-          .isGreaterThanOrEqualTo(EXTERNAL_TASK_PRIORITY);
-      assertThat(handler.getHandledTasks().get(1).getPriority())
-          .isGreaterThanOrEqualTo(EXTERNAL_TASK_PRIORITY);
+      assertThat(handler.getHandledTasks()).hasSize(2);
+      assertThat(handler.getHandledTasks().get(0).getPriority()).isGreaterThanOrEqualTo(EXTERNAL_TASK_PRIORITY);
+      assertThat(handler.getHandledTasks().get(1).getPriority()).isGreaterThanOrEqualTo(EXTERNAL_TASK_PRIORITY);
     }
     finally {
       if (client != null) {
         client.stop();
       }
     }
+  }
+
+  @Test
+  public void shouldUseDescOrderByDefaultOnFetchAndLockWithUseCreateTime() {
+    // given
+    String process1 = engineRule.deploy(TWO_PRIORITISED_EXTERNAL_TASKS_PROCESS).get(0).getId();
+
+    ExternalTaskClient client = null;
+
+    try {
+      engineRule.startProcessInstance(process1);
+      incrementClock(60_000);
+      engineRule.startProcessInstance(process1);
+      incrementClock(60_000);
+
+      client = ExternalTaskClient.create()
+          .baseUrl(" " + BASE_URL + " ")
+          .maxTasks(3)
+          .usePriority(false)
+          // when
+          .useCreateTime(true)
+          .build();
+
+      client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+          .handler(handler)
+          .open();
+
+      clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().size() == 4);
+
+      // then tasks are fetched in creation time DESC order
+      assertThat(handler.getHandledTasks()).hasSize(4);
+
+      var tasks = handler.getHandledTasks();
+
+      assertThat(tasks)
+          .extracting("createTime", Date.class)
+          .isSortedAccordingTo(Comparator.reverseOrder());
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
+  public void shouldUseDescOrderOnFetchAndLockWithUseCreateTimeDESC() {
+    String process1 = engineRule.deploy(TWO_PRIORITISED_EXTERNAL_TASKS_PROCESS).get(0).getId();
+
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      engineRule.startProcessInstance(process1);
+      incrementClock(60_000);
+      engineRule.startProcessInstance(process1);
+      incrementClock(60_000);
+
+      client = ExternalTaskClient.create()
+          .baseUrl(" " + BASE_URL + " ")
+          .maxTasks(3)
+          .usePriority(false)
+          // when
+          .orderByCreateTime().desc()
+          .build();
+
+      client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+          .handler(handler)
+          .open();
+
+      clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().size() == 4);
+
+      // then tasks are fetched in creation time DESC order
+      assertThat(handler.getHandledTasks()).hasSize(4);
+
+      var tasks = handler.getHandledTasks();
+
+      assertThat(tasks)
+          .extracting("createTime", Date.class)
+          .isSortedAccordingTo(Comparator.reverseOrder());
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
+  public void shouldUseAscOrderOnFetchAndLockWithUseCreateTimeASC() {
+    String process1 = engineRule.deploy(TWO_PRIORITISED_EXTERNAL_TASKS_PROCESS).get(0).getId();
+
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      engineRule.startProcessInstance(process1);
+      incrementClock(60_000);
+      engineRule.startProcessInstance(process1);
+      incrementClock(60_000);
+
+      client = ExternalTaskClient.create()
+          .baseUrl(" " + BASE_URL + " ")
+          .maxTasks(3)
+          .usePriority(false)
+          // when
+          .orderByCreateTime().asc()
+          .build();
+
+      client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+          .handler(handler)
+          .open();
+
+      clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().size() == 4);
+
+      // then tasks are fetched in creation time ASC order
+      assertThat(handler.getHandledTasks()).hasSize(4);
+
+      var tasks = handler.getHandledTasks();
+
+      assertThat(tasks)
+          .extracting("createTime", Date.class)
+          .isSortedAccordingTo(Comparator.naturalOrder());
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
+  public void shouldUseDescOrderOnFetchAndLockWithUseCreateTimeTrue() {
+    String process1 = engineRule.deploy(TWO_PRIORITISED_EXTERNAL_TASKS_PROCESS).get(0).getId();
+
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      engineRule.startProcessInstance(process1);
+      incrementClock(60_000);
+      engineRule.startProcessInstance(process1);
+      incrementClock(60_000);
+
+      client = ExternalTaskClient.create()
+          .baseUrl(" " + BASE_URL + " ")
+          .maxTasks(3)
+          .usePriority(false)
+          // when
+          .useCreateTime(true)
+          .build();
+
+      client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+          .handler(handler)
+          .open();
+
+      clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().size() == 4);
+
+      // then tasks are fetched in creation time DESC order
+      assertThat(handler.getHandledTasks()).hasSize(4);
+
+      var tasks = handler.getHandledTasks();
+
+      assertThat(tasks)
+          .extracting("createTime", Date.class)
+          .isSortedAccordingTo(Comparator.reverseOrder());
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
+  public void shouldUsePriorityOrderOnFetchAndLockWithUseCreateTimeFalse() {
+    String process1 = engineRule.deploy(TWO_PRIORITISED_EXTERNAL_TASKS_PROCESS).get(0).getId();
+
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      engineRule.startProcessInstance(process1);
+      incrementClock(60_000);
+      engineRule.startProcessInstance(process1);
+      incrementClock(60_000);
+
+      client = ExternalTaskClient.create()
+          .baseUrl(" " + BASE_URL + " ")
+          .maxTasks(3)
+          // when
+          .usePriority(true)
+          .useCreateTime(false)
+          .build();
+
+      client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+          .handler(handler)
+          .open();
+
+      clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().size() == 4);
+
+      // then tasks are fetched in creation time DESC order
+      assertThat(handler.getHandledTasks()).hasSize(4);
+
+      var tasks = handler.getHandledTasks();
+
+      assertThat(tasks)
+          .extracting("priority", Date.class)
+          .isSortedAccordingTo(Comparator.reverseOrder());
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
+  public void shouldUseCreateTimeDescOnPriorityEquality() {
+    String process1 = engineRule.deploy(TWO_PRIORITISED_EXTERNAL_TASKS_PROCESS).get(0).getId();
+
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      engineRule.startProcessInstance(process1);
+      incrementClock(60_000);
+      engineRule.startProcessInstance(process1);
+      incrementClock(60_000);
+
+      client = ExternalTaskClient.create()
+          .baseUrl(" " + BASE_URL + " ")
+          .maxTasks(3)
+          // when
+          .usePriority(true)
+          .orderByCreateTime().desc()
+          .build();
+
+      client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+          .handler(handler)
+          .open();
+
+      clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().size() == 4);
+
+      // then
+      assertThat(handler.getHandledTasks()).hasSize(4);
+
+      var tasks = handler.getHandledTasks();
+
+      // tasks are fetched ordered by priority; when priority is equal, create time DESC is used
+      assertThat(tasks.get(0).getPriority()).isEqualTo(EXTERNAL_TASK_PRIORITY + 1000L);
+      assertThat(tasks.get(1).getPriority()).isEqualTo(EXTERNAL_TASK_PRIORITY + 1000L);
+
+      // given the same priority (elements 0 & 1), their date should be Descending ordered
+      assertThat(tasks.get(0).getCreateTime()).isAfterOrEqualsTo(tasks.get(1).getCreateTime());
+
+      assertThat(tasks.get(2).getPriority()).isEqualTo(EXTERNAL_TASK_PRIORITY);
+      assertThat(tasks.get(3).getPriority()).isEqualTo(EXTERNAL_TASK_PRIORITY);
+
+      // given the same priority (elements 2 & 3), their date should be Descending ordered
+      assertThat(tasks.get(2).getCreateTime()).isAfterOrEqualsTo(tasks.get(3).getCreateTime());
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
+  public void shouldUseCreateTimeAscOnPriorityEquality() {
+    String process1 = engineRule.deploy(TWO_PRIORITISED_EXTERNAL_TASKS_PROCESS).get(0).getId();
+
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      engineRule.startProcessInstance(process1);
+      incrementClock(60_000);
+      engineRule.startProcessInstance(process1);
+      incrementClock(60_000);
+
+      client = ExternalTaskClient.create()
+          .baseUrl(" " + BASE_URL + " ")
+          .maxTasks(3)
+          // when
+          .usePriority(true)
+          .orderByCreateTime().asc()
+          .build();
+
+      client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+          .handler(handler)
+          .open();
+
+      clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().size() == 4);
+
+      assertThat(handler.getHandledTasks()).hasSize(4);
+
+      var tasks = handler.getHandledTasks();
+
+      // then
+
+      // tasks are fetched ordered by priority; when priority is equal, create time ASC is used
+      assertThat(tasks.get(0).getPriority()).isEqualTo(EXTERNAL_TASK_PRIORITY + 1000L);
+      assertThat(tasks.get(1).getPriority()).isEqualTo(EXTERNAL_TASK_PRIORITY + 1000L);
+
+      // given the same priority (elements 0 & 1), their date should be Ascending ordered
+      assertThat(tasks.get(0).getCreateTime()).isBeforeOrEqualsTo(tasks.get(1).getCreateTime());
+
+      assertThat(tasks.get(2).getPriority()).isEqualTo(EXTERNAL_TASK_PRIORITY);
+      assertThat(tasks.get(3).getPriority()).isEqualTo(EXTERNAL_TASK_PRIORITY);
+
+      // given the same priority (elements 2 & 3), their date should be Ascending ordered
+      assertThat(tasks.get(2).getCreateTime()).isBeforeOrEqualsTo(tasks.get(3).getCreateTime());
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
+  public void shouldThrowExceptionOnSubscribeWithNullOrderConfig() {
+    // when
+    assertThatThrownBy(() -> ExternalTaskClient.create()
+        .baseUrl("baseUrl")
+        .orderByCreateTime()
+        .build()
+    ) // then
+        .isInstanceOf(ExternalTaskClientException.class)
+        .hasMessage("Invalid query: call asc() or desc() after using orderByXX()");
+  }
+
+  @Test
+  public void shouldThrowExceptionOnInvalidOrderConfig() {
+    // when
+    assertThatThrownBy(() -> ExternalTaskClient.create()
+        .baseUrl("baseUrl")
+        .orderByCreateTime()
+        .desc()
+        .desc()
+        .build()
+    ) // then
+        .isInstanceOf(ExternalTaskClientException.class)
+        .hasMessage("Invalid query: can specify only one direction desc() or asc() for an ordering constraint");
+  }
+
+  @Test
+  public void shouldThrowExceptionOnMissingOrderbyConfig() {
+    // when
+    assertThatThrownBy(() -> ExternalTaskClient.create()
+        .baseUrl("baseUrl")
+        .asc()
+    ) // then
+        .isInstanceOf(ExternalTaskClientException.class)
+        .hasMessage("Invalid query: You should call any of the orderBy methods first before specifying a direction");
   }
 
   static class MyPojo {
@@ -764,6 +1118,11 @@ public class ClientIT {
       this.id = id;
     }
 
+  }
+
+  public void incrementClock(long seconds) {
+    long time = ClockUtil.getCurrentTime().getTime();
+    ClockUtil.setCurrentTime(new Date(time + seconds * 1000));
   }
 
 }

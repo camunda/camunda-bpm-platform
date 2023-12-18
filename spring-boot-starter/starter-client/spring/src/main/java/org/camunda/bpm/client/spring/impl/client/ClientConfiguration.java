@@ -16,11 +16,11 @@
  */
 package org.camunda.bpm.client.spring.impl.client;
 
-import org.camunda.bpm.client.spring.annotation.EnableExternalTaskClient;
-
 import static org.camunda.bpm.client.spring.annotation.EnableExternalTaskClient.INT_NULL_VALUE;
 import static org.camunda.bpm.client.spring.annotation.ExternalTaskSubscription.LONG_NULL_VALUE;
-import static org.camunda.bpm.client.spring.annotation.ExternalTaskSubscription.STRING_NULL_VALUE;
+
+import org.camunda.bpm.client.spring.annotation.EnableExternalTaskClient;
+import org.camunda.bpm.client.spring.annotation.ExternalTaskSubscription;
 
 public class ClientConfiguration {
 
@@ -28,6 +28,8 @@ public class ClientConfiguration {
   protected String workerId;
   protected Integer maxTasks;
   protected Boolean usePriority;
+  protected Boolean useCreateTime;
+  protected String orderByCreateTime;
   protected String defaultSerializationFormat;
   protected String dateFormat;
   protected Long asyncResponseTimeout;
@@ -99,6 +101,22 @@ public class ClientConfiguration {
     this.usePriority = usePriority;
   }
 
+  public String getOrderByCreateTime() {
+    return orderByCreateTime;
+  }
+
+  public void setOrderByCreateTime(String orderByCreateTime) {
+    this.orderByCreateTime = orderByCreateTime;
+  }
+
+  public Boolean getUseCreateTime() {
+    return useCreateTime;
+  }
+
+  public void setUseCreateTime(Boolean useCreateTime) {
+    this.useCreateTime = useCreateTime;
+  }
+
   public Boolean getDisableAutoFetching() {
     return disableAutoFetching;
   }
@@ -127,6 +145,9 @@ public class ClientConfiguration {
 
     setUsePriority(annotation.usePriority());
 
+    setUseCreateTime(annotation.useCreateTime());
+    configureOrderByCreateTime(annotation);
+
     long asyncResponseTimeout = annotation.asyncResponseTimeout();
     setAsyncResponseTimeout(isNull(asyncResponseTimeout) ? null : asyncResponseTimeout);
 
@@ -144,8 +165,16 @@ public class ClientConfiguration {
     setDefaultSerializationFormat(isNull(serializationFormat) ? null : serializationFormat);
   }
 
+  protected void configureOrderByCreateTime(EnableExternalTaskClient annotation) {
+    if (EnableExternalTaskClient.STRING_NULL_VALUE.equals(annotation.orderByCreateTime())) {
+      setOrderByCreateTime(null);
+    } else {
+      setOrderByCreateTime(annotation.orderByCreateTime());
+    }
+  }
+
   protected static boolean isNull(String value) {
-    return STRING_NULL_VALUE.equals(value);
+    return ExternalTaskSubscription.STRING_NULL_VALUE.equals(value);
   }
 
   protected static boolean isNull(long value) {

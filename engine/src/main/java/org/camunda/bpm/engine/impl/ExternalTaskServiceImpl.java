@@ -18,13 +18,24 @@ package org.camunda.bpm.engine.impl;
 
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
+import org.camunda.bpm.engine.externaltask.FetchAndLockBuilder;
+import org.camunda.bpm.engine.impl.externaltask.FetchAndLockBuilderImpl;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesSelectBuilder;
-import org.camunda.bpm.engine.impl.cmd.*;
+import org.camunda.bpm.engine.impl.cmd.CompleteExternalTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.ExtendLockOnExternalTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.GetExternalTaskErrorDetailsCmd;
+import org.camunda.bpm.engine.impl.cmd.GetTopicNamesCmd;
+import org.camunda.bpm.engine.impl.cmd.HandleExternalTaskBpmnErrorCmd;
+import org.camunda.bpm.engine.impl.cmd.HandleExternalTaskFailureCmd;
+import org.camunda.bpm.engine.impl.cmd.LockExternalTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.SetExternalTaskPriorityCmd;
+import org.camunda.bpm.engine.impl.cmd.SetExternalTaskRetriesCmd;
+import org.camunda.bpm.engine.impl.cmd.UnlockExternalTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.UpdateExternalTaskRetriesBuilderImpl;
 import org.camunda.bpm.engine.impl.externaltask.ExternalTaskQueryTopicBuilderImpl;
 
 /**
@@ -42,6 +53,11 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
   @Override
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority) {
     return new ExternalTaskQueryTopicBuilderImpl(commandExecutor, workerId, maxTasks, usePriority);
+  }
+
+  @Override
+  public FetchAndLockBuilder fetchAndLock() {
+    return new FetchAndLockBuilderImpl(commandExecutor);
   }
 
   @Override

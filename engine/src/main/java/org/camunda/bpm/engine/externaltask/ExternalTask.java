@@ -51,6 +51,12 @@ public interface ExternalTask {
   Date getLockExpirationTime();
 
   /**
+   * @return the absolute time at which the task was created
+   * @return
+   */
+  Date getCreateTime();
+
+  /**
    * @return the id of the process instance the task exists in
    */
   String getProcessInstanceId();

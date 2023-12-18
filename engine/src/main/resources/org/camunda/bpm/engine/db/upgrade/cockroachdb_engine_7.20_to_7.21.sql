@@ -15,5 +15,10 @@
 -- limitations under the License.
 --
 
+-- table writes should ideally come after schema changes, see https://github.com/cockroachdb/cockroach/pull/58182
+
+alter table ACT_RU_EXT_TASK
+  add column CREATE_TIME_ timestamp;
+
 insert into ACT_GE_SCHEMA_LOG
 values ('1000', CURRENT_TIMESTAMP, '7.21.0');
