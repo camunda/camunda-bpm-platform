@@ -1103,7 +1103,7 @@ public class ClientIT {
         .asc()
     ) // then
         .isInstanceOf(ExternalTaskClientException.class)
-        .hasMessage("You should call any of the orderBy methods first before specifying a direction");
+        .hasMessage("Invalid query: You should call any of the orderBy methods first before specifying a direction");
   }
 
   static class MyPojo {
