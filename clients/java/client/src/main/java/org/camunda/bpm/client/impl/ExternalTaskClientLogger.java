@@ -86,6 +86,20 @@ public class ExternalTaskClientLogger extends BaseLogger {
     return new ExternalTaskClientException(exceptionMessage("002", "Cannot get hostname"), cause);
   }
 
+  public ExternalTaskClientException doubleDirectionConfigException() {
+    return new ExternalTaskClientException(
+        "Invalid query: can specify only one direction desc() or asc() for an ordering constraint");
+  }
+
+  public ExternalTaskClientException unspecifiedOrderByMethodException() {
+    return new ExternalTaskClientException(
+        "Invalid query: You should call any of the orderBy methods first before specifying a direction");
+  }
+
+  public ExternalTaskClientException missingDirectionException() {
+    return new ExternalTaskClientException("Invalid query: call asc() or desc() after using orderByXX()");
+  }
+
   public ExternalTaskClientException topicNameNullException() {
     return new ExternalTaskClientException(exceptionMessage(
       "003", "Topic name cannot be null"));

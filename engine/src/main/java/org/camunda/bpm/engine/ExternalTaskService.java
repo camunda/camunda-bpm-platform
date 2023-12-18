@@ -18,7 +18,6 @@ package org.camunda.bpm.engine;
 
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
@@ -27,6 +26,7 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
+import org.camunda.bpm.engine.externaltask.FetchAndLockBuilder;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesBuilder;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesSelectBuilder;
 
@@ -92,6 +92,14 @@ public interface ExternalTaskService {
    * @return a builder to define and execute an external task fetching operation
    */
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority);
+
+  /**
+   * Fetch and Lock method which allows the configuration of all parameters through a Fluent API.
+   * Configuration options of the builder allow for extra sorting options such as sorting by createTime.
+   *
+   * @return a builder to define and execute an external task fetching operation
+   */
+  public FetchAndLockBuilder fetchAndLock();
 
   /**
    * <p>Lock an external task on behalf of a worker.

@@ -31,6 +31,7 @@
     <result property="errorDetailsByteArrayId" column="ERROR_DETAILS_ID_" jdbcType="VARCHAR" />
 
     <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
@@ -57,6 +58,7 @@
       WORKER_ID_,
       TOPIC_NAME_,
       LOCK_EXP_TIME_,
+      CREATE_TIME_,
       RETRIES_,
       ERROR_MSG_,
       ERROR_DETAILS_ID_,
@@ -76,6 +78,7 @@
       #{workerId, jdbcType=VARCHAR},
       #{topicName, jdbcType=VARCHAR},
       #{lockExpirationTime, jdbcType=TIMESTAMP},
+      #{createTime, jdbcType=TIMESTAMP},
       #{retries, jdbcType=INTEGER},
       #{errorMessage, jdbcType=VARCHAR},
       #{errorDetailsByteArrayId, jdbcType=VARCHAR},
@@ -442,6 +445,7 @@
     RES.TOPIC_NAME_, 
     RES.WORKER_ID_, 
     RES.LOCK_EXP_TIME_,
+    RES.CREATE_TIME_,
     RES.RETRIES_,
     RES.ERROR_MSG_,
     RES.ERROR_DETAILS_ID_,

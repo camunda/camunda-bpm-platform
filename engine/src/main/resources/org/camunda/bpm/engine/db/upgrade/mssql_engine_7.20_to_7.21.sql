@@ -18,6 +18,8 @@
 insert into ACT_GE_SCHEMA_LOG
 values ('1000', CURRENT_TIMESTAMP, '7.21.0');
 
---
+alter table ACT_RU_EXT_TASK
+  add CREATE_TIME_ datetime2;
+
 ALTER TABLE ACT_RU_JOB
   ADD ROOT_PROCESS_INSTANCE_ID_ nvarchar(64);

@@ -122,6 +122,20 @@ public class CollectionUtil {
     return result;
   }
 
+  public static <T> T getLastElement(final Iterable<T> elements) {
+    T lastElement = null;
+
+    if (elements instanceof List) {
+      return ((List<T>) elements).get(((List<T>) elements).size() - 1);
+    }
+
+    for (T element : elements) {
+      lastElement = element;
+    }
+
+    return lastElement;
+  }
+
   public static boolean isEmpty(Collection<?> collection) {
     return collection == null || collection.isEmpty();
   }

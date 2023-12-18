@@ -33,6 +33,10 @@
                            {
                              "sortBy": "lockExpirationTime",
                              "sortOrder": "desc"
+                           },
+                           {
+                             "sortBy": "createTime",
+                             "sortOrder": "asc"
                            }
                          ]
                        }
