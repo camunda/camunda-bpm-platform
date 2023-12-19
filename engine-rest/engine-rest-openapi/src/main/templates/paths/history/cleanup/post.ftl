@@ -46,11 +46,11 @@
                          "executionId": null,
                          "exceptionMessage": null,
                          "retries": 3,
-                         "dueDate": "2017-04-06T13:57:45.000+0200",
+                         "dueDate": "2017-04-06T13:57:45.000+02:00",
                          "suspended": false,
                          "priority": 0,
                          "tenantId": null,
-                         "createTime": "2017-04-01T09:45:15.039+0100"
+                         "createTime": "2017-04-01T09:45:15.039+01:00"
                        }
                      }']
     />

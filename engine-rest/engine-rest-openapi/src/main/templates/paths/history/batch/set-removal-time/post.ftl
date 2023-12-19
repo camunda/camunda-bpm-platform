@@ -19,7 +19,7 @@
       examples = ['"example-1": {
                      "summary": "POST `/history/batch/set-removal-time`",
                      "value": {
-                       "absoluteRemovalTime": "2019-05-05T11:56:24.725+0200",
+                       "absoluteRemovalTime": "2019-05-05T11:56:24.725+02:00",
                        "historicBatchQuery": {
                          "completed": true
                        },

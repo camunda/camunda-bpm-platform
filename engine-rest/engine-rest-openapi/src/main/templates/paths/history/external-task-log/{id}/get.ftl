@@ -32,7 +32,7 @@
                        "description": "GET `/history/external-task-log/someId`",
                        "value": {
                          "id": "someId",
-                         "timestamp": "2017-01-15T15:22:20.000+0200",
+                         "timestamp": "2017-01-15T15:22:20.000+02:00",
                          "externalTaskId": "anExternalTaskId",
                          "topicName": "aTopicName",
                          "workerId": "aWorkerId",
@@ -50,7 +50,7 @@
                          "failureLog": true,
                          "successLog": false,
                          "deletionLog": false,
-                         "removalTime": "2018-02-10T14:33:19.000+0200",
+                         "removalTime": "2018-02-10T14:33:19.000+02:00",
                          "rootProcessInstanceId": "aRootProcessInstanceId"
                        }
                      }']

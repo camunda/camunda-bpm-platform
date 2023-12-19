@@ -19,9 +19,9 @@
                        "summary": "GET `/history/cleanup/configuration`",
                        "description": "GET `/history/cleanup/configuration`",
                        "value": {
-                         "batchWindowStartTime": "2017-09-11T23:59:00.000+0200",
-                         "batchWindowEndTime": "2017-09-12T02:00:00.000+0200",
-                         "enabled": "true"
+                         "batchWindowStartTime": "2017-09-11T23:59:00.000+02:00",
+                         "batchWindowEndTime": "2017-09-12T02:00:00.000+02:00",
+                         "enabled": true
                        }
                      }']
         last = true

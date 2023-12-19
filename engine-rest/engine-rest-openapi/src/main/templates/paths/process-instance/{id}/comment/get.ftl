@@ -34,9 +34,9 @@
                            "userId": "userId",
                            "taskId": "aTaskId",
                            "processInstanceId": "aProcessInstanceId",
-                           "time": "2013-01-02T21:37:03.764+0200",
+                           "time": "2013-01-02T21:37:03.764+02:00",
                            "message": "message",
-                           "removalTime": "2018-02-10T14:33:19.000+0200",
+                           "removalTime": "2018-02-10T14:33:19.000+02:00",
                            "rootProcessInstanceId": "aRootProcessInstanceId"
                          },
                          {
@@ -44,9 +44,9 @@
                            "userId": "anotherUserId",
                            "taskId": "aTaskId",
                            "processInstanceId": "aProcessInstanceId",
-                           "time": "2013-02-23T20:37:43.975+0200",
+                           "time": "2013-02-23T20:37:43.975+02:00",
                            "message": "anotherMessage",
-                           "removalTime": "2018-02-10T14:33:19.000+0200",
+                           "removalTime": "2018-02-10T14:33:19.000+02:00",
                            "rootProcessInstanceId": "aRootProcessInstanceId"
                          },
                          {
@@ -54,9 +54,9 @@
                            "userId": "yetAnotherUserId",
                            "taskId": "aTaskId",
                            "processInstanceId": "aProcessInstanceId",
-                           "time": "2013-04-21T10:15:23.764+0200",
+                           "time": "2013-04-21T10:15:23.764+02:00",
                            "message": "yetAnotherMessage",
-                           "removalTime": "2018-02-10T14:33:19.000+0200",
+                           "removalTime": "2018-02-10T14:33:19.000+02:00",
                            "rootProcessInstanceId": "aRootProcessInstanceId"
                          }
                        ]

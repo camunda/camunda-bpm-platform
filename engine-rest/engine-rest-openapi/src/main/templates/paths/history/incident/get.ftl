@@ -42,7 +42,7 @@
                            "processDefinitionId": "aProcDefId",
                            "processInstanceId": "aProcInstId",
                            "executionId": "anExecutionId",
-                           "createTime": "2014-03-01T08:00:00.000+0200",
+                           "createTime": "2014-03-01T08:00:00.000+02:00",
                            "endTime": null,
                            "incidentType": "failedJob",
                            "activityId": "serviceTask",
@@ -65,8 +65,8 @@
                            "processDefinitionId": "aProcDefId",
                            "processInstanceId": "aProcInstId",
                            "executionId": "anotherExecutionId",
-                           "createTime": "2014-03-01T08:00:00.000+0200",
-                           "endTime": "2014-03-10T12:00:00.000+0200",
+                           "createTime": "2014-03-01T08:00:00.000+02:00",
+                           "endTime": "2014-03-10T12:00:00.000+02:00",
                            "incidentType": "customIncidentType",
                            "activityId": "userTask",
                            "failedActivityId": "userTask",
@@ -79,7 +79,7 @@
                            "open": false,
                            "deleted": false,
                            "resolved": true,
-                           "removalTime": "2018-02-10T14:33:19.000+0200",
+                           "removalTime": "2018-02-10T14:33:19.000+02:00",
                            "rootProcessInstanceId": "aRootProcessInstanceId",
                            "annotation": "another annotation"
                          }

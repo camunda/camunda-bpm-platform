@@ -43,7 +43,7 @@
                          "groupId": null,
                          "resourceType": 1,
                          "resourceId": "*",
-                         "removalTime": "2018-02-10T14:33:19.000+0200",
+                         "removalTime": "2018-02-10T14:33:19.000+02:00",
                          "rootProcessInstanceId": "f8259e5d-ab9d-11e8-8449-e4a7a094a9d6",
                          "links":[
                            {"method": "GET", href":"http://localhost:8080/engine-rest/authorization/anAuthorizationId", "rel":"self"},

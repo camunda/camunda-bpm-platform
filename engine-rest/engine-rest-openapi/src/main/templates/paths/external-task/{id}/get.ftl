@@ -33,7 +33,7 @@
                          "errorMessage": "anErrorMessage",
                          "executionId": "anExecutionId",
                          "id": "anExternalTaskId",
-                         "lockExpirationTime": "2015-10-06T16:34:42.000+0200",
+                         "lockExpirationTime": "2015-10-06T16:34:42.000+02:00",
                          "processDefinitionId": "aProcessDefinitionId",
                          "processDefinitionKey": "aProcessDefinitionKey",
                          "processInstanceId": "aProcessInstanceId",

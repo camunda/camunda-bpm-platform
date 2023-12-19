@@ -26,29 +26,29 @@
   <@lib.parameter name = "processInstanceBusinessKeyExpression"
       location = "query"
       type = "string"
-      desc = "Restrict to tasks that belong to process instances with the given business key which 
-              is described by an expression. See the 
+      desc = "Restrict to tasks that belong to process instances with the given business key which
+              is described by an expression. See the
               [user guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions)
               for more information on available functions." />
 
   <@lib.parameter name = "processInstanceBusinessKeyIn"
       location = "query"
       type = "string"
-      desc = "Restrict to tasks that belong to process instances with one of the give business keys. 
+      desc = "Restrict to tasks that belong to process instances with one of the give business keys.
               The keys need to be in a comma-separated list." />
 
   <@lib.parameter name = "processInstanceBusinessKeyLike"
       location = "query"
       type = "string"
-      desc = "Restrict to tasks that have a process instance business key that has the parameter 
+      desc = "Restrict to tasks that have a process instance business key that has the parameter
               value as a substring." />
 
   <@lib.parameter name = "processInstanceBusinessKeyLikeExpression"
       location = "query"
       type = "string"
-      desc = "Restrict to tasks that have a process instance business key that has the parameter 
+      desc = "Restrict to tasks that have a process instance business key that has the parameter
               value as a substring and is described by an expression. See the
-              [user guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions) 
+              [user guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions)
               for more information on available functions." />
 
   <@lib.parameter name = "processDefinitionId"
@@ -64,7 +64,7 @@
   <@lib.parameter name = "processDefinitionKeyIn"
       location = "query"
       type = "string"
-      desc = "Restrict to tasks that belong to a process definition with one of the given keys. The 
+      desc = "Restrict to tasks that belong to a process definition with one of the given keys. The
               keys need to be in a comma-separated list." />
 
   <@lib.parameter name = "processDefinitionName"
@@ -75,7 +75,7 @@
   <@lib.parameter name = "processDefinitionNameLike"
       location = "query"
       type = "string"
-      desc = "Restrict to tasks that have a process definition name that has the parameter value as 
+      desc = "Restrict to tasks that have a process definition name that has the parameter value as
               a substring." />
 
   <@lib.parameter name = "executionId"
@@ -96,7 +96,7 @@
   <@lib.parameter name = "caseInstanceBusinessKeyLike"
       location = "query"
       type = "string"
-      desc = "Restrict to tasks that have a case instance business key that has the parameter value 
+      desc = "Restrict to tasks that have a case instance business key that has the parameter value
               as a substring." />
 
   <@lib.parameter name = "caseDefinitionId"
@@ -117,7 +117,7 @@
   <@lib.parameter name = "caseDefinitionNameLike"
       location = "query"
       type = "string"
-      desc = "Restrict to tasks that have a case definition name that has the parameter value as a 
+      desc = "Restrict to tasks that have a case definition name that has the parameter value as a
               substring." />
 
   <@lib.parameter name = "caseExecutionId"
@@ -128,20 +128,20 @@
   <@lib.parameter name = "activityInstanceIdIn"
       location = "query"
       type = "string"
-      desc = "Only include tasks which belong to one of the passed and comma-separated activity 
+      desc = "Only include tasks which belong to one of the passed and comma-separated activity
               instance ids." />
 
   <@lib.parameter name = "tenantIdIn"
       location = "query"
       type = "string"
-      desc = "Only include tasks which belong to one of the passed and comma-separated 
+      desc = "Only include tasks which belong to one of the passed and comma-separated
               tenant ids." />
 
   <@lib.parameter name = "withoutTenantId"
       location = "query"
       type = "boolean"
       defaultValue = "false"
-      desc = "Only include tasks which belong to no tenant. Value may only be `true`, 
+      desc = "Only include tasks which belong to no tenant. Value may only be `true`,
               as `false` is the default behavior." />
 
   <@lib.parameter name = "assignee"
@@ -152,29 +152,29 @@
   <@lib.parameter name = "assigneeExpression"
       location = "query"
       type = "string"
-      desc = "Restrict to tasks that the user described by the given expression is assigned to. 
-              See the 
-              [user guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions) 
+      desc = "Restrict to tasks that the user described by the given expression is assigned to.
+              See the
+              [user guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions)
               for more information on available functions." />
 
   <@lib.parameter name = "assigneeLike"
       location = "query"
       type = "string"
-      desc = "Restrict to tasks that have an assignee that has the parameter 
+      desc = "Restrict to tasks that have an assignee that has the parameter
               value as a substring." />
 
   <@lib.parameter name = "assigneeLikeExpression"
       location = "query"
       type = "string"
-      desc = "Restrict to tasks that have an assignee that has the parameter value described by the 
-              given expression as a substring. See the 
-              [user guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions) 
+      desc = "Restrict to tasks that have an assignee that has the parameter value described by the
+              given expression as a substring. See the
+              [user guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions)
               for more information on available functions." />
 
   <@lib.parameter name = "assigneeIn"
       location = "query"
       type = "string"
-      desc = "Only include tasks which are assigned to one of the passed and 
+      desc = "Only include tasks which are assigned to one of the passed and
               comma-separated user ids." />
 
   <@lib.parameter name = "assigneeNotIn"
@@ -191,8 +191,8 @@
   <@lib.parameter name = "ownerExpression"
       location = "query"
       type = "string"
-      desc = "Restrict to tasks that the user described by the given expression owns. See the 
-              [user guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions) 
+      desc = "Restrict to tasks that the user described by the given expression owns. See the
+              [user guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions)
               for more information on available functions." />
 
   <@lib.parameter name = "candidateGroup"
@@ -203,9 +203,9 @@
   <@lib.parameter name = "candidateGroupExpression"
       location = "query"
       type = "string"
-      desc = "Only include tasks that are offered to the group described by the given expression. 
-              See the 
-              [user guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions) 
+      desc = "Only include tasks that are offered to the group described by the given expression.
+              See the
+              [user guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions)
               for more information on available functions." />
 
   <@lib.parameter name = "candidateUser"
@@ -216,23 +216,23 @@
   <@lib.parameter name = "candidateUserExpression"
       location = "query"
       type = "string"
-      desc = "Only include tasks that are offered to the user described by the given expression. 
-              See the 
-              [user guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions) 
+      desc = "Only include tasks that are offered to the user described by the given expression.
+              See the
+              [user guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions)
               for more information on available functions." />
 
   <@lib.parameter name = "includeAssignedTasks"
       location = "query"
       type = "boolean"
       defaultValue = "false"
-      desc = "Also include tasks that are assigned to users in candidate queries. Default is to only 
+      desc = "Also include tasks that are assigned to users in candidate queries. Default is to only
               include tasks that are not assigned to any user if you query by candidate user or
               group(s)." />
 
   <@lib.parameter name = "involvedUser"
       location = "query"
       type = "string"
-      desc = "Only include tasks that the given user is involved in. A user is involved in a task if 
+      desc = "Only include tasks that the given user is involved in. A user is involved in a task if
               an identity link exists between task and user (e.g., the user is the assignee)." />
 
   <@lib.parameter name = "involvedUserExpression"
@@ -325,7 +325,7 @@
       desc = "Restrict to tasks that are due on the given date. By
               [default](${docsUrl}/reference/rest/overview/date-format/), the date must have the
               format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g.,
-              `2013-01-23T14:42:45.546+0200`." />
+              `2013-01-23T14:42:45.546+02:00`." />
 
   <@lib.parameter name = "dueDateExpression"
       location = "query"
@@ -341,7 +341,7 @@
       desc = "Restrict to tasks that are due after the given date. By
               [default](${docsUrl}/reference/rest/overview/date-format/), the date must have
               the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g.,
-              `2013-01-23T14:42:45.435+0200`." />
+              `2013-01-23T14:42:45.435+02:00`." />
 
   <@lib.parameter name = "dueAfterExpression"
       location = "query"
@@ -358,7 +358,7 @@
       desc = "Restrict to tasks that are due before the given date. By
               [default](${docsUrl}/reference/rest/overview/date-format/), the date must have
               the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g.,
-              `2013-01-23T14:42:45.243+0200`." />
+              `2013-01-23T14:42:45.243+02:00`." />
 
   <@lib.parameter name = "dueBeforeExpression"
       location = "query"
@@ -373,7 +373,7 @@
       location = "query"
       type = "boolean"
       defaultValue = "false"
-      desc = "Only include tasks which have no due date. Value may only be `true`, 
+      desc = "Only include tasks which have no due date. Value may only be `true`,
               as `false` is the default behavior." />
 
   <@lib.parameter name = "followUpDate"
@@ -382,7 +382,7 @@
       desc = "Restrict to tasks that have a followUp date on the given date. By
               [default](${docsUrl}/reference/rest/overview/date-format/), the date
               must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g.,
-              `2013-01-23T14:42:45.342+0200`." />
+              `2013-01-23T14:42:45.342+02:00`." />
 
   <@lib.parameter name = "followUpDateExpression"
       location = "query"
@@ -399,7 +399,7 @@
       desc = "Restrict to tasks that have a followUp date after the given date. By
               [default](${docsUrl}/reference/rest/overview/date-format/), the
               date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g.,
-              `2013-01-23T14:42:45.542+0200`." />
+              `2013-01-23T14:42:45.542+02:00`." />
 
   <@lib.parameter name = "followUpAfterExpression"
       location = "query"
@@ -416,7 +416,7 @@
       desc = "Restrict to tasks that have a followUp date before the given date. By
               [default](${docsUrl}/reference/rest/overview/date-format/), the
               date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g.,
-              `2013-01-23T14:42:45.234+0200`." />
+              `2013-01-23T14:42:45.234+02:00`." />
 
   <@lib.parameter name = "followUpBeforeExpression"
       location = "query"
@@ -432,7 +432,7 @@
       type = "string"
       desc = "Restrict to tasks that have no followUp date or a followUp date before the given date.
               By [default](${docsUrl}/reference/rest/overview/date-format/), the date must have the
-              format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.432+0200`. The
+              format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.432+02:00`. The
               typical use case is to query all `active` tasks for a user for a given date." />
 
   <@lib.parameter name = "followUpBeforeOrNotExistentExpression"
@@ -449,7 +449,7 @@
       type = "string"
       desc = "Restrict to tasks that were created on the given date. By
               [default](${docsUrl}/reference/rest/overview/date-format/), the date must have
-              the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.324+0200`." />
+              the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.324+02:00`." />
 
   <@lib.parameter name = "createdOnExpression"
       location = "query"
@@ -465,7 +465,7 @@
       type = "string"
       desc = "Restrict to tasks that were created after the given date. By
               [default](${docsUrl}/reference/rest/overview/date-format/), the date must have the
-              format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.342+0200`." />
+              format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.342+02:00`." />
 
   <@lib.parameter name = "createdAfterExpression"
       location = "query"
@@ -481,7 +481,7 @@
       type = "string"
       desc = "Restrict to tasks that were created before the given date. By
               [default](${docsUrl}/reference/rest/overview/date-format/), the date must have the
-              format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.332+0200`." />
+              format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.332+02:00`." />
 
   <@lib.parameter name = "createdBeforeExpression"
       location = "query"
@@ -495,15 +495,15 @@
   <@lib.parameter name = "updatedAfter"
       location = "query"
       type = "string"
-      desc = "Restrict to tasks that were updated after the given date. Every action that fires 
+      desc = "Restrict to tasks that were updated after the given date. Every action that fires
               a [task update event](${docsUrl}/user-guide/process-engine/delegation-code/#task-listener-event-lifecycle) is considered as updating the task.
               By [default](${docsUrl}/reference/rest/overview/date-format/), the date must
-              have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.332+0200`." />
+              have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.332+02:00`." />
 
   <@lib.parameter name = "updatedAfterExpression"
       location = "query"
       type = "string"
-      desc = "Restrict to tasks that were updated after the date described by the given expression. Every action that fires 
+      desc = "Restrict to tasks that were updated after the date described by the given expression. Every action that fires
               a [task update event](${docsUrl}/user-guide/process-engine/delegation-code/#task-listener-event-lifecycle) is considered as updating the task.
               See the
               [user guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions)
@@ -598,7 +598,7 @@
   <@lib.parameter name = "processVariables"
       location = "query"
       type = "string"
-      desc = "Only include tasks that belong to process instances that have variables with certain 
+      desc = "Only include tasks that belong to process instances that have variables with certain
               values. Variable filtering expressions are comma-separated and are structured as
               follows:
 

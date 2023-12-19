@@ -16,9 +16,9 @@
                   '"example-1": {
                      "summary": "POST `/history/process-instance/count`",
                      "value": {
-                                "finishedAfter": "2013-01-01T00:00:00.000+0200",
-                                "finishedBefore": "2013-04-01T23:59:59.000+0200",
-                                "executedActivityAfter": "2013-03-23T13:42:44.000+0200",
+                                "finishedAfter": "2013-01-01T00:00:00.000+02:00",
+                                "finishedBefore": "2013-04-01T23:59:59.000+02:00",
+                                "executedActivityAfter": "2013-03-23T13:42:44.000+02:00",
                                 "variables": [
                                   {
                                     "name": "myVariable",

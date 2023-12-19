@@ -37,7 +37,7 @@
                        "value": [
                          {
                            "id": "1",
-                           "time": "2014-03-01T08:00:00.000+0200",
+                           "time": "2014-03-01T08:00:00.000+02:00",
                            "type": "candidate",
                            "userId": "aUserId",
                            "groupId": "aGroupId",
@@ -47,12 +47,12 @@
                            "assignerId": "aAssignerId",
                            "processDefinitionKey": "oneTaskProcess",
                            "tenantId": "tenant1",
-                           "removalTime": "2018-02-10T14:33:19.000+0200",
+                           "removalTime": "2018-02-10T14:33:19.000+02:00",
                            "rootProcessInstanceId": "aRootProcessInstanceId"
                          },
                          {
                            "id": "2",
-                           "time": "2014-03-05T10:00:00.000+0200",
+                           "time": "2014-03-05T10:00:00.000+02:00",
                            "type": "candidate",
                            "userId": "aUserId",
                            "groupId": "aGroupId",
@@ -62,7 +62,7 @@
                            "assignerId": "aAssignerId",
                            "processDefinitionKey": "oneTaskProcess",
                            "tenantId": "tenant1",
-                           "removalTime": "2018-02-10T14:33:19.000+0200",
+                           "removalTime": "2018-02-10T14:33:19.000+02:00",
                            "rootProcessInstanceId": "aRootProcessInstanceId"
                          }
                        ]

@@ -31,7 +31,7 @@
               Only selects process definitions that have been deployed after (exclusive) a specific time.
               By [default](${docsUrl}/reference/rest/overview/date-format/), the date must have the
               format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g.,
-              `2013-01-23T14:42:45.546+0200`."/>
+              `2013-01-23T14:42:45.546+02:00`."/>
 
   <@lib.parameter name = "deployedAt"
       location = "query"
@@ -41,7 +41,7 @@
               Only selects process definitions that have been deployed at a specific time (exact match).
               By [default](${docsUrl}/reference/rest/overview/date-format/), the date must have the
               format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g.,
-              `2013-01-23T14:42:45.546+0200`."/>
+              `2013-01-23T14:42:45.546+02:00`."/>
 
   <@lib.parameter name = "key"
       location = "query"

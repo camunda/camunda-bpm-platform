@@ -36,7 +36,7 @@
                           "executionId":"anExecutionId",
                           "processInstanceId":"aProcessInstanceId",
                           "activityId":"anActivityId",
-                          "createdDate":"2020-04-20T15:23:12.229+0200",
+                          "createdDate":"2020-04-20T15:23:12.229+02:00",
                           "tenantId":null
                           },
                           {
@@ -46,7 +46,7 @@
                           "executionId":"anotherExecutionId",
                           "processInstanceId":"anotherProcessInstanceId",
                           "activityId":"anotherActivityId",
-                          "createdDate":"2020-04-20T15:20:12.229+0200",
+                          "createdDate":"2020-04-20T15:20:12.229+02:00",
                           "tenantId":null
                         }
                       ]

@@ -60,7 +60,7 @@
     format = "date-time"
     desc = "Restricts to all deployments after the given date.
             By [default](${docsUrl}/reference/rest/overview/date-format/), the date must have the format
-            `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`."/>
+            `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+02:00`."/>
 
 <@lib.parameter
     name = "before"
@@ -70,4 +70,4 @@
     last = last
     desc = "Restricts to all deployments before the given date.
             By [default](${docsUrl}/reference/rest/overview/date-format/), the date must have the format
-            `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`."/>
+            `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+02:00`."/>

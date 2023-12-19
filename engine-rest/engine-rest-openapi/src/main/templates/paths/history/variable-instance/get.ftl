@@ -57,8 +57,8 @@
                            "tenantId": null,
                            "errorMessage": null,
                            "state": "CREATED",
-                           "createTime": "2017-02-10T14:33:19.000+0200",
-                           "removalTime": "2018-02-10T14:33:19.000+0200",
+                           "createTime": "2017-02-10T14:33:19.000+02:00",
+                           "removalTime": "2018-02-10T14:33:19.000+02:00",
                            "rootProcessInstanceId": "aRootProcessInstanceId"
                          }
                        ]

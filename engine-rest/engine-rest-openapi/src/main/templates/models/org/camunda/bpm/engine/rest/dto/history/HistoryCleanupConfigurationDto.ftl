@@ -3,7 +3,7 @@
 <@lib.dto >
     <#assign dateFormatDescription="By [default](${docsUrl}/reference/rest/overview/date-format/),
                                     the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`,
-                                    e.g., `2013-01-23T14:42:45.000+0200`."
+                                    e.g., `2013-01-23T14:42:45.000+02:00`."
     />
     <@lib.property
         name = "batchWindowStartTime"
@@ -11,14 +11,14 @@
         format = "date-time"
         desc = "Start time of the current or next batch window. ${dateFormatDescription}"
     />
-    
+
     <@lib.property
         name = "batchWindowEndTime"
         type = "string"
         format = "date-time"
         desc = "End time of the current or next batch window. ${dateFormatDescription}"
     />
-    
+
     <@lib.property
         name = "enabled"
         type = "boolean"

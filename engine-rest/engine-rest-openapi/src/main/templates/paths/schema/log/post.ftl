@@ -10,7 +10,7 @@
     <#assign last = true >
     <#include "/lib/commons/pagination-params.ftl" >
   ],
-  
+
   <@lib.requestBody
       mediaType = "application/json"
       dto = "SchemaLogQueryDto"
@@ -40,7 +40,7 @@
                          {
                            "id": "0",
                            "version": "7.11.0",
-                           "timestamp": "2019-05-13T09:07:11.751+0200"
+                           "timestamp": "2019-05-13T09:07:11.751+02:00"
                          }
                        ]
                      }'] />

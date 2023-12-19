@@ -26,7 +26,7 @@
       examples = ['"example-1": {
                      "summary": "PUT `/authorization/anAuthorizationId`",
                      "value": {
-                       "permissions": 16,
+                       "permissions": ["CREATE", "READ"],
                        "userId": "*",
                        "groupId": null,
                        "resourceType": 1,

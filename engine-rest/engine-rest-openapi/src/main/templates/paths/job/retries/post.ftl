@@ -15,18 +15,18 @@
                      "summary": "POST `/job/retries`",
                      "value": {
                        "retries" : 5,
-                       "dueDate": "2017-04-06T13:57:45.000+0200",
+                       "dueDate": "2017-04-06T13:57:45.000+02:00",
                        "jobIds": ["aJob","secondJob"],
                        "jobQuery": {
                          "dueDates":
                            [
                              {
                                "operator": "gt",
-                               "value": "2012-07-17T17:00:00.000+0200"
+                               "value": "2012-07-17T17:00:00.000+02:00"
                               },
                              {
                                "operator": "lt",
-                               "value": "2012-07-17T18:00:00.000+0200"
+                               "value": "2012-07-17T18:00:00.000+02:00"
                              }
                            ]
                        }

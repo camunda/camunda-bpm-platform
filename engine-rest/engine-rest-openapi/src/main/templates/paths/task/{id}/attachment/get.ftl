@@ -36,8 +36,8 @@
                            "description": "attachmentDescription",
                            "type": "attachmentType",
                            "url": "http://my-attachment-content-url.de",
-                           "createTime": "2017-02-10T14:33:19.000+0200",
-                           "removalTime": "2018-02-10T14:33:19.000+0200",
+                           "createTime": "2017-02-10T14:33:19.000+02:00",
+                           "removalTime": "2018-02-10T14:33:19.000+02:00",
                            "rootProcessInstanceId": "aRootProcessInstanceId"
                          },
                          {
@@ -47,8 +47,8 @@
                            "description": "anotherAttachmentDescription",
                            "type": "anotherAttachmentType",
                            "url": "http://my-another-attachment-content-url.de",
-                           "createTime": "2017-02-10T14:33:19.000+0200",
-                           "removalTime": "2018-02-10T14:33:19.000+0200",
+                           "createTime": "2017-02-10T14:33:19.000+02:00",
+                           "removalTime": "2018-02-10T14:33:19.000+02:00",
                            "rootProcessInstanceId": "aRootProcessInstanceId"
                          },
                          {
@@ -58,8 +58,8 @@
                            "description": "yetAnotherAttachmentDescription",
                            "type": "yetAnotherAttachmentType",
                            "url": "http://yet-another-attachment-content-url.de",
-                           "createTime": "2017-02-10T14:33:19.000+0200",
-                           "removalTime": "2018-02-10T14:33:19.000+0200",
+                           "createTime": "2017-02-10T14:33:19.000+02:00",
+                           "removalTime": "2018-02-10T14:33:19.000+02:00",
                            "rootProcessInstanceId": "aRootProcessInstanceId"
                          }
                        ]

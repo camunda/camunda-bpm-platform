@@ -28,7 +28,7 @@
                        "description": "POST `/history/detail?firstResult=1&maxResults=10`",
                        "value": {
                          "processInstanceId": "3cd597b7-001a-11e7-8c6b-34f39ab71d4e",
-                         "occurredAfter": "2018-01-29T10:15:45.000+0100",
+                         "occurredAfter": "2018-01-29T10:15:45.000+01:00",
                          "sorting": [
                            {
                              "sortBy": "processInstanceId",
@@ -65,7 +65,7 @@
                            "taskId": null,
                            "tenantId": null,
                            "userOperationId": "3cd76c7f-001a-11e7-8c6b-34f39ab71d4e",
-                           "time": "2017-03-03T15:03:54.000+0200",
+                           "time": "2017-03-03T15:03:54.000+02:00",
                            "variableName": "amount",
                            "variableInstanceId": "3cd65b08-001a-11e7-8c6b-34f39ab71d4e",
                            "variableType": "Double",
@@ -73,7 +73,7 @@
                            "valueInfo": {},
                            "revision": 0,
                            "errorMessage": null,
-                           "removalTime": "2018-02-10T14:33:19.000+0200",
+                           "removalTime": "2018-02-10T14:33:19.000+02:00",
                            "rootProcessInstanceId": "aRootProcessInstanceId",
                            "initial": true
                          },
@@ -92,7 +92,7 @@
                            "taskId": null,
                            "tenantId": null,
                            "userOperationId": "3cd76c7f-001a-11e7-8c6b-34f39ab71d4e",
-                           "time": "2017-03-03T15:03:54.000+0200",
+                           "time": "2017-03-03T15:03:54.000+02:00",
                            "variableName": "invoiceDocument",
                            "variableInstanceId": "3cd65b0a-001a-11e7-8c6b-34f39ab71d4e",
                            "variableType": "File",
@@ -103,7 +103,7 @@
                            },
                            "revision": 0,
                            "errorMessage": null,
-                           "removalTime": "2018-02-10T14:33:19.000+0200",
+                           "removalTime": "2018-02-10T14:33:19.000+02:00",
                            "rootProcessInstanceId": "aRootProcessInstanceId",
                            "initial": true
                          }

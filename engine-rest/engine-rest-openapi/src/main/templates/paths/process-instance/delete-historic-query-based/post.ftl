@@ -17,7 +17,7 @@
                      "value": {
                        "deleteReason" : "aReason",
                        "historicProcessInstanceQuery": {
-                         "startedBefore": "2017-04-28T11:24:37.765+0200"
+                         "startedBefore": "2017-04-28T11:24:37.765+02:00"
                        },
                        "skipCustomListeners" : true,
                        "skipSubprocesses" : true,

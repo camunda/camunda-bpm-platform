@@ -27,7 +27,7 @@
       examples = ['"example-1": {
                      "summary": "PUT `/job/aJobId/duedate`",
                      "value": {
-                       "duedate": "2013-08-13T18:43:28.000+0200",
+                       "duedate": "2013-08-13T18:43:28.000+02:00",
                        "cascade": false
                      }
                    }']

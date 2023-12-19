@@ -26,7 +26,7 @@
                              "version": "7.14.0",
                              "edition": "enterprise",
                              "internals": {
-                               "database": {  
+                               "database": {
                                  "vendor": "h2",
                                  "version": "1.4.190 (2015-10-11)"
                                },
@@ -48,7 +48,7 @@
                                  "decision-instances": { "count": 140 },
                                  "executed-decision-elements": { "count": 732 }
                                },
-                               "data-collection-start-date": "2022-11-320T15:53:20.386+0100",
+                               "data-collection-start-date": "2022-11-20T15:53:20.386+01:00",
                                "camunda-integration": [
                                  "spring-boot-starter",
                                  "camunda-bpm-run"

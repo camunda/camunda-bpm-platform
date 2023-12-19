@@ -34,7 +34,7 @@
                        "id": "aDeploymentId",
                        "name": "aName",
                        "source": "process application",
-                       "deploymentTime": "2013-01-23T13:59:43.000+0200",
+                       "deploymentTime": "2013-01-23T13:59:43.000+02:00",
                        "tenantId": null,
                        "deployedProcessDefinitions": {
                            "aProcDefId": {
@@ -100,7 +100,7 @@
                            }
                          }
                        }
-                     }' 
+                     }'
                    ] />
 
   }

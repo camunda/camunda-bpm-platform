@@ -21,10 +21,10 @@
                      "summary": "POST `/history/decision-instance/set-removal-time`",
                      "description": "POST `/history/decision-instance/set-removal-time`",
                      "value": {
-                       "absoluteRemovalTime": "2019-05-05T11:56:24.725+0200",
+                       "absoluteRemovalTime": "2019-05-05T11:56:24.725+02:00",
                        "hierarchical": true,
                        "historicDecisionInstanceQuery": {
-                         "evaluatedBefore": "2019-09-05T17:02:10.123+0200"
+                         "evaluatedBefore": "2019-09-05T17:02:10.123+02:00"
                        },
                        "historicDecisionInstanceIds": [
                          "b4d2ad98-7240-11e9-98b7-be5e0f7575b7",

@@ -51,9 +51,9 @@
                          "userId": "userId",
                          "taskId": "aTaskId",
                          "processInstanceId": "96dc383f-23eb-11e6-8e4a-f6aefe19b687",
-                         "time": "2013-01-02T21:37:03.887+0200",
+                         "time": "2013-01-02T21:37:03.887+02:00",
                          "message": "comment message",
-                         "removalTime": "2018-02-10T14:33:19.000+0200",
+                         "removalTime": "2018-02-10T14:33:19.000+02:00",
                          "rootProcessInstanceId": "aRootProcessInstanceId"
                        }
                      }'] />

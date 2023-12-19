@@ -47,7 +47,7 @@
                          "processDefinitionId": "aProcDefId",
                          "processInstanceId": "aProcInstId",
                          "executionId": "anExecutionId",
-                         "incidentTimestamp": "2014-03-01T08:00:00.000+0200",
+                         "incidentTimestamp": "2014-03-01T08:00:00.000+02:00",
                          "incidentType": "failedJob",
                          "activityId": "serviceTask",
                          "failedActivityId": "serviceTask",

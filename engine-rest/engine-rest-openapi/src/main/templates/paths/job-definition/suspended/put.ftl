@@ -18,7 +18,7 @@
                        "processDefinitionId": "aProcessDefinitionId",
                        "suspended": true,
                        "includeJobs": true,
-                       "executionDate": "2013-11-21T10:49:45.000+0200"
+                       "executionDate": "2013-11-21T10:49:45.000+02:00"
                      }
                    }',
                    '"example-2": {
@@ -28,7 +28,7 @@
                        "processDefinitionKey": "aProcessDefinitionKey",
                        "suspended": true,
                        "includeJobs": true,
-                       "executionDate": "2013-11-21T10:49:45.000+0200"
+                       "executionDate": "2013-11-21T10:49:45.000+02:00"
                      }
                    }']
   />

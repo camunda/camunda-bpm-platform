@@ -32,8 +32,8 @@
                        "description": "GET `/history/job-log/someId`",
                        "value": {
                          "id": "someId",
-                         "timestamp": "2015-01-15T15:22:20.000+0200",
-                         "removalTime": "2018-02-10T14:33:19.000+0200",
+                         "timestamp": "2015-01-15T15:22:20.000+02:00",
+                         "removalTime": "2018-02-10T14:33:19.000+02:00",
                          "jobId": "aJobId",
                          "jobDefinitionId": "aJobDefinitionId",
                          "activityId": "serviceTask",
