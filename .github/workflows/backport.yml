@@ -1,8 +1,10 @@
 name: Backport merged pull request
 
 on:
-  pull_request_target:
-    types: [closed, labeled]
+  pull_request:
+    types: [closed]
+  issue_comment:
+    types: [created]
 
 jobs:
   call-reusable-flow:
