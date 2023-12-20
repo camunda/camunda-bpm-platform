@@ -16,9 +16,8 @@
  */
 package org.camunda.bpm.engine.history;
 
-import org.camunda.bpm.engine.EntityTypes;
-
 import java.util.Date;
+import org.camunda.bpm.engine.EntityTypes;
 
 
 /**

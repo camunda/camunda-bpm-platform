@@ -44,7 +44,8 @@ public abstract class AbstractCorrelateMessageCmd {
   protected final MessageCorrelationBuilderImpl builder;
 
   protected ExecutionVariableSnapshotObserver variablesListener;
-  protected boolean variablesEnabled = false;
+  protected boolean variablesInResultEnabled = false;
+  protected long variablesCount = 0;
   protected boolean deserializeVariableValues = false;
 
   /**
@@ -55,11 +56,13 @@ public abstract class AbstractCorrelateMessageCmd {
   protected AbstractCorrelateMessageCmd(MessageCorrelationBuilderImpl builder) {
     this.builder = builder;
     this.messageName = builder.getMessageName();
+    countVariables();
+
   }
 
   protected AbstractCorrelateMessageCmd(MessageCorrelationBuilderImpl builder, boolean variablesEnabled, boolean deserializeVariableValues) {
     this(builder);
-    this.variablesEnabled = variablesEnabled;
+    this.variablesInResultEnabled = variablesEnabled;
     this.deserializeVariableValues = deserializeVariableValues;
   }
 
@@ -81,11 +84,11 @@ public abstract class AbstractCorrelateMessageCmd {
     ActivityImpl messageStartEvent = processDefinitionEntity.findActivity(correlationResult.getStartEventActivityId());
     ExecutionEntity processInstance = processDefinitionEntity.createProcessInstance(builder.getBusinessKey(), messageStartEvent);
 
-    if (variablesEnabled) {
+    if (variablesInResultEnabled) {
       variablesListener = new ExecutionVariableSnapshotObserver(processInstance, false, deserializeVariableValues);
     }
 
-    VariableMap startVariables = resolveStartVariables();
+    VariableMap startVariables = resolveVariables();
 
     processInstance.start(startVariables);
 
@@ -112,7 +115,11 @@ public abstract class AbstractCorrelateMessageCmd {
     MessageCorrelationResultImpl resultWithVariables = new MessageCorrelationResultImpl(handlerResult);
     if (MessageCorrelationResultType.Execution.equals(handlerResult.getResultType())) {
       ExecutionEntity execution = findProcessInstanceExecution(commandContext, handlerResult);
-      if (variablesEnabled && execution != null) {
+
+      ProcessInstance processInstance = execution.getProcessInstance();
+      resultWithVariables.setProcessInstance(processInstance);
+
+      if (variablesInResultEnabled && execution != null) {
         variablesListener = new ExecutionVariableSnapshotObserver(execution, false, deserializeVariableValues);
       }
       triggerExecution(commandContext, handlerResult);
@@ -133,7 +140,7 @@ public abstract class AbstractCorrelateMessageCmd {
     return execution;
   }
 
-  protected VariableMap resolveStartVariables() {
+  protected VariableMap resolveVariables() {
     VariableMap mergedVariables = Variables.createVariables();
     mergedVariables.putAll(builder.getPayloadProcessInstanceVariables());
     mergedVariables.putAll(builder.getPayloadProcessInstanceVariablesLocal());
@@ -141,4 +148,15 @@ public abstract class AbstractCorrelateMessageCmd {
     return mergedVariables;
   }
 
+  protected void countVariables() {
+    if(builder.getPayloadProcessInstanceVariables() != null) {
+      variablesCount += builder.getPayloadProcessInstanceVariables().size();
+    }
+    if(builder.getPayloadProcessInstanceVariablesLocal() != null) {
+      variablesCount += builder.getPayloadProcessInstanceVariablesLocal().size();
+    }
+    if(builder.getPayloadProcessInstanceVariablesToTriggeredScope() != null) {
+      variablesCount += builder.getPayloadProcessInstanceVariablesToTriggeredScope().size();
+    }
+  }
 }
