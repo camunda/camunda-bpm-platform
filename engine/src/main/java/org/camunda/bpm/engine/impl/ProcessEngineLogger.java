@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.impl;
 
 import java.net.URL;
-
 import org.camunda.bpm.application.impl.ProcessApplicationLogger;
 import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -126,10 +125,10 @@ public class ProcessEngineLogger extends BaseLogger {
       MigrationLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.migration", "23");
 
   public static final ExternalTaskLogger EXTERNAL_TASK_LOGGER = BaseLogger.createLogger(
-    ExternalTaskLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.externaltask", "24");
+      ExternalTaskLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.externaltask", "24");
 
   public static final SecurityLogger SECURITY_LOGGER = BaseLogger.createLogger(
-    SecurityLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.security", "25");
+      SecurityLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.security", "25");
 
   public static final IncidentLogger INCIDENT_LOGGER = BaseLogger.createLogger(
       IncidentLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.incident", "26");
