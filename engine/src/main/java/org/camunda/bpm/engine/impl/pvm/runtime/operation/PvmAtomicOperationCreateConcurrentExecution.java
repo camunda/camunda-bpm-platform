@@ -62,6 +62,10 @@ public abstract class PvmAtomicOperationCreateConcurrentExecution implements Pvm
       PvmExecutionImpl processInstance = execution.getProcessInstance();
       if (processInstance.getPayloadForTriggeredScope() != null) {
         execution.setVariablesLocal(processInstance.getPayloadForTriggeredScope());
+        // print current thread and object details
+        System.out.println("Input thread=" + Thread.currentThread().getId() + "\n processInstanceHash= "
+            + System.identityHashCode(processInstance) + "\n variableValue= "
+            + processInstance.getPayloadForTriggeredScope().get("testVar"));
         // clear the process instance
         processInstance.setPayloadForTriggeredScope(null);
       }

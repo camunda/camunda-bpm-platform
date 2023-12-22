@@ -123,13 +123,14 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     String outpuValue1 = "outputValue1";
     messagePayload1.put(variableName, outpuValue1);
 
-    // and two threads correlating in parallel
+    // and two threads correlating in parallel with different variable inputs
     ThreadControl thread1 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", false, messagePayload));
     thread1.reportInterrupts();
     ThreadControl thread2 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", false, messagePayload1));
     thread2.reportInterrupts();
 
     // both threads open a transaction and wait before correlating the message
+    // so they are setting the variables and there's no guarantee in which order
     thread1.waitForSync();
     thread2.waitForSync();
 
@@ -140,9 +141,7 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     thread1.waitForSync();
     thread2.waitForSync();
 
-    // the service task was executed twice
-
-    // the first thread ends its transaction
+    // the first thread ends its transaction successfully
     thread1.waitUntilDone();
     assertNull(thread1.getException());
 
@@ -151,6 +150,9 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
 
     // the second thread ends its transaction and fails with optimistic locking exception
     thread2.waitUntilDone();
+
+    // then always OLE for the second thread
+    // and the stored variable is always in "afterMessage"
     assertTrue(thread2.getException() != null);
     assertTrue(thread2.getException() instanceof OptimisticLockingException);
     Execution execution = runtimeService.createExecutionQuery().activityId("afterMessage").singleResult();
