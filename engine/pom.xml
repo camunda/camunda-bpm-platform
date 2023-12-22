@@ -414,7 +414,7 @@
           <trimStackTrace>false</trimStackTrace>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <includes>
-           <include>%regex[.*(${test.includes}).*Test.*.class]</include>
+           <include>**/CompetingMessageCorrelationTest.java</include>
           </includes>
           <excludes>
             <exclude>**/*TestCase.java</exclude>
