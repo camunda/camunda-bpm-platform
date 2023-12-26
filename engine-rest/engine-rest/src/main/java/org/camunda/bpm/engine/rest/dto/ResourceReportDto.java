@@ -22,10 +22,12 @@ public class ResourceReportDto {
 
   protected List<ProblemDto> errors;
   protected List<ProblemDto> warnings;
+  protected List<ProblemDto> infos;
 
-  public ResourceReportDto(List<ProblemDto> errors, List<ProblemDto> warnings) {
+  public ResourceReportDto(List<ProblemDto> errors, List<ProblemDto> warnings, List<ProblemDto> infos) {
     this.errors = errors;
     this.warnings = warnings;
+    this.infos = infos;
   }
 
   // getter / setters ////////////////////////
@@ -46,4 +48,11 @@ public class ResourceReportDto {
     this.warnings = warnings;
   }
 
+  public List<ProblemDto> getInfos() {
+    return infos;
+  }
+
+  public void setInfos(List<ProblemDto> infos) {
+    this.infos = infos;
+  }
 }

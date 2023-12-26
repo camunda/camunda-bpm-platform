@@ -62,14 +62,22 @@ public class EngineUtilLogger extends ProcessEngineLogger {
         "Warnings during parsing: {}", formattedMessage);
   }
 
-  public ProcessEngineException exceptionDuringParsing(String string, String resourceName, List<Problem> errors, List<Problem> warnings) {
+  public void logParseInfos(String formattedMessage) {
+    logInfo(
+        "004",
+        "Infos during parsing: {}", formattedMessage);
+  }
+
+  public ProcessEngineException exceptionDuringParsing(String string, String resourceName, List<Problem> errors,
+                                                       List<Problem> warnings, List<Problem> infos) {
     return new ParseException(exceptionMessage(
         "005",
         "Could not parse BPMN process. Errors: {}",
         string),
         resourceName,
         errors,
-        warnings);
+        warnings,
+        infos);
   }
 
   public void unableToSetSchemaResource(Throwable cause) {

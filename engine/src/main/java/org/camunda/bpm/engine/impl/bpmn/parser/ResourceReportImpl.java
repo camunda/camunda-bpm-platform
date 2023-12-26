@@ -30,11 +30,13 @@ public class ResourceReportImpl implements ResourceReport {
   protected String resourceName;
   protected List<Problem> errors = new ArrayList<>();
   protected List<Problem> warnings = new ArrayList<>();
+  protected List<Problem> infos = new ArrayList<>();
 
-  public ResourceReportImpl(String resourceName, List<Problem> errors, List<Problem> warnings) {
+  public ResourceReportImpl(String resourceName, List<Problem> errors, List<Problem> warnings, List<Problem> infos) {
     this.resourceName = resourceName;
     this.errors.addAll(errors);
     this.warnings.addAll(warnings);
+    this.infos.addAll(infos);
   }
 
   @Override
@@ -50,4 +52,7 @@ public class ResourceReportImpl implements ResourceReport {
     return warnings;
   }
 
+  public List<Problem> getInfos() {
+    return infos;
+  }
 }

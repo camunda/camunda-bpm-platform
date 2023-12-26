@@ -27,9 +27,10 @@ public class ParseException extends ProcessEngineException {
 
   protected List<ResourceReport> resorceReports;
 
-  public ParseException(String exceptionMessage, String resource, List<Problem> errors, List<Problem> warnings) {
+  public ParseException(String exceptionMessage, String resource, List<Problem> errors, List<Problem> warnings,
+                        List<Problem> infos) {
     super(exceptionMessage);
-    ResourceReportImpl resourceReport = new ResourceReportImpl(resource, errors, warnings);
+    ResourceReportImpl resourceReport = new ResourceReportImpl(resource, errors, warnings, infos);
     List<ResourceReport> reports = new ArrayList<>();
     reports.add(resourceReport);
     this.resorceReports = reports;
