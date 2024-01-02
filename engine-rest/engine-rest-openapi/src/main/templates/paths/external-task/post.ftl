@@ -25,7 +25,7 @@
                        "summary": "POST /external-task",
                        "value": {
                          "processDefinitionId": "aProcessDefinitionId",
-                         "sorting": [
+                         "sortings": [
                            {
                              "sortBy": "processDefinitionKey",
                              "sortOrder": "asc"

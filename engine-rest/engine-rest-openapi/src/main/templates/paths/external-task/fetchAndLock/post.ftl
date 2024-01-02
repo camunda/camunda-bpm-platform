@@ -67,7 +67,7 @@
                          "workerId": "aWorkerId",
                          "maxTasks": 2,
                          "usePriority": true,
-                         "sorting": [
+                         "sortings": [
                              {
                                 "sortBy":"createTime",
                                 "sortOrder":"ASC"
