@@ -32,7 +32,7 @@ public class FetchAndLockRequestDto extends RequestDto {
   protected boolean usePriority;
   protected Long asyncResponseTimeout;
   protected List<TopicRequestDto> topics;
-  protected List<SortingDto> sortings;
+  protected List<SortingDto> sorting;
 
   public FetchAndLockRequestDto(String workerId, int maxTasks, Long asyncResponseTimeout, List<TopicRequestDto> topics) {
     this(workerId, maxTasks, asyncResponseTimeout, topics, true);
@@ -50,7 +50,7 @@ public class FetchAndLockRequestDto extends RequestDto {
     this.usePriority = usePriority;
     this.asyncResponseTimeout = asyncResponseTimeout;
     this.topics = topics;
-    this.sortings = orderingConfig.toSortingDtos();
+    this.sorting = orderingConfig.toSortingDtos();
   }
 
   public int getMaxTasks() {
@@ -69,12 +69,12 @@ public class FetchAndLockRequestDto extends RequestDto {
     return asyncResponseTimeout;
   }
 
-  public List<SortingDto> getSortings() {
-    return sortings;
+  public List<SortingDto> getSorting() {
+    return sorting;
   }
 
-  public void setSortings(List<SortingDto> sortings) {
-    this.sortings = sortings;
+  public void setSorting(List<SortingDto> sorting) {
+    this.sorting = sorting;
   }
 
 }

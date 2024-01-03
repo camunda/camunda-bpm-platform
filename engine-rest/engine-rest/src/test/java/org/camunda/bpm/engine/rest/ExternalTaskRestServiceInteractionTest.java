@@ -360,7 +360,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("maxTasks", 5);
     parameters.put("workerId", "aWorkerId");
     parameters.put("usePriority", false);
-    parameters.put("sortings", List.of(create("createTime", "desc")));
+    parameters.put("sorting", List.of(create("createTime", "desc")));
 
     Map<String, Object> topicParameter = new HashMap<>();
     topicParameter.put("topicName", "aTopicName");
@@ -408,7 +408,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("maxTasks", 5);
     parameters.put("workerId", "aWorkerId");
     parameters.put("usePriority", false);
-    parameters.put("sortings", List.of(create("createTime", null)));
+    parameters.put("sorting", List.of(create("createTime", null)));
 
     Map<String, Object> topicParameter = new HashMap<>();
     topicParameter.put("topicName", "aTopicName");
