@@ -96,30 +96,6 @@
         </dependency>
 
         <dependency>
-          <groupId>org.seleniumhq.selenium</groupId>
-          <artifactId>selenium-remote-driver</artifactId>
-          <version>${version.selenium}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.seleniumhq.selenium</groupId>
-          <artifactId>selenium-chrome-driver</artifactId>
-          <version>${version.selenium}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.seleniumhq.selenium</groupId>
-          <artifactId>selenium-api</artifactId>
-          <version>${version.selenium}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.seleniumhq.selenium</groupId>
-          <artifactId>selenium-support</artifactId>
-          <version>${version.selenium}</version>
-        </dependency>
-
-        <dependency>
           <groupId>com.sun.jersey</groupId>
           <artifactId>jersey-json</artifactId>
           <version>${version.jersey-json}</version>

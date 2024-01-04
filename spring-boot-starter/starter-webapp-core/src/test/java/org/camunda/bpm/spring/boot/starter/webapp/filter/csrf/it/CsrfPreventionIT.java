@@ -18,7 +18,7 @@ package org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it;
 
 import org.camunda.bpm.spring.boot.starter.property.WebappProperty;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HttpClientRule;
-import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
+import org.camunda.bpm.spring.boot.starter.webapp.filter.util.FilterTestApp;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { TestApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+@SpringBootTest(classes = { FilterTestApp.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = {"server.error.include-message=always"})
 @DirtiesContext
 public class CsrfPreventionIT {

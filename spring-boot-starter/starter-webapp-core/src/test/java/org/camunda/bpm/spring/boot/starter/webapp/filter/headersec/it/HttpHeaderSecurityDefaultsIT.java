@@ -17,7 +17,7 @@
 package org.camunda.bpm.spring.boot.starter.webapp.filter.headersec.it;
 
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HttpClientRule;
-import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
+import org.camunda.bpm.spring.boot.starter.webapp.filter.util.FilterTestApp;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,7 +32,7 @@ import static org.camunda.bpm.webapp.impl.security.filter.headersec.provider.imp
 import static org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.ContentSecurityPolicyProvider.HEADER_NONCE_PLACEHOLDER;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { TestApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = { FilterTestApp.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class HttpHeaderSecurityDefaultsIT {
 
   @Rule

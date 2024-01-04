@@ -44,7 +44,7 @@
       <dependency>
         <groupId>org.seleniumhq.selenium</groupId>
         <artifactId>selenium-java</artifactId>
-        <version>${version.selenium}</version>
+        <version>4.10.0</version>
       </dependency>
 
       <dependency>

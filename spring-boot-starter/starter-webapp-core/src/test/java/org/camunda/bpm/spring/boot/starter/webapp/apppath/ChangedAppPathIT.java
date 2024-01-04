@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.spring.boot.starter.webapp.apppath;
 
-import org.camunda.bpm.spring.boot.starter.webapp.TestApplication;
+import org.camunda.bpm.spring.boot.starter.webapp.WebappTestApp;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HttpClientRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,7 +39,7 @@ import static org.camunda.bpm.webapp.impl.security.filter.headersec.provider.imp
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
-    classes = { TestApplication.class },
+    classes = { WebappTestApp.class },
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
     "camunda.bpm.webapp.applicationPath=" + ChangedAppPathIT.MY_APP_PATH
