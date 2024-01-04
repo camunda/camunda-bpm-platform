@@ -64,9 +64,10 @@ public class AbstractWebappUiIT extends AbstractWebIT {
         .build();
 
     ChromeOptions chromeOptions = new ChromeOptions()
-        .setHeadless(true)
+        .addArguments("--headless=new")
         .addArguments("--window-size=1920,1200")
-        .addArguments("--remote-allow-origins=*");
+        .addArguments("--remote-allow-origins=*")
+        .addArguments("--disable-dev-shm-usage");
 
     driver = new ChromeDriver(chromeDriverService, chromeOptions);
   }

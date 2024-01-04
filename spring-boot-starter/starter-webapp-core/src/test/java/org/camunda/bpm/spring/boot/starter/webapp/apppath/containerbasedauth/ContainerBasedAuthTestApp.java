@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.spring.boot.starter.webapp;
+package org.camunda.bpm.spring.boot.starter.webapp.apppath.containerbasedauth;
 
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.springframework.boot.SpringApplication;
@@ -23,10 +23,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 @SpringBootApplication
 @EnableConfigurationProperties(CamundaBpmProperties.class)
-public class TestApplication {
+public class ContainerBasedAuthTestApp {
 
   public static void main(String[] args) {
-    SpringApplication.run(TestApplication.class, args);
+    SpringApplication.run(ContainerBasedAuthTestApp.class, args);
   }
 
 }
