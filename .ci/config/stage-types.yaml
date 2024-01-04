@@ -23,12 +23,9 @@
 db-unit:
   directory: '.'
   command: 'clean package -pl "engine,webapps/assembly,webapps/assembly-jakarta" -Dskip.frontend.build=true -P'
-  stash:
-    runtimeStash: true
   labels:
   - 'all-db'
   - 'db2'
-  - 'mysql'
   - 'oracle'
   - 'mariadb'
   - 'sqlserver'
@@ -43,7 +40,6 @@ sql-scripts:
   labels:
   - 'all-db'
   - 'db2'
-  - 'mysql'
   - 'oracle'
   - 'mariadb'
   - 'sqlserver'
@@ -63,7 +59,6 @@ old-engine:
   labels:
   - 'all-db'
   - 'db2'
-  - 'mysql'
   - 'oracle'
   - 'mariadb'
   - 'sqlserver'

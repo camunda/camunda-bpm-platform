@@ -27,7 +27,7 @@ pipeline {
     stage('ASSEMBLY') {
       when {
         expression {
-          env.BRANCH_NAME == cambpmDefaultBranch() || (changeRequest() && !pullRequest.labels.contains('ci:no-build'))
+          env.BRANCH_NAME == cambpmDefaultBranch()
         }
       }
       environment {
@@ -465,7 +465,7 @@ pipeline {
         stage('engine-UNIT-database-table-prefix') {
           when {
             expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb')
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('all-db','h2','db2','oracle','mariadb','sqlserver','postgresql','cockroachdb')
             }
           }
           steps {
