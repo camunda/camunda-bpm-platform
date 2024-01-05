@@ -18,10 +18,10 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.exception.NotFoundException;
@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.SynchronousOperationLogProducer;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
@@ -47,7 +48,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
  * Provide common logic for process instance deletion operations.
  * Permissions checking and single process instance removal included.
  */
-public abstract class AbstractDeleteProcessInstanceCmd {
+public abstract class AbstractDeleteProcessInstanceCmd implements SynchronousOperationLogProducer<ProcessInstance>{
 
   protected boolean externallyTerminated;
   protected String deleteReason;
@@ -56,6 +57,8 @@ public abstract class AbstractDeleteProcessInstanceCmd {
   protected boolean failIfNotExists = true;
   protected boolean skipIoMappings;
 
+  protected List<ProcessInstance> deletedInstances = new ArrayList<>();
+
   protected void checkDeleteProcessInstance(ExecutionEntity execution, CommandContext commandContext) {
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkDeleteProcessInstance(execution);
@@ -63,10 +66,12 @@ public abstract class AbstractDeleteProcessInstanceCmd {
   }
 
   protected void deleteProcessInstances(final CommandContext commandContext, List<String> processInstanceIds) {
-    processInstanceIds.forEach(processInstance -> deleteProcessInstance(commandContext, processInstance));
+    processInstanceIds.forEach(processInstance -> deleteProcessInstance(commandContext, processInstance, false));
+    // create user operation log
+    produceOperationLog(commandContext, deletedInstances);
   }
 
-  protected void deleteProcessInstance(final CommandContext commandContext, String processInstanceId) {
+  protected void deleteProcessInstance(final CommandContext commandContext, String processInstanceId, boolean writeOpLogImmediately) {
     ensureNotNull(BadUserRequestException.class, "processInstanceId is null", "processInstanceId", processInstanceId);
 
     // fetch process instance
@@ -107,9 +112,11 @@ public abstract class AbstractDeleteProcessInstanceCmd {
     }
 
     // create user operation log
-    commandContext.getOperationLogManager()
-        .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, processInstanceId,
-            null, null, Collections.singletonList(PropertyChange.EMPTY_CHANGE));
+    if(writeOpLogImmediately) {
+      produceOperationLog(commandContext, List.of(execution));
+    } else {
+      deletedInstances.add(execution);
+    }
   }
 
   public void triggerHistoryEvent(List<ProcessInstance> subProcesslist) {
@@ -131,4 +138,31 @@ public abstract class AbstractDeleteProcessInstanceCmd {
     }
   }
 
+  @Override
+  public Map<ProcessInstance, List<PropertyChange>> getPropChangesForOperation(List<ProcessInstance> results) {
+    return null;
+  }
+
+  @Override
+  public List<PropertyChange> getSummarizingPropChangesForOperation(List<ProcessInstance> results) {
+    ArrayList<PropertyChange> propChanges = new ArrayList<>();
+    propChanges.add(new PropertyChange("nrOfInstances", null, results.size()));
+    return propChanges;
+  }
+
+  @Override
+  public void createOperationLogEntry(CommandContext commandContext, ProcessInstance result,
+      List<PropertyChange> propChanges, boolean isSummary) {
+
+    String processInstanceId = null;
+    String processDefinitionId = null;
+    if (!isSummary) {
+      processInstanceId = result.getId();
+      processDefinitionId = result.getProcessDefinitionId();
+    }
+
+    commandContext.getOperationLogManager()
+    .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, processInstanceId,
+        processDefinitionId, null, propChanges);
+  }
 }
