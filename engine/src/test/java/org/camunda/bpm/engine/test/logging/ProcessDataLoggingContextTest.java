@@ -43,8 +43,10 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.commons.logging.MdcAccess;
 import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.camunda.commons.testing.WatchLogger;
+import org.jboss.logging.MDC;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -162,6 +164,60 @@ public class ProcessDataLoggingContextTest {
     assertActivityLogsPresent(instance, Arrays.asList("start", "waitState", "end"));
     // other logs do not contain MDC properties
     assertActivityLogsPresentWithoutMdc("ENGINE-130");
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {PVM_LOGGER, CMD_LOGGER}, level = "DEBUG")
+  public void shouldPreserveCustomMDCInformationAfterJobCompletion() {
+    // given
+
+    // a set of custom Logging Context parameters that populate the MDC prior to any process instance execution
+    MdcAccess.put("activityId", "customActivityId");
+    MdcAccess.put("activityName", "customActivityName");
+    MdcAccess.put("applicationName", "customApplicationName");
+    MdcAccess.put("businessKey", "customBusinessKey");
+    MdcAccess.put("processDefinitionId", "customProcessDefinitionId");
+    MdcAccess.put("processDefinitionKey", "customProcessDefinitionKey");
+    MdcAccess.put("processInstanceId", "customProcessInstanceId");
+    MdcAccess.put("tenantId", "customTenantId");
+    MdcAccess.put("engineName", "customEngineName");
+
+    // and a deployed process
+    manageDeployment(modelOneTaskProcess());
+
+    // when a process instance starts and completes
+    runtimeService.startProcessInstanceByKey(PROCESS, B_KEY);
+    taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+    // then the activity log events
+    List<ILoggingEvent> logs = loggingRule.getFilteredLog("ENGINE-200");
+
+    // should not use the values of the external properties
+    for (ILoggingEvent logEvent : logs) {
+      Map<String, String> mdcPropertyMap = logEvent.getMDCPropertyMap();
+
+      assertThat(mdcPropertyMap).doesNotContainEntry("activityId", "customActivityId");
+      assertThat(mdcPropertyMap).doesNotContainEntry("activityName", "customActivityName");
+      assertThat(mdcPropertyMap).doesNotContainEntry("applicationName", "customApplicationName");
+      assertThat(mdcPropertyMap).doesNotContainEntry("businessKey", "customBusinessKey");
+      assertThat(mdcPropertyMap).doesNotContainEntry("processDefinitionId", "customProcessDefinitionId");
+      assertThat(mdcPropertyMap).doesNotContainEntry("processInstanceId", "customProcessInstanceId");
+      assertThat(mdcPropertyMap).doesNotContainEntry("tenantId", "customTenantId");
+      assertThat(mdcPropertyMap).doesNotContainEntry("engineName", "customEngineName");
+    }
+
+    // And the MDC should be in same state as before the execution of any command
+    Map<String, Object> mdcMap = MDC.getMap();
+
+    assertThat(mdcMap).containsEntry("activityId", "customActivityId");
+    assertThat(mdcMap).containsEntry("activityName", "customActivityName");
+    assertThat(mdcMap).containsEntry("applicationName", "customApplicationName");
+    assertThat(mdcMap).containsEntry("businessKey", "customBusinessKey");
+    assertThat(mdcMap).containsEntry("processDefinitionId", "customProcessDefinitionId");
+    assertThat(mdcMap).containsEntry("processDefinitionKey", "customProcessDefinitionKey");
+    assertThat(mdcMap).containsEntry("processInstanceId", "customProcessInstanceId");
+    assertThat(mdcMap).containsEntry("tenantId", "customTenantId");
+    assertThat(mdcMap).containsEntry("engineName", "customEngineName");
   }
 
   @Test

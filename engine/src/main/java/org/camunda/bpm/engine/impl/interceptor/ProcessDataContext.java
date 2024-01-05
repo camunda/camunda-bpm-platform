@@ -74,6 +74,8 @@ public class ProcessDataContext {
   protected Map<String, ProcessDataStack> mdcDataStacks = new HashMap<>();
   protected ProcessDataSections sections = new ProcessDataSections();
 
+  protected Map<String, String> externalProperties = new HashMap<>();
+
   public ProcessDataContext(ProcessEngineConfigurationImpl configuration) {
     this(configuration, false);
   }
@@ -97,6 +99,8 @@ public class ProcessDataContext {
     mdcPropertyTenantId = initProperty(configuration::getLoggingContextTenantId);
     mdcPropertyEngineName = initProperty(configuration::getLoggingContextEngineName);
 
+    initExternalProperties(configuration);
+
     handleMdc = !mdcDataStacks.isEmpty();
 
     if (initFromCurrentMdc) {
@@ -111,10 +115,31 @@ public class ProcessDataContext {
     }
   }
 
+  protected void initExternalProperties(ProcessEngineConfigurationImpl configuration) {
+    initExternalMDCProperty(configuration::getLoggingContextActivityId);
+    initExternalMDCProperty(configuration::getLoggingContextActivityName);
+    initExternalMDCProperty(configuration::getLoggingContextApplicationName);
+    initExternalMDCProperty(configuration::getLoggingContextBusinessKey);
+    initExternalMDCProperty(configuration::getLoggingContextProcessDefinitionId);
+    initExternalMDCProperty(configuration::getLoggingContextProcessDefinitionKey);
+    initExternalMDCProperty(configuration::getLoggingContextProcessInstanceId);
+    initExternalMDCProperty(configuration::getLoggingContextTenantId);
+    initExternalMDCProperty(configuration::getLoggingContextEngineName);
+  }
+
   protected String initProperty(final Supplier<String> configSupplier) {
     final String configValue = configSupplier.get();
     if (isNotBlank(configValue)) {
       mdcDataStacks.put(configValue, new ProcessDataStack(configValue));
+    }
+    return configValue;
+  }
+
+  protected String initExternalMDCProperty(final Supplier<String> configSupplier) {
+    final String configValue = configSupplier.get();
+
+    if (isNotBlank(configValue) && isNotBlank(MdcAccess.get(configValue))) {
+      externalProperties.put(configValue, MdcAccess.get(configValue));
     }
     return configValue;
   }
@@ -191,6 +216,13 @@ public class ProcessDataContext {
     if (handleMdc) {
       mdcDataStacks.values().forEach(ProcessDataStack::clearMdcProperty);
     }
+  }
+
+  /**
+   * Restores the MDC External Properties
+   */
+  public void restoreExternalMDCProperties() {
+    externalProperties.forEach(MdcAccess::put);
   }
 
   /** Update the MDC with the current values of this logging context */
