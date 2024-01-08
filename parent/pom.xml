@@ -303,6 +303,14 @@
             <npmVersion>${version.npm}</npmVersion>
           </configuration>
         </plugin>
+
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <configuration>
+            <wait>750</wait>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
