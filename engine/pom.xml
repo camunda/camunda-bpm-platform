@@ -674,11 +674,11 @@
             <configuration>
               <failIfNoTests>false</failIfNoTests>
               <trimStackTrace>true</trimStackTrace>
-              <useFile>false</useFile> <!-- TODO -->
-              <printSummary>true</printSummary>
-              <disableXmlReport>false</disableXmlReport>
-              <testFailureIgnore>true</testFailureIgnore>
-              <redirectTestOutputToFile>false</redirectTestOutputToFile><!-- TODO -->
+<!--              <useFile>false</useFile>  TODO -->
+<!--              <printSummary>true</printSummary>-->
+<!--              <disableXmlReport>false</disableXmlReport>-->
+<!--              <testFailureIgnore>true</testFailureIgnore>-->
+              <redirectTestOutputToFile>true</redirectTestOutputToFile><!-- TODO -->
               <excludes combine.children="append">
                 <exclude>**/CompetingMessageCorrelationTest.java</exclude>
               </excludes>

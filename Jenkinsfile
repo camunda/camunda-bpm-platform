@@ -580,6 +580,42 @@ pipeline {
             ])
           }
         }
+        stage('engine-UNIT-mysql') {
+          when {
+            expression {
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('all-db', 'mysql')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'mysql_80',
+              runSteps: {
+                cambpmRunMaven('engine/', ' clean package -Pmysql', runtimeStash: true)
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+              }
+            ])
+          }
+        }
+        stage('webapps-UNIT-mysql') {
+          when {
+            expression {
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('all-db', 'mysql')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'mysql_80',
+              runSteps: {
+                cambpmRunMaven('.', ' clean package -pl "webapps/assembly,webapps/assembly-jakarta" -Dskip.frontend.build=true -Pmysql', runtimeStash: true)
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+              }
+            ])
+          }
+        }
       }
     }
   }

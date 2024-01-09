@@ -26,11 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -49,7 +47,6 @@ public class VariableScopeTest extends PluggableProcessEngineTest {
    */
   @Deployment
   @Test
-  @RequiredDatabase(excludes = { DbSqlSessionFactory.H2 })
   public void testVariableNamesScope() {
 
     // After starting the process, the task in the subprocess should be active
@@ -72,7 +69,7 @@ public class VariableScopeTest extends PluggableProcessEngineTest {
             execute(new GetVariableNamesCommand(pi.getProcessInstanceId(), true));
 
     // pi contains local the variablenames "test", "helloWorld" and "mainProcessLocalVariable" but not "subProcessLocalVariable"
-    assertTrue(result.contains("testq"));
+    assertTrue(result.contains("test"));
     assertTrue(result.contains("helloWorld"));
     assertTrue(result.contains("mainProcessLocalVariable"));
     assertFalse(result.contains("subProcessLocalVariable"));

@@ -35,10 +35,8 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.After;
 import org.junit.Assert;
@@ -65,7 +63,6 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTest {
   }
 
   @Test
-  @RequiredDatabase(excludes = { DbSqlSessionFactory.H2 })
   public void testSetPAContextByName() throws ProcessApplicationUnavailableException {
 
     Assert.assertNull(Context.getCurrentProcessApplication());
@@ -78,7 +75,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTest {
       ProcessApplicationContext.clear();
     }
 
-    Assert.assertNotNull(Context.getCurrentProcessApplication());
+    Assert.assertNull(Context.getCurrentProcessApplication());
   }
 
   @Test

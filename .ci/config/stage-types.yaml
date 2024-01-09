@@ -28,7 +28,6 @@ db-unit:
   - 'db2'
   - 'oracle'
   - 'mariadb'
-  - 'mysql'
   - 'sqlserver'
   - 'postgresql'
   - 'cockroachdb'
