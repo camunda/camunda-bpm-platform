@@ -303,6 +303,15 @@
             <npmVersion>${version.npm}</npmVersion>
           </configuration>
         </plugin>
+
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <configuration>
+            <!-- https://github.com/camunda/camunda-bpm-platform/issues/3996 -->
+            <wait>750</wait>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
