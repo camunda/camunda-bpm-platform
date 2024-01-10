@@ -673,12 +673,8 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <failIfNoTests>false</failIfNoTests>
-              <trimStackTrace>true</trimStackTrace>
-<!--              <useFile>false</useFile>  TODO -->
-<!--              <printSummary>true</printSummary>-->
-<!--              <disableXmlReport>false</disableXmlReport>-->
-<!--              <testFailureIgnore>true</testFailureIgnore>-->
-              <redirectTestOutputToFile>true</redirectTestOutputToFile><!-- TODO -->
+              <trimStackTrace>false</trimStackTrace>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
               <excludes combine.children="append">
                 <exclude>**/CompetingMessageCorrelationTest.java</exclude>
               </excludes>
