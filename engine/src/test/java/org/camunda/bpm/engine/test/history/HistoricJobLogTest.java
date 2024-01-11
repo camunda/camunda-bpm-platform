@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.fail;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Random;
-
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -64,7 +63,6 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -1316,7 +1314,8 @@ public class HistoricJobLogTest {
   @Test
   public void testThrowExceptionMessageTruncation() {
     // given
-    String exceptionMessage = randomString(10000);
+    // a random string of size 10000 using characters [0-1]
+    String exceptionMessage = new BigInteger(10000, new Random()).toString(2);
     ThrowExceptionWithOverlongMessageDelegate delegate =
         new ThrowExceptionWithOverlongMessageDelegate(exceptionMessage);
 
@@ -1343,7 +1342,6 @@ public class HistoricJobLogTest {
   }
 
   @Test
-  @Ignore
   public void testAsyncAfterJobDefinitionAfterEngineRestart() {
     // given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("testProcess")
@@ -1386,14 +1384,6 @@ public class HistoricJobLogTest {
         .creationLog().jobId(asyncAfterJob.getId()).singleResult();
     assertThat(asyncAfterLog.getJobDefinitionId()).isEqualTo(asyncAfterJobDef.getId());
   }
-
-  /**
-   * returns a random of the given size using characters [0-1]
-   */
-  protected static String randomString(int numCharacters) {
-    return new BigInteger(numCharacters, new Random()).toString(2);
-  }
-
 
   @Test
   public void testDeleteByteArray() {
