@@ -180,7 +180,12 @@ public class TaskDefinition {
 
     listeners.add(0, taskListener);
 
-    CollectionUtil.addToMapOfLists(builtinTaskListeners, eventName, taskListener);
+    List<TaskListener> builtins = builtinTaskListeners.get(eventName);
+    if (builtins == null) {
+      builtins = new ArrayList<>();
+      builtinTaskListeners.put(eventName, builtins);
+    }
+    builtins.add(0, taskListener);
   }
 
   public void addTimeoutTaskListener(String timeoutId, TaskListener taskListener) {
