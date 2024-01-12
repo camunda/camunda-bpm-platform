@@ -49,9 +49,9 @@ public class CommandInvocationContext {
   protected BpmnStackTrace bpmnStackTrace = new BpmnStackTrace();
   protected ProcessDataContext processDataContext;
 
-  public CommandInvocationContext(Command<?> command, ProcessEngineConfigurationImpl configuration) {
+  public CommandInvocationContext(Command<?> command, ProcessEngineConfigurationImpl configuration, boolean isOuterCommand) {
     this.command = command;
-    this.processDataContext = new ProcessDataContext(configuration);
+    this.processDataContext = new ProcessDataContext(configuration, isOuterCommand); // only outer commands will park external properties
   }
 
   public Throwable getThrowable() {

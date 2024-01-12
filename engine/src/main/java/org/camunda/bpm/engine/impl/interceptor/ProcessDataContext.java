@@ -77,19 +77,27 @@ public class ProcessDataContext {
   protected Map<String, String> externalProperties = new HashMap<>();
 
   public ProcessDataContext(ProcessEngineConfigurationImpl configuration) {
-    this(configuration, false);
+    this(configuration, false, false);
   }
 
-  public ProcessDataContext(ProcessEngineConfigurationImpl configuration, boolean initFromCurrentMdc) {
+  public ProcessDataContext(ProcessEngineConfigurationImpl configuration, boolean parkExternalProperties) {
+    this(configuration, false, parkExternalProperties);
+  }
+
+  //TODO add JavaDoc to explain how initExternalProperties are used (inner, outer commands)
+  public ProcessDataContext(ProcessEngineConfigurationImpl configuration, boolean initFromCurrentMdc,
+                            boolean parkExternalProperties) {
     mdcPropertyActivityId = configuration.getLoggingContextActivityId();
 
     // always keep track of activity ids, because those are used to
     // populate the Job#getFailedActivityId field. This is independent
     // of the logging configuration
     activityIdStack = new ProcessDataStack(isNotBlank(mdcPropertyActivityId) ? mdcPropertyActivityId : null);
+
     if (isNotBlank(mdcPropertyActivityId)) {
       mdcDataStacks.put(mdcPropertyActivityId, activityIdStack);
     }
+
     mdcPropertyActivityName = initProperty(configuration::getLoggingContextActivityName);
     mdcPropertyApplicationName = initProperty(configuration::getLoggingContextApplicationName);
     mdcPropertyBusinessKey = initProperty(configuration::getLoggingContextBusinessKey);
@@ -99,7 +107,9 @@ public class ProcessDataContext {
     mdcPropertyTenantId = initProperty(configuration::getLoggingContextTenantId);
     mdcPropertyEngineName = initProperty(configuration::getLoggingContextEngineName);
 
-    initExternalProperties(configuration);
+    if (parkExternalProperties) {
+      parkExternalProperties(configuration);
+    }
 
     handleMdc = !mdcDataStacks.isEmpty();
 
@@ -115,16 +125,16 @@ public class ProcessDataContext {
     }
   }
 
-  protected void initExternalProperties(ProcessEngineConfigurationImpl configuration) {
-    initExternalMDCProperty(configuration::getLoggingContextActivityId);
-    initExternalMDCProperty(configuration::getLoggingContextActivityName);
-    initExternalMDCProperty(configuration::getLoggingContextApplicationName);
-    initExternalMDCProperty(configuration::getLoggingContextBusinessKey);
-    initExternalMDCProperty(configuration::getLoggingContextProcessDefinitionId);
-    initExternalMDCProperty(configuration::getLoggingContextProcessDefinitionKey);
-    initExternalMDCProperty(configuration::getLoggingContextProcessInstanceId);
-    initExternalMDCProperty(configuration::getLoggingContextTenantId);
-    initExternalMDCProperty(configuration::getLoggingContextEngineName);
+  protected void parkExternalProperties(ProcessEngineConfigurationImpl configuration) {
+    parkExternalMDCProperty(configuration::getLoggingContextActivityId);
+    parkExternalMDCProperty(configuration::getLoggingContextActivityName);
+    parkExternalMDCProperty(configuration::getLoggingContextApplicationName);
+    parkExternalMDCProperty(configuration::getLoggingContextBusinessKey);
+    parkExternalMDCProperty(configuration::getLoggingContextProcessDefinitionId);
+    parkExternalMDCProperty(configuration::getLoggingContextProcessDefinitionKey);
+    parkExternalMDCProperty(configuration::getLoggingContextProcessInstanceId);
+    parkExternalMDCProperty(configuration::getLoggingContextTenantId);
+    parkExternalMDCProperty(configuration::getLoggingContextEngineName);
   }
 
   protected String initProperty(final Supplier<String> configSupplier) {
@@ -135,7 +145,7 @@ public class ProcessDataContext {
     return configValue;
   }
 
-  protected String initExternalMDCProperty(final Supplier<String> configSupplier) {
+  protected String parkExternalMDCProperty(final Supplier<String> configSupplier) {
     final String configValue = configSupplier.get();
 
     if (isNotBlank(configValue) && isNotBlank(MdcAccess.get(configValue))) {

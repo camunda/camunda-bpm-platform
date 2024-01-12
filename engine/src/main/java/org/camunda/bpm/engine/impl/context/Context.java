@@ -82,11 +82,13 @@ public class Context {
     if (stack.isEmpty()) {
       // do not clear when called from JobExecutor, will be cleared there after logging
       if (getJobExecutorContext() == null) {
+        // outer command remove flow
         currentContext.getProcessDataContext().clearMdc();
         currentContext.getProcessDataContext().restoreExternalMDCProperties();
       }
     } else {
       // reset the MDC to the logging context of the outer command invocation
+      // inner command remove flow
       stack.peek().getProcessDataContext().updateMdcFromCurrentValues();
     }
   }

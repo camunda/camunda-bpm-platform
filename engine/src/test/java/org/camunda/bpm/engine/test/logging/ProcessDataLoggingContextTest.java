@@ -207,6 +207,52 @@ public class ProcessDataLoggingContextTest {
   }
 
   @Test
+  @WatchLogger(loggerNames = {NestedLoggingDelegate.LOGGER_NAME}, level = "DEBUG")
+  public void shouldPreserveMDCExternalPropertiesInFlowsWithInnerCommands() {
+    // given
+
+    // a set of custom Logging Context parameters that populate the MDC prior to any process instance execution
+    testMDCFacade.withDefaultLoggingContextParameters(
+        "customActivityId",
+        "customActivityName",
+        "customApplicationName",
+        "customBusinessKey",
+        "customProcessDefinitionId",
+        "customProcessDefinitionKey",
+        "customProcessInstanceId",
+        "customTenantId",
+        "customEngineName"
+    );
+
+    manageDeployment(Bpmn.createExecutableProcess(PROCESS)
+        .startEvent("start")
+        .serviceTask("startProcess")
+        .camundaClass(NestedLoggingDelegate.class.getName())
+        .endEvent("end")
+        .done());
+
+    // when
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS, B_KEY);
+
+    // then
+    List<ILoggingEvent> customLogs = loggingRule.getLog();
+
+    // Log events contain the execution specific MDC Properties
+    assertThat(customLogs).hasSize(2);
+
+    for (ILoggingEvent logEvent : customLogs) {
+      assertThat(logEvent.getMDCPropertyMap()).containsEntry("activityId", "startProcess");
+      assertThat(logEvent.getMDCPropertyMap()).containsEntry("businessKey", B_KEY);
+      assertThat(logEvent.getMDCPropertyMap()).containsEntry("processDefinitionId", processInstance.getProcessDefinitionId());
+      assertThat(logEvent.getMDCPropertyMap()).containsEntry("processInstanceId", processInstance.getId());
+      assertThat(logEvent.getMDCPropertyMap()).containsEntry("tenantId", processInstance.getTenantId());
+    }
+
+    // And the MDC External Properties are in the same state as prior to the commands execution
+    testMDCFacade.assertAllInsertedPropertiesAreInMdc();
+  }
+
+  @Test
   @WatchLogger(loggerNames = {PVM_LOGGER, CMD_LOGGER}, level = "DEBUG")
   public void shouldPreserveThirdPartyMDCProperties() {
     // given
