@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.cfg.ConfigurationLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.impl.util.xml.Element;
@@ -118,6 +117,9 @@ public class HistoryTimeToLiveParser {
       if (result.shouldBeLogged()) {
         LOG.logHistoryTimeToLiveDefaultValueWarning(definitionKey);
       }
+      if (result.hasLongerModelValueThanGlobalConfig()) {
+        LOG.logModelHTTLLongerThanGlobalCongig(result.value);
+      }
     }
 
     return result.valueAsInteger;
@@ -143,6 +145,12 @@ public class HistoryTimeToLiveParser {
       return !systemDefaultConfigWillBeUsed // only values originating from models make sense to be logged
           && valueAsInteger != null
           && valueAsInteger == CAMUNDA_MODELER_TTL_DEFAULT_VALUE;
+    }
+
+    protected boolean hasLongerModelValueThanGlobalConfig() {
+      return !systemDefaultConfigWillBeUsed // only values originating from models make sense to be logged
+          && valueAsInteger != null
+          && valueAsInteger > CAMUNDA_MODELER_TTL_DEFAULT_VALUE;
     }
   }
 }
