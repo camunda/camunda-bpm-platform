@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl.cfg;
 
 import javax.naming.NamingException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
@@ -114,18 +115,12 @@ public class ConfigurationLogger extends ProcessEngineLogger {
   }
 
   /**
-   * Method for logging message when default history time to live is configured.
+   * Method for logging message when model history TTL longer than global TTL.
    *
-   * @param definitionKey the correlated definition key with which history time to live is related to.
+   * @param definitionKey the correlated definition key with which history TTL is related to.
    *                      For processes related to httl, that is the processDefinitionKey, for cases the case definition key
    *                      whereas for decisions is the decision definition key.
    */
-  public void logHistoryTimeToLiveDefaultValueWarning(String definitionKey) {
-    String message = formatHTTLDefaultValueMessage(definitionKey);
-
-    logWarn("016", message);
-  }
-
   public void logModelHTTLLongerThanGlobalConfiguration(String definitionKey, String ttl) {
     logWarn(
         "017", "definitionKey: {}; "
@@ -133,17 +128,8 @@ public class ConfigurationLogger extends ProcessEngineLogger {
             definitionKey, ttl);
   }
 
-  protected String formatHTTLDefaultValueMessage(String definitionKey) {
-    String result = "You are using the default TTL (Time To Live) of 180 days (six months); "
-        + "the history clean-up feature will delete your data after six months. "
-        + "We recommend adjusting the TTL configuration property aligned with your specific requirements. "
-        + "You can set a custom historyTimeToLive as a global process engine configuration.";
-
-    if (definitionKey != null) {
-      result = "definitionKey: " + definitionKey + "; " + result;
-    }
-
-    return result;
+  public NotValidException logErrorNoTTLConfigured() {
+    return new NotValidException(exceptionMessage("018",
+        "History Time To Live cannot be null. You can set a default historyTimeToLive as a global process engine configuration."));
   }
-
 }

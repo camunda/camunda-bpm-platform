@@ -103,7 +103,7 @@ public class HistoryTimeToLiveDeploymentTest {
 
         // then
         .isInstanceOf(ParseException.class)
-        .hasMessageContaining("History Time To Live cannot be null");
+        .hasMessageContaining("History Time To Live cannot be null. You can set a default historyTimeToLive as a global process engine configuration");
   }
 
   @Test
@@ -208,10 +208,10 @@ public class HistoryTimeToLiveDeploymentTest {
 
     // when
     testRule.deploy(repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version3.bpmn20.xml"));
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version2.bpmn20.xml"));
 
     // then
-    assertThat(loggingRule.getFilteredLog("definitionKey: process; " + EXPECTED_DEFAULT_CONFIG_MSG)).hasSize(1);
+    assertThat(loggingRule.getFilteredLog("History Time To Live cannot be null. You can set a default historyTimeToLive as a global process engine configuration")).hasSize(1);
   }
 
   @Test
