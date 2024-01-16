@@ -126,16 +126,18 @@ public class ConfigurationLogger extends ProcessEngineLogger {
     logWarn("016", message);
   }
 
-  public void logModelHTTLLongerThanGlobalCongig(String ttl) {
+  public void logModelHTTLLongerThanGlobalConfiguration(String definitionKey, String ttl) {
     logWarn(
-        "017", "Specified TTL (Time To Live) longer than the global (180 days) TTL configuration: {} ", ttl);
+        "017", "definitionKey: {}; "
+            + "The specified TTL (Time To Live) in the model is longer than the global (180 days) TTL configuration: {} days",
+            definitionKey, ttl);
   }
 
   protected String formatHTTLDefaultValueMessage(String definitionKey) {
     String result = "You are using the default TTL (Time To Live) of 180 days (six months); "
         + "the history clean-up feature will delete your data after six months. "
         + "We recommend adjusting the TTL configuration property aligned with your specific requirements. "
-        + "You can set a custom historyTimeToLive as a global process engine configuration";
+        + "You can set a custom historyTimeToLive as a global process engine configuration.";
 
     if (definitionKey != null) {
       result = "definitionKey: " + definitionKey + "; " + result;

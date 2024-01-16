@@ -117,8 +117,9 @@ public class HistoryTimeToLiveParser {
       if (result.shouldBeLogged()) {
         LOG.logHistoryTimeToLiveDefaultValueWarning(definitionKey);
       }
+
       if (result.hasLongerModelValueThanGlobalConfig()) {
-        LOG.logModelHTTLLongerThanGlobalCongig(result.value);
+        LOG.logModelHTTLLongerThanGlobalConfiguration(definitionKey, result.value);
       }
     }
 

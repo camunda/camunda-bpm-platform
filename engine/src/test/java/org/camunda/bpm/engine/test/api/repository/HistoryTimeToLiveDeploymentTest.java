@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.junit.After;
 import org.junit.Before;
@@ -49,7 +50,11 @@ public class HistoryTimeToLiveDeploymentTest {
   protected static final String EXPECTED_DEFAULT_CONFIG_MSG =
       "You are using the default TTL (Time To Live) of 180 days (six months); "
       + "the history clean-up feature will delete your data after six months. "
-      + "We recommend adjusting the TTL configuration property aligned with your specific requirements.";
+      + "We recommend adjusting the TTL configuration property aligned with your specific requirements. "
+      + "You can set a custom historyTimeToLive as a global process engine configuration.";
+
+  protected static final String EXPECTED_LONGER_TTL_MSG =
+      "The specified TTL (Time To Live) in the model is longer than the global (180 days) TTL configuration:";
 
   protected static final String DEFAULT_HTTL_CONFIG_VALUE = "180";
 
@@ -295,6 +300,57 @@ public class HistoryTimeToLiveDeploymentTest {
     processEngineConfiguration.setEnforceHistoryTimeToLive(true);
     processEngineConfiguration.getDeploymentCache().purgeCache();
     repositoryService.getCaseDefinition(definitions.getDeployedCaseDefinitions().get(0).getId());
+  }
+
+  @Test
+  public void shouldLogMessageOnLongerTTLInProcessModel() {
+    // given
+    String nonDefaultValue = "179";
+    processEngineConfiguration.setHistoryTimeToLive(nonDefaultValue);
+
+    // when
+    deployProcessDefinitions();
+
+    // then
+    assertThat(loggingRule.getFilteredLog("definitionKey: process; " + EXPECTED_LONGER_TTL_MSG)).hasSize(1);
+  }
+
+  @Test
+  public void shouldLogMessageOnLongerTTLInfCaseModel() {
+    // given
+    String nonDefaultValue = "179";
+    processEngineConfiguration.setHistoryTimeToLive(nonDefaultValue);
+
+    // when
+    testRule.deploy(repositoryService.createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/case_with_365_httl.cmmn"));
+
+    // then
+    assertThat(loggingRule.getFilteredLog("definitionKey: testCase; " + EXPECTED_LONGER_TTL_MSG)).hasSize(1);
+  }
+
+  @Test
+  public void shouldLogMessageOnLongerTTLInDecisionModel() {
+    // given
+    String nonDefaultValue = "179";
+    processEngineConfiguration.setHistoryTimeToLive(nonDefaultValue);
+
+    // when
+    testRule.deploy(repositoryService.createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/decision_with_365_httl.dmn"));
+
+    // then
+    assertThat(loggingRule.getFilteredLog("definitionKey: testDecision; " + EXPECTED_LONGER_TTL_MSG)).hasSize(1);
+  }
+
+  protected void deployProcessDefinitions() {
+    testRule.deploy(
+      Bpmn.createExecutableProcess("process")
+        .camundaHistoryTimeToLive(365)
+        .startEvent()
+        .userTask()
+        .endEvent()
+        .done());
   }
 
 }
