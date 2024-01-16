@@ -126,7 +126,7 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:bean-validation:1.0"/>
         <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
-        <subsystem xmlns="urn:jboss:domain:datasources:7.0">
+        <subsystem xmlns="urn:jboss:domain:datasources:7.1">
             <datasources>
                 <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
                     <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
@@ -162,7 +162,7 @@
             <infinispan-timer-management name="persistent" cache-container="ejb" cache="persistent" max-active-timers="10000"/>
             <infinispan-timer-management name="transient" cache-container="ejb" cache="transient" max-active-timers="10000"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:distributable-web:3.0" default-session-management="default" default-single-sign-on-management="default">
+        <subsystem xmlns="urn:jboss:domain:distributable-web:4.0" default-session-management="default" default-single-sign-on-management="default">
             <infinispan-session-management name="default" cache-container="web" granularity="SESSION">
                 <local-affinity/>
             </infinispan-session-management>
@@ -451,11 +451,12 @@
             <remote-naming/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
-        <subsystem xmlns="urn:jboss:domain:remoting:5.0">
+        <subsystem xmlns="urn:jboss:domain:remoting:6.0">
+                  <endpoint worker="default"/>                      
             <http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-sasl-authentication"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
-        <subsystem xmlns="urn:jboss:domain:resource-adapters:7.0"/>
+        <subsystem xmlns="urn:jboss:domain:resource-adapters:7.1"/>
         <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
         <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
             <deployment-permissions>
