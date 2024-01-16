@@ -109,18 +109,12 @@
                     <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
                         <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
                         <driver>h2</driver>
-                        <security>
-                            <user-name>sa</user-name>
-                            <password>sa</password>
-                        </security>
+                        <security user-name="sa" password="sa"/>
                     </datasource>
                     <datasource jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngineDS" enabled="true" use-java-context="true">
                         <connection-url>jdbc:h2:mem:processengine;DB_CLOSE_DELAY=-1</connection-url>
                         <driver>h2</driver>
-                        <security>
-                            <user-name>sa</user-name>
-                            <password>sa</password>
-                        </security>
+                        <security user-name="sa" password="sa"/>
                     </datasource>
                     <drivers>
                         <driver name="h2" module="com.h2database.h2">
@@ -551,10 +545,7 @@
                     <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
                         <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
                         <driver>h2</driver>
-                        <security>
-                            <user-name>sa</user-name>
-                            <password>sa</password>
-                        </security>
+                        <security user-name="sa" password="sa"/>
                     </datasource>
                     <drivers>
                         <driver name="h2" module="com.h2database.h2">
@@ -1017,10 +1008,7 @@
                     <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
                         <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
                         <driver>h2</driver>
-                        <security>
-                            <user-name>sa</user-name>
-                            <password>sa</password>
-                        </security>
+                        <security user-name="sa" password="sa"/>
                     </datasource>
                     <drivers>
                         <driver name="h2" module="com.h2database.h2">
@@ -1452,10 +1440,7 @@
                     <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
                         <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
                         <driver>h2</driver>
-                        <security>
-                            <user-name>sa</user-name>
-                            <password>sa</password>
-                        </security>
+                        <security user-name="sa" password="sa"/>
                     </datasource>
                     <drivers>
                         <driver name="h2" module="com.h2database.h2">

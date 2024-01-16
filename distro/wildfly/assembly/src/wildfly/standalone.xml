@@ -131,19 +131,13 @@
                 <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
                     <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
                     <driver>h2</driver>
-                    <security>
-                        <user-name>sa</user-name>
-                        <password>sa</password>
-                    </security>
+                    <security user-name="sa" password="sa"/>
                 </datasource>
                 <datasource jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngine" enabled="true" use-java-context="true" jta="true" use-ccm="true">
                     <connection-url>jdbc:h2:./camunda-h2-dbs/process-engine;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
                     <driver>h2</driver>
                     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
-                    <security>
-                        <user-name>sa</user-name>
-                        <password>sa</password>
-                    </security>
+                    <security user-name="sa" password="sa"/>
                 </datasource>
                 <drivers>
                     <driver name="h2" module="com.h2database.h2">
