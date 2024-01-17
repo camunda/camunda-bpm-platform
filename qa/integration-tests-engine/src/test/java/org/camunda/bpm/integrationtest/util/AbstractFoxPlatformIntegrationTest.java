@@ -45,6 +45,8 @@ import java.util.logging.Logger;
 
 public abstract class AbstractFoxPlatformIntegrationTest {
 
+  protected static final long JOBS_WAIT_TIMEOUT_MS = 20_000L;
+
   protected Logger logger = Logger.getLogger(AbstractFoxPlatformIntegrationTest.class.getName());
 
   protected ProcessEngineService processEngineService;
@@ -101,7 +103,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   }
 
   public void waitForJobExecutorToProcessAllJobs() {
-    waitForJobExecutorToProcessAllJobs(12000);
+    waitForJobExecutorToProcessAllJobs(JOBS_WAIT_TIMEOUT_MS);
   }
 
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait) {
