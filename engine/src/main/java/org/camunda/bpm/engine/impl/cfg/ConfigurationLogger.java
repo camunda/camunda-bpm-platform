@@ -115,21 +115,26 @@ public class ConfigurationLogger extends ProcessEngineLogger {
   }
 
   /**
-   * Method for logging message when model history TTL longer than global TTL.
+   * Method for logging message when model TTL longer than global TTL.
    *
    * @param definitionKey the correlated definition key with which history TTL is related to.
    *                      For processes related to httl, that is the processDefinitionKey, for cases the case definition key
    *                      whereas for decisions is the decision definition key.
    */
-  public void logModelHTTLLongerThanGlobalConfiguration(String definitionKey, String ttl) {
+  public void logModelHTTLLongerThanGlobalConfiguration(String definitionKey) {
     logWarn(
         "017", "definitionKey: {}; "
-            + "The specified TTL (Time To Live) in the model is longer than the global (180 days) TTL configuration: {} days",
-            definitionKey, ttl);
+            + "The specified Time To Live (TTL) in the model is longer than the global TTL configuration. "
+            + "The historic data related to this model will be cleaned up at later point comparing to the other processes.",
+            definitionKey);
   }
 
   public NotValidException logErrorNoTTLConfigured() {
     return new NotValidException(exceptionMessage("018",
-        "History Time To Live cannot be null. You can set a default historyTimeToLive as a global process engine configuration."));
+        "History Time To Live (TTL) cannot be null. "
+        + "TTL is necessary for the History Cleanup to work. The following options are possible:\n"
+        + "* Set historyTimeToLive in the model\n"
+        + "* Set a default historyTimeToLive as a global process engine configuration\n"
+        + "* (Not recommended) Deactivate the enforceTTL config to disable this check"));
   }
 }

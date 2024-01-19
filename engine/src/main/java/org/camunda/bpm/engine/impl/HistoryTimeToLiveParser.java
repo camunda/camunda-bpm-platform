@@ -110,7 +110,7 @@ public class HistoryTimeToLiveParser {
       }
 
       if (result.hasLongerModelValueThanGlobalConfig()) {
-        LOG.logModelHTTLLongerThanGlobalConfiguration(definitionKey, result.value);
+        LOG.logModelHTTLLongerThanGlobalConfiguration(definitionKey);
       }
     }
 
