@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.spring.variable.impl.format.xml;
+package org.camunda.bpm.client.variable.impl.format.xml;
 
 import static org.camunda.bpm.engine.variable.Variables.SerializationDataFormats.XML;
 
 import org.camunda.bpm.client.spi.DataFormat;
 import org.camunda.bpm.client.spi.DataFormatProvider;
+import org.camunda.bpm.client.spring.variable.impl.format.xml.DomXmlDataFormat;
 
 public class DomXmlDataFormatProvider implements DataFormatProvider {
 
