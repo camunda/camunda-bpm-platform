@@ -47,6 +47,8 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
@@ -59,7 +61,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 /**
  * @author roman.smirnov
@@ -502,7 +503,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
   @Deployment(resources = {
     "processes/variables-process.bpmn"
   })
-  @Category(SlowMariaDbTest.class)
+  @RequiredDatabase(excludes = {DbSqlSessionFactory.MYSQL, DbSqlSessionFactory.MARIADB})
   public void testQueryWithComplexVariableFilter() {
     // given
     startProcessInstances("variableProcess", 2);
