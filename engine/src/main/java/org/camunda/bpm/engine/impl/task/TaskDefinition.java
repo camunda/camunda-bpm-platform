@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.form.FormDefinition;
@@ -156,7 +155,20 @@ public class TaskDefinition {
   }
 
   public List<TaskListener> getTaskListeners(String eventName) {
-    return taskListeners.get(eventName);
+    // ensure builtinTaskListeners are executed before regular taskListeners
+    List<TaskListener> listeners = new ArrayList<>();
+
+    List<TaskListener> builtinTaskListenersForEvent = getBuiltinTaskListeners(eventName);
+    if (builtinTaskListenersForEvent != null) {
+      listeners.addAll(builtinTaskListenersForEvent);
+    }
+
+    List<TaskListener> taskListenersForEvent = taskListeners.get(eventName);
+    if (taskListenersForEvent != null) {
+      listeners.addAll(taskListenersForEvent);
+    }
+
+    return listeners;
   }
 
   public List<TaskListener> getBuiltinTaskListeners(String eventName) {
@@ -172,14 +184,6 @@ public class TaskDefinition {
   }
 
   public void addBuiltInTaskListener(String eventName, TaskListener taskListener) {
-    List<TaskListener> listeners = taskListeners.get(eventName);
-    if (listeners == null) {
-      listeners = new ArrayList<>();
-      taskListeners.put(eventName, listeners);
-    }
-
-    listeners.add(0, taskListener);
-
     CollectionUtil.addToMapOfLists(builtinTaskListeners, eventName, taskListener);
   }
 

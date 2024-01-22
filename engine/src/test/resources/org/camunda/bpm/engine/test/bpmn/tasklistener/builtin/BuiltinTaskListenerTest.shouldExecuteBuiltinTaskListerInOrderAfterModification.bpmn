@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0ylgmhj" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.13.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.19.0">
+  <bpmn:process id="oneTaskProcess" isExecutable="true" camunda:historyTimeToLive="180">
+    <bpmn:startEvent id="startEvent">
+      <bpmn:outgoing>Flow_1ti3kzd</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1ti3kzd" sourceRef="startEvent" targetRef="theTask" />
+    <bpmn:endEvent id="endEvent">
+      <bpmn:incoming>Flow_0ayjmt5</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0ayjmt5" sourceRef="theTask" targetRef="endEvent" />
+    <bpmn:userTask id="theTask">
+      <bpmn:extensionElements>
+        <camunda:taskListener class="org.camunda.bpm.engine.test.bpmn.tasklistener.builtin.TestTaskListener" event="create" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1ti3kzd</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ayjmt5</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="oneTaskProcess">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="startEvent">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_11zmogh_di" bpmnElement="endEvent">
+        <dc:Bounds x="432" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0hsoozz_di" bpmnElement="theTask">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1ti3kzd_di" bpmnElement="Flow_1ti3kzd">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ayjmt5_di" bpmnElement="Flow_0ayjmt5">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="432" y="117" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
