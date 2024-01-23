@@ -80,11 +80,18 @@ public class ProcessDataContext {
     this(configuration, false, false);
   }
 
-  public ProcessDataContext(ProcessEngineConfigurationImpl configuration, boolean parkExternalProperties) {
-    this(configuration, false, parkExternalProperties);
+  public ProcessDataContext(ProcessEngineConfigurationImpl configuration, boolean initFromCurrentMdc) {
+    this(configuration, initFromCurrentMdc, false);
   }
 
-  //TODO add JavaDoc to explain how initExternalProperties are used (inner, outer commands)
+  /**
+   * All-args constructor.
+   *
+   * @param configuration          the process engine configuration to use to fetch Logging Context Parameters.
+   * @param initFromCurrentMdc     when true, this process data context will be populated from the current state of the MDC
+   * @param parkExternalProperties when true, the MDC tuples that are the same as the configured logging context parameters
+   *                               will be preserved separately in the process data context.
+   */
   public ProcessDataContext(ProcessEngineConfigurationImpl configuration, boolean initFromCurrentMdc,
                             boolean parkExternalProperties) {
     mdcPropertyActivityId = configuration.getLoggingContextActivityId();
@@ -229,7 +236,7 @@ public class ProcessDataContext {
   }
 
   /**
-   * Restores the MDC External Properties
+   * Restores the external properties to the MDC. Meant to be called for ProcessDataContexts associated with outer commands.
    */
   public void restoreExternalMDCProperties() {
     externalProperties.forEach(MdcAccess::put);
