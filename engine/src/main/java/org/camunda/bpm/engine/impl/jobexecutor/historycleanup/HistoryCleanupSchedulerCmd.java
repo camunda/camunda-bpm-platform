@@ -50,9 +50,7 @@ public class HistoryCleanupSchedulerCmd implements Command<Void> {
 
   @Override
   public Void execute(CommandContext commandContext) {
-    if (isMetricsEnabled()) {
       reportMetrics(commandContext);
-    }
 
     JobEntity jobEntity = commandContext.getJobManager().findJobById(jobId);
 
@@ -117,11 +115,5 @@ public class HistoryCleanupSchedulerCmd implements Command<Void> {
         engineConfiguration.getDbMetricsReporter().reportValueAtOnce(report.getKey(), report.getValue());
       }
     }
-  }
-
-  protected boolean isMetricsEnabled() {
-    return Context
-        .getProcessEngineConfiguration()
-        .isHistoryCleanupMetricsEnabled();
   }
 }
