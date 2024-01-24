@@ -4960,8 +4960,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.historyCleanupBatchThreshold = historyCleanupBatchThreshold;
   }
 
+  /**
+   * Checks if history cleanup metrics are enabled.
+   * This method returns {@code true} only if both {@code historyCleanupMetricsEnabled} and
+   * {@code isMetricsEnabled} are true
+   *
+   * @return {@code true} if both history cleanup metrics and general metrics are enabled,
+   *         {@code false} otherwise.
+   */
   public boolean isHistoryCleanupMetricsEnabled() {
-    return historyCleanupMetricsEnabled;
+    return historyCleanupMetricsEnabled && isMetricsEnabled;
   }
 
   public void setHistoryCleanupMetricsEnabled(boolean historyCleanupMetricsEnabled) {
