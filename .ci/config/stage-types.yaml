@@ -141,6 +141,14 @@ platform-jdk-openjdk-jdk-17-latest:
   nodeLabel: 'h2'
   jdkVersion: 'openjdk-jdk-17-latest'
   withNpm: true
+platform-jdk-openjdk-jdk-21-latest:
+  directory: '.'
+  command: 'install source:jar source:test-jar -pl ''!webapps/assembly'',''!webapps/assembly-jakarta'' -Pdistro,distro-ce,distro-wildfly'
+  stash:
+    runtimeStash: true
+  nodeLabel: 'h2'
+  jdkVersion: 'openjdk-jdk-21-latest'
+  withNpm: true
 platform-jdk-openjdk-jdk-11-latest:
   directory: '.'
   command: 'install source:jar source:test-jar
@@ -170,6 +178,14 @@ platform-jdk-jdk-17-latest:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'jdk-17-latest'
+  withNpm: true
+platform-jdk-jdk-21-latest:
+  directory: '.'
+  command: 'install source:jar source:test-jar -pl ''!webapps/assembly'',''!webapps/assembly-jakarta'' -Pdistro,distro-ce,distro-wildfly'
+  stash:
+    runtimeStash: true
+  nodeLabel: 'h2'
+  jdkVersion: 'jdk-21-latest'
   withNpm: true
 platform-jdk-jdk-11-latest:
   directory: '.'
