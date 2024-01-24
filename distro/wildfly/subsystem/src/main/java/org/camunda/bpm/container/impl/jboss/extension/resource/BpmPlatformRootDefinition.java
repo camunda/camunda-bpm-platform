@@ -59,6 +59,7 @@ public class BpmPlatformRootDefinition extends PersistentResourceDefinition {
   public void registerOperations(ManagementResourceRegistration resourceRegistration) {
     super.registerOperations(resourceRegistration);
 
+    //register describe operation,  note that this can be also registered in BpmPlatformExtension.initialize(ExtensionContext)
     resourceRegistration.registerOperationHandler(GenericSubsystemDescribeHandler.DEFINITION, GenericSubsystemDescribeHandler.INSTANCE);
   }
 }

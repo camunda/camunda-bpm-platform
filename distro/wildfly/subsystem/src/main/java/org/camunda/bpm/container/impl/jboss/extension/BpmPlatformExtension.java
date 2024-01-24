@@ -53,8 +53,12 @@ public class BpmPlatformExtension implements Extension {
 
   @Override
   public void initialize(ExtensionContext context) {
+    // register subsystem with its model version
     SubsystemRegistration subsystem = context.registerSubsystem(SUBSYSTEM_NAME, ModelVersion.create(BPM_PLATFORM_SUBSYSTEM_MAJOR_VERSION, BPM_PLATFORM_SUBSYSTEM_MINOR_VERSION));
+    // register subsystem model with subsystem definition that defines all attributes and operations
     subsystem.registerSubsystemModel(BpmPlatformRootDefinition.INSTANCE);
+        // we can register additional submodels here
+    //
     subsystem.registerXMLElementWriter(parser);
   }
 
