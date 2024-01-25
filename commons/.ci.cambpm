@@ -3,7 +3,9 @@ buildMavenAndDeployToMavenCentral([
   jdk:11,
   extraJdks: [
     'openjdk-jdk-21-latest',
-    'jdk-21-latest'
+    'jdk-21-latest',
+    'openjdk-jdk-17-latest',
+    'jdk-17-latest'
   ],
   mvn:3.8,
   additionalMvnGoals:'javadoc:javadoc',
