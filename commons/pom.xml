@@ -23,6 +23,8 @@
   <properties>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
     <additionalparam>-Xdoclint:none</additionalparam>
+
+    <maven-bundle-plugin.version>5.1.1</maven-bundle-plugin.version>
   </properties>
 
   <dependencyManagement>
@@ -73,6 +75,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
+          <version>${maven-bundle-plugin.version}</version>
           <configuration>
             <instructions>
               <Export-Package>org.camunda*</Export-Package>
