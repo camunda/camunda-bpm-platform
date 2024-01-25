@@ -139,6 +139,7 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
 
   public void undeploy(DeploymentUnit context) {
 
+    // TODO there's nothing here? the undeploy was done via the services?
   }
 
 }

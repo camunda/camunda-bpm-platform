@@ -66,4 +66,10 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler {
     serviceBuilder.install();
   }
 
+//  @Override
+//  protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
+  //There is operation validateAndSet on AttributeDefinition that helps us validate and set the model based on definition of the attribute.
+//      TypeDefinition.TICK.validateAndSet(operation,model);
+  //...
+//  }
 }

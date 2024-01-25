@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.jboss.as.connector.util.AbstractParser;
 import org.jboss.as.connector.util.ParserException;
 import org.jboss.as.controller.AttributeDefinition;
+import org.jboss.as.controller.PersistentResourceXMLDescription;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.parsing.ParseUtils;
 import org.jboss.as.controller.persistence.SubsystemMarshallingContext;
@@ -378,6 +379,14 @@ public class BpmPlatformParser1_1 extends AbstractParser {
 
     static final BpmPlatformSubsystemParser INSTANCE = new BpmPlatformSubsystemParser();
 
+//    private SubsystemParser() {
+//      //this.xmlDescription = PersistentResourceXMLDescription.builder(SubsystemDefinition.INSTANCE)
+//      this.xmlDescription = PersistentResourceXMLDescription.builder(SubsystemDefinition.INSTANCE.getPathElement())
+//              // use .addChild(...) to add any children
+//              .build();
+//  }
+
+
     /**
      * {@inheritDoc}
      */
@@ -388,11 +397,11 @@ public class BpmPlatformParser1_1 extends AbstractParser {
 
       final ModelNode subsystemAddress = new ModelNode();
       subsystemAddress.add(SUBSYSTEM, ModelConstants.SUBSYSTEM_NAME);
-      subsystemAddress.protect();
+      subsystemAddress.protect(); //
 
       final ModelNode subsystemAdd = new ModelNode();
       subsystemAdd.get(OP).set(ADD);
-      subsystemAdd.get(OP_ADDR).set(subsystemAddress);
+      subsystemAdd.get(OP_ADDR).set(subsystemAddress);// subsystem.get(OP_ADDR).set(PathAddress.pathAddress(SUBSYSTEM_PATH).toModelNode());
       operations.add(subsystemAdd);
 
 

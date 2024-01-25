@@ -36,7 +36,9 @@ public class BpmPlatformRootDefinition extends PersistentResourceDefinition {
   private BpmPlatformRootDefinition() {
     super(BpmPlatformExtension.SUBSYSTEM_PATH,
         BpmPlatformExtension.getResourceDescriptionResolver(),
+        //We always need to add an 'add' operation
         BpmPlatformSubsystemAdd.INSTANCE,
+        //Every resource that is added, normally needs a remove operation
         BpmPlatformSubsystemRemove.INSTANCE);
   }
 

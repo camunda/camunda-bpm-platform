@@ -32,8 +32,6 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 
-import java.util.List;
-
 
 /**
  * Provides the description and the implementation of the subsystem#add operation.
@@ -47,6 +45,13 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
   private BpmPlatformSubsystemAdd() {
   }
+
+
+  // SubsystemAdd also has a performBoottime() method which is used for
+  // initializing the deployer chain associated with this subsystem. We will
+  // talk about the deployers later on. However, the basic idea for all
+  // operation handlers is that we do any model updates before changing the
+  // actual runtime state.
 
   /** {@inheritDoc} */
   @Override

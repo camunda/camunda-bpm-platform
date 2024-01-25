@@ -58,7 +58,7 @@ public class BpmPlatformExtension implements Extension {
     // register subsystem model with subsystem definition that defines all attributes and operations
     subsystem.registerSubsystemModel(BpmPlatformRootDefinition.INSTANCE);
         // we can register additional submodels here
-    //
+    //...
     subsystem.registerXMLElementWriter(parser);
   }
 
