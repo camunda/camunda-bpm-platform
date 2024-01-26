@@ -59,7 +59,7 @@ public class CommandInvocationContext {
    */
   public CommandInvocationContext(Command<?> command, ProcessEngineConfigurationImpl configuration, boolean isOuterCommand) {
     this.command = command;
-    this.processDataContext = new ProcessDataContext(configuration, isOuterCommand); // only outer commands will park external properties
+    this.processDataContext = new ProcessDataContext(configuration, false, isOuterCommand); // only outer command park external properties
   }
 
   public Throwable getThrowable() {
