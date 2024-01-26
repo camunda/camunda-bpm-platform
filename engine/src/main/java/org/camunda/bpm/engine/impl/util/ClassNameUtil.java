@@ -40,4 +40,25 @@ public abstract class ClassNameUtil {
     }
     return unqualifiedClassName;
   }
+
+  /**
+   * Returns True if the given class name represents a lambda.
+   *
+   * @param className the given class name
+   */
+  public static boolean isLambda(String className) {
+    if (isJdk21OrGreater()) {
+      return className.contains("$$Lambda");
+    }
+
+    return className.contains("$$Lambda$");
+  }
+
+  /**
+   * Returns true if the JDK version is greater or equal to 21.
+   */
+  public static boolean isJdk21OrGreater() {
+    int featureVersion = Runtime.version().feature();
+    return featureVersion >= 21;
+  }
 }

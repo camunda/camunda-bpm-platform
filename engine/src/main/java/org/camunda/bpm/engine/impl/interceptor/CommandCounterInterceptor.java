@@ -30,7 +30,6 @@ public class CommandCounterInterceptor extends CommandInterceptor {
 
   @Override
   public <T> T execute(Command<T> command) {
-
     try {
       return next.execute(command);
     } finally {
@@ -38,7 +37,7 @@ public class CommandCounterInterceptor extends CommandInterceptor {
       if (telemetryRegistry != null) {
         String className = ClassNameUtil.getClassNameWithoutPackage(command);
         // anonymous class/lambda implementations of the Command interface are excluded
-        if (!command.getClass().isAnonymousClass() && !className.contains("$$Lambda$")) {
+        if (!command.getClass().isAnonymousClass() && !ClassNameUtil.isLambda(className)) {
           className = parseLocalClassName(className);
           telemetryRegistry.markOccurrence(className);
         }
