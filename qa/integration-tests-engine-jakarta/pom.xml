@@ -288,6 +288,27 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.gmaven</groupId>
+        <artifactId>gmaven-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <providerSelection>2.0</providerSelection>
+              <source>
+                Random random = new Random()
+                int portOffset = random.nextInt(10)
+                project.properties.setProperty('portOffset', portOffset)
+              </source>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
