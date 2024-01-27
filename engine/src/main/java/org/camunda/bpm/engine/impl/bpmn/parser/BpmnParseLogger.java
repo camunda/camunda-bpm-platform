@@ -44,6 +44,10 @@ public class BpmnParseLogger extends ProcessEngineLogger {
     logError("004", "Unexpected Exception with message: {} ", cause.getMessage());
   }
 
+  public void intermediateCatchTimerEventWithTimeCycleNotRecommended(String elementId) {
+    logInfo("005", "Element with id '{}' is an intermediate catch timer event with a time cycle which is not recommended.", elementId);
+  }
+
   // EXCEPTIONS
 
   public ProcessEngineException parsingProcessException(Exception cause) {

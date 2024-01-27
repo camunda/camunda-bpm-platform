@@ -3566,7 +3566,7 @@ public class BpmnParse extends Parse {
 
     Element timeCycleElement = timerEventDefinition.element("timeCycle");
     if (timeCycleElement != null) {
-      addTimeCycleWarning(timeCycleElement, "intermediate catch", timerActivity.getId());
+      LOG.intermediateCatchTimerEventWithTimeCycleNotRecommended(timerActivity.getId());
     }
 
     addTimerDeclaration(timerActivity.getEventScope(), timerDeclaration);

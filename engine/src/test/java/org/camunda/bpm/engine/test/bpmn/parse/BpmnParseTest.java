@@ -67,6 +67,8 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.test.util.SystemPropertiesRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.commons.testing.ProcessEngineLoggingRule;
+import org.camunda.commons.testing.WatchLogger;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
@@ -88,6 +90,9 @@ public class BpmnParseTest {
 
   @Rule
   public SystemPropertiesRule systemProperties = SystemPropertiesRule.resetPropsAfterTest();
+
+  @Rule
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
 
   public RepositoryService repositoryService;
   public RuntimeService runtimeService;
@@ -1362,6 +1367,31 @@ public class BpmnParseTest {
       assertThat(errors.get(2).getMainElementId()).isEqualTo("plainStart2");
       assertThat(errors.get(3).getMainElementId()).isEqualTo("plainStartInSub1");
     }
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.bpmn.parser"}, level = "INFO")
+  public void testIntermediateCatchTimerEventWithTimeCycleNotRecommendedInfoMessage() {
+    String timerCycle = "<?xml version='1.0' encoding='UTF-8'?>" +
+        "<definitions xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'" +
+        "  xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL'" +
+        "  xmlns:camunda='http://camunda.org/schema/1.0/bpmn'" +
+        "  targetNamespace='Examples'>" +
+        "  <process id='process' isExecutable='true'>" +
+        "    <startEvent id='theStart' name='Start'></startEvent>" +
+        "    <endEvent id='theEnd' name='End'></endEvent>" +
+        "    <intermediateCatchEvent id='timerintermediatecatchevent1' name='TimerCatchEvent'>" +
+        "      <timerEventDefinition>" +
+        "    	   <timeCycle>0 0/5 * * * ?</timeCycle>" +
+        "      </timerEventDefinition>" +
+        "    </intermediateCatchEvent>" +
+        "    <sequenceFlow id='flow1' name='' sourceRef='theStart' targetRef='timerintermediatecatchevent1'></sequenceFlow>" +
+        "    <sequenceFlow id='flow2' name='' sourceRef='timerintermediatecatchevent1' targetRef='theEnd'></sequenceFlow>" +
+        "  </process>" +
+        "</definitions>";
+    repositoryService.createDeployment().addString("process.bpmn20.xml", timerCycle).deploy();
+    String logMessage = "Element with id 'timerintermediatecatchevent1' is an intermediate catch timer event with a time cycle which is not recommended.";
+    assertThat(loggingRule.getFilteredLog(logMessage)).hasSize(1);
   }
 
   @Test
