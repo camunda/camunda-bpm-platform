@@ -347,9 +347,6 @@ public class BpmnParse extends Parse {
       throw LOG.parsingProcessException(e);
 
     } finally {
-      if (hasInfos()) {
-        logInfos();
-      }
       if (hasWarnings()) {
         logWarnings();
       }
@@ -3569,7 +3566,7 @@ public class BpmnParse extends Parse {
 
     Element timeCycleElement = timerEventDefinition.element("timeCycle");
     if (timeCycleElement != null) {
-      addTimeCycleInfo(timeCycleElement, "intermediate catch", timerActivity.getId());
+      addTimeCycleWarning(timeCycleElement, "intermediate catch", timerActivity.getId());
     }
 
     addTimerDeclaration(timerActivity.getEventScope(), timerDeclaration);
@@ -4880,11 +4877,6 @@ public class BpmnParse extends Parse {
     } else {
       return new ConstantValueProvider(value);
     }
-  }
-
-  protected void addTimeCycleInfo(Element timeCycleElement, String type, String timerElementId) {
-    String info = "It is not recommended to use a " + type + " timer event with a time cycle.";
-    addInfo(info, timeCycleElement, timerElementId);
   }
 
   protected void addTimeCycleWarning(Element timeCycleElement, String type, String timerElementId) {

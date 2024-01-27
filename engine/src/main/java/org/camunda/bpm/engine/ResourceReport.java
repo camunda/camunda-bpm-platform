@@ -31,7 +31,4 @@ public interface ResourceReport {
 
   /** Returns list of warnings in this report */
   List<Problem> getWarnings();
-
-  /** Returns list of infos in this report */
-  List<Problem> getInfos();
 }

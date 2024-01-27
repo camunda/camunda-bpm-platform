@@ -975,15 +975,8 @@ public abstract class MockProvider {
   public static final int EXAMPLE_PROBLEM_LINE_2 = 87;
   public static final int EXAMPLE_PROBLEM_COLUMN_2 = 88;
   public static final String EXAMPLE_PROBLEM_ELEMENT_ID_2 = "element_89";
-  public static final String EXAMPLE_PROBLEM_MESSAGE_2 = "aProblemMessage_" + EXAMPLE_PROBLEM_ELEMENT_ID_2;
-  public static final int EXAMPLE_PROBLEM_LINE_3 = 97;
-  public static final int EXAMPLE_PROBLEM_COLUMN_3 = 98;
-  public static final String EXAMPLE_PROBLEM_ELEMENT_ID_3 = "element_99";
-  public static final String EXAMPLE_PROBLEM_MESSAGE_3 = "aProblemMessage_" + EXAMPLE_PROBLEM_ELEMENT_ID_3;
   public static final String EXAMPLE_RESOURCE_NAME = "abc";
-  public static final List<String> EXAMPLE_ELEMENT_IDS = Arrays.asList(
-      EXAMPLE_PROBLEM_ELEMENT_ID, EXAMPLE_PROBLEM_ELEMENT_ID_2, EXAMPLE_PROBLEM_ELEMENT_ID_3);
-
+  public static final List<String> EXAMPLE_ELEMENT_IDS = Arrays.asList(EXAMPLE_PROBLEM_ELEMENT_ID, EXAMPLE_PROBLEM_ELEMENT_ID_2);
 
   // Telemetry
   public static final String EXAMPLE_TELEMETRY_INSTALLATION_ID = "8343cc7a-8ad1-42d4-97d2-43452c0bdfa3";

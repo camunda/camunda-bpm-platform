@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.Problem;
@@ -60,7 +61,6 @@ public abstract class Parse extends DefaultHandler {
   protected Element rootElement = null;
   protected List<Problem> errors = new ArrayList<>();
   protected List<Problem> warnings = new ArrayList<>();
-  protected List<Problem> infos = new ArrayList<>();
   protected String schemaResource;
 
   public Parse(Parser parser) {
@@ -218,37 +218,25 @@ public abstract class Parse extends DefaultHandler {
     return warnings != null && !warnings.isEmpty();
   }
 
-  public void addInfo(String errorMessage, Element element, String... elementIds) {
-    infos.add(new ProblemImpl(errorMessage, element, elementIds));
-  }
-
-  public boolean hasInfos() {
-    return infos != null && !infos.isEmpty();
-  }
-
-  public void logInfos() {
-    String message = buildMessage(name, infos);
-    LOG.logParseInfos(message);
-  }
-
   public void logWarnings() {
-    String message = buildMessage(name, warnings);
-    LOG.logParseWarnings(message);
+    StringBuilder builder = new StringBuilder();
+    for (Problem warning : warnings) {
+      builder.append("\n* ");
+      builder.append(warning.getMessage());
+      builder.append(" | resource " + name);
+      builder.append(warning.toString());
+    }
+    LOG.logParseWarnings(builder.toString());
   }
 
   public void throwExceptionForErrors() {
-    String message = buildMessage(name, errors);
-    throw LOG.exceptionDuringParsing(message, name, errors, warnings, infos);
-  }
-
-  private static String buildMessage(String resourceName, List<Problem> problems) {
-    StringBuilder builder = new StringBuilder();
-    for (Problem problem : problems) {
-      builder.append("\n* ");
-      builder.append(problem.getMessage());
-      builder.append(" | resource " + resourceName);
-      builder.append(problem.toString());
+    StringBuilder strb = new StringBuilder();
+    for (Problem error : errors) {
+      strb.append("\n* ");
+      strb.append(error.getMessage());
+      strb.append(" | resource " + name);
+      strb.append(error.toString());
     }
-    return builder.toString();
+    throw LOG.exceptionDuringParsing(strb.toString(), name, errors, warnings);
   }
 }

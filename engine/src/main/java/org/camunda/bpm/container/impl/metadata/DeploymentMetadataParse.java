@@ -56,9 +56,6 @@ public abstract class DeploymentMetadataParse extends Parse {
       throw LOG.unknownExceptionWhileParsingDeploymentDescriptor(e);
     }
     finally {
-      if (hasInfos()) {
-        logInfos();
-      }
       if (hasWarnings()) {
         logWarnings();
       }

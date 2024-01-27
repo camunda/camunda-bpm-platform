@@ -28,7 +28,8 @@ import org.camunda.bpm.engine.ResourceReport;
 /**
  * Dto for {@link ParseException}
  *
- * The exception contains a list of errors, warnings and infos that occurred during parsing.
+ * The exception contains a list of errors and warning that occurred during
+ * parsing.
  */
 public class ParseExceptionDto extends ExceptionDto {
 
@@ -52,13 +53,7 @@ public class ParseExceptionDto extends ExceptionDto {
       for (Problem warning : report.getWarnings()) {
         warningDtos.add(ProblemDto.fromProblem(warning));
       }
-
-      List<ProblemDto> infoDtos = new ArrayList<>();
-      for (Problem info : report.getInfos()) {
-        infoDtos.add(ProblemDto.fromProblem(info));
-      }
-
-      ResourceReportDto resourceReportDto = new ResourceReportDto(errorDtos, warningDtos, infoDtos);
+      ResourceReportDto resourceReportDto = new ResourceReportDto(errorDtos, warningDtos);
       dto.details.put(report.getResourceName(), resourceReportDto);
     }
 

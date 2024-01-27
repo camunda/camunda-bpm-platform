@@ -1414,9 +1414,8 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     resourceNames.addAll( Arrays.asList("data", "more-data") );
     String message = "expected exception";
     List<Problem> mockErrors = mockProblems(EXAMPLE_PROBLEM_COLUMN, EXAMPLE_PROBLEM_LINE, message, EXAMPLE_PROBLEM_ELEMENT_ID);
-    List<Problem> mockWarnings = mockProblems(EXAMPLE_PROBLEM_COLUMN_2, EXAMPLE_PROBLEM_LINE_2, EXAMPLE_PROBLEM_MESSAGE_2, EXAMPLE_PROBLEM_ELEMENT_ID_2);
-    List<Problem> mockInfos = mockProblems(EXAMPLE_PROBLEM_COLUMN_3, EXAMPLE_PROBLEM_LINE_3, EXAMPLE_PROBLEM_MESSAGE_3, EXAMPLE_PROBLEM_ELEMENT_ID_3);
-    ParseException mockParseException = createMockParseException(mockErrors, mockWarnings, mockInfos, message);
+    List<Problem> mockWarnings = mockProblems(EXAMPLE_PROBLEM_COLUMN_2, EXAMPLE_PROBLEM_LINE_2, EXAMPLE_EXCEPTION_MESSAGE, EXAMPLE_PROBLEM_ELEMENT_ID_2);
+    ParseException mockParseException = createMockParseException(mockErrors, mockWarnings, message);
     when(mockDeploymentBuilder.deployWithResult()).thenThrow(mockParseException);
 
     Response response = given()
@@ -1445,17 +1444,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     HashMap<String, Object> warning = warnings.get(0);
     assertEquals(EXAMPLE_PROBLEM_COLUMN_2, warning.get("column"));
     assertEquals(EXAMPLE_PROBLEM_LINE_2, warning.get("line"));
-    assertEquals(EXAMPLE_PROBLEM_MESSAGE_2, warning.get("message"));
+    assertEquals(EXAMPLE_EXCEPTION_MESSAGE, warning.get("message"));
     assertEquals(EXAMPLE_PROBLEM_ELEMENT_ID_2, warning.get("mainElementId"));
     assertEquals(EXAMPLE_ELEMENT_IDS, warning.get("еlementIds"));
-
-    List<HashMap<String, Object>> infos = problems.get("infos");
-    HashMap<String, Object> info = infos.get(0);
-    assertEquals(EXAMPLE_PROBLEM_COLUMN_3, info.get("column"));
-    assertEquals(EXAMPLE_PROBLEM_LINE_3, info.get("line"));
-    assertEquals(EXAMPLE_PROBLEM_MESSAGE_3, info.get("message"));
-    assertEquals(EXAMPLE_PROBLEM_ELEMENT_ID_3, info.get("mainElementId"));
-    assertEquals(EXAMPLE_ELEMENT_IDS, info.get("еlementIds"));
   }
 
   @Test
@@ -2166,7 +2157,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   }
 
   private ParseException createMockParseException(List<Problem> mockErrors,
-      List<Problem> mockWarnings, List<Problem> mockInfos, String message) {
+      List<Problem> mockWarnings, String message) {
     ParseException mockParseException = mock(ParseException.class);
     when(mockParseException.getMessage()).thenReturn(message);
 
@@ -2174,7 +2165,6 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     when(report.getResourceName()).thenReturn(EXAMPLE_RESOURCE_NAME);
     when(report.getErrors()).thenReturn(mockErrors);
     when(report.getWarnings()).thenReturn(mockWarnings);
-    when(report.getInfos()).thenReturn(mockInfos);
 
     List<ResourceReport> reports = new ArrayList<>();
     reports.add(report);
