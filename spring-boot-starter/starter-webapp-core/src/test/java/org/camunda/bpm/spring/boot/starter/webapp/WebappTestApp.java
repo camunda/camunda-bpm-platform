@@ -14,10 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.plugin.base;
+package org.camunda.bpm.spring.boot.starter.webapp;
 
-/**
- * Test maker for slow maria db tests.
- */
-public interface SlowMariaDbTest {
+import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+
+@SpringBootApplication
+@EnableConfigurationProperties(CamundaBpmProperties.class)
+public class WebappTestApp {
+
+  public static void main(String[] args) {
+    SpringApplication.run(WebappTestApp.class, args);
+  }
+
 }

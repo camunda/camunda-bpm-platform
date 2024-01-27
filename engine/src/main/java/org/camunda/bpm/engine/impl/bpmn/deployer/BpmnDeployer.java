@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -75,7 +74,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
   public static final String[] BPMN_RESOURCE_SUFFIXES = new String[] { "bpmn20.xml", "bpmn" };
 
   protected static final PropertyMapKey<String, List<JobDeclaration<?, ?>>> JOB_DECLARATIONS_PROPERTY =
-      new PropertyMapKey<String, List<JobDeclaration<?, ?>>>("JOB_DECLARATIONS_PROPERTY");
+      new PropertyMapKey<>("JOB_DECLARATIONS_PROPERTY");
 
   protected ExpressionManager expressionManager;
   protected BpmnParser bpmnParser;
@@ -185,11 +184,17 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
 
       for (JobDeclaration<?, ?> jobDeclaration : jobDeclarations) {
         boolean jobDefinitionExists = false;
+        // find matching job definition entity
         for (JobDefinition jobDefinitionEntity : existingDefinitions) {
 
-          // <!> Assumption: there can be only one job definition per activity and type
-          if(jobDeclaration.getActivityId().equals(jobDefinitionEntity.getActivityId()) &&
-              jobDeclaration.getJobHandlerType().equals(jobDefinitionEntity.getJobType())) {
+          // activity id needs to match
+          boolean activityIdMatches = jobDeclaration.getActivityId().equals(jobDefinitionEntity.getActivityId());
+          // handler type (e.g. 'async-continuation' needs to match
+          boolean handlerTypeMatches = jobDeclaration.getJobHandlerType().equals(jobDefinitionEntity.getJobType());
+          // configuration (e.g. 'async-before', 'async-after' needs to match
+          boolean configurationMatches = jobDeclaration.getJobConfiguration().equals(jobDefinitionEntity.getJobConfiguration());
+
+          if(activityIdMatches && handlerTypeMatches && configurationMatches) {
             jobDeclaration.setJobDefinitionId(jobDefinitionEntity.getId());
             jobDefinitionExists = true;
             break;
@@ -255,7 +260,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     if (latestProcessDefinition != null) {
       EventSubscriptionManager eventSubscriptionManager = getEventSubscriptionManager();
 
-      List<EventSubscriptionEntity> subscriptionsToDelete = new ArrayList<EventSubscriptionEntity>();
+      List<EventSubscriptionEntity> subscriptionsToDelete = new ArrayList<>();
 
       List<EventSubscriptionEntity> messageEventSubscriptions = eventSubscriptionManager
           .findEventSubscriptionsByConfiguration(EventType.MESSAGE.name(), latestProcessDefinition.getId());

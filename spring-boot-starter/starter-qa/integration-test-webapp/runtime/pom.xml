@@ -19,8 +19,6 @@
     <version.jersey-apache-client>1.15</version.jersey-apache-client>
     <version.junit>4.12</version.junit>
     <version.chromedriver>112.0.5615.49</version.chromedriver>
-    <version.selenium>4.10.0</version.selenium>
-
 
     <http.port>58080</http.port>
     <http.ctx-path.webapp>camunda/</http.ctx-path.webapp>
@@ -92,30 +90,6 @@
         <dependency>
           <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>selenium-java</artifactId>
-          <version>${version.selenium}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.seleniumhq.selenium</groupId>
-          <artifactId>selenium-remote-driver</artifactId>
-          <version>${version.selenium}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.seleniumhq.selenium</groupId>
-          <artifactId>selenium-chrome-driver</artifactId>
-          <version>${version.selenium}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.seleniumhq.selenium</groupId>
-          <artifactId>selenium-api</artifactId>
-          <version>${version.selenium}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.seleniumhq.selenium</groupId>
-          <artifactId>selenium-support</artifactId>
           <version>${version.selenium}</version>
         </dependency>
 

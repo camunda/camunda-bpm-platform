@@ -16,13 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.task;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.form.FormDefinition;
@@ -55,6 +53,7 @@ public class TaskDefinition {
   // task listeners
   protected Map<String, List<TaskListener>> taskListeners = new HashMap<>();
   protected Map<String, List<TaskListener>> builtinTaskListeners = new HashMap<>();
+  protected Map<String, List<TaskListener>> allTaskListeners = new HashMap<>();
   protected Map<String, TaskListener> timeoutTaskListeners = new HashMap<>();
 
   public TaskDefinition(TaskFormHandler taskFormHandler) {
@@ -155,12 +154,16 @@ public class TaskDefinition {
     this.taskListeners = taskListeners;
   }
 
-  public List<TaskListener> getTaskListeners(String eventName) {
+  public List<TaskListener> getTaskListenersForEvent(String eventName) {
     return taskListeners.get(eventName);
   }
 
-  public List<TaskListener> getBuiltinTaskListeners(String eventName) {
+  public List<TaskListener> getBuiltinTaskListenersForEvent(String eventName) {
     return builtinTaskListeners.get(eventName);
+  }
+
+  public List<TaskListener> getAllTaskListenersForEvent(String eventName) {
+    return allTaskListeners.get(eventName);
   }
 
   public TaskListener getTimeoutTaskListener(String timeoutId) {
@@ -169,18 +172,14 @@ public class TaskDefinition {
 
   public void addTaskListener(String eventName, TaskListener taskListener) {
     CollectionUtil.addToMapOfLists(taskListeners, eventName, taskListener);
+    // re-calculate combined map to ensure order of listener execution
+    populateAllTaskListeners();
   }
 
   public void addBuiltInTaskListener(String eventName, TaskListener taskListener) {
-    List<TaskListener> listeners = taskListeners.get(eventName);
-    if (listeners == null) {
-      listeners = new ArrayList<>();
-      taskListeners.put(eventName, listeners);
-    }
-
-    listeners.add(0, taskListener);
-
     CollectionUtil.addToMapOfLists(builtinTaskListeners, eventName, taskListener);
+    // re-calculate combined map to ensure order of listener execution
+    populateAllTaskListeners();
   }
 
   public void addTimeoutTaskListener(String timeoutId, TaskListener taskListener) {
@@ -215,4 +214,13 @@ public class TaskDefinition {
     return formDefinition.getCamundaFormDefinitionVersion();
   }
 
+  // helper methods ///////////////////////////////////////////////////////////
+
+  protected void populateAllTaskListeners() {
+    // reset allTaskListeners to build it from zero
+    allTaskListeners = new HashMap<>();
+    // ensure builtinTaskListeners are executed before regular taskListeners
+    CollectionUtil.mergeMapsOfLists(allTaskListeners, builtinTaskListeners);
+    CollectionUtil.mergeMapsOfLists(allTaskListeners, taskListeners);
+  }
 }

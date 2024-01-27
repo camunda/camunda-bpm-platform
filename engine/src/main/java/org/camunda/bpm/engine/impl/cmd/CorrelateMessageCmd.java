@@ -21,7 +21,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNul
 
 import java.util.List;
 import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;

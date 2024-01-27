@@ -17,26 +17,32 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.SynchronousOperationLogProducer;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
+import org.camunda.bpm.engine.impl.runtime.CorrelationHandlerResult;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
 import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResultImpl;
-import org.camunda.bpm.engine.impl.runtime.CorrelationHandlerResult;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * @author Thorben Lindhauer
  * @author Daniel Meyer
  * @author Michael Scholz
  */
-public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd implements Command<List<MessageCorrelationResultImpl>> {
+public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd implements Command<List<MessageCorrelationResultImpl>>, SynchronousOperationLogProducer<MessageCorrelationResultImpl> {
 
   /**
    * Initialize the command with a builder
@@ -70,6 +76,54 @@ public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd implemen
       results.add(createMessageCorrelationResult(commandContext, correlationResult));
     }
 
+    produceOperationLog(commandContext, results);
+
     return results;
+  }
+
+  @Override
+  public void createOperationLogEntry(CommandContext commandContext, MessageCorrelationResultImpl result, List<PropertyChange> propChanges, boolean isSummary) {
+    String processInstanceId = null;
+    String processDefinitionId = null;
+    if(result.getProcessInstance() != null) {
+      if(!isSummary) {
+        processInstanceId = result.getProcessInstance().getId();
+      }
+      processDefinitionId = result.getProcessInstance().getProcessDefinitionId();
+    }
+    commandContext.getOperationLogManager()
+        .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_CORRELATE_MESSAGE, processInstanceId, processDefinitionId, null, propChanges);
+  }
+
+  @Override
+  public Map<MessageCorrelationResultImpl, List<PropertyChange>> getPropChangesForOperation(List<MessageCorrelationResultImpl> results) {
+    Map<MessageCorrelationResultImpl, List<PropertyChange>> resultPropChanges = new HashMap<>();
+    for (MessageCorrelationResultImpl messageCorrelationResultImpl : results) {
+      List<PropertyChange> propChanges = getGenericPropChangesForOperation();
+      ProcessInstance processInstance = messageCorrelationResultImpl.getProcessInstance();
+      if(processInstance != null) {
+        propChanges.add(new PropertyChange("processInstanceId", null, processInstance.getId()));
+      }
+      resultPropChanges.put(messageCorrelationResultImpl, propChanges);
+    }
+    return resultPropChanges;
+  }
+
+  @Override
+  public List<PropertyChange> getSummarizingPropChangesForOperation(List<MessageCorrelationResultImpl> results) {
+    List<PropertyChange> propChanges = getGenericPropChangesForOperation();
+    propChanges.add(new PropertyChange("nrOfInstances", null, results.size()));
+    return propChanges;
+  }
+
+  protected List<PropertyChange> getGenericPropChangesForOperation() {
+    ArrayList<PropertyChange> propChanges = new ArrayList<>();
+
+    propChanges.add(new PropertyChange("messageName", null, messageName));
+    if(variablesCount > 0) {
+      propChanges.add(new PropertyChange("nrOfVariables", null, variablesCount));
+    }
+
+    return propChanges;
   }
 }

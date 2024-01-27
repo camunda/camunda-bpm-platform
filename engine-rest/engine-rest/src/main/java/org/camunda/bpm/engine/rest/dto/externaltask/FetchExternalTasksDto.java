@@ -43,7 +43,7 @@ public class FetchExternalTasksDto {
   protected List<FetchExternalTaskTopicDto> topics;
   protected boolean includeExtensionProperties = false;
 
-  protected List<SortingDto> sortings;
+  protected List<SortingDto> sorting;
 
   public int getMaxTasks() {
     return maxTasks;
@@ -77,12 +77,12 @@ public class FetchExternalTasksDto {
     this.usePriority = usePriority;
   }
 
-  public void setSortings(List<SortingDto> sortings) {
-    this.sortings = sortings;
+  public void setSorting(List<SortingDto> sorting) {
+    this.sorting = sorting;
   }
 
-  public List<SortingDto> getSortings() {
-    return this.sortings;
+  public List<SortingDto> getSorting() {
+    return this.sorting;
   }
 
   public boolean isIncludeExtensionProperties() {
@@ -283,7 +283,7 @@ public class FetchExternalTasksDto {
         .maxTasks(maxTasks)
         .usePriority(usePriority);
 
-    SortMapper mapper = new SortMapper(sortings, builder);
+    SortMapper mapper = new SortMapper(sorting, builder);
 
     return mapper.getBuilderWithSortConfigs();
   }
@@ -306,11 +306,11 @@ public class FetchExternalTasksDto {
         "desc", FetchAndLockBuilder::desc
     );
 
-    protected final List<SortingDto> sortings;
+    protected final List<SortingDto> sorting;
     protected final FetchAndLockBuilder builder;
 
-    protected SortMapper(List<SortingDto> sortings, FetchAndLockBuilder builder) {
-      this.sortings = (sortings == null) ? Collections.emptyList() : sortings;
+    protected SortMapper(List<SortingDto> sorting, FetchAndLockBuilder builder) {
+      this.sorting = (sorting == null) ? Collections.emptyList() : sorting;
       this.builder = builder;
     }
 
@@ -318,7 +318,7 @@ public class FetchExternalTasksDto {
      * Applies the sorting field mappings to the builder and returns it.
      */
     protected FetchAndLockBuilder getBuilderWithSortConfigs() {
-      sortings.forEach(dto -> {
+      sorting.forEach(dto -> {
         fieldMappingKey(dto).ifPresent(key -> FIELD_MAPPINGS.get(key).accept(builder));
         orderMappingKey(dto).ifPresent(key -> ORDER_MAPPINGS.get(key).accept(builder));
       });

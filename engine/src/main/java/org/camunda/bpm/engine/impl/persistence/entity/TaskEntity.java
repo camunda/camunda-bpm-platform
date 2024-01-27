@@ -1044,10 +1044,10 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     TaskDefinition resolvedTaskDefinition = getTaskDefinition();
     if (resolvedTaskDefinition != null) {
       if (skipCustomListeners) {
-        return resolvedTaskDefinition.getBuiltinTaskListeners(event);
+        return resolvedTaskDefinition.getBuiltinTaskListenersForEvent(event);
       }
       else {
-        return resolvedTaskDefinition.getTaskListeners(event);
+        return resolvedTaskDefinition.getAllTaskListenersForEvent(event);
       }
     }
     else {

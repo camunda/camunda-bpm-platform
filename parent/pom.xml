@@ -21,7 +21,7 @@
     <version.quarkus>3.2.6.Final</version.quarkus>
     <version.spring.framework>5.3.27</version.spring.framework>
     <version.spring.framework6>6.0.9</version.spring.framework6>
-    <version.spring-boot>3.1.5</version.spring-boot>
+    <version.spring-boot>3.2.1</version.spring-boot>
     <version.resteasy>3.15.6.Final</version.resteasy>
     <version.jersey2>2.34</version.jersey2>
     <!-- use minimum version of resteasy and jersey -->
@@ -58,11 +58,11 @@
     <version.wildfly26>26.0.1.Final</version.wildfly26>
     <version.wildfly26.core>18.0.4.Final</version.wildfly26.core>
 
-    <version.tomcat>9.0.82</version.tomcat>
+    <version.tomcat>9.0.85</version.tomcat>
 
     <version.arquillian>1.1.10.Final</version.arquillian>
     <version.shrinkwrap.resolvers>2.2.2</version.shrinkwrap.resolvers>
-    <version.selenium>4.1.4</version.selenium>
+    <version.selenium>4.10.0</version.selenium>
     <version.freemarker>2.3.31</version.freemarker>
 
     <version.jboss-javaee-spec>3.0.2.Final</version.jboss-javaee-spec>
@@ -301,6 +301,15 @@
           <configuration>
             <nodeVersion>v${version.nodejs}</nodeVersion>
             <npmVersion>${version.npm}</npmVersion>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <configuration>
+            <!-- https://github.com/camunda/camunda-bpm-platform/issues/3996 -->
+            <wait>750</wait>
           </configuration>
         </plugin>
       </plugins>

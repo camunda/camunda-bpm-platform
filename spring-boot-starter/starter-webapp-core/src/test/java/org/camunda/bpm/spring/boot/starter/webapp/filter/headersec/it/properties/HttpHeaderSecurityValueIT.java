@@ -17,7 +17,7 @@
 package org.camunda.bpm.spring.boot.starter.webapp.filter.headersec.it.properties;
 
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HttpClientRule;
-import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
+import org.camunda.bpm.spring.boot.starter.webapp.filter.util.FilterTestApp;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,7 +31,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { TestApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = { FilterTestApp.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
   "camunda.bpm.webapp.headerSecurity.xssProtectionValue=aValue",
   "camunda.bpm.webapp.headerSecurity.contentSecurityPolicyValue=aValue",
