@@ -1372,25 +1372,16 @@ public class BpmnParseTest {
   @Test
   @WatchLogger(loggerNames = {"org.camunda.bpm.engine.bpmn.parser"}, level = "INFO")
   public void testIntermediateCatchTimerEventWithTimeCycleNotRecommendedInfoMessage() {
-    String timerCycle = "<?xml version='1.0' encoding='UTF-8'?>" +
-        "<definitions xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'" +
-        "  xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL'" +
-        "  xmlns:camunda='http://camunda.org/schema/1.0/bpmn'" +
-        "  targetNamespace='Examples'>" +
-        "  <process id='process' isExecutable='true'>" +
-        "    <startEvent id='theStart' name='Start'></startEvent>" +
-        "    <endEvent id='theEnd' name='End'></endEvent>" +
-        "    <intermediateCatchEvent id='timerintermediatecatchevent1' name='TimerCatchEvent'>" +
-        "      <timerEventDefinition>" +
-        "    	   <timeCycle>0 0/5 * * * ?</timeCycle>" +
-        "      </timerEventDefinition>" +
-        "    </intermediateCatchEvent>" +
-        "    <sequenceFlow id='flow1' name='' sourceRef='theStart' targetRef='timerintermediatecatchevent1'></sequenceFlow>" +
-        "    <sequenceFlow id='flow2' name='' sourceRef='timerintermediatecatchevent1' targetRef='theEnd'></sequenceFlow>" +
-        "  </process>" +
-        "</definitions>";
-    repositoryService.createDeployment().addString("process.bpmn20.xml", timerCycle).deploy();
-    String logMessage = "Element with id 'timerintermediatecatchevent1' is an intermediate catch timer event with a time cycle which is not recommended.";
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .intermediateCatchEvent("timerintermediatecatchevent1")
+        .timerWithCycle("0 0/5 * * * ?")
+        .endEvent()
+        .done();
+    testRule.deploy(process);
+
+    String logMessage = "definitionKey: process; It is not recommended to use an intermediate catch timer event with a time cycle, "
+        + "element with id 'timerintermediatecatchevent1'.";
     assertThat(loggingRule.getFilteredLog(logMessage)).hasSize(1);
   }
 
