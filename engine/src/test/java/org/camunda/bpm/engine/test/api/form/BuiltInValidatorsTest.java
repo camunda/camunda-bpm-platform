@@ -26,6 +26,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.form.FormException;
 import org.camunda.bpm.engine.impl.form.handler.FormFieldHandler;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidator;
@@ -72,7 +73,7 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTest {
     assertTrue(validator.validate(1, validatorContext));
     assertTrue(validator.validate(true, validatorContext));
 
-    // empty string and 'null' are invalid
+    // empty string and 'null' are invalid without default
     assertFalse(validator.validate("", validatorContext));
     assertFalse(validator.validate(null, validatorContext));
 
@@ -80,6 +81,12 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTest {
     validatorContext = new TestValidatorContext(null, "fieldName");
     validatorContext.getVariableScope().setVariable("fieldName", "existingValue");
     assertTrue(validator.validate(null, validatorContext));
+
+    // can submit null if a default value exists
+    validatorContext = new TestValidatorContext(null, "fieldName");
+    validatorContext.getFormFieldHandler().setDefaultValueExpression(new FixedValue("defaultValue"));
+    assertTrue(validator.validate(null, validatorContext));
+    assertEquals("defaultValue", validatorContext.getVariableScope().getVariable("fieldName"));
   }
 
   @Test

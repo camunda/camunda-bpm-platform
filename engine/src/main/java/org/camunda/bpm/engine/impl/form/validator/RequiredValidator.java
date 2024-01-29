@@ -26,13 +26,31 @@ public class RequiredValidator implements FormFieldValidator {
 
   public boolean validate(Object submittedValue, FormFieldValidatorContext validatorContext) {
     if(submittedValue == null) {
-      TypedValue value = validatorContext.getVariableScope().getVariableTyped(validatorContext.getFormFieldHandler().getId());
-      return (value != null && value.getValue() != null);
+      var variableName = validatorContext.getFormFieldHandler().getId();
+      TypedValue value = validatorContext.getVariableScope().getVariableTyped(variableName);
+
+      if (value != null) {
+        return value.getValue() != null;
+      }
+
+      // check if there is a default value
+      var defaultValueExpression = validatorContext.getFormFieldHandler().getDefaultValueExpression();
+      if (defaultValueExpression != null) {
+        var variableValue = defaultValueExpression.getValue(validatorContext.getVariableScope());
+
+        if (variableValue != null) {
+          // set default value
+          validatorContext.getVariableScope().setVariable(variableName, variableValue);
+          return true;
+        }
+      }
+
+      return false;
     } else {
       if (submittedValue instanceof String) {
-        return submittedValue != null && !((String)submittedValue).isEmpty();
+        return !((String)submittedValue).isEmpty();
       } else {
-        return submittedValue != null;
+        return true;
       }
     }
   }
