@@ -107,6 +107,13 @@
           <forkMode>once</forkMode>
         </configuration>
       </plugin>
+      <plugin>
+     <groupId>org.apache.maven.plugins</groupId>
+     <artifactId>maven-compiler-plugin</artifactId>
+     <configuration>
+         <showDeprecation>true</showDeprecation>
+     </configuration>
+ </plugin>
     </plugins>
   </build>
 

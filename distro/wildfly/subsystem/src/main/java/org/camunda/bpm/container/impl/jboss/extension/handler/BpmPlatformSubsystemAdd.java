@@ -75,6 +75,7 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
             .addService(ServiceNames.forMscRuntimeContainerDelegate(), processEngineService)
             .setInitialMode(Mode.ACTIVE)
             .install();
+//    context.getServiceTarget().addService(ServiceName.of(ServiceNames.forMscRuntimeContainerDelegate(), "name"), new MscRuntimeContainerDelegate()).install();
 
     // discover and register Camunda Platform plugins
     BpmPlatformPlugins plugins = BpmPlatformPlugins.load(getClass().getClassLoader());

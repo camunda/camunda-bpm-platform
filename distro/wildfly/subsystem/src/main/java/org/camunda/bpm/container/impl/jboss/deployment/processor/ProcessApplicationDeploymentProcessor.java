@@ -97,7 +97,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     List<ServiceName> deploymentServiceNames = new ArrayList<>();
 
     ProcessApplicationStopService paStopService = new ProcessApplicationStopService();
-    ServiceBuilder<ProcessApplicationStopService> stopServiceBuilder = phaseContext.getServiceTarget().addService(paStopServiceName, paStopService)
+    ServiceBuilder<ProcessApplicationStopService> stopServiceBuilder = phaseContext.getRequirementServiceTarget().addService(paStopServiceName, paStopService)
       .addDependency(ServiceNames.forBpmPlatformPlugins(), BpmPlatformPlugins.class, paStopService.getPlatformPluginsInjector())
       .setInitialMode(Mode.ACTIVE);
 
