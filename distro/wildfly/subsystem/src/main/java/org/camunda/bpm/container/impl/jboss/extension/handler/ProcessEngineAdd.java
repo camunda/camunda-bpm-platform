@@ -47,10 +47,6 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
 
   public static final ProcessEngineAdd INSTANCE = new ProcessEngineAdd();
 
-  private ProcessEngineAdd() {
-    super(SubsystemAttributeDefinitons.PROCESS_ENGINE_ATTRIBUTES);
-  }
-
   @Override
   protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model) throws OperationFailedException {
 

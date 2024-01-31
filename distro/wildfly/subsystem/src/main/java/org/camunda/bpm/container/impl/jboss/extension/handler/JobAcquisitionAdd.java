@@ -40,10 +40,6 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler {
 
   public static final JobAcquisitionAdd INSTANCE = new JobAcquisitionAdd();
 
-  private JobAcquisitionAdd() {
-    super(SubsystemAttributeDefinitons.JOB_ACQUISITION_ATTRIBUTES);
-  }
-
   @Override
   protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model) throws OperationFailedException {
 
@@ -72,4 +68,6 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler {
 //      TypeDefinition.TICK.validateAndSet(operation,model);
   //...
 //  }
+
+
 }

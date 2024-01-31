@@ -27,13 +27,11 @@ import org.jboss.as.threads.ManagedQueueExecutorService;
 import org.jboss.as.threads.ThreadFactoryService;
 import org.jboss.as.threads.TimeSpec;
 import org.jboss.dmr.ModelNode;
-import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 
-import java.util.List;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
@@ -48,10 +46,6 @@ public class JobExecutorAdd extends AbstractAddStepHandler {
     public static final String THREAD_POOL_GRP_NAME = "Camunda BPM ";
 
     public static final JobExecutorAdd INSTANCE = new JobExecutorAdd();
-
-    private JobExecutorAdd() {
-        super(SubsystemAttributeDefinitons.JOB_EXECUTOR_ATTRIBUTES);
-    }
 
     @Override
     protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model)
