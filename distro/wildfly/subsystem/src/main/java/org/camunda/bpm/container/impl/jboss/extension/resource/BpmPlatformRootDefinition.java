@@ -34,12 +34,10 @@ public class BpmPlatformRootDefinition extends PersistentResourceDefinition {
   public static final BpmPlatformRootDefinition INSTANCE = new BpmPlatformRootDefinition();
 
   private BpmPlatformRootDefinition() {
-    super(BpmPlatformExtension.SUBSYSTEM_PATH,
-        BpmPlatformExtension.getResourceDescriptionResolver(),
-        //We always need to add an 'add' operation
-        BpmPlatformSubsystemAdd.INSTANCE,
-        //Every resource that is added, normally needs a remove operation
-        BpmPlatformSubsystemRemove.INSTANCE);
+    super(new Parameters(BpmPlatformExtension.SUBSYSTEM_PATH,
+        BpmPlatformExtension.getResourceDescriptionResolver())
+        .setAddHandler(BpmPlatformSubsystemAdd.INSTANCE)
+        .setRemoveHandler(BpmPlatformSubsystemRemove.INSTANCE));
   }
 
   @Override
