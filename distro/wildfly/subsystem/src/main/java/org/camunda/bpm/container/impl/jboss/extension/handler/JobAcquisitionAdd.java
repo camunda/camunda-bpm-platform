@@ -55,7 +55,7 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler {
     }
 
     // start new service for job executor
-    ServiceBuilder<RuntimeContainerJobExecutor> serviceBuilder = context.getServiceTarget().addService(ServiceNames.forMscRuntimeContainerJobExecutorService(acquisitionName), mscRuntimeContainerJobExecutor)
+    ServiceBuilder<RuntimeContainerJobExecutor> serviceBuilder = context.getCapabilityServiceTarget().addService(ServiceNames.forMscRuntimeContainerJobExecutorService(acquisitionName), mscRuntimeContainerJobExecutor)
         .setInitialMode(Mode.ACTIVE);
     serviceBuilder.requires(ServiceNames.forMscRuntimeContainerDelegate());
     serviceBuilder.requires(ServiceNames.forMscExecutorService());

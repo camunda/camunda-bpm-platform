@@ -81,7 +81,7 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
     BpmPlatformPlugins plugins = BpmPlatformPlugins.load(getClass().getClassLoader());
     MscBpmPlatformPlugins managedPlugins = new MscBpmPlatformPlugins(plugins);
 
-    ServiceController<BpmPlatformPlugins> serviceController = context.getServiceTarget()
+    context.getCapabilityServiceTarget()
       .addService(ServiceNames.forBpmPlatformPlugins(), managedPlugins)
       .setInitialMode(Mode.ACTIVE)
       .install();

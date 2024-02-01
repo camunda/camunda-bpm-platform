@@ -129,7 +129,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
           processArachiveName = UUID.randomUUID().toString();
         }
         ServiceName deploymentServiceName = ServiceNames.forProcessApplicationDeploymentService(deploymentUnit.getName(), processArachiveName);
-        ServiceBuilder<ProcessApplicationDeploymentService> serviceBuilder = phaseContext.getServiceTarget().addService(deploymentServiceName, deploymentService)
+        ServiceBuilder<ProcessApplicationDeploymentService> serviceBuilder = phaseContext.getRequirementServiceTarget().addService(deploymentServiceName, deploymentService)
           .addDependency(processEngineServiceName, ProcessEngine.class, deploymentService.getProcessEngineInjector())
           .setInitialMode(Mode.ACTIVE);
 
@@ -158,7 +158,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
 
     // register the managed process application start service
     ProcessApplicationStartService paStartService = new ProcessApplicationStartService(deploymentServiceNames, postDeploy, preUndeploy, module);
-    ServiceBuilder<ProcessApplicationStartService> serviceBuilder = phaseContext.getServiceTarget().addService(paStartServiceName, paStartService)
+    ServiceBuilder<ProcessApplicationStartService> serviceBuilder = phaseContext.getRequirementServiceTarget().addService(paStartServiceName, paStartService)
       .addDependency(ServiceNames.forBpmPlatformPlugins(), BpmPlatformPlugins.class, paStartService.getPlatformPluginsInjector())
       .setInitialMode(Mode.ACTIVE);
 
