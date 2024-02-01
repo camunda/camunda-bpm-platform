@@ -17,7 +17,6 @@
 package org.camunda.bpm.container.impl.jboss.deployment.processor;
 
 import java.util.List;
-import java.util.Map;
 
 import org.camunda.bpm.container.impl.jboss.config.ManagedProcessEngineMetadata;
 import org.camunda.bpm.container.impl.jboss.deployment.marker.ProcessApplicationAttachments;
@@ -96,7 +95,6 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
 
   /** transforms the configuration as provided via the {@link ProcessEngineXml}
    * into a {@link ManagedProcessEngineMetadata} */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   protected ManagedProcessEngineMetadata transformConfiguration(ProcessEngineXml processEngineXml) {
     return new ManagedProcessEngineMetadata(
         processEngineXml.getName().equals("default"),

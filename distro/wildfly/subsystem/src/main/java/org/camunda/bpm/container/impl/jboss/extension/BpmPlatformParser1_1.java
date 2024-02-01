@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.jboss.as.connector.util.AbstractParser;
 import org.jboss.as.connector.util.ParserException;
 import org.jboss.as.controller.AttributeDefinition;
-import org.jboss.as.controller.PersistentResourceXMLDescription;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.parsing.ParseUtils;
 import org.jboss.as.controller.persistence.SubsystemMarshallingContext;

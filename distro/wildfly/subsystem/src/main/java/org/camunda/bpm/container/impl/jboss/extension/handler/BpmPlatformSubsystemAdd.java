@@ -29,7 +29,6 @@ import org.jboss.as.server.AbstractDeploymentChainStep;
 import org.jboss.as.server.DeploymentProcessorTarget;
 import org.jboss.as.server.deployment.Phase;
 import org.jboss.dmr.ModelNode;
-import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 
 
@@ -71,7 +70,7 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
     // create and register the MSC container delegate.
     final MscRuntimeContainerDelegate processEngineService = new MscRuntimeContainerDelegate();
 
-    final ServiceController<MscRuntimeContainerDelegate> controller = context.getServiceTarget()
+    context.getCapabilityServiceTarget()
             .addService(ServiceNames.forMscRuntimeContainerDelegate(), processEngineService)
             .setInitialMode(Mode.ACTIVE)
             .install();

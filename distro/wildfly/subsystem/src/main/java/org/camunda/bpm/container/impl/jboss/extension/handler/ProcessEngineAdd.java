@@ -27,7 +27,6 @@ import org.jboss.as.controller.*;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
 import org.jboss.msc.service.ServiceBuilder;
-import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 
 import java.util.ArrayList;
@@ -54,10 +53,10 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
 
     ManagedProcessEngineMetadata processEngineConfiguration = transformConfiguration(context, engineName, model);
 
-    ServiceController<ProcessEngine> controller = installService(context, processEngineConfiguration);
+    installService(context, processEngineConfiguration);
   }
 
-  protected ServiceController<ProcessEngine> installService(OperationContext context,
+  protected void installService(OperationContext context,
                                                             ManagedProcessEngineMetadata processEngineConfiguration) {
 
     MscManagedProcessEngineController service = new MscManagedProcessEngineController(processEngineConfiguration);
@@ -67,7 +66,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
 
     MscManagedProcessEngineController.initializeServiceBuilder(processEngineConfiguration, service, serviceBuilder, processEngineConfiguration.getJobExecutorAcquisitionName());
 
-    return serviceBuilder.install();
+    serviceBuilder.install();
   }
 
   protected ManagedProcessEngineMetadata transformConfiguration(final OperationContext context, String engineName, final ModelNode model) throws OperationFailedException {
