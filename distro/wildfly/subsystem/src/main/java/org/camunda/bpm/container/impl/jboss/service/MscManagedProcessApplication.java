@@ -19,7 +19,7 @@ package org.camunda.bpm.container.impl.jboss.service;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
-import org.jboss.msc.Service;
+import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
@@ -32,7 +32,7 @@ import org.jboss.msc.service.StopContext;
  * @author Daniel Meyer
  *
  */
-public class MscManagedProcessApplication implements Service {
+public class MscManagedProcessApplication implements Service<MscManagedProcessApplication> {
 
   protected ProcessApplicationInfo processApplicationInfo;
   protected ProcessApplicationReference processApplicationReference;
