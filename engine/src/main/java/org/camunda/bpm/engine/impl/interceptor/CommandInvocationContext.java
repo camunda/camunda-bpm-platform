@@ -54,8 +54,10 @@ public class CommandInvocationContext {
    *
    * @param command        the associated command of this command invocation context.
    * @param configuration  the process engine configuration
-   * @param isOuterCommand when set to true, marks this command invocation context as associated to outer commands.
-   *                       when set to false, this command invocation context will be associated to an inner command.
+   * @param isOuterCommand when true, the flag marks this command invocation context as outer and parks any MDC value
+   *                       associated with the Logging Context Parameters as external properties.
+   *                       when set to false, this command invocation context will be associated to an inner command,
+   *                       no external properties will be parked
    */
   public CommandInvocationContext(Command<?> command, ProcessEngineConfigurationImpl configuration, boolean isOuterCommand) {
     this.command = command;
