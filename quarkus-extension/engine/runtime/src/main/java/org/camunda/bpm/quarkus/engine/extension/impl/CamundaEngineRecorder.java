@@ -49,13 +49,15 @@ public class CamundaEngineRecorder {
   public void configureProcessEngineCdiBeans(BeanContainer beanContainer) {
 
     if (BeanManagerLookup.localInstance == null) {
-      BeanManagerLookup.localInstance = beanContainer.beanInstance(BeanManager.class);
+      BeanManagerLookup.localInstance = beanContainer.beanInstanceFactory(BeanManager.class).create().get();
     }
   }
 
   public RuntimeValue<ProcessEngineConfigurationImpl> createProcessEngineConfiguration(BeanContainer beanContainer,
                                                                                        CamundaEngineConfig config) {
-    QuarkusProcessEngineConfiguration configuration = beanContainer.beanInstance(QuarkusProcessEngineConfiguration.class);
+
+    QuarkusProcessEngineConfiguration configuration = beanContainer.beanInstanceFactory(QuarkusProcessEngineConfiguration.class)
+        .create().get();
 
     // apply properties from config before any other configuration.
     PropertyHelper.applyProperties(configuration, config.genericConfig, PropertyHelper.KEBAB_CASE);
