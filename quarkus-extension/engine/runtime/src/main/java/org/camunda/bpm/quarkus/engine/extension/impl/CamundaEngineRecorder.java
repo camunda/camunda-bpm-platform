@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.quarkus.engine.extension.CamundaEngineConfig;
+import org.camunda.bpm.quarkus.engine.extension.ContainerBeanFactory;
 import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
 import org.camunda.bpm.quarkus.engine.extension.event.CamundaEngineStartupEvent;
 import org.eclipse.microprofile.context.ManagedExecutor;
@@ -49,15 +50,15 @@ public class CamundaEngineRecorder {
   public void configureProcessEngineCdiBeans(BeanContainer beanContainer) {
 
     if (BeanManagerLookup.localInstance == null) {
-      BeanManagerLookup.localInstance = beanContainer.beanInstanceFactory(BeanManager.class).create().get();
+      BeanManagerLookup.localInstance = ContainerBeanFactory.getBeanFromContainer(BeanManager.class, beanContainer);
     }
   }
 
   public RuntimeValue<ProcessEngineConfigurationImpl> createProcessEngineConfiguration(BeanContainer beanContainer,
                                                                                        CamundaEngineConfig config) {
 
-    QuarkusProcessEngineConfiguration configuration = beanContainer.beanInstanceFactory(QuarkusProcessEngineConfiguration.class)
-        .create().get();
+    QuarkusProcessEngineConfiguration configuration = ContainerBeanFactory.getBeanFromContainer(
+        QuarkusProcessEngineConfiguration.class, beanContainer);
 
     // apply properties from config before any other configuration.
     PropertyHelper.applyProperties(configuration, config.genericConfig, PropertyHelper.KEBAB_CASE);
