@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,7 +45,6 @@ import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
-import org.jboss.msc.value.InjectedValue;
 
 /**
  * <p>Service responsible for performing a deployment to the process engine and managing
@@ -62,13 +62,11 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
 
   private final static Logger LOGGER = Logger.getLogger(ProcessApplicationDeploymentService.class.getName());
 
-  protected InjectedValue<ExecutorService> executorInjector = new InjectedValue<ExecutorService>();
-
-  protected InjectedValue<ProcessEngine> processEngineInjector = new InjectedValue<ProcessEngine>();
-
-  protected InjectedValue<ProcessApplicationInterface> noViewProcessApplication = new InjectedValue<ProcessApplicationInterface>();
+  protected final Supplier<ExecutorService> executorSupplier;
+  protected final Supplier<ProcessEngine> processEngineSupplier;
+  protected final Supplier<ProcessApplicationInterface> noViewProcessApplicationSupplier;
   // for view-exposing ProcessApplicationComponents
-  protected InjectedValue<ComponentView> paComponentViewInjector = new InjectedValue<ComponentView>();
+  protected final Supplier<ComponentView> paComponentViewSupplier;
 
   /** the map of deployment resources obtained  through scanning */
   protected final Map<String,byte[]> deploymentMap;
@@ -80,15 +78,26 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
 
   protected Module module;
 
-  public ProcessApplicationDeploymentService(Map<String,byte[]> deploymentMap, ProcessArchiveXml processArchive, Module module) {
+  public ProcessApplicationDeploymentService(Map<
+      String,byte[]> deploymentMap,
+      ProcessArchiveXml processArchive,
+      Module module,
+      Supplier<ExecutorService> executorSupplier,
+      Supplier<ProcessEngine> processEngineInjector,
+      Supplier<ProcessApplicationInterface> noViewProcessApplication,
+      Supplier<ComponentView> paComponentView) {
     this.deploymentMap = deploymentMap;
     this.processArchive = processArchive;
     this.module = module;
+    this.executorSupplier = executorSupplier;
+    this.processEngineSupplier = processEngineInjector;
+    this.noViewProcessApplicationSupplier = noViewProcessApplication;
+    this.paComponentViewSupplier = paComponentView;
   }
 
   public void start(final StartContext context) throws StartException {
     context.asynchronous();
-    executorInjector.getValue().submit(new Runnable() {
+    executorSupplier.get().submit(new Runnable() {
       public void run() {
         try {
           performDeployment();
@@ -104,7 +113,7 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
 
   public void stop(final StopContext context) {
     context.asynchronous();
-    executorInjector.getValue().submit(new Runnable() {
+    executorSupplier.get().submit(new Runnable() {
       public void run() {
         try {
           performUndeployment();
@@ -121,16 +130,16 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
     try {
 
       // get process engine
-      ProcessEngine processEngine = processEngineInjector.getValue();
+      ProcessEngine processEngine = processEngineSupplier.get();
 
       // get the process application component
       ProcessApplicationInterface processApplication = null;
-      ComponentView componentView = paComponentViewInjector.getOptionalValue();
-      if(componentView != null) {
+      if(paComponentViewSupplier != null) {
+        ComponentView componentView = paComponentViewSupplier.get();
         reference = componentView.createInstance();
         processApplication = (ProcessApplicationInterface) reference.getInstance();
       } else {
-        processApplication = noViewProcessApplication.getValue();
+        processApplication = noViewProcessApplicationSupplier.get();
       }
 
       // get the application name
@@ -243,7 +252,7 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
 
   protected void performUndeployment() {
 
-    final ProcessEngine processEngine = processEngineInjector.getValue();
+    final ProcessEngine processEngine = processEngineSupplier.get();
 
     try {
       if(deployment != null) {
@@ -275,28 +284,18 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
     return this;
   }
 
-  public InjectedValue<ProcessEngine> getProcessEngineInjector() {
-    return processEngineInjector;
-  }
 
-  public InjectedValue<ProcessApplicationInterface> getNoViewProcessApplication() {
-    return noViewProcessApplication;
-  }
-
-  public InjectedValue<ComponentView> getPaComponentViewInjector() {
-    return paComponentViewInjector;
-  }
 
   public ProcessApplicationDeployment getDeployment() {
     return deployment;
   }
 
   public String getProcessEngineName() {
-    return processEngineInjector.getValue().getName();
+    return processEngineSupplier.get().getName();
   }
 
-  public InjectedValue<ExecutorService> getExecutorInjector() {
-    return executorInjector;
+  public Supplier<ProcessEngine> getProcessEngineSupplier() {
+    return processEngineSupplier;
   }
 
 
