@@ -17,14 +17,12 @@
 package org.camunda.bpm.container.impl.jboss.deployment.processor;
 
 import java.util.List;
-
 import org.camunda.bpm.container.impl.jboss.config.ManagedProcessEngineMetadata;
 import org.camunda.bpm.container.impl.jboss.deployment.marker.ProcessApplicationAttachments;
 import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessEngineController;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.jboss.util.ProcessesXmlWrapper;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
@@ -80,15 +78,16 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
     ServiceName serviceName = ServiceNames.forManagedProcessEngine(processEngineXml.getName());
 
     // get service builder
-    ServiceBuilder<ProcessEngine> serviceBuilder = serviceTarget.addService(serviceName, service);
+    ServiceBuilder<?> serviceBuilder = serviceTarget.addService();
 
     // make this service depend on the current phase -> makes sure it is removed with the phase service at undeployment
     serviceBuilder.requires(phaseContext.getPhaseServiceName());
 
     // add Service dependencies
-    service.initializeServiceBuilder(configuration, serviceBuilder, processEngineXml.getJobAcquisitionName());
+    service.initializeServiceBuilder(configuration, serviceBuilder, serviceName, processEngineXml.getJobAcquisitionName());
 
     // install the service
+    serviceBuilder.setInstance(service);
     serviceBuilder.install();
 
   }

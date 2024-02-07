@@ -72,6 +72,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
   protected static final String CONNECT_PROCESS_ENGINE_PLUGIN_NAME = "org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin";
 
   protected Supplier<ExecutorService> executorSupplier;
+  protected Consumer<ProcessEngine> provider;
 
   // Injecting these values makes the MSC aware of our dependencies on these resources.
   // This ensures that they are available when this service is started
@@ -265,7 +266,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     return mscRuntimeContainerJobExecutorInjector;
   }
 
-  public  void initializeServiceBuilder(ManagedProcessEngineMetadata processEngineConfiguration, ServiceBuilder<ProcessEngine> serviceBuilder, String jobExecutorName) {
+  public  void initializeServiceBuilder(ManagedProcessEngineMetadata processEngineConfiguration, ServiceBuilder<?> serviceBuilder, ServiceName name, String jobExecutorName) {
 
     ContextNames.BindInfo datasourceBindInfo = ContextNames.bindInfoFor(processEngineConfiguration.getDatasourceJndiName());
     serviceBuilder.addDependency(ServiceName.JBOSS.append("txn").append("TransactionManager"), TransactionManager.class, transactionManagerInjector)
@@ -276,8 +277,11 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     serviceBuilder.requires(ServiceNames.forMscExecutorService());
 
     if(processEngineConfiguration.isDefault()) {
-      processEngineConsumers.add(serviceBuilder.provides(ServiceNames.forDefaultProcessEngine()));
+      serviceBuilder.addAliases(ServiceNames.forDefaultProcessEngine());
     }
+
+    provider = serviceBuilder.provides(name);
+    processEngineConsumers.add(provider);
 
     this.executorSupplier = JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder);
     JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder);

@@ -22,7 +22,6 @@ import org.camunda.bpm.container.impl.jboss.extension.Element;
 import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessEngineController;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.jboss.as.controller.*;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
@@ -62,10 +61,11 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
     MscManagedProcessEngineController service = new MscManagedProcessEngineController(processEngineConfiguration);
     ServiceName name = ServiceNames.forManagedProcessEngine(processEngineConfiguration.getEngineName());
 
-    ServiceBuilder<ProcessEngine> serviceBuilder = context.getCapabilityServiceTarget().addService(name, service);
+    ServiceBuilder<?> serviceBuilder = context.getCapabilityServiceTarget().addService();
 
-    service.initializeServiceBuilder(processEngineConfiguration, serviceBuilder, processEngineConfiguration.getJobExecutorAcquisitionName());
+    service.initializeServiceBuilder(processEngineConfiguration, serviceBuilder, name, processEngineConfiguration.getJobExecutorAcquisitionName());
 
+    serviceBuilder.setInstance(service);
     serviceBuilder.install();
   }
 
