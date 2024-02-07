@@ -27,6 +27,7 @@ import org.jboss.as.threads.ManagedQueueExecutorService;
 import org.jboss.as.threads.ThreadFactoryService;
 import org.jboss.as.threads.TimeSpec;
 import org.jboss.dmr.ModelNode;
+import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
@@ -34,6 +35,7 @@ import org.jboss.msc.service.ServiceTarget;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 
 /**
@@ -57,11 +59,13 @@ public class JobExecutorAdd extends AbstractAddStepHandler {
 
         performRuntimeThreadPool(context, model, jobExecutorThreadPoolName, jobExecutorThreadPoolServiceName);
 
-        MscExecutorService service = new MscExecutorService();
-        context.getCapabilityServiceTarget().addService(ServiceNames.forMscExecutorService(), service)
-                .addDependency(jobExecutorThreadPoolServiceName, ManagedQueueExecutorService.class,
-                        service.getManagedQueueInjector())
-                .setInitialMode(Mode.ACTIVE).install();
+        ServiceBuilder<?> sb = context.getCapabilityServiceTarget().addService();
+        sb.provides(ServiceNames.forMscExecutorService());
+        Supplier<ManagedQueueExecutorService> supplier = sb.requires(jobExecutorThreadPoolServiceName);
+        MscExecutorService service = new MscExecutorService(supplier);
+        sb.setInitialMode(Mode.ACTIVE);
+        sb.setInstance(service);
+        sb.install();
     }
 
     protected void performRuntimeThreadPool(OperationContext context, ModelNode model, String name,
