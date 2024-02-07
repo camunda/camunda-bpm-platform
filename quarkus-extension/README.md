@@ -57,7 +57,7 @@ quarkus.camunda.datasource=my-datasource
 ---------
 #### Quarkus and JUEL bytecode incompatibilities
 
-**Context**: JUEL was built with a different Java version. Quarkus won't pick up new build changes.
+**Context**: JUEL was built with a different Java version. Quarkus won't pick up new build changes. For more information, check #3419 ([comment](https://github.com/camunda/camunda-bpm-platform/issues/3419#issuecomment-1720916174))
 
 **Solution**: If you notice juel exceptions like below, delete `/juel/target` folder and run the Quarkus build again.
 
