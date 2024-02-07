@@ -89,6 +89,9 @@
             <logger category="com.arjuna">
                 <level name="WARN"/>
             </logger>
+            <logger category="com.networknt.schema">
+                <level name="WARN"/>
+            </logger>                                                     
             <logger category="io.jaegertracing.Configuration">
                 <level name="WARN"/>
             </logger>
@@ -440,6 +443,7 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
         <subsystem xmlns="urn:jboss:domain:remoting:6.0">
+            <endpoint worker="default"/>                    
             <http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-sasl-authentication"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
