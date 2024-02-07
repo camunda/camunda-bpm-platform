@@ -47,3 +47,38 @@ quarkus.datasource.my-datasource.password=camunda
 quarkus.datasource.my-datasource.jdbc.url=jdbc:h2:mem:camunda;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE
 quarkus.camunda.datasource=my-datasource
 ```
+
+### Local Build
+
+#### Executing the Tests
+```mvn clean install -Pquarkus-tests```
+
+
+---------
+#### Quarkus and juel bytecode incompatibilities
+
+**Context**: juel was built with a different java version. Quarkus won't pick up new build changes.
+
+**Solution**: If you notice juel exceptions like below, delete juel/target folder and execute again.
+
+<details>
+
+<summary>Stacktrace</summary>
+
+```java
+Caused by: java.lang.VerifyError: Bad type on operand stack
+Exception Details:
+Location:
+org/camunda/bpm/engine/impl/el/JuelExpressionManager.<init>(Ljava/util/Map;)V @28: putfield
+Reason:
+Type 'org/camunda/bpm/impl/juel/ExpressionFactoryImpl' (current frame, stack[1]) is not assignable to 'org/camunda/bpm/impl/juel/jakarta/el/ExpressionFactory'
+Current Frame:
+bci: @28
+flags: { }
+locals: { 'org/camunda/bpm/engine/impl/el/JuelExpressionManager', 'java/util/Map' }
+stack: { 'org/camunda/bpm/engine/impl/el/JuelExpressionManager', 'org/camunda/bpm/impl/juel/ExpressionFactoryImpl' }
+Bytecode:
+0000000: 2ab7 0007 2abb 000c 59b7 000e b500 0f2a
+0000010: 03b5 0013 2abb 0017 59b7 0019 b500 1a2a
+0000020: 2bb5 001e b1```
+</details>
