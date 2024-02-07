@@ -59,7 +59,7 @@ quarkus.camunda.datasource=my-datasource
 
 **Context**: juel was built with a different java version. Quarkus won't pick up new build changes.
 
-**Solution**: If you notice juel exceptions like below, delete juel/target folder and execute again.
+**Solution**: If you notice juel exceptions like below, delete `/juel/target` folder and run the Quarkus build again.
 
 <details>
 
