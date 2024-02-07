@@ -4,18 +4,19 @@
   "private": true,
   "scripts": {
     "prebuild": "node ./tasks/license.js",
-    "build": "npx webpack --mode production"
+    "build": "npx webpack --mode production --stats-error-details"
   },
   "dependencies": {
-    "swagger-ui": "~5.10.0"
+    "react": "~18.2.0",
+    "swagger-ui": "~5.11.2"
   },
   "devDependencies": {
-    "copy-webpack-plugin": "~11.0.0",
-    "css-loader": "~6.8.1",
+    "copy-webpack-plugin": "~12.0.2",
+    "css-loader": "~6.10.0",
     "license-checker": "~25.0.1",
     "license-checker-webpack-plugin": "~0.2.1",
-    "style-loader": "~3.3.3",
-    "webpack": "~5.89.0",
+    "style-loader": "~3.3.4",
+    "webpack": "~5.90.1",
     "webpack-cli": "~5.1.4"
   }
 }
