@@ -145,8 +145,8 @@ module.exports = (_env, argv = {}) => {
     }
 
     if (plugin instanceof HtmlWebpackPlugin) {
-      const options = plugin.userOptions;
-      plugin.userOptions = {
+      const options = plugin.options;
+      plugin.options = {
         ...options,
         publicPath: '/camunda',
         appRoot: '/camunda',

@@ -110,8 +110,8 @@ module.exports = () => {
 
   merged.plugins.forEach(plugin => {
     if (plugin instanceof HtmlWebPackPlugin) {
-      plugin.userOptions = {
-        ...plugin.userOptions,
+      plugin.options = {
+        ...plugin.options,
         appRoot: '$APP_ROOT',
         appBase: '$BASE',
         pluginDeps: '$PLUGIN_DEPENDENCIES',
