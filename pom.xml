@@ -27,7 +27,7 @@
     <!-- These properties are used in both the BOM as well as camunda-parent and subprojects -->
     <version.mybatis>3.5.15</version.mybatis>
     <version.joda-time>2.12.5</version.joda-time>
-    <version.uuid-generator>3.2.0</version.uuid-generator>
+    <version.uuid-generator>4.3.0</version.uuid-generator>
     <version.camunda.commons>1.13.0</version.camunda.commons>
     <version.camunda.connect>1.6.0</version.camunda.connect>
     <version.camunda.spin>1.22.0</version.camunda.spin>
