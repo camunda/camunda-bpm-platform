@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,6 +48,7 @@ import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.MethodInfo;
 import org.jboss.modules.Module;
 import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
@@ -168,8 +170,12 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       // install the ManagedProcessApplication Service as a child to this service
       // if this service stops (at undeployment) the ManagedProcessApplication service is removed as well.
       ServiceName serviceName = ServiceNames.forManagedProcessApplication(processApplicationInfo.getName());
-      MscManagedProcessApplication managedProcessApplication = new MscManagedProcessApplication(processApplicationInfo, processApplication.getReference());
-      context.getChildTarget().addService(serviceName, managedProcessApplication).install();
+      ServiceBuilder<?> sb = context.getChildTarget().addService();
+      Consumer<MscManagedProcessApplication> provider = sb.provides(serviceName);
+      MscManagedProcessApplication managedProcessApplication = new MscManagedProcessApplication(processApplicationInfo,
+          processApplication.getReference(), provider);
+      sb.setInstance(managedProcessApplication);
+      sb.install();
 
     } catch (StartException e) {
       throw e;

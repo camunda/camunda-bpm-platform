@@ -43,15 +43,12 @@ import org.camunda.bpm.engine.impl.cfg.JakartaTransactionProcessEngineConfigurat
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.jboss.as.connector.subsystems.datasources.DataSourceReferenceFactoryService;
 import org.jboss.as.naming.deployment.ContextNames;
-import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
-import org.jboss.msc.value.InjectedValue;
-
 import jakarta.transaction.TransactionManager;
 
 
@@ -76,9 +73,9 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
 
   // Injecting these values makes the MSC aware of our dependencies on these resources.
   // This ensures that they are available when this service is started
-  protected final InjectedValue<TransactionManager> transactionManagerInjector = new InjectedValue<>();
-  protected final InjectedValue<DataSourceReferenceFactoryService> datasourceBinderServiceInjector = new InjectedValue<>();
-  protected final InjectedValue<MscRuntimeContainerJobExecutor> mscRuntimeContainerJobExecutorInjector = new InjectedValue<>();
+  protected Supplier<TransactionManager> transactionManagerSupplier;
+  protected Supplier<DataSourceReferenceFactoryService> datasourceBinderServiceSupplier;
+  protected Supplier<MscRuntimeContainerJobExecutor> mscRuntimeContainerJobExecutorSupplier;
 
   protected ManagedProcessEngineMetadata processEngineMetadata;
 
@@ -162,10 +159,10 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     processEngineConfiguration.setHistory(processEngineMetadata.getHistoryLevel());
 
     // use the injected datasource
-    processEngineConfiguration.setDataSource((DataSource) datasourceBinderServiceInjector.getValue().getReference().getInstance());
+    processEngineConfiguration.setDataSource((DataSource) datasourceBinderServiceSupplier.get().getReference().getInstance());
 
     // use the injected transaction manager
-    processEngineConfiguration.setTransactionManager(transactionManagerInjector.getValue());
+    processEngineConfiguration.setTransactionManager(transactionManagerSupplier.get());
 
     // set auto schema update
     if(processEngineMetadata.isAutoSchemaUpdate()) {
@@ -180,7 +177,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     }
 
     // set job executor on process engine.
-    MscRuntimeContainerJobExecutor mscRuntimeContainerJobExecutor = mscRuntimeContainerJobExecutorInjector.getValue();
+    MscRuntimeContainerJobExecutor mscRuntimeContainerJobExecutor = mscRuntimeContainerJobExecutorSupplier.get();
     processEngineConfiguration.setJobExecutor(mscRuntimeContainerJobExecutor);
 
     PropertyHelper.applyProperties(processEngineConfiguration, processEngineMetadata.getConfigurationProperties());
@@ -254,26 +251,14 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     }
   }
 
-  public Injector<TransactionManager> getTransactionManagerInjector() {
-    return transactionManagerInjector;
-  }
-
-  public Injector<DataSourceReferenceFactoryService> getDatasourceBinderServiceInjector() {
-    return datasourceBinderServiceInjector;
-  }
-
-  public InjectedValue<MscRuntimeContainerJobExecutor> getMscRuntimeContainerJobExecutorInjector() {
-    return mscRuntimeContainerJobExecutorInjector;
-  }
-
   public  void initializeServiceBuilder(ManagedProcessEngineMetadata processEngineConfiguration, ServiceBuilder<?> serviceBuilder, ServiceName name, String jobExecutorName) {
 
     ContextNames.BindInfo datasourceBindInfo = ContextNames.bindInfoFor(processEngineConfiguration.getDatasourceJndiName());
-    serviceBuilder.addDependency(ServiceName.JBOSS.append("txn").append("TransactionManager"), TransactionManager.class, transactionManagerInjector)
-    .addDependency(datasourceBindInfo.getBinderServiceName(), DataSourceReferenceFactoryService.class, datasourceBinderServiceInjector)
-    .addDependency(ServiceNames.forMscRuntimeContainerDelegate(), MscRuntimeContainerDelegate.class, runtimeContainerDelegateInjector)
-    .addDependency(ServiceNames.forMscRuntimeContainerJobExecutorService(jobExecutorName), MscRuntimeContainerJobExecutor.class, mscRuntimeContainerJobExecutorInjector)
-    .setInitialMode(Mode.ACTIVE);
+    transactionManagerSupplier=serviceBuilder.requires(ServiceName.JBOSS.append("txn").append("TransactionManager"));
+    datasourceBinderServiceSupplier = serviceBuilder.requires(datasourceBindInfo.getBinderServiceName() );
+    runtimeContainerDelegateSupplier =serviceBuilder .requires(ServiceNames.forMscRuntimeContainerDelegate());
+    mscRuntimeContainerJobExecutorSupplier = serviceBuilder.requires(ServiceNames.forMscRuntimeContainerJobExecutorService(jobExecutorName));
+    serviceBuilder.setInitialMode(Mode.ACTIVE);
     serviceBuilder.requires(ServiceNames.forMscExecutorService());
 
     if(processEngineConfiguration.isDefault()) {
