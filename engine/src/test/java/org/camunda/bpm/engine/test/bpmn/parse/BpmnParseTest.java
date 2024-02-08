@@ -67,6 +67,8 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.test.util.SystemPropertiesRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.commons.testing.ProcessEngineLoggingRule;
+import org.camunda.commons.testing.WatchLogger;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
@@ -88,6 +90,9 @@ public class BpmnParseTest {
 
   @Rule
   public SystemPropertiesRule systemProperties = SystemPropertiesRule.resetPropsAfterTest();
+
+  @Rule
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
 
   public RepositoryService repositoryService;
   public RuntimeService runtimeService;
@@ -1362,6 +1367,22 @@ public class BpmnParseTest {
       assertThat(errors.get(2).getMainElementId()).isEqualTo("plainStart2");
       assertThat(errors.get(3).getMainElementId()).isEqualTo("plainStartInSub1");
     }
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.bpmn.parser"}, level = "INFO")
+  public void testIntermediateCatchTimerEventWithTimeCycleNotRecommendedInfoMessage() {
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .intermediateCatchEvent("timerintermediatecatchevent1")
+        .timerWithCycle("0 0/5 * * * ?")
+        .endEvent()
+        .done();
+    testRule.deploy(process);
+
+    String logMessage = "definitionKey: process; It is not recommended to use an intermediate catch timer event with a time cycle, "
+        + "element with id 'timerintermediatecatchevent1'.";
+    assertThat(loggingRule.getFilteredLog(logMessage)).hasSize(1);
   }
 
   @Test

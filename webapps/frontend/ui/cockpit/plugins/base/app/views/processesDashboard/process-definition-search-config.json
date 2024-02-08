@@ -7,12 +7,12 @@
       },
       "operators": [
         {
-          "key": "eq",
-          "value": "="
-        },
-        {
           "key": "Like",
           "value": "PLUGIN_PROCESS_DEF_LIKE"
+        },
+        {
+          "key": "eq",
+          "value": "="
         }
       ],
       "default": true

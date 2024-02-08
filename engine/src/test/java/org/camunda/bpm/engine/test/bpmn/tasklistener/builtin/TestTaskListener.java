@@ -14,10 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.plugin.base;
+package org.camunda.bpm.engine.test.bpmn.tasklistener.builtin;
 
-/**
- * Test maker for slow maria db tests.
- */
-public interface SlowMariaDbTest {
+import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.slf4j.Logger;
+
+public class TestTaskListener implements TaskListener {
+
+  Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+
+  @Override
+  public void notify(DelegateTask delegateTask) {
+    LOG.info("Executed task listener: TestTaskListener");
+  }
+
 }

@@ -853,6 +853,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected boolean restrictUserOperationLogToAuthenticatedUsers = true;
 
+  /**
+   * Maximum number of operation log entries written per synchronous operation.
+   * APIs that can affect multiple entities can produce an operation log entry each.
+   * This property controls how the operation logs are handled. Possible values:
+   * <ul>
+   *   <li>1 (Default): Always write one summary operation log including message name, number of affected entities, number of variables set by operation, and async=false</li>
+   *   <lI>-1: Disable limiting of operation logs for synchronous APIs. Write one log entry per affected entity. Caution: This may impact performance with large data.</li>
+   *   <li>1<x<=Long.MAX_VALUE: Write at most x operation logs per synchronous operation. If an operation exceeds x, a {@link ProcessEngineException} is thrown.</li>
+   * </ul>
+   */
+  protected long logEntriesPerSyncOperationLimit = 1L;
+
   protected boolean disableStrictCallActivityValidation = false;
 
   protected boolean isBpmnStacktraceVerbose = false;
@@ -1194,6 +1206,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initAdminUser();
     initAdminGroups();
     initPasswordPolicy();
+    initOperationLog();
     invokePostInit();
   }
 
@@ -2849,6 +2862,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initDeploymentRegistration() {
     if (registeredDeployments == null) {
       registeredDeployments = new CopyOnWriteArraySet<>();
+    }
+  }
+
+  protected void initOperationLog() {
+    if(logEntriesPerSyncOperationLimit < -1 || logEntriesPerSyncOperationLimit == 0) {
+      throw new ProcessEngineException(
+          "Invalid configuration for logEntriesPerSyncOperationLimit. Configured value needs to be either -1 or greater than 0 but was "
+              + logEntriesPerSyncOperationLimit + ".");
     }
   }
 
@@ -4593,6 +4614,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  public long getLogEntriesPerSyncOperationLimit() {
+    return logEntriesPerSyncOperationLimit;
+  }
+
+  public ProcessEngineConfigurationImpl setLogEntriesPerSyncOperationLimit(long logEntriesPerSyncOperationLimit) {
+    this.logEntriesPerSyncOperationLimit = logEntriesPerSyncOperationLimit;
+    return this;
+  }
+
   public ProcessEngineConfigurationImpl setTenantIdProvider(TenantIdProvider tenantIdProvider) {
     this.tenantIdProvider = tenantIdProvider;
     return this;
@@ -4930,8 +4960,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.historyCleanupBatchThreshold = historyCleanupBatchThreshold;
   }
 
+  /**
+   * Checks if history cleanup metrics are enabled.
+   * This method returns {@code true} only if both {@code historyCleanupMetricsEnabled} and
+   * {@code isMetricsEnabled} are true
+   *
+   * @return {@code true} if both history cleanup metrics and general metrics are enabled,
+   *         {@code false} otherwise.
+   */
   public boolean isHistoryCleanupMetricsEnabled() {
-    return historyCleanupMetricsEnabled;
+    return historyCleanupMetricsEnabled && isMetricsEnabled;
   }
 
   public void setHistoryCleanupMetricsEnabled(boolean historyCleanupMetricsEnabled) {

@@ -24,6 +24,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -71,7 +72,7 @@ public class MultipartFormData {
       fileName = stream.getName();
 
       if(contentType == null || contentType.contains(MediaType.TEXT_PLAIN)) {
-        textContent = new String(binaryContent);
+        textContent = new String(binaryContent, StandardCharsets.UTF_8);
       }
     }
 

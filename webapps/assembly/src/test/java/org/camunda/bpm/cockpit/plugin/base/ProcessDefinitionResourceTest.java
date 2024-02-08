@@ -37,6 +37,8 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -45,7 +47,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
 
@@ -625,7 +626,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
       "processes/variables-process-with-call-activity.bpmn",
       "processes/user-task-process.bpmn"
   })
-  @Category(SlowMariaDbTest.class)
+  @RequiredDatabase(excludes = {DbSqlSessionFactory.MYSQL, DbSqlSessionFactory.MARIADB})
   public void testQueryWithComplexVariableFilter() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableProcessWithCallActivity");
