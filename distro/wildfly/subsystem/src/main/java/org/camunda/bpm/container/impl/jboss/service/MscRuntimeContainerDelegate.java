@@ -123,7 +123,10 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
 
     // remove the service asynchronously
     ServiceController<ProcessEngine> service = (ServiceController<ProcessEngine>) serviceContainer.getService(serviceName);
-    if(service != null && service.getService() instanceof MscManagedProcessEngine) {
+    // 1. can we check for the instance in a different way
+    // 2. do we remove the default engine as well somewhere else?
+    // 3. do we need to have the check?
+    if(service != null ) {
       service.setMode(Mode.REMOVE);
     }
 
