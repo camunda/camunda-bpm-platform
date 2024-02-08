@@ -844,7 +844,7 @@
     <bind name="atomicChecks" value="authCheck.permissionChecks.atomicChecks" />
     <bind name="disjunctive" value="authCheck.permissionChecks.disjunctive" />
     <bind name="useLeftJoin" value="authCheck.useLeftJoin" />
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClauseWithBinding" />
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClauseWithBindingUnion" />
   </sql>
 
   <sql id="authCheckJoinWithoutOnClauseWithBinding">
@@ -875,6 +875,40 @@
       </if>
       )
     </if>  
+    )
+  </sql>
+
+  <sql id="authCheckJoinWithoutOnClauseWithBindingUnion">
+    <choose>
+      <when test="useLeftJoin != null &amp;&amp; useLeftJoin == true">left join</when>
+      <otherwise>inner join</otherwise>
+    </choose>
+    (
+    SELECT A.*
+    FROM ${prefix}ACT_RU_AUTHORIZATION A
+    WHERE A.TYPE_ &lt; 2
+    AND ( A.USER_ID_ in ( #{authCheck.authUserId, jdbcType=VARCHAR}, '*')
+    <if test="authGroupIds != null &amp;&amp; authGroupIds.size > 0">
+      UNION ( SELECT A.*
+      FROM ${prefix}ACT_RU_AUTHORIZATION A
+      WHERE A.TYPE_ &lt; 2
+      AND A.GROUP_ID_ IN <foreach item="item" index="index" collection="authGroupIds" open="(" separator="," close=")">#{item}</foreach>
+    </if>
+    )
+    <if test="atomicChecks != null &amp;&amp; atomicChecks.size > 0">
+      AND (
+      <if test="disjunctive">
+        <foreach item="permCheck" index="index" collection="atomicChecks" open="(" separator="OR" close=")">
+          A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER} AND ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} = #{permCheck.perms,  jdbcType=INTEGER}
+        </foreach>
+      </if>
+      <if test="!disjunctive">
+        <foreach item="permCheck" index="index" collection="atomicChecks" open="(" separator="AND" close=")">
+          A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER} AND ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} = #{permCheck.perms,  jdbcType=INTEGER}
+        </foreach>
+      </if>
+      )
+    </if>
     )
   </sql>
 
