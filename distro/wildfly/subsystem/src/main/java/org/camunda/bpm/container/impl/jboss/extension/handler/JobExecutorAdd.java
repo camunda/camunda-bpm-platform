@@ -78,7 +78,44 @@ public class JobExecutorAdd extends AbstractAddStepHandler {
 
         ServiceName threadFactoryServiceName = ServiceNames.forThreadFactoryService(name);
 
+        // TODO document the WildFly classes use deprecated API
         serviceTarget.addService(threadFactoryServiceName, threadFactory).install();
+//        ServiceBuilder<?> sb = serviceTarget.addService();
+//        sb.provides(threadFactoryServiceName);
+//        sb.setInstance(threadFactory);
+//        sb.install();
+        //CAN't cause
+//        ERROR: MSC000012: Injection failed for service service org.camunda.bpm.platform.job-executor.job-executor-tp
+//        java.lang.IllegalStateException: Service unavailable
+//          at org.jboss.msc.service.WritableValueImpl.getValue(WritableValueImpl.java:41)
+//          at org.jboss.msc.service.ServiceRegistrationImpl.getValue(ServiceRegistrationImpl.java:161)
+//          at org.jboss.msc.service.ServiceControllerImpl.inject(ServiceControllerImpl.java:1397)
+//          at org.jboss.msc.service.ServiceControllerImpl.inject(ServiceControllerImpl.java:1383)
+//          at org.jboss.msc.service.ServiceControllerImpl$StartTask.execute(ServiceControllerImpl.java:1579)
+//          at org.jboss.msc.service.ServiceControllerImpl$ControllerTask.run(ServiceControllerImpl.java:1438)
+//          at org.jboss.threads.ContextClassLoaderSavingRunnable.run(ContextClassLoaderSavingRunnable.java:35)
+//          at org.jboss.threads.EnhancedQueueExecutor.safeRun(EnhancedQueueExecutor.java:1990)
+//          at org.jboss.threads.EnhancedQueueExecutor$ThreadBody.doRunTask(EnhancedQueueExecutor.java:1486)
+//          at org.jboss.threads.EnhancedQueueExecutor$ThreadBody.run(EnhancedQueueExecutor.java:1377)
+//          at java.base/java.lang.Thread.run(Thread.java:834)
+//
+//        Feb 08, 2024 3:43:28 PM org.jboss.msc.service.ServiceControllerImpl startFailed
+//        ERROR: MSC000001: Failed to start service org.camunda.bpm.platform.job-executor.job-executor-tp
+//        org.jboss.msc.service.StartException in service org.camunda.bpm.platform.job-executor.job-executor-tp: Failed to start service
+//          at org.jboss.msc.service.ServiceControllerImpl$StartTask.execute(ServiceControllerImpl.java:1609)
+//          at org.jboss.msc.service.ServiceControllerImpl$ControllerTask.run(ServiceControllerImpl.java:1438)
+//          at org.jboss.threads.ContextClassLoaderSavingRunnable.run(ContextClassLoaderSavingRunnable.java:35)
+//          at org.jboss.threads.EnhancedQueueExecutor.safeRun(EnhancedQueueExecutor.java:1990)
+//          at org.jboss.threads.EnhancedQueueExecutor$ThreadBody.doRunTask(EnhancedQueueExecutor.java:1486)
+//          at org.jboss.threads.EnhancedQueueExecutor$ThreadBody.run(EnhancedQueueExecutor.java:1377)
+//          at java.base/java.lang.Thread.run(Thread.java:834)
+//        Caused by: java.lang.IllegalStateException: Service unavailable
+//          at org.jboss.msc.service.WritableValueImpl.getValue(WritableValueImpl.java:41)
+//          at org.jboss.msc.service.ServiceRegistrationImpl.getValue(ServiceRegistrationImpl.java:161)
+//          at org.jboss.msc.service.ServiceControllerImpl.inject(ServiceControllerImpl.java:1397)
+//          at org.jboss.msc.service.ServiceControllerImpl.inject(ServiceControllerImpl.java:1383)
+//          at org.jboss.msc.service.ServiceControllerImpl$StartTask.execute(ServiceControllerImpl.java:1579)
+//          ... 6 more
 
         final BoundedQueueThreadPoolService threadPoolService = new BoundedQueueThreadPoolService(
                 SubsystemAttributeDefinitons.CORE_THREADS.resolveModelAttribute(context, model).asInt(),
@@ -92,6 +129,14 @@ public class JobExecutorAdd extends AbstractAddStepHandler {
                 .addDependency(threadFactoryServiceName, ThreadFactory.class,
                         threadPoolService.getThreadFactoryInjector())
                 .setInitialMode(ServiceController.Mode.ACTIVE).install();
+//        ServiceBuilder<?> sb = serviceTarget.addService();
+//        sb.provides(jobExecutorThreadPoolServiceName);
+//        sb.requires(threadFactoryServiceName);
+//        sb.setInitialMode(ServiceController.Mode.ACTIVE);
+//        sb.setInstance(threadPoolService);
+//        sb.install();
+        //CAN'T cause
+//        WFLYCTL0186:   Services which failed to start:      service org.camunda.bpm.platform.job-executor.job-executor-tp: Failed to start service
     }
 
 }
