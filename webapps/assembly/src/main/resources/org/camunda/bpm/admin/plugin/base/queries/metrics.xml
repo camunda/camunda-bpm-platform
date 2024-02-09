@@ -28,98 +28,107 @@
 
   <sql id="selectGroupByCases">
     <if test="groupBy.equals('year')">
-       , case
-           when <include refid="extractMonth"/> &gt; #{subscriptionMonth} then <include refid="extractYear"/>
-           when <include refid="extractMonth"/> = #{subscriptionMonth} and <include refid="extractDay"/> &gt;= #{subscriptionDay}
-             then <include refid="extractYear"/>
-           else <include refid="extractYear"/> - 1
-           end     as SUBSCRIPTION_YEAR_
-      </if>
-      <if test="groupBy.equals('month')">
-       , case
-            when <include refid="extractDay"/> &gt;= #{subscriptionDay} or <include refid="extractMonth"/> &gt; 1 then <include refid="extractYear"/>
-            else <include refid="extractYear"/> - 1
-            end    as SUBSCRIPTION_YEAR_
-       , case
-           when <include refid="extractDay"/> &gt;= #{subscriptionDay} then <include refid="extractMonth"/>
-           else case
-                  when <include refid="extractMonth"/> &gt; 1 then <include refid="extractMonth"/> - 1
-                  else 12
-             end
-           end     as SUBSCRIPTION_MONTH_
-      </if>
+      case
+        when <include refid="extractMonth"/> &gt; #{subscriptionMonth}
+          then <include refid="extractYear"/>
+        when <include refid="extractMonth"/> = #{subscriptionMonth} and <include refid="extractDay"/> &gt;= #{subscriptionDay}
+          then <include refid="extractYear"/>
+        else <include refid="extractYear"/> - 1
+        end     as SUBSCRIPTION_YEAR_
+    </if>
+    <if test="groupBy.equals('month')">
+      case
+        when <include refid="extractDay"/> &gt;= #{subscriptionDay} or <include refid="extractMonth"/> &gt; 1
+          then <include refid="extractYear"/>
+        else <include refid="extractYear"/> - 1
+        end     as SUBSCRIPTION_YEAR_,
+      case
+        when <include refid="extractDay"/> &gt;= #{subscriptionDay}
+          then <include refid="extractMonth"/>
+        else
+          case
+            when <include refid="extractMonth"/> &gt; 1
+              then <include refid="extractMonth"/> - 1
+            else 12
+            end
+        end     as SUBSCRIPTION_MONTH_
+    </if>
   </sql>
 
   <select id="selectMetricsAggregated"
           parameterType="org.camunda.bpm.admin.impl.plugin.base.dto.MetricsAggregatedQueryDto"
           resultMap="metricsResultMap">
     <bind name="extractDateColumn" value="'TIMESTAMP_'"/>
+    <bind name="groupByColumns" value="'RES.SUBSCRIPTION_YEAR_'"/>
+    <if test="groupBy.equals('month')">
+      <bind name="groupByColumns" value="groupByColumns + ', RES.SUBSCRIPTION_MONTH_'"/>
+    </if>
 
     select
-      NAME_,
-      sum(VALUE_) as SUM_
-      <include refid="selectGroupByCases"/>
-    from ${prefix}ACT_RU_METER_LOG
+      RES.NAME_,
+      sum(RES.VALUE_) as SUM_,
+      ${groupByColumns}
+    from (
+      select
+        NAME_,
+        VALUE_,
+        <include refid="selectGroupByCases"/>
+      from ${prefix}ACT_RU_METER_LOG
 
-    <where>
-      1 = 1
+      <where>
+        1 = 1
 
-      <if test="startDate != null">
-        and TIMESTAMP_ &gt;= #{startDate}
-      </if>
-      <if test="endDate != null">
-        and TIMESTAMP_ &lt; #{endDate}
-      </if>
+        <if test="startDate != null">
+          and TIMESTAMP_ &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+          and TIMESTAMP_ &lt; #{endDate}
+        </if>
 
-      <if test="metrics != null &amp;&amp; metrics.size > 0">
-        and NAME_ in
-        <foreach item="metric" index="index" collection="metrics"
-                 open="(" separator="," close=")">
-          #{metric}
-        </foreach>
-      </if>
-    </where>
+        <if test="metrics != null &amp;&amp; metrics.size > 0">
+          and NAME_ in
+          <foreach item="metric" index="index" collection="metrics"
+                   open="(" separator="," close=")">
+            #{metric}
+          </foreach>
+        </if>
+      </where>
+    ) RES
 
-    <bind name="internalGroupBy" value="'SUBSCRIPTION_YEAR_'"/>
-    <if test="groupBy.equals('month')">
-      <bind name="internalGroupBy" value="internalGroupBy + ', SUBSCRIPTION_MONTH_'"/>
-    </if>
-    group by NAME_, ${internalGroupBy}
-
-    <bind name="internalOrderBy" value="internalGroupBy + ' desc'"/>
-    ${orderBy}
+    group by RES.NAME_, ${groupByColumns}
   </select>
 
   <select id="selectMetricsAggregatedTU"
           parameterType="org.camunda.bpm.admin.impl.plugin.base.dto.MetricsAggregatedQueryDto"
           resultMap="metricsResultMap">
     <bind name="extractDateColumn" value="'TIMESTAMP_'"/>
+    <bind name="groupByColumns" value="'RES.SUBSCRIPTION_YEAR_'"/>
+    <if test="groupBy.equals('month')">
+      <bind name="groupByColumns" value="groupByColumns + ', RES.SUBSCRIPTION_MONTH_'"/>
+    </if>
 
     select
       'unique-task-workers' as NAME_,
-      count(*)              as SUM_
-      <include refid="selectGroupByCases"/>
-    from ${prefix}ACT_RU_TASK_METER_LOG
+      count(*) as SUM_,
+      ${groupByColumns}
+    from (
+      select
+        <include refid="selectGroupByCases"/>
+      from ${prefix}ACT_RU_TASK_METER_LOG
 
-    <where>
-      1 = 1
+      <where>
+        1 = 1
 
-      <if test="startDate != null">
-        and TIMESTAMP_ &gt;= #{startDate}
-      </if>
-      <if test="endDate != null">
-        and TIMESTAMP_ &lt; #{endDate}
-      </if>
-    </where>
+        <if test="startDate != null">
+          and TIMESTAMP_ &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+          and TIMESTAMP_ &lt; #{endDate}
+        </if>
+      </where>
+    ) RES
 
-    <bind name="internalGroupBy" value="'SUBSCRIPTION_YEAR_'"/>
-    <if test="groupBy.equals('month')">
-      <bind name="internalGroupBy" value="internalGroupBy + ', SUBSCRIPTION_MONTH_'"/>
-    </if>
-    group by ${internalGroupBy}
-
-    <bind name="internalOrderBy" value="internalGroupBy + ' desc'"/>
-    ${orderBy}
+    group by ${groupByColumns}
   </select>
 
 </mapper>
