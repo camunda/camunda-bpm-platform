@@ -26,21 +26,22 @@ import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 
 /**
- * <p>Utiliy class 
+ * <p>Utiliy class
  * @author Daniel Meyer
  *
  */
 public class BindingUtil {
-  
+
   public static ServiceController<ManagedReferenceFactory> createJndiBindings(ServiceTarget target, ServiceName serviceName, String binderServiceName,  ManagedReferenceFactory managedReferenceFactory) {
 
+    // can't change as BinderService is uses deprecated API
     BinderService binderService = new BinderService(binderServiceName);
     ServiceBuilder<ManagedReferenceFactory> serviceBuilder = target
             .addService(serviceName, binderService)
             .addDependency(ContextNames.GLOBAL_CONTEXT_SERVICE_NAME, ServiceBasedNamingStore.class, binderService.getNamingStoreInjector());
     binderService.getManagedObjectInjector().inject(managedReferenceFactory);
-            
+
     return serviceBuilder.install();
   }
-  
+
 }
