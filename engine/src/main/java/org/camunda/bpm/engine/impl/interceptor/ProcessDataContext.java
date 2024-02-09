@@ -74,20 +74,37 @@ public class ProcessDataContext {
   protected Map<String, ProcessDataStack> mdcDataStacks = new HashMap<>();
   protected ProcessDataSections sections = new ProcessDataSections();
 
+  protected Map<String, String> externalProperties = new HashMap<>();
+
   public ProcessDataContext(ProcessEngineConfigurationImpl configuration) {
-    this(configuration, false);
+    this(configuration, false, false);
   }
 
   public ProcessDataContext(ProcessEngineConfigurationImpl configuration, boolean initFromCurrentMdc) {
+    this(configuration, initFromCurrentMdc, false);
+  }
+
+  /**
+   * All-args constructor.
+   *
+   * @param configuration          the process engine configuration to use to fetch Logging Context Parameters.
+   * @param initFromCurrentMdc     when true, this process data context will be populated from the current state of the MDC
+   * @param parkExternalProperties when true, the MDC tuples that are the same as the configured logging context parameters
+   *                               will be preserved separately in the process data context.
+   */
+  public ProcessDataContext(ProcessEngineConfigurationImpl configuration, boolean initFromCurrentMdc,
+                            boolean parkExternalProperties) {
     mdcPropertyActivityId = configuration.getLoggingContextActivityId();
 
     // always keep track of activity ids, because those are used to
     // populate the Job#getFailedActivityId field. This is independent
     // of the logging configuration
     activityIdStack = new ProcessDataStack(isNotBlank(mdcPropertyActivityId) ? mdcPropertyActivityId : null);
+
     if (isNotBlank(mdcPropertyActivityId)) {
       mdcDataStacks.put(mdcPropertyActivityId, activityIdStack);
     }
+
     mdcPropertyActivityName = initProperty(configuration::getLoggingContextActivityName);
     mdcPropertyApplicationName = initProperty(configuration::getLoggingContextApplicationName);
     mdcPropertyBusinessKey = initProperty(configuration::getLoggingContextBusinessKey);
@@ -96,6 +113,10 @@ public class ProcessDataContext {
     mdcPropertyInstanceId = initProperty(configuration::getLoggingContextProcessInstanceId);
     mdcPropertyTenantId = initProperty(configuration::getLoggingContextTenantId);
     mdcPropertyEngineName = initProperty(configuration::getLoggingContextEngineName);
+
+    if (parkExternalProperties) {
+      parkExternalProperties(configuration);
+    }
 
     handleMdc = !mdcDataStacks.isEmpty();
 
@@ -111,10 +132,31 @@ public class ProcessDataContext {
     }
   }
 
+  protected void parkExternalProperties(ProcessEngineConfigurationImpl configuration) {
+    parkExternalMDCProperty(configuration::getLoggingContextActivityId);
+    parkExternalMDCProperty(configuration::getLoggingContextActivityName);
+    parkExternalMDCProperty(configuration::getLoggingContextApplicationName);
+    parkExternalMDCProperty(configuration::getLoggingContextBusinessKey);
+    parkExternalMDCProperty(configuration::getLoggingContextProcessDefinitionId);
+    parkExternalMDCProperty(configuration::getLoggingContextProcessDefinitionKey);
+    parkExternalMDCProperty(configuration::getLoggingContextProcessInstanceId);
+    parkExternalMDCProperty(configuration::getLoggingContextTenantId);
+    parkExternalMDCProperty(configuration::getLoggingContextEngineName);
+  }
+
   protected String initProperty(final Supplier<String> configSupplier) {
     final String configValue = configSupplier.get();
     if (isNotBlank(configValue)) {
       mdcDataStacks.put(configValue, new ProcessDataStack(configValue));
+    }
+    return configValue;
+  }
+
+  protected String parkExternalMDCProperty(final Supplier<String> configSupplier) {
+    final String configValue = configSupplier.get();
+
+    if (isNotBlank(configValue) && isNotBlank(MdcAccess.get(configValue))) {
+      externalProperties.put(configValue, MdcAccess.get(configValue));
     }
     return configValue;
   }
@@ -191,6 +233,13 @@ public class ProcessDataContext {
     if (handleMdc) {
       mdcDataStacks.values().forEach(ProcessDataStack::clearMdcProperty);
     }
+  }
+
+  /**
+   * Restores the external properties to the MDC. Meant to be called for ProcessDataContexts associated with outer commands.
+   */
+  public void restoreExternalMDCProperties() {
+    externalProperties.forEach(MdcAccess::put);
   }
 
   /** Update the MDC with the current values of this logging context */

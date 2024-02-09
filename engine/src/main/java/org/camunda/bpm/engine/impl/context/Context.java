@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl.context;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.concurrent.Callable;
-
 import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
@@ -83,10 +82,13 @@ public class Context {
     if (stack.isEmpty()) {
       // do not clear when called from JobExecutor, will be cleared there after logging
       if (getJobExecutorContext() == null) {
+        // outer command remove flow
         currentContext.getProcessDataContext().clearMdc();
+        currentContext.getProcessDataContext().restoreExternalMDCProperties();
       }
     } else {
       // reset the MDC to the logging context of the outer command invocation
+      // inner command remove flow
       stack.peek().getProcessDataContext().updateMdcFromCurrentValues();
     }
   }
