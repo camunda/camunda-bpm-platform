@@ -168,13 +168,13 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
 
       ServiceController<ServiceTarget> requiredService = (ServiceController<ServiceTarget>) serviceContainer.getRequiredService(paModuleService);
 
-      ServiceBuilder<?> sb = requiredService.getValue()
-        .addService();//(serviceName, service)
+      ServiceBuilder<?> sb = requiredService.getValue().addService();
       Consumer<ProcessApplicationInterface> provider1 = sb.provides(serviceName);
-        sb.setInitialMode(Mode.ACTIVE);
-        NoViewProcessApplicationStartService service = new NoViewProcessApplicationStartService(processApplication.getReference(),provider1);
-sb.setInstance(service);
-        sb.install();
+      sb.setInitialMode(Mode.ACTIVE);
+      NoViewProcessApplicationStartService service = new NoViewProcessApplicationStartService(
+          processApplication.getReference(), provider1);
+      sb.setInstance(service);
+      sb.install();
 
     }
   }

@@ -76,7 +76,7 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
     CapabilityServiceBuilder<?> sb = context.getCapabilityServiceTarget().addService();
     Consumer<RuntimeContainerDelegate> provider = sb.provides(ServiceNames.forMscRuntimeContainerDelegate());
             sb.setInitialMode(Mode.ACTIVE);
-            final MscRuntimeContainerDelegate processEngineService = new MscRuntimeContainerDelegate(provider);
+            MscRuntimeContainerDelegate processEngineService = new MscRuntimeContainerDelegate(provider);
             sb.setInstance(processEngineService);
             sb.install();
 
