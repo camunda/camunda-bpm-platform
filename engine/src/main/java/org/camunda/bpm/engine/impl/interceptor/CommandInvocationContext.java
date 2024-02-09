@@ -45,13 +45,24 @@ public class CommandInvocationContext {
   protected Throwable throwable;
   protected Command< ? > command;
   protected boolean isExecuting = false;
-  protected List<AtomicOperationInvocation> queuedInvocations = new ArrayList<AtomicOperationInvocation>();
+  protected List<AtomicOperationInvocation> queuedInvocations = new ArrayList<>();
   protected BpmnStackTrace bpmnStackTrace = new BpmnStackTrace();
   protected ProcessDataContext processDataContext;
 
-  public CommandInvocationContext(Command<?> command, ProcessEngineConfigurationImpl configuration) {
+  /**
+   * All-args constructor.
+   *
+   * @param command        the associated command of this command invocation context.
+   * @param configuration  the process engine configuration
+   * @param isOuterCommand when true, the flag marks this command invocation context as outer and parks any MDC value
+   *                       associated with the Logging Context Parameters as external properties.
+   *                       when set to false, this command invocation context will be associated to an inner command,
+   *                       no external properties will be parked
+   */
+  public CommandInvocationContext(Command<?> command, ProcessEngineConfigurationImpl configuration, boolean isOuterCommand) {
     this.command = command;
-    this.processDataContext = new ProcessDataContext(configuration);
+    // only outer commands park external properties
+    this.processDataContext = new ProcessDataContext(configuration, false, isOuterCommand);
   }
 
   public Throwable getThrowable() {

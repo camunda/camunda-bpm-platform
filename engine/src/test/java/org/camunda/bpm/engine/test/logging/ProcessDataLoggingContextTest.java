@@ -43,8 +43,10 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.commons.logging.MdcAccess;
 import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.camunda.commons.testing.WatchLogger;
+import org.jboss.logging.MDC;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -89,16 +91,20 @@ public class ProcessDataLoggingContextTest {
   private RuntimeService runtimeService;
   private TaskService taskService;
 
+  private TestMdcFacade testMDCFacade;
+
   @Before
   public void setupServices() {
     runtimeService = engineRule.getRuntimeService();
     taskService = engineRule.getTaskService();
     defaultEngineRegistered = false;
+    testMDCFacade = TestMdcFacade.empty();
   }
 
   @After
   public void resetClock() {
     ClockUtil.reset();
+    testMDCFacade.clear();
   }
 
   @After
@@ -162,6 +168,131 @@ public class ProcessDataLoggingContextTest {
     assertActivityLogsPresent(instance, Arrays.asList("start", "waitState", "end"));
     // other logs do not contain MDC properties
     assertActivityLogsPresentWithoutMdc("ENGINE-130");
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {PVM_LOGGER, CMD_LOGGER}, level = "DEBUG")
+  public void shouldPreserveMDCExternalPropertiesAfterJobCompletion() {
+    // given
+
+    // a set of custom Logging Context parameters that populate the MDC prior to any process instance execution
+    testMDCFacade.withDefaultLoggingContextParameters(
+        "customActivityId",
+        "customActivityName",
+        "customApplicationName",
+        "customBusinessKey",
+        "customProcessDefinitionId",
+        "customProcessDefinitionKey",
+        "customProcessInstanceId",
+        "customTenantId",
+        "customEngineName"
+    );
+
+    // and a deployed process
+    manageDeployment(modelOneTaskProcess());
+
+    // when a process instance starts and completes
+    runtimeService.startProcessInstanceByKey(PROCESS, B_KEY);
+    taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+    // then the activity log events should use the process instance specific values (not their external property counterparts)
+    assertThat(loggingRule.getFilteredLog("ENGINE-200")).hasSize(13);
+
+    assertActivityLogsAtRange(0, 3, "start", "process:(.*):(.*)", "(\\d)+", "start", "testTenant", "businessKey1", "default");
+    assertActivityLogsAtRange(4, 7, "waitState", "process:(.*):(.*)", "(\\d)+", "waitState", "testTenant", "businessKey1", "default");
+    assertActivityLogsAtRange(8, 12, "end", "process:(.*):(.*)", "(\\d)+", "end", "testTenant", "businessKey1", "default");
+
+    // And the MDC External Properties are in the same state as prior to the commands execution
+    testMDCFacade.assertAllInsertedPropertiesAreInMdc();
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {NestedLoggingDelegate.LOGGER_NAME}, level = "DEBUG")
+  public void shouldPreserveMDCExternalPropertiesInFlowsWithInnerCommands() {
+    // given
+
+    // a set of custom Logging Context parameters that populate the MDC prior to any process instance execution
+    testMDCFacade.withDefaultLoggingContextParameters(
+        "customActivityId",
+        "customActivityName",
+        "customApplicationName",
+        "customBusinessKey",
+        "customProcessDefinitionId",
+        "customProcessDefinitionKey",
+        "customProcessInstanceId",
+        "customTenantId",
+        "customEngineName"
+    );
+
+    manageDeployment(Bpmn.createExecutableProcess(PROCESS)
+        .startEvent("start")
+        .serviceTask("startProcess")
+        .camundaClass(NestedLoggingDelegate.class.getName())
+        .endEvent("end")
+        .done());
+
+    // when
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS, B_KEY);
+
+    // then
+    List<ILoggingEvent> customLogs = loggingRule.getLog();
+
+    // Log events contain the execution specific MDC Properties
+    assertThat(customLogs).hasSize(2);
+
+    for (ILoggingEvent logEvent : customLogs) {
+      assertThat(logEvent.getMDCPropertyMap()).containsEntry("activityId", "startProcess");
+      assertThat(logEvent.getMDCPropertyMap()).containsEntry("businessKey", B_KEY);
+      assertThat(logEvent.getMDCPropertyMap()).containsEntry("processDefinitionId", processInstance.getProcessDefinitionId());
+      assertThat(logEvent.getMDCPropertyMap()).containsEntry("processInstanceId", processInstance.getId());
+      assertThat(logEvent.getMDCPropertyMap()).containsEntry("tenantId", processInstance.getTenantId());
+    }
+
+    // And the MDC External Properties are in the same state as prior to the commands execution
+    testMDCFacade.assertAllInsertedPropertiesAreInMdc();
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {PVM_LOGGER, CMD_LOGGER}, level = "DEBUG")
+  public void shouldPreserveThirdPartyMDCProperties() {
+    // given
+
+    // Logging Context Properties
+    testMDCFacade.withDefaultLoggingContextParameters(
+        "customActivityId",
+        "customActivityName",
+        "customApplicationName",
+        "customBusinessKey",
+        "customProcessDefinitionId",
+        "customProcessDefinitionKey",
+        "customProcessInstanceId",
+        "customTenantId",
+        "customEngineName"
+    );
+
+    // And a custom property that does not belong to the logging context properties
+    testMDCFacade.withMDCProperty("thirdPartyProperty", "withAValue");
+
+    // and a deployed process
+    manageDeployment(modelOneTaskProcess());
+
+    // when a process instance starts and completes
+    runtimeService.startProcessInstanceByKey(PROCESS, B_KEY);
+    taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+    // then the activity log events should use the process instance specific values (not their external property counterparts)
+    assertThat(loggingRule.getFilteredLog("ENGINE-200")).hasSize(13);
+
+    assertActivityLogsAtRange(0, 3, "start", "process:(.*):(.*)", "(\\d)+", "start", "testTenant", "businessKey1", "default");
+    assertActivityLogsAtRange(4, 7, "waitState", "process:(.*):(.*)", "(\\d)+", "waitState", "testTenant", "businessKey1", "default");
+    assertActivityLogsAtRange(8, 12, "end", "process:(.*):(.*)", "(\\d)+", "end", "testTenant", "businessKey1", "default");
+
+    // and the MDC should contain both the logging context properties & the third party property prior to any command execution
+    Map<String, Object> mdcMap = MDC.getMap();
+
+    assertThat(mdcMap).hasSize(10);
+
+    testMDCFacade.assertAllInsertedPropertiesAreInMdc();
   }
 
   @Test
@@ -659,6 +790,37 @@ public class ProcessDataLoggingContextTest {
     application.undeploy();
     // then
     assertFailureLogInApplication(instance, "failingTask", application.getName());
+  }
+
+  protected void assertActivityLogsAtRange(int start, int end, String activityId, String processDefinitionId,
+                                           String processInstanceId, String activityName, String tenantId, String businessKey,
+                                           String engineName) {
+    for (int i=start; i <= end; i++) {
+      assertActivityLogsAtIndex(i, activityId, processDefinitionId, processInstanceId, activityName, tenantId, businessKey, engineName);
+    }
+  }
+
+  protected void assertActivityLogsAtIndex(int index, String activityId, String processDefinitionIdRegex, String processInstanceIdRegex,
+                                    String activityName, String tenantId, String businessKey, String engineName) {
+    List<ILoggingEvent> logs = loggingRule.getFilteredLog("ENGINE-200");
+    ILoggingEvent logEvent = logs.get(index);
+
+    Map<String, String> mdcPropertyMap = logEvent.getMDCPropertyMap();
+
+    assertThat(mdcPropertyMap.get("processDefinitionId")).matches(processDefinitionIdRegex);
+    assertThat(mdcPropertyMap.get("processInstanceId")).matches(processInstanceIdRegex);
+
+    assertThat(mdcPropertyMap).containsEntry("activityId", activityId);
+    assertThat(mdcPropertyMap).containsEntry("activityName", activityName);
+    assertThat(mdcPropertyMap).containsEntry("tenantId", tenantId);
+    assertThat(mdcPropertyMap).containsEntry("businessKey", businessKey);
+    assertThat(mdcPropertyMap).containsEntry("engineName", engineName);
+  }
+
+  protected void clearMDCFromProperties(String... properties) {
+    for (String property : properties) {
+      MdcAccess.remove(property);
+    }
   }
 
   protected void assertActivityLogsPresent(ProcessInstance instance, List<String> expectedActivities) {
