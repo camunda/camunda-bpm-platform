@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension.handler;
 
+import org.camunda.bpm.container.ExecutorService;
 import org.camunda.bpm.container.impl.jboss.extension.SubsystemAttributeDefinitons;
 import org.camunda.bpm.container.impl.jboss.service.MscExecutorService;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
@@ -35,6 +36,7 @@ import org.jboss.msc.service.ServiceTarget;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 
@@ -60,9 +62,9 @@ public class JobExecutorAdd extends AbstractAddStepHandler {
         performRuntimeThreadPool(context, model, jobExecutorThreadPoolName, jobExecutorThreadPoolServiceName);
 
         ServiceBuilder<?> sb = context.getCapabilityServiceTarget().addService();
-        sb.provides(ServiceNames.forMscExecutorService());
+        Consumer<ExecutorService> provider = sb.provides(ServiceNames.forMscExecutorService());
         Supplier<ManagedQueueExecutorService> supplier = sb.requires(jobExecutorThreadPoolServiceName);
-        MscExecutorService service = new MscExecutorService(supplier);
+        MscExecutorService service = new MscExecutorService(supplier, provider);
         sb.setInitialMode(Mode.ACTIVE);
         sb.setInstance(service);
         sb.install();
