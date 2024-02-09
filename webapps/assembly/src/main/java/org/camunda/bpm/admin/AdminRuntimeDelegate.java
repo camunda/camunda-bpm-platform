@@ -17,6 +17,7 @@
 package org.camunda.bpm.admin;
 
 import org.camunda.bpm.admin.plugin.spi.AdminPlugin;
+import org.camunda.bpm.cockpit.db.QueryService;
 import org.camunda.bpm.webapp.AppRuntimeDelegate;
 
 /**
@@ -27,5 +28,13 @@ import org.camunda.bpm.webapp.AppRuntimeDelegate;
  *
  */
 public interface AdminRuntimeDelegate extends AppRuntimeDelegate<AdminPlugin> {
+
+  /**
+   * Returns a configured {@link QueryService} to execute custom
+   * statements to the corresponding process engine.
+   * @param processEngineName
+   * @return a {@link QueryService}
+   */
+  QueryService getQueryService(String processEngineName);
 
 }

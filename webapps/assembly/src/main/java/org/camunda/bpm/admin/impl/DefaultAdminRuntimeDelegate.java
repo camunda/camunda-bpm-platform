@@ -18,7 +18,19 @@ package org.camunda.bpm.admin.impl;
 
 import org.camunda.bpm.admin.AdminRuntimeDelegate;
 import org.camunda.bpm.admin.plugin.spi.AdminPlugin;
+import org.camunda.bpm.cockpit.db.CommandExecutor;
+import org.camunda.bpm.cockpit.db.QueryService;
+import org.camunda.bpm.cockpit.impl.db.CommandExecutorImpl;
+import org.camunda.bpm.cockpit.impl.db.QueryServiceImpl;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.webapp.impl.AbstractAppRuntimeDelegate;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Daniel Meyer
@@ -26,8 +38,48 @@ import org.camunda.bpm.webapp.impl.AbstractAppRuntimeDelegate;
  */
 public class DefaultAdminRuntimeDelegate extends AbstractAppRuntimeDelegate<AdminPlugin> implements AdminRuntimeDelegate {
 
+  private static final List<String> MAPPING_FILES = List.of(
+      "org/camunda/bpm/admin/plugin/base/queries/metrics.xml"
+  );
+
+  protected final Map<String, CommandExecutor> commandExecutors;
+
   public DefaultAdminRuntimeDelegate() {
     super(AdminPlugin.class);
+    this.commandExecutors = new HashMap<>();
+  }
+
+  @Override
+  public QueryService getQueryService(String processEngineName) {
+    CommandExecutor commandExecutor = getCommandExecutor(processEngineName);
+    return new QueryServiceImpl(commandExecutor);
+  }
+
+  public CommandExecutor getCommandExecutor(String processEngineName) {
+    CommandExecutor commandExecutor = commandExecutors.get(processEngineName);
+    if (commandExecutor == null) {
+      commandExecutor = createCommandExecutor(processEngineName);
+      commandExecutors.put(processEngineName, commandExecutor);
+    }
+
+    return commandExecutor;
+  }
+
+  /**
+   * Create command executor for the engine with the given name
+   *
+   * @param processEngineName the process engine name
+   * @return the command executor
+   */
+  protected CommandExecutor createCommandExecutor(String processEngineName) {
+    ProcessEngine processEngine = getProcessEngine(processEngineName);
+    if (processEngine == null) {
+      throw new ProcessEngineException("No process engine with name " + processEngineName + " found.");
+    }
+
+    ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl)processEngine).getProcessEngineConfiguration();
+
+    return new CommandExecutorImpl(processEngineConfiguration, MAPPING_FILES);
   }
 
 }

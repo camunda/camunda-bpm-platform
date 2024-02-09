@@ -18,6 +18,7 @@ package org.camunda.bpm.admin.resource;
 
 import org.camunda.bpm.admin.Admin;
 import org.camunda.bpm.admin.plugin.spi.AdminPlugin;
+import org.camunda.bpm.cockpit.db.QueryService;
 import org.camunda.bpm.webapp.plugin.resource.AbstractAppPluginResource;
 
 /**
@@ -30,6 +31,16 @@ public abstract class AbstractAdminPluginResource extends AbstractAppPluginResou
 
   public AbstractAdminPluginResource(String engineName) {
     super(Admin.getRuntimeDelegate(), engineName);
+  }
+
+  /**
+   * Return a {@link QueryService} for the current
+   * engine to execute queries against the engine database.
+   *
+   * @return
+   */
+  protected QueryService getQueryService() {
+    return Admin.getRuntimeDelegate().getQueryService(engineName);
   }
 
 }

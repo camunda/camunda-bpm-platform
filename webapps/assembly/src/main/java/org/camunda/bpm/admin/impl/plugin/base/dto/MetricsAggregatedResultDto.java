@@ -14,27 +14,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.admin.impl.plugin.resources;
+package org.camunda.bpm.admin.impl.plugin.base.dto;
 
-import org.camunda.bpm.admin.impl.plugin.AdminPlugins;
-import org.camunda.bpm.admin.resource.AbstractAdminPluginRootResource;
+public class MetricsAggregatedResultDto {
 
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+  protected String metric;
+  protected Long sum;
+  protected Integer subscriptionYear;
+  protected Integer subscriptionMonth;
 
-/**
- * @author vale
- */
-@Path("plugin/" + AdminPlugins.ID)
-public class AdminPluginsRootResource extends AbstractAdminPluginRootResource {
-
-  public AdminPluginsRootResource() {
-    super(AdminPlugins.ID);
+  public String getMetric() {
+    return metric;
   }
 
-  @Path("{engine}" + MetricsRestService.PATH)
-  public MetricsRestService getProcessDefinitionResource(@PathParam("engine") String engineName) {
-    return subResource(new MetricsRestService(engineName), engineName);
+  public void setMetric(String metric) {
+    this.metric = metric;
   }
 
+  public Long getSum() {
+    return sum;
+  }
+
+  public void setSum(Long sum) {
+    this.sum = sum;
+  }
+
+  public Integer getSubscriptionYear() {
+    return subscriptionYear;
+  }
+
+  public void setSubscriptionYear(Integer subscriptionYear) {
+    this.subscriptionYear = subscriptionYear;
+  }
+
+  public Integer getSubscriptionMonth() {
+    return subscriptionMonth;
+  }
+
+  public void setSubscriptionMonth(Integer subscriptionMonth) {
+    this.subscriptionMonth = subscriptionMonth;
+  }
 }
