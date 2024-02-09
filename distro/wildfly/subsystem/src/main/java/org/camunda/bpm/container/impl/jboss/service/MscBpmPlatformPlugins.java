@@ -19,7 +19,7 @@ package org.camunda.bpm.container.impl.jboss.service;
 import java.util.function.Consumer;
 
 import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugins;
-import org.jboss.msc.service.Service;
+import org.jboss.msc.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
@@ -28,7 +28,7 @@ import org.jboss.msc.service.StopContext;
  * @author Thorben Lindhauer
  *
  */
-public class MscBpmPlatformPlugins implements Service<BpmPlatformPlugins> {
+public class MscBpmPlatformPlugins implements Service {
 
   protected BpmPlatformPlugins plugins;
   protected final Consumer<BpmPlatformPlugins> provider;
@@ -36,11 +36,6 @@ public class MscBpmPlatformPlugins implements Service<BpmPlatformPlugins> {
   public MscBpmPlatformPlugins(BpmPlatformPlugins plugins, Consumer<BpmPlatformPlugins> provider) {
     this.provider = provider;
     this.plugins = plugins;
-  }
-
-  @Override
-  public BpmPlatformPlugins getValue() throws IllegalStateException, IllegalArgumentException {
-    return plugins;
   }
 
   @Override
