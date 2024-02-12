@@ -297,16 +297,25 @@
             <goals>
               <goal>execute</goal>
             </goals>
-            <configuration>
-              <providerSelection>2.0</providerSelection>
-              <source>
-                Random random = new Random()
-                int portOffset = random.nextInt(10)
-                project.properties.setProperty('portOffset', portOffset)
-              </source>
-            </configuration>
           </execution>
         </executions>
+        <configuration>
+          <scripts>
+            <script>
+              Random random = new Random()
+              int portOffset = random.nextInt(10)
+              project.properties.setProperty('portOffset', portOffset)
+            </script>
+          </scripts>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>4.0.15</version>
+            <scope>runtime</scope>
+          </dependency>
+        </dependencies>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
