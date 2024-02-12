@@ -5,7 +5,6 @@
 
   <dependencies>
 
-    <module name="javax.api" />
     <module name="com.fasterxml.jackson.core.jackson-core" slot="@version.jackson@" />
 
   </dependencies>
