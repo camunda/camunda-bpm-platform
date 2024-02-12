@@ -3,9 +3,4 @@
     <resource-root path="jackson-core-@version.jackson@.jar" />
   </resources>
 
-  <dependencies>
-
-    <module name="javax.api" />
-
-  </dependencies>
 </module>
