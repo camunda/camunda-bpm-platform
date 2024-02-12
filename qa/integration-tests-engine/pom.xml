@@ -273,9 +273,9 @@
     </testResources>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.gmaven</groupId>
-        <artifactId>gmaven-plugin</artifactId>
-        <version>1.5</version>
+        <groupId>org.codehaus.gmavenplus</groupId>
+        <artifactId>gmavenplus-plugin</artifactId>
+        <version>3.0.2</version>
         <executions>
           <execution>
             <phase>validate</phase>
