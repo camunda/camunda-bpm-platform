@@ -289,7 +289,7 @@
             <script>
               Random random = new Random()
               int portOffset = random.nextInt(10)
-              project.properties.setProperty('portOffset', portOffset)
+              project.properties.setProperty('portOffset', portOffset + '')
             </script>
           </scripts>
         </configuration>
