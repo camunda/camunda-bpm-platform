@@ -305,6 +305,8 @@
               Random random = new Random()
               int portOffset = random.nextInt(10)
               project.properties.setProperty('portOffset', portOffset + '')
+              int defaultManagementPort = project.properties.getProperty('jboss.management-http.port') as Integer
+              project.properties.setProperty('jboss.management-http.port', (defaultManagementPort + portOffset) + '')
             </script>
           </scripts>
         </configuration>
