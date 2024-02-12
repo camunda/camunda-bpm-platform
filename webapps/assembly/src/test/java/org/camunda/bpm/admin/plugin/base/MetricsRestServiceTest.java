@@ -16,11 +16,13 @@
  */
 package org.camunda.bpm.admin.plugin.base;
 
+import org.assertj.core.groups.Tuple;
 import org.camunda.bpm.admin.impl.plugin.resources.MetricsRestService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskMeterLogEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -35,6 +37,8 @@ import org.mockito.Mockito;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -73,6 +77,7 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
     queryParameters.clear();
     managementService.deleteMetrics(null);
     managementService.deleteTaskMetrics(null);
+    ClockUtil.reset();
   }
 
   @Test
@@ -201,16 +206,14 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
 
     // generate metrics for all available meters
     var metricNames = metricsRegistry.getDbMeters().keySet();
-    metricNames.forEach(metric -> {
-      metricsRegistry.markOccurrence(metric, 1);
-    });
+    metricNames.forEach(metric -> metricsRegistry.markOccurrence(metric, 1));
     dbMetricsReporter.reportNow();
 
     // when
     var actual = resource.getAggregatedMetrics(uriInfo);
 
     // then - only the two selected metrics are returned
-    assertThat(actual.size()).isEqualTo(2);
+    assertThat(actual).hasSize(2);
     assertThat(actual).extracting("metric", "sum", "subscriptionYear", "subscriptionMonth")
         .containsExactlyInAnyOrder(
             tuple(Metrics.PROCESS_INSTANCES, 1L, new DateTime().getYear(), null),
@@ -238,7 +241,7 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
     var actual = resource.getAggregatedMetrics(uriInfo);
 
     // then - the metric from 2021 is not returned
-    assertThat(actual.size()).isEqualTo(1);
+    assertThat(actual).hasSize(1);
     assertThat(actual).extracting("metric", "sum", "subscriptionYear", "subscriptionMonth")
         .containsExactly(
             tuple(Metrics.PROCESS_INSTANCES, 1L, new DateTime().getYear(), null));
@@ -265,7 +268,7 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
     var actual = resource.getAggregatedMetrics(uriInfo);
 
     // then - the metric from current year is not returned
-    assertThat(actual.size()).isEqualTo(1);
+    assertThat(actual).hasSize(1);
     assertThat(actual).extracting("metric", "sum", "subscriptionYear", "subscriptionMonth")
         .containsExactly(
             tuple(Metrics.PROCESS_INSTANCES, 1L, dateTime.getYear(), null));
@@ -297,7 +300,7 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
     var actual = resource.getAggregatedMetrics(uriInfo);
 
     // then - metrics are grouped by months (Jan, Feb) with respect to the subscriptionStartDate
-    assertThat(actual.size()).isEqualTo(2);
+    assertThat(actual).hasSize(2);
     assertThat(actual).extracting("metric", "sum", "subscriptionYear", "subscriptionMonth")
         .containsExactlyInAnyOrder(
             tuple(Metrics.PROCESS_INSTANCES, 1L, dateTime.getYear(), 2),
@@ -330,11 +333,122 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
     var actual = resource.getAggregatedMetrics(uriInfo);
 
     // then - metrics are grouped by years (2020, 2021) with respect to the subscriptionStartDate
-    assertThat(actual.size()).isEqualTo(2);
+    assertThat(actual).hasSize(2);
     assertThat(actual).extracting("metric", "sum", "subscriptionYear", "subscriptionMonth")
         .containsExactlyInAnyOrder(
             tuple(Metrics.PROCESS_INSTANCES, 1L, dateTime.getYear(), null),
             tuple(Metrics.PROCESS_INSTANCES, 1L, dateTime.minusYears(1).getYear(), null));
+  }
+
+  @Test
+  public void shouldReturnAggregatedMetricsForTU() {
+    // given
+    queryParameters.add("subscriptionStartDate", "2020-01-01");
+    queryParameters.add("groupBy", "year");
+    queryParameters.add("metrics", Metrics.TASK_USERS);
+
+    // generate TU metric
+    processEngineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(commandContext -> {
+      commandContext.getMeterLogManager().insert(new TaskMeterLogEntity("assignee", ClockUtil.getCurrentTime()));
+      return null;
+    });
+
+    // when
+    var actual = resource.getAggregatedMetrics(uriInfo);
+
+    // then
+    System.out.println("actual = " + actual);
+    assertThat(actual).hasSize(1);
+    assertThat(actual).extracting("metric", "sum", "subscriptionYear", "subscriptionMonth")
+        .containsExactlyInAnyOrder(
+            tuple(Metrics.TASK_USERS, 1L, new DateTime().getYear(), null));
+  }
+
+  protected void generateMetrics(int year, int month, int times) {
+    var dateTime = new DateTime().withYear(year).withMonthOfYear(month).withDayOfMonth(10);
+
+    for (int i = 1; i <= times; i++) {
+      ClockUtil.setCurrentTime(dateTime.toDate());
+
+      metricsRegistry.markOccurrence(Metrics.ROOT_PROCESS_INSTANCE_START, i);
+      metricsRegistry.markOccurrence(Metrics.ACTIVTY_INSTANCE_START, i);
+      metricsRegistry.markOccurrence(Metrics.EXECUTED_DECISION_INSTANCES, i);
+      metricsRegistry.markOccurrence(Metrics.EXECUTED_DECISION_ELEMENTS, i);
+      dbMetricsReporter.reportNow();
+
+      int i1 = i;
+      processEngineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(commandContext -> {
+        for (int j = 1; j <= i1; j++) {
+          commandContext.getMeterLogManager().insert(new TaskMeterLogEntity("assignee", ClockUtil.getCurrentTime()));
+        }
+        return null;
+      });
+
+      dateTime = dateTime.minusDays(1);
+    }
+    ClockUtil.reset();
+  }
+
+  @Test
+  public void shouldReturnAggregatedMetricsByYear() {
+    // given
+    queryParameters.add("subscriptionStartDate", "2020-01-01");
+    queryParameters.add("groupBy", "year");
+
+    // generate metrics for last 5 days & last 3 years
+    generateMetrics(2024, 2, 2);
+    generateMetrics(2023, 2, 3);
+
+    // when
+    var actual = resource.getAggregatedMetrics(uriInfo);
+
+    // then
+    assertThat(actual).hasSize(10);
+    // generate tuples
+    var tuples = new ArrayList<Tuple>();
+    Consumer<String> generateAssertTuple = (String metric) -> {
+      tuples.add(tuple(metric, 3L, 2024, null));
+      tuples.add(tuple(metric, 6L, 2023, null));
+    };
+    generateAssertTuple.accept(Metrics.PROCESS_INSTANCES);
+    generateAssertTuple.accept(Metrics.FLOW_NODE_INSTANCES);
+    generateAssertTuple.accept(Metrics.DECISION_INSTANCES);
+    generateAssertTuple.accept(Metrics.EXECUTED_DECISION_ELEMENTS);
+    generateAssertTuple.accept(Metrics.TASK_USERS);
+
+    assertThat(actual).extracting("metric", "sum", "subscriptionYear", "subscriptionMonth")
+        .containsExactlyInAnyOrder(tuples.toArray(new Tuple[]{}));
+  }
+
+  @Test
+  public void shouldReturnAggregatedMetricsByMonth() {
+    // given
+    queryParameters.add("subscriptionStartDate", "2020-01-01");
+    queryParameters.add("groupBy", "month");
+
+    // generate metrics for last 5 days & last 3 years
+    generateMetrics(2024, 2, 2);
+    generateMetrics(2024, 1, 3);
+
+    // when
+    var actual = resource.getAggregatedMetrics(uriInfo);
+
+    // then
+    assertThat(actual).hasSize(10);
+    // generate tuples
+    var tuples = new ArrayList<Tuple>();
+    Consumer<String> generateAssertTuple = (String metric) -> {
+      tuples.add(tuple(metric, 3L, 2024, 2));
+      tuples.add(tuple(metric, 6L, 2024, 1));
+    };
+    generateAssertTuple.accept(Metrics.PROCESS_INSTANCES);
+    generateAssertTuple.accept(Metrics.FLOW_NODE_INSTANCES);
+    generateAssertTuple.accept(Metrics.DECISION_INSTANCES);
+    generateAssertTuple.accept(Metrics.EXECUTED_DECISION_ELEMENTS);
+    generateAssertTuple.accept(Metrics.TASK_USERS);
+
+    assertThat(actual).extracting("metric", "sum", "subscriptionYear", "subscriptionMonth")
+        .containsExactlyInAnyOrder(tuples.toArray(new Tuple[]{}));
   }
 
 }

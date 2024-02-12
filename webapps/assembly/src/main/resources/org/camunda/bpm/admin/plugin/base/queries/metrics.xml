@@ -26,81 +26,21 @@
     ${extractTimeUnitFromDate}
   </sql>
 
-  <sql id="selectGroupByCases">
-    <if test="groupBy.equals('year')">
-      case
-        when <include refid="extractMonth"/> &gt; #{subscriptionMonth}
-          then <include refid="extractYear"/>
-        when <include refid="extractMonth"/> = #{subscriptionMonth} and <include refid="extractDay"/> &gt;= #{subscriptionDay}
-          then <include refid="extractYear"/>
-        else <include refid="extractYear"/> - 1
-        end     as SUBSCRIPTION_YEAR_
-    </if>
-    <if test="groupBy.equals('month')">
-      case
-        when <include refid="extractDay"/> &gt;= #{subscriptionDay} or <include refid="extractMonth"/> &gt; 1
-          then <include refid="extractYear"/>
-        else <include refid="extractYear"/> - 1
-        end     as SUBSCRIPTION_YEAR_,
-      case
-        when <include refid="extractDay"/> &gt;= #{subscriptionDay}
-          then <include refid="extractMonth"/>
-        else
-          case
-            when <include refid="extractMonth"/> &gt; 1
-              then <include refid="extractMonth"/> - 1
-            else 12
-            end
-        end     as SUBSCRIPTION_MONTH_
-    </if>
-  </sql>
-
   <select id="selectMetricsAggregated"
           parameterType="org.camunda.bpm.admin.impl.plugin.base.dto.MetricsAggregatedQueryDto"
           resultMap="metricsResultMap">
-    <bind name="extractDateColumn" value="'TIMESTAMP_'"/>
-    <bind name="groupByColumns" value="'RES.SUBSCRIPTION_YEAR_'"/>
-    <if test="groupBy.equals('month')">
-      <bind name="groupByColumns" value="groupByColumns + ', RES.SUBSCRIPTION_MONTH_'"/>
-    </if>
-
-    select
-      RES.NAME_,
-      sum(RES.VALUE_) as SUM_,
-      ${groupByColumns}
-    from (
-      select
-        NAME_,
-        VALUE_,
-        <include refid="selectGroupByCases"/>
-      from ${prefix}ACT_RU_METER_LOG
-
-      <where>
-        1 = 1
-
-        <if test="startDate != null">
-          and TIMESTAMP_ &gt;= #{startDate}
-        </if>
-        <if test="endDate != null">
-          and TIMESTAMP_ &lt; #{endDate}
-        </if>
-
-        <if test="metrics != null &amp;&amp; metrics.size > 0">
-          and NAME_ in
-          <foreach item="metric" index="index" collection="metrics"
-                   open="(" separator="," close=")">
-            #{metric}
-          </foreach>
-        </if>
-      </where>
-    ) RES
-
-    group by RES.NAME_, ${groupByColumns}
+    <bind name="table" value="'ACT_RU_METER_LOG'"/>
+    <include refid="selectMetricsAggregatedByQueryCriteriaSql"/>
   </select>
 
   <select id="selectMetricsAggregatedTU"
           parameterType="org.camunda.bpm.admin.impl.plugin.base.dto.MetricsAggregatedQueryDto"
           resultMap="metricsResultMap">
+    <bind name="table" value="'ACT_RU_TASK_METER_LOG'"/>
+    <include refid="selectMetricsAggregatedByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectMetricsAggregatedByQueryCriteriaSql">
     <bind name="extractDateColumn" value="'TIMESTAMP_'"/>
     <bind name="groupByColumns" value="'RES.SUBSCRIPTION_YEAR_'"/>
     <if test="groupBy.equals('month')">
@@ -108,27 +48,70 @@
     </if>
 
     select
-      'unique-task-workers' as NAME_,
-      count(*) as SUM_,
+      <if test="table.equals('ACT_RU_METER_LOG')">
+        RES.NAME_,
+        sum(RES.VALUE_)       as SUM_,
+      </if>
+      <if test="table.equals('ACT_RU_TASK_METER_LOG')">
+        'unique-task-workers' as NAME_,
+        count(*)              as SUM_,
+      </if>
       ${groupByColumns}
     from (
       select
-        <include refid="selectGroupByCases"/>
-      from ${prefix}ACT_RU_TASK_METER_LOG
+        <if test="table.equals('ACT_RU_METER_LOG')">
+          NAME_,
+          VALUE_,
+        </if>
+        <if test="groupBy.equals('year')">
+          case
+            when <include refid="extractMonth"/> &gt; #{subscriptionMonth}
+              then <include refid="extractYear"/>
+            when <include refid="extractMonth"/> = #{subscriptionMonth} and <include refid="extractDay"/> &gt;= #{subscriptionDay}
+              then <include refid="extractYear"/>
+            else <include refid="extractYear"/> - 1
+            end               as SUBSCRIPTION_YEAR_
+        </if>
+        <if test="groupBy.equals('month')">
+          case
+            when <include refid="extractDay"/> &gt;= #{subscriptionDay} or <include refid="extractMonth"/> &gt; 1
+              then <include refid="extractYear"/>
+            else <include refid="extractYear"/> - 1
+            end               as SUBSCRIPTION_YEAR_,
+          case
+            when <include refid="extractDay"/> &gt;= #{subscriptionDay}
+              then <include refid="extractMonth"/>
+            else
+              case
+                when <include refid="extractMonth"/> &gt; 1
+                  then <include refid="extractMonth"/> - 1
+                else 12
+                end
+            end               as SUBSCRIPTION_MONTH_
+        </if>
+      from ${prefix}${table}
 
       <where>
-        1 = 1
+      1 = 1
 
-        <if test="startDate != null">
-          and TIMESTAMP_ &gt;= #{startDate}
-        </if>
-        <if test="endDate != null">
-          and TIMESTAMP_ &lt; #{endDate}
-        </if>
-      </where>
+      <if test="startDate != null">
+        and TIMESTAMP_ &gt;= #{startDate}
+      </if>
+      <if test="endDate != null">
+        and TIMESTAMP_ &lt; #{endDate}
+      </if>
+
+      <if test="table.equals('ACT_RU_METER_LOG') &amp;&amp; metrics != null &amp;&amp; metrics.size > 0">
+        and NAME_ in
+        <foreach item="metric" index="index" collection="metrics"
+                 open="(" separator="," close=")">
+          #{metric}
+        </foreach>
+      </if>
+    </where>
     ) RES
 
-    group by ${groupByColumns}
-  </select>
+    group by <if test="table.equals('ACT_RU_METER_LOG')">RES.NAME_,</if> ${groupByColumns}
+  </sql>
 
 </mapper>
