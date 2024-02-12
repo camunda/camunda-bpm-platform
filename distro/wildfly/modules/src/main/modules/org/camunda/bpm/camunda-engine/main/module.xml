@@ -6,12 +6,12 @@
   <dependencies>
 
     <module name="javax.api" />
-    <module name="javax.transaction.api"/>
-    <module name="javax.enterprise.api" />
-    <module name="javax.inject.api" />
-    <module name="javax.ejb.api" />
-    <module name="javax.xml.bind.api" />
-    <module name="javax.servlet.api" />
+    <module name="jakarta.transaction.api"/>
+    <module name="jakarta.enterprise.api" />
+    <module name="jakarta.inject.api" />
+    <module name="jakarta.ejb.api" />
+    <module name="jakarta.xml.bind.api" />
+    <module name="jakarta.servlet.api" />
 
     <module name="org.jboss.vfs" />
 

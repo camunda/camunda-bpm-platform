@@ -29,7 +29,7 @@
     </resources>
     <dependencies>
         <module name="javax.api"/>
-        <module name="javax.transaction.api"/>
-        <module name="javax.servlet.api" optional="true"/>
+        <module name="jakarta.transaction.api"/>
+        <module name="jakarta.servlet.api" optional="true"/>
     </dependencies>
 </module>
