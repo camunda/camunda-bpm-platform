@@ -170,12 +170,8 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       // install the ManagedProcessApplication Service as a child to this service
       // if this service stops (at undeployment) the ManagedProcessApplication service is removed as well.
       ServiceName serviceName = ServiceNames.forManagedProcessApplication(processApplicationInfo.getName());
-      ServiceBuilder<?> sb = context.getChildTarget().addService();
-      Consumer<MscManagedProcessApplication> provider = sb.provides(serviceName);
-      MscManagedProcessApplication managedProcessApplication = new MscManagedProcessApplication(processApplicationInfo,
-          processApplication.getReference(), provider);
-      sb.setInstance(managedProcessApplication);
-      sb.install();
+      MscManagedProcessApplication managedProcessApplication = new MscManagedProcessApplication(processApplicationInfo, processApplication.getReference());
+      context.getChildTarget().addService(serviceName, managedProcessApplication).install();
 
     } catch (StartException e) {
       throw e;

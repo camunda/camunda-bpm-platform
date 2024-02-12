@@ -43,10 +43,18 @@ public class ServiceTracker<S> implements LifecycleListener {
   }
 
   @Override
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({ "unchecked" })
   public void handleEvent(final ServiceController<?> controller, final LifecycleEvent event) {
 
-      // TODO class not needed?
+    if(!typeToTrack.isParentOf(controller.getName())) {
+      return;
+    }
+
+    if(event.equals(LifecycleEvent.UP)) {
+      serviceCollection.add((S) controller.getValue());
+    } else  {
+      serviceCollection.remove(controller.getValue());
+    }
 
   }
 }

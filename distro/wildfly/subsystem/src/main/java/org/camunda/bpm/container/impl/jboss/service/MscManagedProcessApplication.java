@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.container.impl.jboss.service;
 
-import java.util.function.Consumer;
-
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
@@ -38,12 +36,10 @@ public class MscManagedProcessApplication implements Service<MscManagedProcessAp
 
   protected ProcessApplicationInfo processApplicationInfo;
   protected ProcessApplicationReference processApplicationReference;
-  protected final Consumer<MscManagedProcessApplication> provider;
 
-  public MscManagedProcessApplication(ProcessApplicationInfo processApplicationInfo, ProcessApplicationReference processApplicationReference, Consumer<MscManagedProcessApplication> provider) {
+  public MscManagedProcessApplication(ProcessApplicationInfo processApplicationInfo, ProcessApplicationReference processApplicationReference) {
     this.processApplicationInfo = processApplicationInfo;
     this.processApplicationReference = processApplicationReference;
-    this.provider = provider;
   }
 
   public MscManagedProcessApplication getValue() throws IllegalStateException, IllegalArgumentException {
@@ -52,12 +48,10 @@ public class MscManagedProcessApplication implements Service<MscManagedProcessAp
 
   public void start(StartContext context) throws StartException {
     // call the process application's
-    provider.accept(this);
   }
 
   public void stop(StopContext context) {
     // Nothing to do
-    provider.accept(null);
   }
 
   public ProcessApplicationInfo getProcessApplicationInfo() {
