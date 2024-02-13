@@ -5,7 +5,7 @@
 
   <dependencies>
 
-    <module name="javax.api" />
+    <!-- <module name="javax.api" /> -->
     <module name="jakarta.transaction.api"/>
     <module name="jakarta.enterprise.api" />
     <module name="jakarta.inject.api" />

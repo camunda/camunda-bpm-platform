@@ -4,7 +4,7 @@
   </resources>
 
   <dependencies>
-    <module name="javax.api" />
+    <!-- <module name="javax.api" /> -->
     <module name="sun.jdk" />
     <module name="org.camunda.spin.camunda-spin-core" />
     <module name="org.graalvm.regex.regex" />

@@ -7,7 +7,7 @@
 
     <module name="sun.jdk" />
 
-    <module name="javax.api" />
+    <!-- <module name="javax.api" /> -->
     <module name="org.camunda.bpm.camunda-engine" />
     <module name="org.camunda.commons.camunda-commons-logging" />
 

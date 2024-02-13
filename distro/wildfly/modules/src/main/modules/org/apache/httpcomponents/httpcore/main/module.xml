@@ -5,7 +5,7 @@
 
   <dependencies>
 
-    <module name="javax.api" />
+    <!-- <module name="javax.api" /> -->
 
     <module name="commons-logging.commons-logging" />
     <module name="commons-codec.commons-codec" />
