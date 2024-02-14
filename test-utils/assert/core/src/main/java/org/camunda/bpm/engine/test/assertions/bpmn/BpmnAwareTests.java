@@ -1003,7 +1003,7 @@ public class BpmnAwareTests extends AbstractAssertions {
    */
   public static List<LockedExternalTask> fetchAndLock(String topic, String workerId, int maxResults) {
     if (workerId == null || topic == null) {
-      throw new IllegalArgumentException(format("Illegal call of fetchAndLock(topic = '%s', workerId = '%s', maxResults = '%s') - all must not be null!", workerId, topic, maxResults));
+      throw new IllegalArgumentException(format("Illegal call of fetchAndLock(topic = '%s', workerId = '%s', maxResults = '%s') - all must not be null!", topic, workerId, maxResults));
     }
     return externalTaskService().fetchAndLock(maxResults, workerId)
       .topic(topic, DEFAULT_LOCK_DURATION_EXTERNAL_TASK)
