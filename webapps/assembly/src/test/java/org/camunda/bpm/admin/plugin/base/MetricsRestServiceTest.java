@@ -38,6 +38,7 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -341,15 +342,17 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
   }
 
   @Test
-  public void shouldReturnAggregatedMetricsForTU() {
+  public void shouldReturnAnnualAggregatedMetricsForTU() {
     // given
     queryParameters.add("subscriptionStartDate", "2020-01-01");
     queryParameters.add("groupBy", "year");
     queryParameters.add("metrics", Metrics.TASK_USERS);
 
-    // generate TU metric
+    // generate TU metric - counts _unique_ task workers (unique ASSIGNEE_HASH_)
     processEngineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(commandContext -> {
       commandContext.getMeterLogManager().insert(new TaskMeterLogEntity("assignee", ClockUtil.getCurrentTime()));
+      commandContext.getMeterLogManager().insert(new TaskMeterLogEntity("assignee", ClockUtil.getCurrentTime()));
+      ClockUtil.reset();
       return null;
     });
 
@@ -357,11 +360,42 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
     var actual = resource.getAggregatedMetrics(uriInfo);
 
     // then
-    System.out.println("actual = " + actual);
     assertThat(actual).hasSize(1);
     assertThat(actual).extracting("metric", "sum", "subscriptionYear", "subscriptionMonth")
-        .containsExactlyInAnyOrder(
+        .containsExactly(
             tuple(Metrics.TASK_USERS, 1L, new DateTime().getYear(), null));
+  }
+
+  @Test
+  public void shouldReturnMonthlyAggregatedMetricsForTU() {
+    // given
+    queryParameters.add("subscriptionStartDate", "2020-01-01");
+    queryParameters.add("groupBy", "month");
+    queryParameters.add("metrics", Metrics.TASK_USERS);
+
+    // generate TU metric - counts _unique_ task workers (unique ASSIGNEE_HASH_)
+    DateTime now = new DateTime();
+    DateTime prevMonth = now.minusMonths(1);
+    processEngineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(commandContext -> {
+      commandContext.getMeterLogManager().insert(new TaskMeterLogEntity("assignee1", ClockUtil.getCurrentTime()));
+      commandContext.getMeterLogManager().insert(new TaskMeterLogEntity("assignee3", ClockUtil.getCurrentTime()));
+
+      ClockUtil.setCurrentTime(prevMonth.toDate());
+      commandContext.getMeterLogManager().insert(new TaskMeterLogEntity("assignee1", ClockUtil.getCurrentTime()));
+      commandContext.getMeterLogManager().insert(new TaskMeterLogEntity("assignee2", ClockUtil.getCurrentTime()));
+      ClockUtil.reset();
+      return null;
+    });
+
+    // when
+    var actual = resource.getAggregatedMetrics(uriInfo);
+
+    // then
+    assertThat(actual).hasSize(2);
+    assertThat(actual).extracting("metric", "sum", "subscriptionYear", "subscriptionMonth")
+        .containsExactlyInAnyOrder(
+            tuple(Metrics.TASK_USERS, 1L, now.getYear(), now.getMonthOfYear()),
+            tuple(Metrics.TASK_USERS, 2L, prevMonth.getYear(), prevMonth.getMonthOfYear()));
   }
 
   protected void generateMetrics(int year, int month, int times) {
@@ -379,7 +413,8 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
       int i1 = i;
       processEngineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(commandContext -> {
         for (int j = 1; j <= i1; j++) {
-          commandContext.getMeterLogManager().insert(new TaskMeterLogEntity("assignee", ClockUtil.getCurrentTime()));
+          commandContext.getMeterLogManager().insert(
+              new TaskMeterLogEntity(UUID.randomUUID().toString(), ClockUtil.getCurrentTime()));
         }
         return null;
       });
