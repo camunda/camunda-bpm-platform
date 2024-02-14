@@ -1,9 +1,16 @@
 <form name="form">
-  <h3>{{ 'EXECUTION_METRICS' | translate }}</h3>
 
-  <div uib-alert class="alert alert-info">
-    <p>
-      {{ 'EXECUTION_METRICS_INFO_1' | translate }}
+  <div class="row">
+    <div class="col-xs-10">
+      <h3>{{ 'EXECUTION_METRICS' | translate }}</h3>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12">
+      <div uib-alert class="alert alert-info">
+        <p>
+          {{ 'EXECUTION_METRICS_INFO_1' | translate }}
           <strong>{{ 'EXECUTION_METRICS_FNI' | translate }}</strong>,
           <strong>{{ 'EXECUTION_METRICS_EDE' | translate }}</strong>,
           <strong>{{ 'EXECUTION_METRICS_RPI' | translate }}</strong>
@@ -13,7 +20,143 @@
           {{ 'EXECUTION_METRICS_AND' | translate }}
           <strong>{{ 'EXECUTION_METRICS_TW' | translate }}</strong>
           {{ 'EXECUTION_METRICS_INFO_3' | translate }}
-    </p>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="form-group col-xs-10">
+      <label for="startDate">
+        Contract start date:
+      </label>
+      <div>
+        <span cam-widget-inline-field
+              id="startDate"
+              class="form-control-static"
+              type="date"
+              value="startDate"
+              flexible="true">
+                <a class="form-control-static">{{startDate}}</a>
+        </span>
+      </div>
+    </div>
+    <div class="col-xs-2">
+      <div class="pull-right"
+           ng-show="loadingState !== 'INITIAL'">
+        <button type="submit"
+                ng-disabled="!form.$valid || loadingState === 'LOADING'"
+                class="btn btn-default"
+                ng-click="load()">
+          {{ 'EXECUTION_METRICS_REFRESH' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-8">
+      <h4 class="pull-left">
+        Usage last 12 months by month
+      </h4>
+    </div>
+    <div class="col-xs-4">
+      <div class="pull-right">
+        <label class="checkbox">
+          <input type="checkbox" ng-model="displayLegacyMetrics">
+          Display legacy metrics (FNI/EDE)
+        </label>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <div cam-widget-loader
+           loading-state="{{ loadingStateMonthly }}"
+           text-error="{{ loadingError }}">
+        <table class="cam-table">
+          <thead>
+          <tr>
+            <th>Subscription month</th>
+            <th>PI</th>
+            <th>DI</th>
+            <th>TU
+              <!-- TODO hint that this metric is accumulated -->
+              <span class="glyphicon glyphicon-info-sign"
+                    uib-tooltip="{{ 'PROCESS_INSTANCE_TOOLTIP_ACTIVITY_INSTANCE_TREE' | translate }}"></span></th>
+            <th ng-show="displayLegacyMetrics">FNI</th>
+            <th ng-show="displayLegacyMetrics">EDE</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="mUsage in monthlyUsage" ng-style="getSubscriptionMonthStyle(mUsage.label)">
+            <td>{{mUsage.labelFmt}}</td>
+            <td>{{mUsage['process-instances'].sumFmt}}</td>
+            <td>{{mUsage['decision-instances'].sumFmt}}</td>
+            <td>{{mUsage['task-users'].sumFmt}}</td>
+            <td ng-show="displayLegacyMetrics">{{mUsage['flow-node-instances'].sumFmt}}</td>
+            <td ng-show="displayLegacyMetrics">{{mUsage['executed-decision-elements'].sumFmt}}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12">
+      <h4>Annual usage metrics by subscription term</h4>
+    </div>
+
+    <div class="col-xs-12">
+      <div cam-widget-loader
+           loading-state="{{ loadingStateAnnual }}"
+           text-error="{{ loadingError }}">
+        <table class="cam-table">
+          <thead>
+          <tr>
+            <th>Subscription year</th>
+            <th>PI</th>
+            <th>DI</th>
+            <th>TU</th>
+            <th>FNI</th>
+            <th>EDE</th>
+            <th>Copy</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="yUsage in annualUsage">
+            <td>{{yUsage.labelFmt}}</td>
+            <td>{{yUsage['process-instances'].sumFmt}}</td>
+            <td>{{yUsage['decision-instances'].sumFmt}}</td>
+            <td>{{yUsage['task-users'].sumFmt}}</td>
+            <td>{{yUsage['flow-node-instances'].sumFmt}}</td>
+            <td>{{yUsage['executed-decision-elements'].sumFmt}}</td>
+            <td>
+              <span class="hovered" cam-widget-clipboard="yUsage.labelFmt"></span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="pull-right"
+           ng-show="loadingState !== 'INITIAL'">
+        <button type="submit"
+                ng-disabled="!form.$valid || loadingState === 'LOADING'"
+                class="btn btn-default"
+                ng-click="load()">
+          {{ 'EXECUTION_METRICS_REFRESH' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 500px;">
   </div>
 
   <div class="row">

@@ -15,20 +15,13 @@
  * limitations under the License.
  */
 
-/**
- * @namespace cam.admin.plugin
- */
-
-/**
- * @namespace cam.admin.plugin.base
- */
 'use strict';
 
 const angular = require('angular'),
-  viewsModule = require('./views/main'),
-  resourcesModule = require('./resources/main');
+  metrics = require('./metrics');
 
-module.exports = angular.module('admin.plugin.base', [
-  viewsModule.name,
-  resourcesModule.name
-]);
+const ngModule = angular.module('admin.plugin.base.resources', []);
+
+ngModule.factory('PluginMetricsResource', metrics);
+
+module.exports = ngModule;

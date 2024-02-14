@@ -15,20 +15,22 @@
  * limitations under the License.
  */
 
-/**
- * @namespace cam.admin.plugin
- */
-
-/**
- * @namespace cam.admin.plugin.base
- */
 'use strict';
 
-const angular = require('angular'),
-  viewsModule = require('./views/main'),
-  resourcesModule = require('./resources/main');
-
-module.exports = angular.module('admin.plugin.base', [
-  viewsModule.name,
-  resourcesModule.name
-]);
+module.exports = [
+  '$resource',
+  'Uri',
+  function($resource, Uri) {
+    return $resource(
+      Uri.appUri('plugin://adminPlugins/:engine/metrics/:action'),
+      {id: '@id'},
+      {
+        getAggregated: {
+          method: 'GET',
+          isArray: true,
+          params: {action: 'aggregated'}
+        }
+      }
+    );
+  }
+];

@@ -82,6 +82,7 @@ module.exports = [
         var dateRegex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/;
 
         scope.editing = false;
+        scope.varTypeOriginal = scope.varType;
 
         scope.isNumber = scope.varType === 'number';
 
@@ -316,10 +317,10 @@ module.exports = [
         }
 
         scope.changeType = function() {
-          if (scope.varType === 'datetime') {
+          if (scope.varType !== 'text') {
             scope.varType = 'text';
           } else {
-            scope.varType = 'datetime';
+            scope.varType = scope.varTypeOriginal;
           }
           reset();
           scope.editing = true;

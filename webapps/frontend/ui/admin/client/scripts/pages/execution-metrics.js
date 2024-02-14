@@ -17,41 +17,55 @@
 
 'use strict';
 
-var template = require('./execution-metrics.html?raw');
-var CamSDK = require('camunda-bpm-sdk-js/lib/angularjs/index');
+const template = require('./execution-metrics.html?raw');
+const CamSDK = require('camunda-bpm-sdk-js/lib/angularjs/index');
+const moment = require('moment');
+const angular = require('angular');
 
-var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
+const debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
   .debouncePromiseFactory;
-var debounceQuery = debouncePromiseFactory();
+const debounceQuery = debouncePromiseFactory();
 
-var Controller = [
+const fmtMonth = 'MMMM YYYY';
+const fmtYear = 'DD/MM/YYYY';
+
+const Controller = [
   '$scope',
   '$filter',
   'Uri',
   'camAPI',
   'fixDate',
   'configuration',
-  function($scope, $filter, Uri, camAPI, fixDate, configuration) {
+  'PluginMetricsResource',
+  function(
+    $scope,
+    $filter,
+    Uri,
+    camAPI,
+    fixDate,
+    configuration,
+    PluginMetricsResource
+  ) {
     var MetricsResource = camAPI.resource('metrics');
 
     // date variables
     var now = new Date();
     var dateFilter = $filter('date');
-    var dateFormat = "yyyy-MM-dd'T'HH:mm:ss";
+    var dateFormat = 'yyyy-MM-dd';
 
     // initial scope data
-    $scope.startDate = dateFilter(
-      now.getFullYear() + '-01-01T00:00:00.000',
-      dateFormat
-    );
-    $scope.endDate = dateFilter(
-      now.getFullYear() + '-12-31T23:59:59.999',
-      dateFormat
-    );
+    $scope.startDate = dateFilter(now.getFullYear() + '-01-01', dateFormat);
+    $scope.endDate = dateFilter(now.getFullYear() + '-12-31', dateFormat);
     $scope.loadingState = 'INITIAL';
+    $scope.loadingStateMonthly = 'INITIAL';
+    $scope.loadingStateAnnual = 'INITIAL';
     $scope.alwaysShowUTWMetrics = configuration.getAlwaysShowUniqueTaskWorkerMetrics();
     $scope.showTaskWorkerMetric = $scope.alwaysShowUTWMetrics;
     $scope.metrics = {};
+
+    $scope.monthlyUsage = {};
+    $scope.yearlyUsage = {};
+    $scope.displayLegacyMetrics = true;
 
     // sets loading state to error and updates error message
     function setLoadingError(error) {
@@ -68,7 +82,7 @@ var Controller = [
         form.startDate.$error.datePattern ||
         form.endDate.$error.datePattern
       ) {
-        setLoadingError("Supported pattern 'yyyy-MM-ddTHH:mm:ss'.");
+        setLoadingError(`Supported pattern '${dateFormat}'.`);
       } else if (
         form.startDate.$error.dateValue ||
         form.endDate.$error.dateValue
@@ -79,6 +93,7 @@ var Controller = [
 
     $scope.$watch('startDate', function(newValue, oldValue) {
       if (newValue !== oldValue) {
+        $scope.startDate = fixDate($scope.startDate);
         handleDateChange();
       }
     });
@@ -127,7 +142,141 @@ var Controller = [
       }
     });
 
+    $scope.getSubscriptionMonthStyle = label => {
+      // TODO extract logic
+      let lastPeriodEnd = moment($scope.startDate);
+      while (
+        lastPeriodEnd
+          .clone()
+          .add(1, 'years')
+          .isBefore(moment())
+      ) {
+        lastPeriodEnd.add(1, 'years');
+      }
+      //lastPeriodEnd = lastPeriodEnd.subtract(1, 'milliseconds');
+
+      const activeMonth = !moment(label, 'YYYY.MM').isBefore(
+        lastPeriodEnd,
+        'month'
+      );
+      return activeMonth ? {} : {opacity: 0.7};
+    };
+
+    $scope.formatSubscriptionYear = label => {
+      // TODO i18n
+      const date = moment(label, 'YYYY-MM-DD');
+      return `${date.format(fmtYear)} to ${date
+        .add(1, 'years')
+        .format(fmtYear)}`;
+    };
+
+    $scope.$watch('displayLegacyMetrics', () => {
+      $scope.loadMonthly();
+    });
+
+    function createGroupLabel(year, month) {
+      if (!month) {
+        return year;
+      } else {
+        return `${year}.${String(month).padStart(2, '0')}`;
+      }
+    }
+
+    function prepareTableData(response, labelFormat, initialMap) {
+      let metricsGroupMap = angular.copy(initialMap || {});
+      for (const metricItem of response) {
+        const label = createGroupLabel(
+          metricItem.subscriptionYear,
+          metricItem.subscriptionMonth
+        );
+        let labelFmt;
+        if (angular.isFunction(labelFormat)) {
+          labelFmt = labelFormat(label);
+        }
+        if (angular.isString(labelFormat)) {
+          labelFmt = moment(label, 'YYYY.MM').format(labelFormat);
+        }
+
+        if (!metricsGroupMap[label]) {
+          metricsGroupMap[label] = {};
+          metricsGroupMap[label].label = label;
+          metricsGroupMap[label].labelFmt = labelFmt;
+        }
+        metricsGroupMap[label][metricItem.metric] = {
+          sum: metricItem.sum,
+          sumFmt: metricItem.sum.toLocaleString() || 0
+        };
+      }
+      const monthlyList = Object.values(metricsGroupMap).sort(
+        (a, b) => b.label - a.label
+      );
+      return monthlyList;
+    }
+
+    $scope.loadMonthly = () => {
+      $scope.loadingStateMonthly = 'LOADING';
+      let metrics = [];
+      if (!$scope.displayLegacyMetrics) {
+        metrics.push('process-instances', 'decision-instances', 'task-users');
+      }
+      PluginMetricsResource.getAggregated({
+        subscriptionStartDate: $scope.startDate,
+        startDate: moment($scope.startDate)
+          .subtract(1, 'years')
+          .startOf('month')
+          .format('YYYY-MM-DDT00:00:00'),
+        groupBy: 'month',
+        metrics: metrics.length > 0 ? Array.from(metrics).toString() : null
+      }).$promise.then(
+        monthlyUsages => {
+          // last 12 months
+          // TODO calculate with subscriptionStart!!!
+          const initialMap = {};
+          let date = moment();
+          for (let i = 0; i < 12; i++) {
+            const label = createGroupLabel(date.year(), date.month() + 1);
+            initialMap[label] = {label, labelFmt: date.format(fmtMonth)};
+            date = date.subtract(1, 'months');
+          }
+
+          $scope.monthlyUsage = prepareTableData(
+            monthlyUsages,
+            fmtMonth,
+            initialMap
+          );
+          $scope.loadingStateMonthly = 'LOADED';
+        },
+        err => {
+          $scope.loadingStateMonthly = 'ERROR';
+          $scope.loadingError = err; // FIXME
+        }
+      );
+    };
+
+    $scope.loadAnnual = () => {
+      $scope.loadingStateAnnual = 'LOADING';
+      PluginMetricsResource.getAggregated({
+        subscriptionStartDate: fixDate($scope.startDate),
+        groupBy: 'year'
+      }).$promise.then(
+        annualUsage => {
+          $scope.annualUsage = prepareTableData(
+            annualUsage,
+            $scope.formatSubscriptionYear
+          );
+          $scope.loadingStateAnnual = 'LOADED';
+        },
+        err => {
+          $scope.loadingStateAnnual = 'ERROR';
+          $scope.loadingError = err; // FIXME
+        }
+      );
+    };
+
     var load = ($scope.load = function() {
+      $scope.loadMonthly();
+      $scope.loadAnnual();
+
       $scope.loadingState = 'LOADING';
       var series = {
         flowNodes: function(cb) {
