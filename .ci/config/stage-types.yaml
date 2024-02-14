@@ -135,7 +135,7 @@ engine-rest-jakarta-unit-compatibility-wildfly:
   jdkVersion: 'openjdk-jdk-17-latest'
 platform-jdk-openjdk-jdk-17-latest:
   directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps/assembly'',''!webapps/assembly-jakarta'' -Pdistro,distro-ce,distro-wildfly'
+  command: 'install source:jar source:test-jar -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
@@ -144,8 +144,7 @@ platform-jdk-openjdk-jdk-17-latest:
 platform-jdk-openjdk-jdk-11-latest:
   directory: '.'
   command: 'install source:jar source:test-jar
-    -pl ''!webapps/assembly,!webapps/assembly-jakarta,
-          !spring-boot-starter,!spring-boot-starter/starter,!spring-boot-starter/starter-client/spring,!spring-boot-starter/starter-client/spring-boot,
+    -pl ''!spring-boot-starter,!spring-boot-starter/starter,!spring-boot-starter/starter-client/spring,!spring-boot-starter/starter-client/spring-boot,
           !spring-boot-starter/starter-qa,!spring-boot-starter/starter-rest,!spring-boot-starter/starter-test,!spring-boot-starter/starter-webapp,
           !spring-boot-starter/starter-webapp-core,
           !spring-boot-starter/starter-qa/integration-test-liquibase,!spring-boot-starter/starter-qa/integration-test-plugins,
@@ -165,7 +164,7 @@ platform-jdk-openjdk-jdk-11-latest:
   withNpm: true
 platform-jdk-jdk-17-latest:
   directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps/assembly'',''!webapps/assembly-jakarta'' -Pdistro,distro-ce,distro-wildfly'
+  command: 'install source:jar source:test-jar -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
@@ -174,8 +173,7 @@ platform-jdk-jdk-17-latest:
 platform-jdk-jdk-11-latest:
   directory: '.'
   command: 'install source:jar source:test-jar
-    -pl ''!webapps/assembly,!webapps/assembly-jakarta,
-          !spring-boot-starter,!spring-boot-starter/starter,!spring-boot-starter/starter-client/spring,!spring-boot-starter/starter-client/spring-boot,
+    -pl ''!spring-boot-starter,!spring-boot-starter/starter,!spring-boot-starter/starter-client/spring,!spring-boot-starter/starter-client/spring-boot,
           !spring-boot-starter/starter-qa,!spring-boot-starter/starter-rest,!spring-boot-starter/starter-test,!spring-boot-starter/starter-webapp,
           !spring-boot-starter/starter-webapp-core,
           !spring-boot-starter/starter-qa/integration-test-liquibase,!spring-boot-starter/starter-qa/integration-test-plugins,
