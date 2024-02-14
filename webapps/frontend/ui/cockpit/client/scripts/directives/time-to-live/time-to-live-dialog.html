@@ -11,11 +11,14 @@
   <div ng-show="!status" class="alert alert-info">
     <p>
       <strong> 
-        {{ 'TIME_TO_LIVE_POPUP_REMOVAL_TIME_NOT_UPTDATED_WARNING_START' | translate }}
+        {{ 'TIME_TO_LIVE_POPUP_REMOVAL_TIME_NOT_UPTDATED_INFO' | translate }}
+      </strong>   
+      <strong ng-show="showLinkToBachProcess"> 
+        {{ 'TIME_TO_LIVE_POPUP_RUN_BATCH_JOB_INFO_START' | translate }}
         <a href="/camunda/app/cockpit/default/#/batch/operation">
-          {{ 'TIME_TO_LIVE_POPUP_REMOVAL_TIME_NOT_UPTDATED_WARNING_MIDDLE' | translate }}
+          {{ 'TIME_TO_LIVE_POPUP_RUN_BATCH_JOB_INFO_LINK' | translate }}
         </a>
-        {{ 'TIME_TO_LIVE_POPUP_REMOVAL_TIME_NOT_UPTDATED_WARNING_END' | translate }}
+        {{ 'TIME_TO_LIVE_POPUP_RUN_BATCH_JOB_INFO_END' | translate }}
       </strong>
     </p>
   </div>

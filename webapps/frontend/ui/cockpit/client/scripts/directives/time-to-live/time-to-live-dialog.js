@@ -27,6 +27,7 @@ const Controller = [
   '$translate',
   function(camAPI, $modalInstance, $scope, Notifications, $translate) {
     const resource = camAPI.resource($scope.resource);
+    $scope.showLinkToBachProcess = $scope.$parent?.resource !== "case-definition";
     $scope.status = null;
     $scope.mode = 'UPDATE';
     $scope.ttl = $scope.definition.historyTimeToLive;
