@@ -49,7 +49,6 @@ sql-scripts:
   - 'sqlserver'
   - 'postgresql'
   - 'cockroachdb'
-  jdkVersion: 'openjdk-jdk-21-latest'
 instance-migration:
   directory: 'qa/test-db-instance-migration'
   command: 'verify -Pinstance-migration,'
