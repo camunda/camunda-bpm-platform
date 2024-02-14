@@ -8,6 +8,18 @@
 <div class="modal-body">
   <div notifications-panel></div>
 
+  <div ng-show="!status" class="alert alert-info">
+    <p>
+      <strong> 
+        {{ 'TIME_TO_LIVE_POPUP_REMOVAL_TIME_NOT_UPTDATED_WARNING_START' | translate }}
+        <a href="/camunda/app/cockpit/default/#/batch/operation">
+          {{ 'TIME_TO_LIVE_POPUP_REMOVAL_TIME_NOT_UPTDATED_WARNING_MIDDLE' | translate }}
+        </a>
+        {{ 'TIME_TO_LIVE_POPUP_REMOVAL_TIME_NOT_UPTDATED_WARNING_END' | translate }}
+      </strong>
+    </p>
+  </div>
+
   <div ng-show="!status" class="container-fluid">
 
     <form class="form-inline">
