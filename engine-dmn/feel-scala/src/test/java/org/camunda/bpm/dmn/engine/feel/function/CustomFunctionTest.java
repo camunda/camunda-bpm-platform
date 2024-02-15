@@ -16,6 +16,16 @@
  */
 package org.camunda.bpm.dmn.engine.feel.function;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import org.camunda.bpm.dmn.engine.feel.function.helper.FunctionProvider;
 import org.camunda.bpm.dmn.engine.feel.function.helper.MyPojo;
 import org.camunda.bpm.dmn.engine.feel.helper.FeelRule;
@@ -27,17 +37,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
 
 public class CustomFunctionTest {
 
@@ -494,12 +493,11 @@ public class CustomFunctionTest {
 
     functionProvider.register("myFunction", myFunction);
 
-    // then
-    thrown.expect(FeelException.class);
-    thrown.expectMessage("no function found with name 'myFunction' and 3 parameters");
-
     // when
-    feelRule.evaluateExpression("myFunction(\"foo\", \"bar\", \"baz\")");
+    var result = feelRule.evaluateExpression("myFunction(\"foo\", \"bar\", \"baz\")");
+
+    // then
+    assertThat(result).isNull();
   }
 
   @Test
