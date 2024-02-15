@@ -143,7 +143,7 @@ platform-jdk-openjdk-jdk-17-latest:
   withNpm: true
 platform-jdk-openjdk-jdk-21-latest:
   directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps/assembly'',''!webapps/assembly-jakarta'' -Pdistro,distro-ce,distro-wildfly'
+  command: 'install source:jar source:test-jar -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
