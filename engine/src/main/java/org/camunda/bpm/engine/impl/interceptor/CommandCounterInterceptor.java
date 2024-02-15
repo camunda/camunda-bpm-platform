@@ -37,7 +37,7 @@ public class CommandCounterInterceptor extends CommandInterceptor {
       if (telemetryRegistry != null) {
         String className = ClassNameUtil.getClassNameWithoutPackage(command);
         // anonymous class/lambda implementations of the Command interface are excluded
-        if (!command.getClass().isAnonymousClass() && !ClassNameUtil.isLambda(className)) {
+        if (!command.getClass().isAnonymousClass() && !className.contains("$$Lambda")) {
           className = parseLocalClassName(className);
           telemetryRegistry.markOccurrence(className);
         }
