@@ -56,7 +56,9 @@ sidetrack-stages:
   - 'rolling-update'
 jdk-ce-stages:
   stages:
+  - 'platform-jdk-openjdk-jdk-21-latest'
   - 'platform-jdk-openjdk-jdk-17-latest'
   - 'platform-jdk-openjdk-jdk-11-latest'
+  - 'platform-jdk-jdk-21-latest'
   - 'platform-jdk-jdk-17-latest'
   - 'platform-jdk-jdk-11-latest'
