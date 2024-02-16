@@ -370,10 +370,11 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
   public void shouldReturnMonthlyAggregatedMetricsForTU() {
     // given
     queryParameters.add("subscriptionStartDate", "2020-01-01");
+    queryParameters.add("startDate", "2023-01-01");
     queryParameters.add("groupBy", "month");
     queryParameters.add("metrics", Metrics.TASK_USERS);
 
-    // generate TU metric - counts _unique_ task workers (unique ASSIGNEE_HASH_)
+    // generate TU metric - counts _unique_ task workers (unique ASSIGNEE_HASH_) for the selected period (startDate, endDate)
     DateTime now = new DateTime();
     DateTime prevMonth = now.minusMonths(1);
     processEngineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(commandContext -> {
@@ -383,6 +384,9 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
       ClockUtil.setCurrentTime(prevMonth.toDate());
       commandContext.getMeterLogManager().insert(new TaskMeterLogEntity("assignee1", ClockUtil.getCurrentTime()));
       commandContext.getMeterLogManager().insert(new TaskMeterLogEntity("assignee2", ClockUtil.getCurrentTime()));
+
+      ClockUtil.setCurrentTime(now.withYear(2022).toDate());
+      commandContext.getMeterLogManager().insert(new TaskMeterLogEntity("assignee1", ClockUtil.getCurrentTime()));
       ClockUtil.reset();
       return null;
     });

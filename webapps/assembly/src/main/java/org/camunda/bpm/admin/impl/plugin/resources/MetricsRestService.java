@@ -29,6 +29,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,7 +52,10 @@ public class MetricsRestService extends AbstractAdminPluginResource {
     boolean queryTaskUsers = queryDto.getMetrics().contains(Metrics.UNIQUE_TASK_WORKERS);
     queryDto.getMetrics().remove(Metrics.TASK_USERS);
 
-    List<MetricsAggregatedResultDto> result = getQueryService().executeQuery("selectMetricsAggregated", queryDto);
+    List<MetricsAggregatedResultDto> result = new ArrayList<>();
+    if (!queryDto.getMetrics().isEmpty()) {
+      result.addAll(getQueryService().executeQuery("selectMetricsAggregated", queryDto));
+    }
     if (queryTaskUsers) {
       result.addAll(getQueryService().executeQuery("selectMetricsAggregatedTU", queryDto));
     }

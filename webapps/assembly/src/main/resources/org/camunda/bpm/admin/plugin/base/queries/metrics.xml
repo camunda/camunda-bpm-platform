@@ -101,11 +101,17 @@
   <select id="selectMetricsAggregatedTU"
           parameterType="org.camunda.bpm.admin.impl.plugin.base.dto.MetricsAggregatedQueryDto"
           resultMap="metricsResultMap">
+    <if test="groupBy.equals('year')">
+      <include refid="selectMetricsAggregatedTU_annual"/>
+    </if>
+    <if test="groupBy.equals('month')">
+      <include refid="selectMetricsAggregatedTU_monthly"/>
+    </if>
+  </select>
+
+  <sql id="selectMetricsAggregatedTU_annual">
     <bind name="extractDateColumn" value="'RES2.TIMESTAMP_'"/>
     <bind name="groupByColumns" value="'RES.SUBSCRIPTION_YEAR_'"/>
-    <if test="groupBy.equals('month')">
-      <bind name="groupByColumns" value="groupByColumns + ', RES.SUBSCRIPTION_MONTH_'"/>
-    </if>
 
     select
       'unique-task-workers' as NAME_,
@@ -113,20 +119,9 @@
       ${groupByColumns}
     from (
       select
-        <if test="groupBy.equals('year')">
-          distinct RES2.ASSIGNEE_HASH_,
-        </if>
+        distinct RES2.ASSIGNEE_HASH_,
         <include refid="selectGroupByCases"/>
-      <if test="groupBy.equals('year')">
-        from ${prefix}ACT_RU_TASK_METER_LOG RES2
-      </if>
-      <if test="groupBy.equals('month')">
-        from (
-          select min(RES3.TIMESTAMP_) as TIMESTAMP_
-          from ${prefix}ACT_RU_TASK_METER_LOG RES3
-          group by RES3.ASSIGNEE_HASH_
-        ) RES2
-      </if>
+      from ${prefix}ACT_RU_TASK_METER_LOG RES2
 
       <where>
         1 = 1
@@ -141,6 +136,37 @@
     ) RES
 
     group by ${groupByColumns}
-  </select>
+  </sql>
+
+  <sql id="selectMetricsAggregatedTU_monthly">
+    <bind name="extractDateColumn" value="'RES2.TIMESTAMP_'"/>
+    <bind name="groupByColumns" value="'RES.SUBSCRIPTION_YEAR_, RES.SUBSCRIPTION_MONTH_'"/>
+
+    select
+      'unique-task-workers' as NAME_,
+      count(*)              as SUM_,
+      ${groupByColumns}
+    from (
+      select
+        <include refid="selectGroupByCases"/>
+      from (
+        select min(RES3.TIMESTAMP_) as TIMESTAMP_
+        from ${prefix}ACT_RU_TASK_METER_LOG RES3
+        <where>
+          1 = 1
+
+          <if test="startDate != null">
+            and RES3.TIMESTAMP_ &gt;= #{startDate}
+          </if>
+          <if test="endDate != null">
+            and RES3.TIMESTAMP_ &lt; #{endDate}
+          </if>
+        </where>
+        group by RES3.ASSIGNEE_HASH_
+      ) RES2
+    ) RES
+
+    group by ${groupByColumns}
+  </sql>
 
 </mapper>
