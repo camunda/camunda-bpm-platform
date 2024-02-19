@@ -49,16 +49,16 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
 
   public static final int PRIORITY = 0x2300;
 
-  public static ModuleIdentifier MODULE_IDENTIFYER_PROCESS_ENGINE = ModuleIdentifier.create("org.camunda.bpm.camunda-engine");
-  public static ModuleIdentifier MODULE_IDENTIFYER_XML_MODEL = ModuleIdentifier.create("org.camunda.bpm.model.camunda-xml-model");
-  public static ModuleIdentifier MODULE_IDENTIFYER_BPMN_MODEL = ModuleIdentifier.create("org.camunda.bpm.model.camunda-bpmn-model");
-  public static ModuleIdentifier MODULE_IDENTIFYER_CMMN_MODEL = ModuleIdentifier.create("org.camunda.bpm.model.camunda-cmmn-model");
-  public static ModuleIdentifier MODULE_IDENTIFYER_DMN_MODEL = ModuleIdentifier.create("org.camunda.bpm.model.camunda-dmn-model");
-  public static ModuleIdentifier MODULE_IDENTIFYER_SPIN = ModuleIdentifier.create("org.camunda.spin.camunda-spin-core");
-  public static ModuleIdentifier MODULE_IDENTIFYER_CONNECT = ModuleIdentifier.create("org.camunda.connect.camunda-connect-core");
-  public static ModuleIdentifier MODULE_IDENTIFYER_ENGINE_DMN = ModuleIdentifier.create("org.camunda.bpm.dmn.camunda-engine-dmn");
-  public static ModuleIdentifier MODULE_IDENTIFYER_GRAAL_JS = ModuleIdentifier.create("org.graalvm.js.js-scriptengine");
-  public static ModuleIdentifier MODULE_IDENTIFYER_JUEL = ModuleIdentifier.create("org.camunda.bpm.juel.camunda-juel");
+  public static String MODULE_IDENTIFYER_PROCESS_ENGINE = "org.camunda.bpm.camunda-engine";
+  public static String MODULE_IDENTIFYER_XML_MODEL = "org.camunda.bpm.model.camunda-xml-model";
+  public static String MODULE_IDENTIFYER_BPMN_MODEL = "org.camunda.bpm.model.camunda-bpmn-model";
+  public static String MODULE_IDENTIFYER_CMMN_MODEL = "org.camunda.bpm.model.camunda-cmmn-model";
+  public static String MODULE_IDENTIFYER_DMN_MODEL = "org.camunda.bpm.model.camunda-dmn-model";
+  public static String MODULE_IDENTIFYER_SPIN = "org.camunda.spin.camunda-spin-core";
+  public static String MODULE_IDENTIFYER_CONNECT = "org.camunda.connect.camunda-connect-core";
+  public static String MODULE_IDENTIFYER_ENGINE_DMN = "org.camunda.bpm.dmn.camunda-engine-dmn";
+  public static String MODULE_IDENTIFYER_GRAAL_JS = "org.graalvm.js.js-scriptengine";
+  public static String MODULE_IDENTIFYER_JUEL = "org.camunda.bpm.juel.camunda-juel";
 
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
 
@@ -129,12 +129,12 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
     addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_JUEL, true);
   }
 
-  private void addSystemDependency(ModuleLoader moduleLoader, final ModuleSpecification moduleSpecification, ModuleIdentifier dependency) {
-    addSystemDependency(moduleLoader, moduleSpecification, dependency, false);
+  private void addSystemDependency(ModuleLoader moduleLoader, final ModuleSpecification moduleSpecification, String identifier) {
+    addSystemDependency(moduleLoader, moduleSpecification, identifier, false);
   }
 
-  private void addSystemDependency(ModuleLoader moduleLoader, final ModuleSpecification moduleSpecification, ModuleIdentifier dependency, boolean importServices) {
-    moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, dependency, false, false, importServices, false));
+  private void addSystemDependency(ModuleLoader moduleLoader, final ModuleSpecification moduleSpecification, String identifier, boolean importServices) {
+    moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, identifier, false, false, importServices, false));
   }
 
   public void undeploy(DeploymentUnit context) {

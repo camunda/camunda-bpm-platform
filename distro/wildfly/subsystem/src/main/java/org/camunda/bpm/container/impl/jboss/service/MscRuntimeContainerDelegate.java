@@ -139,7 +139,7 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
   protected void deployServletProcessApplication(JakartaServletProcessApplication processApplication) {
 
     ClassLoader contextClassloader = ClassLoaderUtil.getContextClassloader();
-    String moduleName = ((ModuleClassLoader)contextClassloader).getModule().getIdentifier().toString();
+    String moduleName = ((ModuleClassLoader)contextClassloader).getModule().getName();
 
     ServiceName serviceName = ServiceNames.forNoViewProcessApplicationStartService(moduleName);
     ServiceName paModuleService = ServiceNames.forProcessApplicationModuleService(moduleName);
