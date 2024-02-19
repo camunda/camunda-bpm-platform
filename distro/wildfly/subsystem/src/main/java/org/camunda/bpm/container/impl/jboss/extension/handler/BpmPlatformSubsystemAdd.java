@@ -42,9 +42,6 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
   public static final BpmPlatformSubsystemAdd INSTANCE = new BpmPlatformSubsystemAdd();
 
-  private BpmPlatformSubsystemAdd() {
-  }
-
   /** {@inheritDoc} */
   @Override
   protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {

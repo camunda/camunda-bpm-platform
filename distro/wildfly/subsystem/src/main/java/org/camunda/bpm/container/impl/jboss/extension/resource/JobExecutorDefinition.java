@@ -31,10 +31,10 @@ public class JobExecutorDefinition extends PersistentResourceDefinition {
   public static final JobExecutorDefinition INSTANCE = new JobExecutorDefinition();
 
   private JobExecutorDefinition() {
-    super(BpmPlatformExtension.JOB_EXECUTOR_PATH,
-        BpmPlatformExtension.getResourceDescriptionResolver(ModelConstants.JOB_EXECUTOR),
-        JobExecutorAdd.INSTANCE,
-        JobExecutorRemove.INSTANCE);
+    super(new Parameters(BpmPlatformExtension.JOB_EXECUTOR_PATH,
+        BpmPlatformExtension.getResourceDescriptionResolver(ModelConstants.JOB_EXECUTOR))
+        .setAddHandler(JobExecutorAdd.INSTANCE)
+        .setRemoveHandler(JobExecutorRemove.INSTANCE));
   }
 
   @Override

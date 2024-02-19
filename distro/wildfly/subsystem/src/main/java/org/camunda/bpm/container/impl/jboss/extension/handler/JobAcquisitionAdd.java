@@ -16,19 +16,22 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension.handler;
 
+import java.util.List;
+
 import org.camunda.bpm.container.impl.jboss.extension.SubsystemAttributeDefinitons;
 import org.camunda.bpm.container.impl.jboss.service.MscRuntimeContainerJobExecutor;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 import org.camunda.bpm.engine.impl.jobexecutor.RuntimeContainerJobExecutor;
-import org.jboss.as.controller.*;
+import org.jboss.as.controller.AbstractAddStepHandler;
+import org.jboss.as.controller.OperationContext;
+import org.jboss.as.controller.OperationFailedException;
+import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController.Mode;
-
-import java.util.List;
 
 
 /**
@@ -39,10 +42,6 @@ import java.util.List;
 public class JobAcquisitionAdd extends AbstractAddStepHandler {
 
   public static final JobAcquisitionAdd INSTANCE = new JobAcquisitionAdd();
-
-  private JobAcquisitionAdd() {
-    super(SubsystemAttributeDefinitons.JOB_ACQUISITION_ATTRIBUTES);
-  }
 
   @Override
   protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model) throws OperationFailedException {

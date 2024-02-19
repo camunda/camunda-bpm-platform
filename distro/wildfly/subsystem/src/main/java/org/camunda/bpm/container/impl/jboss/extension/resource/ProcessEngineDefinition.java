@@ -32,10 +32,10 @@ public class ProcessEngineDefinition extends PersistentResourceDefinition {
   public static final ProcessEngineDefinition INSTANCE = new ProcessEngineDefinition();
 
   private ProcessEngineDefinition() {
-    super(BpmPlatformExtension.PROCESS_ENGINES_PATH,
-        BpmPlatformExtension.getResourceDescriptionResolver(ModelConstants.PROCESS_ENGINE),
-        ProcessEngineAdd.INSTANCE,
-        ProcessEngineRemove.INSTANCE);
+    super(new Parameters(BpmPlatformExtension.PROCESS_ENGINES_PATH,
+        BpmPlatformExtension.getResourceDescriptionResolver(ModelConstants.PROCESS_ENGINE))
+        .setAddHandler(ProcessEngineAdd.INSTANCE)
+        .setRemoveHandler(ProcessEngineRemove.INSTANCE));
   }
 
   @Override

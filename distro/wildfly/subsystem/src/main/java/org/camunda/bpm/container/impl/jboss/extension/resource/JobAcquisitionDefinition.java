@@ -33,10 +33,10 @@ public class JobAcquisitionDefinition extends PersistentResourceDefinition {
   public static final JobAcquisitionDefinition INSTANCE = new JobAcquisitionDefinition();
 
   private JobAcquisitionDefinition() {
-    super(BpmPlatformExtension.JOB_ACQUISTIONS_PATH,
-        BpmPlatformExtension.getResourceDescriptionResolver(ModelConstants.JOB_ACQUISITION),
-        JobAcquisitionAdd.INSTANCE,
-        JobAcquisitionRemove.INSTANCE);
+    super(new Parameters(BpmPlatformExtension.JOB_ACQUISTIONS_PATH,
+        BpmPlatformExtension.getResourceDescriptionResolver(ModelConstants.JOB_ACQUISITION))
+        .setAddHandler(JobAcquisitionAdd.INSTANCE)
+        .setRemoveHandler(JobAcquisitionRemove.INSTANCE));
   }
 
   @Override
