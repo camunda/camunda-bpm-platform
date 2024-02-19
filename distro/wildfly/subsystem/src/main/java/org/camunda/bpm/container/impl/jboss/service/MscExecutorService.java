@@ -31,15 +31,14 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
-import org.jboss.threads.ExecutionTimedOutException;
 
 
 public class MscExecutorService implements Service<MscExecutorService>, ExecutorService {
 
   private static Logger log = Logger.getLogger(MscExecutorService.class.getName());
-  
+
   private final InjectedValue<ManagedQueueExecutorService> managedQueueInjector = new InjectedValue<ManagedQueueExecutorService>();
-  
+
   private long lastWarningLogged = System.currentTimeMillis();
 
   public MscExecutorService getValue() throws IllegalStateException, IllegalArgumentException {
@@ -51,21 +50,21 @@ public class MscExecutorService implements Service<MscExecutorService>, Executor
   }
 
   public void stop(StopContext context) {
-    // nothing to do    
+    // nothing to do
   }
-  
+
   public Runnable getExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
     return new ExecuteJobsRunnable(jobIds, processEngine);
   }
-  
+
   public boolean schedule(Runnable runnable, boolean isLongRunning) {
-    
+
     if(isLongRunning) {
       return scheduleLongRunningWork(runnable);
-      
-    } else {      
+
+    } else {
       return scheduleShortRunningWork(runnable);
-      
+
     }
 
   }
@@ -73,36 +72,34 @@ public class MscExecutorService implements Service<MscExecutorService>, Executor
   protected boolean scheduleShortRunningWork(Runnable runnable) {
 
     ManagedQueueExecutorService managedQueueExecutorService = managedQueueInjector.getValue();
-    
+
     try {
-      
+
       managedQueueExecutorService.executeBlocking(runnable);
       return true;
-      
+
     } catch (InterruptedException e) {
-      // the the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore          
-    } catch (Exception e) {      
+      // the the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore
+    } catch (Exception e) {
       // we must be able to schedule this
       log.log(Level.WARNING,  "Cannot schedule long running work.", e);
     }
-    
+
     return false;
   }
 
   protected boolean scheduleLongRunningWork(Runnable runnable) {
-    
+
     final ManagedQueueExecutorService managedQueueExecutorService = managedQueueInjector.getValue();
 
     boolean rejected = false;
     try {
-      
+
       // wait for 2 seconds for the job to be accepted by the pool.
       managedQueueExecutorService.executeBlocking(runnable, 2, TimeUnit.SECONDS);
-      
+
     } catch (InterruptedException e) {
-      // the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore          
-    } catch (ExecutionTimedOutException e) {
-      rejected = true;
+      // the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore
     } catch (RejectedExecutionException e) {
       rejected = true;
     } catch (Exception e) {
@@ -115,13 +112,13 @@ public class MscExecutorService implements Service<MscExecutorService>, Executor
         log.log(Level.FINE, "Unexpected Exception while submitting job to executor pool.", e);
       }
     }
-    
+
     return !rejected;
-    
+
   }
 
   public InjectedValue<ManagedQueueExecutorService> getManagedQueueInjector() {
     return managedQueueInjector;
   }
-    
+
 }
