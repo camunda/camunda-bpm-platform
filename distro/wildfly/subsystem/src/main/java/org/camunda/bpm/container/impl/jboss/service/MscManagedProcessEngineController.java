@@ -236,7 +236,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
   private Object createInstance(String configurationClassName) {
     try {
       Class<?> configurationClass = getClass().getClassLoader().loadClass(configurationClassName);
-      return configurationClass.newInstance();
+      return configurationClass.getDeclaredConstructor().newInstance();
 
     } catch (Exception e) {
       throw new ProcessEngineException("Could not load '"+configurationClassName+"': the class must be visible from the camunda-wildfly-subsystem module.", e);
