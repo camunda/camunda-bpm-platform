@@ -19,6 +19,8 @@ package org.camunda.bpm.container.impl.jboss.service;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,16 +32,21 @@ import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
-import org.jboss.msc.value.InjectedValue;
 
 
 public class MscExecutorService implements Service<MscExecutorService>, ExecutorService {
 
   private static Logger log = Logger.getLogger(MscExecutorService.class.getName());
 
-  private final InjectedValue<ManagedQueueExecutorService> managedQueueInjector = new InjectedValue<ManagedQueueExecutorService>();
+  protected final Supplier<ManagedQueueExecutorService> managedQueueSupplier;
+  protected final Consumer<ExecutorService> provider;
 
   private long lastWarningLogged = System.currentTimeMillis();
+
+  public MscExecutorService(Supplier<ManagedQueueExecutorService> managedQueueSupplier, Consumer<ExecutorService> provider) {
+    this.managedQueueSupplier = managedQueueSupplier;
+    this.provider = provider;
+  }
 
   public MscExecutorService getValue() throws IllegalStateException, IllegalArgumentException {
     return this;
@@ -47,10 +54,12 @@ public class MscExecutorService implements Service<MscExecutorService>, Executor
 
   public void start(StartContext context) throws StartException {
     // nothing to do
+    provider.accept(this);
   }
 
   public void stop(StopContext context) {
     // nothing to do
+    provider.accept(null);
   }
 
   public Runnable getExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
@@ -71,7 +80,7 @@ public class MscExecutorService implements Service<MscExecutorService>, Executor
 
   protected boolean scheduleShortRunningWork(Runnable runnable) {
 
-    ManagedQueueExecutorService managedQueueExecutorService = managedQueueInjector.getValue();
+    ManagedQueueExecutorService managedQueueExecutorService = managedQueueSupplier.get();
 
     try {
 
@@ -90,7 +99,7 @@ public class MscExecutorService implements Service<MscExecutorService>, Executor
 
   protected boolean scheduleLongRunningWork(Runnable runnable) {
 
-    final ManagedQueueExecutorService managedQueueExecutorService = managedQueueInjector.getValue();
+    final ManagedQueueExecutorService managedQueueExecutorService = managedQueueSupplier.get();
 
     boolean rejected = false;
     try {
@@ -115,10 +124,6 @@ public class MscExecutorService implements Service<MscExecutorService>, Executor
 
     return !rejected;
 
-  }
-
-  public InjectedValue<ManagedQueueExecutorService> getManagedQueueInjector() {
-    return managedQueueInjector;
   }
 
 }
