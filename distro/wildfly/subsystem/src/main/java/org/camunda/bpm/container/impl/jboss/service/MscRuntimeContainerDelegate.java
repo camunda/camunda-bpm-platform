@@ -28,6 +28,7 @@ import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInfo;
+import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.impl.JakartaServletProcessApplication;
 import org.camunda.bpm.container.ExecutorService;
@@ -41,6 +42,7 @@ import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.modules.ModuleClassLoader;
 import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
@@ -112,10 +114,12 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
       MscManagedProcessEngine processEngineRegistration = new MscManagedProcessEngine(processEngine);
 
       // install the service asynchronously.
-      childTarget.addService(serviceName, processEngineRegistration)
-        .setInitialMode(Mode.ACTIVE)
-        .addDependency(ServiceNames.forMscRuntimeContainerDelegate(), MscRuntimeContainerDelegate.class, processEngineRegistration.getRuntimeContainerDelegateInjector())
-        .install();
+      ServiceBuilder<?> sb = childTarget.addService();
+      sb.requires(ServiceNames.forMscRuntimeContainerDelegate());
+//      Consumer<RuntimeContainerDelegate> provider1 = sb.provides(serviceName); // TODO is it needed?
+      sb.setInitialMode(Mode.ACTIVE);
+      sb.setInstance(processEngineRegistration.getRuntimeContainerDelegateSupplier().get());
+      sb.install();
     }
 
   }
@@ -156,11 +160,12 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
 
       ServiceController<ServiceTarget> requiredService = (ServiceController<ServiceTarget>) serviceContainer.getRequiredService(paModuleService);
 
-      NoViewProcessApplicationStartService service = new NoViewProcessApplicationStartService(processApplication.getReference());
-      requiredService.getValue()
-        .addService(serviceName, service)
-        .setInitialMode(Mode.ACTIVE)
-        .install();
+      ServiceBuilder<?> serviceBuilder = requiredService.getValue().addService();
+      Consumer<ProcessApplicationInterface> provider = serviceBuilder.provides(serviceName);
+      NoViewProcessApplicationStartService service = new NoViewProcessApplicationStartService(processApplication.getReference(), provider);
+      serviceBuilder.setInitialMode(Mode.ACTIVE);
+      serviceBuilder.setInstance(service);
+      serviceBuilder.install();
 
     }
   }

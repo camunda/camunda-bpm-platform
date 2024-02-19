@@ -22,12 +22,10 @@ import org.camunda.bpm.container.impl.jboss.extension.Element;
 import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessEngineController;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.jboss.as.controller.*;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
 import org.jboss.msc.service.ServiceBuilder;
-import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 
 import java.util.ArrayList;
@@ -57,17 +55,17 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
     installService(context, processEngineConfiguration);
   }
 
-  protected ServiceController<ProcessEngine> installService(OperationContext context,
-                                                            ManagedProcessEngineMetadata processEngineConfiguration) {
+  protected void installService(OperationContext context, ManagedProcessEngineMetadata processEngineConfiguration) {
 
     MscManagedProcessEngineController service = new MscManagedProcessEngineController(processEngineConfiguration);
     ServiceName name = ServiceNames.forManagedProcessEngine(processEngineConfiguration.getEngineName());
 
-    ServiceBuilder<ProcessEngine> serviceBuilder = context.getCapabilityServiceTarget().addService(name, service);
+    ServiceBuilder<?> serviceBuilder = context.getCapabilityServiceTarget().addService();
 
-    MscManagedProcessEngineController.initializeServiceBuilder(processEngineConfiguration, service, serviceBuilder, processEngineConfiguration.getJobExecutorAcquisitionName());
+    service.initializeServiceBuilder(processEngineConfiguration, serviceBuilder, name, processEngineConfiguration.getJobExecutorAcquisitionName());
 
-    return serviceBuilder.install();
+    serviceBuilder.setInstance(service);
+    serviceBuilder.install();
   }
 
   protected ManagedProcessEngineMetadata transformConfiguration(final OperationContext context, String engineName, final ModelNode model) throws OperationFailedException {
