@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.function.Consumer;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessApplicationService;
@@ -68,10 +69,16 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
 
   protected ServiceTracker<MscManagedProcessApplication> processApplicationServiceTracker;
   protected Set<MscManagedProcessApplication> processApplications = new CopyOnWriteArraySet<MscManagedProcessApplication>();
+  protected Consumer<RuntimeContainerDelegate> provider;
+
+  public MscRuntimeContainerDelegate(Consumer<RuntimeContainerDelegate> provider) {
+    this.provider = provider;
+  }
 
   // Lifecycle /////////////////////////////////////////////////
 
   public void start(StartContext context) throws StartException {
+    provider.accept(this);
     serviceContainer = context.getController().getServiceContainer();
     childTarget = context.getChildTarget();
 
@@ -83,6 +90,7 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
   }
 
   public void stop(StopContext context) {
+    provider.accept(null);
     stopTrackingServices();
   }
 
