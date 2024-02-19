@@ -63,7 +63,7 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
     // create and register the MSC container delegate.
     final MscRuntimeContainerDelegate processEngineService = new MscRuntimeContainerDelegate();
 
-    context.getServiceTarget()
+    context.getCapabilityServiceTarget()
             .addService(ServiceNames.forMscRuntimeContainerDelegate(), processEngineService)
             .setInitialMode(Mode.ACTIVE)
             .install();
@@ -72,7 +72,7 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
     BpmPlatformPlugins plugins = BpmPlatformPlugins.load(getClass().getClassLoader());
     MscBpmPlatformPlugins managedPlugins = new MscBpmPlatformPlugins(plugins);
 
-    context.getServiceTarget()
+    context.getCapabilityServiceTarget()
       .addService(ServiceNames.forBpmPlatformPlugins(), managedPlugins)
       .setInitialMode(Mode.ACTIVE)
       .install();

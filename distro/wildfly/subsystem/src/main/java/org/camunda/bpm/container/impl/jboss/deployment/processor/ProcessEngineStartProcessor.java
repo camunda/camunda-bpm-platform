@@ -65,7 +65,7 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
 
   protected void startProcessEngine(ProcessEngineXml processEngineXml, DeploymentPhaseContext phaseContext) {
 
-    final ServiceTarget serviceTarget = phaseContext.getServiceTarget();
+    final ServiceTarget serviceTarget = phaseContext.getRequirementServiceTarget();
 
     // transform configuration
     ManagedProcessEngineMetadata configuration = transformConfiguration(processEngineXml);
