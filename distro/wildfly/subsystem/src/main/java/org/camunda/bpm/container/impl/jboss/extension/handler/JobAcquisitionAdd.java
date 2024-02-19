@@ -17,6 +17,7 @@
 package org.camunda.bpm.container.impl.jboss.extension.handler;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.camunda.bpm.container.impl.jboss.extension.SubsystemAttributeDefinitons;
 import org.camunda.bpm.container.impl.jboss.service.MscRuntimeContainerJobExecutor;
@@ -48,7 +49,12 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler {
 
     String acquisitionName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
 
-    MscRuntimeContainerJobExecutor mscRuntimeContainerJobExecutor = new MscRuntimeContainerJobExecutor();
+    // start new service for job executor
+    ServiceBuilder<?> serviceBuilder = context.getCapabilityServiceTarget().addService();
+    serviceBuilder.requires(ServiceNames.forMscRuntimeContainerDelegate());
+    serviceBuilder.requires(ServiceNames.forMscExecutorService());
+    Consumer<RuntimeContainerJobExecutor> provider = serviceBuilder.provides(ServiceNames.forMscRuntimeContainerJobExecutorService(acquisitionName));
+    MscRuntimeContainerJobExecutor mscRuntimeContainerJobExecutor = new MscRuntimeContainerJobExecutor(provider);
 
     if (model.hasDefined(SubsystemAttributeDefinitons.PROPERTIES.getName())) {
       List<Property> properties = SubsystemAttributeDefinitons.PROPERTIES.resolveModelAttribute(context, model).asPropertyList();
@@ -57,11 +63,8 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler {
       }
     }
 
-    // start new service for job executor
-    ServiceBuilder<RuntimeContainerJobExecutor> serviceBuilder = context.getCapabilityServiceTarget().addService(ServiceNames.forMscRuntimeContainerJobExecutorService(acquisitionName), mscRuntimeContainerJobExecutor)
-        .setInitialMode(Mode.ACTIVE);
-    serviceBuilder.requires(ServiceNames.forMscRuntimeContainerDelegate());
-    serviceBuilder.requires(ServiceNames.forMscExecutorService());
+    serviceBuilder.setInitialMode(Mode.ACTIVE);
+    serviceBuilder.setInstance(mscRuntimeContainerJobExecutor);
     serviceBuilder.install();
   }
 
