@@ -58,7 +58,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
 
     ManagedProcessEngineMetadata processEngineConfiguration = transformConfiguration(context, engineName, model);
 
-    ServiceController<ProcessEngine> controller = installService(context, processEngineConfiguration);
+    installService(context, processEngineConfiguration);
   }
 
   protected ServiceController<ProcessEngine> installService(OperationContext context,
