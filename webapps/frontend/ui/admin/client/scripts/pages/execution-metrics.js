@@ -18,44 +18,59 @@
 'use strict';
 
 const template = require('./execution-metrics.html?raw');
-const CamSDK = require('camunda-bpm-sdk-js/lib/angularjs/index');
 const moment = require('moment');
 const angular = require('angular');
 
 const debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
   .debouncePromiseFactory;
-const debounceQuery = debouncePromiseFactory();
+const debounceMonthly = debouncePromiseFactory();
+const debounceAnnual = debouncePromiseFactory();
 
 const fmtMonth = 'MMMM YYYY';
 const fmtYear = 'DD/MM/YYYY';
+const fmtDatePicker = 'yyyy-MM-dd';
+const fmtRequest = 'YYYY-MM-DD';
+const metrics = {
+  PI: 'process-instances',
+  DI: 'decision-instances',
+  TU: 'task-users',
+  FNI: 'flow-node-instances',
+  EDE: 'executed-decision-elements'
+};
+const localConfContractStartDate = 'metricsContractStartDate';
 
 const Controller = [
   '$scope',
   '$filter',
-  'Uri',
   'camAPI',
-  'fixDate',
   'configuration',
+  'localConf',
   'PluginMetricsResource',
+  '$translate',
   function(
     $scope,
     $filter,
-    Uri,
     camAPI,
-    fixDate,
     configuration,
-    PluginMetricsResource
+    localConf,
+    PluginMetricsResource,
+    $translate
   ) {
-    var MetricsResource = camAPI.resource('metrics');
-
-    // date variables
-    var now = new Date();
-    var dateFilter = $filter('date');
-    var dateFormat = 'yyyy-MM-dd';
+    const telemetryResource = camAPI.resource('telemetry');
+    const dateFilter = $filter('date');
 
     // initial scope data
-    $scope.startDate = dateFilter(now.getFullYear() + '-01-01', dateFormat);
-    $scope.endDate = dateFilter(now.getFullYear() + '-12-31', dateFormat);
+    $scope.fmtDatePicker = fmtDatePicker;
+    let startDate = localConf.get(localConfContractStartDate);
+    if (startDate) {
+      $scope.startDate = startDate;
+    } else {
+      startDate = moment()
+        .startOf('year')
+        .toDate();
+    }
+    $scope.startDate = dateFilter(startDate, fmtDatePicker);
+
     $scope.loadingState = 'INITIAL';
     $scope.loadingStateMonthly = 'INITIAL';
     $scope.loadingStateAnnual = 'INITIAL';
@@ -63,131 +78,76 @@ const Controller = [
     $scope.showTaskWorkerMetric = $scope.alwaysShowUTWMetrics;
     $scope.metrics = {};
 
-    $scope.monthlyUsage = {};
-    $scope.yearlyUsage = {};
+    let monthlyMetricUsageMap = {};
+    let monthlyMetricsArray = {};
+    $scope.monthlyMetrics = [];
+    $scope.annualMetrics = [];
     $scope.displayLegacyMetrics = true;
+    $scope.datePickerOptions = {maxDate: moment().toDate()};
+
+    telemetryResource.fetchData((err, res) => {
+      if (!err) {
+        $scope.telemetryData = res;
+        delete $scope.telemetryData.product.internals.commands;
+        delete $scope.telemetryData.product.internals.metrics;
+      } else {
+        $scope.telemetryData = $translate.instant(
+          'DIAGNOSTICS_FETCH_DATA_ERROR_MESSAGE',
+          {
+            err
+          }
+        );
+      }
+    });
 
     // sets loading state to error and updates error message
-    function setLoadingError(error) {
+    const setLoadingError = error => {
       $scope.loadingState = 'ERROR';
       $scope.loadingError = error;
-    }
+    };
 
     // called every time date input changes
-    function handleDateChange() {
-      var form = $scope.form;
+    const handleDateChange = () => {
+      const form = $scope.form;
       if (form.$valid) {
+        localConf.set(localConfContractStartDate, $scope.startDate);
+        calculateContractDates();
         return load();
-      } else if (
-        form.startDate.$error.datePattern ||
-        form.endDate.$error.datePattern
-      ) {
-        setLoadingError(`Supported pattern '${dateFormat}'.`);
-      } else if (
-        form.startDate.$error.dateValue ||
-        form.endDate.$error.dateValue
-      ) {
+      } else if (form.startDate.$error.datePattern) {
+        setLoadingError(`Supported pattern '${fmtDatePicker}'.`);
+      } else if (form.startDate.$error.dateValue) {
         setLoadingError('Invalid Date Value.');
       }
-    }
-
-    $scope.$watch('startDate', function(newValue, oldValue) {
-      if (newValue !== oldValue) {
-        $scope.startDate = fixDate($scope.startDate);
-        handleDateChange();
-      }
-    });
-
-    $scope.$watch('endDate', function(newValue, oldValue) {
-      if (newValue !== oldValue) {
-        handleDateChange();
-      }
-    });
-
-    function updateView() {
-      var phase = $scope.$root.$$phase;
-      if (phase !== '$apply' && phase !== '$digest') {
-        $scope.$apply();
-      }
-    }
-
-    function fetchTaskWorkerMetric(cb) {
-      MetricsResource.sum(
-        {
-          name: 'task-users',
-          startDate: fixDate($scope.startDate),
-          endDate: fixDate($scope.endDate)
-        },
-        function(err, res) {
-          cb(err, !err ? res.result : null);
-        }
-      );
-    }
-
-    $scope.$watch('showTaskWorkerMetric', function() {
-      if ($scope.showTaskWorkerMetric) {
-        $scope.loadingState = 'LOADING';
-        fetchTaskWorkerMetric(function(err, result) {
-          if (!err) {
-            $scope.loadingState = 'LOADED';
-            $scope.metrics.taskWorkers = result;
-          } else {
-            setLoadingError('Could not load task worker metrics.');
-            $scope.loadingState = 'ERROR';
-          }
-          updateView();
-        });
-      } else if (typeof $scope.showTaskWorkerMetric !== 'undefined') {
-        $scope.loadingState = 'LOADED';
-      }
-    });
-
-    $scope.getSubscriptionMonthStyle = label => {
-      // TODO extract logic
-      let lastPeriodEnd = moment($scope.startDate);
-      while (
-        lastPeriodEnd
-          .clone()
-          .add(1, 'years')
-          .isBefore(moment())
-      ) {
-        lastPeriodEnd.add(1, 'years');
-      }
-      //lastPeriodEnd = lastPeriodEnd.subtract(1, 'milliseconds');
-
-      const activeMonth = !moment(label, 'YYYY.MM').isBefore(
-        lastPeriodEnd,
-        'month'
-      );
-      return activeMonth ? {} : {opacity: 0.7};
     };
 
-    $scope.formatSubscriptionYear = label => {
+    $scope.getSubscriptionMonthStyle = metric => {
+      return metric.activeYear ? {} : {opacity: 0.7};
+    };
+
+    const formatSubscriptionYear = label => {
       // TODO i18n
-      const date = moment(label, 'YYYY-MM-DD');
-      return `${date.format(fmtYear)} to ${date
-        .add(1, 'years')
-        .format(fmtYear)}`;
+      const date = moment($scope.startDate).year(label);
+      const endDate = date.clone().add(1, 'years');
+      if (endDate.isAfter(moment())) {
+        return `${date.format(fmtYear)} up to today`;
+      } else {
+        return `${date.format(fmtYear)} to ${endDate.format(fmtYear)}`;
+      }
     };
 
-    $scope.$watch('displayLegacyMetrics', () => {
-      $scope.loadMonthly();
-    });
-
-    function createGroupLabel(year, month) {
+    const createGroupLabel = (year, month) => {
       if (!month) {
         return year;
       } else {
         return `${year}.${String(month).padStart(2, '0')}`;
       }
-    }
+    };
 
-    function prepareTableData(response, labelFormat, initialMap) {
-      let metricsGroupMap = angular.copy(initialMap || {});
-      for (const metricItem of response) {
+    const prepareTableData = (response, labelFormat, metricsGroupMap = {}) => {
+      for (const metricUsage of response) {
         const label = createGroupLabel(
-          metricItem.subscriptionYear,
-          metricItem.subscriptionMonth
+          metricUsage.subscriptionYear,
+          metricUsage.subscriptionMonth
         );
         let labelFmt;
         if (angular.isFunction(labelFormat)) {
@@ -202,154 +162,212 @@ const Controller = [
           metricsGroupMap[label].label = label;
           metricsGroupMap[label].labelFmt = labelFmt;
         }
-        metricsGroupMap[label][metricItem.metric] = {
-          sum: metricItem.sum,
-          sumFmt: metricItem.sum.toLocaleString() || 0
+        metricsGroupMap[label][metricUsage.metric] = {
+          sum: metricUsage.sum,
+          sumFmt: metricUsage.sum.toLocaleString() || 0
         };
       }
-      const monthlyList = Object.values(metricsGroupMap).sort(
-        (a, b) => b.label - a.label
-      );
-      return monthlyList;
-    }
+      return metricsGroupMap;
+    };
 
-    $scope.loadMonthly = () => {
-      $scope.loadingStateMonthly = 'LOADING';
-      let metrics = [];
-      if (!$scope.displayLegacyMetrics) {
-        metrics.push('process-instances', 'decision-instances', 'task-users');
+    const mapToList = metricsGroupMap => {
+      // sort descending by date labels
+      return Object.values(metricsGroupMap).sort((a, b) => b.label - a.label);
+    };
+
+    const getMonthlyMetrics = (metrics, startDate, endDate) => {
+      return new Promise((resolve, reject) => {
+        PluginMetricsResource.getAggregated({
+          subscriptionStartDate: $scope.startDate,
+          groupBy: 'month',
+          metrics: Array.from(metrics).toString(),
+          startDate,
+          endDate
+        }).$promise.then(
+          monthlyMetrics => {
+            prepareTableData(monthlyMetrics, fmtMonth, monthlyMetricUsageMap);
+            resolve();
+          },
+          err => reject(err)
+        );
+      });
+    };
+
+    const calculateContractDates = () => {
+      // calculate active subscription month
+      let activeMonth = moment($scope.startDate).startOf('day');
+      while (
+        activeMonth
+          .clone()
+          .add(1, 'month')
+          .isBefore(moment())
+      ) {
+        activeMonth.add(1, 'month');
       }
-      PluginMetricsResource.getAggregated({
-        subscriptionStartDate: $scope.startDate,
-        startDate: moment($scope.startDate)
-          .subtract(1, 'years')
-          .startOf('month')
-          .format('YYYY-MM-DDT00:00:00'),
-        groupBy: 'month',
-        metrics: metrics.length > 0 ? Array.from(metrics).toString() : null
-      }).$promise.then(
-        monthlyUsages => {
-          // last 12 months
-          // TODO calculate with subscriptionStart!!!
-          const initialMap = {};
-          let date = moment();
-          for (let i = 0; i < 12; i++) {
-            const label = createGroupLabel(date.year(), date.month() + 1);
-            initialMap[label] = {label, labelFmt: date.format(fmtMonth)};
-            date = date.subtract(1, 'months');
+      $scope.activeMonth = activeMonth;
+      // calculate active subscription year
+      let activeYear = moment($scope.startDate).startOf('day');
+      while (
+        activeYear
+          .clone()
+          .add(1, 'year')
+          .isBefore(moment())
+      ) {
+        activeYear.add(1, 'year');
+      }
+      $scope.activeYear = activeYear;
+    };
+
+    const initializeMonthlyData = () => {
+      // prefill last 12 months for monthly table
+      monthlyMetricUsageMap = {};
+      let month = $scope.activeMonth.clone();
+      for (let i = 0; i < 12; i++) {
+        // create label
+        const label = createGroupLabel(month.year(), month.month() + 1);
+        monthlyMetricUsageMap[label] = {
+          label,
+          labelFmt: month.format(fmtMonth),
+          activeYear: !month.isBefore($scope.activeYear)
+        };
+
+        // prefill data
+        Object.values(metrics).forEach(metricName => {
+          monthlyMetricUsageMap[label][metricName] = {
+            sum: 0,
+            sumFmt: 0
+          };
+        });
+
+        month = month.subtract(1, 'months');
+      }
+    };
+
+    const loadMonthly = () => {
+      $scope.loadingStateMonthly = 'LOADING';
+
+      initializeMonthlyData();
+
+      // calculate query dates
+      const prevSubStart = $scope.activeYear
+        .clone()
+        .subtract(1, 'year')
+        .format(fmtRequest);
+      const curSubStart = $scope.activeYear.format(fmtRequest);
+      let requestMetrics = [metrics.PI, metrics.DI];
+      if ($scope.displayLegacyMetrics) {
+        requestMetrics.push(metrics.FNI, metrics.EDE);
+      }
+
+      let series = [
+        // load regular metrics (non-TU)
+        getMonthlyMetrics(requestMetrics, prevSubStart),
+        // load TU metrics for current and last subscription year
+        getMonthlyMetrics([metrics.TU], curSubStart),
+        getMonthlyMetrics([metrics.TU], prevSubStart, curSubStart)
+      ];
+
+      debounceMonthly(Promise.all(series))
+        .then(() => {
+          monthlyMetricsArray = mapToList(monthlyMetricUsageMap);
+
+          // accumulate TU metrics
+          for (let i = monthlyMetricsArray.length - 1; i >= 0; i--) {
+            const metric = monthlyMetricsArray[i];
+            if (i - 1 >= 0) {
+              // check if two items belong to the same subscription year
+              const nextMetric = monthlyMetricsArray[i - 1];
+              if (metric.activeYear === nextMetric.activeYear) {
+                const sum = metric[metrics.TU].sum + nextMetric[metrics.TU].sum;
+                nextMetric[metrics.TU].sum = sum;
+                nextMetric[metrics.TU].sumFmt = sum.toLocaleString();
+              }
+            }
           }
 
-          $scope.monthlyUsage = prepareTableData(
-            monthlyUsages,
-            fmtMonth,
-            initialMap
-          );
+          $scope.monthlyMetrics = angular.copy(monthlyMetricsArray);
           $scope.loadingStateMonthly = 'LOADED';
-        },
-        err => {
-          $scope.loadingStateMonthly = 'ERROR';
-          $scope.loadingError = err; // FIXME
-        }
-      );
-    };
-
-    $scope.loadAnnual = () => {
-      $scope.loadingStateAnnual = 'LOADING';
-      PluginMetricsResource.getAggregated({
-        subscriptionStartDate: fixDate($scope.startDate),
-        groupBy: 'year'
-      }).$promise.then(
-        annualUsage => {
-          $scope.annualUsage = prepareTableData(
-            annualUsage,
-            $scope.formatSubscriptionYear
-          );
-          $scope.loadingStateAnnual = 'LOADED';
-        },
-        err => {
-          $scope.loadingStateAnnual = 'ERROR';
-          $scope.loadingError = err; // FIXME
-        }
-      );
-    };
-
-    var load = ($scope.load = function() {
-      $scope.loadMonthly();
-      $scope.loadAnnual();
-
-      $scope.loadingState = 'LOADING';
-      var series = {
-        flowNodes: function(cb) {
-          MetricsResource.sum(
-            {
-              name: 'flow-node-instances',
-              startDate: fixDate($scope.startDate),
-              endDate: fixDate($scope.endDate)
-            },
-            function(err, res) {
-              cb(err, !err ? res.result : null);
-            }
-          );
-        },
-        decisionElements: function(cb) {
-          MetricsResource.sum(
-            {
-              name: 'executed-decision-elements',
-              startDate: fixDate($scope.startDate),
-              endDate: fixDate($scope.endDate)
-            },
-            function(err, res) {
-              cb(err, !err ? res.result : null);
-            }
-          );
-        },
-        rootProcessInstances: function(cb) {
-          MetricsResource.sum(
-            {
-              name: 'process-instances',
-              startDate: fixDate($scope.startDate),
-              endDate: fixDate($scope.endDate)
-            },
-            function(err, res) {
-              cb(err, !err ? res.result : null);
-            }
-          );
-        },
-        decisionInstances: function(cb) {
-          MetricsResource.sum(
-            {
-              name: 'decision-instances',
-              startDate: fixDate($scope.startDate),
-              endDate: fixDate($scope.endDate)
-            },
-            function(err, res) {
-              cb(err, !err ? res.result : null);
-            }
-          );
-        }
-      };
-
-      if ($scope.showTaskWorkerMetric) {
-        series.taskWorkers = fetchTaskWorkerMetric;
-      } else {
-        delete series.taskWorkers;
-      }
-
-      // promises??? YES!
-      debounceQuery(CamSDK.utils.series(series))
-        .then(function(res) {
-          $scope.loadingState = 'LOADED';
-          $scope.metrics = res;
-          updateView();
+          $scope.$apply();
         })
-        .catch(function() {
-          setLoadingError('Could not set start and end dates.');
-          $scope.loadingState = 'ERROR';
-          updateView();
-          return;
+        .catch(err => {
+          $scope.loadingStateMonthly = 'ERROR';
+          $scope.loadingErrorMonthly = err;
         });
+    };
+
+    const loadAnnual = () => {
+      $scope.loadingStateAnnual = 'LOADING';
+      debounceAnnual(
+        PluginMetricsResource.getAggregated({
+          subscriptionStartDate: $scope.startDate,
+          groupBy: 'year'
+        }).$promise
+      )
+        .then(annualMetrics => {
+          let annualMetricsMap = prepareTableData(
+            annualMetrics,
+            formatSubscriptionYear
+          );
+          // fill missing values
+          for (const annualMetrics in annualMetricsMap) {
+            Object.values(metrics).forEach(metricName => {
+              if (!annualMetricsMap[annualMetrics][metricName]) {
+                annualMetricsMap[annualMetrics][metricName] = {
+                  sum: 0,
+                  sumFmt: 0
+                };
+              }
+            });
+          }
+          $scope.annualMetrics = mapToList(annualMetricsMap);
+          $scope.loadingStateAnnual = 'LOADED';
+          $scope.$apply();
+        })
+        .catch(err => {
+          $scope.loadingStateAnnual = 'ERROR';
+          $scope.loadingErrorAnnual = err;
+        });
+    };
+
+    $scope.getClipboardText = metric => {
+      let str = '';
+      str += `${metric.labelFmt}\n`;
+      Object.keys(metrics).forEach(metricKey => {
+        str += `- ${metricKey}: ${metric[metrics[metricKey]].sumFmt}\n`;
+      });
+      str += '\n';
+      str += JSON.stringify($scope.telemetryData, null, 2);
+      return str;
+    };
+
+    $scope.loadingNotInitial = () => {
+      return (
+        $scope.loadingStateAnnual !== 'INITIAL' &&
+        $scope.loadingStateMonthly !== 'INITIAL'
+      );
+    };
+
+    $scope.loading = () => {
+      return (
+        $scope.loadingStateAnnual === 'LOADING' &&
+        $scope.loadingStateMonthly === 'LOADING'
+      );
+    };
+
+    const load = ($scope.load = () => {
+      loadMonthly();
+      loadAnnual();
     });
 
+    $scope.$watch('startDate', (newValue, oldValue) => {
+      if (newValue !== oldValue) handleDateChange();
+    });
+
+    $scope.$watch('displayLegacyMetrics', (newValue, oldValue) => {
+      if (newValue !== oldValue) loadMonthly();
+    });
+
+    calculateContractDates();
     load();
   }
 ];
