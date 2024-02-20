@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.junit.After;
 import org.junit.Before;
@@ -46,12 +47,12 @@ public class HistoryTimeToLiveDeploymentTest {
 
   protected static final String CONFIG_LOGGER = "org.camunda.bpm.engine.cfg";
 
-  protected static final String EXPECTED_DEFAULT_CONFIG_MSG =
-      "You are using the default TTL (Time To Live) of 180 days (six months); "
-      + "the history clean-up feature will delete your data after six months. "
-      + "We recommend adjusting the TTL configuration property aligned with your specific requirements.";
+  protected static final String EXPECTED_DEFAULT_CONFIG_MSG = "History Time To Live (TTL) cannot be null. ";
 
-  protected static final String DEFAULT_HTTL_CONFIG_VALUE = "180";
+  protected static final String EXPECTED_LONGER_TTL_MSG = "The specified Time To Live (TTL) in the model is longer than the global TTL configuration. "
+      + "The historic data related to this model will be cleaned up at later point comparing to the other processes.";
+
+  protected static final String HTTL_CONFIG_VALUE = "180";
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -98,7 +99,11 @@ public class HistoryTimeToLiveDeploymentTest {
 
         // then
         .isInstanceOf(ParseException.class)
-        .hasMessageContaining("History Time To Live cannot be null");
+        .hasMessageContaining(EXPECTED_DEFAULT_CONFIG_MSG)
+        .hasMessageContaining("TTL is necessary for the History Cleanup to work. The following options are possible:")
+        .hasMessageContaining("* Set historyTimeToLive in the model")
+        .hasMessageContaining("* Set a default historyTimeToLive as a global process engine configuration")
+        .hasMessageContaining("* (Not recommended) Deactivate the enforceTTL config to disable this check");
   }
 
   @Test
@@ -137,7 +142,7 @@ public class HistoryTimeToLiveDeploymentTest {
         // then
         .isInstanceOf(ProcessEngineException.class)
         .hasCauseInstanceOf(NotValidException.class)
-        .hasStackTraceContaining("History Time To Live cannot be null");
+        .hasStackTraceContaining(EXPECTED_DEFAULT_CONFIG_MSG);
   }
 
   @Test
@@ -164,7 +169,7 @@ public class HistoryTimeToLiveDeploymentTest {
         // then
         .isInstanceOf(ProcessEngineException.class)
         .hasCauseInstanceOf(DmnTransformException.class)
-        .hasStackTraceContaining("History Time To Live cannot be null");
+        .hasStackTraceContaining(EXPECTED_DEFAULT_CONFIG_MSG);
   }
 
   @Test
@@ -185,64 +190,7 @@ public class HistoryTimeToLiveDeploymentTest {
   @Test
   public void shouldNotLogMessageOnDefaultConfigOriginatingFromConfig() {
     // given
-    processEngineConfiguration.setHistoryTimeToLive(DEFAULT_HTTL_CONFIG_VALUE);
-
-    // when
-    testRule.deploy(repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml"));
-
-    // then
-    assertThat(loggingRule.getFilteredLog(EXPECTED_DEFAULT_CONFIG_MSG)).hasSize(0);
-  }
-
-  @Test
-  public void shouldLogMessageOnDefaultValueOfProcessModel() {
-    // given
-    String nonDefaultValue = "179";
-    processEngineConfiguration.setHistoryTimeToLive(nonDefaultValue);
-
-    // when
-    testRule.deploy(repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version3.bpmn20.xml"));
-
-    // then
-    assertThat(loggingRule.getFilteredLog("definitionKey: process; " + EXPECTED_DEFAULT_CONFIG_MSG)).hasSize(1);
-  }
-
-  @Test
-  public void shouldLogMessageOnDefaultValueOfCaseModel() {
-    // given
-    String nonDefaultValue = "179";
-    processEngineConfiguration.setHistoryTimeToLive(nonDefaultValue);
-
-    // when
-    testRule.deploy(repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/case_with_180_httl.cmmn"));
-
-    // then
-    assertThat(loggingRule.getFilteredLog("definitionKey: testCase; " + EXPECTED_DEFAULT_CONFIG_MSG)).hasSize(1);
-  }
-
-  @Test
-  public void shouldLogMessageOnDefaultValueOfDecisionModel() {
-    // given
-    String nonDefaultValue = "179";
-    processEngineConfiguration.setHistoryTimeToLive(nonDefaultValue);
-
-    // when
-    testRule.deploy(repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/decision_with_180_httl.dmn"));
-
-    // then
-    assertThat(loggingRule.getFilteredLog("definitionKey: testDecision; " + EXPECTED_DEFAULT_CONFIG_MSG)).hasSize(1);
-  }
-
-  @Test
-  public void shouldNotLogAnyMessageOnNonDefaultConfig() {
-    String nonDefaultValue = "179";
-
-    // given
-    processEngineConfiguration.setHistoryTimeToLive(nonDefaultValue);
+    processEngineConfiguration.setHistoryTimeToLive(HTTL_CONFIG_VALUE);
 
     // when
     testRule.deploy(repositoryService.createDeployment()
@@ -295,6 +243,57 @@ public class HistoryTimeToLiveDeploymentTest {
     processEngineConfiguration.setEnforceHistoryTimeToLive(true);
     processEngineConfiguration.getDeploymentCache().purgeCache();
     repositoryService.getCaseDefinition(definitions.getDeployedCaseDefinitions().get(0).getId());
+  }
+
+  @Test
+  public void shouldLogMessageOnLongerTTLInProcessModel() {
+    // given
+    String nonDefaultValue = "179";
+    processEngineConfiguration.setHistoryTimeToLive(nonDefaultValue);
+
+    // when
+    deployProcessDefinitions();
+
+    // then
+    assertThat(loggingRule.getFilteredLog("definitionKey: process; " + EXPECTED_LONGER_TTL_MSG)).hasSize(1);
+  }
+
+  @Test
+  public void shouldLogMessageOnLongerTTLInfCaseModel() {
+    // given
+    String nonDefaultValue = "179";
+    processEngineConfiguration.setHistoryTimeToLive(nonDefaultValue);
+
+    // when
+    testRule.deploy(repositoryService.createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/case_with_365_httl.cmmn"));
+
+    // then
+    assertThat(loggingRule.getFilteredLog("definitionKey: testCase; " + EXPECTED_LONGER_TTL_MSG)).hasSize(1);
+  }
+
+  @Test
+  public void shouldLogMessageOnLongerTTLInDecisionModel() {
+    // given
+    String nonDefaultValue = "179";
+    processEngineConfiguration.setHistoryTimeToLive(nonDefaultValue);
+
+    // when
+    testRule.deploy(repositoryService.createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/decision_with_365_httl.dmn"));
+
+    // then
+    assertThat(loggingRule.getFilteredLog("definitionKey: testDecision; " + EXPECTED_LONGER_TTL_MSG)).hasSize(1);
+  }
+
+  protected void deployProcessDefinitions() {
+    testRule.deploy(
+      Bpmn.createExecutableProcess("process")
+        .camundaHistoryTimeToLive(365)
+        .startEvent()
+        .userTask()
+        .endEvent()
+        .done());
   }
 
 }

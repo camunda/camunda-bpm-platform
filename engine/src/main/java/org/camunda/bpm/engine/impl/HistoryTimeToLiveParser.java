@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.cfg.ConfigurationLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.impl.util.xml.Element;
@@ -34,15 +33,10 @@ import org.camunda.bpm.model.dmn.instance.Decision;
 
 /**
  * Class that encapsulates the business logic of parsing HistoryTimeToLive of different deployable resources (process, definition, case).
- * <p>
- * Furthermore, it considers notifying the users with a logging message when parsing historyTimeToLive values that are
- * the same with the default camunda modeler TTL value (see {@code CAMUNDA_MODELER_TTL_DEFAULT_VALUE}).
  */
 public class HistoryTimeToLiveParser {
 
   protected static final ConfigurationLogger LOG = ConfigurationLogger.CONFIG_LOGGER;
-
-  protected static final int CAMUNDA_MODELER_TTL_DEFAULT_VALUE = 180; // This value is hardcoded into camunda modeler
 
   protected final boolean enforceNonNullValue;
   protected final String httlConfigValue;
@@ -112,11 +106,11 @@ public class HistoryTimeToLiveParser {
 
     if (!skipEnforceTtl) {
       if (result.isInValidAgainstConfig()) {
-        throw new NotValidException("History Time To Live cannot be null");
+        throw LOG.logErrorNoTTLConfigured();
       }
 
-      if (result.shouldBeLogged()) {
-        LOG.logHistoryTimeToLiveDefaultValueWarning(definitionKey);
+      if (result.hasLongerModelValueThanGlobalConfig()) {
+        LOG.logModelHTTLLongerThanGlobalConfiguration(definitionKey);
       }
     }
 
@@ -139,10 +133,11 @@ public class HistoryTimeToLiveParser {
       return enforceNonNullValue && (valueAsInteger == null);
     }
 
-    protected boolean shouldBeLogged() {
+    protected boolean hasLongerModelValueThanGlobalConfig() {
       return !systemDefaultConfigWillBeUsed // only values originating from models make sense to be logged
           && valueAsInteger != null
-          && valueAsInteger == CAMUNDA_MODELER_TTL_DEFAULT_VALUE;
+          && httlConfigValue != null && !httlConfigValue.isEmpty()
+          && valueAsInteger > ParseUtil.parseHistoryTimeToLive(httlConfigValue);
     }
   }
 }
