@@ -81,7 +81,6 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
   protected JakartaTransactionProcessEngineConfiguration processEngineConfiguration;
 
   protected final List<Consumer<ProcessEngine>> processEngineConsumers = new ArrayList<>();
-  protected Consumer<ProcessEngine> provider;
 
   /**
    * Instantiate  the process engine controller for a process engine configuration.
@@ -265,8 +264,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
       serviceBuilder.addAliases(ServiceNames.forDefaultProcessEngine()); // TODO can we remove it?
     }
 
-    provider = serviceBuilder.provides(name);
-    processEngineConsumers.add(provider);
+    processEngineConsumers.add(serviceBuilder.provides(name));
 
     this.executorSupplier = JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder);
     JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder);
