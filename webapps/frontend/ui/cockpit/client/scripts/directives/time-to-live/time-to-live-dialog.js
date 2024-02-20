@@ -25,13 +25,26 @@ const Controller = [
   '$scope',
   'Notifications',
   '$translate',
-  function(camAPI, $modalInstance, $scope, Notifications, $translate) {
+  '$location',
+  function(
+    camAPI,
+    $modalInstance,
+    $scope,
+    Notifications,
+    $translate,
+    $location
+  ) {
     const resource = camAPI.resource($scope.resource);
     $scope.showLinkToBatchProcess =
       $scope.$parent?.resource !== 'case-definition';
     $scope.status = null;
     $scope.mode = 'UPDATE';
     $scope.ttl = $scope.definition.historyTimeToLive;
+
+    $scope.openBatchOperation = () => {
+      $scope.$dismiss();
+      $location.path('/batch/operation');
+    };
 
     $scope.isValid = () => {
       return (
