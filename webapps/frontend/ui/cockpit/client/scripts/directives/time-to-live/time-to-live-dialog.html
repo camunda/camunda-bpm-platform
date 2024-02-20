@@ -1,14 +1,17 @@
 <!-- # CE - camunda-bpm-webapp/ui/cockpit/client/scripts/components/ttl/time-to-live-dialog.html -->
 <div class="modal-header">
-  <h3>
-    {{ 'TIME_TO_LIVE_POPUP_TITLE' | translate }}
+  <h3 ng-show="status !== 'SUCCESS'">
+    {{ 'TIME_TO_LIVE_POPUP_TITLE_EDIT' | translate }}
+  </h3>
+  <h3 ng-show="status === 'SUCCESS'">
+    {{ 'TIME_TO_LIVE_POPUP_TITLE_SUCCESS' | translate }}
   </h3>
 </div>
 
 <div class="modal-body">
-  <div notifications-panel></div>
+  <div notifications-panel ng-show="status !== 'SUCCESS'"></div>
 
-  <div ng-show="!status" class="alert alert-info">
+  <div ng-show="status === 'SUCCESS'" class="alert alert-info">
     <p>
       <strong> 
         {{ 'TIME_TO_LIVE_POPUP_REMOVAL_TIME_NOT_UPDATED_INFO' | translate }}
