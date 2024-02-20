@@ -292,7 +292,6 @@
           <systemPropertyVariables>
             <restEasyVersion>${version.resteasy}</restEasyVersion>
           </systemPropertyVariables>
-          <argLine>-Xmx2g</argLine>
         </configuration>
       </plugin>
 
