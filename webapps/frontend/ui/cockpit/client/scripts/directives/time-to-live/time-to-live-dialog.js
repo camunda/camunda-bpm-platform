@@ -83,7 +83,6 @@ const Controller = [
         });
     };
 
-
     const getAndCorrectTimeToLiveValue = () => {
       if ($scope.definition.historyTimeToLive === null) {
         return null;
