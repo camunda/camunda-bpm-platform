@@ -699,7 +699,7 @@
       </activation>
 
       <properties>
-        <version.spring.framework>6.0.4</version.spring.framework>
+        <version.spring.framework>${version.spring.framework6}</version.spring.framework>
       </properties>
 
       <dependencies>
