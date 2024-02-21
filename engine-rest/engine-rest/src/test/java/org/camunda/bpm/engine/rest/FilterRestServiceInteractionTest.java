@@ -221,10 +221,10 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     variableInstanceQueryMock = mock(VariableInstanceQueryImpl.class);
     when(processEngine.getRuntimeService().createVariableInstanceQuery())
       .thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.variableScopeIdIn(any()))
-      .thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.variableNameIn(any()))
-      .thenReturn(variableInstanceQueryMock);
+
+    when(variableInstanceQueryMock.variableScopeIdIn(any(String[].class))).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.variableNameIn(any(String[].class))).thenReturn(variableInstanceQueryMock);
+
     when(variableInstanceQueryMock.disableBinaryFetching()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
   }
@@ -1601,9 +1601,9 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       .get(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
     verify(filterServiceMock, times(1)).getFilter(eq(EXAMPLE_FILTER_ID));
-    verify(variableInstanceQueryMock, times(1)).variableScopeIdIn(any());
+    verify(variableInstanceQueryMock, times(1)).variableScopeIdIn(any(String[].class));
     verify(variableInstanceQueryMock).variableScopeIdIn(TASK_A_ID, EXECUTION_A_ID, PROCESS_INSTANCE_A_ID);
-    verify(variableInstanceQueryMock, times(1)).variableNameIn(any());
+    verify(variableInstanceQueryMock, times(1)).variableNameIn(any(String[].class));
     verify(variableInstanceQueryMock).variableNameIn("foo", "bar");
     verify(variableInstanceQueryMock, times(1)).unlimitedList();
   }
@@ -1643,9 +1643,9 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       .get(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
     verify(filterServiceMock, times(1)).getFilter(eq(EXAMPLE_FILTER_ID));
-    verify(variableInstanceQueryMock, times(1)).variableScopeIdIn(any());
+    verify(variableInstanceQueryMock, times(1)).variableScopeIdIn(any(String[].class));
     verify(variableInstanceQueryMock).variableScopeIdIn(TASK_A_ID, EXECUTION_A_ID, PROCESS_INSTANCE_A_ID, CASE_EXECUTION_A_ID, CASE_INSTANCE_A_ID);
-    verify(variableInstanceQueryMock, times(1)).variableNameIn(any());
+    verify(variableInstanceQueryMock, times(1)).variableNameIn(any(String[].class));
     verify(variableInstanceQueryMock).variableNameIn("foo", "bar");
     verify(variableInstanceQueryMock, times(1)).unlimitedList();
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
@@ -1713,9 +1713,9 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       .get(EXECUTE_LIST_FILTER_URL);
 
     verify(filterServiceMock, times(1)).getFilter(eq(EXAMPLE_FILTER_ID));
-    verify(variableInstanceQueryMock, times(1)).variableScopeIdIn(any());
+    verify(variableInstanceQueryMock, times(1)).variableScopeIdIn(any(String[].class));
     verify(variableInstanceQueryMock).variableScopeIdIn(TASK_A_ID, EXECUTION_A_ID, PROCESS_INSTANCE_A_ID, TASK_B_ID, EXECUTION_B_ID, TASK_C_ID, CASE_EXECUTION_A_ID, CASE_INSTANCE_A_ID);
-    verify(variableInstanceQueryMock, times(1)).variableNameIn(any());
+    verify(variableInstanceQueryMock, times(1)).variableNameIn(any(String[].class));
     verify(variableInstanceQueryMock).variableNameIn("foo", "bar");
     verify(variableInstanceQueryMock, times(1)).unlimitedList();
 
