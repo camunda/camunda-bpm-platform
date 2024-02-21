@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
              xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="sid-ac2984dd-4f48-4b66-a1a5-54d754c16033" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.0.0" targetNamespace="http://www.signavio.com/bpmn20">
   <error id="sid-c8a77357-a790-491b-922d-8d0e2257a5c3" errorCode="errorCode" name="ErrorCodeTest"/>
   <collaboration id="sid-4c24fb90-1d8f-44ff-ac51-b3154784ae47">
