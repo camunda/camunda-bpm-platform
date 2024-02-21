@@ -116,7 +116,8 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
       // install the service asynchronously.
       ServiceBuilder<?> sb = childTarget.addService();
       sb.requires(ServiceNames.forMscRuntimeContainerDelegate());
-//      Consumer<RuntimeContainerDelegate> provider1 = sb.provides(serviceName); // TODO is it needed?
+//      Consumer<RuntimeContainerDelegate> provider1 =
+      sb.provides(serviceName); // TODO is it needed?
       sb.setInitialMode(Mode.ACTIVE);
       sb.setInstance(processEngineRegistration.getRuntimeContainerDelegateSupplier().get());
       sb.install();

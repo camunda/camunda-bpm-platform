@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.container.impl.jboss.deployment.processor;
 
+import java.util.function.Consumer;
+
 import org.camunda.bpm.container.impl.jboss.deployment.marker.ProcessApplicationAttachments;
 import org.camunda.bpm.container.impl.jboss.service.ProcessApplicationModuleService;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
@@ -104,13 +106,13 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
     ModuleIdentifier identifyer = deploymentUnit.getAttachment(Attachments.MODULE_IDENTIFIER);
     String moduleName = identifyer.toString();
 
-    ProcessApplicationModuleService processApplicationModuleService = new ProcessApplicationModuleService();
     ServiceName serviceName = ServiceNames.forProcessApplicationModuleService(moduleName);
 
     ServiceBuilder<?> serviceBuilder = phaseContext.getRequirementServiceTarget().addService();
-    serviceBuilder.provides(serviceName); // TODO do we need the provider?
+    Consumer<ProcessApplicationModuleService> provider = serviceBuilder.provides(serviceName); // TODO do we need the provider?
     serviceBuilder.requires(phaseContext.getPhaseServiceName());
     serviceBuilder.setInitialMode(Mode.ACTIVE);
+    ProcessApplicationModuleService processApplicationModuleService = new ProcessApplicationModuleService(provider);
     serviceBuilder.setInstance(processApplicationModuleService);
     serviceBuilder.install();
 
