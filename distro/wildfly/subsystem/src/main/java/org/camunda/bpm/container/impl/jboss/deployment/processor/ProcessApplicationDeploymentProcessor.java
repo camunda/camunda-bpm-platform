@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.camunda.bpm.application.ProcessApplicationInterface;
@@ -100,7 +101,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     List<ServiceName> deploymentServiceNames = new ArrayList<>();
 
     ServiceBuilder<?> stopServiceBuilder = phaseContext.getRequirementServiceTarget().addService();
-    stopServiceBuilder.provides(paStopServiceName);
+    Consumer<ProcessApplicationStopService> paStopProvider = stopServiceBuilder.provides(paStopServiceName);
     stopServiceBuilder.requires(phaseContext.getPhaseServiceName());
     Supplier<BpmPlatformPlugins> platformPluginsSupplier = stopServiceBuilder.requires(ServiceNames.forBpmPlatformPlugins());
 
@@ -115,7 +116,8 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     ProcessApplicationStopService paStopService = new ProcessApplicationStopService(
         paComponentViewSupplierStopService,
         noViewApplicationSupplierStopService,
-        platformPluginsSupplier);
+        platformPluginsSupplier,
+        paStopProvider);
     stopServiceBuilder.setInitialMode(Mode.ACTIVE);
     stopServiceBuilder.setInstance(paStopService);
     stopServiceBuilder.install();
@@ -139,7 +141,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
         ServiceName deploymentServiceName = ServiceNames.forProcessApplicationDeploymentService(deploymentUnit.getName(), processArachiveName);
         ServiceBuilder<?> deploymentServiceBuilder = phaseContext.getRequirementServiceTarget().addService();
 
-        deploymentServiceBuilder.provides(deploymentServiceName);
+        Consumer<ProcessApplicationDeploymentService> paDeploymentProvider = deploymentServiceBuilder.provides(deploymentServiceName);
         deploymentServiceBuilder.requires(phaseContext.getPhaseServiceName());
         deploymentServiceBuilder.requires(paStopServiceName);
         Supplier<ProcessEngine> processEngineServiceSupplier = deploymentServiceBuilder.requires(processEngineServiceName);
@@ -165,7 +167,8 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
             executorSupplier,
             processEngineServiceSupplier,
             noViewProcessApplicationSupplier,
-            paComponentViewSupplier);
+            paComponentViewSupplier,
+            paDeploymentProvider);
         deploymentServiceBuilder.setInstance(deploymentService);
 
         deploymentServiceBuilder.install();
@@ -180,7 +183,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
 
     // register the managed process application start service
     ServiceBuilder<?> processApplicationStartServiceBuilder = phaseContext.getRequirementServiceTarget().addService();
-    processApplicationStartServiceBuilder.provides(paStartServiceName);
+    Consumer<ProcessApplicationStartService> paStartProvider =processApplicationStartServiceBuilder.provides(paStartServiceName);
 
     processApplicationStartServiceBuilder.requires(phaseContext.getPhaseServiceName());
     Supplier<BpmPlatformPlugins> platformPluginsSupplierStartService = processApplicationStartServiceBuilder.requires(ServiceNames.forBpmPlatformPlugins());
@@ -208,7 +211,8 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
         paComponentViewSupplier,
         noViewProcessApplication,
         defaultProcessEngineSupplier,
-        platformPluginsSupplierStartService);
+        platformPluginsSupplierStartService,
+        paStartProvider);
 
     processApplicationStartServiceBuilder.setInstance(paStartService);
     processApplicationStartServiceBuilder.install();

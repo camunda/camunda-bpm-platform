@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,7 +48,6 @@ import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.MethodInfo;
 import org.jboss.modules.Module;
 import org.jboss.msc.service.Service;
-import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
@@ -91,6 +91,8 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
 
   protected final Supplier<BpmPlatformPlugins> platformPluginsSupplier;
 
+  protected final Consumer<ProcessApplicationStartService> provider;
+
   protected AnnotationInstance preUndeployDescription;
   protected AnnotationInstance postDeployDescription;
 
@@ -107,7 +109,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       Supplier<ComponentView> paComponentViewSupplier,
       Supplier<ProcessApplicationInterface> noViewProcessApplication,
       Supplier<ProcessEngine> defaultProcessEngineSupplier,
-      Supplier<BpmPlatformPlugins> platformPluginsSupplier) {
+      Supplier<BpmPlatformPlugins> platformPluginsSupplier, Consumer<ProcessApplicationStartService> provider) {
     this.deploymentServiceNames = deploymentServiceNames;
     this.postDeployDescription = postDeployDescription;
     this.preUndeployDescription = preUndeployDescription;
@@ -116,10 +118,12 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     this.noViewProcessApplicationSupplier = noViewProcessApplication;
     this.defaultProcessEngineSupplier = defaultProcessEngineSupplier;
     this.platformPluginsSupplier = platformPluginsSupplier;
+    this.provider = provider;
   }
 
   @Override
   public void start(StartContext context) throws StartException {
+    provider.accept(this);
 
     ManagedReference reference = null;
     try {
@@ -170,10 +174,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       // if this service stops (at undeployment) the ManagedProcessApplication service is removed as well.
       ServiceName serviceName = ServiceNames.forManagedProcessApplication(processApplicationInfo.getName());
       MscManagedProcessApplication managedProcessApplication = new MscManagedProcessApplication(processApplicationInfo, processApplication.getReference());
-      ServiceBuilder<?> serviceBuilder = context.getChildTarget().addService();
-      serviceBuilder.provides(serviceName);
-      serviceBuilder.setInstance(managedProcessApplication);
-      serviceBuilder.install();
+      context.getChildTarget().addService(serviceName, managedProcessApplication).install();
 
     } catch (StartException e) {
       throw e;
@@ -196,6 +197,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
 
   @Override
   public void stop(StopContext context) {
+    provider.accept(null);
 
     ManagedReference reference = null;
     try {
@@ -265,7 +267,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
 
   }
 
-  protected Object[] getInjections(Method lifecycleMethod) {
+  protected Object[] getInjections(Method lifecycleMethod) {  // TODO check
     final Type[] parameterTypes = lifecycleMethod.getGenericParameterTypes();
     final List<Object> parameters = new ArrayList<Object>();
 

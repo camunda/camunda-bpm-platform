@@ -109,7 +109,7 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
     ServiceName serviceName = ServiceNames.forProcessApplicationModuleService(moduleName);
 
     ServiceBuilder<?> serviceBuilder = phaseContext.getRequirementServiceTarget().addService();
-    Consumer<ProcessApplicationModuleService> provider = serviceBuilder.provides(serviceName); // TODO do we need the provider?
+    Consumer<ProcessApplicationModuleService> provider = serviceBuilder.provides(serviceName);
     serviceBuilder.requires(phaseContext.getPhaseServiceName());
     serviceBuilder.setInitialMode(Mode.ACTIVE);
     ProcessApplicationModuleService processApplicationModuleService = new ProcessApplicationModuleService(provider);

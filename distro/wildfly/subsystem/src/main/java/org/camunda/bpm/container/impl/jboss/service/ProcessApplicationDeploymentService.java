@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,6 +68,7 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
   protected final Supplier<ProcessApplicationInterface> noViewProcessApplicationSupplier;
   // for view-exposing ProcessApplicationComponents
   protected final Supplier<ComponentView> paComponentViewSupplier;
+  protected final Consumer<ProcessApplicationDeploymentService> provider;
 
   /** the map of deployment resources obtained  through scanning */
   protected final Map<String,byte[]> deploymentMap;
@@ -85,7 +87,7 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
       Supplier<ExecutorService> executorSupplier,
       Supplier<ProcessEngine> processEngineInjector,
       Supplier<ProcessApplicationInterface> noViewProcessApplication,
-      Supplier<ComponentView> paComponentView) {
+      Supplier<ComponentView> paComponentView, Consumer<ProcessApplicationDeploymentService> provider) {
     this.deploymentMap = deploymentMap;
     this.processArchive = processArchive;
     this.module = module;
@@ -93,9 +95,11 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
     this.processEngineSupplier = processEngineInjector;
     this.noViewProcessApplicationSupplier = noViewProcessApplication;
     this.paComponentViewSupplier = paComponentView;
+    this.provider = provider;
   }
 
   public void start(final StartContext context) throws StartException {
+    provider.accept(this);
     context.asynchronous();
     executorSupplier.get().submit(new Runnable() {
       public void run() {
@@ -112,6 +116,7 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
   }
 
   public void stop(final StopContext context) {
+    provider.accept(null);
     context.asynchronous();
     executorSupplier.get().submit(new Runnable() {
       public void run() {

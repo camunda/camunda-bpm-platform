@@ -17,6 +17,7 @@
 package org.camunda.bpm.container.impl.jboss.service;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,13 +47,15 @@ public class ProcessApplicationStopService implements Service<ProcessApplication
   protected final Supplier<ComponentView> paComponentViewSupplier;
   protected final Supplier<ProcessApplicationInterface> noViewApplicationSupplier;
   protected final Supplier<BpmPlatformPlugins> platformPluginsSupplier;
+  protected final Consumer<ProcessApplicationStopService> provider;
 
   public ProcessApplicationStopService(Supplier<ComponentView> paComponentViewSupplier,
       Supplier<ProcessApplicationInterface> noViewApplicationSupplier,
-      Supplier<BpmPlatformPlugins> platformPluginsSupplier) {
+      Supplier<BpmPlatformPlugins> platformPluginsSupplier, Consumer<ProcessApplicationStopService> provider) {
     this.paComponentViewSupplier = paComponentViewSupplier;
     this.noViewApplicationSupplier = noViewApplicationSupplier;
     this.platformPluginsSupplier = platformPluginsSupplier;
+    this.provider = provider;
   }
   @Override
   public ProcessApplicationStopService getValue() throws IllegalStateException, IllegalArgumentException {
@@ -62,10 +65,12 @@ public class ProcessApplicationStopService implements Service<ProcessApplication
   @Override
   public void start(StartContext arg0) throws StartException {
     // nothing to do
+    provider.accept(this);
   }
 
   @Override
   public void stop(StopContext arg0) {
+    provider.accept(null);
 
     ManagedReference reference = null;
     try {
