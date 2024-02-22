@@ -90,6 +90,7 @@ engine-rest-unit-jersey-2:
   labels:
   - 'rest-api'
   nodeLabel: 'h2'
+  jdkVersion: 'openjdk-jdk-11-latest'
 engine-rest-unit-resteasy:
   directory: 'engine-rest/engine-rest'
   command: 'clean install -Presteasy'
@@ -98,6 +99,7 @@ engine-rest-unit-resteasy:
   labels:
   - 'rest-api'
   nodeLabel: 'h2'
+  jdkVersion: 'openjdk-jdk-11-latest'
 engine-rest-jakarta-unit-resteasy:
   directory: 'engine-rest/engine-rest-jakarta'
   command: 'clean install -Presteasy'
@@ -115,6 +117,7 @@ engine-rest-unit-compatibility-wildfly:
   labels:
   - 'rest-api'
   nodeLabel: 'h2'
+  jdkVersion: 'openjdk-jdk-11-latest'
 engine-rest-IT-embedded-wildfly26:
   directory: 'qa'
   command: 'clean install -Pwildfly26,h2,webapps-integration,embedded-engine-rest'
