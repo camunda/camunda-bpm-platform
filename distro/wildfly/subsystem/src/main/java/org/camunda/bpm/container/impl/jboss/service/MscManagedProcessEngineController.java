@@ -261,7 +261,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     serviceBuilder.requires(ServiceNames.forMscExecutorService());
 
     if(processEngineConfiguration.isDefault()) {
-      serviceBuilder.addAliases(ServiceNames.forDefaultProcessEngine()); // TODO can we remove it?
+//      serviceBuilder.addAliases(ServiceNames.forDefaultProcessEngine()); // TODO can we remove it?
     }
 
     processEngineConsumers.add(serviceBuilder.provides(name));

@@ -17,7 +17,6 @@
 package org.camunda.bpm.container.impl.jboss.service;
 
 import java.util.function.Consumer;
-
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
@@ -58,8 +57,8 @@ public class NoViewProcessApplicationStartService implements Service<ProcessAppl
     try {
       provider.accept(reference.getProcessApplication());
     } catch (ProcessApplicationUnavailableException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new IllegalStateException("Process application '" + reference.getName() + "' is not available during "
+          + NoViewProcessApplicationStartService.class + " start.", e);
     }
   }
 
