@@ -64,6 +64,9 @@ rem set "JAVA_OPTS=%JAVA_OPTS% -agentlib:jdwp=transport=dt_shmem,address=jboss,s
 rem # Use JBoss Modules lockless mode
 rem set "JAVA_OPTS=%JAVA_OPTS% -Djboss.modules.lockless=true"
 
+rem # Uncomment to enable the experimental JDK 11 support for ByteBuddy
+rem # ByteBuddy is the default bytecode provider of Hibernate ORM
+rem set "JAVA_OPTS=%JAVA_OPTS% -Dnet.bytebuddy.experimental=true"
 
 rem # Uncomment to run server in debug mode
 rem set "DEBUG_MODE=true"
@@ -75,4 +78,11 @@ rem set "SECMGR=true"
 rem # Uncomment this out to control garbage collection logging
 rem set "GC_LOG=true"
 
+rem # Uncomment and edit to use a custom java.security file to override all the Java security properties
+rem set "JAVA_OPTS=%JAVA_OPTS% -Djava.security.properties==C:\path\to\custom\java.security"
+
 :JAVA_OPTS_SET
+
+rem # Uncomment to add a Java agent. If an agent is added to the module options, then jboss-modules.jar is added as an agent
+rem # on the JVM. This allows things like the log manager or security manager to be configured before the agent is invoked.
+rem set "MODULE_OPTS=-javaagent:agent.jar"
