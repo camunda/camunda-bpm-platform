@@ -90,7 +90,7 @@ public class DeleteProcessInstanceUserOperationLogTest {
   }
 
   @Test
-  public void single() {
+  public void shouldProduceSingleOperationLog() {
     // given
     processEngineConfiguration.setLogEntriesPerSyncOperationLimit(1);
     testRule.deploy(instance);
@@ -101,9 +101,7 @@ public class DeleteProcessInstanceUserOperationLogTest {
     runtimeService.deleteProcessInstance(instance1.getId(), null);
 
     // then
-    List<UserOperationLogEntry> logs = historyService.createUserOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_DELETE).list();
-    assertThat(logs).hasSize(1);
-    UserOperationLogEntry logEntry = logs.get(0);
+    UserOperationLogEntry logEntry = historyService.createUserOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_DELETE).singleResult();
     assertThat(logEntry.getProcessInstanceId()).isEqualTo(instance1.getId());
     assertThat(logEntry.getProcessDefinitionId()).isEqualTo(instance1.getProcessDefinitionId());
     assertThat(logEntry.getProperty()).isNull();
@@ -111,7 +109,7 @@ public class DeleteProcessInstanceUserOperationLogTest {
   }
 
   @Test
-  public void multiDetail() {
+  public void shouldProduceMultipleOperationLogs() {
     // given
     processEngineConfiguration.setLogEntriesPerSyncOperationLimit(3);
     testRule.deploy(instance);
@@ -135,7 +133,7 @@ public class DeleteProcessInstanceUserOperationLogTest {
   }
 
   @Test
-  public void multiSummary() {
+  public void shouldProduceSummaryOperationLog() {
     // given
     processEngineConfiguration.setLogEntriesPerSyncOperationLimit(1);
     testRule.deploy(instance);
@@ -148,9 +146,7 @@ public class DeleteProcessInstanceUserOperationLogTest {
     runtimeService.deleteProcessInstances(List.of(instance1.getId(), instance2.getId(), instance3.getId()), null, false, true);
 
     // then
-    List<UserOperationLogEntry> logs = historyService.createUserOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_DELETE).list();
-    assertThat(logs).hasSize(1);
-    UserOperationLogEntry logEntry = logs.get(0);
+    UserOperationLogEntry logEntry = historyService.createUserOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_DELETE).singleResult();
     assertThat(logEntry.getProcessInstanceId()).isNull();
     assertThat(logEntry.getProcessDefinitionId()).isNull();
     assertThat(logEntry.getProperty()).isEqualTo("nrOfInstances");
