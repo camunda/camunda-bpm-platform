@@ -96,7 +96,7 @@
     </button>
   </div>
 
-  <div ng-show="status === 'SUCCESS'" class="container-fluid">
+  <div ng-show="status === 'SUCCESS' && showLinkToBatchProcess" class="container-fluid">
     <button class="btn btn-link" ng-click="close(null)">{{ 'CLOSE' | translate }}</button>
     <button type="submit"
       class="btn btn-primary"
@@ -104,6 +104,10 @@
     >
       {{ 'TIME_TO_LIVE_POPUP_BTN_OPEN' | translate}}
     </button>
+  </div>
+
+  <div ng-show="status === 'SUCCESS' && !showLinkToBatchProcess">
+    <button class="btn btn-primary" ng-click="close(null)">{{ 'OK' | translate }}</button>
   </div>
 
   <div ng-show="status === 'FAIL'" class="container-fluid">
