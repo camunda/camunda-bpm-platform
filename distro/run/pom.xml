@@ -18,13 +18,6 @@
   <dependencyManagement>
     <dependencies>
 
-      <!-- Explicit override Snakeyaml version before spring-boot-dependencies -->
-      <dependency>
-        <groupId>org.yaml</groupId>
-        <artifactId>snakeyaml</artifactId>
-        <version>${version.snakeyaml}</version>
-      </dependency>
-
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
