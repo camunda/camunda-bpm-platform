@@ -13,16 +13,15 @@
 
   <div ng-show="status === 'SUCCESS'" class="alert alert-info">
     <p>
-      <strong> 
         {{ 'TIME_TO_LIVE_POPUP_REMOVAL_TIME_NOT_UPDATED_INFO' | translate }}
-      </strong>   
-      <strong ng-show="showLinkToBatchProcess"> 
+      
+      <span ng-show="showLinkToBatchProcess"> 
         {{ 'TIME_TO_LIVE_POPUP_RUN_BATCH_JOB_INFO_START' | translate }}
         <a href="/camunda/app/cockpit/default/#/batch/operation">
           {{ 'TIME_TO_LIVE_POPUP_RUN_BATCH_JOB_INFO_LINK' | translate }}
         </a>
         {{ 'TIME_TO_LIVE_POPUP_RUN_BATCH_JOB_INFO_END' | translate }}
-      </strong>
+      </span>
     </p>
   </div>
 
