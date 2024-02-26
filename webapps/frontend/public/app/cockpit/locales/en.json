@@ -2487,7 +2487,7 @@
     "TIME_TO_LIVE_DAYS": "{{ttl}} days",
     "TIME_TO_LIVE_MESSAGE_ERR": "Failed to update history time to live.",
     "TIME_TO_LIVE_NULL": "null",
-    "TIME_TO_LIVE_POPUP_BTN_OPEN": "Open Batch Operation",
+    "TIME_TO_LIVE_POPUP_BTN_OPEN": "Update Removal Time",
     "TIME_TO_LIVE_POPUP_RADIO_CLEAR": "Clear Value",
     "TIME_TO_LIVE_POPUP_RADIO_CLEAR_TOOLTIP": "Sets the value to null",
     "TIME_TO_LIVE_POPUP_RADIO_UPDATE": "Update Value",
