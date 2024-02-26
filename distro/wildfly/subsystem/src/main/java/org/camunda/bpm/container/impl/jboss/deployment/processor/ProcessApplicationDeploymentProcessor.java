@@ -100,7 +100,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
 
     List<ServiceName> deploymentServiceNames = new ArrayList<>();
 
-    ServiceBuilder<?> stopServiceBuilder = phaseContext.getRequirementServiceTarget().addService();
+    ServiceBuilder<?> stopServiceBuilder = phaseContext.getRequirementServiceTarget().addService(paStopServiceName);
     Consumer<ProcessApplicationStopService> paStopProvider = stopServiceBuilder.provides(paStopServiceName);
     stopServiceBuilder.requires(phaseContext.getPhaseServiceName());
     Supplier<BpmPlatformPlugins> platformPluginsSupplier = stopServiceBuilder.requires(ServiceNames.forBpmPlatformPlugins());
@@ -139,7 +139,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
           processArachiveName = UUID.randomUUID().toString();
         }
         ServiceName deploymentServiceName = ServiceNames.forProcessApplicationDeploymentService(deploymentUnit.getName(), processArachiveName);
-        ServiceBuilder<?> deploymentServiceBuilder = phaseContext.getRequirementServiceTarget().addService();
+        ServiceBuilder<?> deploymentServiceBuilder = phaseContext.getRequirementServiceTarget().addService(deploymentServiceName);
 
         Consumer<ProcessApplicationDeploymentService> paDeploymentProvider = deploymentServiceBuilder.provides(deploymentServiceName);
         deploymentServiceBuilder.requires(phaseContext.getPhaseServiceName());
@@ -182,7 +182,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     AnnotationInstance preUndeploy = ProcessApplicationAttachments.getPreUndeployDescription(deploymentUnit);
 
     // register the managed process application start service
-    ServiceBuilder<?> processApplicationStartServiceBuilder = phaseContext.getRequirementServiceTarget().addService();
+    ServiceBuilder<?> processApplicationStartServiceBuilder = phaseContext.getRequirementServiceTarget().addService(paStartServiceName);
     Consumer<ProcessApplicationStartService> paStartProvider =processApplicationStartServiceBuilder.provides(paStartServiceName);
 
     processApplicationStartServiceBuilder.requires(phaseContext.getPhaseServiceName());

@@ -79,7 +79,7 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
     ServiceName serviceName = ServiceNames.forManagedProcessEngine(processEngineXml.getName());
 
     // get service builder
-    ServiceBuilder<?> serviceBuilder = serviceTarget.addService();
+    ServiceBuilder<?> serviceBuilder = serviceTarget.addService(serviceName);
 
     // make this service depend on the current phase -> makes sure it is removed with the phase service at undeployment
     serviceBuilder.requires(phaseContext.getPhaseServiceName());

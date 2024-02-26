@@ -62,7 +62,7 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
     }, OperationContext.Stage.RUNTIME);
 
     // create and register the MSC container delegate.
-    CapabilityServiceBuilder<?> processEngineBuilder = context.getCapabilityServiceTarget().addService();
+    CapabilityServiceBuilder<?> processEngineBuilder = context.getCapabilityServiceTarget().addService(ServiceNames.forMscRuntimeContainerDelegate());
     Consumer<RuntimeContainerDelegate> delegateProvider = processEngineBuilder.provides(ServiceNames.forMscRuntimeContainerDelegate());
     processEngineBuilder.setInitialMode(Mode.ACTIVE);
     MscRuntimeContainerDelegate processEngineService = new MscRuntimeContainerDelegate(delegateProvider);
@@ -71,7 +71,7 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     // discover and register Camunda Platform plugins
     BpmPlatformPlugins plugins = BpmPlatformPlugins.load(getClass().getClassLoader());
-    CapabilityServiceBuilder<?> pluginsBuilder =context.getCapabilityServiceTarget().addService();
+    CapabilityServiceBuilder<?> pluginsBuilder =context.getCapabilityServiceTarget().addService(ServiceNames.forBpmPlatformPlugins());
     Consumer<BpmPlatformPlugins> pluginsProvider = pluginsBuilder.provides(ServiceNames.forBpmPlatformPlugins());
     MscBpmPlatformPlugins managedPlugins = new MscBpmPlatformPlugins(plugins, pluginsProvider);
     pluginsBuilder.setInitialMode(Mode.ACTIVE);

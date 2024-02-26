@@ -33,6 +33,7 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController.Mode;
+import org.jboss.msc.service.ServiceName;
 
 
 /**
@@ -50,10 +51,11 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler {
     String acquisitionName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
 
     // start new service for job executor
-    ServiceBuilder<?> serviceBuilder = context.getCapabilityServiceTarget().addService();
+    ServiceName serviceName = ServiceNames.forMscRuntimeContainerJobExecutorService(acquisitionName);
+    ServiceBuilder<?> serviceBuilder = context.getCapabilityServiceTarget().addService(serviceName);
     serviceBuilder.requires(ServiceNames.forMscRuntimeContainerDelegate());
     serviceBuilder.requires(ServiceNames.forMscExecutorService());
-    Consumer<RuntimeContainerJobExecutor> provider = serviceBuilder.provides(ServiceNames.forMscRuntimeContainerJobExecutorService(acquisitionName));
+    Consumer<RuntimeContainerJobExecutor> provider = serviceBuilder.provides(serviceName);
     MscRuntimeContainerJobExecutor mscRuntimeContainerJobExecutor = new MscRuntimeContainerJobExecutor(provider);
 
     if (model.hasDefined(SubsystemAttributeDefinitons.PROPERTIES.getName())) {

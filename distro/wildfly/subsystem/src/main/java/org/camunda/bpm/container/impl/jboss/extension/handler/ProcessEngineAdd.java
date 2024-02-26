@@ -58,11 +58,11 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
   protected void installService(OperationContext context, ManagedProcessEngineMetadata processEngineConfiguration) {
 
     MscManagedProcessEngineController service = new MscManagedProcessEngineController(processEngineConfiguration);
-    ServiceName name = ServiceNames.forManagedProcessEngine(processEngineConfiguration.getEngineName());
+    ServiceName serviceName = ServiceNames.forManagedProcessEngine(processEngineConfiguration.getEngineName());
 
-    ServiceBuilder<?> serviceBuilder = context.getCapabilityServiceTarget().addService();
+    ServiceBuilder<?> serviceBuilder = context.getCapabilityServiceTarget().addService(serviceName);
 
-    service.initializeServiceBuilder(processEngineConfiguration, serviceBuilder, name, processEngineConfiguration.getJobExecutorAcquisitionName());
+    service.initializeServiceBuilder(processEngineConfiguration, serviceBuilder, serviceName, processEngineConfiguration.getJobExecutorAcquisitionName());
 
     serviceBuilder.setInstance(service);
     serviceBuilder.install();

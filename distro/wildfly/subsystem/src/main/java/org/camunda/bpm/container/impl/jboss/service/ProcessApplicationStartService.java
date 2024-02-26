@@ -48,6 +48,7 @@ import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.MethodInfo;
 import org.jboss.modules.Module;
 import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
@@ -174,7 +175,9 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       // if this service stops (at undeployment) the ManagedProcessApplication service is removed as well.
       ServiceName serviceName = ServiceNames.forManagedProcessApplication(processApplicationInfo.getName());
       MscManagedProcessApplication managedProcessApplication = new MscManagedProcessApplication(processApplicationInfo, processApplication.getReference());
-      context.getChildTarget().addService(serviceName, managedProcessApplication).install();
+      ServiceBuilder<?> sb = context.getChildTarget().addService(serviceName);
+      sb.setInstance(managedProcessApplication);
+      sb.install();
 
     } catch (StartException e) {
       throw e;

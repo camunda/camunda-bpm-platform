@@ -61,8 +61,9 @@ public class JobExecutorAdd extends AbstractAddStepHandler {
 
     performRuntimeThreadPool(context, model, jobExecutorThreadPoolName, jobExecutorThreadPoolServiceName);
 
-    ServiceBuilder<?> builder = context.getCapabilityServiceTarget().addService();
-    Consumer<ExecutorService> provider = builder.provides(ServiceNames.forMscExecutorService());
+    ServiceName serviceName = ServiceNames.forMscExecutorService();
+    ServiceBuilder<?> builder = context.getCapabilityServiceTarget().addService(serviceName);
+    Consumer<ExecutorService> provider = builder.provides(serviceName);
     Supplier<ManagedQueueExecutorService> supplier = builder.requires(jobExecutorThreadPoolServiceName);
     MscExecutorService service = new MscExecutorService(supplier, provider);
     builder.setInitialMode(Mode.ACTIVE);
