@@ -55,6 +55,7 @@ public class ActivityCancellationCmd extends AbstractProcessInstanceModification
     for (AbstractInstanceCancellationCmd cmd : commands) {
       cmd.setSkipCustomListeners(skipCustomListeners);
       cmd.setSkipIoMappings(skipIoMappings);
+      cmd.setExternallyTerminated(true);
       cmd.execute(commandContext);
     }
 
