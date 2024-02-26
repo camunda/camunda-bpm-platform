@@ -23,8 +23,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Date;
 import java.util.List;
-
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -33,9 +35,9 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 /**
@@ -372,5 +374,51 @@ public class ParallelGatewayTest extends PluggableProcessEngineTest {
 
     // then
     assertEquals(3, taskService.createTaskQuery().count());
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testParallelGatewayCancellationHistoryEvent() {
+    // given
+    // a process with one splitting and one merging parallel gateway and two parallel sequence flows between them
+    // one sequence flow has a wait state "Event_Wait", the other has none
+    testRule.deploy(Bpmn.createExecutableProcess("parallelProcess")
+        .startEvent()
+        .parallelGateway("Gateway_in")
+          .intermediateCatchEvent("Event_Wait")
+          .message("Message_1")
+        .parallelGateway("Gateway_out")
+        .endEvent()
+        .moveToNode("Gateway_in")
+        .connectTo("Gateway_out")
+        .done());
+
+    var processInstance = runtimeService.startProcessInstanceByKey("parallelProcess");
+
+    // when
+    // cancel "Event_Wait" first
+    // then cancel "Gateway_out" (merging parallel gateway)
+    this.runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelAllForActivity("Event_Wait")
+        .cancelAllForActivity("Gateway_out")
+        .execute();
+
+    Date currentTime = ClockUtil.now();
+
+    // then
+    // the whole process instance is canceled and history is produced
+    assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult()).isNull();
+    assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult()).isNotNull();
+
+    //
+    var historicActivityInstanceEventWait = this.historyService.createHistoricActivityInstanceQuery()
+        .activityId("Event_Wait")
+        .singleResult();
+    assertThat(historicActivityInstanceEventWait.getEndTime()).isCloseTo(currentTime, 2000);
+
+    var historicActivityInstanceMergingGateway = this.historyService.createHistoricActivityInstanceQuery()
+        .activityId("Gateway_out")
+        .singleResult();
+    assertThat(historicActivityInstanceMergingGateway.getEndTime()).isCloseTo(currentTime, 2000);
   }
 }
