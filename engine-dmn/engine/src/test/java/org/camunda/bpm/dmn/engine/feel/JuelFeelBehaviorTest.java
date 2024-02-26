@@ -16,9 +16,13 @@
  */
 package org.camunda.bpm.dmn.engine.feel;
 
+import java.util.Date;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
+import org.camunda.bpm.dmn.engine.test.DecisionResource;
+import org.camunda.bpm.dmn.feel.impl.FeelException;
 import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineFactoryImpl;
+import org.junit.Test;
 
 public class JuelFeelBehaviorTest extends FeelBehavior {
 
@@ -28,6 +32,27 @@ public class JuelFeelBehaviorTest extends FeelBehavior {
     configuration.setFeelEngineFactory(new FeelEngineFactoryImpl());
     configuration.init();
     return configuration;
+  }
+
+  /**
+   * For expression languages, so-called context functions can be used [1].
+   *
+   * This test ensures that context functions cannot be called in the
+   * juel as well as the scala-based implementation.
+   *
+   * [1] https://docs.camunda.org/manual/7.12/user-guide/process-engine/expression-language/#internal-context-functions
+   */
+  @Test
+  @DecisionResource(resource = "context_function.dmn")
+  public void shouldFailOnInternalContextFunctions() {
+    // given
+    getVariables().putValue("myDate", new Date());
+
+    // then
+    thrown.expect(FeelException.class);
+
+    // when
+    evaluateDecision().getSingleEntry();
   }
 
 }
