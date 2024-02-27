@@ -13,7 +13,7 @@
 
   <properties>
     <org.jboss.shrinkwrap.resolver.version>1.0.0-beta-5</org.jboss.shrinkwrap.resolver.version>
-    <version.json-path>2.8.0</version.json-path>
+    <version.json-path>2.9.0</version.json-path>
     <version.json-smart>2.4.10</version.json-smart>
     <version.accessors-smart>2.4.9</version.accessors-smart>
     <!-- generate a bom of compile time dependencies for the license book.
