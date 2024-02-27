@@ -234,8 +234,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
   }
 
   protected ComponentDescription getProcessApplicationComponent(DeploymentUnit deploymentUnit) {
-    ComponentDescription paComponentDescription = ProcessApplicationAttachments.getProcessApplicationComponent(deploymentUnit);
-    return paComponentDescription;
+    return ProcessApplicationAttachments.getProcessApplicationComponent(deploymentUnit);
   }
 
   protected ServiceName getProcessEngineServiceName(ProcessArchiveXml processArchive) {

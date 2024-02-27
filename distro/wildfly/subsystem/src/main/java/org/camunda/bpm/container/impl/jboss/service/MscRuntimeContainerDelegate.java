@@ -243,10 +243,6 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
 
   // internal implementation ///////////////////////////////
 
-  protected void createProcessEngineServiceJndiBindings() {
-
-  }
-
   protected void createJndiBindings() {
 
     final PlatformServiceReferenceFactory managedReferenceFactory = new PlatformServiceReferenceFactory(this);
