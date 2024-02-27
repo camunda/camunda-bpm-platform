@@ -30,7 +30,7 @@
     <version.uuid-generator>4.3.0</version.uuid-generator>
     <version.camunda.commons>1.13.0</version.camunda.commons>
     <version.camunda.connect>1.6.0</version.camunda.connect>
-    <version.camunda.spin>1.22.0</version.camunda.spin>
+    <version.camunda.spin>1.23.0</version.camunda.spin>
     <version.camunda.freemarker.template.engine>2.2.0</version.camunda.freemarker.template.engine>
     <version.feel-scala>1.17.5</version.feel-scala>
   </properties>
