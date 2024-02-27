@@ -28,7 +28,7 @@ import org.jboss.msc.service.ServiceName;
 
 /**
  * Provides the description and the implementation of the process-engine#remove operation.
- * 
+ *
  * @author Daniel Meyer
  * @author Christian Lipphardt
  */
@@ -36,6 +36,7 @@ public class ProcessEngineRemove extends AbstractRemoveStepHandler {
 
   public static final ProcessEngineRemove INSTANCE = new ProcessEngineRemove();
 
+  @Override
   protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
     String suffix = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
     ServiceName name = ServiceNames.forManagedProcessEngine(suffix);

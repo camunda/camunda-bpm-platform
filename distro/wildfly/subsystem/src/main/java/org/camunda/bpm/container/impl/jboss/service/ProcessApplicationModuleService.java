@@ -45,15 +45,18 @@ public class ProcessApplicationModuleService implements Service<ServiceTarget> {
     this.provider = provider;
   }
 
+  @Override
   public ServiceTarget getValue() throws IllegalStateException, IllegalArgumentException {
     return childTarget;
   }
 
+  @Override
   public void start(StartContext context) throws StartException {
     childTarget = context.getChildTarget();
     provider.accept(this);
   }
 
+  @Override
   public void stop(StopContext context) {
     provider.accept(null);
   }

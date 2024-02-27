@@ -61,6 +61,7 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
   public static String MODULE_IDENTIFYER_GRAAL_JS = "org.graalvm.js.js-scriptengine";
   public static String MODULE_IDENTIFYER_JUEL = "org.camunda.bpm.juel.camunda-juel";
 
+  @Override
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
 
     final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
@@ -139,6 +140,7 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
     moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, identifier, false, false, importServices, false));
   }
 
+  @Override
   public void undeploy(DeploymentUnit context) {
 
   }

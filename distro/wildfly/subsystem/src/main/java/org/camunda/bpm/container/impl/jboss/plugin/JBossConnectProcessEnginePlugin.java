@@ -26,7 +26,7 @@ public class JBossConnectProcessEnginePlugin extends AbstractProcessEnginePlugin
 
   @Override
   public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    ClassLoader classloader = ClassLoaderUtil.getClassloader(MscManagedProcessEngineController.class); 
+    ClassLoader classloader = ClassLoaderUtil.getClassloader(MscManagedProcessEngineController.class);
     Connectors.loadConnectors(classloader);
 
     processEngineConfiguration.setTelemetryHttpConnector(Connectors.getConnector(Connectors.HTTP_CONNECTOR_ID));

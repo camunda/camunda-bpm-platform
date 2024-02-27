@@ -64,10 +64,12 @@ public class MscManagedProcessEngine implements Service<ProcessEngine> {
     this.processEngine = processEngine;
   }
 
+  @Override
   public ProcessEngine getValue() throws IllegalStateException, IllegalArgumentException {
     return processEngine;
   }
 
+  @Override
   public void start(StartContext context) throws StartException {
     MscRuntimeContainerDelegate runtimeContainerDelegate = runtimeContainerDelegateSupplier.get();
     runtimeContainerDelegate.processEngineStarted(processEngine);
@@ -100,6 +102,7 @@ public class MscManagedProcessEngine implements Service<ProcessEngine> {
     bindingService.setMode(Mode.REMOVE);
   }
 
+  @Override
   public void stop(StopContext context) {
     MscRuntimeContainerDelegate runtimeContainerDelegate = runtimeContainerDelegateSupplier.get();
     runtimeContainerDelegate.processEngineStopped(processEngine);

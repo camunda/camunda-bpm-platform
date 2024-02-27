@@ -98,10 +98,12 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
     this.provider = provider;
   }
 
+  @Override
   public void start(final StartContext context) throws StartException {
     provider.accept(this);
     context.asynchronous();
     executorSupplier.get().submit(new Runnable() {
+      @Override
       public void run() {
         try {
           performDeployment();
@@ -115,10 +117,12 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
     });
   }
 
+  @Override
   public void stop(final StopContext context) {
     provider.accept(null);
     context.asynchronous();
     executorSupplier.get().submit(new Runnable() {
+      @Override
       public void run() {
         try {
           performUndeployment();
@@ -285,6 +289,7 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
     }
   }
 
+  @Override
   public ProcessApplicationDeploymentService getValue() throws IllegalStateException, IllegalArgumentException {
     return this;
   }

@@ -48,24 +48,29 @@ public class MscExecutorService implements Service<MscExecutorService>, Executor
     this.provider = provider;
   }
 
+  @Override
   public MscExecutorService getValue() throws IllegalStateException, IllegalArgumentException {
     return this;
   }
 
+  @Override
   public void start(StartContext context) throws StartException {
     // nothing to do
     provider.accept(this);
   }
 
+  @Override
   public void stop(StopContext context) {
     // nothing to do
     provider.accept(null);
   }
 
+  @Override
   public Runnable getExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
     return new ExecuteJobsRunnable(jobIds, processEngine);
   }
 
+  @Override
   public boolean schedule(Runnable runnable, boolean isLongRunning) {
 
     if(isLongRunning) {

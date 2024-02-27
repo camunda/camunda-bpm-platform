@@ -45,6 +45,7 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
   // this can happen at the beginning of the phase
   public static final int PRIORITY = 0x0000;
 
+  @Override
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
 
     final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
@@ -106,6 +107,7 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
         processEngineXml.getPlugins());
   }
 
+  @Override
   public void undeploy(DeploymentUnit deploymentUnit) {
 
   }

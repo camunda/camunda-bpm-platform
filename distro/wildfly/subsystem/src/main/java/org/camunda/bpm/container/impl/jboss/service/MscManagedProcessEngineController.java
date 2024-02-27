@@ -49,6 +49,7 @@ import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
+
 import jakarta.transaction.TransactionManager;
 
 
@@ -90,9 +91,11 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     this.processEngineMetadata = processEngineConfiguration;
   }
 
+  @Override
   public void start(final StartContext context) throws StartException {
     context.asynchronous();
     executorSupplier.get().submit(new Runnable() {
+      @Override
       public void run() {
         try {
           startInternal(context);
@@ -109,6 +112,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     });
   }
 
+  @Override
   public void stop(final StopContext context) {
     stopInternal(context);
   }
@@ -135,6 +139,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     // this exploits a hack in MyBatis allowing it to use the TCCL to load the
     // mapping files from the process engine module
     Tccl.runUnderClassloader(new Operation<Void>() {
+      @Override
       public Void run() {
         startProcessEngine();
         return null;

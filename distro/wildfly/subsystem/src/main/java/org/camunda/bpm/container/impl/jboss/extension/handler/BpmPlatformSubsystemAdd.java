@@ -19,7 +19,11 @@ package org.camunda.bpm.container.impl.jboss.extension.handler;
 import java.util.function.Consumer;
 
 import org.camunda.bpm.container.RuntimeContainerDelegate;
-import org.camunda.bpm.container.impl.jboss.deployment.processor.*;
+import org.camunda.bpm.container.impl.jboss.deployment.processor.ModuleDependencyProcessor;
+import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessApplicationDeploymentProcessor;
+import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessApplicationProcessor;
+import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessEngineStartProcessor;
+import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessesXmlProcessor;
 import org.camunda.bpm.container.impl.jboss.extension.ModelConstants;
 import org.camunda.bpm.container.impl.jboss.service.MscBpmPlatformPlugins;
 import org.camunda.bpm.container.impl.jboss.service.MscRuntimeContainerDelegate;
@@ -52,6 +56,7 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     // add deployment processors
     context.addStep(new AbstractDeploymentChainStep() {
+      @Override
       public void execute(DeploymentProcessorTarget processorTarget) {
         processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.PARSE, ProcessApplicationProcessor.PRIORITY, new ProcessApplicationProcessor());
         processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.DEPENDENCIES, ModuleDependencyProcessor.PRIORITY, new ModuleDependencyProcessor());

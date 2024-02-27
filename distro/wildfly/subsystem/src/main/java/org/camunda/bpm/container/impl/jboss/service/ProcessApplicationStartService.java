@@ -144,8 +144,8 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       processApplicationInfo.setName(processApplication.getName());
       processApplicationInfo.setProperties(processApplication.getProperties());
 
-      referencedProcessEngines = new HashSet<ProcessEngine>();
-      List<ProcessApplicationDeploymentInfo> deploymentInfos = new ArrayList<ProcessApplicationDeploymentInfo>();
+      referencedProcessEngines = new HashSet<>();
+      List<ProcessApplicationDeploymentInfo> deploymentInfos = new ArrayList<>();
 
       for (ServiceName deploymentServiceName : deploymentServiceNames) {
 
@@ -272,7 +272,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
 
   protected Object[] getInjections(Method lifecycleMethod) {  // TODO check
     final Type[] parameterTypes = lifecycleMethod.getGenericParameterTypes();
-    final List<Object> parameters = new ArrayList<Object>();
+    final List<Object> parameters = new ArrayList<>();
 
     for (Type parameterType : parameterTypes) {
 
@@ -301,7 +301,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
 
         // support injection of List<ProcessEngine>
         if(actualTypeArguments.length==1 && ProcessEngine.class.isAssignableFrom((Class<?>) actualTypeArguments[0])) {
-          parameters.add(new ArrayList<ProcessEngine>(referencedProcessEngines));
+          parameters.add(new ArrayList<>(referencedProcessEngines));
           injectionResolved = true;
         }
       }

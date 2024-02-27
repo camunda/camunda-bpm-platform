@@ -17,6 +17,7 @@
 package org.camunda.bpm.container.impl.jboss.service;
 
 import java.util.function.Consumer;
+
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
@@ -44,6 +45,7 @@ public class NoViewProcessApplicationStartService implements Service<ProcessAppl
     this.provider = provider;
   }
 
+  @Override
   public ProcessApplicationInterface getValue() throws IllegalStateException, IllegalArgumentException {
     try {
       return reference.getProcessApplication();
@@ -53,6 +55,7 @@ public class NoViewProcessApplicationStartService implements Service<ProcessAppl
     }
   }
 
+  @Override
   public void start(StartContext context) throws StartException {
     try {
       provider.accept(reference.getProcessApplication());
@@ -62,6 +65,7 @@ public class NoViewProcessApplicationStartService implements Service<ProcessAppl
     }
   }
 
+  @Override
   public void stop(StopContext context) {
     provider.accept(null);
   }
