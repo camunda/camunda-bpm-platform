@@ -76,7 +76,7 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     // discover and register Camunda Platform plugins
     BpmPlatformPlugins plugins = BpmPlatformPlugins.load(getClass().getClassLoader());
-    CapabilityServiceBuilder<?> pluginsBuilder =context.getCapabilityServiceTarget().addService(ServiceNames.forBpmPlatformPlugins());
+    CapabilityServiceBuilder<?> pluginsBuilder = context.getCapabilityServiceTarget().addService(ServiceNames.forBpmPlatformPlugins());
     Consumer<BpmPlatformPlugins> pluginsProvider = pluginsBuilder.provides(ServiceNames.forBpmPlatformPlugins());
     MscBpmPlatformPlugins managedPlugins = new MscBpmPlatformPlugins(plugins, pluginsProvider);
     pluginsBuilder.setInitialMode(Mode.ACTIVE);

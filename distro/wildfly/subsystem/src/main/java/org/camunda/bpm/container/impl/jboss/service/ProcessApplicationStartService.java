@@ -270,7 +270,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
 
   }
 
-  protected Object[] getInjections(Method lifecycleMethod) {  // TODO check
+  protected Object[] getInjections(Method lifecycleMethod) {
     final Type[] parameterTypes = lifecycleMethod.getGenericParameterTypes();
     final List<Object> parameters = new ArrayList<>();
 
