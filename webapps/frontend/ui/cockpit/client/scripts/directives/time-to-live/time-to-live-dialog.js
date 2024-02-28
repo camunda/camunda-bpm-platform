@@ -67,7 +67,6 @@ const Controller = [
         .then(function() {
           $scope.status = 'SUCCESS';
           $scope.definition.historyTimeToLive = $scope.ttl;
-          customOnChange();
 
           Notifications.addMessage({
             status: $translate.instant('TIME_TO_LIVE_POPUP_STATE_STATUS'),
