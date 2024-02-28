@@ -84,10 +84,11 @@ const Controller = [
         });
     };
 
-    const customOnChange = () => {
+    $scope.closeAndCustomOnChange = () => {
       if (typeof $scope.customOnChange === 'function') {
         $scope.customOnChange();
       }
+      $scope.close(null);
     };
 
     const getAndCorrectTimeToLiveValue = () => {
