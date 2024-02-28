@@ -31,6 +31,7 @@ module.exports = [
       template: template,
       scope: {
         definition: '=timeToLive',
+        customOnChange: '=onChange',
         resource: '@'
       },
       link: function($scope) {
