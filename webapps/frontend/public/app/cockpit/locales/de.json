@@ -2487,7 +2487,7 @@
     "TIME_TO_LIVE_DAYS": "{{ttl}} Tage",
     "TIME_TO_LIVE_MESSAGE_ERR": "Fehler beim Aktualisieren des Lebenszyklus historischer Daten.",
     "TIME_TO_LIVE_NULL": "null",
-    "TIME_TO_LIVE_POPUP_BTN_OPEN": "Update Removal Time",
+    "TIME_TO_LIVE_POPUP_BTN_OPEN": "Löschzeit aktualisieren",
     "TIME_TO_LIVE_POPUP_RADIO_CLEAR": "Wert zurücksetzen",
     "TIME_TO_LIVE_POPUP_RADIO_CLEAR_TOOLTIP": "Setzt den Wert auf \"null\"",
     "TIME_TO_LIVE_POPUP_RADIO_UPDATE": "Wert aktualisieren",

@@ -13,7 +13,7 @@
 
   <div ng-show="status === 'SUCCESS'" class="alert alert-info">
     <p>
-        {{ 'TIME_TO_LIVE_POPUP_REMOVAL_TIME_NOT_UPDATED_INFO' | translate }}
+      {{ 'TIME_TO_LIVE_POPUP_REMOVAL_TIME_NOT_UPDATED_INFO' | translate }}
       
       <span ng-show="showLinkToBatchProcess"> 
         {{ 'TIME_TO_LIVE_POPUP_RUN_BATCH_JOB_INFO_START' | translate }}
@@ -100,8 +100,7 @@
     <button class="btn btn-link" ng-click="customOnChange()">{{ 'CLOSE' | translate }}</button>
     <button type="submit"
       class="btn btn-primary"
-      ng-click="openBatchOperation()"
-    >
+      ng-click="openBatchOperation()">
       {{ 'TIME_TO_LIVE_POPUP_BTN_OPEN' | translate}}
     </button>
   </div>
