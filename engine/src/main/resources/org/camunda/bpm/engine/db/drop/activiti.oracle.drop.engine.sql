@@ -131,6 +131,9 @@ alter table ACT_RU_VARIABLE
 alter table ACT_RU_EXT_TASK
     drop CONSTRAINT ACT_FK_EXT_TASK_EXE;
 
+alter table ACT_RU_EXT_TASK
+    drop index ACT_IDX_EXT_TASK_PROCINST;
+
 alter table ACT_RU_BATCH
     drop CONSTRAINT ACT_FK_BATCH_SEED_JOB_DEF;
 

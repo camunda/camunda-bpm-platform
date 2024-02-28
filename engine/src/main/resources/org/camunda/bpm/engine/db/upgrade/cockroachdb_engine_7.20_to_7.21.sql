@@ -20,5 +20,11 @@
 alter table ACT_RU_EXT_TASK
   add column CREATE_TIME_ timestamp;
 
+create index ACT_IDX_EXT_TASK_PROCINST on ACT_RU_EXT_TASK(PROC_INST_ID_);
+
+create index ACT_IDX_HI_JOB_LOG_DEPLOYMENT_ID on ACT_HI_JOB_LOG(DEPLOYMENT_ID_);
+
+create index ACT_IDX_HI_ACT_INST_PROC_DEF_ID on ACT_HI_ACTINST(PROC_DEF_ID_);
+
 insert into ACT_GE_SCHEMA_LOG
 values ('1000', CURRENT_TIMESTAMP, '7.21.0');

@@ -112,6 +112,9 @@ alter table ACT_RU_BATCH
 alter table ACT_RU_EXT_TASK
     drop foreign key ACT_FK_EXT_TASK_ERROR_DETAILS;
 
+alter table ACT_RU_EXT_TASK
+    drop index ACT_IDX_EXT_TASK_PROCINST;
+
 alter table ACT_RU_VARIABLE
     drop foreign key ACT_FK_VAR_BATCH;
 

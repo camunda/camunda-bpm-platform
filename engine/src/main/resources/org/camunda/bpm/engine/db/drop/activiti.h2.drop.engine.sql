@@ -109,6 +109,9 @@ alter table ACT_RU_EXT_TASK
 alter table ACT_RU_BATCH
     drop constraint ACT_FK_BATCH_SEED_JOB_DEF;
 
+alter table ACT_RU_EXT_TASK
+    drop index ACT_IDX_EXT_TASK_PROCINST;
+
 alter table ACT_RU_BATCH
     drop constraint ACT_FK_BATCH_MONITOR_JOB_DEF;
 

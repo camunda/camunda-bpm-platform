@@ -112,6 +112,9 @@ alter table ACT_RU_INCIDENT
 alter table ACT_RU_EXT_TASK
     drop FOREIGN KEY ACT_FK_EXT_TASK_EXE;
 
+alter table ACT_RU_EXT_TASK
+    drop index ACT_IDX_EXT_TASK_PROCINST;
+
 alter table ACT_RU_BATCH
     drop FOREIGN KEY ACT_FK_BATCH_SEED_JOB_DEF;
 
