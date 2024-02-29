@@ -102,8 +102,8 @@ const Controller = [
 
     // sets loading state to error and updates error message
     const setLoadingError = error => {
-      $scope.loadingState = 'ERROR';
-      $scope.loadingError = error;
+      $scope.loadingStateMonthly = $scope.loadingStateAnnual = 'ERROR';
+      $scope.loadingErrorMonthly = $scope.loadingErrorAnnual = error;
     };
 
     // called every time date input changes
@@ -125,14 +125,16 @@ const Controller = [
     };
 
     const formatSubscriptionYear = label => {
-      // TODO i18n
       const date = moment($scope.startDate).year(label);
       const endDate = date.clone().add(1, 'years');
-      if (endDate.isAfter(moment())) {
-        return `${date.format(fmtYear)} up to today`;
-      } else {
-        return `${date.format(fmtYear)} to ${endDate.format(fmtYear)}`;
-      }
+      const translationId = endDate.isAfter(moment())
+        ? 'EXECUTION_METRICS_ANNUAL_FORMAT_CURRENT'
+        : 'EXECUTION_METRICS_ANNUAL_FORMAT';
+
+      return $translate.instant(translationId, {
+        from: date.format(fmtYear),
+        to: endDate.format(fmtYear)
+      });
     };
 
     const createGroupLabel = (year, month) => {

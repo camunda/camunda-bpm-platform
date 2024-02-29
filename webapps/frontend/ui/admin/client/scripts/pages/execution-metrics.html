@@ -28,7 +28,7 @@
   <div class="row">
     <div class="form-group col-xs-10">
       <label for="startDate">
-        {{ 'Contract start date:' | translate }}
+        {{ 'EXECUTION_METRICS_START_DATE' | translate }}
       </label>
       <div>
         <span cam-widget-inline-field
@@ -59,15 +59,14 @@
   <div class="row">
     <div class="col-xs-8">
       <h4 class="pull-left">
-        <!-- TODO i18n -->
-        {{ 'Usage last 12 months by month' | translate }}
+        {{ 'EXECUTION_METRICS_MONTHLY_TABLE_TITLE' | translate }}
       </h4>
     </div>
     <div class="col-xs-4">
       <div class="pull-right">
         <label class="checkbox">
           <input type="checkbox" ng-model="displayLegacyMetrics">
-          {{ 'Display legacy metrics (FNI/EDE)' | translate }}
+          {{ 'EXECUTION_METRICS_SHOW_LEGACY' | translate }}
         </label>
       </div>
     </div>
@@ -81,13 +80,10 @@
                ng-class="{'without-legacy': !displayLegacyMetrics}">
           <thead>
           <tr>
-            <th>{{ 'Subscription month' | translate }}</th>
+            <th></th>
             <th class="metric-header">PI</th>
             <th class="metric-header">DI</th>
-            <th class="metric-header">TU
-              <span class="glyphicon glyphicon-info-sign"
-                    uib-tooltip="{{ 'Task user metric shows an accumulated value over the contract months.' | translate }}"></span>
-            </th>
+            <th class="metric-header">TU</th>
             <th class="metric-header" ng-show="displayLegacyMetrics">FNI</th>
             <th class="metric-header" ng-show="displayLegacyMetrics">EDE</th>
           </tr>
@@ -119,13 +115,13 @@
         <table class="cam-table metrics-annual">
           <thead>
           <tr>
-            <th>{{ 'Subscription year' | translate }}</th>
+            <th></th>
             <th class="metric-header">PI</th>
             <th class="metric-header">DI</th>
             <th class="metric-header">TU</th>
             <th class="metric-header">FNI</th>
             <th class="metric-header">EDE</th>
-            <th class="metric-action-header">{{ 'Copy' | translate }}</th>
+            <th class="metric-action-header">{{ 'EXECUTION_METRICS_COPY_HEADER' | translate }}</th>
           </tr>
           </thead>
           <tbody>
@@ -138,7 +134,7 @@
             <td class="metric-row">{{metric['executed-decision-elements'].sumFmt}}</td>
             <td class="metric-action-value">
               <span class="hovered" cam-widget-clipboard="getClipboardText(metric)"
-                    tooltip-text="{{ 'Copy with diagnostics' | translate }}"></span>
+                    tooltip-text="{{ 'EXECUTION_METRICS_COPY_TOOLTIP' | translate }}"></span>
             </td>
           </tr>
           </tbody>
