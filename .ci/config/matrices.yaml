@@ -12,6 +12,7 @@ engine-webapp-unit:
   - 'postgresql_160'
   - 'aws_aurora_postgresql_13'
   - 'aws_aurora_postgresql_14'
+  - 'aws_aurora_postgresql_15'
   - 'mariadb_106'
   - 'mysql_80'
   - 'oracle_19'
@@ -32,7 +33,7 @@ daily-stages:
   databases:
 # daily-stages.databases should include the latest version for each supported database
   - 'postgresql_160'
-  - 'aws_aurora_postgresql_14'
+  - 'aws_aurora_postgresql_15'
   - 'mariadb_106'
   - 'mysql_80'
   - 'oracle_19'
