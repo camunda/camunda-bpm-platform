@@ -28,7 +28,14 @@
         <resource-root path="h2-@version.h2@.jar"/>
     </resources>
     <dependencies>
-        <module name="javax.api"/>
+        <module name="java.compiler"/>
+        <module name="java.desktop"/>
+        <module name="java.instrument"/>
+        <module name="java.logging"/>
+        <module name="java.management"/>
+        <module name="java.naming"/>
+        <module name="java.scripting"/>
+        <module name="java.sql"/>
         <module name="jakarta.transaction.api"/>
         <module name="jakarta.servlet.api" optional="true"/>
     </dependencies>
