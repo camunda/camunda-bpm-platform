@@ -100,6 +100,12 @@
           </tbody>
         </table>
       </div>
+      <div class="col-xs-12"
+           ng-style="{display: loadingStateMonthly !== 'LOADING' ? 'block' : 'none'}">
+        <div class="monthly-metrics-chart">
+          <canvas id="monthly-metrics-chart-canvas"></canvas>
+        </div>
+      </div>
     </div>
   </div>
 
