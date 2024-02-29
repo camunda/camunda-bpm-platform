@@ -30,6 +30,6 @@
     </resources>
 
     <dependencies>
-        <module name="javax.api" />
+        <module name="java.base" />
     </dependencies>
 </module>
