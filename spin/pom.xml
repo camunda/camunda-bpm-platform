@@ -31,7 +31,7 @@
     <jaxb-impl.version>2.3.6</jaxb-impl.version>
     <jruby.version>9.1.17.0</jruby.version>
     <json-junit-fluent.version>1.1.6</json-junit-fluent.version>
-    <json-path.version>2.8.0</json-path.version>
+    <json-path.version>2.9.0</json-path.version>
     <junit.version>4.13.1</junit.version>
     <jython.version>2.5.3</jython.version>
     <logback.version>1.2.11</logback.version>
