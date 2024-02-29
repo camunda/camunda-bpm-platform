@@ -4,7 +4,10 @@
   </resources>
 
   <dependencies>
-    <module name="javax.api"/>
+    <module name="java.base" />
+    <module name="java.compiler" />
+    <module name="java.desktop" />
+    <module name="java.logging"/>
     
     <module name="org.camunda.commons.camunda-commons-utils" />
     
