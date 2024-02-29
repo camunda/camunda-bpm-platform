@@ -3,4 +3,9 @@
     <resource-root path="jackson-core-@version.jackson@.jar" />
   </resources>
 
+  <dependencies>
+
+    <module name="java.base" />
+
+  </dependencies>
 </module>

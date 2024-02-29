@@ -5,6 +5,7 @@
 
   <dependencies>
 
+    <module name="java.base" />
     <module name="com.fasterxml.jackson.core.jackson-core" slot="@version.jackson@" />
 
   </dependencies>

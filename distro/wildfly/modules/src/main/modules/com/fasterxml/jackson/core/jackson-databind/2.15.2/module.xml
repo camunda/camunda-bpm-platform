@@ -5,6 +5,7 @@
 
   <dependencies>
 
+    <module name="java.base" />
     <module name="java.desktop"/>
     <module name="java.logging"/>
     <module name="java.sql"/>
