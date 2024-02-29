@@ -24,19 +24,20 @@
 
 <module xmlns="urn:jboss:module:1.3" name="com.h2database.h2">
 
-    <resources>
-        <resource-root path="h2-@version.h2@.jar"/>
-    </resources>
-    <dependencies>
-        <module name="java.compiler"/>
-        <module name="java.desktop"/>
-        <module name="java.instrument"/>
-        <module name="java.logging"/>
-        <module name="java.management"/>
-        <module name="java.naming"/>
-        <module name="java.scripting"/>
-        <module name="java.sql"/>
-        <module name="jakarta.transaction.api"/>
-        <module name="jakarta.servlet.api" optional="true"/>
-    </dependencies>
+  <resources>
+    <resource-root path="h2-@version.h2@.jar"/>
+  </resources>
+  <dependencies>
+    <module name="java.base"/>
+    <module name="java.compiler"/>
+    <module name="java.desktop"/>
+    <module name="java.instrument"/>
+    <module name="java.management"/>
+    <module name="java.naming"/>
+    <module name="java.scripting"/>
+    <module name="java.sql"/>
+    <module name="jdk.net"/>
+    <module name="jakarta.transaction.api"/>
+    <module name="jakarta.servlet.api" optional="true"/>
+  </dependencies>
 </module>
