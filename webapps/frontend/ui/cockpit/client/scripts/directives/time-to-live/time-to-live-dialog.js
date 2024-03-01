@@ -84,13 +84,6 @@ const Controller = [
         });
     };
 
-    $scope.closeAndCustomOnChange = () => {
-      if (typeof $scope.customOnChange === 'function') {
-        $scope.customOnChange();
-      }
-      $scope.close(null);
-    };
-
     const getAndCorrectTimeToLiveValue = () => {
       if ($scope.definition.historyTimeToLive === null) {
         return null;

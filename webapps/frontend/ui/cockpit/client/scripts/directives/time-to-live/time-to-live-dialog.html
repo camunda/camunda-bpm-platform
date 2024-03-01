@@ -93,7 +93,7 @@
   </div>
 
   <div ng-show="status === 'SUCCESS' && showLinkToBatchProcess" class="container-fluid">
-    <button class="btn btn-link" ng-click="closeAndCustomOnChange()">{{ 'CLOSE' | translate }}</button>
+    <button class="btn btn-link" ng-click="close(true)">{{ 'CLOSE' | translate }}</button>
     <button type="submit"
       class="btn btn-primary"
       ng-click="openBatchOperation()">
@@ -102,7 +102,7 @@
   </div>
 
   <div ng-show="status === 'SUCCESS' && !showLinkToBatchProcess">
-    <button class="btn btn-primary" ng-click="closeAndCustomOnChange()">{{ 'OK' | translate }}</button>
+    <button class="btn btn-primary" ng-click="close(true)">{{ 'OK' | translate }}</button>
   </div>
 
   <div ng-show="status === 'FAIL'" class="container-fluid">
