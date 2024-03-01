@@ -40,11 +40,11 @@ const metrics = {
 };
 const localConfContractStartDate = 'metricsContractStartDate';
 const datasetMetricColors = {
-  PI: 'rgba(255, 99, 132, 0.8)',
-  DI: 'rgba(255, 159, 64, 0.8)',
-  TU: 'rgba(255, 205, 86, 0.8)',
-  FNI: 'rgba(75, 192, 192, 0.8)',
-  EDE: 'rgba(54, 162, 235, 0.8)'
+  PI: 'hsl(230, 70%, 41%)',
+  DI: 'hsl(302, 70%, 41%)',
+  TU: 'hsl(14, 70%, 41%)',
+  FNI: 'hsl(86, 70%, 41%)',
+  EDE: 'hsl(158, 70%, 41%)'
 };
 
 const Controller = [
@@ -142,8 +142,7 @@ const Controller = [
         return {
           label: metricsKey,
           data: data,
-          backgroundColor: datasetMetricColors[metricsKey],
-          borderColor: 'rgba(0, 0, 0, 1)'
+          backgroundColor: datasetMetricColors[metricsKey]
         };
       };
 
