@@ -18,7 +18,7 @@ package org.camunda.bpm.admin.resource;
 
 import org.camunda.bpm.admin.Admin;
 import org.camunda.bpm.admin.plugin.spi.AdminPlugin;
-import org.camunda.bpm.cockpit.db.QueryService;
+import org.camunda.bpm.webapp.db.QueryService;
 import org.camunda.bpm.webapp.plugin.resource.AbstractAppPluginResource;
 
 /**

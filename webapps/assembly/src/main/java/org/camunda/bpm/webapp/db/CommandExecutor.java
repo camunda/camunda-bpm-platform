@@ -14,27 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.admin;
+package org.camunda.bpm.webapp.db;
 
-import org.camunda.bpm.admin.plugin.spi.AdminPlugin;
-import org.camunda.bpm.webapp.db.QueryService;
-import org.camunda.bpm.webapp.AppRuntimeDelegate;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 
 /**
- * The admin application service runtime delegate. Provides access to the
- * application services of the admin application.
  *
- * @author Daniel Meyer
- *
+ * @author Nico Rehwaldt
  */
-public interface AdminRuntimeDelegate extends AppRuntimeDelegate<AdminPlugin> {
+public interface CommandExecutor {
 
   /**
-   * Returns a configured {@link QueryService} to execute custom
-   * statements to the corresponding process engine.
-   * @param processEngineName
-   * @return a {@link QueryService}
+   * Execute the given command and return the result
+   * of the execution
+   *
+   * @param <T>
+   * @param command
+   *
+   * @return
    */
-  QueryService getQueryService(String processEngineName);
-
+  public <T> T executeCommand(Command<T> command);
 }

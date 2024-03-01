@@ -17,7 +17,7 @@
 package org.camunda.bpm.admin.impl.plugin.base.dto;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.cockpit.rest.dto.AbstractRestQueryParametersDto;
+import org.camunda.bpm.webapp.rest.dto.AbstractRestQueryParametersDto;
 import org.camunda.bpm.engine.impl.metrics.util.MetricsUtil;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;

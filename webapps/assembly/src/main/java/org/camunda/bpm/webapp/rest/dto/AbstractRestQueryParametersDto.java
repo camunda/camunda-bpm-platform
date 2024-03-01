@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.rest.dto;
+package org.camunda.bpm.webapp.rest.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.cockpit.db.QueryParameters;
-import org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper;
+import org.camunda.bpm.webapp.db.QueryParameters;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.camunda.bpm.engine.rest.dto.converter.JacksonAwareStringToTypeConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringToTypeConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
@@ -63,7 +63,8 @@ public abstract class AbstractRestQueryParametersDto<T> extends QueryParameters 
   // required for populating via jackson
   public AbstractRestQueryParametersDto() { }
 
-  public AbstractRestQueryParametersDto(MultivaluedMap<String, String> queryParameters) {
+  public AbstractRestQueryParametersDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+    this.objectMapper = objectMapper;
     for (Entry<String, List<String>> param : queryParameters.entrySet()) {
       String key = param.getKey();
       String value = param.getValue().iterator().next();
@@ -135,19 +136,18 @@ public abstract class AbstractRestQueryParametersDto<T> extends QueryParameters 
   protected void setValueBasedOnAnnotation(String key, String value) {
     List<Method> matchingMethods = findMatchingAnnotatedMethods(key);
     for (Method method : matchingMethods) {
-      Class<? extends StringToTypeConverter<?>> converterClass = findAnnotatedTypeConverter(method);
+      Class<? extends JacksonAwareStringToTypeConverter<?>> converterClass = findAnnotatedTypeConverter(method);
       if (converterClass == null) {
         continue;
       }
 
-      StringToTypeConverter<?> converter = null;
+      JacksonAwareStringToTypeConverter<?> converter = null;
       try {
         converter = converterClass.newInstance();
+        converter.setObjectMapper(objectMapper);
         Object convertedValue = converter.convertQueryParameterToType(value);
         method.invoke(this, convertedValue);
-      } catch (InstantiationException e) {
-        throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Server error.");
-      } catch (IllegalAccessException e) {
+      } catch (InstantiationException | IllegalAccessException e) {
         throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Server error.");
       } catch (InvocationTargetException e) {
         throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot set query parameter '" + key + "' to value '" + value + "'");
@@ -178,7 +178,7 @@ public abstract class AbstractRestQueryParametersDto<T> extends QueryParameters 
     return result;
   }
 
-  private Class<? extends StringToTypeConverter<?>> findAnnotatedTypeConverter(Method method) {
+  private Class<? extends JacksonAwareStringToTypeConverter<?>> findAnnotatedTypeConverter(Method method) {
     Annotation[] methodAnnotations = method.getAnnotations();
 
     for (int j = 0; j < methodAnnotations.length; j++) {

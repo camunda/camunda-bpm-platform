@@ -18,10 +18,10 @@ package org.camunda.bpm.admin.impl;
 
 import org.camunda.bpm.admin.AdminRuntimeDelegate;
 import org.camunda.bpm.admin.plugin.spi.AdminPlugin;
-import org.camunda.bpm.cockpit.db.CommandExecutor;
-import org.camunda.bpm.cockpit.db.QueryService;
-import org.camunda.bpm.cockpit.impl.db.CommandExecutorImpl;
-import org.camunda.bpm.cockpit.impl.db.QueryServiceImpl;
+import org.camunda.bpm.webapp.db.CommandExecutor;
+import org.camunda.bpm.webapp.db.QueryService;
+import org.camunda.bpm.webapp.impl.db.CommandExecutorImpl;
+import org.camunda.bpm.webapp.impl.db.QueryServiceImpl;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
