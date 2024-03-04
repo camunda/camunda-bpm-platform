@@ -322,7 +322,8 @@ const Controller = [
             });
           }
           $scope.annualMetrics = mapToList(annualMetricsMap);
-          $scope.loadingStateAnnual = 'LOADED';
+          $scope.loadingStateAnnual =
+            $scope.annualMetrics.length === 0 ? 'EMPTY' : 'LOADED';
           $scope.$apply();
         })
         .catch(err => {
