@@ -30,6 +30,11 @@ public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEven
   protected long executedDecisionInstances;
   protected long executedDecisionElements;
 
+  /**
+   * GIT Issue: https://github.com/camunda/camunda-bpm-platform/issues/2749
+   */
+  protected String decisionInstanceId;
+
   @Override
   public DmnDecisionLogicEvaluationEvent getDecisionResult() {
     return decisionResult;
@@ -67,6 +72,15 @@ public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEven
   }
 
   @Override
+  public String getDecisionInstanceId() {
+    return decisionInstanceId;
+  }
+
+  public void setDecisionInstanceId(String decisionInstanceId) {
+    this.decisionInstanceId = decisionInstanceId;
+  }
+
+  @Override
   public String toString() {
     DmnDecision dmnDecision = decisionResult.getDecision();
     return "DmnDecisionEvaluationEventImpl{" +
@@ -76,6 +90,7 @@ public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEven
       ", requiredDecisionResults=" + requiredDecisionResults +
       ", executedDecisionInstances=" + executedDecisionInstances +
       ", executedDecisionElements=" + executedDecisionElements +
+      ", dmnDecisionInstanceId=" + decisionInstanceId +
       '}';
   }
 

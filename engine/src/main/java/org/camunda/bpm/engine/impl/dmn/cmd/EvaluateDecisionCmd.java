@@ -26,6 +26,7 @@ import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.camunda.bpm.engine.impl.dmn.DecisionEvaluationBuilderImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -70,7 +71,12 @@ public class EvaluateDecisionCmd implements Command<DmnDecisionResult> {
     }
 
     writeUserOperationLog(commandContext, decisionDefinition);
-
+    /**
+     * Generating custom decisionInstanceId to persist the history event and return the id in the response
+     * GIT Issue: https://github.com/camunda/camunda-bpm-platform/issues/2749
+     */
+    String decisionInstanceId = commandContext.getProcessEngineConfiguration().getIdGenerator().getNextId();
+    variables.put("decisionInstanceId", decisionInstanceId);
     return doEvaluateDecision(decisionDefinition, variables);
 
   }
