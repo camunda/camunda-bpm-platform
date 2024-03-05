@@ -955,6 +955,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected int historyCleanupDefaultNumberOfRetries = Integer.MIN_VALUE;
 
   /**
+   * When set to false, exclusivity (no parallel execution) of tasks is applied per process instance.
+   * When set to true, exclusivity (no parallel execution) of tasks is extended across all process instances.
+   * <p>
+   * Default value: false; to keep the legacy behaviour backwards compatible.
+   * //TODO add rest of javadoc, mention performance implications.
+   */
+  protected boolean enableExclusivenessAcrossProcessInstances = false;
+
+  /**
    * Time to live for historic job log entries written by history cleanup jobs.
    * Must be an ISO-8601 conform String specifying only a number of days. Only
    * works in conjunction with removal-time-based cleanup strategy.
@@ -5000,6 +5009,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public ProcessEngineConfigurationImpl setEnforceHistoryTimeToLive(boolean enforceHistoryTimeToLive) {
     this.enforceHistoryTimeToLive = enforceHistoryTimeToLive;
     return this;
+  }
+
+  public ProcessEngineConfigurationImpl setEnableExclusivenessAcrossProcessInstances(boolean enableExclusivenessAcrossProcessInstances) {
+    this.enableExclusivenessAcrossProcessInstances = enableExclusivenessAcrossProcessInstances;
+    return this;
+  }
+
+  public boolean isEnableExclusivenessAcrossProcessInstances() {
+    return this.enableExclusivenessAcrossProcessInstances;
   }
 
   public String getBatchOperationHistoryTimeToLive() {
