@@ -154,8 +154,9 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
   }
 
   protected boolean isExclusiveAcrossProcessInstances(CommandContext context) {
-    var processEngineConfiguration = context.getProcessEngineConfiguration();
-    return processEngineConfiguration.isEnableExclusivenessAcrossProcessInstances();
+    var engineConfig = context.getProcessEngineConfiguration();
+
+    return engineConfig != null && engineConfig.isEnableExclusivenessAcrossProcessInstances();
   }
 
 
