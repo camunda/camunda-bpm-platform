@@ -350,14 +350,15 @@ public class SequentialJobAcquisitionTest {
     jobExecutor.setMaxJobsPerAcquisition(10);
 
     // configure and build a process engine
-    StandaloneProcessEngineConfiguration engineConfiguration = new StandaloneInMemProcessEngineConfiguration();
-    engineConfiguration.setProcessEngineName(getClass().getName() + "-engine");
-    engineConfiguration.setJdbcUrl("jdbc:h2:mem:activiti1");
-    engineConfiguration.setJobExecutorActivate(false);
-    engineConfiguration.setJobExecutor(jobExecutor);
-    engineConfiguration.setDbMetricsReporterActivate(false);
+    var engineConfig = new StandaloneInMemProcessEngineConfiguration()
+        .setProcessEngineName(getClass().getName() + "-engine")
+        .setJdbcUrl("jdbc:h2:mem:activiti1")
+        .setJobExecutorActivate(false)
+        .setJobExecutor(jobExecutor)
+        .setDbMetricsReporterActivate(false)
+        .setEnableExclusivenessAcrossProcessInstances(true); // enable exclusiveness
 
-    ProcessEngine engine = engineConfiguration.buildProcessEngine();
+    ProcessEngine engine = engineConfig.buildProcessEngine();
     createdProcessEngines.add(engine);
     jobExecutor.registerProcessEngine((ProcessEngineImpl) engine);
 
@@ -417,14 +418,15 @@ public class SequentialJobAcquisitionTest {
     jobExecutor.setMaxJobsPerAcquisition(10);
 
     // configure and build a process engine
-    StandaloneProcessEngineConfiguration engineConfiguration = new StandaloneInMemProcessEngineConfiguration();
-    engineConfiguration.setProcessEngineName(getClass().getName() + "-engine");
-    engineConfiguration.setJdbcUrl("jdbc:h2:mem:activiti1");
-    engineConfiguration.setJobExecutorActivate(false);
-    engineConfiguration.setJobExecutor(jobExecutor);
-    engineConfiguration.setDbMetricsReporterActivate(false);
+    var engineConfig = new StandaloneInMemProcessEngineConfiguration()
+        .setProcessEngineName(getClass().getName() + "-engine")
+        .setJdbcUrl("jdbc:h2:mem:activiti1")
+        .setJobExecutorActivate(false)
+        .setJobExecutor(jobExecutor)
+        .setDbMetricsReporterActivate(false)
+        .setEnableExclusivenessAcrossProcessInstances(true); // enable exclusiveness
 
-    ProcessEngine engine = engineConfiguration.buildProcessEngine();
+    ProcessEngine engine = engineConfig.buildProcessEngine();
     createdProcessEngines.add(engine);
 
     // given
