@@ -5,7 +5,8 @@
 
   <dependencies>
     
-    <module name="javax.api" />
+    <module name="java.base" />
+    <module name="org.slf4j"/>
     
   </dependencies>
 </module>

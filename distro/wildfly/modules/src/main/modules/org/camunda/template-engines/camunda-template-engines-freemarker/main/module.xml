@@ -4,7 +4,8 @@
   </resources>
 
   <dependencies>
-    <module name="javax.api" />
+    <module name="java.base" />
+    <module name="java.scripting" />
     <module name="org.freemarker.freemarker" />
   </dependencies>
 </module>

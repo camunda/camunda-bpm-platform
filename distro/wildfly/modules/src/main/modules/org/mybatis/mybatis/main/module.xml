@@ -3,8 +3,15 @@
     <resource-root path="mybatis-@version.mybatis@.jar" />
   </resources>
 
-  <dependencies>    
-    <module name="javax.api" />
-    <module name="javax.transaction.api" />
+  <dependencies>
+    <module name="java.base" />
+    <module name="java.desktop" />
+    <module name="java.instrument" />
+    <module name="java.management" />
+    <module name="java.naming" />
+    <module name="java.sql" />
+    <module name="jdk.attach" />
+    <module name="jdk.jdi" />
+    <module name="jakarta.transaction.api" />
   </dependencies>
 </module>

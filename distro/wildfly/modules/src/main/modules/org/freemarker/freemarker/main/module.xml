@@ -4,7 +4,10 @@
   </resources>
 
   <dependencies>
-    <module name="javax.api" />
+    <module name="java.base" />
+    <module name="java.desktop" />
+    <module name="java.rmi" />
+    <module name="java.sql" />
     <module name="org.apache.log4j" optional="true"/>
   </dependencies>
 </module>
