@@ -18,7 +18,6 @@
     <jakarta.webapp>${project.build.directory}/generated-resources/jakarta-webapp</jakarta.webapp>
     <jakarta.runtime>${project.build.directory}/generated-resources/jakarta-runtime</jakarta.runtime>
 
-    <version.xml.jaxb-impl>4.0.2</version.xml.jaxb-impl>
     <version.resteasy>6.2.3.Final</version.resteasy>
     <version.jetty>11.0.14</version.jetty>
     <version.jersey2>3.1.1</version.jersey2>
@@ -519,7 +518,7 @@
         <dependency>
           <groupId>com.sun.xml.bind</groupId>
           <artifactId>jaxb-impl</artifactId>
-          <version>${version.xml.jaxb-impl}</version>
+          <version>${version.xml.jaxb-impl-4}</version>
         </dependency>
         <dependency>
           <groupId>org.graalvm.js</groupId>
