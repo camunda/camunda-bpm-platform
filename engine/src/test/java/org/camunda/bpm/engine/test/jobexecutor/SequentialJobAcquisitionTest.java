@@ -16,7 +16,17 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import org.assertj.core.api.Assertions;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.text.DateFormat.Field;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -34,16 +44,6 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.text.DateFormat.Field;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -309,13 +309,20 @@ public class SequentialJobAcquisitionTest {
   }
 
   protected List<String> assertProcessInstanceJobs(ProcessEngine engine, ProcessInstance pi, int nJobs, String pdKey) {
-    var jobs = engine.getManagementService().createJobQuery().rootProcessInstanceId(pi.getId()).list();
-    Assertions.assertThat(jobs).hasSize(nJobs);
+    var jobs = engine.getManagementService().createJobQuery()
+        .rootProcessInstanceId(pi.getId())
+        .list();
+
+    assertThat(jobs).hasSize(nJobs);
+
     jobs.forEach(job -> {
-      Assertions.assertThat(job.getProcessDefinitionKey()).isEqualTo(pdKey);
-      Assertions.assertThat(job.getRootProcessInstanceId()).isEqualTo(pi.getId());
+      assertThat(job.getProcessDefinitionKey()).isEqualTo(pdKey);
+      assertThat(job.getRootProcessInstanceId()).isEqualTo(pi.getId());
     });
-    return jobs.stream().map(Job::getId).collect(Collectors.toList());
+
+    return jobs.stream()
+        .map(Job::getId)
+        .collect(Collectors.toList());
   }
 
   public static class AssertJobExecutor extends DefaultJobExecutor {
@@ -324,13 +331,13 @@ public class SequentialJobAcquisitionTest {
 
     @SafeVarargs
     public final void assertJobGroup(List<String>... jobIds) {
-      // FIXME order of nested lists could make this fail
-      Assertions.assertThat(jobGroups).containsExactlyInAnyOrder(jobIds);
+      assertThat(jobGroups).containsExactlyInAnyOrder(jobIds);
     }
 
     @Override
     public void executeJobs(List<String> jobIds, ProcessEngineImpl processEngine) {
       super.executeJobs(jobIds, processEngine);
+
       System.out.println("jobIds = " + jobIds);
       jobGroups.add(jobIds);
     }
@@ -338,10 +345,10 @@ public class SequentialJobAcquisitionTest {
 
   @Test
   public void testJobAcquisitionWithCallActivitySubProcesses() {
-
     // configure job executor
     var jobExecutor = new AssertJobExecutor();
     jobExecutor.setMaxJobsPerAcquisition(10);
+
     // configure and build a process engine
     StandaloneProcessEngineConfiguration engineConfiguration = new StandaloneInMemProcessEngineConfiguration();
     engineConfiguration.setProcessEngineName(getClass().getName() + "-engine");
@@ -386,8 +393,9 @@ public class SequentialJobAcquisitionTest {
     var pi1 = engine.getRuntimeService().startProcessInstanceByKey("rootProcess");
     var pi2 = engine.getRuntimeService().startProcessInstanceByKey("rootProcess");
 
-    // then
-    Assertions.assertThat(engine.getManagementService().createJobQuery().list()).hasSize(4);
+    // then 4 jobs are created (2 for each root process due to cardinality)
+    assertThat(engine.getManagementService().createJobQuery().list()).hasSize(4);
+
     var pi1Jobs = assertProcessInstanceJobs(engine, pi1, 2, "subProcess");
     var pi2Jobs = assertProcessInstanceJobs(engine, pi2, 2, "subProcess");
 
@@ -407,6 +415,7 @@ public class SequentialJobAcquisitionTest {
     // configure job executor
     var jobExecutor = new AssertJobExecutor();
     jobExecutor.setMaxJobsPerAcquisition(10);
+
     // configure and build a process engine
     StandaloneProcessEngineConfiguration engineConfiguration = new StandaloneInMemProcessEngineConfiguration();
     engineConfiguration.setProcessEngineName(getClass().getName() + "-engine");
@@ -464,7 +473,8 @@ public class SequentialJobAcquisitionTest {
 
     // then
     // 4 jobs of subSubProcess are waiting with the rootProcess's id as rootProcessInstanceId
-    Assertions.assertThat(engine.getManagementService().createJobQuery().list()).hasSize(8);
+    assertThat(engine.getManagementService().createJobQuery().list()).hasSize(8);
+
     var pi1Jobs = assertProcessInstanceJobs(engine, pi1, 4, "subSubProcess");
     var pi2Jobs = assertProcessInstanceJobs(engine, pi2, 4, "subSubProcess");
 
