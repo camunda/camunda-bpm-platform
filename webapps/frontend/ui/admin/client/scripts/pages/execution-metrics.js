@@ -74,15 +74,13 @@ const Controller = [
     $scope.loadingState = 'INITIAL';
     $scope.loadingStateMonthly = 'INITIAL';
     $scope.loadingStateAnnual = 'INITIAL';
-    $scope.alwaysShowUTWMetrics = configuration.getAlwaysShowUniqueTaskWorkerMetrics();
-    $scope.showTaskWorkerMetric = $scope.alwaysShowUTWMetrics;
     $scope.metrics = {};
 
     let monthlyMetricUsageMap = {};
     let monthlyMetricsArray = {};
     $scope.monthlyMetrics = [];
     $scope.annualMetrics = [];
-    $scope.displayLegacyMetrics = true;
+    $scope.displayLegacyMetrics = false;
     $scope.datePickerOptions = {maxDate: moment().toDate()};
 
     telemetryResource.fetchData((err, res) => {
