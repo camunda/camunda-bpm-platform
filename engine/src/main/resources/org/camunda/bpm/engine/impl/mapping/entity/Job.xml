@@ -181,7 +181,9 @@
     select RES.ID_,
       RES.REV_,
       RES.DUEDATE_,
+    <if test="parameter.enableExclusivenessAcrossProcessInstances">
       RES.ROOT_PROCESS_INSTANCE_ID_,
+    </if>
       RES.PROCESS_INSTANCE_ID_,
       RES.EXCLUSIVE_
     ${limitBetweenAcquisition}
@@ -236,16 +238,20 @@
   <sql id="AtomicExclusiveJobs">
     RES.EXCLUSIVE_ = ${trueConstant}
           and not exists(
-            select J2.ID_ from ${prefix}ACT_RU_JOB J2
-            where
-              -- from the same root proc. inst. if not null
-              (RES.ROOT_PROCESS_INSTANCE_ID_ is not null and J2.ROOT_PROCESS_INSTANCE_ID_ = RES.ROOT_PROCESS_INSTANCE_ID_
-              -- otherwise from the same proc. inst.
-              or RES.ROOT_PROCESS_INSTANCE_ID_ is null and J2.PROCESS_INSTANCE_ID_ = RES.PROCESS_INSTANCE_ID_)
-              -- also exclusive
-              and (J2.EXCLUSIVE_ = ${trueConstant})
-              -- in progress
-              and (J2.LOCK_OWNER_ is not null and J2.LOCK_EXP_TIME_ &gt;= #{parameter.now, jdbcType=TIMESTAMP})
+            select J2.ID_
+            from ${prefix}ACT_RU_JOB J2
+
+            <if test="!parameter.enableExclusivenessAcrossProcessInstances">
+              where J2.PROCESS_INSTANCE_ID_ = RES.PROCESS_INSTANCE_ID_
+            </if>
+            <if test="parameter.enableExclusivenessAcrossProcessInstances">
+              where (
+                  RES.ROOT_PROCESS_INSTANCE_ID_ is not null and J2.ROOT_PROCESS_INSTANCE_ID_ = RES.ROOT_PROCESS_INSTANCE_ID_    -- from the same root proc. inst. if not null
+                or RES.ROOT_PROCESS_INSTANCE_ID_ is null and J2.PROCESS_INSTANCE_ID_ = RES.PROCESS_INSTANCE_ID_                 -- otherwise from the same proc. inst.
+              )
+            </if>
+            and (J2.EXCLUSIVE_ = ${trueConstant})                                                                               -- also exclusive
+            and (J2.LOCK_OWNER_ is not null and J2.LOCK_EXP_TIME_ &gt;= #{parameter.now, jdbcType=TIMESTAMP})                   -- in progress
             )
   </sql>
 

@@ -22,7 +22,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
@@ -67,14 +66,15 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
 
     Map<String, List<String>> exclusiveJobsByProcessInstance = new HashMap<String, List<String>>();
 
+    boolean isExclusiveAcrossProcessInstances = isExclusiveAcrossProcessInstances(commandContext);
+
     for (AcquirableJobEntity job : jobs) {
 
       lockJob(job);
 
       if(job.isExclusive()) {
-        // TODO check engine config
-        String processInstanceId = job.getRootProcessInstanceId() != null ?
-            job.getRootProcessInstanceId() : job.getProcessInstanceId();
+
+        String processInstanceId = selectProcessInstanceId(job, isExclusiveAcrossProcessInstances);
         List<String> list = exclusiveJobsByProcessInstance.computeIfAbsent(processInstanceId, key -> new ArrayList<>());
         list.add(job.getId());
       }
@@ -151,6 +151,21 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
     // If none of the conditions are satisfied, this might indicate a bug,
     // so we throw the OLE.
     return OptimisticLockingResult.THROW;
+  }
+
+  protected boolean isExclusiveAcrossProcessInstances(CommandContext context) {
+    var processEngineConfiguration = context.getProcessEngineConfiguration();
+    return processEngineConfiguration.isEnableExclusivenessAcrossProcessInstances();
+  }
+
+
+  protected String selectProcessInstanceId(AcquirableJobEntity job, boolean isExclusiveAcrossProcessInstances) {
+
+    if (isExclusiveAcrossProcessInstances && job.getRootProcessInstanceId() != null) {
+      return job.getRootProcessInstanceId();
+    }
+
+    return job.getProcessInstanceId();
   }
 
 }
