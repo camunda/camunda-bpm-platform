@@ -64,17 +64,16 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
       .getJobManager()
       .findNextJobsToExecute(new Page(0, numJobsToAcquire));
 
-    Map<String, List<String>> exclusiveJobsByProcessInstance = new HashMap<String, List<String>>();
+    Map<String, List<String>> exclusiveJobsByProcessInstance = new HashMap<>();
 
-    boolean isExclusiveAcrossProcessInstances = isExclusiveAcrossProcessInstances(commandContext);
+    boolean isAcquireExclusiveOverProcessHierarchies = isAcquireExclusiveOverProcessHierarchies(commandContext);
 
     for (AcquirableJobEntity job : jobs) {
 
       lockJob(job);
 
       if(job.isExclusive()) {
-
-        String processInstanceId = selectProcessInstanceId(job, isExclusiveAcrossProcessInstances);
+        String processInstanceId = selectProcessInstanceId(job, isAcquireExclusiveOverProcessHierarchies);
         List<String> list = exclusiveJobsByProcessInstance.computeIfAbsent(processInstanceId, key -> new ArrayList<>());
         list.add(job.getId());
       }
@@ -153,16 +152,16 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
     return OptimisticLockingResult.THROW;
   }
 
-  protected boolean isExclusiveAcrossProcessInstances(CommandContext context) {
+  protected boolean isAcquireExclusiveOverProcessHierarchies(CommandContext context) {
     var engineConfig = context.getProcessEngineConfiguration();
 
-    return engineConfig != null && engineConfig.isEnableExclusivenessAcrossProcessInstances();
+    return engineConfig != null && engineConfig.isJobExecutorAcquireExclusiveOverProcessHierarchies();
   }
 
 
-  protected String selectProcessInstanceId(AcquirableJobEntity job, boolean isExclusiveAcrossProcessInstances) {
+  protected String selectProcessInstanceId(AcquirableJobEntity job, boolean isAcquireExclusiveOverProcessHierarchies) {
 
-    if (isExclusiveAcrossProcessInstances && job.getRootProcessInstanceId() != null) {
+    if (isAcquireExclusiveOverProcessHierarchies && job.getRootProcessInstanceId() != null) {
       return job.getRootProcessInstanceId();
     }
 

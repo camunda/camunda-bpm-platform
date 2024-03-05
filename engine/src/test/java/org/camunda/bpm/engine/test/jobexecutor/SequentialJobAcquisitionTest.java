@@ -356,7 +356,7 @@ public class SequentialJobAcquisitionTest {
         .setJobExecutorActivate(false)
         .setJobExecutor(jobExecutor)
         .setDbMetricsReporterActivate(false)
-        .setEnableExclusivenessAcrossProcessInstances(true); // enable exclusiveness
+        .setJobExecutorAcquireExclusiveOverProcessHierarchies(true); // enable exclusiveness
 
     ProcessEngine engine = engineConfig.buildProcessEngine();
     createdProcessEngines.add(engine);
@@ -424,7 +424,7 @@ public class SequentialJobAcquisitionTest {
         .setJobExecutorActivate(false)
         .setJobExecutor(jobExecutor)
         .setDbMetricsReporterActivate(false)
-        .setEnableExclusivenessAcrossProcessInstances(true); // enable exclusiveness
+        .setJobExecutorAcquireExclusiveOverProcessHierarchies(true); // enable exclusiveness
 
     ProcessEngine engine = engineConfig.buildProcessEngine();
     createdProcessEngines.add(engine);

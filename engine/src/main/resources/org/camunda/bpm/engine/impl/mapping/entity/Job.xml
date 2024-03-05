@@ -181,7 +181,7 @@
     select RES.ID_,
       RES.REV_,
       RES.DUEDATE_,
-    <if test="parameter.enableExclusivenessAcrossProcessInstances">
+    <if test="parameter.applyExclusiveOverProcessHierarchies">
       RES.ROOT_PROCESS_INSTANCE_ID_,
     </if>
       RES.PROCESS_INSTANCE_ID_,
@@ -241,10 +241,10 @@
             select J2.ID_
             from ${prefix}ACT_RU_JOB J2
 
-            <if test="!parameter.enableExclusivenessAcrossProcessInstances">
+            <if test="!parameter.applyExclusiveOverProcessHierarchies">
               where J2.PROCESS_INSTANCE_ID_ = RES.PROCESS_INSTANCE_ID_
             </if>
-            <if test="parameter.enableExclusivenessAcrossProcessInstances">
+            <if test="parameter.applyExclusiveOverProcessHierarchies">
               where (
                   RES.ROOT_PROCESS_INSTANCE_ID_ is not null and J2.ROOT_PROCESS_INSTANCE_ID_ = RES.ROOT_PROCESS_INSTANCE_ID_    -- from the same root proc. inst. if not null
                 or RES.ROOT_PROCESS_INSTANCE_ID_ is null and J2.PROCESS_INSTANCE_ID_ = RES.PROCESS_INSTANCE_ID_                 -- otherwise from the same proc. inst.

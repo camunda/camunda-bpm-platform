@@ -240,7 +240,7 @@ public class JobManager extends AbstractManager {
     params.put("orderingProperties", orderingProperties);
     // don't apply default sorting
     params.put("applyOrdering", !orderingProperties.isEmpty());
-    params.put("enableExclusivenessAcrossProcessInstances", engineConfiguration.isEnableExclusivenessAcrossProcessInstances());
+    params.put("applyExclusiveOverProcessHierarchies", engineConfiguration.isJobExecutorAcquireExclusiveOverProcessHierarchies());
 
     return getDbEntityManager().selectList("selectNextJobsToExecute", params, page);
   }

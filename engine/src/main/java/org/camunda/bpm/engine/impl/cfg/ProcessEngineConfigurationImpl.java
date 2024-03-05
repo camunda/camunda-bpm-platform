@@ -961,7 +961,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * Default value: false; to keep the legacy behaviour backwards compatible.
    * //TODO add rest of javadoc, mention performance implications.
    */
-  protected boolean enableExclusivenessAcrossProcessInstances = false;
+  protected boolean jobExecutorAcquireExclusiveOverProcessHierarchies = false;
 
   /**
    * Time to live for historic job log entries written by history cleanup jobs.
@@ -5011,13 +5011,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public ProcessEngineConfigurationImpl setEnableExclusivenessAcrossProcessInstances(boolean enableExclusivenessAcrossProcessInstances) {
-    this.enableExclusivenessAcrossProcessInstances = enableExclusivenessAcrossProcessInstances;
+  public ProcessEngineConfigurationImpl setJobExecutorAcquireExclusiveOverProcessHierarchies(boolean jobExecutorAcquireExclusiveOverProcessHierarchies) {
+    this.jobExecutorAcquireExclusiveOverProcessHierarchies = jobExecutorAcquireExclusiveOverProcessHierarchies;
     return this;
   }
 
-  public boolean isEnableExclusivenessAcrossProcessInstances() {
-    return this.enableExclusivenessAcrossProcessInstances;
+  public boolean isJobExecutorAcquireExclusiveOverProcessHierarchies() {
+    return this.jobExecutorAcquireExclusiveOverProcessHierarchies;
   }
 
   public String getBatchOperationHistoryTimeToLive() {
