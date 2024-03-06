@@ -123,7 +123,8 @@ public class MetricsAggregatedQueryDto extends AbstractRestQueryParametersDto<Me
 
   public void validateAndPrepareQuery() {
     if (subscriptionStartDate == null || !subscriptionStartDate.before(new Date())) {
-      throw new InvalidRequestException(Response.Status.BAD_REQUEST, "subscriptionStartDate parameter has invalid value: " + subscriptionStartDate);
+      throw new InvalidRequestException(Response.Status.BAD_REQUEST,
+          "subscriptionStartDate parameter has invalid value: " + subscriptionStartDate);
     }
     if (startDate != null && endDate != null && !endDate.after(startDate)) {
       throw new InvalidRequestException(Response.Status.BAD_REQUEST, "endDate parameter must be after startDate");

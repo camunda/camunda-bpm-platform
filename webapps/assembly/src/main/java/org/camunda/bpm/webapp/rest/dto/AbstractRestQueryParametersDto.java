@@ -36,9 +36,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 
-/**
- * @author roman.smirnov
- */
 public abstract class AbstractRestQueryParametersDto<T> extends QueryParameters {
   protected static final String DEFAULT_ORDER = "RES.ID_ asc";
 

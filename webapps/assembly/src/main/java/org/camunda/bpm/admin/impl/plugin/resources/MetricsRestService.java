@@ -31,7 +31,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MetricsRestService extends AbstractAdminPluginResource {
 
@@ -60,10 +59,8 @@ public class MetricsRestService extends AbstractAdminPluginResource {
       result.addAll(getQueryService().executeQuery("selectMetricsAggregatedTU", queryDto));
     }
 
-    return result.stream()
-        // map to public metric names
-        .peek(resultDto -> resultDto.setMetric(MetricsUtil.resolvePublicName(resultDto.getMetric())))
-        .collect(Collectors.toList());
+    result.forEach(resultDto -> resultDto.setMetric(MetricsUtil.resolvePublicName(resultDto.getMetric())));
+    return result;
   }
 
 }

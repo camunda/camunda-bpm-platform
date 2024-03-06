@@ -26,11 +26,6 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 
-/**
- *
- * @author drobisch
- *
- */
 public class QuerySessionFactory extends StandaloneProcessEngineConfiguration {
 
   protected static final String[] DEFAULT_MAPPING_FILES = {

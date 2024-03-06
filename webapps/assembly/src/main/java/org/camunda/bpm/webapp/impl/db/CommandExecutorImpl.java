@@ -22,11 +22,6 @@ import org.camunda.bpm.webapp.db.CommandExecutor;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 
-/**
- *
- * @author drobisch
- * @author nico.rehwaldt
- */
 public class CommandExecutorImpl implements CommandExecutor {
 
   private QuerySessionFactory sessionFactory;

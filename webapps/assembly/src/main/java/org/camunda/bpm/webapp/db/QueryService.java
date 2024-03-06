@@ -20,13 +20,10 @@ import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 
 import java.util.List;
 
-/**
- *
- * @author Nico Rehwaldt
- */
 public interface QueryService {
 
-  public <T> List<T> executeQuery(final String statement, final QueryParameters parameter);
+  <T> List<T> executeQuery(final String statement, final QueryParameters parameter);
 
-  public Long executeQueryRowCount(final String statement, final ListQueryParameterObject parameter);
+  Long executeQueryRowCount(final String statement, final ListQueryParameterObject parameter);
+
 }

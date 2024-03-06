@@ -77,7 +77,8 @@ public class DefaultAdminRuntimeDelegate extends AbstractAppRuntimeDelegate<Admi
       throw new ProcessEngineException("No process engine with name " + processEngineName + " found.");
     }
 
-    ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl)processEngine).getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine)
+        .getProcessEngineConfiguration();
 
     return new CommandExecutorImpl(processEngineConfiguration, MAPPING_FILES);
   }

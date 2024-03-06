@@ -20,10 +20,8 @@ import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 
 /**
  * Typed query parameters for usage in webapp plugins
- *
- * @author Nico Rehwaldt
  */
-public class QueryParameters extends ListQueryParameterObject {
+public abstract class QueryParameters extends ListQueryParameterObject {
 
   private static final long serialVersionUID = 1L;
 
