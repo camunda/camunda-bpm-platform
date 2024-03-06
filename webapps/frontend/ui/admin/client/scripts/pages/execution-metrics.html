@@ -74,7 +74,7 @@
 
   <div class="row">
     <div class="col-xs-12 monthly-metrics-chart"
-         ng-style="{display: loadingStateMonthly !== 'LOADING' ? 'table-cell' : 'none'}">
+         ng-style="{display: loadingStateMonthly === 'LOADED' ? 'block' : 'none'}">
       <canvas id="monthly-metrics-chart-canvas"></canvas>
     </div>
     <div class="col-xs-12">
