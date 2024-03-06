@@ -17,7 +17,6 @@
 
 'use strict';
 
-const angular = require('angular');
 const modalDialog = require('./time-to-live-dialog');
 
 const template = require('./time-to-live.html?raw');
@@ -50,7 +49,13 @@ module.exports = [
             controller: modalDialog.controller,
             template: modalDialog.template
           });
-          dialog.result.then(angular.noop).catch(console.error); // eslint-disable-line
+          dialog.result
+            .then(
+              // handle modal closed with result
+              updated => updated && $scope.customOnChange?.(),
+              // handle modal canceled via backdrop click or esc
+              () => $scope.customOnChange?.()
+            ).catch(console.error); // eslint-disable-line
         };
       }
     };

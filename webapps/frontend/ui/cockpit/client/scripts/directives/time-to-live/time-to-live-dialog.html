@@ -1,25 +1,23 @@
 <!-- # CE - camunda-bpm-webapp/ui/cockpit/client/scripts/components/ttl/time-to-live-dialog.html -->
 <div class="modal-header">
-  <h3>
-    {{ 'TIME_TO_LIVE_POPUP_TITLE' | translate }}
+  <h3 ng-show="status !== 'SUCCESS'">
+    {{ 'TIME_TO_LIVE_POPUP_TITLE_EDIT' | translate }}
+  </h3>
+  <h3 ng-show="status === 'SUCCESS'">
+    {{ 'TIME_TO_LIVE_POPUP_TITLE_SUCCESS' | translate }}
   </h3>
 </div>
 
 <div class="modal-body">
-  <div notifications-panel></div>
+  <div notifications-panel ng-show="status !== 'SUCCESS'"></div>
 
-  <div ng-show="!status" class="alert alert-info">
+  <div ng-show="status === 'SUCCESS'" class="alert alert-info">
     <p>
-      <strong> 
-        {{ 'TIME_TO_LIVE_POPUP_REMOVAL_TIME_NOT_UPDATED_INFO' | translate }}
-      </strong>   
-      <strong ng-show="showLinkToBatchProcess"> 
-        {{ 'TIME_TO_LIVE_POPUP_RUN_BATCH_JOB_INFO_START' | translate }}
-        <a href="/camunda/app/cockpit/default/#/batch/operation">
-          {{ 'TIME_TO_LIVE_POPUP_RUN_BATCH_JOB_INFO_LINK' | translate }}
-        </a>
-        {{ 'TIME_TO_LIVE_POPUP_RUN_BATCH_JOB_INFO_END' | translate }}
-      </strong>
+      {{ 'TIME_TO_LIVE_POPUP_REMOVAL_TIME_NOT_UPDATED_INFO' | translate }}
+      
+      <span ng-show="showLinkToBatchProcess"> 
+        {{ 'TIME_TO_LIVE_POPUP_RUN_BATCH_JOB_INFO' | translate }}
+      </span>
     </p>
   </div>
 
@@ -94,7 +92,20 @@
     </button>
   </div>
 
-  <div ng-show="!!status" class="container-fluid">
+  <div ng-show="status === 'SUCCESS' && showLinkToBatchProcess" class="container-fluid">
+    <button class="btn btn-link" ng-click="close(true)">{{ 'CLOSE' | translate }}</button>
+    <button type="submit"
+      class="btn btn-primary"
+      ng-click="openBatchOperation()">
+      {{ 'TIME_TO_LIVE_POPUP_BTN_OPEN' | translate}}
+    </button>
+  </div>
+
+  <div ng-show="status === 'SUCCESS' && !showLinkToBatchProcess">
+    <button class="btn btn-primary" ng-click="close(true)">{{ 'OK' | translate }}</button>
+  </div>
+
+  <div ng-show="status === 'FAIL'" class="container-fluid">
     <button class="btn btn-primary" ng-click="close(null)">{{ 'OK' | translate }}</button>
   </div>
 

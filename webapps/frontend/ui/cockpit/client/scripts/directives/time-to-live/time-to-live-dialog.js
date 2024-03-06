@@ -25,13 +25,26 @@ const Controller = [
   '$scope',
   'Notifications',
   '$translate',
-  function(camAPI, $modalInstance, $scope, Notifications, $translate) {
+  '$location',
+  function(
+    camAPI,
+    $modalInstance,
+    $scope,
+    Notifications,
+    $translate,
+    $location
+  ) {
     const resource = camAPI.resource($scope.resource);
     $scope.showLinkToBatchProcess =
       $scope.$parent?.resource !== 'case-definition';
     $scope.status = null;
     $scope.mode = 'UPDATE';
     $scope.ttl = $scope.definition.historyTimeToLive;
+
+    $scope.openBatchOperation = () => {
+      $scope.$dismiss();
+      $location.path('/batch/operation');
+    };
 
     $scope.isValid = () => {
       return (
@@ -54,7 +67,6 @@ const Controller = [
         .then(function() {
           $scope.status = 'SUCCESS';
           $scope.definition.historyTimeToLive = $scope.ttl;
-          customOnChange();
 
           Notifications.addMessage({
             status: $translate.instant('TIME_TO_LIVE_POPUP_STATE_STATUS'),
@@ -70,12 +82,6 @@ const Controller = [
             message: error
           });
         });
-    };
-
-    const customOnChange = () => {
-      if (typeof $scope.customOnChange === 'function') {
-        $scope.customOnChange();
-      }
     };
 
     const getAndCorrectTimeToLiveValue = () => {
