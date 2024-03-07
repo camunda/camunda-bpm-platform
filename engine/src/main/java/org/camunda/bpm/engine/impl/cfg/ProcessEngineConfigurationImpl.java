@@ -1953,6 +1953,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       properties.put("authJoin1End", DbSqlSessionFactory.databaseSpecificAuth1JoinEnd.get(databaseType));
       properties.put("authJoin1Separator", DbSqlSessionFactory.databaseSpecificAuth1JoinSeparator.get(databaseType));
 
+      properties.put("extractTimeUnitFromDate", DbSqlSessionFactory.databaseSpecificExtractTimeUnitFromDate.get(databaseType));
+
       Map<String, String> constants = DbSqlSessionFactory.dbSpecificConstants.get(databaseType);
       for (Entry<String, String> entry : constants.entrySet()) {
         properties.put(entry.getKey(), entry.getValue());
