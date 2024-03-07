@@ -73,7 +73,7 @@ describe('Admin system Spec', function() {
       );
     });
 
-    it.skip('should validate metrics page', function() {
+    it('should validate metrics page', function() {
       // when
       systemPage.selectSystemNavbarItem('Execution Metrics');
 
@@ -90,7 +90,7 @@ describe('Admin system Spec', function() {
       ).to.eventually.eql('9');
     });
 
-    it.skip('should support time range', function() {
+    it('should support time range', function() {
       // given
       // we are on the flow node count page
 
