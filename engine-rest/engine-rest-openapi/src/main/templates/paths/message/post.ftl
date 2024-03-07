@@ -15,7 +15,7 @@
       mediaType = "application/json"
       dto = "CorrelationMessageDto"
       examples = ['"example-1": {
-                      "summary": "POST /condition",
+                      "summary": "POST /message",
                       "description": "Correlate without result",
                       "value": {
                         "messageName" : "aMessage",
@@ -32,7 +32,7 @@
                       }
                      },
                    "example-2": {
-                      "summary": "POST /condition",
+                      "summary": "POST /message",
                       "description": "Correlate with result",
                       "value": {
                         "messageName" : "aMessage",
@@ -50,7 +50,7 @@
                       }
                      },
                    "example-3": {
-                      "summary": "POST /condition",
+                      "summary": "POST /message",
                       "description": "Correlate with result and variables",
                       "value": {
                         "messageName" : "aMessage",
