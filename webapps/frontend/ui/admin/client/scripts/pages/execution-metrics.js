@@ -71,7 +71,6 @@ const Controller = [
     }
     $scope.startDate = dateFilter(startDate, fmtDatePicker);
 
-    $scope.loadingState = 'INITIAL';
     $scope.loadingStateMonthly = 'INITIAL';
     $scope.loadingStateAnnual = 'INITIAL';
     $scope.metrics = {};
@@ -99,7 +98,7 @@ const Controller = [
     });
 
     // sets loading state to error and updates error message
-    const setLoadingError = error => {
+    const setInputError = error => {
       $scope.loadingStateMonthly = $scope.loadingStateAnnual = 'ERROR';
       $scope.loadingErrorMonthly = $scope.loadingErrorAnnual = error;
     };
@@ -112,9 +111,9 @@ const Controller = [
         calculateContractDates();
         return load();
       } else if (form.startDate.$error.datePattern) {
-        setLoadingError(`Supported pattern '${fmtDatePicker}'.`);
+        setInputError(`Supported pattern '${fmtDatePicker}'.`);
       } else if (form.startDate.$error.dateValue) {
-        setLoadingError('Invalid Date Value.');
+        setInputError('Invalid Date Value.');
       }
     };
 
