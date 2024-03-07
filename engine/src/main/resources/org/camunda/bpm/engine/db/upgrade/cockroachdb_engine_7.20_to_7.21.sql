@@ -20,8 +20,8 @@
 alter table ACT_RU_EXT_TASK
   add column CREATE_TIME_ timestamp;
 
-ALTER TABLE ACT_RU_JOB
-  ADD ROOT_PROCESS_INSTANCE_ID_ varchar(64);
+alter table ACT_RU_JOB
+  add ROOT_PROCESS_INSTANCE_ID_ varchar(64);
 
 create index ACT_IDX_JOB_ROOT_PROCINST on ACT_RU_JOB(ROOT_PROCESS_INSTANCE_ID_);
 
