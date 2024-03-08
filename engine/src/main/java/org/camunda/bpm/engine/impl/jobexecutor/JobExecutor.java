@@ -171,10 +171,13 @@ public abstract class JobExecutor {
   }
 
   public void logRejectedExecution(ProcessEngineImpl engine, int numJobs) {
-    if (engine != null && engine.getProcessEngineConfiguration().isMetricsEnabled()) {
-      engine.getProcessEngineConfiguration()
-        .getMetricsRegistry()
-        .markOccurrence(Metrics.JOB_EXECUTION_REJECTED, numJobs);
+    if(engine != null){
+      LOG.rejectedJobExecutions(engine.getName(),numJobs);
+      if (engine.getProcessEngineConfiguration().isMetricsEnabled()) {
+        engine.getProcessEngineConfiguration()
+                .getMetricsRegistry()
+                .markOccurrence(Metrics.JOB_EXECUTION_REJECTED, numJobs);
+      }
     }
   }
 
