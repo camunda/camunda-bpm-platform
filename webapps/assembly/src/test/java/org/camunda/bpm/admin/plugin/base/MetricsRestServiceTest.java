@@ -26,11 +26,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskMeterLogEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -46,9 +44,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 public class MetricsRestServiceTest extends AbstractAdminPluginTest {
-
-  @ClassRule
-  public static ProcessEngineRule processEngineRule = new ProcessEngineRule("metrics.camunda.cfg.xml", true);
 
   private final MultivaluedMap<String, String> queryParameters = new MultivaluedHashMap<>();
   private MetricsRestService resource;
