@@ -19,12 +19,12 @@ package org.camunda.bpm.container.impl.jboss.extension;
 
 /**
  * Constants used in the model
- * 
+ *
  * @author Daniel Meyer
  * @author christian.lipphardt@camunda.com
  */
 public interface ModelConstants {
-  
+
   // elements
   @Deprecated
   String ACQUISITION_STRATEGY = "acquisition-strategy";
@@ -46,7 +46,6 @@ public interface ModelConstants {
   // attributes
   String DEFAULT = "default";
   String NAME = "name";
-  @Deprecated
   String THREAD_POOL_NAME = "thread-pool-name";
   String MAX_THREADS = "max-threads";
   String CORE_THREADS = "core-threads";
