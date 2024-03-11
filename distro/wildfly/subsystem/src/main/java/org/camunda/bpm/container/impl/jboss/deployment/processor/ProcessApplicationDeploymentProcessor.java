@@ -218,11 +218,6 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     processApplicationStartServiceBuilder.install();
   }
 
-  @Override
-  public void undeploy(DeploymentUnit deploymentUnit) {
-
-  }
-
   protected ServiceName getProcessApplicationViewServiceName(ComponentDescription paComponent) {
     Set<ViewDescription> views = paComponent.getViews();
     if(views == null || views.isEmpty()) {

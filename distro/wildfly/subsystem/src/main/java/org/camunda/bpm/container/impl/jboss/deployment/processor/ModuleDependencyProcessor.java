@@ -140,9 +140,4 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
     moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, identifier, false, false, importServices, false));
   }
 
-  @Override
-  public void undeploy(DeploymentUnit context) {
-
-  }
-
 }

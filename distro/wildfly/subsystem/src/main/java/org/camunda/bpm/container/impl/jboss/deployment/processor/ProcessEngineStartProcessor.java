@@ -107,9 +107,4 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
         processEngineXml.getPlugins());
   }
 
-  @Override
-  public void undeploy(DeploymentUnit deploymentUnit) {
-
-  }
-
 }
