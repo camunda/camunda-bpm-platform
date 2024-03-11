@@ -28,6 +28,10 @@ public class ProcessInstanceDto extends LinkableDto {
   private boolean ended;
   private boolean suspended;
   private String tenantId;
+  /**
+   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4049
+   */
+  private String definitionKey;
 
   public ProcessInstanceDto() {
   }
@@ -35,6 +39,7 @@ public class ProcessInstanceDto extends LinkableDto {
   public ProcessInstanceDto(ProcessInstance instance) {
     this.id = instance.getId();
     this.definitionId = instance.getProcessDefinitionId();
+    this.definitionKey = instance.getProcessDefinitionKey();
     this.businessKey = instance.getBusinessKey();
     this.caseInstanceId = instance.getCaseInstanceId();
     this.ended = instance.isEnded();
@@ -48,6 +53,14 @@ public class ProcessInstanceDto extends LinkableDto {
 
   public String getDefinitionId() {
     return definitionId;
+  }
+  
+ /**
+ * @return the definitionKey
+ * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4049
+ */
+  public String getDefinitionKey() {
+	return definitionKey;
   }
 
   public String getBusinessKey() {
