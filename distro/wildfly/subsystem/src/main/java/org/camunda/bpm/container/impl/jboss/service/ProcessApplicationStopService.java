@@ -64,7 +64,6 @@ public class ProcessApplicationStopService implements Service<ProcessApplication
 
   @Override
   public void start(StartContext arg0) throws StartException {
-    // nothing to do
     provider.accept(this);
   }
 

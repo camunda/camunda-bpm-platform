@@ -183,13 +183,11 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
 
   @Override
   public ProcessEngineService getProcessEngineService() {
-    // TODO: return proxy?
     return this;
   }
 
   @Override
   public ProcessApplicationService getProcessApplicationService() {
-    // TODO: return proxy?
     return this;
   }
 

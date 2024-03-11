@@ -55,13 +55,11 @@ public class MscExecutorService implements Service<MscExecutorService>, Executor
 
   @Override
   public void start(StartContext context) throws StartException {
-    // nothing to do
     provider.accept(this);
   }
 
   @Override
   public void stop(StopContext context) {
-    // nothing to do
     provider.accept(null);
   }
 

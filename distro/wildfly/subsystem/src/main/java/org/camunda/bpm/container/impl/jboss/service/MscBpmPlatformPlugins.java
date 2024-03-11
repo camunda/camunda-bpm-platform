@@ -45,13 +45,11 @@ public class MscBpmPlatformPlugins implements Service<BpmPlatformPlugins> {
 
   @Override
   public void start(StartContext context) throws StartException {
-    // nothing to do
     provider.accept(plugins);
   }
 
   @Override
   public void stop(StopContext context) {
-    // nothing to do
     provider.accept(null);
   }
 
