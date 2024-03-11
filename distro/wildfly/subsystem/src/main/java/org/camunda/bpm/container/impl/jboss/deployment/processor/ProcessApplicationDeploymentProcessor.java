@@ -187,7 +187,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
 
     processApplicationStartServiceBuilder.requires(phaseContext.getPhaseServiceName());
     Supplier<BpmPlatformPlugins> platformPluginsSupplierStartService = processApplicationStartServiceBuilder.requires(ServiceNames.forBpmPlatformPlugins());
-    deploymentServiceNames.forEach(serviceName -> processApplicationStartServiceBuilder.requires(serviceName));
+    deploymentServiceNames.forEach(processApplicationStartServiceBuilder::requires);
 
     processApplicationStartServiceBuilder.setInitialMode(Mode.ACTIVE);
 
