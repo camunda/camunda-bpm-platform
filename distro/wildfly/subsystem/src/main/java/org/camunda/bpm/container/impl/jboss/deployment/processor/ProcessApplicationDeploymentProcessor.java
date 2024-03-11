@@ -133,12 +133,12 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
         Map<String, byte[]> deploymentResources = getDeploymentResources(processArchive, deploymentUnit, processesXmlWrapper.getProcessesXmlFile());
 
         // add the deployment service for each process archive we deploy.
-        String processArachiveName = processArchive.getName();
-        if(processArachiveName == null) {
+        String processArchiveName = processArchive.getName();
+        if(processArchiveName == null) {
           // use random name for deployment service if name is null (we cannot ask the process application yet since the component might not be up.
-          processArachiveName = UUID.randomUUID().toString();
+          processArchiveName = UUID.randomUUID().toString();
         }
-        ServiceName deploymentServiceName = ServiceNames.forProcessApplicationDeploymentService(deploymentUnit.getName(), processArachiveName);
+        ServiceName deploymentServiceName = ServiceNames.forProcessApplicationDeploymentService(deploymentUnit.getName(), processArchiveName);
         ServiceBuilder<?> deploymentServiceBuilder = phaseContext.getRequirementServiceTarget().addService(deploymentServiceName);
 
         Consumer<ProcessApplicationDeploymentService> paDeploymentProvider = deploymentServiceBuilder.provides(deploymentServiceName);
@@ -248,7 +248,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
 
     Map<String, byte[]> resources = new HashMap<>();
 
-    // first, add all resources listed in the processe.xml
+    // first, add all resources listed in the processes.xml
     List<String> process = processArchive.getProcessResourceNames();
     ModuleClassLoader classLoader = module.getClassLoader();
 
