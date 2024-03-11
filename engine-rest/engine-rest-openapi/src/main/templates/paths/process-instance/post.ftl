@@ -60,6 +60,7 @@
                            "links": [],
                            "id": "anId",
                            "definitionId": "aProcessDefinitionId",
+                           "definitionKey": "aProcessDefinitionKey",
                            "businessKey": "aKey",
                            "caseInstanceId": "aCaseInstanceId",
                            "ended": false,
