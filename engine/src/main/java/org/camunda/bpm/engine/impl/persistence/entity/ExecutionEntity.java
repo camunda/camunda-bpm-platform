@@ -1935,4 +1935,25 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   public String getProcessDefinitionTenantId() {
     return getProcessDefinition().getTenantId();
   }
+
+  /**
+   * reference to a process definition entity within Execution Entity
+   * 
+   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4049
+   */
+  
+  protected transient ProcessDefinitionEntity processDefinitionKey;
+  
+  /**
+   * persisted reference to the process definition.
+   *
+   * @see #getProcessDefinitionKey()
+   * 
+   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4049
+   */
+
+  @Override
+  public String getProcessDefinitionKey() {
+		return getProcessDefinition().getKey();
+	}
 }
