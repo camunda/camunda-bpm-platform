@@ -20,6 +20,7 @@
 const template = require('./execution-metrics.html?raw');
 const moment = require('moment');
 const angular = require('angular');
+const Chart = require('chart.js');
 
 const debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
   .debouncePromiseFactory;
@@ -38,6 +39,13 @@ const metrics = {
   EDE: 'executed-decision-elements'
 };
 const localConfContractStartDate = 'metricsContractStartDate';
+const datasetMetricColors = {
+  PI: 'hsl(230, 70%, 41%)',
+  DI: 'hsl(302, 70%, 41%)',
+  TU: 'hsl(14, 70%, 41%)',
+  FNI: 'hsl(86, 70%, 41%)',
+  EDE: 'hsl(158, 70%, 41%)'
+};
 
 const Controller = [
   '$scope',
@@ -96,6 +104,61 @@ const Controller = [
         );
       }
     });
+
+    const initChart = () => {
+      const $canvas = angular.element('canvas#monthly-metrics-chart-canvas');
+      const ctx = $canvas[0].getContext('2d');
+      Chart.Chart.register(
+        Chart.BarController,
+        Chart.BarElement,
+        Chart.LinearScale,
+        Chart.CategoryScale,
+        Chart.Legend,
+        Chart.Tooltip
+      );
+      $scope.chart = new Chart.Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: [],
+          datasets: []
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          }
+        }
+      });
+    };
+
+    const updateMonthlyChart = monthlyMetrics => {
+      const createDataset = metricsKey => {
+        let data = [];
+        for (const monthlyMetric of monthlyMetrics) {
+          data.push(monthlyMetric[metrics[metricsKey]]?.sum || 0);
+        }
+        return {
+          label: metricsKey,
+          data: data,
+          backgroundColor: datasetMetricColors[metricsKey]
+        };
+      };
+
+      let datasets = [];
+      datasets.push(createDataset('PI'));
+      datasets.push(createDataset('DI'));
+      datasets.push(createDataset('TU'));
+      if ($scope.displayLegacyMetrics) {
+        datasets.push(createDataset('FNI'));
+        datasets.push(createDataset('EDE'));
+      }
+
+      $scope.chart.data.labels = monthlyMetrics.map(a => a.labelFmt);
+      $scope.chart.data.datasets = datasets;
+      $scope.chart.update();
+    };
 
     // sets loading state to error and updates error message
     const setInputError = error => {
@@ -284,6 +347,8 @@ const Controller = [
             }
           }
 
+          updateMonthlyChart(monthlyMetricsArray);
+
           $scope.monthlyMetrics = angular.copy(monthlyMetricsArray);
           $scope.loadingStateMonthly = 'LOADED';
           $scope.$apply();
@@ -367,6 +432,7 @@ const Controller = [
       if (newValue !== oldValue) loadMonthly();
     });
 
+    initChart();
     calculateContractDates();
     load();
   }

@@ -37,6 +37,7 @@
     "bpmn-font": "0.12.1",
     "bpmn-js": "16.5.0",
     "camunda-dmn-js": "1.8.0",
+    "chart.js": "^4.4.1",
     "clipboard": "2.0.11",
     "cmmn-js": "0.20.0",
     "core-js": "3.35.1",
