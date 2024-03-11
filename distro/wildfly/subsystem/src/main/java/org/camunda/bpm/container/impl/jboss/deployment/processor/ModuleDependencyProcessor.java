@@ -50,16 +50,16 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
 
   public static final int PRIORITY = 0x2300;
 
-  public static String MODULE_IDENTIFYER_PROCESS_ENGINE = "org.camunda.bpm.camunda-engine";
-  public static String MODULE_IDENTIFYER_XML_MODEL = "org.camunda.bpm.model.camunda-xml-model";
-  public static String MODULE_IDENTIFYER_BPMN_MODEL = "org.camunda.bpm.model.camunda-bpmn-model";
-  public static String MODULE_IDENTIFYER_CMMN_MODEL = "org.camunda.bpm.model.camunda-cmmn-model";
-  public static String MODULE_IDENTIFYER_DMN_MODEL = "org.camunda.bpm.model.camunda-dmn-model";
-  public static String MODULE_IDENTIFYER_SPIN = "org.camunda.spin.camunda-spin-core";
-  public static String MODULE_IDENTIFYER_CONNECT = "org.camunda.connect.camunda-connect-core";
-  public static String MODULE_IDENTIFYER_ENGINE_DMN = "org.camunda.bpm.dmn.camunda-engine-dmn";
-  public static String MODULE_IDENTIFYER_GRAAL_JS = "org.graalvm.js.js-scriptengine";
-  public static String MODULE_IDENTIFYER_JUEL = "org.camunda.bpm.juel.camunda-juel";
+  public static String MODULE_IDENTIFIER_PROCESS_ENGINE = "org.camunda.bpm.camunda-engine";
+  public static String MODULE_IDENTIFIER_XML_MODEL = "org.camunda.bpm.model.camunda-xml-model";
+  public static String MODULE_IDENTIFIER_BPMN_MODEL = "org.camunda.bpm.model.camunda-bpmn-model";
+  public static String MODULE_IDENTIFIER_CMMN_MODEL = "org.camunda.bpm.model.camunda-cmmn-model";
+  public static String MODULE_IDENTIFIER_DMN_MODEL = "org.camunda.bpm.model.camunda-dmn-model";
+  public static String MODULE_IDENTIFIER_SPIN = "org.camunda.spin.camunda-spin-core";
+  public static String MODULE_IDENTIFIER_CONNECT = "org.camunda.connect.camunda-connect-core";
+  public static String MODULE_IDENTIFIER_ENGINE_DMN = "org.camunda.bpm.dmn.camunda-engine-dmn";
+  public static String MODULE_IDENTIFIER_GRAAL_JS = "org.graalvm.js.js-scriptengine";
+  public static String MODULE_IDENTIFIER_JUEL = "org.camunda.bpm.juel.camunda-juel";
 
   @Override
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
@@ -120,16 +120,16 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
   }
 
   private void addSystemDependencies(ModuleLoader moduleLoader, final ModuleSpecification moduleSpecification) {
-    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_PROCESS_ENGINE);
-    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_XML_MODEL);
-    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_BPMN_MODEL);
-    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_CMMN_MODEL);
-    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_DMN_MODEL);
-    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_SPIN);
-    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_CONNECT);
-    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_ENGINE_DMN);
-    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_GRAAL_JS, true);
-    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_JUEL, true);
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFIER_PROCESS_ENGINE);
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFIER_XML_MODEL);
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFIER_BPMN_MODEL);
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFIER_CMMN_MODEL);
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFIER_DMN_MODEL);
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFIER_SPIN);
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFIER_CONNECT);
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFIER_ENGINE_DMN);
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFIER_GRAAL_JS, true);
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFIER_JUEL, true);
   }
 
   private void addSystemDependency(ModuleLoader moduleLoader, final ModuleSpecification moduleSpecification, String identifier) {
