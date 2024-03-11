@@ -32,6 +32,13 @@ public interface ProcessInstance extends Execution {
    */
   String getProcessDefinitionId();
 
+   /**
+   * The Key of the process definition of the process instance.
+   * 
+   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4049
+   */
+  String getProcessDefinitionKey();
+
   /**
    * The business key of this process instance.
    */
