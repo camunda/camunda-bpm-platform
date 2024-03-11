@@ -80,8 +80,8 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
 
   protected Module module;
 
-  public ProcessApplicationDeploymentService(Map<
-      String,byte[]> deploymentMap,
+  public ProcessApplicationDeploymentService(
+      Map<String, byte[]> deploymentMap,
       ProcessArchiveXml processArchive,
       Module module,
       Supplier<ExecutorService> executorSupplier,
