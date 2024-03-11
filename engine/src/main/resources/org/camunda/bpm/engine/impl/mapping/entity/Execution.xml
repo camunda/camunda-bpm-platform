@@ -155,8 +155,22 @@
     <result property="cachedEntityState" column="CACHED_ENT_STATE_" jdbcType="INTEGER"/>
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+    
+    <!-- Added the association relationship between Process Instance and Process Definition
+         GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4049  -->
+    <association property="processDefinitionKey" resultMap="definitionResult"/>
   </resultMap>
   
+  <!-- Added the resultMap id="definitionResult" to accomodate returning Process definition Key for Process Instance GET and POST API Calls
+       as per GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4049 
+       Averted updates to selectExecutionsByQueryCriteriaSql, as this select query is also being used by other API's-->
+  
+  <resultMap id="definitionResult" type="org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity">
+     <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="key" column="KEY_"/>
+  </resultMap>
+    
   <resultMap type="org.camunda.bpm.engine.impl.util.ImmutablePair" id="deploymentIdMapping">
     <id property="left" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
     <id property="right" column="ID_" jdbcType="VARCHAR" />
