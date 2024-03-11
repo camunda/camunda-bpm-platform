@@ -86,4 +86,14 @@ public class ProcessInstanceWithVariablesImpl implements ProcessInstanceWithVari
   public String getTenantId() {
     return executionEntity.getTenantId();
   }
+  /**
+   * The Key of the process definition of the process instance.
+   * 
+   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4049
+   */
+
+  @Override
+  public String getProcessDefinitionKey() {
+		return executionEntity.getProcessDefinitionKey();
+  }
 }
