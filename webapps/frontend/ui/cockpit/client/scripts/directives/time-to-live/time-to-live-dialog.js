@@ -52,12 +52,10 @@ const Controller = [
 
     $scope.openBatchOperation = () => {
       let batchSearchQuery = null;
-      const operation =
-        $scope.$parent?.resource === 'process-definition'
-          ? 'PROCESS_SET_REMOVAL_TIME'
-          : 'DECISION_SET_REMOVAL_TIME';
+      let operation = null;
 
       if ($scope.$parent?.resource === 'process-definition') {
+        operation = 'PROCESS_SET_REMOVAL_TIME';
         batchSearchQuery = JSON.stringify([
           {
             type: 'PIprocessDefinitionKey',
@@ -70,9 +68,8 @@ const Controller = [
             value: ''
           }
         ]);
-      }
-
-      if ($scope.$parent?.resource === 'decision-definition') {
+      } else {
+        operation = 'DECISION_SET_REMOVAL_TIME';
         batchSearchQuery = JSON.stringify([
           {
             type: 'decisionDefinitionKeyIn',
