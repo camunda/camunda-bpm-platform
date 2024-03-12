@@ -29,7 +29,7 @@ assignees:
 - [ ] [Inform the support team](https://confluence.camunda.com/pages/viewpage.action?spaceKey=AP&title=Performing+an+Alpha+Release#PerforminganAlphaRelease-Informthesupportteam)
 - [ ] [Release Maven Central](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-ReleaseMavenCentral)
 - [ ] [Release the Documentation (Manual)](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-ReleasetheDocumentation(Manual))
-- [ ] [Release Javadocs](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-ReleaseJavadocs)
+- [ ] [Release Javadocs/REST docs](https://confluence.camunda.com/pages/viewpage.action?spaceKey=AP&title=Performing+an+Alpha+Release#PerforminganAlphaRelease-ReleaseJavadocs/RESTdocs)
 - [ ] [Check Docker Images](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-CheckDockerImages)
 - [ ] [Publish the Enterprise Page](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-PublishtheEnterprisePage)
 - [ ] [Inform the Support Team and Forward the Security Reports](https://confluence.camunda.com/pages/viewpage.action?spaceKey=AP&title=Performing+an+Alpha+Release#PerforminganAlphaRelease-SendSlackreleasenotifications)
