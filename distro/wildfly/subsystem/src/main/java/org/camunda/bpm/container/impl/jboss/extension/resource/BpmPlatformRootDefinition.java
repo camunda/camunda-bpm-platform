@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension.resource;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.camunda.bpm.container.impl.jboss.extension.BpmPlatformExtension;
 import org.camunda.bpm.container.impl.jboss.extension.handler.BpmPlatformSubsystemAdd;
 import org.camunda.bpm.container.impl.jboss.extension.handler.BpmPlatformSubsystemRemove;
@@ -24,20 +29,15 @@ import org.jboss.as.controller.PersistentResourceDefinition;
 import org.jboss.as.controller.operations.common.GenericSubsystemDescribeHandler;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 public class BpmPlatformRootDefinition extends PersistentResourceDefinition {
 
   public static final BpmPlatformRootDefinition INSTANCE = new BpmPlatformRootDefinition();
 
   private BpmPlatformRootDefinition() {
-    super(BpmPlatformExtension.SUBSYSTEM_PATH,
-        BpmPlatformExtension.getResourceDescriptionResolver(),
-        BpmPlatformSubsystemAdd.INSTANCE,
-        BpmPlatformSubsystemRemove.INSTANCE);
+    super(new Parameters(BpmPlatformExtension.SUBSYSTEM_PATH,
+        BpmPlatformExtension.getResourceDescriptionResolver())
+        .setAddHandler(BpmPlatformSubsystemAdd.INSTANCE)
+        .setRemoveHandler(BpmPlatformSubsystemRemove.INSTANCE));
   }
 
   @Override

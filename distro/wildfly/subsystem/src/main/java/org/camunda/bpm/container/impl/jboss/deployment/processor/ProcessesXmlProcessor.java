@@ -58,6 +58,7 @@ public class ProcessesXmlProcessor implements DeploymentUnitProcessor {
 
   public static final int PRIORITY = 0x0000; // this can happen ASAP in the POST_MODULE Phase
 
+  @Override
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
 
     DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
@@ -100,7 +101,7 @@ public class ProcessesXmlProcessor implements DeploymentUnitProcessor {
         throw new DeploymentUnitProcessingException("Could not load processes.xml resource: ", e);
       }
       while (resources.hasMoreElements()) {
-        deploymentDescriptorURLs.add((URL) resources.nextElement());
+        deploymentDescriptorURLs.add(resources.nextElement());
       }
     }
     return deploymentDescriptorURLs;
@@ -117,7 +118,7 @@ public class ProcessesXmlProcessor implements DeploymentUnitProcessor {
 
     Class<?> paClass = null;
     try {
-      paClass = (Class<?>) module.getClassLoader().loadClass(paClassName);
+      paClass = module.getClassLoader().loadClass(paClassName);
     } catch (ClassNotFoundException e) {
       throw new DeploymentUnitProcessingException("Unable to load process application class '"+paClassName+"'.");
     }
@@ -177,10 +178,6 @@ public class ProcessesXmlProcessor implements DeploymentUnitProcessor {
       .getProcessesXml();
 
     return processesXml;
-
-  }
-
-  public void undeploy(DeploymentUnit context) {
 
   }
 

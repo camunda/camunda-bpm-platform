@@ -17,10 +17,10 @@
 package org.camunda.bpm.container.impl.jboss.util;
 
 import java.util.concurrent.ExecutorService;
+import java.util.function.Supplier;
 
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceName;
-import org.jboss.msc.value.InjectedValue;
 
 /**
  * Provides method abstractions to make our subsystem compatible with different JBoss versions.
@@ -44,7 +44,7 @@ public class JBossCompatibilityExtension {
    * Adds the JBoss server executor as a dependency to the given service.
    * Copied from org.jboss.as.server.Services - JBoss 7.2.0.Final
    */
-  public static void addServerExecutorDependency(ServiceBuilder<?> serviceBuilder,  InjectedValue<ExecutorService> injector) {
-    serviceBuilder.addDependency(JBOSS_SERVER_EXECUTOR, ExecutorService.class, injector);
+  public static Supplier<ExecutorService> addServerExecutorDependency(ServiceBuilder<?> serviceBuilder) {
+    return serviceBuilder.requires(JBOSS_SERVER_EXECUTOR);
   }
 }

@@ -17,7 +17,6 @@
 package org.camunda.bpm.container.impl.jboss.deployment.processor;
 
 import java.util.List;
-import java.util.Map;
 
 import org.camunda.bpm.container.impl.jboss.config.ManagedProcessEngineMetadata;
 import org.camunda.bpm.container.impl.jboss.deployment.marker.ProcessApplicationAttachments;
@@ -25,7 +24,6 @@ import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessEngineContr
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.jboss.util.ProcessesXmlWrapper;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
@@ -47,6 +45,7 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
   // this can happen at the beginning of the phase
   public static final int PRIORITY = 0x0000;
 
+  @Override
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
 
     final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
@@ -66,7 +65,7 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
 
   protected void startProcessEngine(ProcessEngineXml processEngineXml, DeploymentPhaseContext phaseContext) {
 
-    final ServiceTarget serviceTarget = phaseContext.getServiceTarget();
+    final ServiceTarget serviceTarget = phaseContext.getRequirementServiceTarget();
 
     // transform configuration
     ManagedProcessEngineMetadata configuration = transformConfiguration(processEngineXml);
@@ -81,22 +80,22 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
     ServiceName serviceName = ServiceNames.forManagedProcessEngine(processEngineXml.getName());
 
     // get service builder
-    ServiceBuilder<ProcessEngine> serviceBuilder = serviceTarget.addService(serviceName, service);
+    ServiceBuilder<?> serviceBuilder = serviceTarget.addService(serviceName);
 
     // make this service depend on the current phase -> makes sure it is removed with the phase service at undeployment
     serviceBuilder.requires(phaseContext.getPhaseServiceName());
 
     // add Service dependencies
-    MscManagedProcessEngineController.initializeServiceBuilder(configuration, service, serviceBuilder, processEngineXml.getJobAcquisitionName());
+    service.initializeServiceBuilder(configuration, serviceBuilder, serviceName, processEngineXml.getJobAcquisitionName());
 
     // install the service
+    serviceBuilder.setInstance(service);
     serviceBuilder.install();
 
   }
 
   /** transforms the configuration as provided via the {@link ProcessEngineXml}
    * into a {@link ManagedProcessEngineMetadata} */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   protected ManagedProcessEngineMetadata transformConfiguration(ProcessEngineXml processEngineXml) {
     return new ManagedProcessEngineMetadata(
         processEngineXml.getName().equals("default"),
@@ -106,10 +105,6 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
         processEngineXml.getConfigurationClass(),
         processEngineXml.getProperties(),
         processEngineXml.getPlugins());
-  }
-
-  public void undeploy(DeploymentUnit deploymentUnit) {
-
   }
 
 }

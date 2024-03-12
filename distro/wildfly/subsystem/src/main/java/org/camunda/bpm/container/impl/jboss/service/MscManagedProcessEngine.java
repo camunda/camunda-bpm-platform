@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.container.impl.jboss.service;
 
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.BpmPlatform;
@@ -25,7 +26,6 @@ import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngine;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.jboss.as.naming.ManagedReferenceFactory;
 import org.jboss.as.naming.deployment.ContextNames;
-import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
@@ -33,25 +33,24 @@ import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
-import org.jboss.msc.value.InjectedValue;
 
 /**
  * <p>Service representing a managed process engine instance registered with the Msc.</p>
- * 
- * <p>Instances of this service are created and registered by the {@link MscRuntimeContainerDelegate} 
+ *
+ * <p>Instances of this service are created and registered by the {@link MscRuntimeContainerDelegate}
  * when {@link MscRuntimeContainerDelegate#registerProcessEngine(ProcessEngine)} is called.</p>
- * 
+ *
  * <p>This is the JBoass Msc counterpart of the {@link JmxManagedProcessEngine}</p>
- * 
+ *
  * @author Daniel Meyer
  *
  */
 public class MscManagedProcessEngine implements Service<ProcessEngine> {
-  
+
   private final static Logger LOGG = Logger.getLogger(MscManagedProcessEngine.class.getName());
-  
-  protected InjectedValue<MscRuntimeContainerDelegate> runtimeContainerDelegateInjector = new InjectedValue<MscRuntimeContainerDelegate>();
-  
+
+  protected Supplier<MscRuntimeContainerDelegate> runtimeContainerDelegateSupplier;
+
   /** the process engine managed by this service */
   protected ProcessEngine processEngine;
 
@@ -60,34 +59,36 @@ public class MscManagedProcessEngine implements Service<ProcessEngine> {
   // for subclasses only
   protected MscManagedProcessEngine() {
   }
-  
+
   public MscManagedProcessEngine(ProcessEngine processEngine) {
     this.processEngine = processEngine;
   }
 
+  @Override
   public ProcessEngine getValue() throws IllegalStateException, IllegalArgumentException {
     return processEngine;
   }
 
+  @Override
   public void start(StartContext context) throws StartException {
-    MscRuntimeContainerDelegate runtimeContainerDelegate = runtimeContainerDelegateInjector.getValue();
+    MscRuntimeContainerDelegate runtimeContainerDelegate = runtimeContainerDelegateSupplier.get();
     runtimeContainerDelegate.processEngineStarted(processEngine);
-    
+
     createProcessEngineJndiBinding(context);
   }
 
   protected void createProcessEngineJndiBinding(StartContext context) {
-    
+
     final ProcessEngineManagedReferenceFactory managedReferenceFactory = new ProcessEngineManagedReferenceFactory(processEngine);
-    
-    final ServiceName processEngineServiceBindingServiceName = ContextNames.GLOBAL_CONTEXT_SERVICE_NAME            
+
+    final ServiceName processEngineServiceBindingServiceName = ContextNames.GLOBAL_CONTEXT_SERVICE_NAME
         .append(BpmPlatform.APP_JNDI_NAME)
         .append(BpmPlatform.MODULE_JNDI_NAME)
         .append(processEngine.getName());
-    
-    final String jndiName = BpmPlatform.JNDI_NAME_PREFIX 
-        + "/" + BpmPlatform.APP_JNDI_NAME 
-        + "/" + BpmPlatform.MODULE_JNDI_NAME 
+
+    final String jndiName = BpmPlatform.JNDI_NAME_PREFIX
+        + "/" + BpmPlatform.APP_JNDI_NAME
+        + "/" + BpmPlatform.MODULE_JNDI_NAME
         + "/" +processEngine.getName();
 
     // bind process engine service
@@ -96,18 +97,19 @@ public class MscManagedProcessEngine implements Service<ProcessEngine> {
     // log info message
     LOGG.info("jndi binding for process engine " + processEngine.getName() + " is " + jndiName);
   }
-  
+
   protected void removeProcessEngineJndiBinding() {
     bindingService.setMode(Mode.REMOVE);
   }
-  
+
+  @Override
   public void stop(StopContext context) {
-    MscRuntimeContainerDelegate runtimeContainerDelegate = runtimeContainerDelegateInjector.getValue();
-    runtimeContainerDelegate.processEngineStopped(processEngine);  
+    MscRuntimeContainerDelegate runtimeContainerDelegate = runtimeContainerDelegateSupplier.get();
+    runtimeContainerDelegate.processEngineStopped(processEngine);
   }
 
-  public Injector<MscRuntimeContainerDelegate> getRuntimeContainerDelegateInjector() {
-    return runtimeContainerDelegateInjector;
+  public Supplier<MscRuntimeContainerDelegate> getRuntimeContainerDelegateSupplier() {
+    return runtimeContainerDelegateSupplier;
   }
-  
+
 }

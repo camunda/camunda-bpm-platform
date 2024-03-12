@@ -19,6 +19,8 @@ package org.camunda.bpm.container.impl.jboss.service;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,79 +32,86 @@ import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
-import org.jboss.msc.value.InjectedValue;
-import org.jboss.threads.ExecutionTimedOutException;
 
 
 public class MscExecutorService implements Service<MscExecutorService>, ExecutorService {
 
   private static Logger log = Logger.getLogger(MscExecutorService.class.getName());
-  
-  private final InjectedValue<ManagedQueueExecutorService> managedQueueInjector = new InjectedValue<ManagedQueueExecutorService>();
-  
+
+  protected final Supplier<ManagedQueueExecutorService> managedQueueSupplier;
+  protected final Consumer<ExecutorService> provider;
+
   private long lastWarningLogged = System.currentTimeMillis();
 
+  public MscExecutorService(Supplier<ManagedQueueExecutorService> managedQueueSupplier, Consumer<ExecutorService> provider) {
+    this.managedQueueSupplier = managedQueueSupplier;
+    this.provider = provider;
+  }
+
+  @Override
   public MscExecutorService getValue() throws IllegalStateException, IllegalArgumentException {
     return this;
   }
 
+  @Override
   public void start(StartContext context) throws StartException {
-    // nothing to do
+    provider.accept(this);
   }
 
+  @Override
   public void stop(StopContext context) {
-    // nothing to do    
+    provider.accept(null);
   }
-  
+
+  @Override
   public Runnable getExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
     return new ExecuteJobsRunnable(jobIds, processEngine);
   }
-  
+
+  @Override
   public boolean schedule(Runnable runnable, boolean isLongRunning) {
-    
+
     if(isLongRunning) {
       return scheduleLongRunningWork(runnable);
-      
-    } else {      
+
+    } else {
       return scheduleShortRunningWork(runnable);
-      
+
     }
 
   }
 
   protected boolean scheduleShortRunningWork(Runnable runnable) {
 
-    ManagedQueueExecutorService managedQueueExecutorService = managedQueueInjector.getValue();
-    
+    ManagedQueueExecutorService managedQueueExecutorService = managedQueueSupplier.get();
+
     try {
-      
+
       managedQueueExecutorService.executeBlocking(runnable);
       return true;
-      
+
     } catch (InterruptedException e) {
-      // the the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore          
-    } catch (Exception e) {      
+      // the the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore
+    } catch (Exception e) {
       // we must be able to schedule this
       log.log(Level.WARNING,  "Cannot schedule long running work.", e);
     }
-    
+
     return false;
   }
 
   protected boolean scheduleLongRunningWork(Runnable runnable) {
-    
-    final ManagedQueueExecutorService managedQueueExecutorService = managedQueueInjector.getValue();
+
+    final ManagedQueueExecutorService managedQueueExecutorService = managedQueueSupplier.get();
 
     boolean rejected = false;
     try {
-      
+
       // wait for 2 seconds for the job to be accepted by the pool.
       managedQueueExecutorService.executeBlocking(runnable, 2, TimeUnit.SECONDS);
-      
+
     } catch (InterruptedException e) {
-      // the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore          
-    } catch (ExecutionTimedOutException e) {
-      rejected = true;
+      // the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore
     } catch (RejectedExecutionException e) {
       rejected = true;
     } catch (Exception e) {
@@ -115,13 +124,9 @@ public class MscExecutorService implements Service<MscExecutorService>, Executor
         log.log(Level.FINE, "Unexpected Exception while submitting job to executor pool.", e);
       }
     }
-    
+
     return !rejected;
-    
+
   }
 
-  public InjectedValue<ManagedQueueExecutorService> getManagedQueueInjector() {
-    return managedQueueInjector;
-  }
-    
 }

@@ -29,13 +29,12 @@ public class BpmPlatformSubsystemRemove extends ReloadRequiredRemoveStepHandler 
 
   public static final BpmPlatformSubsystemRemove INSTANCE = new BpmPlatformSubsystemRemove();
 
-  private BpmPlatformSubsystemRemove() {
-  }
-
+  @Override
   protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
     super.performRuntime(context, operation, model);
   }
 
+  @Override
   protected void recoverServices(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
     super.recoverServices(context, operation, model);
 

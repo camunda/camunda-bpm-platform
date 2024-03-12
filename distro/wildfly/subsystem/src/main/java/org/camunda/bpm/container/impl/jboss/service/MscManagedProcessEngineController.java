@@ -16,13 +16,17 @@
  */
 package org.camunda.bpm.container.impl.jboss.service;
 
-import jakarta.transaction.TransactionManager;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.sql.DataSource;
+
 import org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfiguration;
 import org.camunda.bpm.container.impl.jboss.config.ManagedProcessEngineMetadata;
 import org.camunda.bpm.container.impl.jboss.plugin.JBossConnectProcessEnginePlugin;
@@ -39,14 +43,14 @@ import org.camunda.bpm.engine.impl.cfg.JakartaTransactionProcessEngineConfigurat
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.jboss.as.connector.subsystems.datasources.DataSourceReferenceFactoryService;
 import org.jboss.as.naming.deployment.ContextNames;
-import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
-import org.jboss.msc.value.InjectedValue;
+
+import jakarta.transaction.TransactionManager;
 
 
 /**
@@ -65,17 +69,19 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
 
   protected static final String CONNECT_PROCESS_ENGINE_PLUGIN_NAME = "org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin";
 
-  protected InjectedValue<ExecutorService> executorInjector = new InjectedValue<ExecutorService>();
+  protected Supplier<ExecutorService> executorSupplier;
 
-  // Injecting these values makes the MSC aware of our dependencies on these resources.
+  // Providing these values makes the MSC aware of our dependencies on these resources.
   // This ensures that they are available when this service is started
-  protected final InjectedValue<TransactionManager> transactionManagerInjector = new InjectedValue<>();
-  protected final InjectedValue<DataSourceReferenceFactoryService> datasourceBinderServiceInjector = new InjectedValue<>();
-  protected final InjectedValue<MscRuntimeContainerJobExecutor> mscRuntimeContainerJobExecutorInjector = new InjectedValue<>();
+  protected Supplier<TransactionManager> transactionManagerSupplier;
+  protected Supplier<DataSourceReferenceFactoryService> datasourceBinderServiceSupplier;
+  protected Supplier<MscRuntimeContainerJobExecutor> mscRuntimeContainerJobExecutorSupplier;
 
   protected ManagedProcessEngineMetadata processEngineMetadata;
 
   protected JakartaTransactionProcessEngineConfiguration processEngineConfiguration;
+
+  protected final List<Consumer<ProcessEngine>> processEngineConsumers = new ArrayList<>();
 
   /**
    * Instantiate  the process engine controller for a process engine configuration.
@@ -85,9 +91,11 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     this.processEngineMetadata = processEngineConfiguration;
   }
 
+  @Override
   public void start(final StartContext context) throws StartException {
     context.asynchronous();
-    executorInjector.getValue().submit(new Runnable() {
+    executorSupplier.get().submit(new Runnable() {
+      @Override
       public void run() {
         try {
           startInternal(context);
@@ -104,12 +112,12 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     });
   }
 
+  @Override
   public void stop(final StopContext context) {
     stopInternal(context);
   }
 
   protected void stopInternal(StopContext context) {
-
     try {
       super.stop(context);
 
@@ -123,6 +131,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
 
       }
     }
+    processEngineConsumers.forEach(c -> c.accept(null));
   }
 
   public void startInternal(StartContext context) throws StartException {
@@ -130,6 +139,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     // this exploits a hack in MyBatis allowing it to use the TCCL to load the
     // mapping files from the process engine module
     Tccl.runUnderClassloader(new Operation<Void>() {
+      @Override
       public Void run() {
         startProcessEngine();
         return null;
@@ -152,10 +162,10 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     processEngineConfiguration.setHistory(processEngineMetadata.getHistoryLevel());
 
     // use the injected datasource
-    processEngineConfiguration.setDataSource((DataSource) datasourceBinderServiceInjector.getValue().getReference().getInstance());
+    processEngineConfiguration.setDataSource((DataSource) datasourceBinderServiceSupplier.get().getReference().getInstance());
 
     // use the injected transaction manager
-    processEngineConfiguration.setTransactionManager(transactionManagerInjector.getValue());
+    processEngineConfiguration.setTransactionManager(transactionManagerSupplier.get());
 
     // set auto schema update
     if(processEngineMetadata.isAutoSchemaUpdate()) {
@@ -170,7 +180,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     }
 
     // set job executor on process engine.
-    MscRuntimeContainerJobExecutor mscRuntimeContainerJobExecutor = mscRuntimeContainerJobExecutorInjector.getValue();
+    MscRuntimeContainerJobExecutor mscRuntimeContainerJobExecutor = mscRuntimeContainerJobExecutorSupplier.get();
     processEngineConfiguration.setJobExecutor(mscRuntimeContainerJobExecutor);
 
     PropertyHelper.applyProperties(processEngineConfiguration, processEngineMetadata.getConfigurationProperties());
@@ -178,6 +188,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     addProcessEnginePlugins(processEngineConfiguration);
 
     processEngine = processEngineConfiguration.buildProcessEngine();
+    processEngineConsumers.forEach(c -> c.accept(processEngine));
   }
 
   protected void addProcessEnginePlugins(JakartaTransactionProcessEngineConfiguration processEngineConfiguration) {
@@ -236,50 +247,33 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
   private Object createInstance(String configurationClassName) {
     try {
       Class<?> configurationClass = getClass().getClassLoader().loadClass(configurationClassName);
-      return configurationClass.newInstance();
+      return configurationClass.getDeclaredConstructor().newInstance();
 
     } catch (Exception e) {
       throw new ProcessEngineException("Could not load '"+configurationClassName+"': the class must be visible from the camunda-wildfly-subsystem module.", e);
     }
   }
 
-  public Injector<TransactionManager> getTransactionManagerInjector() {
-    return transactionManagerInjector;
-  }
-
-  public Injector<DataSourceReferenceFactoryService> getDatasourceBinderServiceInjector() {
-    return datasourceBinderServiceInjector;
-  }
-
-  public InjectedValue<MscRuntimeContainerJobExecutor> getMscRuntimeContainerJobExecutorInjector() {
-    return mscRuntimeContainerJobExecutorInjector;
-  }
-
-  public static void initializeServiceBuilder(ManagedProcessEngineMetadata processEngineConfiguration, MscManagedProcessEngineController service,
-    ServiceBuilder<ProcessEngine> serviceBuilder, String jobExecutorName) {
+  public void initializeServiceBuilder(ManagedProcessEngineMetadata processEngineConfiguration,
+      ServiceBuilder<?> serviceBuilder, ServiceName name, String jobExecutorName) {
 
     ContextNames.BindInfo datasourceBindInfo = ContextNames.bindInfoFor(processEngineConfiguration.getDatasourceJndiName());
-    serviceBuilder.addDependency(ServiceName.JBOSS.append("txn").append("TransactionManager"), TransactionManager.class, service.getTransactionManagerInjector())
-      .addDependency(datasourceBindInfo.getBinderServiceName(), DataSourceReferenceFactoryService.class, service.getDatasourceBinderServiceInjector())
-      .addDependency(ServiceNames.forMscRuntimeContainerDelegate(), MscRuntimeContainerDelegate.class, service.getRuntimeContainerDelegateInjector())
-      .addDependency(ServiceNames.forMscRuntimeContainerJobExecutorService(jobExecutorName), MscRuntimeContainerJobExecutor.class, service.getMscRuntimeContainerJobExecutorInjector())
-      .setInitialMode(Mode.ACTIVE);
+    transactionManagerSupplier = serviceBuilder.requires(ServiceName.JBOSS.append("txn").append("TransactionManager"));
+    datasourceBinderServiceSupplier = serviceBuilder.requires(datasourceBindInfo.getBinderServiceName());
+    runtimeContainerDelegateSupplier = serviceBuilder.requires(ServiceNames.forMscRuntimeContainerDelegate());
+    mscRuntimeContainerJobExecutorSupplier = serviceBuilder.requires(ServiceNames.forMscRuntimeContainerJobExecutorService(jobExecutorName));
+    serviceBuilder.setInitialMode(Mode.ACTIVE);
     serviceBuilder.requires(ServiceNames.forMscExecutorService());
 
-    if(processEngineConfiguration.isDefault()) {
-      serviceBuilder.addAliases(ServiceNames.forDefaultProcessEngine());
-    }
+    processEngineConsumers.add(serviceBuilder.provides(name));
 
-    JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder, service.getExecutorInjector());
+    this.executorSupplier = JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder);
+    JBossCompatibilityExtension.addServerExecutorDependency(serviceBuilder);
 
   }
 
   public ProcessEngine getProcessEngine() {
     return processEngine;
-  }
-
-  public InjectedValue<ExecutorService> getExecutorInjector() {
-    return executorInjector;
   }
 
   public ManagedProcessEngineMetadata getProcessEngineMetadata() {

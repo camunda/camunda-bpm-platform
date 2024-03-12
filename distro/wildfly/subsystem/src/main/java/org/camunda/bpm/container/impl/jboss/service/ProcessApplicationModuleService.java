@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.container.impl.jboss.service;
 
+import java.util.function.Consumer;
+
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.StartContext;
@@ -24,33 +26,40 @@ import org.jboss.msc.service.StopContext;
 
 /**
  * <p>Service installed for a process application module</p>
- * 
- * <p>This service is used as a "root" service for all services installed by a 
- * process application deployment, be it from a DeploymentProcessor or at Runtime. 
- * As this service is installed as a child service on the deployment unit, it is 
- * guaranteed that the undeployment operation removes all services installed by 
+ *
+ * <p>This service is used as a "root" service for all services installed by a
+ * process application deployment, be it from a DeploymentProcessor or at Runtime.
+ * As this service is installed as a child service on the deployment unit, it is
+ * guaranteed that the undeployment operation removes all services installed by
  * the process application.</p>
- * 
+ *
  * @author Daniel Meyer
  *
  */
 public class ProcessApplicationModuleService implements Service<ServiceTarget> {
-  
-  protected ServiceTarget childTarget;
 
-  public ProcessApplicationModuleService() {
+  protected ServiceTarget childTarget;
+  protected Consumer<ProcessApplicationModuleService> provider;
+
+  public ProcessApplicationModuleService(Consumer<ProcessApplicationModuleService> provider) {
+    this.provider = provider;
   }
 
+  @Override
   public ServiceTarget getValue() throws IllegalStateException, IllegalArgumentException {
     return childTarget;
   }
 
+  @Override
   public void start(StartContext context) throws StartException {
     childTarget = context.getChildTarget();
+    provider.accept(this);
   }
 
+  @Override
   public void stop(StopContext context) {
+    provider.accept(null);
   }
-  
+
 
 }

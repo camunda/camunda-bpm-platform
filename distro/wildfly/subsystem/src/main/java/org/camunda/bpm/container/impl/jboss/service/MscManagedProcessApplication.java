@@ -42,14 +42,17 @@ public class MscManagedProcessApplication implements Service<MscManagedProcessAp
     this.processApplicationReference = processApplicationReference;
   }
 
+  @Override
   public MscManagedProcessApplication getValue() throws IllegalStateException, IllegalArgumentException {
     return this;
   }
 
+  @Override
   public void start(StartContext context) throws StartException {
     // call the process application's
   }
 
+  @Override
   public void stop(StopContext context) {
     // Nothing to do
   }
