@@ -30,8 +30,9 @@ import org.jboss.msc.service.ServiceName;
  */
 public class JobExecutorRemove extends AbstractRemoveStepHandler {
 
-  public static JobExecutorRemove INSTANCE = new JobExecutorRemove();
+  public static final JobExecutorRemove INSTANCE = new JobExecutorRemove();
 
+  @Override
   protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
     ServiceName name = ServiceNames.forMscExecutorService();
     context.removeService(name);

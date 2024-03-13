@@ -244,9 +244,4 @@ public class ProcessApplicationProcessor implements DeploymentUnitProcessor {
     }
   }
 
-  @Override
-  public void undeploy(DeploymentUnit context) {
-
-  }
-
 }

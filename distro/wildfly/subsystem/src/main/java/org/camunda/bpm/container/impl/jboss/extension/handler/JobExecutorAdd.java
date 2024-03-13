@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension.handler;
 
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import org.camunda.bpm.container.ExecutorService;
 import org.camunda.bpm.container.impl.jboss.extension.SubsystemAttributeDefinitons;
 import org.camunda.bpm.container.impl.jboss.service.MscExecutorService;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
@@ -33,10 +39,6 @@ import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 
-import java.util.List;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-
 
 /**
  * Installs the JobExecutor service into the container.
@@ -45,56 +47,54 @@ import java.util.concurrent.TimeUnit;
  */
 public class JobExecutorAdd extends AbstractAddStepHandler {
 
-    public static final String THREAD_POOL_GRP_NAME = "Camunda BPM ";
+  public static final String THREAD_POOL_GRP_NAME = "Camunda BPM ";
 
-    public static final JobExecutorAdd INSTANCE = new JobExecutorAdd();
+  public static final JobExecutorAdd INSTANCE = new JobExecutorAdd();
 
-    private JobExecutorAdd() {
-        super(SubsystemAttributeDefinitons.JOB_EXECUTOR_ATTRIBUTES);
-    }
+  @Override
+  protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model)
+      throws OperationFailedException {
 
-    @Override
-    protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model)
-            throws OperationFailedException {
+    String jobExecutorThreadPoolName = SubsystemAttributeDefinitons.THREAD_POOL_NAME
+        .resolveModelAttribute(context, model).asString();
+    ServiceName jobExecutorThreadPoolServiceName = ServiceNames.forManagedThreadPool(jobExecutorThreadPoolName);
 
-        String jobExecutorThreadPoolName =
-                SubsystemAttributeDefinitons.THREAD_POOL_NAME.resolveModelAttribute(context, model).asString();
-        ServiceName jobExecutorThreadPoolServiceName = ServiceNames.forManagedThreadPool(jobExecutorThreadPoolName);
+    performRuntimeThreadPool(context, model, jobExecutorThreadPoolName, jobExecutorThreadPoolServiceName);
 
-        performRuntimeThreadPool(context, model, jobExecutorThreadPoolName, jobExecutorThreadPoolServiceName);
+    ServiceName serviceName = ServiceNames.forMscExecutorService();
+    ServiceBuilder<?> builder = context.getCapabilityServiceTarget().addService(serviceName);
+    Consumer<ExecutorService> provider = builder.provides(serviceName);
+    Supplier<ManagedQueueExecutorService> supplier = builder.requires(jobExecutorThreadPoolServiceName);
+    MscExecutorService service = new MscExecutorService(supplier, provider);
+    builder.setInitialMode(Mode.ACTIVE);
+    builder.setInstance(service);
+    builder.install();
+  }
 
-        MscExecutorService service = new MscExecutorService();
-        ServiceController<MscExecutorService> serviceController =
-                context.getServiceTarget().addService(ServiceNames.forMscExecutorService(), service)
-                        .addDependency(jobExecutorThreadPoolServiceName, ManagedQueueExecutorService.class,
-                                service.getManagedQueueInjector())
-                        .setInitialMode(Mode.ACTIVE).install();
-    }
+  protected void performRuntimeThreadPool(OperationContext context, ModelNode model, String name,
+      ServiceName jobExecutorThreadPoolServiceName) throws OperationFailedException {
 
-    protected void performRuntimeThreadPool(OperationContext context, ModelNode model, String name,
-            ServiceName jobExecutorThreadPoolServiceName) throws OperationFailedException {
+    ServiceTarget serviceTarget = context.getCapabilityServiceTarget();
 
-        ServiceTarget serviceTarget = context.getServiceTarget();
+    ThreadFactoryService threadFactory = new ThreadFactoryService();
+    threadFactory.setThreadGroupName(THREAD_POOL_GRP_NAME + name);
 
-        ThreadFactoryService threadFactory = new ThreadFactoryService();
-        threadFactory.setThreadGroupName(THREAD_POOL_GRP_NAME + name);
+    ServiceName threadFactoryServiceName = ServiceNames.forThreadFactoryService(name);
 
-        ServiceName threadFactoryServiceName = ServiceNames.forThreadFactoryService(name);
+    serviceTarget.addService(threadFactoryServiceName, threadFactory).install();
 
-        serviceTarget.addService(threadFactoryServiceName, threadFactory).install();
+    final BoundedQueueThreadPoolService threadPoolService = new BoundedQueueThreadPoolService(
+        SubsystemAttributeDefinitons.CORE_THREADS.resolveModelAttribute(context, model).asInt(),
+        SubsystemAttributeDefinitons.MAX_THREADS.resolveModelAttribute(context, model).asInt(),
+        SubsystemAttributeDefinitons.QUEUE_LENGTH.resolveModelAttribute(context, model).asInt(), false,
+        new TimeSpec(TimeUnit.SECONDS,
+                SubsystemAttributeDefinitons.KEEPALIVE_TIME.resolveModelAttribute(context, model).asInt()),
+        SubsystemAttributeDefinitons.ALLOW_CORE_TIMEOUT.resolveModelAttribute(context, model).asBoolean());
 
-        final BoundedQueueThreadPoolService threadPoolService = new BoundedQueueThreadPoolService(
-                SubsystemAttributeDefinitons.CORE_THREADS.resolveModelAttribute(context, model).asInt(),
-                SubsystemAttributeDefinitons.MAX_THREADS.resolveModelAttribute(context, model).asInt(),
-                SubsystemAttributeDefinitons.QUEUE_LENGTH.resolveModelAttribute(context, model).asInt(), false,
-                new TimeSpec(TimeUnit.SECONDS,
-                        SubsystemAttributeDefinitons.KEEPALIVE_TIME.resolveModelAttribute(context, model).asInt()),
-                SubsystemAttributeDefinitons.ALLOW_CORE_TIMEOUT.resolveModelAttribute(context, model).asBoolean());
-
-        serviceTarget.addService(jobExecutorThreadPoolServiceName, threadPoolService)
-                .addDependency(threadFactoryServiceName, ThreadFactory.class,
-                        threadPoolService.getThreadFactoryInjector())
-                .setInitialMode(ServiceController.Mode.ACTIVE).install();
-    }
+    serviceTarget.addService(jobExecutorThreadPoolServiceName, threadPoolService)
+        .addDependency(threadFactoryServiceName, ThreadFactory.class,
+                threadPoolService.getThreadFactoryInjector())
+        .setInitialMode(ServiceController.Mode.ACTIVE).install();
+  }
 
 }

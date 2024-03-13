@@ -19,7 +19,6 @@ package org.camunda.bpm.dmn.engine.feel;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
-
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
@@ -72,32 +71,27 @@ public class BreakingScalaFeelBehaviorTest extends DmnEngineTest {
   @Test
   @DecisionResource(resource = "breaking_compare_date_with_time_zone_untyped.dmn")
   public void shouldEvaluateTimezoneComparisonWithTypedValue() {
-    // given
+    // given a date typed value
     variables.putValue("date1", Variables.dateValue(new Date()));
 
-    // then
-    thrown.expect(FeelException.class);
-    thrown.expectMessage("can not be compared to ValDateTime(2019-09-12T13:00+02:00[Europe/Berlin])");
+    // when it is compared against timezone
+    var evaluationResult = evaluateDecisionTable(dmnEngine);
 
-    // when
-    assertThatDecisionTableResult()
-      .hasSingleResult()
-      .hasSingleEntryTyped(Variables.stringValue("foo"));
+    // then the evaluation is handled gracefully and empty results are returned despite the type mismatch
+    assertThat(evaluationResult).isEmpty();
   }
 
   @Test
   @DecisionResource(resource = "breaking_compare_date_with_time_zone_untyped.dmn")
   public void shouldEvaluateTimezoneComparisonWithDate() {
+    // given a date
     variables.putValue("date1", new Date());
 
-    // then
-    thrown.expect(FeelException.class);
-    thrown.expectMessage("can not be compared to ValDateTime(2019-09-12T13:00+02:00[Europe/Berlin])");
+    // when it is compared against timezone
+    var evaluationResult = evaluateDecisionTable(dmnEngine);
 
-    // when
-    assertThatDecisionTableResult()
-      .hasSingleResult()
-      .hasSingleEntryTyped(Variables.stringValue("foo"));
+    // then the evaluation is handled gracefully and empty results are returned despite the type mismatch
+    assertThat(evaluationResult).isEmpty();
   }
 
   @Test
@@ -110,7 +104,7 @@ public class BreakingScalaFeelBehaviorTest extends DmnEngineTest {
     // then
     thrown.expect(FeelException.class);
     thrown.expectMessage("FEEL/SCALA-01008 Error while evaluating expression: failed to parse expression ''Hello World'': "
-      + "Expected (negation | positiveUnaryTests | anyInput):1:1, found \"'Hello Wor\"");
+      + "Expected (start-of-input | negation | positiveUnaryTests | anyInput):1:1, found \"'Hello Wor\"");
 
     // when
     engine.evaluateDecision(decision, Variables.createVariables().putValue("input", "Hello World"));

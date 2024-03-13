@@ -76,7 +76,6 @@ public class SubsystemAttributeDefinitons {
                 .build();
 
     // job executor
-    @Deprecated
     public static final AttributeDefinition THREAD_POOL_NAME =
             new SimpleAttributeDefinitionBuilder(ModelConstants.THREAD_POOL_NAME, ModelType.STRING, true)
                 .setDefaultValue(new ModelNode(DEFAULT_JOB_EXECUTOR_THREADPOOL_NAME))

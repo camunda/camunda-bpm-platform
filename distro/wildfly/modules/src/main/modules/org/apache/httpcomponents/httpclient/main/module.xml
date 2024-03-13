@@ -5,7 +5,9 @@
 
   <dependencies>
 
-    <module name="javax.api" />
+    <module name="java.base" />
+    <module name="java.naming" />
+    <module name="java.security.jgss" />
 
     <module name="commons-logging.commons-logging" />
     <module name="commons-codec.commons-codec" />

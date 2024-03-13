@@ -7,6 +7,7 @@
   <process-engine name="default">
     <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration</configuration>
     <properties>
+      <property name="enforceHistoryTimeToLive">false</property>
       <property name="authorizationEnabled">true</property>
       <property name="history">full</property>
       <property name="queryMaxResultsLimit">2000</property>
@@ -25,6 +26,7 @@
   <process-engine name="engine2">
     <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration</configuration>
     <properties>
+      <property name="enforceHistoryTimeToLive">false</property>
       <property name="jdbcUrl">jdbc:h2:mem:activiti2;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
       <property name="authorizationEnabled">true</property>
     </properties>
@@ -42,6 +44,7 @@
   <process-engine name="engine3">
     <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration</configuration>
     <properties>
+      <property name="enforceHistoryTimeToLive">false</property>
       <property name="jdbcUrl">jdbc:h2:mem:activiti3;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
       <property name="authorizationEnabled">true</property>
     </properties>

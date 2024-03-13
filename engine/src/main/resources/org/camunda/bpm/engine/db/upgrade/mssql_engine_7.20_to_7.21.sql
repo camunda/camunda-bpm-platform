@@ -24,4 +24,6 @@ alter table ACT_RU_EXT_TASK
 alter table ACT_RU_JOB
   add ROOT_PROCESS_INSTANCE_ID_ nvarchar(64);
 
+--https://github.com/camunda/camunda-bpm-platform/pull/4030
+create index ACT_IDX_TASK_PARENT_TASK_ID on ACT_RU_TASK(PARENT_TASK_ID_);
 create index ACT_IDX_JOB_ROOT_PROCINST on ACT_RU_JOB(ROOT_PROCESS_INSTANCE_ID_);

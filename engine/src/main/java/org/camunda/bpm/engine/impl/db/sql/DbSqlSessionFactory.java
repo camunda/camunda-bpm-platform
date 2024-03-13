@@ -105,6 +105,8 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final Map<String, String> databaseSpecificAuth1JoinEnd = new HashMap<>();
   public static final Map<String, String> databaseSpecificAuth1JoinSeparator = new HashMap<>();
 
+  public static final Map<String, String> databaseSpecificExtractTimeUnitFromDate = new HashMap<>();
+
   /*
    * On SQL server, the overall maximum number of parameters in a prepared statement
    * is 2100.
@@ -124,6 +126,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     String defaultAuthOnStart = "IN (";
     String defaultAuthOnEnd = ")";
     String defaultAuthOnSeparator = ",";
+
+    String defaultExtractTimeUnitFromDate = "EXTRACT(${extractTimeUnit} FROM ${extractDateColumn})";
 
     // h2
     databaseSpecificLimitBeforeStatements.put(H2, "");
@@ -172,6 +176,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificAuth1JoinStart.put(H2, defaultAuthOnStart);
     databaseSpecificAuth1JoinEnd.put(H2, defaultAuthOnEnd);
     databaseSpecificAuth1JoinSeparator.put(H2, defaultAuthOnSeparator);
+
+    databaseSpecificExtractTimeUnitFromDate.put(H2, defaultExtractTimeUnitFromDate);
 
     HashMap<String, String> constants = new HashMap<>();
     constants.put("constant.event", "'event'");
@@ -236,6 +242,8 @@ public class DbSqlSessionFactory implements SessionFactory {
       databaseSpecificAuth1JoinStart.put(mysqlLikeDatabase, "=");
       databaseSpecificAuth1JoinEnd.put(mysqlLikeDatabase, "");
       databaseSpecificAuth1JoinSeparator.put(mysqlLikeDatabase, "OR AUTH1.RESOURCE_ID_ =");
+
+      databaseSpecificExtractTimeUnitFromDate.put(mysqlLikeDatabase, defaultExtractTimeUnitFromDate);
 
       addDatabaseSpecificStatement(mysqlLikeDatabase, "toggleForeignKey", "toggleForeignKey_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectDeploymentsByQueryCriteria", "selectDeploymentsByQueryCriteria_mysql");
@@ -379,6 +387,8 @@ public class DbSqlSessionFactory implements SessionFactory {
       databaseSpecificAuth1JoinStart.put(postgresLikeDatabase, defaultAuthOnStart);
       databaseSpecificAuth1JoinEnd.put(postgresLikeDatabase, defaultAuthOnEnd);
       databaseSpecificAuth1JoinSeparator.put(postgresLikeDatabase, defaultAuthOnSeparator);
+
+      databaseSpecificExtractTimeUnitFromDate.put(postgresLikeDatabase, defaultExtractTimeUnitFromDate);
 
       addDatabaseSpecificStatement(postgresLikeDatabase, "insertByteArray", "insertByteArray_postgres");
       addDatabaseSpecificStatement(postgresLikeDatabase, "updateByteArray", "updateByteArray_postgres");
@@ -536,6 +546,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificAuth1JoinEnd.put(ORACLE, defaultAuthOnEnd);
     databaseSpecificAuth1JoinSeparator.put(ORACLE, defaultAuthOnSeparator);
 
+    databaseSpecificExtractTimeUnitFromDate.put(ORACLE, defaultExtractTimeUnitFromDate);
+
     addDatabaseSpecificStatement(ORACLE, "selectHistoricProcessInstanceDurationReport", "selectHistoricProcessInstanceDurationReport_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectHistoricTaskInstanceDurationReport", "selectHistoricTaskInstanceDurationReport_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectHistoricTaskInstanceCountByTaskNameReport", "selectHistoricTaskInstanceCountByTaskNameReport_oracle");
@@ -628,6 +640,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificAuth1JoinStart.put(DB2, defaultAuthOnStart);
     databaseSpecificAuth1JoinEnd.put(DB2, defaultAuthOnEnd);
     databaseSpecificAuth1JoinSeparator.put(DB2, defaultAuthOnSeparator);
+
+    databaseSpecificExtractTimeUnitFromDate.put(DB2, defaultExtractTimeUnitFromDate);
 
     addDatabaseSpecificStatement(DB2, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(DB2, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
@@ -724,6 +738,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificAuth1JoinStart.put(MSSQL, defaultAuthOnStart);
     databaseSpecificAuth1JoinEnd.put(MSSQL, defaultAuthOnEnd);
     databaseSpecificAuth1JoinSeparator.put(MSSQL, defaultAuthOnSeparator);
+
+    databaseSpecificExtractTimeUnitFromDate.put(MSSQL, "DATEPART(${extractTimeUnit}, ${extractDateColumn})");
 
     addDatabaseSpecificStatement(MSSQL, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(MSSQL, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");

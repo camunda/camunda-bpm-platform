@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.container.impl.jboss.service;
 
+import java.util.function.Consumer;
+
 import org.camunda.bpm.engine.impl.jobexecutor.RuntimeContainerJobExecutor;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -29,17 +31,28 @@ import org.jboss.msc.service.StopContext;
  */
 public class MscRuntimeContainerJobExecutor extends RuntimeContainerJobExecutor implements Service<RuntimeContainerJobExecutor> {
 
+  protected Consumer<RuntimeContainerJobExecutor> provider;
+
+  public MscRuntimeContainerJobExecutor(Consumer<RuntimeContainerJobExecutor> provider) {
+    this.provider = provider;
+  }
+
+  @Override
   public RuntimeContainerJobExecutor getValue() throws IllegalStateException, IllegalArgumentException {
     return this;
   }
 
+  @Override
   public void start(StartContext arg0) throws StartException {
     // no-op:
     // job executor is lazy-started when first process engine is registered and jobExecutorActivate = true
     // See: #CAM-4817
+    provider.accept(this);
   }
 
+  @Override
   public void stop(StopContext arg0) {
+    provider.accept(null);
     shutdown();
   }
 

@@ -6,7 +6,12 @@
 
 <span ng-if="editing && (varType === 'datetime' || varType === 'date' || varType === 'time')"
       class="preview">
-  {{ formData.dateValue | camDate }}
+  <span ng-if="!hasCustomDateFormat">
+    {{ formData.dateValue | camDate }}
+  </span>
+  <span ng-if="hasCustomDateFormat">
+    {{ formData.dateValue }}
+  </span>
 </span>
 
 <span ng-if="editing"
@@ -40,6 +45,7 @@
                 ng-required="true"
                 is-open="datePickerOptions.isOpen"
                 show-button-bar="false"
+                datepicker-options="datePickerOptions"
                 ng-click="$event.stopPropagation()"
                 ng-keydown="trapKeyboard($event, true); cancelOnEsc($event);"
 

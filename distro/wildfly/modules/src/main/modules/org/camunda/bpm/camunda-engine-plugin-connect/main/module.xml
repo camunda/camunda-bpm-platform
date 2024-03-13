@@ -5,7 +5,7 @@
 
   <dependencies>
 
-    <module name="javax.api" />
+    <module name="java.base" />
 
     <module name="org.camunda.bpm.camunda-engine" />
 

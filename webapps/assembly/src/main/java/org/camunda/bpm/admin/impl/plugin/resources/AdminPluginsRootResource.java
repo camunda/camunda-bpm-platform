@@ -16,11 +16,11 @@
  */
 package org.camunda.bpm.admin.impl.plugin.resources;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-
 import org.camunda.bpm.admin.impl.plugin.AdminPlugins;
 import org.camunda.bpm.admin.resource.AbstractAdminPluginRootResource;
+
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
 /**
  * @author vale
@@ -30,6 +30,11 @@ public class AdminPluginsRootResource extends AbstractAdminPluginRootResource {
 
   public AdminPluginsRootResource() {
     super(AdminPlugins.ID);
+  }
+
+  @Path("{engine}" + MetricsRestService.PATH)
+  public MetricsRestService getProcessDefinitionResource(@PathParam("engine") String engineName) {
+    return subResource(new MetricsRestService(engineName), engineName);
   }
 
 }

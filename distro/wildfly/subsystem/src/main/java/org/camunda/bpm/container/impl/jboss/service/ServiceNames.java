@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.container.impl.jboss.service;
 
-import org.jboss.as.threads.CommonAttributes;
 import org.jboss.as.threads.ThreadsServices;
 import org.jboss.msc.service.ServiceName;
 

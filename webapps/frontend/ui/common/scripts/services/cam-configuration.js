@@ -57,8 +57,7 @@ var defaultConfig = {
   disableWelcomeMessage: false,
   userOperationLogAnnotationLength: 4000,
   previewHtml: true,
-  assignProcessInstanceIdToTaskComment: false,
-  alwaysShowUniqueTaskWorkerMetrics: true
+  assignProcessInstanceIdToTaskComment: false
 };
 
 module.exports = function(config, app) {
@@ -141,13 +140,6 @@ module.exports = function(config, app) {
       this.getRuntimeActivityInstanceMetrics = function() {
         var param = 'runtimeActivityInstanceMetrics';
         return angular.extend({}, defaultConfig[param], config[param]).display;
-      };
-
-      this.getAlwaysShowUniqueTaskWorkerMetrics = function() {
-        return (
-          config.alwaysShowUniqueTaskWorkerMetrics ??
-          defaultConfig.alwaysShowUniqueTaskWorkerMetrics
-        );
       };
 
       this.getActivityInstancePeriod = function() {

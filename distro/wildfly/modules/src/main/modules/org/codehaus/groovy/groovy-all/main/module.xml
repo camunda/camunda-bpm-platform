@@ -8,7 +8,13 @@
   </resources>
 
   <dependencies>
-    <module name="javax.api" />
+    <module name="java.base" />
+    <module name="java.desktop" />
+    <module name="java.management.rmi" />
+    <module name="java.prefs" />
+    <module name="java.scripting" />
+    <module name="java.sql" />
+    <module name="jdk.unsupported" />
     <module name="sun.jdk" />
     <module name="org.camunda.spin.camunda-spin-core" />
   </dependencies>

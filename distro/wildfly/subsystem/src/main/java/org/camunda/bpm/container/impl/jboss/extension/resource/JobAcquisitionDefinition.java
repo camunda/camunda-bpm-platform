@@ -16,27 +16,27 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension.resource;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.camunda.bpm.container.impl.jboss.extension.BpmPlatformExtension;
-import org.camunda.bpm.container.impl.jboss.extension.SubsystemAttributeDefinitons;
 import org.camunda.bpm.container.impl.jboss.extension.ModelConstants;
+import org.camunda.bpm.container.impl.jboss.extension.SubsystemAttributeDefinitons;
 import org.camunda.bpm.container.impl.jboss.extension.handler.JobAcquisitionAdd;
 import org.camunda.bpm.container.impl.jboss.extension.handler.JobAcquisitionRemove;
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.PersistentResourceDefinition;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 public class JobAcquisitionDefinition extends PersistentResourceDefinition {
 
   public static final JobAcquisitionDefinition INSTANCE = new JobAcquisitionDefinition();
 
   private JobAcquisitionDefinition() {
-    super(BpmPlatformExtension.JOB_ACQUISTIONS_PATH,
-        BpmPlatformExtension.getResourceDescriptionResolver(ModelConstants.JOB_ACQUISITION),
-        JobAcquisitionAdd.INSTANCE,
-        JobAcquisitionRemove.INSTANCE);
+    super(new Parameters(BpmPlatformExtension.JOB_ACQUISTIONS_PATH,
+        BpmPlatformExtension.getResourceDescriptionResolver(ModelConstants.JOB_ACQUISITION))
+        .setAddHandler(JobAcquisitionAdd.INSTANCE)
+        .setRemoveHandler(JobAcquisitionRemove.INSTANCE));
   }
 
   @Override

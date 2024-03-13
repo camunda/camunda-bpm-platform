@@ -27,7 +27,7 @@ import org.jboss.dmr.ModelNode;
 
 /**
  * Provides the description and the implementation of the process-engine#remove operation.
- * 
+ *
  * @author Daniel Meyer
  * @author Christian Lipphardt
  */
@@ -35,6 +35,7 @@ public class JobAcquisitionRemove extends AbstractRemoveStepHandler {
 
   public static final JobAcquisitionRemove INSTANCE = new JobAcquisitionRemove();
 
+  @Override
   protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
     String jobAcquisitionName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
     context.removeService(ServiceNames.forMscRuntimeContainerJobExecutorService(jobAcquisitionName));

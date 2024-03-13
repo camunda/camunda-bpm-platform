@@ -62,6 +62,8 @@ module.exports = [
         options: '=?',
         allowNonOptions: '@',
         flexible: '@',
+        dateFormat: '=?',
+        datePickerOptions: '=?',
 
         disableAutoselect: '=?'
       },
@@ -76,14 +78,16 @@ module.exports = [
         var $btnsEl;
         var $ctrlsEl;
 
-        var dateFilter = $filter('date'),
-          dateFormat = "yyyy-MM-dd'T'HH:mm:ss";
+        var dateFilter = $filter('date');
 
         var dateRegex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/;
 
         scope.editing = false;
+        scope.varTypeOriginal = scope.varType;
 
         scope.isNumber = scope.varType === 'number';
+        scope.hasCustomDateFormat = !!scope.dateFormat;
+        scope.dateFormat = scope.dateFormat || "yyyy-MM-dd'T'HH:mm:ss";
 
         scope.$on('$locationChangeSuccess', function() {
           scope.cancelChange();
@@ -151,6 +155,8 @@ module.exports = [
           scope.options = scope.options || [];
           scope.allowNonOptions = scope.allowNonOptions || false;
           scope.flexible = scope.flexible || false;
+          scope.dateFormat = scope.dateFormat || "yyyy-MM-dd'T'HH:mm:ss";
+          scope.datePickerOptions = scope.datePickerOptions || {};
 
           scope.varType = scope.varType ? scope.varType : 'text';
 
@@ -316,10 +322,10 @@ module.exports = [
         }
 
         scope.changeType = function() {
-          if (scope.varType === 'datetime') {
+          if (scope.varType !== 'text') {
             scope.varType = 'text';
           } else {
-            scope.varType = 'datetime';
+            scope.varType = scope.varTypeOriginal;
           }
           reset();
           scope.editing = true;
@@ -424,7 +430,10 @@ module.exports = [
                 selection || $('[ng-model="formData.editValue"]').val();
               scope.varValue = scope.formData.editValue;
             } else if (isDate()) {
-              scope.varValue = dateFilter(scope.formData.dateValue, dateFormat);
+              scope.varValue = dateFilter(
+                scope.formData.dateValue,
+                scope.dateFormat
+              );
             }
 
             scope.$event = evt;
@@ -458,8 +467,14 @@ module.exports = [
         };
 
         scope.changeDate = function(pickerScope) {
-          scope.formData.editValue = scope.formData.dateValue =
-            pickerScope.formData.dateValue;
+          let dateValue = pickerScope.formData.dateValue;
+          if (scope.hasCustomDateFormat) {
+            dateValue = dateFilter(
+              pickerScope.formData.dateValue,
+              scope.dateFormat
+            );
+          }
+          scope.formData.editValue = scope.formData.dateValue = dateValue;
         };
 
         scope.selectNextInlineField = function(reversed) {

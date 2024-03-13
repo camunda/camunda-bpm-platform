@@ -42,7 +42,7 @@ public class Admin {
 
   /**
    * A setter to set the {@link AdminRuntimeDelegate}.
-   * @param cockpitRuntimeDelegate
+   * @param adminRuntimeDelegate
    */
   public static void setAdminRuntimeDelegate(AdminRuntimeDelegate adminRuntimeDelegate) {
     ADMIN_RUNTIME_DELEGATE = adminRuntimeDelegate;

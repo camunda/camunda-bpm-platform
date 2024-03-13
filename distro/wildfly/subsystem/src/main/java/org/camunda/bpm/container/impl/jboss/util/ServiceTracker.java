@@ -43,7 +43,7 @@ public class ServiceTracker<S> implements LifecycleListener {
   }
 
   @Override
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({ "unchecked" })
   public void handleEvent(final ServiceController<?> controller, final LifecycleEvent event) {
 
     if(!typeToTrack.isParentOf(controller.getName())) {
