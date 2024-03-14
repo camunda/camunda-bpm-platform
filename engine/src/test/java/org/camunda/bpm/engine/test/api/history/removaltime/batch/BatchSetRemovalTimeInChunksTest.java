@@ -23,7 +23,9 @@ import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 import static org.camunda.bpm.engine.test.api.history.removaltime.batch.helper.BatchSetRemovalTimeRule.addDays;
 
 import java.io.ByteArrayInputStream;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -94,7 +96,7 @@ public class BatchSetRemovalTimeInChunksTest {
 
   protected final Date REMOVAL_TIME = testRule.REMOVAL_TIME;
 
-  protected final Date CREATE_TIME = new Date(1363608000000L);
+  protected final Date CREATE_TIME = new GregorianCalendar(2013, Calendar.MARCH, 18, 13, 0, 0).getTime();
 
   protected final Date CURRENT_DATE = testRule.CURRENT_DATE;
 

@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.api.history.removaltime.batch.helper;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Map;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -44,7 +45,7 @@ import org.junit.runner.Description;
  */
 public class BatchSetRemovalTimeRule extends BatchRule {
 
-  public final Date CURRENT_DATE = new Date(1363608000000L);
+  public final Date CURRENT_DATE = new GregorianCalendar(2013, Calendar.MARCH, 18, 13, 0, 0).getTime();
   public final Date REMOVAL_TIME = new Date(1363609000000L);
 
   public BatchSetRemovalTimeRule(ProcessEngineRule engineRule, ProcessEngineTestRule engineTestRule) {
