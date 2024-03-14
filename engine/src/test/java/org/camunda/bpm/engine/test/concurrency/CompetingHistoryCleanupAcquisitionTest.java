@@ -21,9 +21,10 @@ import static org.apache.commons.lang3.time.DateUtils.addSeconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandlerConfiguration.START_DELAY;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-
+import java.util.GregorianCalendar;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -58,7 +59,7 @@ public class CompetingHistoryCleanupAcquisitionTest extends ConcurrencyTestHelpe
   protected HistoryService historyService;
   protected ManagementService managementService;
 
-  protected final Date CURRENT_DATE = new Date(1363608000000L);
+  protected final Date CURRENT_DATE = new GregorianCalendar(2023, Calendar.MARCH, 18, 12, 0, 0).getTime();
 
   protected static ThreadControl cleanupThread = null;
 
@@ -214,7 +215,7 @@ public class CompetingHistoryCleanupAcquisitionTest extends ConcurrencyTestHelpe
       syncBeforeFlush.set(true);
 
       managementService.executeJob(jobId);
-      
+
       return null;
     }
 

@@ -21,10 +21,11 @@ import static org.apache.commons.lang3.time.DateUtils.addSeconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandlerConfiguration.START_DELAY;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
-
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
@@ -87,7 +88,7 @@ public class HistoryCleanupSchedulerBatchesTest extends AbstractHistoryCleanupSc
           .multiInstanceDone()
     .endEvent().done();
 
-  protected final Date END_DATE = new Date(1363608000000L);
+  protected final Date END_DATE = new GregorianCalendar(2013, Calendar.MARCH, 18, 13, 0, 0).getTime();
 
   @Test
   public void shouldScheduleToNow() {

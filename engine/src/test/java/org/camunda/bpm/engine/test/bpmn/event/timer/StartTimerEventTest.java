@@ -28,12 +28,13 @@ import static org.junit.Assert.fail;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
 import org.camunda.bpm.engine.impl.cmd.DeleteJobsCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -66,6 +67,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
 
   protected static final long ONE_HOUR = TimeUnit.HOURS.toMillis(1L);
   protected static final long TWO_HOURS = TimeUnit.HOURS.toMillis(2L);
+  private static final Date START_DATE = new GregorianCalendar(2023, Calendar.AUGUST, 18, 8, 0, 0).getTime();
 
   protected boolean reevaluateTimeCycleWhenDue;
 
@@ -1725,7 +1727,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
   @Test
   public void shouldReevaluateCronTimerCycleWhenDue() throws Exception {
     // given
-    ClockUtil.setCurrentTime(new Date(1692338400000l)); //"2023/8/18 8:00:00"
+    ClockUtil.setCurrentTime(START_DATE);
     MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("0 0 * ? * * *"); // every hour
     processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
     processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
@@ -1747,7 +1749,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
   @Test
   public void shouldReevaluateRepeatingToCronTimerCycle() throws Exception {
     // given
-    ClockUtil.setCurrentTime(new Date(1692338400000l)); // "2023/8/18 8:00:00"
+    ClockUtil.setCurrentTime(START_DATE);
     MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R2/PT1H");
     processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
     processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
@@ -1768,7 +1770,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
   @Test
   public void shouldReevaluateCronToRepeatingTimerCycle() throws Exception {
     // given
-    ClockUtil.setCurrentTime(new Date(1692338400000l)); //"2023/8/18 8:00:00"
+    ClockUtil.setCurrentTime(START_DATE);
     MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("0 0 * ? * * *"); // every hour
     processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
     processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
@@ -1803,7 +1805,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
   @Test
   public void shouldReevaluateCronToRepeatingTimerCycleWithDate() throws Exception {
     // given
-    ClockUtil.setCurrentTime(new Date(1692338400000l)); //"2023/8/18 8:00:00"
+    ClockUtil.setCurrentTime(START_DATE);
     MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("0 0 * ? * * *"); // every hour
     processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
     processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
@@ -1838,7 +1840,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
   @Test
   public void shouldReevaluateRepeatingTimerCycleWithDate() throws Exception {
     // given
-    ClockUtil.setCurrentTime(new Date(1692338400000l)); //"2023/8/18 8:00:00"
+    ClockUtil.setCurrentTime(START_DATE);
     MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R3/2023-08-18T8:00/PT1H"); // every hour
     processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
     processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
@@ -1873,7 +1875,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
   @Test
   public void shouldReevaluateRepeatingTimerCycleToTimerCycleWithDate() throws Exception {
     // given
-    ClockUtil.setCurrentTime(new Date(1692338400000l)); //"2023/8/18 8:00:00"
+    ClockUtil.setCurrentTime(START_DATE);
     MyCycleTimerBean myCycleTimerBean = new MyCycleTimerBean("R3/PT1H"); // every hour
     processEngineConfiguration.getBeans().put("myCycleTimerBean", myCycleTimerBean);
     processEngineConfiguration.setReevaluateTimeCycleWhenDue(true);
