@@ -22,12 +22,13 @@ import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_END;
 import static org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHandler.MAX_BATCH_SIZE;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -60,7 +61,7 @@ public abstract class AbstractHistoryCleanupSchedulerTest {
   protected HistoryService historyService;
   protected ManagementService managementService;
 
-  protected final Date END_DATE = new Date(1363608000000L);
+  protected final Date END_DATE = new GregorianCalendar(2013, Calendar.MARCH, 18, 13, 0, 0).getTime();
 
   public void initEngineConfiguration(ProcessEngineConfigurationImpl engineConfiguration) {
     engineConfiguration

@@ -16,8 +16,9 @@
  */
 package org.camunda.bpm.engine.test.util;
 
+import java.util.Calendar;
 import java.util.Date;
-
+import java.util.GregorianCalendar;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 public final class ClockTestUtil {
@@ -42,7 +43,7 @@ public final class ClockTestUtil {
    * @return the new current time
    */
   public static Date setClockToDateWithoutMilliseconds() {
-    ClockUtil.setCurrentTime(new Date(1363608000000L));
+    ClockUtil.setCurrentTime(new GregorianCalendar(2023, Calendar.AUGUST, 18, 8, 0, 0).getTime());
     return ClockUtil.getCurrentTime();
   }
 
