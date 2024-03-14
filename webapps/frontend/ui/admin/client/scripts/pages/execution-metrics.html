@@ -135,11 +135,26 @@
           <tbody>
           <tr ng-repeat="metric in annualMetrics">
             <td>{{metric.labelFmt}}</td>
-            <td class="metric-row">{{metric['process-instances'].sumFmt}}</td>
-            <td class="metric-row">{{metric['decision-instances'].sumFmt}}</td>
-            <td class="metric-row">{{metric['task-users'].sumFmt}}</td>
-            <td class="metric-row">{{metric['flow-node-instances'].sumFmt}}</td>
-            <td class="metric-row">{{metric['executed-decision-elements'].sumFmt}}</td>
+            <td class="metric-row">
+              <span cam-widget-clipboard="metric['process-instances'].sum.toString()"
+                    left-side="true">{{metric['process-instances'].sumFmt}}</span>
+            </td>
+            <td class="metric-row">
+              <span cam-widget-clipboard="metric['decision-instances'].sum.toString()"
+                    left-side="true">{{metric['decision-instances'].sumFmt}}</span>
+            </td>
+            <td class="metric-row">
+              <span cam-widget-clipboard="metric['task-users'].sum.toString()"
+                    left-side="true">{{metric['task-users'].sumFmt}}</span>
+            </td>
+            <td class="metric-row">
+              <span cam-widget-clipboard="metric['flow-node-instances'].sum.toString()"
+                    left-side="true">{{metric['flow-node-instances'].sumFmt}}</span>
+            </td>
+            <td class="metric-row">
+              <span cam-widget-clipboard="metric['executed-decision-elements'].sum.toString()"
+                    left-side="true">{{metric['executed-decision-elements'].sumFmt}}</span>
+            </td>
             <td class="metric-action-value">
               <span class="hovered" cam-widget-clipboard="getClipboardText(metric)"
                     tooltip-text="{{ 'EXECUTION_METRICS_COPY_TOOLTIP' | translate }}"></span>
