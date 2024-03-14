@@ -181,6 +181,20 @@ public abstract class JobExecutor {
     }
   }
 
+  public void logJobExecutionInfo(ProcessEngineImpl engine, int executionQueueSize, int executionQueueCapacity, int maxExecutionThreads, int activeExecutionThreads) {
+    if(engine != null){
+      LOG.numJobsInQueue(engine.getName(),executionQueueSize, executionQueueCapacity);
+      LOG.currentJobExecutions(engine.getName(),activeExecutionThreads);
+      try {
+        LOG.availableJobExecutionThreads(engine.getName(),
+                Math.subtractExact(maxExecutionThreads, activeExecutionThreads));
+      } catch (ArithmeticException arithmeticException){
+        //arithmetic exception occurred while computing remaining available thread count for logging.
+        LOG.availableThreadsCalculationError();
+      }
+      }
+  }
+
   // getters and setters //////////////////////////////////////////////////////
 
   public List<ProcessEngineImpl> getProcessEngines() {

@@ -20,9 +20,7 @@ import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorLogger;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -42,8 +40,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  */
 public class SpringJobExecutor extends JobExecutor {
 
-	private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
-
 	private TaskExecutor taskExecutor;
 
 	public TaskExecutor getTaskExecutor() {
@@ -62,18 +58,16 @@ public class SpringJobExecutor extends JobExecutor {
 	public void executeJobs(List<String> jobIds, ProcessEngineImpl processEngine) {
 	  try {
       taskExecutor.execute(getExecuteJobsRunnable(jobIds, processEngine));
-	  if(taskExecutor instanceof ThreadPoolTaskExecutor){
-		  LOG.numJobsInQueue(processEngine.getName(),((ThreadPoolTaskExecutor)taskExecutor).getQueueSize(), ((ThreadPoolTaskExecutor)taskExecutor).getQueueCapacity());
-		  LOG.currentJobExecutions(processEngine.getName(),((ThreadPoolTaskExecutor)taskExecutor).getActiveCount());
-		  LOG.availableJobExecutionThreads(processEngine.getName(),Math.subtractExact(((ThreadPoolTaskExecutor)taskExecutor).getMaxPoolSize(),((ThreadPoolTaskExecutor)taskExecutor).getActiveCount()));
-	  }
     } catch (RejectedExecutionException e) {
       logRejectedExecution(processEngine, jobIds.size());
       rejectedJobsHandler.jobsRejected(jobIds, processEngine, this);
-    } catch (ArithmeticException arithmeticException){
-		  //arithmetic exception occurred while computing remaining available thread count for logging.
-		  LOG.availableThreadsCalculationError();
-	  }
+    }
+	if(taskExecutor instanceof ThreadPoolTaskExecutor){
+		logJobExecutionInfo(processEngine, ((ThreadPoolTaskExecutor)taskExecutor).getQueueSize(),
+				((ThreadPoolTaskExecutor)taskExecutor).getQueueCapacity(),
+				((ThreadPoolTaskExecutor)taskExecutor).getMaxPoolSize(),
+				((ThreadPoolTaskExecutor)taskExecutor).getActiveCount());
+	}
 	}
 
 	@Override
