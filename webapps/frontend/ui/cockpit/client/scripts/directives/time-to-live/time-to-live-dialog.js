@@ -51,8 +51,39 @@ const Controller = [
     $scope.ttl = $scope.definition.historyTimeToLive;
 
     $scope.openBatchOperation = () => {
+      let batchSearchQuery = null;
+      let operation = null;
+
+      if ($scope.$parent?.resource === 'process-definition') {
+        operation = 'PROCESS_SET_REMOVAL_TIME';
+        batchSearchQuery = JSON.stringify([
+          {
+            type: 'PIprocessDefinitionKey',
+            operator: 'eq',
+            value: $scope.definition.key
+          },
+          {
+            type: 'PIfinished',
+            operator: 'eq',
+            value: ''
+          }
+        ]);
+      } else {
+        operation = 'DECISION_SET_REMOVAL_TIME';
+        batchSearchQuery = JSON.stringify([
+          {
+            type: 'decisionDefinitionKeyIn',
+            operator: 'In',
+            value: [$scope.definition.key]
+          }
+        ]);
+      }
+
       $scope.$dismiss();
-      $location.path('/batch/operation');
+      $location.path('/batch/operation').search({
+        batchSearchQuery,
+        operation
+      });
     };
 
     $scope.isValid = () => {
