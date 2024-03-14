@@ -16,31 +16,21 @@
  */
 package org.camunda.bpm.cockpit.impl.db;
 
-import java.util.List;
-
 import org.camunda.bpm.cockpit.db.CommandExecutor;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.interceptor.Command;
+
+import java.util.List;
 
 /**
  *
  * @author drobisch
  * @author nico.rehwaldt
  */
-public class CommandExecutorImpl implements CommandExecutor {
-
-  private QuerySessionFactory sessionFactory;
-
-  public CommandExecutorImpl() { }
+public class CommandExecutorImpl extends org.camunda.bpm.webapp.impl.db.CommandExecutorImpl implements CommandExecutor {
 
   public CommandExecutorImpl(ProcessEngineConfigurationImpl processEngineConfiguration, List<String> mappingFiles) {
-    sessionFactory = new QuerySessionFactory();
-    sessionFactory.initFromProcessEngineConfiguration(processEngineConfiguration, mappingFiles);
+    super(processEngineConfiguration, mappingFiles);
   }
 
-  @Override
-  public <T> T executeCommand(Command<T> command) {
-    return sessionFactory.getCommandExecutorTxRequired().execute(command);
-  }
 }
 
