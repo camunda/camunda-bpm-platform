@@ -168,15 +168,13 @@ const Controller = [
 
     // called every time date input changes
     const handleDateChange = () => {
-      const form = $scope.form;
-      if (form.$valid) {
+      const date = moment($scope.startDate, fmtRequest, true);
+      if (date.isValid()) {
         localConf.set(localConfContractStartDate, $scope.startDate);
         calculateContractDates();
         return load();
-      } else if (form.startDate.$error.datePattern) {
-        setInputError(`Supported pattern '${fmtDatePicker}'.`);
-      } else if (form.startDate.$error.dateValue) {
-        setInputError('Invalid Date Value.');
+      } else {
+        setInputError(`Invalid Date Value. Supported pattern '${fmtRequest}'.`);
       }
     };
 
