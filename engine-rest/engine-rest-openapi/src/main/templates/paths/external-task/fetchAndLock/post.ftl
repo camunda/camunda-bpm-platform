@@ -70,7 +70,7 @@
                          "sorting": [
                              {
                                 "sortBy":"createTime",
-                                "sortOrder":"ASC"
+                                "sortOrder":"asc"
                              }
                          ]
                        }

@@ -40,15 +40,27 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
 public class OpenAPIExamplesTest {
+
+  // TODO fix these tests
+  private static final Set<String> SKIP_TESTS = new HashSet<>(Arrays.asList(
+      "[get] /history/decision-instance - Response:200 - example-1",
+      "[get] /history/decision-instance/{id} - Response:200 - example-1",
+      "[get] /history/detail - Response:200 - example-1",
+      "[post] /history/detail - Response:200 - example-1",
+      "[get] /history/detail/{id} - Response:200 - example-1",
+      "[post] /history/variable-instance - Request - example-1",
+      "[post] /history/variable-instance/count - Request - example-1"
+  ));
 
   private static final JsonSchemaFactory FACTORY = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
   private static final SchemaValidatorsConfig SCHEMA_VALIDATORS_CONFIG = new SchemaValidatorsConfig();
@@ -129,11 +141,8 @@ public class OpenAPIExamplesTest {
 
   @Parameterized.Parameters(name = "{index} - {0}")
   public static Collection<Object[]> data() throws Exception {
-    // FIXME: temporary solution until we fix these examples
-    List<Integer> testsToSkip = Arrays.asList(149, 155, 158, 160, 162, 212, 215);
-    Collections.reverse(testsToSkip);
     var parametersList = initTestParameters();
-    testsToSkip.forEach(i -> parametersList.remove((int) i));
+    parametersList.removeIf(parameters -> SKIP_TESTS.contains(parameters[0]));
     return parametersList;
   }
 
