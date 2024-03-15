@@ -954,13 +954,23 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected int historyCleanupDefaultNumberOfRetries = Integer.MIN_VALUE;
 
-  /**
-   * When set to false, exclusivity (no parallel execution) of tasks is applied per process instance.
-   * When set to true, exclusivity (no parallel execution) of tasks is extended across all process instances.
-   * <p>
-   * Default value: false; to keep the legacy behaviour backwards compatible.
-   * //TODO add rest of javadoc, mention performance implications.
-   */
+    /**
+     * When set to false, exclusivity (no parallel execution) of tasks is applied per process instance.
+     * When set to true, exclusivity (no parallel execution) of tasks is extended across all hierarchies of each given
+     * process instance.
+     * <p>
+     * The feature is targeting processes which might spawn a hierarchy of subprocesses e.g. via a call activity.
+     * The legacy behaviour does not guarantee sequential execution of any spawned subprocesses. Instead, it works only
+     * at the root level. When the feature is enabled, any spawned subprocess of the root process will be acquired and
+     * executed sequentially by one thread.
+     * <p>
+     * Note that the above configuration might introduce performance implications in complex process modelling that involves
+     * high multi-instance multiplicity and numerous subprocesses.
+     * <p>
+     * Use the feature in combination with awareness of your process modeling.
+     * <p>
+     * Default value: false; to keep the legacy behaviour backwards compatible.
+     */
   protected boolean jobExecutorAcquireExclusiveOverProcessHierarchies = false;
 
   /**
