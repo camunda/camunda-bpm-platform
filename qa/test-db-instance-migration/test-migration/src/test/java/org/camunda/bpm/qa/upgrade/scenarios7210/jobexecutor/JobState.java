@@ -36,10 +36,12 @@ public class JobState {
 
     private final CommandExecutor commandExecutor;
     private final Map<String, Date> lockExpirationTimeByJobIdMap;
+    private final Map<String, String> lockOwnerByJobIdMap;
 
     private JobState(List<Job> jobs, CommandExecutor commandExecutor) {
         this.commandExecutor = commandExecutor;
         this.lockExpirationTimeByJobIdMap = getLockExpirationTimeByJobIdMap(jobs);
+        this.lockOwnerByJobIdMap = getLockOwner(jobs);
     }
 
     /**
@@ -68,21 +70,23 @@ public class JobState {
         for (Map.Entry<String, Date> entry : lockExpirationTimeByJobIdMap.entrySet()) {
             var jobId = entry.getKey();
             var lockExpirationTime = entry.getValue();
+            var lockOwner = lockOwnerByJobIdMap.get(jobId);
 
-            updateJob(jobId, lockExpirationTime);
+            restoreJobIfLockStateChanged(jobId, lockExpirationTime, lockOwner);
         }
     }
 
-    private void updateJob(String jobId, Date originallockExpirationTime) {
+    private void restoreJobIfLockStateChanged(String jobId, Date originalLockExpirationTime, String originalLockOwner) {
         commandExecutor.execute((Command<Void>) context -> {
             var jobManager = context.getJobManager();
             var job = jobManager.findJobById(jobId);
 
-            if (jobHasBeenLocked(job, originallockExpirationTime)) {
-                job.unlock();
-            }
+            if (hasLockStateChanged(job, originalLockExpirationTime, originalLockOwner)) {
+                job.setLockExpirationTime(originalLockExpirationTime);
+                job.setLockOwner(originalLockOwner);
 
-            jobManager.updateJob(job);
+                jobManager.updateJob(job);
+            }
             return null;
         });
     }
@@ -98,9 +102,77 @@ public class JobState {
         return result;
     }
 
-    private boolean jobHasBeenLocked(JobEntity job, Date originalLockExpirationTime) {
+    private Map<String, String> getLockOwner(List<Job> jobs) {
+        Map<String, String> result = new HashMap<>();
+
+        for (Job job : jobs) {
+            var jobEntity = (JobEntity) job;
+            result.put(jobEntity.getId(), jobEntity.getLockOwner());
+        }
+
+        return result;
+    }
+
+    private boolean hasLockStateChanged(JobEntity job, Date originalLockExpirationTime, String originalLockOwner) {
+        return hasLockExpirationTimeChanged(job, originalLockExpirationTime)
+            || hasLockOwnerChanged(job, originalLockOwner);
+    }
+
+    /**
+     * Returns true if the lock expiration time has changed. This involves changes in the lockExpiration state.
+     * <p>
+     * Note: The conditionals of this method are on purpose left verbose (they would be further simplified) to make
+     * the cases more distinct visibly to the reader.
+     *
+     * @param job                        the job to check for lock state changes
+     * @param originalLockExpirationTime the original expiration time
+     * @return true if the job lock state has changed, false otherwise
+     */
+    private boolean hasLockExpirationTimeChanged(JobEntity job, Date originalLockExpirationTime) {
         var currentLockExpirationTime = job.getLockExpirationTime();
 
-        return currentLockExpirationTime != null && originalLockExpirationTime == null;
+        if (originalLockExpirationTime == null && currentLockExpirationTime == null) {
+            return false;
+        }
+
+        if (originalLockExpirationTime == null && currentLockExpirationTime != null) {
+            // the job has been locked - case
+            return true;
+        }
+
+        if (originalLockExpirationTime != null && currentLockExpirationTime == null) {
+            // the job has been unlocked - case
+            return true;
+        }
+
+      return originalLockExpirationTime.compareTo(currentLockExpirationTime) != 0;
+    }
+
+    /**
+     * Returns true if the lock owner has changed.
+     * <p>
+     * Note: The conditionals of this method are on purpose left verbose (they would be further simplified) to make
+     * the cases more distinct visibly to the reader.
+     *
+     * @param job the job to check for lock owner changes
+     * @param originalLockOwner the original lock owner property has changed
+     * @return true if the job lock owner has changed, false otherwise
+     */
+    private boolean hasLockOwnerChanged(JobEntity job, String originalLockOwner) {
+        var currentLockOwner = job.getLockOwner();
+
+        if (originalLockOwner == null && currentLockOwner == null) {
+            return false;
+        }
+
+        if (originalLockOwner == null && currentLockOwner != null) {
+            return true;
+        }
+
+        if (originalLockOwner != null && currentLockOwner == null) {
+            return true;
+        }
+
+        return originalLockOwner.equals(currentLockOwner);
     }
 }

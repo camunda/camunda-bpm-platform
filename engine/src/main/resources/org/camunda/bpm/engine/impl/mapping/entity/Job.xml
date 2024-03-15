@@ -118,7 +118,7 @@
     <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP" />
     <result property="exclusive" column="EXCLUSIVE_" jdbcType="BOOLEAN" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
-    <result property="rootProcessInstanceId" column="ROOT_PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROCESS_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionKey" column="PROCESS_DEF_KEY_" jdbcType="VARCHAR" />
@@ -157,7 +157,7 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
     <result property="duedate" column="DUEDATE_" jdbcType="TIMESTAMP" />
-    <result property="rootProcessInstanceId" column="ROOT_PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
     <result property="exclusive" column="EXCLUSIVE_" jdbcType="BOOLEAN" />
   </resultMap>
@@ -182,7 +182,7 @@
       RES.REV_,
       RES.DUEDATE_,
     <if test="parameter.applyExclusiveOverProcessHierarchies">
-      RES.ROOT_PROCESS_INSTANCE_ID_,
+      RES.ROOT_PROC_INST_ID_,
     </if>
       RES.PROCESS_INSTANCE_ID_,
       RES.EXCLUSIVE_
@@ -246,8 +246,8 @@
             </if>
             <if test="parameter.applyExclusiveOverProcessHierarchies">
               where (
-                  RES.ROOT_PROCESS_INSTANCE_ID_ is not null and J2.ROOT_PROCESS_INSTANCE_ID_ = RES.ROOT_PROCESS_INSTANCE_ID_    -- from the same root proc. inst. if not null
-                or RES.ROOT_PROCESS_INSTANCE_ID_ is null and J2.PROCESS_INSTANCE_ID_ = RES.PROCESS_INSTANCE_ID_                 -- otherwise from the same proc. inst.
+                  RES.ROOT_PROC_INST_ID_ is not null and J2.ROOT_PROC_INST_ID_ = RES.ROOT_PROC_INST_ID_                  -- from the same root proc. inst. if not null
+                or RES.ROOT_PROC_INST_ID_ is null and J2.PROCESS_INSTANCE_ID_ = RES.PROCESS_INSTANCE_ID_                 -- otherwise from the same proc. inst.
               )
             </if>
             and (J2.EXCLUSIVE_ = ${trueConstant})                                                                               -- also exclusive
@@ -343,7 +343,7 @@
       	JD.ACT_ID_ = #{activityId}
       </if>
       <if test="rootProcessInstanceId != null">
-        and RES.ROOT_PROCESS_INSTANCE_ID_ = #{rootProcessInstanceId}
+        and RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId}
       </if>
       <if test="processInstanceId != null">
         and RES.PROCESS_INSTANCE_ID_ = #{processInstanceId}
@@ -471,7 +471,7 @@
             LOCK_EXP_TIME_,
             EXCLUSIVE_,
             EXECUTION_ID_,
-            ROOT_PROCESS_INSTANCE_ID_,
+            ROOT_PROC_INST_ID_,
             PROCESS_INSTANCE_ID_,
             PROCESS_DEF_ID_,
             PROCESS_DEF_KEY_,
@@ -584,7 +584,7 @@
             LOCK_EXP_TIME_,
             EXCLUSIVE_,
             EXECUTION_ID_,
-            ROOT_PROCESS_INSTANCE_ID_,
+            ROOT_PROC_INST_ID_,
             PROCESS_INSTANCE_ID_,
             PROCESS_DEF_ID_,
             PROCESS_DEF_KEY_,
@@ -667,7 +667,7 @@
         LOCK_EXP_TIME_,
         EXCLUSIVE_,
         EXECUTION_ID_,
-        ROOT_PROCESS_INSTANCE_ID_,
+        ROOT_PROC_INST_ID_,
         PROCESS_INSTANCE_ID_,
         PROCESS_DEF_ID_,
         PROCESS_DEF_KEY_,
@@ -750,7 +750,7 @@
           LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP},
           LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
           DUEDATE_ = #{duedate, jdbcType=TIMESTAMP},
-          ROOT_PROCESS_INSTANCE_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR},
+          ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR},
           PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR},
           EXCLUSIVE_ = #{exclusive, jdbcType=BOOLEAN},
       </set>

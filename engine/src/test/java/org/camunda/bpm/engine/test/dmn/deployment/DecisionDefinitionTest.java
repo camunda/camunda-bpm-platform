@@ -19,6 +19,8 @@ package org.camunda.bpm.engine.test.dmn.deployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
@@ -46,6 +48,7 @@ import org.camunda.bpm.model.dmn.instance.Input;
 import org.camunda.bpm.model.dmn.instance.InputExpression;
 import org.camunda.bpm.model.dmn.instance.Output;
 import org.camunda.bpm.model.dmn.instance.Text;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -72,10 +75,20 @@ public class DecisionDefinitionTest {
   protected HistoryService historyService;
 
   @Before
-  public void init() {
+  public void init() throws ParseException {
     this.repositoryService = engineRule.getRepositoryService();
     this.decisionService = engineRule.getDecisionService();
     this.historyService = engineRule.getHistoryService();
+
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
+    Date fixedDate = sdf.parse("01/01/2001 01:01:01.000");
+
+    ClockUtil.setCurrentTime(fixedDate);
+  }
+
+  @After
+  public void tearDown() {
+    ClockUtil.reset();
   }
 
   @Test
