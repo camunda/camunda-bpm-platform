@@ -75,11 +75,14 @@ module.exports = function() {
       '$sce',
       'configuration',
       function($scope, AuthenticationService, $sce, configuration) {
-        $scope.isCE = CAMUNDA_EDITION === 'CE';
         $scope.logo = $sce.trustAsHtml(logo);
         $scope.brandName =
           configuration.getAppVendor() + ' ' + configuration.getAppName();
         $('head title').text($scope.brandName);
+
+        $scope.trustAsHtml = $sce.trustAsHtml;
+        // eslint-disable-next-line
+        $scope.isCommunityEdition = CAMUNDA_EDITION === 'CE';
 
         $scope.logout = AuthenticationService.logout;
         $scope.getTargetRoute = function() {

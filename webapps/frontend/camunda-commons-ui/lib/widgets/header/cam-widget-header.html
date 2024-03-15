@@ -1,8 +1,5 @@
-<div ng-if="isCE" class="ce-eol-banner">
-  Heads-up – it is time to try out Camunda 8. The last release of Camunda 7 CE will be in October 2025. If you have any
-  more questions, please get in touch with us in the
-  <a href="https://forum.camunda.io/t/important-update-camunda-7-community-edition-end-of-life-announced/50921"
-     target="_blank">forum</a>.
+<div ng-if="isCommunityEdition" class="ce-eol-banner"
+     ng-bind-html="trustAsHtml('BANNER_CE_EOL_TEXT' | translate)">
 </div>
 
 <div class="navbar-header">
