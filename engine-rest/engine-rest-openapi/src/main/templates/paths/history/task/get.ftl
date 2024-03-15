@@ -62,7 +62,8 @@
                            "followUp:":"2013-01-23T13:44:42.000+0200",
                            "tenantId":null,
                            "removalTime":"2018-02-10T14:33:19.000+0200",
-                           "rootProcessInstanceId":"aRootProcessInstanceId"
+                           "rootProcessInstanceId":"aRootProcessInstanceId",
+                           "taskState": "aTaskState"
                          }
                        ]
                      }']

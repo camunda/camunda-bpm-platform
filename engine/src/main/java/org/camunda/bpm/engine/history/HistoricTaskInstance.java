@@ -111,4 +111,9 @@ public interface HistoricTaskInstance {
   /** The time the historic task instance will be removed. */
   Date getRemovalTime();
 
+  /**
+   * Task State also referred as lifeCycleState
+   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
+   */
+  String getTaskState();
 }

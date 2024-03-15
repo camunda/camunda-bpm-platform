@@ -189,4 +189,18 @@ public interface Task {
    */
   void setTenantId(String tenantId);
 
+  /**
+   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
+   * Returns the task's state.
+   *
+   * @return the task's state
+   */
+  String getTaskState();
+
+  /**
+   * Sets the task state or life cycle state for this task.
+   *
+   * @param taskState the taskState to set
+   */
+  void setTaskState(String taskState);
 }

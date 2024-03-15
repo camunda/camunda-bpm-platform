@@ -18,5 +18,9 @@
 insert into ACT_GE_SCHEMA_LOG
 values ('1000', CURRENT_TIMESTAMP, '7.21.0');
 
+alter table ACT_RU_TASK add column TASK_STATE_ varchar(64);
+
+alter table ACT_HI_TASKINST add column TASK_STATE_ varchar(64);
+
 alter table ACT_RU_EXT_TASK
   add column CREATE_TIME_ datetime;

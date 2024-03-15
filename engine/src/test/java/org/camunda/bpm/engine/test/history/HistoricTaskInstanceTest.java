@@ -16,18 +16,6 @@
  */
 package org.camunda.bpm.engine.test.history;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
@@ -45,6 +33,14 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.Test;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -87,6 +83,10 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     assertNull(historicTaskInstance.getCaseDefinitionId());
     assertNull(historicTaskInstance.getCaseInstanceId());
     assertNull(historicTaskInstance.getCaseExecutionId());
+    /**
+     * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
+     */
+    assertEquals("Created", historicTaskInstance.getTaskState());
 
     // the activity instance id is set
     assertEquals(((TaskEntity)runtimeTask).getExecution().getActivityInstanceId(), historicTaskInstance.getActivityInstanceId());
@@ -114,6 +114,8 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     assertNotNull(historicTaskInstance.getDurationInMillis());
     assertTrue(historicTaskInstance.getDurationInMillis() >= 1000);
     assertTrue(((HistoricTaskInstanceEntity)historicTaskInstance).getDurationRaw() >= 1000);
+    assertEquals("Completed", historicTaskInstance.getTaskState());
+
 
     assertNull(historicTaskInstance.getCaseDefinitionId());
     assertNull(historicTaskInstance.getCaseInstanceId());

@@ -201,6 +201,7 @@ create table ACT_RU_TASK (
     FOLLOW_UP_DATE_ datetime,
     SUSPENSION_STATE_ integer,
     TENANT_ID_ varchar(64),
+    TASK_STATE_ varchar(64),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

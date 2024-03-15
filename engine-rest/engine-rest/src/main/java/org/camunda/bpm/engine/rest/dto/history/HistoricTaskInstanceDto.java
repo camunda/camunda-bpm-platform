@@ -16,9 +16,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
-import java.util.Date;
-
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
+
+import java.util.Date;
 
 /**
  * @author Roman Smirnov
@@ -52,6 +52,11 @@ public class HistoricTaskInstanceDto {
   private String tenantId;
   protected Date removalTime;
   protected String rootProcessInstanceId;
+  /**
+   * Returns task State of history tasks
+   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
+   */
+  protected String taskState;
 
   public String getId() {
     return id;
@@ -157,6 +162,12 @@ public class HistoricTaskInstanceDto {
     return rootProcessInstanceId;
   }
 
+  /**
+   * Returns task State of history tasks
+   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
+   */
+  public String getTaskState() { return taskState; }
+
   public static HistoricTaskInstanceDto fromHistoricTaskInstance(HistoricTaskInstance taskInstance) {
 
     HistoricTaskInstanceDto dto = new HistoricTaskInstanceDto();
@@ -187,6 +198,7 @@ public class HistoricTaskInstanceDto {
     dto.tenantId = taskInstance.getTenantId();
     dto.removalTime = taskInstance.getRemovalTime();
     dto.rootProcessInstanceId = taskInstance.getRootProcessInstanceId();
+    dto.taskState = taskInstance.getTaskState();
 
     return dto;
   }

@@ -260,6 +260,11 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setPriority(taskEntity.getPriority());
     evt.setTaskDefinitionKey(taskEntity.getTaskDefinitionKey());
     evt.setTenantId(tenantId);
+    /**
+     * Sets task State for the task
+     * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
+     */
+    evt.setTaskState(taskEntity.getTaskState());
 
     ExecutionEntity execution = taskEntity.getExecution();
     if (execution != null) {

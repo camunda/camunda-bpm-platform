@@ -21,5 +21,9 @@ values ('1000', CURRENT_TIMESTAMP, '7.21.0');
 alter table ACT_RU_EXT_TASK
   add CREATE_TIME_ datetime2;
 
+alter table ACT_RU_TASK add column TASK_STATE_ nvarchar(64);
+
+alter table ACT_HI_TASKINST add column TASK_STATE_ nvarchar(64);
+
 --https://github.com/camunda/camunda-bpm-platform/pull/4030
 create index ACT_IDX_TASK_PARENT_TASK_ID on ACT_RU_TASK(PARENT_TASK_ID_);

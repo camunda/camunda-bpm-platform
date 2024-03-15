@@ -91,6 +91,7 @@ create table ACT_HI_TASKINST (
     FOLLOW_UP_DATE_ timestamp,
     TENANT_ID_ varchar(64),
     REMOVAL_TIME_ timestamp,
+    TASK_STATE_ varchar(64),
     primary key (ID_)
 );
 

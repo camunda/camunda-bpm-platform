@@ -39,6 +39,12 @@ public class HistoricTaskInstanceEventEntity extends HistoricScopeInstanceEvent 
   protected String activityInstanceId;
   protected String tenantId;
 
+  /**
+   * Returns task State of history tasks
+   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
+   */
+  protected String taskState;
+
   // getters and setters //////////////////////////////////////////////////////
 
   public String getDeleteReason() {
@@ -145,6 +151,17 @@ public class HistoricTaskInstanceEventEntity extends HistoricScopeInstanceEvent 
     this.tenantId = tenantId;
   }
 
+  /**
+   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
+   */
+  public String getTaskState() {
+    return taskState;
+  }
+
+  public void setTaskState(String taskState) {
+    this.taskState = taskState;
+  }
+
   public String getRootProcessInstanceId() {
     return rootProcessInstanceId;
   }
@@ -178,6 +195,7 @@ public class HistoricTaskInstanceEventEntity extends HistoricScopeInstanceEvent 
            + ", processInstanceId=" + processInstanceId
            + ", activityInstanceId=" + activityInstanceId
            + ", tenantId=" + tenantId
+           + ", taskState=" + taskState
            + "]";
   }
 }

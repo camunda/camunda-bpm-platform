@@ -50,7 +50,8 @@
         DUE_DATE_,
         FOLLOW_UP_DATE_,
         TENANT_ID_,
-        REMOVAL_TIME_
+        REMOVAL_TIME_,
+        TASK_STATE_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{processDefinitionKey, jdbcType=VARCHAR},
@@ -77,7 +78,8 @@
         #{dueDate, jdbcType=TIMESTAMP},
         #{followUpDate, jdbcType=TIMESTAMP},
         #{tenantId, jdbcType=VARCHAR},
-        #{removalTime, jdbcType=TIMESTAMP}
+        #{removalTime, jdbcType=TIMESTAMP},
+        #{taskState, jdbcType=VARCHAR}
       )
   </insert>
 
@@ -99,7 +101,8 @@
       DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP},
       FOLLOW_UP_DATE_ = #{followUpDate, jdbcType=TIMESTAMP},
       CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR},
-      CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR}
+      CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
+      TASK_STATE_ = #{taskState, jdbcType=VARCHAR}
       <if test="endTime!=null">
         , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}
         , DURATION_ = #{durationInMillis, jdbcType=BIGINT}
@@ -345,6 +348,7 @@
     <result property="followUpDate" column="FOLLOW_UP_DATE_" jdbcType="TIMESTAMP" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="taskState" column="TASK_STATE_" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!-- HISTORIC TASK INSTANCE SELECT -->

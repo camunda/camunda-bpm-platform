@@ -203,6 +203,7 @@ create table ACT_RU_TASK (
     FOLLOW_UP_DATE_ timestamp,
     SUSPENSION_STATE_ integer,
     TENANT_ID_ varchar(64),
+    TASK_STATE_ varchar(64),
     primary key (ID_)
 );
 

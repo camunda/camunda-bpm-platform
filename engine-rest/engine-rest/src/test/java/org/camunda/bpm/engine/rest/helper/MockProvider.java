@@ -16,25 +16,6 @@
  */
 package org.camunda.bpm.engine.rest.helper;
 
-import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.EntityTypes;
@@ -51,33 +32,8 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.filter.FilterQuery;
-import org.camunda.bpm.engine.form.FormField;
-import org.camunda.bpm.engine.form.FormProperty;
-import org.camunda.bpm.engine.form.FormType;
-import org.camunda.bpm.engine.form.StartFormData;
-import org.camunda.bpm.engine.form.TaskFormData;
-import org.camunda.bpm.engine.history.DurationReportResult;
-import org.camunda.bpm.engine.history.HistoricActivityInstance;
-import org.camunda.bpm.engine.history.HistoricActivityStatistics;
-import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
-import org.camunda.bpm.engine.history.HistoricCaseActivityStatistics;
-import org.camunda.bpm.engine.history.HistoricCaseInstance;
-import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
-import org.camunda.bpm.engine.history.HistoricDecisionInstance;
-import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatistics;
-import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
-import org.camunda.bpm.engine.history.HistoricDetail;
-import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
-import org.camunda.bpm.engine.history.HistoricFormField;
-import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
-import org.camunda.bpm.engine.history.HistoricIncident;
-import org.camunda.bpm.engine.history.HistoricJobLog;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.history.HistoricTaskInstance;
-import org.camunda.bpm.engine.history.HistoricTaskInstanceReportResult;
-import org.camunda.bpm.engine.history.HistoricVariableInstance;
-import org.camunda.bpm.engine.history.HistoricVariableUpdate;
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.form.*;
+import org.camunda.bpm.engine.history.*;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
@@ -87,53 +43,14 @@ import org.camunda.bpm.engine.impl.form.CamundaFormRefImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.MetricIntervalEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
-import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
-import org.camunda.bpm.engine.impl.telemetry.dto.CommandImpl;
-import org.camunda.bpm.engine.impl.telemetry.dto.DatabaseImpl;
-import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
-import org.camunda.bpm.engine.impl.telemetry.dto.JdkImpl;
-import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
-import org.camunda.bpm.engine.impl.telemetry.dto.MetricImpl;
-import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
-import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
-import org.camunda.bpm.engine.management.ActivityStatistics;
-import org.camunda.bpm.engine.management.IncidentStatistics;
-import org.camunda.bpm.engine.management.JobDefinition;
-import org.camunda.bpm.engine.management.MetricIntervalValue;
-import org.camunda.bpm.engine.management.MetricsQuery;
-import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
-import org.camunda.bpm.engine.management.SetJobRetriesBuilder;
-import org.camunda.bpm.engine.management.SetJobRetriesByJobsAsyncBuilder;
-import org.camunda.bpm.engine.management.SetJobRetriesByProcessAsyncBuilder;
+import org.camunda.bpm.engine.impl.telemetry.dto.*;
+import org.camunda.bpm.engine.management.*;
 import org.camunda.bpm.engine.query.PeriodUnit;
 import org.camunda.bpm.engine.query.Query;
-import org.camunda.bpm.engine.repository.CaseDefinition;
-import org.camunda.bpm.engine.repository.DecisionDefinition;
-import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
-import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.repository.Resource;
+import org.camunda.bpm.engine.repository.*;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
-import org.camunda.bpm.engine.runtime.CaseExecution;
-import org.camunda.bpm.engine.runtime.CaseInstance;
-import org.camunda.bpm.engine.runtime.EventSubscription;
-import org.camunda.bpm.engine.runtime.Execution;
-import org.camunda.bpm.engine.runtime.Incident;
-import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
-import org.camunda.bpm.engine.runtime.MessageCorrelationResultType;
-import org.camunda.bpm.engine.runtime.MessageCorrelationResultWithVariables;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
-import org.camunda.bpm.engine.runtime.VariableInstance;
-import org.camunda.bpm.engine.task.Attachment;
-import org.camunda.bpm.engine.task.Comment;
-import org.camunda.bpm.engine.task.DelegationState;
-import org.camunda.bpm.engine.task.IdentityLink;
-import org.camunda.bpm.engine.task.IdentityLinkType;
-import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.task.TaskCountByCandidateGroupResult;
+import org.camunda.bpm.engine.runtime.*;
+import org.camunda.bpm.engine.task.*;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.value.ObjectValueImpl;
@@ -141,6 +58,15 @@ import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.*;
 
 /**
  * Provides mocks for the basic engine entities, such as
@@ -161,6 +87,12 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TENANT_ID = "aTenantId";
   public static final String ANOTHER_EXAMPLE_TENANT_ID = "anotherTenantId";
   public static final String EXAMPLE_TENANT_ID_LIST = EXAMPLE_TENANT_ID + "," + ANOTHER_EXAMPLE_TENANT_ID;
+
+  /**
+   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
+   */
+  // task State
+  public static final String EXAMPLE_HISTORIC_TASK_STATE = "aTaskState";
 
   public static final String EXAMPLE_TENANT_NAME = "aTenantName";
 
@@ -1055,7 +987,7 @@ public abstract class MockProvider {
       .caseExecutionId(EXAMPLE_CASE_EXECUTION_ID)
       .formKey(EXAMPLE_FORM_KEY)
       .camundaFormRef(EXAMPLE_FORM_KEY, EXAMPLE_FORM_REF_BINDING, EXAMPLE_FORM_REF_VERSION)
-      .tenantId(EXAMPLE_TENANT_ID);
+      .tenantId(EXAMPLE_TENANT_ID).taskState(EXAMPLE_HISTORIC_TASK_STATE);
   }
 
   public static List<Task> createMockTasks() {
@@ -2574,6 +2506,7 @@ public abstract class MockProvider {
     when(taskInstance.getTenantId()).thenReturn(tenantId);
     when(taskInstance.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_TASK_INST_REMOVAL_TIME));
     when(taskInstance.getRootProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_ROOT_PROC_INST_ID);
+    when(taskInstance.getTaskState()).thenReturn(EXAMPLE_HISTORIC_TASK_STATE);
 
     return taskInstance;
   }

@@ -16,22 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import static org.camunda.bpm.engine.delegate.TaskListener.EVENTNAME_DELETE;
-import static org.camunda.bpm.engine.impl.form.handler.DefaultFormHandler.FORM_REF_BINDING_VERSION;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
@@ -85,6 +69,13 @@ import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 
+import java.io.Serializable;
+import java.util.*;
+
+import static org.camunda.bpm.engine.delegate.TaskListener.EVENTNAME_DELETE;
+import static org.camunda.bpm.engine.impl.form.handler.DefaultFormHandler.FORM_REF_BINDING_VERSION;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -127,6 +118,11 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
   protected TaskState lifecycleState = TaskState.STATE_INIT;
   protected String tenantId;
+  /**
+   * Task State of task
+   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
+   */
+  protected String taskState;
 
   protected boolean isIdentityLinksInitialized = false;
   protected transient List<IdentityLinkEntity> taskIdentityLinkEntities = new ArrayList<>();
@@ -188,12 +184,21 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public static final String PRIORITY = "priority";
   public static final String CASE_INSTANCE_ID = "caseInstanceId";
 
+  /**
+   * Task state that will be stored in running and history task table
+   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
+   */
+  public static final String TASK_STATE_INIT = "Init";
+  public static final String TASK_STATE_CREATED = "Created";
+  public static final String TASK_STATE_COMPLETED = "Completed";
+  public static final String TASK_STATE_DELETED = "Deleted";
 
   /**
    * Mybatis constructor
    */
   public TaskEntity() {
     this.lifecycleState = TaskState.STATE_CREATED;
+    this.taskState = getTaskStateText(this.lifecycleState);
   }
 
   /**
@@ -202,12 +207,14 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public TaskEntity(String id) {
     this(TaskState.STATE_INIT);
     this.id = id;
+    this.taskState = TaskState.STATE_INIT.name();
   }
 
   protected TaskEntity(TaskState initialState) {
     this.isIdentityLinksInitialized = true;
     this.setCreateTime(ClockUtil.getCurrentTime());
     this.lifecycleState = initialState;
+    this.taskState = getTaskStateText(this.lifecycleState);
   }
 
   /**
@@ -1168,6 +1175,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   public boolean transitionTo(TaskState state) {
     this.lifecycleState = state;
+    this.taskState = getTaskStateText(this.lifecycleState);
 
     switch (state) {
     case STATE_CREATED:
@@ -1585,6 +1593,17 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   }
 
   @Override
+  public String getTaskState() {
+    return taskState;
+  }
+
+  @Override
+  public void setTaskState(String taskState) {
+    this.taskState = taskState;
+  }
+
+
+  @Override
   public void setFollowUpDate(Date followUpDate) {
     registerCommandContextCloseListener();
     propertyChanged(FOLLOW_UP_DATE, this.followUpDate, followUpDate);
@@ -1767,6 +1786,28 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       activityExecution.setVariables(variables);
     }
     EscalationHandler.propagateEscalation(activityExecution, escalationCode);
+  }
+
+  /**
+   * Returns task State name as per enum
+   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
+   */
+  public String getTaskStateText(TaskState state){
+
+    switch (state) {
+      case STATE_CREATED:
+        return TaskEntity.TASK_STATE_CREATED;
+
+      case STATE_COMPLETED:
+        return TaskEntity.TASK_STATE_COMPLETED;
+
+      case STATE_DELETED:
+        return TaskEntity.TASK_STATE_DELETED;
+
+      case STATE_INIT:
+      default:
+        return TaskEntity.TASK_STATE_INIT;
+    }
   }
 
   public static enum TaskState {
