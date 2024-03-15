@@ -16,15 +16,15 @@
  */
 package org.camunda.bpm.engine.rest.helper;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.Date;
+
 import org.camunda.bpm.engine.form.CamundaFormRef;
 import org.camunda.bpm.engine.impl.form.CamundaFormRefImpl;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
-
-import java.util.Date;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class MockTaskBuilder {
 

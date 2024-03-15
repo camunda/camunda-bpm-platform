@@ -16,9 +16,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
-import org.camunda.bpm.engine.history.HistoricTaskInstance;
-
 import java.util.Date;
+
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
 
 /**
  * @author Roman Smirnov
