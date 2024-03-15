@@ -18,15 +18,16 @@
 'use strict';
 
 const path = require('path');
-const webpack = require('webpack');
-
-const commonConfig = require(path.resolve(__dirname, './webpack.common.js'));
-
 const {merge} = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = (_env, argv = {}) => {
   const eeBuild = !!argv.eeBuild;
+
+  const commonConfig = require(path.resolve(
+    __dirname,
+    './webpack.common.js'
+  ))(_env, {...argv, eeBuild, devMode: true});
 
   const addEngines = engines => {
     return engines.reduce((acc, engine) => {
@@ -93,16 +94,7 @@ module.exports = (_env, argv = {}) => {
         }
       },
       open: ['/camunda/app/cockpit/default/']
-    },
-    plugins: [
-      new webpack.DefinePlugin({
-        // define custom global variables
-        DEV_MODE: true
-      }),
-      new webpack.ProvidePlugin({
-        DEV_MODE: true
-      })
-    ]
+    }
   };
 
   const merged = merge(commonConfig, developmentConfig);

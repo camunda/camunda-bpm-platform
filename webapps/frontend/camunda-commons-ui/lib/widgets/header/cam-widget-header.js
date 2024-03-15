@@ -75,6 +75,7 @@ module.exports = function() {
       '$sce',
       'configuration',
       function($scope, AuthenticationService, $sce, configuration) {
+        $scope.isCE = CAMUNDA_EDITION === 'CE';
         $scope.logo = $sce.trustAsHtml(logo);
         $scope.brandName =
           configuration.getAppVendor() + ' ' + configuration.getAppName();
