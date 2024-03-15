@@ -76,7 +76,7 @@ public class ExclusiveOverProcessHierarchiesTest {
 
     @After
     public void tearDown() {
-        restoreOriginalStateAfterTes();
+        restoreOriginalStateAfterTest();
     }
 
     @Test
@@ -95,7 +95,6 @@ public class ExclusiveOverProcessHierarchiesTest {
 
         assertThat(rootProcesses).hasSize(2);
 
-        // then
         // 4 jobs are created (2 for each root process due to cardinality)
         var jobs = managementService.createJobQuery()
                 .processDefinitionKey("subProcess")
@@ -113,6 +112,8 @@ public class ExclusiveOverProcessHierarchiesTest {
 
         int allJobsSize = getAllJobsSize();
 
+        // when
+
         // The result of the AcquireJobsCmd (Component responsible for the job acquisition)
         AcquiredJobs result = commandExecutor.execute(new AcquireJobsCmd(jobExecutor, allJobsSize));
 
@@ -123,7 +124,9 @@ public class ExclusiveOverProcessHierarchiesTest {
         var job3 = piJobs.subList(2, 3);
         var job4 = piJobs.subList(3, 4);
 
-        // contains the subprocess job ids in separate lists (batches)
+        // then
+
+        // Contains the subprocess job ids in separate lists (batches)
         // They will be executed in parallel as the legacy acquisition behaviour of multiple hierarchies
         assertThat(jobIdBatches).contains(job1, job2, job3, job4);
     }
@@ -144,7 +147,6 @@ public class ExclusiveOverProcessHierarchiesTest {
 
         assertThat(rootProcesses).hasSize(2);
 
-        // then
         // 4 jobs are created (2 for each root process due to cardinality)
         var jobs = managementService.createJobQuery()
                 .processDefinitionKey("subProcess")
@@ -162,6 +164,8 @@ public class ExclusiveOverProcessHierarchiesTest {
 
         int allJobsSize = getAllJobsSize();
 
+        // when
+
         // The result of the AcquireJobsCmd (Component responsible for the job acquisition)
         AcquiredJobs result = commandExecutor.execute(new AcquireJobsCmd(jobExecutor, allJobsSize));
 
@@ -171,6 +175,8 @@ public class ExclusiveOverProcessHierarchiesTest {
         var job2 = piJobs.subList(1, 2);
         var job3 = piJobs.subList(2, 3);
         var job4 = piJobs.subList(3, 4);
+
+        // then
 
         // contains the subprocess job ids in separate lists (batches)
         // They will be executed in parallel as the legacy behaviour of multiple hierarchies
@@ -216,7 +222,7 @@ public class ExclusiveOverProcessHierarchiesTest {
         this.jobState = JobState.ofAllProcessEngineJobs(engine);
     }
 
-    protected void restoreOriginalStateAfterTes() {
+    protected void restoreOriginalStateAfterTest() {
         this.engineConfig.setJobExecutorAcquireExclusiveOverProcessHierarchies(isJobExecutorAcquireExclusiveOverProcessHierarchies);
         this.jobState.restoreLockedJobs();
     }

@@ -158,7 +158,6 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
     return engineConfig != null && engineConfig.isJobExecutorAcquireExclusiveOverProcessHierarchies();
   }
 
-
   protected String selectProcessInstanceId(AcquirableJobEntity job, boolean isAcquireExclusiveOverProcessHierarchies) {
 
     if (isAcquireExclusiveOverProcessHierarchies && job.getRootProcessInstanceId() != null) {

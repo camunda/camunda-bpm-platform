@@ -366,11 +366,12 @@ public class SequentialJobAcquisitionTest {
         createdProcessEngines.add(engine);
         jobExecutor.registerProcessEngine((ProcessEngineImpl) engine);
 
+        // A root process calling a subprocess
         var subModel = Bpmn.createExecutableProcess("subProcess")
                 .startEvent()
                 .scriptTask("scriptTask")
                 .camundaAsyncBefore()
-                .camundaExclusive(true) // set the subprocess for exclusive execution
+                .camundaExclusive(true) // with an exclusive script task
                 .scriptFormat("javascript")
                 .scriptText("console.log(execution.getJobs())")
                 .endEvent()
@@ -382,7 +383,7 @@ public class SequentialJobAcquisitionTest {
                 .calledElement("subProcess")
                 .multiInstance()
                 .parallel()
-                .cardinality("2")
+                .cardinality("2") // and 2 spawned subprocesses by each process instance
                 .multiInstanceDone()
                 .endEvent()
                 .done();
@@ -394,6 +395,8 @@ public class SequentialJobAcquisitionTest {
                 .deploy();
 
         // when
+
+        // two process instances
         var pi1 = engine.getRuntimeService().startProcessInstanceByKey("rootProcess");
         var pi2 = engine.getRuntimeService().startProcessInstanceByKey("rootProcess");
 
@@ -404,7 +407,7 @@ public class SequentialJobAcquisitionTest {
         var pi1Jobs = assertProcessInstanceJobs(engine, pi1, 2, "subProcess");
         var pi2Jobs = assertProcessInstanceJobs(engine, pi2, 2, "subProcess");
 
-        // when
+        // the scheduler starts to acquire & execute the produced jobs
         jobExecutor.start();
         waitForJobExecutorToProcessAllJobs(10_0000, 100, jobExecutor, engine.getManagementService(), true);
 
@@ -429,7 +432,6 @@ public class SequentialJobAcquisitionTest {
     @Test
     public void shouldApplyExclusiveAcquisitionWhenAcquireExclusiveOverProcessHierarchiesIsEnabled() {
         // given
-
         var jobExecutor = new AssertJobExecutor();
         jobExecutor.setMaxJobsPerAcquisition(10);
 
@@ -440,18 +442,19 @@ public class SequentialJobAcquisitionTest {
                 .setJobExecutorActivate(false)
                 .setJobExecutor(jobExecutor)
                 .setDbMetricsReporterActivate(false)
-                .setJobExecutorAcquireExclusiveOverProcessHierarchies(true); // feature is enabled
+                .setJobExecutorAcquireExclusiveOverProcessHierarchies(true); // enable the feature
 
         ProcessEngine engine = engineConfig.buildProcessEngine();
         createdProcessEngines.add(engine);
         jobExecutor.registerProcessEngine((ProcessEngineImpl) engine);
 
         // given
+        // A root process calling a subprocess
         var subModel = Bpmn.createExecutableProcess("subProcess")
                 .startEvent()
                 .scriptTask("scriptTask")
                 .camundaAsyncBefore()
-                .camundaExclusive(true)
+                .camundaExclusive(true) // with an exclusive script task
                 .scriptFormat("javascript")
                 .scriptText("console.log(execution.getJobs())")
                 .endEvent()
@@ -463,7 +466,7 @@ public class SequentialJobAcquisitionTest {
                 .calledElement("subProcess")
                 .multiInstance()
                 .parallel()
-                .cardinality("2")
+                .cardinality("2") // and 2 spawned subprocesses by each process instance
                 .multiInstanceDone()
                 .endEvent()
                 .done();
@@ -484,6 +487,7 @@ public class SequentialJobAcquisitionTest {
         var pi1Jobs = assertProcessInstanceJobs(engine, pi1, 2, "subProcess");
         var pi2Jobs = assertProcessInstanceJobs(engine, pi2, 2, "subProcess");
 
+        // the scheduler starts to acquire & execute the produced jobs
         jobExecutor.start();
         waitForJobExecutorToProcessAllJobs(10000, 100, jobExecutor, engine.getManagementService(), true);
 
@@ -564,7 +568,7 @@ public class SequentialJobAcquisitionTest {
         var pi1Jobs = assertProcessInstanceJobs(engine, pi1, 4, "subSubProcess");
         var pi2Jobs = assertProcessInstanceJobs(engine, pi2, 4, "subSubProcess");
 
-        // when
+        // the scheduler starts to acquire & execute the produced jobs
         jobExecutor.start();
         waitForJobExecutorToProcessAllJobs(10000, 100, jobExecutor, engine.getManagementService(), true);
 
