@@ -226,7 +226,7 @@ pipeline {
         stage('UPGRADE-instance-migration-h2') {
           when {
             expression {
-              cambpmWithLabels('default-build', 'migration')
+              cambpmWithLabels('default-build', 'migration', 'h2', 'all-db')
             }
           }
           steps {
@@ -264,7 +264,7 @@ pipeline {
         stage('UPGRADE-rolling-update-h2') {
           when {
             expression {
-              cambpmWithLabels('rolling-update', 'default-build')
+              cambpmWithLabels('rolling-update', 'default-build', 'h2', 'all-db')
             }
           }
           steps {
@@ -283,7 +283,7 @@ pipeline {
         stage('PERFORMANCE-large-data-h2') {
           when {
             expression {
-              cambpmWithLabels()
+              cambpmWithLabels('h2', 'all-db')
             }
           }
           steps {
