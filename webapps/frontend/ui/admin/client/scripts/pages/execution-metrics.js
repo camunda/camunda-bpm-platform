@@ -345,9 +345,8 @@ const Controller = [
             }
           }
 
-          updateMonthlyChart(monthlyMetricsArray);
-
           $scope.monthlyMetrics = angular.copy(monthlyMetricsArray);
+          updateMonthlyChart(monthlyMetricsArray.reverse());
           $scope.loadingStateMonthly = 'LOADED';
           $scope.$apply();
         })
@@ -417,20 +416,6 @@ const Controller = [
       str += '\n';
       str += JSON.stringify($scope.telemetryData, null, 2);
       return str;
-    };
-
-    $scope.loadingNotInitial = () => {
-      return (
-        $scope.loadingStateAnnual !== 'INITIAL' &&
-        $scope.loadingStateMonthly !== 'INITIAL'
-      );
-    };
-
-    $scope.loading = () => {
-      return (
-        $scope.loadingStateAnnual === 'LOADING' &&
-        $scope.loadingStateMonthly === 'LOADING'
-      );
     };
 
     const load = ($scope.load = () => {

@@ -20,13 +20,14 @@
           {{ 'EXECUTION_METRICS_AND' | translate }}
           <strong>{{ 'EXECUTION_METRICS_TW' | translate }}</strong>
           {{ 'EXECUTION_METRICS_INFO_3' | translate }}
+          {{ 'EXECUTION_METRICS_INFO_4' | translate }}
         </p>
       </div>
     </div>
   </div>
 
   <div class="row">
-    <div class="form-group col-xs-10">
+    <div class="form-group col-xs-12">
       <label for="startDate">
         {{ 'EXECUTION_METRICS_START_DATE' | translate }}
       </label>
@@ -41,17 +42,6 @@
               flexible="true">
                 <a class="form-control-static">{{startDate}}</a>
         </span>
-      </div>
-    </div>
-    <div class="col-xs-2">
-      <div class="pull-right"
-           ng-show="loadingNotInitial()">
-        <button type="submit"
-                ng-disabled="!form.$valid || loading()"
-                class="btn btn-default"
-                ng-click="load()">
-          {{ 'EXECUTION_METRICS_REFRESH' | translate }}
-        </button>
       </div>
     </div>
   </div>
@@ -88,7 +78,11 @@
             <th></th>
             <th class="metric-header">PI</th>
             <th class="metric-header">DI</th>
-            <th class="metric-header">TU</th>
+            <th class="metric-header">TU
+              <span class="glyphicon glyphicon-question-sign"
+                    uib-tooltip="{{ 'EXECUTION_METRICS_TU_TOOLTIP' | translate }}"
+                    tooltip-placement="left"></span>
+            </th>
             <th class="metric-header" ng-show="displayLegacyMetrics">FNI</th>
             <th class="metric-header" ng-show="displayLegacyMetrics">EDE</th>
           </tr>
@@ -162,20 +156,6 @@
           </tr>
           </tbody>
         </table>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-xs-12">
-      <div class="pull-right"
-           ng-show="loadingNotInitial()">
-        <button type="submit"
-                ng-disabled="!form.$valid || loading()"
-                class="btn btn-default"
-                ng-click="load()">
-          {{ 'EXECUTION_METRICS_REFRESH' | translate }}
-        </button>
       </div>
     </div>
   </div>
