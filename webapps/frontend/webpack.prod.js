@@ -20,8 +20,6 @@
 const path = require('path');
 const webpack = require('webpack');
 
-const commonConfig = require(path.resolve(__dirname, './webpack.common.js'));
-
 const {merge} = require('webpack-merge');
 const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
@@ -47,7 +45,14 @@ class HtmlAdditionalAttributesPlugin {
   }
 }
 
-module.exports = () => {
+module.exports = (_env, argv = {}) => {
+  const eeBuild = !!argv.eeBuild;
+
+  const commonConfig = require(path.resolve(
+    __dirname,
+    './webpack.common.js'
+  ))(_env, {...argv, eeBuild});
+
   const productionConfig = {
     output: {
       clean: true
@@ -65,13 +70,6 @@ module.exports = () => {
       new webpack.BannerPlugin(
         fs.readFileSync('./license-banner.txt', 'utf-8')
       ),
-      new webpack.DefinePlugin({
-        // define custom global variables
-        DEV_MODE: false
-      }),
-      new webpack.ProvidePlugin({
-        DEV_MODE: false
-      }),
       new HtmlAdditionalAttributesPlugin()
     ],
     optimization: {
