@@ -73,12 +73,12 @@ public class JobState {
         }
     }
 
-    private void updateJob(String jobId, Date originallockExpirationTime) {
+    private void updateJob(String jobId, Date originalLockExpirationTime) {
         commandExecutor.execute((Command<Void>) context -> {
             var jobManager = context.getJobManager();
             var job = jobManager.findJobById(jobId);
 
-            if (jobHasBeenLocked(job, originallockExpirationTime)) {
+            if (jobHasBeenLocked(job, originalLockExpirationTime)) {
                 job.unlock();
             }
 
