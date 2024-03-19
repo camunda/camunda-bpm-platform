@@ -55,6 +55,8 @@ instance-migration:
   stash:
     runtimeStash: true
     qaStash: true
+  labels:
+    - 'all-db'
 old-engine:
   directory: 'qa'
   command: 'verify -Pold-engine,'
