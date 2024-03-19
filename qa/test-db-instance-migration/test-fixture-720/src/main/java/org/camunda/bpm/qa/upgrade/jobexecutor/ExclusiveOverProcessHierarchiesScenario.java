@@ -32,15 +32,15 @@ public class ExclusiveOverProcessHierarchiesScenario {
             deployRootProcessWithHierarchies(engine);
 
             // given the two 7.20 process instances
-            runtimeService.startProcessInstanceByKey("rootProcess", "withMultipleHierarchies");
-            runtimeService.startProcessInstanceByKey("rootProcess", "withMultipleHierarchies");
+            runtimeService.startProcessInstanceByKey("rootProcess_7.20", "withMultipleHierarchies");
+            runtimeService.startProcessInstanceByKey("rootProcess_7.20", "withMultipleHierarchies");
         };
     }
 
     protected static void deployRootProcessWithHierarchies(ProcessEngine engine) {
 
         // given
-        var subModel = Bpmn.createExecutableProcess("subProcess")
+        var subModel = Bpmn.createExecutableProcess("subProcess_7.20")
                 .camundaHistoryTimeToLive(180)
                 .startEvent()
                 .scriptTask("scriptTask")
@@ -51,7 +51,7 @@ public class ExclusiveOverProcessHierarchiesScenario {
                 .endEvent()
                 .done();
 
-        var rootModel = Bpmn.createExecutableProcess("rootProcess")
+        var rootModel = Bpmn.createExecutableProcess("rootProcess_7.20")
                 .camundaHistoryTimeToLive(180)
                 .startEvent()
                 .callActivity("callActivity")

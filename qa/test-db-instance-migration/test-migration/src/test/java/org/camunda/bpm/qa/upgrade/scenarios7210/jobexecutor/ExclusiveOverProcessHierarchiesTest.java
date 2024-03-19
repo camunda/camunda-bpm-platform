@@ -89,7 +89,7 @@ public class ExclusiveOverProcessHierarchiesTest {
 
         // a deployed root Process which delegates to a subProcess (cardinality 2). See ExclusiveOverProcessHierarchiesScenario
         var rootProcesses = runtimeService.createProcessInstanceQuery()
-                .processDefinitionKey("rootProcess")
+                .processDefinitionKey("rootProcess_7.20")
                 .processInstanceBusinessKey("withMultipleHierarchies")
                 .list();
 
@@ -97,7 +97,7 @@ public class ExclusiveOverProcessHierarchiesTest {
 
         // 4 jobs are created (2 for each root process due to cardinality)
         var jobs = managementService.createJobQuery()
-                .processDefinitionKey("subProcess")
+                .processDefinitionKey("subProcess_7.20")
                 .list();
 
         assertThat(jobs).hasSize(4);
@@ -108,7 +108,7 @@ public class ExclusiveOverProcessHierarchiesTest {
         assertThat(jobs.get(2).getRootProcessInstanceId()).isNull();
         assertThat(jobs.get(3).getRootProcessInstanceId()).isNull();
 
-        var piJobs = assertProcessInstanceJobs(4, "subProcess", null);
+        var piJobs = assertProcessInstanceJobs(4, "subProcess_7.20", null);
 
         int allJobsSize = getAllJobsSize();
 
@@ -141,7 +141,7 @@ public class ExclusiveOverProcessHierarchiesTest {
 
         // a deployed root Process which delegates to a subProcess (cardinality 2). See ExclusiveOverProcessHierarchiesScenario
         var rootProcesses = runtimeService.createProcessInstanceQuery()
-                .processDefinitionKey("rootProcess")
+                .processDefinitionKey("rootProcess_7.20")
                 .processInstanceBusinessKey("withMultipleHierarchies")
                 .list();
 
@@ -149,7 +149,7 @@ public class ExclusiveOverProcessHierarchiesTest {
 
         // 4 jobs are created (2 for each root process due to cardinality)
         var jobs = managementService.createJobQuery()
-                .processDefinitionKey("subProcess")
+                .processDefinitionKey("subProcess_7.20")
                 .list();
 
         assertThat(jobs).hasSize(4);
@@ -160,7 +160,7 @@ public class ExclusiveOverProcessHierarchiesTest {
         assertThat(jobs.get(2).getRootProcessInstanceId()).isNull();
         assertThat(jobs.get(3).getRootProcessInstanceId()).isNull();
 
-        var piJobs = assertProcessInstanceJobs(4, "subProcess", null);
+        var piJobs = assertProcessInstanceJobs(4, "subProcess_7.20", null);
 
         int allJobsSize = getAllJobsSize();
 
