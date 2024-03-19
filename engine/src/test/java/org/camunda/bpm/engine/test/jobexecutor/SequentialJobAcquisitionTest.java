@@ -229,109 +229,6 @@ public class SequentialJobAcquisitionTest {
     Assert.assertEquals(0, engine2.getManagementService().createJobQuery().count());
   }
 
-  ////////// helper methods ////////////////////////////
-
-  protected void waitForJobExecutorToProcessAllJobs(long maxMillisToWait,
-                                                    long intervalMillis,
-                                                    JobExecutor jobExecutor,
-                                                    ManagementService managementService,
-                                                    boolean shutdown) {
-    try {
-      waitForCondition(maxMillisToWait, intervalMillis, () -> !areJobsAvailable(managementService));
-    } finally {
-      if (shutdown) {
-        jobExecutor.shutdown();
-      }
-    }
-  }
-
-  protected void waitForJobExecutionRunnablesToFinish(long maxMillisToWait,
-                                                      long intervalMillis,
-                                                      JobExecutor jobExecutor) {
-    waitForCondition(maxMillisToWait, intervalMillis,
-        () -> ((ThreadPoolJobExecutor) jobExecutor).getThreadPoolExecutor().getActiveCount() == 0);
-  }
-
-  protected void waitForCondition(long maxMillisToWait, long intervalMillis, Supplier<Boolean> conditionSupplier) {
-    boolean conditionFulfilled = false;
-    Timer timer = new Timer();
-    InteruptTask task = new InteruptTask(Thread.currentThread());
-    timer.schedule(task, maxMillisToWait);
-    try {
-      while (!conditionFulfilled && !task.isTimeLimitExceeded()) {
-        Thread.sleep(intervalMillis);
-        conditionFulfilled = conditionSupplier.get();
-      }
-    } catch (InterruptedException e) {
-    } finally {
-      timer.cancel();
-    }
-    if (!conditionFulfilled) {
-      throw new ProcessEngineException("time limit of " + maxMillisToWait + " was exceeded");
-    }
-  }
-
-  protected boolean areJobsAvailable(ManagementService managementService) {
-    return !managementService.createJobQuery().executable().list().isEmpty();
-  }
-
-  private static class InteruptTask extends TimerTask {
-    protected boolean timeLimitExceeded = false;
-    protected Thread thread;
-
-    public InteruptTask(Thread thread) {
-      this.thread = thread;
-    }
-
-    public boolean isTimeLimitExceeded() {
-      return timeLimitExceeded;
-    }
-
-    @Override
-    public void run() {
-      timeLimitExceeded = true;
-      thread.interrupt();
-    }
-  }
-
-  protected List<String> assertProcessInstanceJobs(ProcessEngine engine, ProcessInstance pi, int nJobs, String pdKey) {
-    var jobs = engine.getManagementService().createJobQuery().rootProcessInstanceId(pi.getId()).list();
-
-    assertThat(jobs).hasSize(nJobs);
-
-    jobs.forEach(job -> {
-      assertThat(job.getProcessDefinitionKey()).isEqualTo(pdKey);
-      assertThat(job.getRootProcessInstanceId()).isEqualTo(pi.getId());
-    });
-
-    return jobs.stream().map(Job::getId).collect(Collectors.toList());
-  }
-
-  /**
-   * Assert Job Executor extends the DefaultJobExecutor to be able to assert the job batches.
-   * Each batch is executed sequentially by the same thread.
-   * <p>
-   * If a batch contains 1 element, it means it can be executed in parallel with other batches.
-   * In order for 2 jobs to be executed exclusively, they should exist in the same batch.
-   */
-  public static class AssertJobExecutor extends DefaultJobExecutor {
-
-    final List<List<String>> jobBatches = new ArrayList<>();
-
-    @SafeVarargs
-    public final void assertJobGroup(List<String>... jobIds) {
-      assertThat(jobBatches).containsExactlyInAnyOrder(jobIds);
-    }
-
-    @Override
-    public void executeJobs(List<String> jobIds, ProcessEngineImpl processEngine) {
-      super.executeJobs(jobIds, processEngine);
-
-      System.out.println("jobIds = " + jobIds);
-      jobBatches.add(jobIds);
-    }
-  }
-
   @Test
   public void shouldNotApplyExclusiveAcquisitionWhenMultipleHierarchiesExclusiveJobsIsDisabled() {
     // given
@@ -560,6 +457,109 @@ public class SequentialJobAcquisitionTest {
 
     // cleanup
     engine.getRepositoryService().deleteDeployment(deployment.getId(), true);
+  }
+
+  ////////// helper methods ////////////////////////////
+
+  protected void waitForJobExecutorToProcessAllJobs(long maxMillisToWait,
+                                                    long intervalMillis,
+                                                    JobExecutor jobExecutor,
+                                                    ManagementService managementService,
+                                                    boolean shutdown) {
+    try {
+      waitForCondition(maxMillisToWait, intervalMillis, () -> !areJobsAvailable(managementService));
+    } finally {
+      if (shutdown) {
+        jobExecutor.shutdown();
+      }
+    }
+  }
+
+  protected void waitForJobExecutionRunnablesToFinish(long maxMillisToWait,
+                                                      long intervalMillis,
+                                                      JobExecutor jobExecutor) {
+    waitForCondition(maxMillisToWait, intervalMillis,
+        () -> ((ThreadPoolJobExecutor) jobExecutor).getThreadPoolExecutor().getActiveCount() == 0);
+  }
+
+  protected void waitForCondition(long maxMillisToWait, long intervalMillis, Supplier<Boolean> conditionSupplier) {
+    boolean conditionFulfilled = false;
+    Timer timer = new Timer();
+    InteruptTask task = new InteruptTask(Thread.currentThread());
+    timer.schedule(task, maxMillisToWait);
+    try {
+      while (!conditionFulfilled && !task.isTimeLimitExceeded()) {
+        Thread.sleep(intervalMillis);
+        conditionFulfilled = conditionSupplier.get();
+      }
+    } catch (InterruptedException e) {
+    } finally {
+      timer.cancel();
+    }
+    if (!conditionFulfilled) {
+      throw new ProcessEngineException("time limit of " + maxMillisToWait + " was exceeded");
+    }
+  }
+
+  protected boolean areJobsAvailable(ManagementService managementService) {
+    return !managementService.createJobQuery().executable().list().isEmpty();
+  }
+
+  private static class InteruptTask extends TimerTask {
+    protected boolean timeLimitExceeded = false;
+    protected Thread thread;
+
+    public InteruptTask(Thread thread) {
+      this.thread = thread;
+    }
+
+    public boolean isTimeLimitExceeded() {
+      return timeLimitExceeded;
+    }
+
+    @Override
+    public void run() {
+      timeLimitExceeded = true;
+      thread.interrupt();
+    }
+  }
+
+  protected List<String> assertProcessInstanceJobs(ProcessEngine engine, ProcessInstance pi, int nJobs, String pdKey) {
+    var jobs = engine.getManagementService().createJobQuery().rootProcessInstanceId(pi.getId()).list();
+
+    assertThat(jobs).hasSize(nJobs);
+
+    jobs.forEach(job -> {
+      assertThat(job.getProcessDefinitionKey()).isEqualTo(pdKey);
+      assertThat(job.getRootProcessInstanceId()).isEqualTo(pi.getId());
+    });
+
+    return jobs.stream().map(Job::getId).collect(Collectors.toList());
+  }
+
+  /**
+   * Assert Job Executor extends the DefaultJobExecutor to be able to assert the job batches.
+   * Each batch is executed sequentially by the same thread.
+   * <p>
+   * If a batch contains 1 element, it means it can be executed in parallel with other batches.
+   * In order for 2 jobs to be executed exclusively, they should exist in the same batch.
+   */
+  public static class AssertJobExecutor extends DefaultJobExecutor {
+
+    final List<List<String>> jobBatches = new ArrayList<>();
+
+    @SafeVarargs
+    public final void assertJobGroup(List<String>... jobIds) {
+      assertThat(jobBatches).containsExactlyInAnyOrder(jobIds);
+    }
+
+    @Override
+    public void executeJobs(List<String> jobIds, ProcessEngineImpl processEngine) {
+      super.executeJobs(jobIds, processEngine);
+
+      System.out.println("jobIds = " + jobIds);
+      jobBatches.add(jobIds);
+    }
   }
 
 }
