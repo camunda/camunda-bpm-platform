@@ -173,6 +173,7 @@
     "EXECUTION_METRICS_ANNUAL_FORMAT": "{{from}} to {{to}}",
     "EXECUTION_METRICS_ANNUAL_FORMAT_CURRENT": "{{from}} up to today",
     "EXECUTION_METRICS_ANNUAL_TABLE_EMPTY": "Annual usage not available yet.",
+    "EXECUTION_METRICS_FETCH_DATA_ERROR_MESSAGE": "Failed to fetch execution metrics data: {{msg}}",
     "FILTER": "Filter",
     "FILTERS": "Filters",
     "FIRST_LOGIN_HEADING": "Welcome to Camunda",
