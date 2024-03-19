@@ -1812,8 +1812,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected String checkForCrdb(Connection connection) {
     try {
-      try (PreparedStatement preparedStatement = connection.prepareStatement("select version() as version;")) {
-        ResultSet result = preparedStatement.executeQuery();
+      try (PreparedStatement preparedStatement = connection.prepareStatement("select version() as version;");
+           ResultSet result = preparedStatement.executeQuery()) {
         if (result.next()) {
           String versionData = result.getString(1);
           if (versionData != null && versionData.toLowerCase().contains("cockroachdb")) {
