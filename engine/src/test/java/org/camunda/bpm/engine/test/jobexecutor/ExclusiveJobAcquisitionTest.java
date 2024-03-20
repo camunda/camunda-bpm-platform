@@ -89,9 +89,9 @@ public class ExclusiveJobAcquisitionTest {
     deleteAllDeployments();
     deleteAllJobs();
 
-    this.jobExecutor.clear();
-
     this.engineState.restore();
+
+    this.jobExecutor.clear();
     this.jobExecutor.shutdown();
   }
 
@@ -282,8 +282,6 @@ public class ExclusiveJobAcquisitionTest {
     jobExecutor.assertJobGroup(pi1Jobs, pi2Jobs);
   }
 
-  ////////// helper methods ////////////////////////////
-
   private List<String> assertProcessInstanceJobs(ProcessInstance pi, int nJobs, String pdKey) {
     var jobs = managementService.createJobQuery()
         .rootProcessInstanceId(pi.getId())
@@ -296,7 +294,9 @@ public class ExclusiveJobAcquisitionTest {
       assertThat(job.getRootProcessInstanceId()).isEqualTo(pi.getId());
     });
 
-    return jobs.stream().map(Job::getId).collect(Collectors.toList());
+    return jobs.stream()
+        .map(Job::getId)
+        .collect(Collectors.toList());
   }
 
   private void deleteAllJobs() {
@@ -308,7 +308,6 @@ public class ExclusiveJobAcquisitionTest {
     var allDeployments = repositoryService.createDeploymentQuery().list();
     allDeployments.forEach(deployment -> TestHelper.deleteDeployment(engine, deployment.getId()));
   }
-
 
   /**
    * Assert Job Executor extends the DefaultJobExecutor to be able to assert the job batches.
@@ -338,7 +337,11 @@ public class ExclusiveJobAcquisitionTest {
       jobBatches.clear();
     }
   }
-  
+
+  /**
+   * Static class that stores / restores the process engine property values that the tests might mutate. Can be used
+   * to isolate changes on the process engine configuration between different tests.
+   */
   static class ProcessEngineState {
     
     private final ProcessEngineConfigurationImpl engineConfig;
@@ -353,10 +356,18 @@ public class ExclusiveJobAcquisitionTest {
       this.jobExecutorActivate = engineConfig.isJobExecutorActivate();
     }
 
+    /**
+     * Creates a new process engine state to preserve the current configuration
+     * @param engineConfig the engine config
+     * @return the ProcessEngineState
+     */
     public static ProcessEngineState of(ProcessEngineConfigurationImpl engineConfig) {
       return new ProcessEngineState(engineConfig);
     }
 
+    /**
+     * Restores the original properties on the engine configuration/
+     */
     public void restore() {
       engineConfig.setJobExecutorAcquireExclusiveOverProcessHierarchies(isJobExecutorAcquireExclusiveOverProcessHierarchies);
       engineConfig.setJobExecutorActivate(jobExecutorActivate);
