@@ -21,7 +21,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.util.JobExecutorWaitUtils.waitForJobExecutorToProcessAllJobs;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -318,11 +320,13 @@ public class ExclusiveJobAcquisitionTest {
    */
   static class AssertJobExecutor extends DefaultJobExecutor {
 
-    final List<List<String>> jobBatches = new ArrayList<>();
+    final List<Set<String>> jobBatches = new ArrayList<>();
 
     @SafeVarargs
     public final void assertJobGroup(List<String>... jobIds) {
-      assertThat(jobBatches).containsExactlyInAnyOrder(jobIds);
+      var jobGroups = asListOfSets(jobIds);
+
+      assertThat(jobBatches).containsExactlyInAnyOrder(jobGroups);
     }
 
     @Override
@@ -330,12 +334,22 @@ public class ExclusiveJobAcquisitionTest {
       super.executeJobs(jobIds, processEngine);
 
       System.out.println("jobIds = " + jobIds);
-      jobBatches.add(jobIds);
+      jobBatches.add(new HashSet<>(jobIds));
     }
 
     public void clear() {
       jobBatches.clear();
     }
+  }
+
+  private static Set<String>[] asListOfSets(List<String>... jobIds) {
+    List<Set<String>> result = new ArrayList<>();
+    for (List<String> jobGroup : jobIds) {
+      result.add(new HashSet<>(jobGroup));
+    }
+
+
+    return result.toArray(new Set[0]);
   }
 
   /**
