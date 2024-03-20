@@ -201,6 +201,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public static final String TASK_STATE_CREATED = "Created";
   public static final String TASK_STATE_COMPLETED = "Completed";
   public static final String TASK_STATE_DELETED = "Deleted";
+  public static final String TASK_STATE_UPDATED = "Updated";
 
   /**
    * Mybatis constructor
@@ -1210,6 +1211,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     if (lifecycleState == TaskState.STATE_CREATED) {
       registerCommandContextCloseListener();
       setLastUpdated(ClockUtil.getCurrentTime());
+      setTaskState(TASK_STATE_UPDATED);
       return fireEvent(TaskListener.EVENTNAME_UPDATE) && fireAssignmentEvent();
     }
     else {
