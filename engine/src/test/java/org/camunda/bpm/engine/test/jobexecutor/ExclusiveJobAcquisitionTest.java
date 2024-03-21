@@ -88,9 +88,6 @@ public class ExclusiveJobAcquisitionTest {
 
   @After
   public void tearDown() {
-    deleteAllDeployments();
-    deleteAllJobs();
-
     this.engineState.restore();
 
     this.jobExecutor.clear();
@@ -128,11 +125,7 @@ public class ExclusiveJobAcquisitionTest {
         .endEvent()
         .done();
 
-    repositoryService
-        .createDeployment()
-        .addModelInstance("subProcess.bpmn", subModel)
-        .addModelInstance("rootProcess.bpmn", rootModel)
-        .deploy();
+   testRule.deploy(subModel, rootModel);
 
     // when
 
@@ -191,11 +184,7 @@ public class ExclusiveJobAcquisitionTest {
         .endEvent()
         .done();
 
-    repositoryService
-        .createDeployment()
-        .addModelInstance("subProcess.bpmn", subModel)
-        .addModelInstance("rootProcess.bpmn", rootModel)
-        .deploy();
+    testRule.deploy(subModel, rootModel);
 
     // when
     var pi1 = runtimeService.startProcessInstanceByKey("rootProcess");
@@ -257,12 +246,7 @@ public class ExclusiveJobAcquisitionTest {
         .endEvent()
         .done();
 
-    repositoryService
-        .createDeployment()
-        .addModelInstance("subSubProcess.bpmn", subSubModel)
-        .addModelInstance("subProcess.bpmn", subModel)
-        .addModelInstance("rootProcess.bpmn", rootModel)
-        .deploy();
+    testRule.deploy(subSubModel, subModel, rootModel);
 
     // when
     // the process instances are started
