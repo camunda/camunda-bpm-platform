@@ -76,6 +76,8 @@ public class DecisionDefinitionTest {
     this.repositoryService = engineRule.getRepositoryService();
     this.decisionService = engineRule.getDecisionService();
     this.historyService = engineRule.getHistoryService();
+
+    ClockUtil.reset();
   }
 
   @Test
