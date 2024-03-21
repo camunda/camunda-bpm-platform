@@ -26,13 +26,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -55,41 +52,30 @@ public class ExclusiveJobAcquisitionTest {
   public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
       configuration.setJobExecutor(new AssertJobExecutor())
   );
-  
+
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-  
-  private RepositoryService repositoryService;
+
+  private ProcessEngineConfigurationImpl engineConfig;
   private RuntimeService runtimeService;
   private ManagementService managementService;
-  
+
   private AssertJobExecutor jobExecutor;
 
-  private ProcessEngine engine;
-  private ProcessEngineConfigurationImpl engineConfig;
-  
-  private ProcessEngineState engineState;
-  
   @Before
   public void setup() {
-    this.engine = engineRule.getProcessEngine();
     this.engineConfig = engineRule.getProcessEngineConfiguration();
-    
-    this.repositoryService = engineConfig.getRepositoryService();
     this.runtimeService = engineRule.getRuntimeService();
     this.managementService = engineRule.getManagementService();
-    this.jobExecutor = (AssertJobExecutor) engineConfig.getJobExecutor();
 
-    this.engineState = ProcessEngineState.of(engineConfig);
+    this.jobExecutor = (AssertJobExecutor) engineConfig.getJobExecutor();
   }
 
   @After
   public void tearDown() {
-    this.engineState.restore();
-
     this.jobExecutor.clear();
     this.jobExecutor.shutdown();
   }
@@ -285,16 +271,6 @@ public class ExclusiveJobAcquisitionTest {
         .collect(Collectors.toList());
   }
 
-  private void deleteAllJobs() {
-    var allJobs = managementService.createJobQuery().list();
-    allJobs.forEach(job -> managementService.deleteJob(job.getId()));
-  }
-
-  private void deleteAllDeployments() {
-    var allDeployments = repositoryService.createDeploymentQuery().list();
-    allDeployments.forEach(deployment -> TestHelper.deleteDeployment(engine, deployment.getId()));
-  }
-
   /**
    * Assert Job Executor extends the DefaultJobExecutor to be able to assert the job batches.
    * Each batch is executed sequentially by the same thread.
@@ -308,7 +284,7 @@ public class ExclusiveJobAcquisitionTest {
 
     @SafeVarargs
     public final void assertJobGroup(List<String>... jobIds) {
-      var jobGroups = asListOfSets(jobIds);
+      var jobGroups = asArrayOfSets(jobIds);
 
       assertThat(jobBatches).containsExactlyInAnyOrder(jobGroups);
     }
@@ -326,7 +302,7 @@ public class ExclusiveJobAcquisitionTest {
     }
   }
 
-  private static Set<String>[] asListOfSets(List<String>... jobIds) {
+  private static Set<String>[] asArrayOfSets(List<String>... jobIds) {
     List<Set<String>> result = new ArrayList<>();
     for (List<String> jobGroup : jobIds) {
       result.add(new HashSet<>(jobGroup));
@@ -334,41 +310,5 @@ public class ExclusiveJobAcquisitionTest {
 
 
     return result.toArray(new Set[0]);
-  }
-
-  /**
-   * Static class that stores / restores the process engine property values that the tests might mutate. Can be used
-   * to isolate changes on the process engine configuration between different tests.
-   */
-  static class ProcessEngineState {
-    
-    private final ProcessEngineConfigurationImpl engineConfig;
-
-    private final boolean isJobExecutorAcquireExclusiveOverProcessHierarchies;
-    private final boolean jobExecutorActivate;
-    
-    private ProcessEngineState(ProcessEngineConfigurationImpl engineConfig) {
-      this.engineConfig = engineConfig;
-
-      this.isJobExecutorAcquireExclusiveOverProcessHierarchies = engineConfig.isJobExecutorAcquireExclusiveOverProcessHierarchies();
-      this.jobExecutorActivate = engineConfig.isJobExecutorActivate();
-    }
-
-    /**
-     * Creates a new process engine state to preserve the current configuration
-     * @param engineConfig the engine config
-     * @return the ProcessEngineState
-     */
-    public static ProcessEngineState of(ProcessEngineConfigurationImpl engineConfig) {
-      return new ProcessEngineState(engineConfig);
-    }
-
-    /**
-     * Restores the original properties on the engine configuration/
-     */
-    public void restore() {
-      engineConfig.setJobExecutorAcquireExclusiveOverProcessHierarchies(isJobExecutorAcquireExclusiveOverProcessHierarchies);
-      engineConfig.setJobExecutorActivate(jobExecutorActivate);
-    }
   }
 }
