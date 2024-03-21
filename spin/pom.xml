@@ -1,0 +1,218 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- camunda BPM parent release pom -->
+  <parent>
+    <groupId>org.camunda.spin</groupId>
+    <artifactId>camunda-spin-bom</artifactId>
+    <version>1.24.0-SNAPSHOT</version>
+    <relativePath>bom</relativePath>
+  </parent>
+
+  <artifactId>camunda-spin-root</artifactId>
+  <name>camunda Spin - root</name>
+  <inceptionYear>2014</inceptionYear>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>bom</module>
+    <module>core</module>
+    <module>dataformat-json-jackson</module>
+    <module>dataformat-xml-dom</module>
+    <module>dataformat-all</module>
+  </modules>
+
+  <properties>
+    <assertj.version>2.9.1</assertj.version>
+    <commons.version>1.13.0</commons.version>
+    <graal.js.version>21.1.0</graal.js.version>
+    <groovy.version>2.4.13</groovy.version>
+    <jackson.version>2.15.2</jackson.version>
+    <jaxb-impl.version>2.3.6</jaxb-impl.version>
+    <jruby.version>9.1.17.0</jruby.version>
+    <json-junit-fluent.version>1.1.6</json-junit-fluent.version>
+    <json-path.version>2.9.0</json-path.version>
+    <junit.version>4.13.1</junit.version>
+    <jython.version>2.5.3</jython.version>
+    <logback.version>1.2.11</logback.version>
+    <powermock.version>2.0.9</powermock.version>
+    <spin.version.old>1.22.0</spin.version.old>
+    <xml.bind-api.version>2.3.3</xml.bind-api.version>
+
+    <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
+    <additionalparam>-Xdoclint:none</additionalparam>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>org.camunda.commons</groupId>
+        <artifactId>camunda-commons-bom</artifactId>
+        <version>${commons.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>${jackson.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${assertj.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock-module-junit4</artifactId>
+        <version>${powermock.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock-api-mockito2</artifactId>
+        <version>${powermock.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.codehaus.groovy</groupId>
+        <artifactId>groovy-all</artifactId>
+        <version>${groovy.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.python</groupId>
+        <artifactId>jython</artifactId>
+        <version>${jython.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jruby</groupId>
+        <artifactId>jruby-complete</artifactId>
+        <version>${jruby.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.graalvm.js</groupId>
+        <artifactId>js</artifactId>
+        <version>${graal.js.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.graalvm.js</groupId>
+        <artifactId>js-scriptengine</artifactId>
+        <version>${graal.js.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logback.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.javacrumbs.json-unit</groupId>
+        <artifactId>json-unit-fluent</artifactId>
+        <version>${json-junit-fluent.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>jakarta.xml.bind</groupId>
+        <artifactId>jakarta.xml.bind-api</artifactId>
+        <version>${xml.bind-api.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-impl</artifactId>
+        <version>${jaxb-impl.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.jayway.jsonpath</groupId>
+        <artifactId>json-path</artifactId>
+        <version>${json-path.version}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.22.1</version>
+          <configuration>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>3.5.0</version>
+          <configuration>
+            <instructions>
+              <Export-Package>org.camunda.spin*</Export-Package>
+            </instructions>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.19</version>
+        <configuration>
+          <acceptPomPackaging>true</acceptPomPackaging>
+          <excludedScopes>test</excludedScopes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>license-header-check</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.mycila</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>jdk11</id>
+      <activation>
+        <jdk>[11,)</jdk>
+      </activation>
+      <modules>
+        <module>dataformat-xml-dom-jakarta</module>
+      </modules>
+    </profile>
+  </profiles>
+
+  <scm>
+    <url>https://github.com/camunda/camunda-spin</url>
+    <connection>scm:git:git@github.com:camunda/camunda-spin.git</connection>
+    <developerConnection>scm:git:git@github.com:camunda/camunda-spin.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+</project>

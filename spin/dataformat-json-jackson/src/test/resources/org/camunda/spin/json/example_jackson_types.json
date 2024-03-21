@@ -1,0 +1,9 @@
+{
+  "amount": 2000,
+  "customer": {
+    "name": "Kermit",
+    "contractStartDate": 20130505,
+    "@class": "org.camunda.spin.json.mapping.RegularCustomer"
+  },
+  "@class": "org.camunda.spin.json.mapping.Invoice"
+}
