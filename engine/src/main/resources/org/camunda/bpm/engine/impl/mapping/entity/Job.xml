@@ -64,7 +64,7 @@
         </if>
         <if test="parameter.isProcessDefinitionTenantIdSet">
           and PROCESS_DEF_ID_ IN (
-            SELECT ID_ 
+            SELECT ID_
             FROM ${prefix}ACT_RE_PROCDEF PD
             WHERE PD.KEY_ = #{parameter.processDefinitionKey, jdbcType=VARCHAR}
             <if test="parameter.processDefinitionTenantId != null">
@@ -118,6 +118,7 @@
     <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP" />
     <result property="exclusive" column="EXCLUSIVE_" jdbcType="BOOLEAN" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROCESS_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionKey" column="PROCESS_DEF_KEY_" jdbcType="VARCHAR" />
@@ -156,6 +157,7 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
     <result property="duedate" column="DUEDATE_" jdbcType="TIMESTAMP" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
     <result property="exclusive" column="EXCLUSIVE_" jdbcType="BOOLEAN" />
   </resultMap>
@@ -179,6 +181,9 @@
     select RES.ID_,
       RES.REV_,
       RES.DUEDATE_,
+    <if test="parameter.applyExclusiveOverProcessHierarchies">
+      RES.ROOT_PROC_INST_ID_,
+    </if>
       RES.PROCESS_INSTANCE_ID_,
       RES.EXCLUSIVE_
     ${limitBetweenAcquisition}
@@ -233,10 +238,20 @@
   <sql id="AtomicExclusiveJobs">
     RES.EXCLUSIVE_ = ${trueConstant}
           and not exists(
-            select J2.ID_ from ${prefix}ACT_RU_JOB J2
-            where J2.PROCESS_INSTANCE_ID_ = RES.PROCESS_INSTANCE_ID_                                           -- from the same proc. inst.
-            and (J2.EXCLUSIVE_ = ${trueConstant})                                                              -- also exclusive
-            and (J2.LOCK_OWNER_ is not null and J2.LOCK_EXP_TIME_ &gt;= #{parameter.now, jdbcType=TIMESTAMP})  -- in progress
+            select J2.ID_
+            from ${prefix}ACT_RU_JOB J2
+
+            <if test="!parameter.applyExclusiveOverProcessHierarchies">
+              where J2.PROCESS_INSTANCE_ID_ = RES.PROCESS_INSTANCE_ID_
+            </if>
+            <if test="parameter.applyExclusiveOverProcessHierarchies">
+              where (
+                  RES.ROOT_PROC_INST_ID_ is not null and J2.ROOT_PROC_INST_ID_ = RES.ROOT_PROC_INST_ID_                  -- from the same root proc. inst. if not null
+                or RES.ROOT_PROC_INST_ID_ is null and J2.PROCESS_INSTANCE_ID_ = RES.PROCESS_INSTANCE_ID_                 -- otherwise from the same proc. inst.
+              )
+            </if>
+            and (J2.EXCLUSIVE_ = ${trueConstant})                                                                               -- also exclusive
+            and (J2.LOCK_OWNER_ is not null and J2.LOCK_EXP_TIME_ &gt;= #{parameter.now, jdbcType=TIMESTAMP})                   -- in progress
             )
   </sql>
 
@@ -326,6 +341,9 @@
       </if>
       <if test="activityId != null">
       	JD.ACT_ID_ = #{activityId}
+      </if>
+      <if test="rootProcessInstanceId != null">
+        and RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId}
       </if>
       <if test="processInstanceId != null">
         and RES.PROCESS_INSTANCE_ID_ = #{processInstanceId}
@@ -453,6 +471,7 @@
             LOCK_EXP_TIME_,
             EXCLUSIVE_,
             EXECUTION_ID_,
+            ROOT_PROC_INST_ID_,
             PROCESS_INSTANCE_ID_,
             PROCESS_DEF_ID_,
             PROCESS_DEF_KEY_,
@@ -480,6 +499,7 @@
             #{lockExpirationTime, jdbcType=TIMESTAMP},
             #{exclusive, jdbcType=BOOLEAN},
             #{executionId, jdbcType=VARCHAR},
+            #{rootProcessInstanceId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
             #{processDefinitionId, jdbcType=VARCHAR},
             #{processDefinitionKey, jdbcType=VARCHAR},
@@ -564,6 +584,7 @@
             LOCK_EXP_TIME_,
             EXCLUSIVE_,
             EXECUTION_ID_,
+            ROOT_PROC_INST_ID_,
             PROCESS_INSTANCE_ID_,
             PROCESS_DEF_ID_,
             PROCESS_DEF_KEY_,
@@ -589,6 +610,7 @@
             #{lockExpirationTime, jdbcType=TIMESTAMP},
             #{exclusive, jdbcType=BOOLEAN},
             #{executionId, jdbcType=VARCHAR},
+            #{rootProcessInstanceId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
             #{processDefinitionId, jdbcType=VARCHAR},
             #{processDefinitionKey, jdbcType=VARCHAR},
@@ -645,6 +667,7 @@
         LOCK_EXP_TIME_,
         EXCLUSIVE_,
         EXECUTION_ID_,
+        ROOT_PROC_INST_ID_,
         PROCESS_INSTANCE_ID_,
         PROCESS_DEF_ID_,
         PROCESS_DEF_KEY_,
@@ -670,6 +693,7 @@
         #{lockExpirationTime, jdbcType=TIMESTAMP},
         #{exclusive, jdbcType=BOOLEAN},
         #{executionId, jdbcType=VARCHAR},
+        #{rootProcessInstanceId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
         #{processDefinitionKey, jdbcType=VARCHAR},
@@ -726,6 +750,7 @@
           LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP},
           LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
           DUEDATE_ = #{duedate, jdbcType=TIMESTAMP},
+          ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR},
           PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR},
           EXCLUSIVE_ = #{exclusive, jdbcType=BOOLEAN},
       </set>

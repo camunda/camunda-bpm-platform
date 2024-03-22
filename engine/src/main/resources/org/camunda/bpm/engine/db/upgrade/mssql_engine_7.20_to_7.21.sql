@@ -21,5 +21,9 @@ values ('1000', CURRENT_TIMESTAMP, '7.21.0');
 alter table ACT_RU_EXT_TASK
   add CREATE_TIME_ datetime2;
 
+alter table ACT_RU_JOB
+  add ROOT_PROC_INST_ID_ nvarchar(64);
+
 --https://github.com/camunda/camunda-bpm-platform/pull/4030
 create index ACT_IDX_TASK_PARENT_TASK_ID on ACT_RU_TASK(PARENT_TASK_ID_);
+create index ACT_IDX_JOB_ROOT_PROCINST on ACT_RU_JOB(ROOT_PROC_INST_ID_);
