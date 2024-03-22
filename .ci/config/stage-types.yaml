@@ -13,7 +13,6 @@
 #   labels: [LIST; OPTIONAL; Doc: defines the PR labels for which this stage type should run. ]
 #   timeout: [MAP; OPTIONAL - default timeout is 3600 seconds; Doc: defines a map containing Job timeouts (in seconds) for each DB type.]
 #     postgresql: [INT; OPTIONAL;]
-#     cockroachdb: [INT; OPTIONAL;]
 #     mysql: [INT; OPTIONAL;]
 #     mariadb: [INT; OPTIONAL;]
 #     oracle: [INT; OPTIONAL;]
@@ -33,7 +32,6 @@ db-unit:
   - 'mariadb'
   - 'sqlserver'
   - 'postgresql'
-  - 'cockroachdb'
   jdkVersion: 'openjdk-jdk-11-latest'
 sql-scripts:
   directory: 'distro/sql-script'
@@ -48,7 +46,6 @@ sql-scripts:
   - 'mariadb'
   - 'sqlserver'
   - 'postgresql'
-  - 'cockroachdb'
 instance-migration:
   directory: 'qa/test-db-instance-migration'
   command: 'verify -Pinstance-migration,'
@@ -68,7 +65,6 @@ old-engine:
   - 'mariadb'
   - 'sqlserver'
   - 'postgresql'
-  - 'cockroachdb'
 rolling-update:
   directory: 'qa/test-db-rolling-update'
   command: 'verify -Prolling-update,'
