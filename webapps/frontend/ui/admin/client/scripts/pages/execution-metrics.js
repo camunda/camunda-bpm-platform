@@ -168,15 +168,13 @@ const Controller = [
 
     // called every time date input changes
     const handleDateChange = () => {
-      const form = $scope.form;
-      if (form.$valid) {
+      const date = moment($scope.startDate, fmtRequest, true);
+      if (date.isValid()) {
         localConf.set(localConfContractStartDate, $scope.startDate);
         calculateContractDates();
         return load();
-      } else if (form.startDate.$error.datePattern) {
-        setInputError(`Supported pattern '${fmtDatePicker}'.`);
-      } else if (form.startDate.$error.dateValue) {
-        setInputError('Invalid Date Value.');
+      } else {
+        setInputError(`Invalid Date Value. Supported pattern '${fmtRequest}'.`);
       }
     };
 
@@ -355,7 +353,7 @@ const Controller = [
         })
         .catch(err => {
           $scope.loadingStateMonthly = 'ERROR';
-          $scope.loadingErrorMonthly = err;
+          $scope.loadingErrorMonthly = getApiError(err);
         });
     };
 
@@ -390,8 +388,24 @@ const Controller = [
         })
         .catch(err => {
           $scope.loadingStateAnnual = 'ERROR';
-          $scope.loadingErrorAnnual = err;
+          $scope.loadingErrorAnnual = getApiError(err);
         });
+    };
+
+    const getApiError = err => {
+      let msg;
+      if (err.data?.type) {
+        msg = err.data.type;
+        if (err.data.message) {
+          msg += ': ' + err.data.message;
+        }
+      } else {
+        msg = err.statusText;
+      }
+
+      return $translate.instant('EXECUTION_METRICS_FETCH_DATA_ERROR_MESSAGE', {
+        msg
+      });
     };
 
     $scope.getClipboardText = metric => {

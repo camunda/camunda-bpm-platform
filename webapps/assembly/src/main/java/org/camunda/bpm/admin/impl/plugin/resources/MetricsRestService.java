@@ -48,8 +48,9 @@ public class MetricsRestService extends AbstractAdminPluginResource {
     MetricsAggregatedQueryDto queryDto = new MetricsAggregatedQueryDto(objectMapper, uriInfo.getQueryParameters());
     queryDto.validateAndPrepareQuery();
 
-    boolean queryTaskUsers = queryDto.getMetrics().contains(Metrics.UNIQUE_TASK_WORKERS);
-    queryDto.getMetrics().remove(Metrics.TASK_USERS);
+    // TU metrics are fetched by a separate query (see below) and the list of metrics is only used by the first query
+    // Remove TU metric from the list
+    boolean queryTaskUsers = queryDto.getMetrics().remove(Metrics.UNIQUE_TASK_WORKERS);
 
     List<MetricsAggregatedResultDto> result = new ArrayList<>();
     if (!queryDto.getMetrics().isEmpty()) {

@@ -41,6 +41,11 @@ public interface Job {
   Date getDuedate();
 
   /**
+   * Returns the id of the root process instance which execution created the job.
+   */
+  String getRootProcessInstanceId();
+
+  /**
    * Returns the id of the process instance which execution created the job.
    */
   String getProcessInstanceId();

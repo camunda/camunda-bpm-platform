@@ -29,7 +29,8 @@ module.exports = [
       transclude: true,
       template: template,
       scope: {
-        value: '=camWidgetClipboard'
+        value: '=camWidgetClipboard',
+        leftSide: '=?'
       },
 
       link: function($scope, element, attrs) {
