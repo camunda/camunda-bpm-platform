@@ -601,7 +601,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenStatements.put(DB2, db2LimitBetweenWithoutColumns + "RES.* ");
     databaseSpecificLimitBetweenFilterStatements.put(DB2, db2LimitBetweenWithoutColumns + "RES.ID_, RES.REV_, RES.RESOURCE_TYPE_, RES.NAME_, RES.OWNER_ ");
     databaseSpecificLimitBetweenAcquisitionStatements.put(DB2, db2LimitBetweenWithoutColumns
-        + "RES.ID_, RES.REV_, RES.TYPE_, RES.LOCK_EXP_TIME_, RES.LOCK_OWNER_, RES.EXCLUSIVE_, RES.PROCESS_INSTANCE_ID_, RES.DUEDATE_, RES.PRIORITY_ ");
+        + "RES.ID_, RES.REV_, RES.TYPE_, RES.LOCK_EXP_TIME_, RES.LOCK_OWNER_, RES.EXCLUSIVE_, RES.ROOT_PROC_INST_ID_, RES.PROCESS_INSTANCE_ID_, RES.DUEDATE_, RES.PRIORITY_ ");
     databaseSpecificLimitBeforeInUpdate.put(DB2, "");
     databaseSpecificLimitAfterInUpdate.put(DB2, "");
     databaseSpecificLimitBeforeWithoutOffsetStatements.put(DB2, "");
@@ -699,7 +699,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenStatements.put(MSSQL, mssqlLimitBetweenWithoutColumns + "RES.* ");
     databaseSpecificLimitBetweenFilterStatements.put(MSSQL, "");
     databaseSpecificLimitBetweenAcquisitionStatements.put(MSSQL, mssqlLimitBetweenWithoutColumns
-        + "RES.ID_, RES.REV_, RES.TYPE_, RES.LOCK_EXP_TIME_, RES.LOCK_OWNER_, RES.EXCLUSIVE_, RES.PROCESS_INSTANCE_ID_, RES.DUEDATE_, RES.PRIORITY_ ");
+        + "RES.ID_, RES.REV_, RES.TYPE_, RES.LOCK_EXP_TIME_, RES.LOCK_OWNER_, RES.EXCLUSIVE_, RES.ROOT_PROC_INST_ID_, RES.PROCESS_INSTANCE_ID_, RES.DUEDATE_, RES.PRIORITY_ ");
     databaseSpecificLimitBeforeInUpdate.put(MSSQL, "");
     databaseSpecificLimitAfterInUpdate.put(MSSQL, "");
     databaseSpecificLimitBeforeWithoutOffsetStatements.put(MSSQL, "TOP (#{maxResults})");

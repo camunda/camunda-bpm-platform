@@ -1,6 +1,6 @@
 body.dashboard {
   background-color: #e5e5e5;
-  padding-top: 70px;
+  padding-top: 90px;
 }
 
 [cam-widget-header] .btn-primary,
@@ -11,6 +11,20 @@ body.dashboard {
 [cam-widget-header] .row {
   display: flex;
   align-items: center;
+}
+[cam-widget-header] .ce-eol-banner {
+  background-color: #B5152BFF;
+  color: white;
+  text-align: center;
+  height: 20px;
+  font-size: 0.9em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+[cam-widget-header] .ce-eol-banner a {
+  color: white;
+  text-decoration: underline;
 }
 
 .navbar-brand .logo {

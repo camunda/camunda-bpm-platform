@@ -17,6 +17,7 @@
 package org.camunda.bpm.admin.impl.plugin.base.dto;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.webapp.rest.dto.AbstractRestQueryParametersDto;
 import org.camunda.bpm.engine.impl.metrics.util.MetricsUtil;
 import org.camunda.bpm.engine.management.Metrics;
@@ -122,7 +123,7 @@ public class MetricsAggregatedQueryDto extends AbstractRestQueryParametersDto<Me
   }
 
   public void validateAndPrepareQuery() {
-    if (subscriptionStartDate == null || !subscriptionStartDate.before(new Date())) {
+    if (subscriptionStartDate == null || !subscriptionStartDate.before(ClockUtil.now())) {
       throw new InvalidRequestException(Response.Status.BAD_REQUEST,
           "subscriptionStartDate parameter has invalid value: " + subscriptionStartDate);
     }

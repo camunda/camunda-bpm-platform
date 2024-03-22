@@ -34,6 +34,7 @@ public class AcquirableJobEntity implements DbEntity, HasDbRevision {
   protected Date lockExpirationTime = null;
   protected Date duedate;
 
+  protected String rootProcessInstanceId = null;
   protected String processInstanceId = null;
 
   protected boolean isExclusive = DEFAULT_EXCLUSIVE;
@@ -99,6 +100,14 @@ public class AcquirableJobEntity implements DbEntity, HasDbRevision {
     this.lockExpirationTime = lockExpirationTime;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
@@ -148,6 +157,7 @@ public class AcquirableJobEntity implements DbEntity, HasDbRevision {
         + ", lockOwner=" + lockOwner
         + ", lockExpirationTime=" + lockExpirationTime
         + ", duedate=" + duedate
+        + ", rootProcessInstanceId=" + rootProcessInstanceId
         + ", processInstanceId=" + processInstanceId
         + ", isExclusive=" + isExclusive
         + "]";

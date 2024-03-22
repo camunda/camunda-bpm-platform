@@ -80,6 +80,10 @@ module.exports = function() {
           configuration.getAppVendor() + ' ' + configuration.getAppName();
         $('head title').text($scope.brandName);
 
+        $scope.trustAsHtml = $sce.trustAsHtml;
+        // eslint-disable-next-line
+        $scope.isCommunityEdition = CAMUNDA_EDITION === 'CE';
+
         $scope.logout = AuthenticationService.logout;
         $scope.getTargetRoute = function() {
           return $scope.authentication ? '' : '#/login';

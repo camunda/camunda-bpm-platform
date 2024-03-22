@@ -247,6 +247,7 @@ public abstract class JobEntity extends AcquirableJobEntity
       this.execution = execution;
       executionId = execution.getId();
       processInstanceId = execution.getProcessInstanceId();
+      rootProcessInstanceId = execution.getRootProcessInstanceId();
       // if the execution is suspended, suspend the job entity as well to prevent unwanted job execution
       if(execution.isSuspended()) {
         suspensionState = execution.getSuspensionState();
@@ -257,6 +258,7 @@ public abstract class JobEntity extends AcquirableJobEntity
       this.execution.removeJob(this);
       this.execution = execution;
       processInstanceId = null;
+      rootProcessInstanceId = null;
       executionId = null;
     }
   }
@@ -713,7 +715,6 @@ public abstract class JobEntity extends AcquirableJobEntity
            + ", lockExpirationTime=" + lockExpirationTime
            + ", executionId=" + executionId
            + ", processInstanceId=" + processInstanceId
-           + ", isExclusive=" + isExclusive
            + ", isExclusive=" + isExclusive
            + ", jobDefinitionId=" + jobDefinitionId
            + ", jobHandlerType=" + jobHandlerType
