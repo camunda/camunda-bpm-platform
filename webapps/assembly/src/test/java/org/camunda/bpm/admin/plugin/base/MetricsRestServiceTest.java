@@ -105,7 +105,7 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
   @Test
   public void shouldThrowExceptionWhenSubscriptionStartDateNotInPast() {
     // given
-    queryParameters.add("subscriptionStartDate", "2100-01-31");
+    queryParameters.add("subscriptionStartDate", new DateTime().withYear(2100).withMonthOfYear(1).withDayOfMonth(31).toString());
     queryParameters.add("groupBy", "month");
 
     // when
@@ -196,7 +196,7 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
   @Test
   public void shouldReturnAggregatedMetricsFilteredByMetricsParameter() {
     // given
-    queryParameters.add("subscriptionStartDate", "2020-01-01");
+    queryParameters.add("subscriptionStartDate", new DateTime().withYear(2020).withMonthOfYear(1).withDayOfMonth(1).toString());
     queryParameters.add("groupBy", "year");
     queryParameters.add("metrics", String.format("%s,%s", Metrics.PROCESS_INSTANCES, Metrics.FLOW_NODE_INSTANCES));
 
@@ -219,7 +219,7 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
   @Test
   public void shouldReturnAggregatedMetricsFilteredByStartDateParameter() {
     // given
-    queryParameters.add("subscriptionStartDate", "2020-01-01");
+    queryParameters.add("subscriptionStartDate", new DateTime().withYear(2020).withMonthOfYear(1).withDayOfMonth(1).toString());
     queryParameters.add("groupBy", "year");
     queryParameters.add("startDate", "2022-01-01");
     queryParameters.add("metrics", Metrics.PROCESS_INSTANCES);
@@ -246,7 +246,7 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
   @Test
   public void shouldReturnAggregatedMetricsFilteredByEndDateParameter() {
     // given
-    queryParameters.add("subscriptionStartDate", "2020-01-01");
+    queryParameters.add("subscriptionStartDate", new DateTime().withYear(2020).withMonthOfYear(1).withDayOfMonth(1).toString());
     queryParameters.add("groupBy", "year");
     queryParameters.add("endDate", "2022-01-01");
     queryParameters.add("metrics", Metrics.PROCESS_INSTANCES);
@@ -273,7 +273,7 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
   @Test
   public void shouldReturnAggregatedMetricsGroupedByMonth() {
     // given
-    queryParameters.add("subscriptionStartDate", "2020-04-15");
+    queryParameters.add("subscriptionStartDate", new DateTime().withYear(2020).withMonthOfYear(4).withDayOfMonth(15).toString());
     queryParameters.add("groupBy", "month");
     queryParameters.add("metrics", Metrics.PROCESS_INSTANCES);
 
@@ -306,7 +306,7 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
   @Test
   public void shouldReturnAggregatedMetricsGroupedByYear() {
     // given
-    queryParameters.add("subscriptionStartDate", "2020-04-15");
+    queryParameters.add("subscriptionStartDate", new DateTime().withYear(2020).withMonthOfYear(4).withDayOfMonth(15).toString());
     queryParameters.add("groupBy", "year");
     queryParameters.add("metrics", Metrics.PROCESS_INSTANCES);
 
@@ -339,7 +339,7 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
   @Test
   public void shouldReturnAnnualAggregatedMetricsForTU() {
     // given
-    queryParameters.add("subscriptionStartDate", "2020-01-01");
+    queryParameters.add("subscriptionStartDate", new DateTime().withYear(2020).withMonthOfYear(1).withDayOfMonth(1).toString());
     queryParameters.add("groupBy", "year");
     queryParameters.add("metrics", Metrics.TASK_USERS);
 
@@ -364,7 +364,7 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
   @Test
   public void shouldReturnMonthlyAggregatedMetricsForTU() {
     // given
-    queryParameters.add("subscriptionStartDate", "2020-01-01");
+    queryParameters.add("subscriptionStartDate", new DateTime().withYear(2020).withMonthOfYear(1).withDayOfMonth(1).toString());
     queryParameters.add("startDate", "2023-01-01");
     queryParameters.add("groupBy", "month");
     queryParameters.add("metrics", Metrics.TASK_USERS);
@@ -426,7 +426,7 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
   @Test
   public void shouldReturnAggregatedMetricsByYear() {
     // given
-    queryParameters.add("subscriptionStartDate", "2020-01-01");
+    queryParameters.add("subscriptionStartDate", new DateTime().withYear(2020).withMonthOfYear(1).withDayOfMonth(1).toString());
     queryParameters.add("groupBy", "year");
 
     // generate metrics for last 5 days & last 3 years
@@ -457,7 +457,7 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
   @Test
   public void shouldReturnAggregatedMetricsByMonth() {
     // given
-    queryParameters.add("subscriptionStartDate", "2020-01-01");
+    queryParameters.add("subscriptionStartDate", new DateTime().withYear(2020).withMonthOfYear(1).withDayOfMonth(1).toString());
     queryParameters.add("groupBy", "month");
 
     // generate metrics for last 5 days & last 3 years
