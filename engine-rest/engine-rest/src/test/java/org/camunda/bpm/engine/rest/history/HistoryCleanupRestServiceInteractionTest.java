@@ -153,16 +153,16 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
   @Test
   public void testHistoryConfigurationOutsideBatchWindow() throws ParseException {
     ProcessEngineConfigurationImpl processEngineConfigurationImplMock = mock(ProcessEngineConfigurationImpl.class);
-    Date startDate = HistoryCleanupHelper.parseTimeConfiguration("23:59+0200");
-    Date endDate = HistoryCleanupHelper.parseTimeConfiguration("00:00+0200");
+    Date startDate = HistoryCleanupHelper.parseTimeConfiguration("23:59");
+    Date endDate = HistoryCleanupHelper.parseTimeConfiguration("00:00");
     when(processEngine.getProcessEngineConfiguration()).thenReturn(processEngineConfigurationImplMock);
-    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTime()).thenReturn("23:59+0200");
-    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTime()).thenReturn("00:00+0200");
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTime()).thenReturn("23:59");
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTime()).thenReturn("00:00");
     when(processEngineConfigurationImplMock.getBatchWindowManager()).thenReturn(new DefaultBatchWindowManager());
     when(processEngineConfigurationImplMock.isHistoryCleanupEnabled()).thenReturn(true);
 
     SimpleDateFormat sdf = new SimpleDateFormat(JacksonConfigurator.dateFormatString);
-    Date now = sdf.parse("2017-09-01T22:00:00.000+0200");
+    Date now = sdf.parse("2017-09-01T22:00:00.000+0000");
 
     ClockUtil.setCurrentTime(now);
     Calendar today = Calendar.getInstance();
