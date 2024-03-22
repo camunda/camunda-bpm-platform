@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.container.impl.jboss.service;
 
+import java.util.function.Consumer;
+
 import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugins;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -29,9 +31,11 @@ import org.jboss.msc.service.StopContext;
 public class MscBpmPlatformPlugins implements Service<BpmPlatformPlugins> {
 
   protected BpmPlatformPlugins plugins;
+  protected final Consumer<BpmPlatformPlugins> provider;
 
-  public MscBpmPlatformPlugins(BpmPlatformPlugins plugins) {
+  public MscBpmPlatformPlugins(BpmPlatformPlugins plugins, Consumer<BpmPlatformPlugins> provider) {
     this.plugins = plugins;
+    this.provider = provider;
   }
 
   @Override
@@ -41,12 +45,12 @@ public class MscBpmPlatformPlugins implements Service<BpmPlatformPlugins> {
 
   @Override
   public void start(StartContext context) throws StartException {
-    // nothing to do
+    provider.accept(plugins);
   }
 
   @Override
   public void stop(StopContext context) {
-    // nothing to do
+    provider.accept(null);
   }
 
 }

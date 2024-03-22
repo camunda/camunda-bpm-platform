@@ -22,7 +22,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
@@ -65,18 +64,17 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
       .getJobManager()
       .findNextJobsToExecute(new Page(0, numJobsToAcquire));
 
-    Map<String, List<String>> exclusiveJobsByProcessInstance = new HashMap<String, List<String>>();
+    Map<String, List<String>> exclusiveJobsByProcessInstance = new HashMap<>();
+
+    boolean isAcquireExclusiveOverProcessHierarchies = isAcquireExclusiveOverProcessHierarchies(commandContext);
 
     for (AcquirableJobEntity job : jobs) {
 
       lockJob(job);
 
       if(job.isExclusive()) {
-        List<String> list = exclusiveJobsByProcessInstance.get(job.getProcessInstanceId());
-        if (list == null) {
-          list = new ArrayList<String>();
-          exclusiveJobsByProcessInstance.put(job.getProcessInstanceId(), list);
-        }
+        String processInstanceId = selectProcessInstanceId(job, isAcquireExclusiveOverProcessHierarchies);
+        List<String> list = exclusiveJobsByProcessInstance.computeIfAbsent(processInstanceId, key -> new ArrayList<>());
         list.add(job.getId());
       }
       else {
@@ -140,7 +138,7 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
     if (operation instanceof DbEntityOperation) {
 
       DbEntityOperation entityOperation = (DbEntityOperation) operation;
-      
+
       // could not lock the job -> remove it from list of acquired jobs
       acquiredJobs.removeJobId(entityOperation.getEntity().getId());
 
@@ -152,6 +150,21 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
     // If none of the conditions are satisfied, this might indicate a bug,
     // so we throw the OLE.
     return OptimisticLockingResult.THROW;
+  }
+
+  protected boolean isAcquireExclusiveOverProcessHierarchies(CommandContext context) {
+    var engineConfig = context.getProcessEngineConfiguration();
+
+    return engineConfig != null && engineConfig.isJobExecutorAcquireExclusiveOverProcessHierarchies();
+  }
+
+  protected String selectProcessInstanceId(AcquirableJobEntity job, boolean isAcquireExclusiveOverProcessHierarchies) {
+
+    if (isAcquireExclusiveOverProcessHierarchies && job.getRootProcessInstanceId() != null) {
+      return job.getRootProcessInstanceId();
+    }
+
+    return job.getProcessInstanceId();
   }
 
 }

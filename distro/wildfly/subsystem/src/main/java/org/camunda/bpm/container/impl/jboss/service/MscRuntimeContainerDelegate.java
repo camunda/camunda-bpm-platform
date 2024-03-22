@@ -21,12 +21,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.function.Consumer;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInfo;
+import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.impl.JakartaServletProcessApplication;
 import org.camunda.bpm.container.ExecutorService;
@@ -40,6 +42,7 @@ import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.modules.ModuleClassLoader;
 import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
@@ -64,14 +67,21 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
   protected ServiceContainer serviceContainer;
 
   protected ServiceTracker<ProcessEngine> processEngineServiceTracker;
-  protected Set<ProcessEngine> processEngines = new CopyOnWriteArraySet<ProcessEngine>();
+  protected Set<ProcessEngine> processEngines = new CopyOnWriteArraySet<>();
 
   protected ServiceTracker<MscManagedProcessApplication> processApplicationServiceTracker;
-  protected Set<MscManagedProcessApplication> processApplications = new CopyOnWriteArraySet<MscManagedProcessApplication>();
+  protected Set<MscManagedProcessApplication> processApplications = new CopyOnWriteArraySet<>();
+  protected Consumer<RuntimeContainerDelegate> provider;
+
+  public MscRuntimeContainerDelegate(Consumer<RuntimeContainerDelegate> provider) {
+    this.provider = provider;
+  }
 
   // Lifecycle /////////////////////////////////////////////////
 
+  @Override
   public void start(StartContext context) throws StartException {
+    provider.accept(this);
     serviceContainer = context.getController().getServiceContainer();
     childTarget = context.getChildTarget();
 
@@ -82,16 +92,20 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
     RuntimeContainerDelegate.INSTANCE.set(this);
   }
 
+  @Override
   public void stop(StopContext context) {
+    provider.accept(null);
     stopTrackingServices();
   }
 
+  @Override
   public MscRuntimeContainerDelegate getValue() throws IllegalStateException, IllegalArgumentException {
     return this;
   }
 
   // RuntimeContainerDelegate implementation /////////////////////////////
 
+  @Override
   public void registerProcessEngine(ProcessEngine processEngine) {
 
     if(processEngine == null) {
@@ -104,14 +118,17 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
       MscManagedProcessEngine processEngineRegistration = new MscManagedProcessEngine(processEngine);
 
       // install the service asynchronously.
-      childTarget.addService(serviceName, processEngineRegistration)
-        .setInitialMode(Mode.ACTIVE)
-        .addDependency(ServiceNames.forMscRuntimeContainerDelegate(), MscRuntimeContainerDelegate.class, processEngineRegistration.getRuntimeContainerDelegateInjector())
-        .install();
+      ServiceBuilder<?> serviceBuilder = childTarget.addService(serviceName);
+      serviceBuilder.requires(ServiceNames.forMscRuntimeContainerDelegate());
+      serviceBuilder.provides(serviceName);
+      serviceBuilder.setInitialMode(Mode.ACTIVE);
+      serviceBuilder.setInstance(processEngineRegistration.getRuntimeContainerDelegateSupplier().get());
+      serviceBuilder.install();
     }
 
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public void unregisterProcessEngine(ProcessEngine processEngine) {
 
@@ -129,6 +146,7 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
 
   }
 
+  @Override
   public void deployProcessApplication(AbstractProcessApplication processApplication) {
     if(processApplication instanceof JakartaServletProcessApplication) {
       deployServletProcessApplication((JakartaServletProcessApplication)processApplication);
@@ -139,7 +157,7 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
   protected void deployServletProcessApplication(JakartaServletProcessApplication processApplication) {
 
     ClassLoader contextClassloader = ClassLoaderUtil.getContextClassloader();
-    String moduleName = ((ModuleClassLoader)contextClassloader).getModule().getIdentifier().toString();
+    String moduleName = ((ModuleClassLoader)contextClassloader).getModule().getName();
 
     ServiceName serviceName = ServiceNames.forNoViewProcessApplicationStartService(moduleName);
     ServiceName paModuleService = ServiceNames.forProcessApplicationModuleService(moduleName);
@@ -148,57 +166,65 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
 
       ServiceController<ServiceTarget> requiredService = (ServiceController<ServiceTarget>) serviceContainer.getRequiredService(paModuleService);
 
-      NoViewProcessApplicationStartService service = new NoViewProcessApplicationStartService(processApplication.getReference());
-      requiredService.getValue()
-        .addService(serviceName, service)
-        .setInitialMode(Mode.ACTIVE)
-        .install();
+      ServiceBuilder<?> serviceBuilder = requiredService.getValue().addService(serviceName);
+      Consumer<ProcessApplicationInterface> provider = serviceBuilder.provides(serviceName);
+      NoViewProcessApplicationStartService service = new NoViewProcessApplicationStartService(processApplication.getReference(), provider);
+      serviceBuilder.setInitialMode(Mode.ACTIVE);
+      serviceBuilder.setInstance(service);
+      serviceBuilder.install();
 
     }
   }
 
+  @Override
   public void undeployProcessApplication(AbstractProcessApplication processApplication) {
     // nothing to do
   }
 
+  @Override
   public ProcessEngineService getProcessEngineService() {
-    // TODO: return proxy?
     return this;
   }
 
+  @Override
   public ProcessApplicationService getProcessApplicationService() {
-    // TODO: return proxy?
     return this;
   }
 
+  @Override
   public ExecutorService getExecutorService() {
     return (ExecutorService) serviceContainer.getRequiredService(ServiceNames.forMscExecutorService()).getValue();
   }
 
   // ProcessEngineService implementation /////////////////////////////////
 
+  @Override
   public ProcessEngine getDefaultProcessEngine() {
     return getProcessEngineService(ServiceNames.forDefaultProcessEngine());
   }
 
+  @Override
   public List<ProcessEngine> getProcessEngines() {
-    return new ArrayList<ProcessEngine>(processEngines);
+    return new ArrayList<>(processEngines);
   }
 
+  @Override
   public Set<String> getProcessEngineNames() {
-    HashSet<String> result = new HashSet<String>();
+    HashSet<String> result = new HashSet<>();
     for (ProcessEngine engine : processEngines) {
       result.add(engine.getName());
     }
     return result;
   }
 
+  @Override
   public ProcessEngine getProcessEngine(String name) {
     return getProcessEngineService(ServiceNames.forManagedProcessEngine(name));
   }
 
   // ProcessApplicationService implementation //////////////////////////////
 
+  @Override
   public ProcessApplicationInfo getProcessApplicationInfo(String processApplicationName) {
     MscManagedProcessApplication managedProcessApplication = getManagedProcessApplication(processApplicationName);
 
@@ -210,14 +236,16 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
     }
   }
 
+  @Override
   public Set<String> getProcessApplicationNames() {
-    HashSet<String> result = new HashSet<String>();
+    HashSet<String> result = new HashSet<>();
     for (MscManagedProcessApplication application : processApplications) {
       result.add(application.getProcessApplicationInfo().getName());
     }
     return result;
   }
 
+  @Override
   public ProcessApplicationReference getDeployedProcessApplication(String name) {
     MscManagedProcessApplication managedPa = getManagedProcessApplication(name);
     if(managedPa == null) {
@@ -229,10 +257,6 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
   }
 
   // internal implementation ///////////////////////////////
-
-  protected void createProcessEngineServiceJndiBindings() {
-
-  }
 
   protected void createJndiBindings() {
 
@@ -272,10 +296,10 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
   }
 
   protected void startTrackingServices() {
-    processEngineServiceTracker = new ServiceTracker<ProcessEngine>(ServiceNames.forManagedProcessEngines(), processEngines);
+    processEngineServiceTracker = new ServiceTracker<>(ServiceNames.forManagedProcessEngines(), processEngines);
     serviceContainer.addListener(processEngineServiceTracker);
 
-    processApplicationServiceTracker = new ServiceTracker<MscManagedProcessApplication>(ServiceNames.forManagedProcessApplications(), processApplications);
+    processApplicationServiceTracker = new ServiceTracker<>(ServiceNames.forManagedProcessApplications(), processApplications);
     serviceContainer.addListener(processApplicationServiceTracker);
   }
 

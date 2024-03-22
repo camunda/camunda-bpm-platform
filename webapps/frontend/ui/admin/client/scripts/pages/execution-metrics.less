@@ -1,0 +1,57 @@
+form.execution-metrics {
+
+  .task-worker-metrics {
+    margin-bottom: 10px;
+  }
+
+  input[type="checkbox"].tw-checkbox-show {
+    margin-right: 8px;
+  }
+
+  .tw-checkbox-show-label {
+    margin-bottom: 0;
+    font-weight: normal;
+  }
+
+  .form-group {
+    margin-bottom: 0;
+  }
+
+  .cam-table {
+    th.metric-header {
+      text-align: right;
+      width: 12%;
+    }
+
+    td.metric-row {
+      text-align: right;
+    }
+
+    &.metrics-monthly {
+      td.metric-row {
+        width: 15%;
+      }
+
+      &.without-legacy {
+        td.metric-row {
+          width: 25%;
+        }
+      }
+    }
+
+    &.metrics-annual {
+      td.metric-row {
+        width: 10%;
+      }
+
+      td.metric-action-value, th.metric-action-header {
+        text-align: center;
+      }
+    }
+  }
+
+  div.monthly-metrics-chart {
+    height: 200px;
+  }
+
+}

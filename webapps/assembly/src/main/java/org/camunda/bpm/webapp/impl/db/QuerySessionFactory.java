@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.impl.db;
+package org.camunda.bpm.webapp.impl.db;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -26,11 +26,6 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 
-/**
- *
- * @author drobisch
- *
- */
 public class QuerySessionFactory extends StandaloneProcessEngineConfiguration {
 
   protected static final String[] DEFAULT_MAPPING_FILES = {

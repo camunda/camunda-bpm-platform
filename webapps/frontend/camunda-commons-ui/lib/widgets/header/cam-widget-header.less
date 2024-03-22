@@ -1,5 +1,5 @@
 body {
-  padding-top: @header-height;
+  padding-top: @header-height + @ce-banner-height;
 }
 
 // Not nested to allow for custom CSS
@@ -15,6 +15,22 @@ body {
 
 [cam-widget-header] {
   .cam-corporate-header();
+
+  .ce-eol-banner {
+    background-color: @main-color;
+    color: white;
+    text-align: center;
+    height: @ce-banner-height;
+    font-size: 0.9em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+
+    a {
+      color: white;
+      text-decoration: underline;
+    }
+  }
 
   .navbar-brand {
     display: flex;

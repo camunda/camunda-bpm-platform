@@ -18,7 +18,7 @@
   </description>
 
   <properties>
-    <version.quarkus>3.7.2</version.quarkus>
+    <version.quarkus>3.8.0</version.quarkus>
     <version.spring.framework>5.3.27</version.spring.framework>
     <version.spring.framework6>6.1.4</version.spring.framework6>
     <version.spring-boot>3.2.2</version.spring-boot>
@@ -36,6 +36,7 @@
     <version.jackson>2.15.2</version.jackson>
     <version.xml.bind-api>2.3.3</version.xml.bind-api>
     <version.xml.jaxb-impl>2.3.6</version.xml.jaxb-impl>
+    <version.xml.jaxb-impl4>4.0.5</version.xml.jaxb-impl4>
     <version.httpclient>4.5.14</version.httpclient>
 
     <version.slf4j>1.7.26</version.slf4j>

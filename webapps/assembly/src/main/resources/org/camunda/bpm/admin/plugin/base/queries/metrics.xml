@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.base">
+
+  <resultMap id="metricsResultMap" type="org.camunda.bpm.admin.impl.plugin.base.dto.MetricsAggregatedResultDto">
+    <result property="metric" column="NAME_" jdbcType="VARCHAR" />
+    <result property="sum" column="SUM_" jdbcType="INTEGER" />
+    <result property="subscriptionYear" column="SUBSCRIPTION_YEAR_" jdbcType="INTEGER" />
+    <result property="subscriptionMonth" column="SUBSCRIPTION_MONTH_" jdbcType="INTEGER" />
+  </resultMap>
+
+  <sql id="extractYear">
+    <bind name="extractTimeUnit" value="'YEAR'" />
+    ${extractTimeUnitFromDate}
+  </sql>
+
+  <sql id="extractMonth">
+    <bind name="extractTimeUnit" value="'MONTH'" />
+    ${extractTimeUnitFromDate}
+  </sql>
+
+  <sql id="extractDay">
+    <bind name="extractTimeUnit" value="'DAY'" />
+    ${extractTimeUnitFromDate}
+  </sql>
+
+  <sql id="selectGroupByCases">
+    <if test="groupBy.equals('year')">
+      <!-- Calculate SUBSCRIPTION_YEAR_ based on the subscription month & day -->
+      case
+        when <include refid="extractMonth"/> &gt; #{subscriptionMonth}
+          then <include refid="extractYear"/>
+        when <include refid="extractMonth"/> = #{subscriptionMonth} and <include refid="extractDay"/> &gt;= #{subscriptionDay}
+          then <include refid="extractYear"/>
+        else <include refid="extractYear"/> - 1
+        end     as SUBSCRIPTION_YEAR_
+    </if>
+    <if test="groupBy.equals('month')">
+      <!-- Calculate SUBSCRIPTION_YEAR_ based on the subscription day -->
+      case
+        when <include refid="extractDay"/> &gt;= #{subscriptionDay} or <include refid="extractMonth"/> &gt; 1
+          then <include refid="extractYear"/>
+        <!-- Metrics in January and before the subscription day get assigned to the previous year -->
+        else <include refid="extractYear"/> - 1
+        end     as SUBSCRIPTION_YEAR_,
+      <!-- Calculate SUBSCRIPTION_MONTH_ based on the subscription day -->
+      case
+        <!-- Metrics belonging to their timestamp's month -->
+        when <include refid="extractDay"/> &gt;= #{subscriptionDay}
+          then <include refid="extractMonth"/>
+        <!-- Metrics belonging to the previous month -->
+        else
+          case
+            when <include refid="extractMonth"/> &gt; 1
+              then <include refid="extractMonth"/> - 1
+            <!-- January to December switch -->
+            else 12
+            end
+        end     as SUBSCRIPTION_MONTH_
+    </if>
+  </sql>
+
+  <select id="selectMetricsAggregated"
+          parameterType="org.camunda.bpm.admin.impl.plugin.base.dto.MetricsAggregatedQueryDto"
+          resultMap="metricsResultMap">
+    <bind name="extractDateColumn" value="'TIMESTAMP_'"/>
+    <bind name="groupByColumns" value="'RES.SUBSCRIPTION_YEAR_'"/>
+    <if test="groupBy.equals('month')">
+      <bind name="groupByColumns" value="groupByColumns + ', RES.SUBSCRIPTION_MONTH_'"/>
+    </if>
+
+    select
+      RES.NAME_,
+      sum(RES.VALUE_) as SUM_,
+      ${groupByColumns}
+    from (
+      select
+        NAME_,
+        VALUE_,
+        <include refid="selectGroupByCases"/>
+      from ${prefix}ACT_RU_METER_LOG
+
+      <where>
+        1 = 1
+
+        <if test="startDate != null">
+          and TIMESTAMP_ &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+          and TIMESTAMP_ &lt; #{endDate}
+        </if>
+
+        <if test="metrics != null &amp;&amp; metrics.size > 0">
+          and NAME_ in
+          <foreach item="metric" index="index" collection="metrics"
+                   open="(" separator="," close=")">
+            #{metric}
+          </foreach>
+        </if>
+      </where>
+    ) RES
+
+    group by RES.NAME_, ${groupByColumns}
+  </select>
+
+  <select id="selectMetricsAggregatedTU"
+          parameterType="org.camunda.bpm.admin.impl.plugin.base.dto.MetricsAggregatedQueryDto"
+          resultMap="metricsResultMap">
+    <if test="groupBy.equals('year')">
+      <include refid="selectMetricsAggregatedTU_annual"/>
+    </if>
+    <if test="groupBy.equals('month')">
+      <include refid="selectMetricsAggregatedTU_monthly"/>
+    </if>
+  </select>
+
+  <sql id="selectMetricsAggregatedTU_annual">
+    <bind name="extractDateColumn" value="'RES2.TIMESTAMP_'"/>
+    <bind name="groupByColumns" value="'RES.SUBSCRIPTION_YEAR_'"/>
+
+    select
+      'unique-task-workers' as NAME_,
+      count(*)              as SUM_,
+      ${groupByColumns}
+    from (
+      <!-- For annual view, simply count the distinct TUs -->
+      select
+        distinct RES2.ASSIGNEE_HASH_,
+        <include refid="selectGroupByCases"/>
+      from ${prefix}ACT_RU_TASK_METER_LOG RES2
+
+      <where>
+        1 = 1
+
+        <if test="startDate != null">
+          and RES2.TIMESTAMP_ &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+          and RES2.TIMESTAMP_ &lt; #{endDate}
+        </if>
+      </where>
+    ) RES
+
+    group by ${groupByColumns}
+  </sql>
+
+  <sql id="selectMetricsAggregatedTU_monthly">
+    <bind name="extractDateColumn" value="'RES2.TIMESTAMP_'"/>
+    <bind name="groupByColumns" value="'RES.SUBSCRIPTION_YEAR_, RES.SUBSCRIPTION_MONTH_'"/>
+
+    select
+      'unique-task-workers' as NAME_,
+      count(*)              as SUM_,
+      ${groupByColumns}
+    from (
+      select
+        <include refid="selectGroupByCases"/>
+      from (
+        <!-- For monthly view, only count the earliest occurence of each unique TU -->
+        select min(RES3.TIMESTAMP_) as TIMESTAMP_
+        from ${prefix}ACT_RU_TASK_METER_LOG RES3
+        <where>
+          1 = 1
+
+          <if test="startDate != null">
+            and RES3.TIMESTAMP_ &gt;= #{startDate}
+          </if>
+          <if test="endDate != null">
+            and RES3.TIMESTAMP_ &lt; #{endDate}
+          </if>
+        </where>
+        group by RES3.ASSIGNEE_HASH_
+      ) RES2
+    ) RES
+
+    group by ${groupByColumns}
+  </sql>
+
+</mapper>
