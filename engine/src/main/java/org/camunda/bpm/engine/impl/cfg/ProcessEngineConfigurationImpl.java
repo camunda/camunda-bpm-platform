@@ -1048,7 +1048,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * {@link ManagementService#toggleTelemetry(boolean) Telemetry} API in {@link ManagementService}
    * Telemetry is deactivated by default.
    */
-  protected Boolean initializeTelemetry = false;
+  protected boolean initializeTelemetry = false;
   /** The endpoint which telemetry is sent to */
   protected String telemetryEndpoint = "https://api.telemetry.camunda.cloud/pings";
   /** The number of times the telemetry request is retried in case it fails **/
@@ -5334,7 +5334,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public Boolean isInitializeTelemetry() {
+  public boolean isInitializeTelemetry() {
     return initializeTelemetry;
   }
 
