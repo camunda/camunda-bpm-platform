@@ -103,7 +103,7 @@ pipeline {
               // or PR builds only, master builds should be excluded.
               // The Sidetrack pipeline contains Azure DB stages,
               // triggered with the sqlserver PR labels.
-              if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('all-db', 'cockroachdb', 'sqlserver')) {
+              if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('all-db', 'sqlserver')) {
                 cambpmTriggerDownstream(
                   platformVersionDir + "/cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}",
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
