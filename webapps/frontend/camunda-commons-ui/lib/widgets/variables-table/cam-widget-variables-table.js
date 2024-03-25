@@ -78,6 +78,15 @@ module.exports = [
       },
 
       link: function($scope) {
+        /**
+         * Starting with clipboard.js 2.0.9 creating a
+         * fake textarea for values not of type string is broken.
+         * Cf. https://github.com/camunda/camunda-bpm-platform/issues/4190
+         * @param value the value that is not a string.
+         * @returns {string} a string value.
+         */
+        $scope.asString = value => value + '';
+
         if ($scope.validatable) {
           const onHideValidationPopover = e => {
             const modalWindow = angular.element('.modal');
@@ -289,9 +298,11 @@ module.exports = [
             info.valid = true;
 
             var varPath = 'variables[' + i + '].variable';
+
             function wrapedValidate() {
               validate(info, i);
             }
+
             $scope.$watch(varPath + '.value', wrapedValidate);
             $scope.$watch(varPath + '.name', wrapedValidate);
             $scope.$watch(varPath + '.type', wrapedValidate);
