@@ -128,7 +128,6 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
       }
 
     } catch (Exception e) {
-      e.printStackTrace();
       LOG.errorConfiguringTelemetryProperty(e);
     }
   }
