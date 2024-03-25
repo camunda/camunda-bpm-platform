@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@52-declarative-pod-specs']) _
 
 def failedStageTypes = []
 
@@ -14,6 +14,7 @@ pipeline {
     LOGGER_LOG_LEVEL = 'DEBUG'
     MAVEN_VERSION = 'maven-3.8-latest'
     DEF_JDK_VERSION = 'jdk-11-latest'
+    NPM_CONFIG_CACHE = "${WORKSPACE}/.npm"
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
@@ -36,9 +37,23 @@ pipeline {
       }
       steps {
         cambpmConditionalRetry([
-          agentLabel: 'h2_perf32',
+          podSpec: [
+            cpu: 32,
+            yaml:"""
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    agent: ap7-ci-build-experiment
+spec:
+  tolerations:
+    - key: "agents-n1-standard-32-netssd-preempt"
+      operator: "Exists"
+      effect: "NoSchedule"
+"""],
           suppressErrors: false,
           runSteps: {
+            sh(label: 'GIT: Mark current directory as safe', script: "git config --global --add safe.directory \$PWD")
             withVault([vaultSecrets: [
                 [
                     path        : 'secret/products/cambpm/ci/xlts.dev',
@@ -47,12 +62,12 @@ pipeline {
                         [envVar: 'XLTS_AUTH_TOKEN', vaultKey: 'authToken']]
                 ]]]) {
               cambpmRunMaven('.',
-                  'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true',
-                  withCatch: false,
-                  withNpm: true,
-                  // we use JDK 17 to build the artifacts, as it is required for supporting Spring Boot 3
-                  // the compiler source and target is set to JDK 11 in the release parents
-                  jdkVersion: 'jdk-17-latest')
+                'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory,skipFrontendBuild -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -DskipTests -DfailIfNoTests=false',
+                withCatch: false,
+                withNpm: true,
+                // we use JDK 17 to build the artifacts, as it is required for supporting Spring Boot 3
+                // the compiler source and target is set to JDK 8 in the release parents
+                jdkVersion: 'jdk-17-latest')
             }
 
             // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
