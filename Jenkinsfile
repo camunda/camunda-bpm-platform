@@ -101,9 +101,9 @@ pipeline {
 
               // the sidetrack pipeline should be triggered on daily,
               // or PR builds only, master builds should be excluded.
-              // The Sidetrack pipeline contains CRDB and Azure DB stages,
-              // triggered with the cockroachdb and sqlserver PR labels.
-              if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('all-db', 'cockroachdb', 'sqlserver')) {
+              // The Sidetrack pipeline contains Azure DB stages,
+              // triggered with the sqlserver PR labels.
+              if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('all-db', 'sqlserver')) {
                 cambpmTriggerDownstream(
                   platformVersionDir + "/cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}",
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
@@ -440,7 +440,7 @@ pipeline {
           parallel(cambpmGetMatrixStages('engine-webapp-unit', failedStageTypes, { stageInfo ->
             List allowedStageLabels = stageInfo.allowedLabels
             String dbLabel = stageInfo.nodeType
-            return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
+            return cambpmWithLabels(allowedStageLabels, cambpmGetDbType(dbLabel))
           }))
         }
       }
@@ -465,7 +465,7 @@ pipeline {
         stage('engine-UNIT-database-table-prefix') {
           when {
             expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb')
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql')
             }
           }
           steps {
