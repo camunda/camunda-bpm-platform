@@ -56,7 +56,7 @@ pipeline {
         stage('check-sql-scripts') {
           when {
             expression {
-              cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb')
+              cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql')
             }
           }
           steps {
@@ -309,7 +309,7 @@ pipeline {
           parallel(cambpmGetMatrixStages('daily-stages', failedStageTypes, { stageInfo ->
             List allowedStageLabels = stageInfo.allowedLabels
             String dbLabel = stageInfo.nodeType
-            return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
+            return cambpmWithLabels(allowedStageLabels, cambpmGetDbType(dbLabel))
           }))
         }
       }

@@ -47,7 +47,6 @@ daily-stages:
   - 'large-data-tests'
 sidetrack-stages:
   databases:
-  - 'cockroachdb_201'
   - 'azure_sql_db_150'
   stages:
   - 'db-unit'
