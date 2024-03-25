@@ -95,7 +95,7 @@
              ng-if="!isEditable('value', info) && !hasEditDialog(variable.type)"
              class="read-only value-wrapper">
           <span ng-if="variable.type !== 'Bytes' && variable.type !== 'Date'"
-                cam-widget-clipboard="variable.value">{{ variable.value }}</span>
+                cam-widget-clipboard="asString(variable.value)">{{ variable.value }}</span>
           <span ng-if="variable.type === 'Bytes'">{{ variable.value }}</span>
           <span ng-if="variable.type === 'Date'"
                 cam-widget-clipboard="variable.value">{{ variable.value | camDate }}</span>
