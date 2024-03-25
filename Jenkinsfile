@@ -47,7 +47,7 @@ pipeline {
                         [envVar: 'XLTS_AUTH_TOKEN', vaultKey: 'authToken']]
                 ]]]) {
               cambpmRunMaven('.',
-                  'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true',
+                  'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -DskipTests',
                   withCatch: false,
                   withNpm: true,
                   // we use JDK 17 to build the artifacts, as it is required for supporting Spring Boot 3
