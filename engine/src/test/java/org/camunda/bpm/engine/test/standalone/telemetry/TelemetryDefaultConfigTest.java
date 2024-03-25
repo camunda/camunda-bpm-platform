@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.test.standalone.telemetry;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -48,7 +47,6 @@ public class TelemetryDefaultConfigTest {
   @Before
   public void setup() {
     configuration = engineRule.getProcessEngineConfiguration();
-    TestHelper.deleteTelemetryProperty(configuration);
   }
 
   @Test
@@ -56,8 +54,8 @@ public class TelemetryDefaultConfigTest {
     // given default configuration
 
     // then
-    assertThat(configuration.isInitializeTelemetry()).isNull();
-    assertThat(configuration.getManagementService().isTelemetryEnabled()).isNull();
+    assertThat(configuration.isInitializeTelemetry()).isFalse();
+    assertThat(configuration.getManagementService().isTelemetryEnabled()).isFalse();
   }
 
 }

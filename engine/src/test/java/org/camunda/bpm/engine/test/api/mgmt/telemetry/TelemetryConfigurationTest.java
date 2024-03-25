@@ -75,13 +75,13 @@ public class TelemetryConfigurationTest {
     inMemoryConfiguration.buildProcessEngine();
 
     // then
-    assertThat(inMemoryConfiguration.isInitializeTelemetry()).isNull();
-    assertThat(inMemoryConfiguration.getManagementService().isTelemetryEnabled()).isNull();
+    assertThat(inMemoryConfiguration.isInitializeTelemetry()).isFalse();
+    assertThat(inMemoryConfiguration.getManagementService().isTelemetryEnabled()).isFalse();
 
     // the telemetry reporter is always scheduled
     assertThat(inMemoryConfiguration.isTelemetryReporterActivate()).isTrue();
     assertThat(inMemoryConfiguration.getTelemetryReporter().isScheduled()).isTrue();
-    assertThat(inMemoryConfiguration.getTelemetryReporter().getInitialReportingDelaySeconds()).isEqualTo(TelemetryReporter.EXTENDED_INIT_REPORT_DELAY_SECONDS);
+    assertThat(inMemoryConfiguration.getTelemetryReporter().getInitialReportingDelaySeconds()).isEqualTo(TelemetryReporter.DEFAULT_INIT_REPORT_DELAY_SECONDS);
   }
 
   @Test
@@ -169,7 +169,7 @@ public class TelemetryConfigurationTest {
 
   @Test
   @WatchLogger(loggerNames = {"org.camunda.bpm.engine.persistence"}, level = "DEBUG")
-  public void shouldLogDefaultTelemetryValue() {
+  public void shouldNotLogDefaultTelemetryValue() {
     // given
     Boolean telemetryInitializedValue = null;
     inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
@@ -180,7 +180,24 @@ public class TelemetryConfigurationTest {
     inMemoryConfiguration.buildProcessEngine();
 
     // then
-    assertThat(loggingRule.getFilteredLog("Creating the telemetry property in database with the value: " + telemetryInitializedValue).size()).isOne();
+    assertThat(loggingRule.getFilteredLog("Creating the telemetry property in database with the value: " + telemetryInitializedValue).size()).isZero();
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.persistence"}, level = "DEBUG")
+  public void shouldLogTelemetryValue() {
+    // given
+    Boolean telemetryInitializedValue = null;
+    inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    inMemoryConfiguration
+    .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
+    .setInitializeTelemetry(true);
+
+    // when
+    inMemoryConfiguration.buildProcessEngine();
+
+    // then
+    assertThat(loggingRule.getFilteredLog("Creating the telemetry property in database with the value: " + telemetryInitializedValue).size()).isZero();
   }
 
   @Test
