@@ -119,7 +119,8 @@
                              "binding": "version",
                              "version": 2
                            },
-                           "tenantId":"aTenantId"
+                           "tenantId":"aTenantId",
+                           "taskState": "aTaskState"
                          }
                        ]
                     }',
@@ -148,7 +149,8 @@
                            "caseDefinitionId": null,
                            "suspended": false,
                            "formKey": "embedded:app:develop/invoice-forms/approve-invoice.html",
-                           "tenantId": null
+                           "tenantId": null,
+                           "taskState": "aTaskState"
                          }
                        ]
                      }'

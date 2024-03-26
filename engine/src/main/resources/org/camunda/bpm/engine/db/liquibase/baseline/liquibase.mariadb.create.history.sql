@@ -91,6 +91,7 @@ create table ACT_HI_TASKINST (
     FOLLOW_UP_DATE_ datetime(3),
     TENANT_ID_ varchar(64),
     REMOVAL_TIME_ datetime(3),
+    TASK_STATE_ varchar(64),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

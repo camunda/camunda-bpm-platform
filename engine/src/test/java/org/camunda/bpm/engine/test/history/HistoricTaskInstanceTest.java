@@ -47,6 +47,7 @@ import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.Test;
 
 
+
 /**
  * @author Tom Baeyens
  * @author Frederik Heremans
@@ -87,6 +88,10 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     assertNull(historicTaskInstance.getCaseDefinitionId());
     assertNull(historicTaskInstance.getCaseInstanceId());
     assertNull(historicTaskInstance.getCaseExecutionId());
+    /**
+     * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
+     */
+    assertEquals("Created", historicTaskInstance.getTaskState());
 
     // the activity instance id is set
     assertEquals(((TaskEntity)runtimeTask).getExecution().getActivityInstanceId(), historicTaskInstance.getActivityInstanceId());
@@ -114,6 +119,8 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     assertNotNull(historicTaskInstance.getDurationInMillis());
     assertTrue(historicTaskInstance.getDurationInMillis() >= 1000);
     assertTrue(((HistoricTaskInstanceEntity)historicTaskInstance).getDurationRaw() >= 1000);
+    assertEquals("Completed", historicTaskInstance.getTaskState());
+
 
     assertNull(historicTaskInstance.getCaseDefinitionId());
     assertNull(historicTaskInstance.getCaseInstanceId());

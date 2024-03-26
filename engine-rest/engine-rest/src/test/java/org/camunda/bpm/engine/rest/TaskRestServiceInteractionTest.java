@@ -313,6 +313,7 @@ public class TaskRestServiceInteractionTest extends
       .body("caseDefinitionId", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_ID))
       .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
       .body("lastUpdated", equalTo(MockProvider.EXAMPLE_TASK_LAST_UPDATED))
+      .body("taskState", equalTo(MockProvider.EXAMPLE_HISTORIC_TASK_STATE))
       .when().get(SINGLE_TASK_URL);
   }
 

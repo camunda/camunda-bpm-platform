@@ -68,7 +68,8 @@
                              "binding": "version",
                              "version": 2
                            },
-                           "tenantId": "aTenantId"
+                           "tenantId": "aTenantId",
+                           "taskState": "aTaskState"
                          }
                        ]
                      }'] />
