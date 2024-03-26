@@ -12,6 +12,14 @@
         type = "string"
         desc = "The id of the process definition that this process instance belongs to." />
 
+   <#-- 
+    GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4049 
+    -->    
+    <@lib.property
+        name = "definitionKey"
+        type = "string"
+        desc = "The key of the process definition that this process instance belongs to." />
+
     <@lib.property
         name = "businessKey"
         type = "string"
