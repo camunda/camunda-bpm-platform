@@ -50,8 +50,6 @@ public class LoginIT extends AbstractWebappUiIntegrationTest {
     wait.until(visibilityOfElementLocated(By.cssSelector("button[type=\"submit\"]")))
         .submit();
 
-    wait.until(visibilityOfElementLocated(By.cssSelector(".modal-close")))
-        .click();
   }
 
   public void sendKeys(WebElement element, String keys)  {
