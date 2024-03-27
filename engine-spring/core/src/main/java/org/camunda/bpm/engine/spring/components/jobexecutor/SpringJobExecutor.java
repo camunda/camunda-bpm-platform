@@ -22,6 +22,7 @@ import java.util.concurrent.RejectedExecutionException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  *
@@ -58,10 +59,15 @@ public class SpringJobExecutor extends JobExecutor {
 	  try {
       taskExecutor.execute(getExecuteJobsRunnable(jobIds, processEngine));
     } catch (RejectedExecutionException e) {
-
       logRejectedExecution(processEngine, jobIds.size());
       rejectedJobsHandler.jobsRejected(jobIds, processEngine, this);
     }
+	if(taskExecutor instanceof ThreadPoolTaskExecutor){
+		logJobExecutionInfo(processEngine, ((ThreadPoolTaskExecutor)taskExecutor).getQueueSize(),
+				((ThreadPoolTaskExecutor)taskExecutor).getQueueCapacity(),
+				((ThreadPoolTaskExecutor)taskExecutor).getMaxPoolSize(),
+				((ThreadPoolTaskExecutor)taskExecutor).getActiveCount());
+	}
 	}
 
 	@Override

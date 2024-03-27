@@ -171,11 +171,28 @@ public abstract class JobExecutor {
   }
 
   public void logRejectedExecution(ProcessEngineImpl engine, int numJobs) {
-    if (engine != null && engine.getProcessEngineConfiguration().isMetricsEnabled()) {
-      engine.getProcessEngineConfiguration()
-        .getMetricsRegistry()
-        .markOccurrence(Metrics.JOB_EXECUTION_REJECTED, numJobs);
+    if(engine != null){
+      LOG.rejectedJobExecutions(engine.getName(),numJobs);
+      if (engine.getProcessEngineConfiguration().isMetricsEnabled()) {
+        engine.getProcessEngineConfiguration()
+                .getMetricsRegistry()
+                .markOccurrence(Metrics.JOB_EXECUTION_REJECTED, numJobs);
+      }
     }
+  }
+
+  public void logJobExecutionInfo(ProcessEngineImpl engine, int executionQueueSize, int executionQueueCapacity, int maxExecutionThreads, int activeExecutionThreads) {
+    if(engine != null){
+      LOG.numJobsInQueue(engine.getName(),executionQueueSize, executionQueueCapacity);
+      LOG.currentJobExecutions(engine.getName(),activeExecutionThreads);
+      try {
+        LOG.availableJobExecutionThreads(engine.getName(),
+                Math.subtractExact(maxExecutionThreads, activeExecutionThreads));
+      } catch (ArithmeticException arithmeticException){
+        //arithmetic exception occurred while computing remaining available thread count for logging.
+        LOG.availableThreadsCalculationError();
+      }
+      }
   }
 
   // getters and setters //////////////////////////////////////////////////////
