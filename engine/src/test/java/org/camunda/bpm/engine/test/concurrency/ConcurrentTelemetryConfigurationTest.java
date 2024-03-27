@@ -53,11 +53,11 @@ public class ConcurrentTelemetryConfigurationTest extends ConcurrencyTestCase {
     Integer transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
     assumeThat((transactionIsolationLevel != null && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED)));
 
-    ThreadControl thread1 = executeControllableCommand(new ControllableUpdateTelemetrySetupCommand(false));
+    ThreadControl thread1 = executeControllableCommand(new ControllableUpdateTelemetrySetupCommand(true));
     thread1.reportInterrupts();
     thread1.waitForSync();
 
-    ThreadControl thread2 = executeControllableCommand(new ControllableUpdateTelemetrySetupCommand(false));
+    ThreadControl thread2 = executeControllableCommand(new ControllableUpdateTelemetrySetupCommand(true));
     thread2.reportInterrupts();
     thread2.waitForSync();
 
@@ -76,13 +76,13 @@ public class ConcurrentTelemetryConfigurationTest extends ConcurrencyTestCase {
     assertNull(thread1.getException());
     if (testRule.isOptimisticLockingExceptionSuppressible()) {
       assertNull(thread2.getException());
-      assertThat(managementService.isTelemetryEnabled()).isNull();
+      assertThat(managementService.isTelemetryEnabled()).isFalse();
     } else {
       // When CockroachDB is used, the CrdbTransactionRetryException can't be ignored,
       // if retries = 0 and the ProcessEngineBootstrapCommand (telemetry initialization)
       // must be manually retried
       assertThat(thread2.getException()).isInstanceOf(CrdbTransactionRetryException.class);
-      assertThat(managementService.isTelemetryEnabled()).isNull();
+      assertThat(managementService.isTelemetryEnabled()).isFalse();
     }
   }
 
@@ -94,6 +94,7 @@ public class ConcurrentTelemetryConfigurationTest extends ConcurrencyTestCase {
       this.telemetryEnabled = telemetryEnabled;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
 
       monitor.sync(); // thread will block here until makeContinue() is called from main thread
