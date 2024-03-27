@@ -26,14 +26,17 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.text.SimpleDateFormat;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DateValueMapperTest {
 
   protected final static String DATE_FORMAT = "dd.MM.yyyy - HH:mm:ss.SSSZ";
-  protected static final Date VARIABLE_VALUE_DATE = new Date(1514790000000L);
-  protected static final String VARIABLE_VALUE_DATE_SERIALIZED = "01.01.2018 - 08:00:00.000+0100";
+  protected final Date VARIABLE_VALUE_DATE = new GregorianCalendar(2018, Calendar.JANUARY, 1, 8, 0, 0).getTime();
+  protected final String VARIABLE_VALUE_DATE_SERIALIZED = new SimpleDateFormat(DATE_FORMAT).format(VARIABLE_VALUE_DATE);
 
   protected DateValueMapper dateValueMapper;
 
