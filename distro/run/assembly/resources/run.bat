@@ -147,10 +147,10 @@ ECHO classpath: %classPath%
 REM start the application
 IF [%detachProcess%]==[true] (
   REM in the background
-  start "%APPNAME%" %JAVA% -Dloader.path="%classPath%" -Dcamunda.deploymentDir="%DEPLOYMENTDIR%" %JAVA_OPTS% -jar "%BASEDIR%camunda-bpm-run-core.jar" --spring.config.location=file:"%configuration%"
+  start "%APPNAME%" "%JAVA%" -Dloader.path="%classPath%" -Dcamunda.deploymentDir="%DEPLOYMENTDIR%" %JAVA_OPTS% -jar "%BASEDIR%camunda-bpm-run-core.jar" --spring.config.location=file:"%configuration%"
 
 ) ELSE (
-  call %JAVA% -Dloader.path="%classPath%" -Dcamunda.deploymentDir="%DEPLOYMENTDIR%" %JAVA_OPTS% -jar "%BASEDIR%camunda-bpm-run-core.jar" --spring.config.location=file:"%configuration%"
+  call "%JAVA%" -Dloader.path="%classPath%" -Dcamunda.deploymentDir="%DEPLOYMENTDIR%" %JAVA_OPTS% -jar "%BASEDIR%camunda-bpm-run-core.jar" --spring.config.location=file:"%configuration%"
 )
 
 GOTO End
