@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.impl.migration.validation.instruction.ConditionalEventUpdateEventTriggerValidator.MIGRATION_CONDITIONAL_VALIDATION_ERROR_MSG;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
@@ -28,17 +29,20 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ResourceDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
@@ -720,8 +724,8 @@ public class MigrationEventSubProcessTest {
         .singleResult();
 
     // assume
-    Assertions.assertThat(activityStatistics.getId()).isEqualTo(EVENT_SUB_PROCESS_TASK_ID);
-    Assertions.assertThat(activityStatistics.getInstances()).isEqualTo(1);
+    assertThat(activityStatistics.getId()).isEqualTo(EVENT_SUB_PROCESS_TASK_ID);
+    assertThat(activityStatistics.getInstances()).isEqualTo(1);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -737,8 +741,8 @@ public class MigrationEventSubProcessTest {
         .singleResult();
 
     // assume
-    Assertions.assertThat(activityStatistics.getId()).isEqualTo(EVENT_SUB_PROCESS_TASK_ID);
-    Assertions.assertThat(activityStatistics.getInstances()).isEqualTo(1);
+    assertThat(activityStatistics.getId()).isEqualTo(EVENT_SUB_PROCESS_TASK_ID);
+    assertThat(activityStatistics.getInstances()).isEqualTo(1);
   }
 
   @Test
@@ -770,8 +774,8 @@ public class MigrationEventSubProcessTest {
         .singleResult();
 
     // assume
-    Assertions.assertThat(activityStatistics.getId()).isEqualTo(EVENT_SUB_PROCESS_TASK_ID);
-    Assertions.assertThat(activityStatistics.getInstances()).isEqualTo(1);
+    assertThat(activityStatistics.getId()).isEqualTo(EVENT_SUB_PROCESS_TASK_ID);
+    assertThat(activityStatistics.getInstances()).isEqualTo(1);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -787,8 +791,37 @@ public class MigrationEventSubProcessTest {
         .singleResult();
 
     // assume
-    Assertions.assertThat(activityStatistics.getId()).isEqualTo(EVENT_SUB_PROCESS_TASK_ID);
-    Assertions.assertThat(activityStatistics.getInstances()).isEqualTo(1);
+    assertThat(activityStatistics.getId()).isEqualTo(EVENT_SUB_PROCESS_TASK_ID);
+    assertThat(activityStatistics.getInstances()).isEqualTo(1);
+  }
+
+  @Deployment
+  @Test
+  public void shouldNotRecreateAlreadyFiredTimerJobAfterMigration() {
+    // given
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceByKey("Process_0i2qa7z");
+
+    Job job = rule.getManagementService().createJobQuery().singleResult();
+    assertThat(job.getDuedate()).isEqualTo("2022-02-02T22:00:00.000");
+    rule.getManagementService().executeJob(job.getId());
+
+    testHelper.deploy(
+        "org/camunda/bpm/engine/test/api/runtime/migration/MigrationEventSubProcessTest.shouldNotRecreateAlreadyFiredTimerJobAfterMigration.bpmn20.xml");
+
+    List<String> definitions = rule.getRepositoryService().createProcessDefinitionQuery().list().stream()
+        .map(ResourceDefinition::getId)
+        .collect(Collectors.toList());
+
+    MigrationPlan build = rule.getRuntimeService().createMigrationPlan(definitions.get(0), definitions.get(1))
+        .mapActivities("Activity_0aj7wap", "Activity_0aj7wap")
+        .build();
+
+    // when
+    testHelper.migrateProcessInstance(build, processInstance);
+
+    // then
+    job = rule.getManagementService().createJobQuery().singleResult();
+    assertThat(job).isNull();
   }
 
 }
