@@ -141,24 +141,23 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
     DeploymentWithDefinitions deployment = commandContext.runWithoutAuthorization(() -> {
       acquireExclusiveLock(commandContext);
       DeploymentEntity deploymentToRegister = initDeployment();
-      Map<String, ResourceEntity> resourcesToDeploy =
-          resolveResourcesToDeploy(commandContext, deploymentToRegister);
+
+      Map<String, ResourceEntity> resourcesToDeploy = resolveResourcesToDeploy(commandContext, deploymentToRegister);
       Map<String, ResourceEntity> resourcesToIgnore = new HashMap<>(deploymentToRegister.getResources());
+
       resourcesToIgnore.keySet().removeAll(resourcesToDeploy.keySet());
 
       // save initial deployment resources before they are replaced with only the deployed ones
-      CandidateDeployment candidateDeployment =
-          CandidateDeploymentImpl.fromDeploymentEntity(deploymentToRegister);
+      CandidateDeployment candidateDeployment = CandidateDeploymentImpl.fromDeploymentEntity(deploymentToRegister);
+
       if (!resourcesToDeploy.isEmpty()) {
         LOG.debugCreatingNewDeployment();
         deploymentToRegister.setResources(resourcesToDeploy);
         deploy(commandContext, deploymentToRegister);
       } else {
         // if there are no resources to be deployed, find an existing deployment
-        String duplicateDeploymentId =
-            deploymentHandler.determineDuplicateDeployment(candidateDeployment);
-        deploymentToRegister =
-            commandContext.getDeploymentManager().findDeploymentById(duplicateDeploymentId);
+        String duplicateDeploymentId = deploymentHandler.determineDuplicateDeployment(candidateDeployment);
+        deploymentToRegister = commandContext.getDeploymentManager().findDeploymentById(duplicateDeploymentId);
       }
 
       scheduleProcessDefinitionActivation(commandContext, deploymentToRegister);
@@ -207,16 +206,12 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
 
     Map<String, ResourceEntity> resourcesToDeploy = new HashMap<>();
     Map<String, ResourceEntity> candidateResources = candidateDeployment.getResources();
+    String source = candidateDeployment.getSource();
 
     if (deploymentBuilder.isDuplicateFilterEnabled()) {
 
       if (candidateDeployment.getName() == null) {
         LOG.warnFilteringDuplicatesEnabledWithNullDeploymentName();
-      }
-
-      String source = candidateDeployment.getSource();
-      if (source == null || source.isEmpty()) {
-        source = ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE;
       }
 
       Map<String, ResourceEntity> existingResources = commandContext
@@ -361,6 +356,11 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
   protected DeploymentEntity initDeployment() {
     DeploymentEntity deployment = deploymentBuilder.getDeployment();
     deployment.setDeploymentTime(ClockUtil.getCurrentTime());
+
+    if (deployment.getSource() == null || deployment.getSource().isEmpty()) {
+      deployment.setSource(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE);
+    }
+
     return deployment;
   }
 
