@@ -1,7 +1,7 @@
 License Book for Camunda Platform 7.21
 
 This is a license book. It contains licensing information for third-party libraries which are used in this release of Camunda Platform 7.21
-(Document generated on: 2024-03-20)
+(Document generated on: 2024-03-28)
 
 Introduction
 This Licensing Information document is a part of the program documentation and is intended to help you understand the license terms and copyright for third-party libraries associated with the Camunda Platform software.
@@ -2936,7 +2936,7 @@ Licensed under Apache 2.0
 ===========================================================================================
 org.wildfly:wildfly-dist:tar.gz:31.0.0.Final
 https://github.com/wildfly/wildfly/tree/main/dist
-Copyright The WildFly Authors (https://github.com/wildfly/wildfly/blob/main/ee-feature-pack/galleon-shared/src/main/resources/content/copyright.txt)
+Copyright The WildFly Authors (https://github.com/wildfly/wildfly/blob/31.0.0.Final/ee-feature-pack/galleon-shared/src/main/resources/content/copyright.txt)
 
 Licensed under Apache 2.0
 
@@ -2944,7 +2944,7 @@ Licensed under Apache 2.0
 ===========================================================================================
 org.wildfly:wildfly-galleon-pack:zip:31.0.0.Final
 https://github.com/wildfly/wildfly/tree/main/galleon-pack
-Copyright The WildFly Authors (https://github.com/wildfly/wildfly/blob/main/ee-feature-pack/galleon-shared/src/main/resources/content/copyright.txt)
+Copyright The WildFly Authors (https://github.com/wildfly/wildfly/blob/31.0.0.Final/ee-feature-pack/galleon-shared/src/main/resources/content/copyright.txt)
 
 Licensed under Apache 2.0
 
