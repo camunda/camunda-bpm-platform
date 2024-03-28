@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Supplier;
-
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.DecisionService;
@@ -129,6 +128,7 @@ public class ProcessEngineExtension implements TestWatcher,
   protected String configurationResource = "camunda.cfg.xml";
   protected String deploymentId;
   protected boolean ensureCleanAfterTest = false;
+  protected boolean failIfNotClean = false;
   protected List<String> additionalDeployments = new ArrayList<>();
 
   // SETUP
@@ -222,7 +222,7 @@ public class ProcessEngineExtension implements TestWatcher,
 
    // finally clear database and fail test if database is dirty
    if (ensureCleanAfterTest) {
-     TestHelper.assertAndEnsureCleanDbAndCache(processEngine);
+     TestHelper.assertAndEnsureCleanDbAndCache(processEngine, failIfNotClean);
    }
   }
 
@@ -257,8 +257,9 @@ public class ProcessEngineExtension implements TestWatcher,
     return this;
   }
 
-  public ProcessEngineExtension ensureCleanAfterTest(boolean ensureCleanAfterTest) {
+  public ProcessEngineExtension ensureCleanAfterTest(boolean ensureCleanAfterTest, boolean failIfNotClean) {
     this.ensureCleanAfterTest = ensureCleanAfterTest;
+    this.failIfNotClean = failIfNotClean;
     return this;
   }
 
