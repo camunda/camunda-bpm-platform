@@ -71,14 +71,14 @@
         type = "string"
         format = "date-time"
         desc = "The time the instance was started. By [default](${docsUrl}/reference/rest/overview/date-format/),
-                the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`."/>
+                the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+02:00`."/>
 
     <@lib.property
         name = "endTime"
         type = "string"
         format = "date-time"
         desc = "The time the instance ended. By [default](${docsUrl}/reference/rest/overview/date-format/),
-                the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`."/>
+                the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+02:00`."/>
 
     <@lib.property
         name = "durationInMillis"
@@ -106,7 +106,7 @@
         type = "string"
         format = "date-time"
         desc = "The time after which the activity instance should be removed by the History Cleanup job. By [default](${docsUrl}/reference/rest/overview/date-format/),
-                the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`."/>
+                the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+02:00`."/>
 
     <@lib.property
         name = "rootProcessInstanceId"

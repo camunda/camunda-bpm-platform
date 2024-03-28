@@ -55,16 +55,16 @@
                                     "canceled": true,
                                     "completeScope": false,
                                     "durationInMillis": 2000,
-                                    "endTime": "2013-04-23T18:42:43.000+0200",
+                                    "endTime": "2013-04-23T18:42:43.000+02:00",
                                     "executionId": "anExecutionId",
                                     "id": "aHistoricActivityInstanceId",
                                     "parentActivityInstanceId": "aHistoricParentActivityInstanceId",
                                     "processDefinitionId": "aProcDefId",
                                     "processInstanceId": "aProcInstId",
-                                    "startTime": "2013-04-23T11:20:43.000+0200",
+                                    "startTime": "2013-04-23T11:20:43.000+02:00",
                                     "taskId": "aTaskId",
                                     "tenantId":null,
-                                    "removalTime":"2018-02-10T14:33:19.000+0200",
+                                    "removalTime":"2018-02-10T14:33:19.000+02:00",
                                     "rootProcessInstanceId": "aRootProcessInstanceId"
                                   }
                                 ]

@@ -41,7 +41,7 @@
                              "topicName": "createOrder",
                              "lockDuration": 10000,
                              "processDefinitionId": "aProcessDefinitionId",
-                             "tenantIdIn": "tenantOne"
+                             "tenantIdIn": ["tenantOne"]
                            }
                          ]
                        }
@@ -70,7 +70,7 @@
                          "sorting": [
                              {
                                 "sortBy":"createTime",
-                                "sortOrder":"ASC"
+                                "sortOrder":"asc"
                              }
                          ]
                        }
@@ -95,7 +95,7 @@
                            "errorDetails": "anErrorDetails",
                            "executionId": "anExecutionId",
                            "id": "anExternalTaskId",
-                           "lockExpirationTime": "2015-10-06T16:34:42.000+0200",
+                           "lockExpirationTime": "2015-10-06T16:34:42.000+02:00",
                            "createTime": "2015-10-06T16:34:42.000+0200",
                            "processDefinitionId": "aProcessDefinitionId",
                            "processDefinitionKey": "aProcessDefinitionKey",
@@ -120,7 +120,7 @@
                            "errorDetails": "anotherErrorDetails",
                            "executionId": "anExecutionId",
                            "id": "anExternalTaskId",
-                           "lockExpirationTime": "2015-10-06T16:34:42.000+0200",
+                           "lockExpirationTime": "2015-10-06T16:34:42.000+02:00",
                            "createTime": "2015-10-06T16:34:42.000+0200",
                            "processDefinitionId": "aProcessDefinitionId",
                            "processDefinitionKey": "aProcessDefinitionKey",
@@ -151,7 +151,7 @@
                            "errorDetails": "anErrorDetails",
                            "executionId": "anExecutionId",
                            "id": "anExternalTaskId",
-                           "lockExpirationTime": "2015-10-06T16:34:42.00+0200",
+                           "lockExpirationTime": "2015-10-06T16:34:42.00+02:00",
                            "createTime": "2015-10-06T16:34:42.000+0200",
                            "processDefinitionId": "aProcessDefinitionId",
                            "processDefinitionKey": "aProcessDefinitionKey",
@@ -177,7 +177,7 @@
                            "errorDetails": "anotherErrorDetails",
                            "executionId": "anExecutionId",
                            "id": "anExternalTaskId",
-                           "lockExpirationTime": "2015-10-06T16:34:42.000+0200",
+                           "lockExpirationTime": "2015-10-06T16:34:42.000+02:00",
                            "createTime": "2015-10-06T16:34:42.000+0200",
                            "processDefinitionId": "aProcessDefinitionId",
                            "processDefinitionKey": "aProcessDefinitionKey",
@@ -208,7 +208,7 @@
                          "errorDetails": "anErrorDetails",
                          "executionId": "anExecutionId",
                          "id": "anExternalTaskId",
-                         "lockExpirationTime": "2015-10-06T16:34:42.000+0200",
+                         "lockExpirationTime": "2015-10-06T16:34:42.000+02:00",
                          "createTime": "2015-10-06T16:34:42.000+0200",
                          "processDefinitionId": "aProcessDefinitionId",
                          "processDefinitionKey": "aProcessDefinitionKey",

@@ -29,11 +29,11 @@
                            "executionId": null,
                            "exceptionMessage": null,
                            "retries": 3,
-                           "dueDate": "aDueDate",
+                           "dueDate": "2018-05-05T17:05:00+02:00",
                            "suspended": false,
                            "priority": 0,
                            "tenantId": null,
-                           "createTime": "2018-05-05T17:00:00+0200"
+                           "createTime": "2018-05-05T17:00:00+02:00"
                          },
                          {
                            "id": "anotherJobId",
@@ -44,11 +44,11 @@
                            "executionId": null,
                            "exceptionMessage": null,
                            "retries": 3,
-                           "dueDate": "anotherDueDate",
+                           "dueDate": "2018-05-05T17:10:00+02:00",
                            "suspended": false,
                            "priority": 0,
                            "tenantId": null,
-                           "createTime": "2018-05-05T17:00:00+0200"
+                           "createTime": "2018-05-05T17:00:00+02:00"
                          }
                        ]
                      }']

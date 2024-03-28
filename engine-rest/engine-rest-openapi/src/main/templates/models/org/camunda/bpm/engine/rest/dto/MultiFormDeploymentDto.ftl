@@ -40,7 +40,7 @@
         desc = "Sets the date on which the process definitions contained in this deployment will be activated. This means that all process
                 definitions will be deployed as usual, but they will be suspended from the start until the given activation date.
                 By [default](${docsUrl}/reference/rest/overview/date-format/),
-                the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`."/>
+                the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+02:00`."/>
 
     <@lib.property
         name = "data"

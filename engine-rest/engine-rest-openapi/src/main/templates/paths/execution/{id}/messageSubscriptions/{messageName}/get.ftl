@@ -46,7 +46,7 @@
                          "processInstanceId": "aProcInstId",
                          "activityId": "anActivity",
                          "tenantId": null,
-                         "createdDate": "2013-01-23T13:59:43.000+0200"
+                         "createdDate": "2013-01-23T13:59:43.000+02:00"
                        }
                      }']
     />

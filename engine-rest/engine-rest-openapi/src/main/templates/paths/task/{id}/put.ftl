@@ -31,8 +31,8 @@
                            "assignee" : "peter",
                            "owner" : "mary",
                            "delegationState" : "PENDING",
-                           "due" : "2014-08-30T10:00:00.000+0200",
-                           "followUp" : "2014-08-25T10:00:00.000+0200",
+                           "due" : "2014-08-30T10:00:00.000+02:00",
+                           "followUp" : "2014-08-25T10:00:00.000+02:00",
                            "parentTaskId" : "aParentTaskId",
                            "caseInstanceId" : "aCaseInstanceId",
                            "tenantId" : "tenantId"

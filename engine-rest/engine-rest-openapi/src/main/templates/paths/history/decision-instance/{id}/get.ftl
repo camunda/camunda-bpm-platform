@@ -5,7 +5,7 @@
       id = "getHistoricDecisionInstance"
       tag = "Historic Decision Instance"
       summary = "Get Historic Decision Instance"
-      desc = "Retrieves a historic decision instance by id, according to the 
+      desc = "Retrieves a historic decision instance by id, according to the
               `HistoricDecisionInstance` interface in the engine."
   />
 
@@ -18,7 +18,7 @@
         required = true
         desc = "The id of the historic decision instance to be retrieved."
     />
-      
+
     <#assign last = true >
     <#include "/lib/commons/historic-decision-instance-single-query-params.ftl" >
     <@lib.parameters
@@ -44,7 +44,7 @@
                          "decisionDefinitionId": "invoice-assign-approver:1:4c864d79-579d-11e5-9848-f0def1e59da8",
                          "decisionDefinitionKey": "invoice-assign-approver",
                          "decisionDefinitionName": "Assign Approver",
-                         "evaluationTime": "2015-09-10T11:22:06.000+0200",
+                         "evaluationTime": "2015-09-10T11:22:06.000+02:00",
                          "removalTime": null,
                          "id": "67ea2c3f-579d-11e5-9848-f0def1e59da8",
                          "inputs": [
@@ -55,7 +55,7 @@
                              "errorMessage": null,
                              "id": "67ea2c41-579d-11e5-9848-f0def1e59da8",
                              "type": "Double",
-                             "createTime": "2015-09-10T11:22:06.000+0200",
+                             "createTime": "2015-09-10T11:22:06.000+02:00",
                              "removalTime": null,
                              "rootProcessInstanceId": "aRootProcessInstanceId",
                              "value": 123.0,
@@ -68,7 +68,7 @@
                              "errorMessage": null,
                              "id": "67ea2c40-579d-11e5-9848-f0def1e59da8",
                              "type": "String",
-                             "createTime": "2015-09-10T11:22:06.000+0200",
+                             "createTime": "2015-09-10T11:22:06.000+02:00",
                              "removalTime": null,
                              "rootProcessInstanceId": "aRootProcessInstanceId",
                              "value": "Misc",
@@ -85,7 +85,7 @@
                              "ruleId": "DecisionRule_1of5a87",
                              "ruleOrder": 1,
                              "type": "String",
-                             "createTime": "2015-09-10T11:22:06.000+0200",
+                             "createTime": "2015-09-10T11:22:06.000+02:00",
                              "removalTime": null,
                              "rootProcessInstanceId": "aRootProcessInstanceId",
                              "value": "accounting",

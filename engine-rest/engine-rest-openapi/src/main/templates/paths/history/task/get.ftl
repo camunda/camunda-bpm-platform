@@ -52,16 +52,16 @@
                            "deleteReason":"aDeleteReason",
                            "owner":"anOwner",
                            "assignee":"anAssignee",
-                           "startTime":"2013-01-23T13:42:42.000+0200",
-                           "endTime":"2013-01-23T13:45:42.000+0200",
+                           "startTime":"2013-01-23T13:42:42.000+02:00",
+                           "endTime":"2013-01-23T13:45:42.000+02:00",
                            "duration":2000,
                            "taskDefinitionKey":"aTaskDefinitionKey",
                            "priority":42,
-                           "due":"2013-01-23T13:49:42.000+0200",
+                           "due":"2013-01-23T13:49:42.000+02:00",
                            "parentTaskId":"aParentId",
-                           "followUp:":"2013-01-23T13:44:42.000+0200",
+                           "followUp:":"2013-01-23T13:44:42.000+02:00",
                            "tenantId":null,
-                           "removalTime":"2018-02-10T14:33:19.000+0200",
+                           "removalTime":"2018-02-10T14:33:19.000+02:00",
                            "rootProcessInstanceId":"aRootProcessInstanceId"
                          }
                        ]

@@ -44,7 +44,7 @@
                        "description": "Response for POST `/decision-definition/key/aKey/evaluate`",
                        "value": [
                          {
-                           "result": { "value" : "management", "type" : "String", "valueInfo" : null }
+                           "result": { "value" : "management", "type" : "String", "valueInfo" : {} }
                          }
                        ]
                      }'] />

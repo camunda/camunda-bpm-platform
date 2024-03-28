@@ -25,7 +25,7 @@
                          "rules": [
                            {
                              "placeholder": "PASSWORD_POLICY_USER_DATA",
-                             "parameter": null
+                             "parameter": {}
                            },
                            {
                              "placeholder": "PASSWORD_POLICY_LENGTH",

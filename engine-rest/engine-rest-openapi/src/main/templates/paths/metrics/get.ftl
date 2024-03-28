@@ -84,7 +84,7 @@
                        "summary": "GET /metrics?name=flow-node-instances&startDate=1970-01-01T01:45:00.000%2b0200&endDate=1970-01-01T02:00:00.000%2b0200",
                        "value": [
                                   {
-                                    "timestamp":"1970-01-01T01:45:00.000+0200",
+                                    "timestamp":"1970-01-01T01:45:00.000+02:00",
                                     "name":"flow-node-instances",
                                     "reporter":"REPORTER",
                                     "value":23

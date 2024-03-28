@@ -16,7 +16,7 @@
                   '"example-1": {
                      "summary": "POST `/history/process-instance/set-removal-time`",
                      "value": {
-                                "absoluteRemovalTime": "2019-05-05T11:56:24.725+0200",
+                                "absoluteRemovalTime": "2019-05-05T11:56:24.725+02:00",
                                 "hierarchical": true,
                                 "historicProcessInstanceQuery": {
                                   "unfinished": true
@@ -30,7 +30,7 @@
                    '"example-2": {
                      "summary": "POST `/history/process-instance/set-removal-time`",
                      "value": {
-                                "absoluteRemovalTime": "2019-05-05T11:56:24.725+0200",
+                                "absoluteRemovalTime": "2019-05-05T11:56:24.725+02:00",
                                 "hierarchical": true,
                                 "updateInChunks": true,
                                 "updateChunkSize": 300,

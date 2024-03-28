@@ -10,7 +10,7 @@
 ]>
 
 <#assign dateFormatDescription = "Default [format](${docsUrl}/reference/rest/overview/date-format/)
-                                  `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., 2013-01-23T14:42:45.000+0200."/>
+                                  `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., 2013-01-23T14:42:45.000+02:00."/>
 <#if requestMethod == "GET">
     <#assign listType = "comma-separated">
 <#elseif requestMethod == "POST">

@@ -52,7 +52,7 @@
                        "description": "Response for POST `/decision-definition/akey/aKey/tenand-id/aTenantId/evaluate`",
                        "value": [
                          {
-                           "result": { "value" : "management", "type" : "String", "valueInfo" : null }
+                           "result": { "value" : "management", "type" : "String", "valueInfo" : {} }
                          }
                        ]
                      }'] />

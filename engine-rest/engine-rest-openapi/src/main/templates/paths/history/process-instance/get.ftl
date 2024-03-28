@@ -41,7 +41,7 @@
                                     "processDefinitionKey":"invoice",
                                     "processDefinitionName":"Invoice Receipt",
                                     "processDefinitionVersion":1,
-                                    "startTime":"2017-02-10T14:33:19.000+0200",
+                                    "startTime":"2017-02-10T14:33:19.000+02:00",
                                     "endTime":null,
                                     "removalTime": null,
                                     "durationInMillis":null,

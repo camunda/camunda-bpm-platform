@@ -29,7 +29,7 @@
         dto = "CountResultDto"
         desc = "Request successful."
         examples = ['"example-1": {
-                       "description": "GET `/job/count?dueDates=gt_2012-07-17T17:00:00.000+0200,lt_2012-07-17T18:00:00.000+0200&createTimes=gt_2012-05-05T10:00:00.000+0200,lt_2012-07-16T15:00:00.000+0200`",
+                       "description": "GET `/job/count?dueDates=gt_2012-07-17T17:00:00.000+02:00,lt_2012-07-17T18:00:00.000+02:00&createTimes=gt_2012-05-05T10:00:00.000+02:00,lt_2012-07-16T15:00:00.000+02:00`",
                        "value": {
                          "count": 2
                        }

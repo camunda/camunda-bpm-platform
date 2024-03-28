@@ -17,7 +17,7 @@
                        "processDefinitionKey" : "aProcessDefinitionKey",
                        "suspended" : true,
                        "includeProcessInstances" : true,
-                       "executionDate" : "2013-11-21T10:49:45T14:42:45"
+                       "executionDate" : "2013-11-21T10:49:45.000+02:00"
                      }
                    }'
                  ] />

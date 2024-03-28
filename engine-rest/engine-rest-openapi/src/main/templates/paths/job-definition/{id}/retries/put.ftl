@@ -29,7 +29,7 @@
                      "summary": "PUT `/job-definition/aJobDefId/retries`",
                      "value": {
                        "retries": 3,
-                       "dueDate": "2017-04-06T13:57:45.000+0200"
+                       "dueDate": "2017-04-06T13:57:45.000+02:00"
                      }
                    }']
   />

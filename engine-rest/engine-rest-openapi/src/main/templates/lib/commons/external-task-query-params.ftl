@@ -57,7 +57,7 @@
       format = "date-time"
       desc = "Restrict to external tasks that have a lock that expires after a given date. By
               [default](${docsUrl}/reference/rest/overview/date-format/), the date must have the format
-              `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`." />
+              `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+02:00`." />
 
   <@lib.parameter
       name = "lockExpirationBefore"
@@ -66,7 +66,7 @@
       format = "date-time"
       desc = "Restrict to external tasks that have a lock that expires before a given date. By
               [default](${docsUrl}/reference/rest/overview/date-format/), the date must have the format
-              `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`." />
+              `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+02:00`." />
 
   <@lib.parameter
       name = "activityId"

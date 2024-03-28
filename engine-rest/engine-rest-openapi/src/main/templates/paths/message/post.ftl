@@ -5,7 +5,7 @@
       id = "deliverMessage"
       tag = "Message"
       summary = "Correlate"
-      desc = "Correlates a message to the process engine to either trigger a message start event or an intermediate message 
+      desc = "Correlates a message to the process engine to either trigger a message start event or an intermediate message
               catching event. Internally this maps to the engine's message correlation builder methods
               `MessageCorrelationBuilder#correlateWithResult()` and `MessageCorrelationBuilder#correlateAllWithResult()`.
               For more information about the correlation behavior, see the [Message Events](${docsUrl}/bpmn20/events/message-events/)
@@ -24,7 +24,7 @@
                           "aVariable" : {"value" : "aValue", "type": "String"}
                         },
                         "processVariables" : {
-                          "aVariable" : {"value" : "aNewValue", "type": "String", 
+                          "aVariable" : {"value" : "aNewValue", "type": "String",
                                           "valueInfo" : { "transient" : true }
                                         },
                           "anotherVariable" : {"value" : true, "type": "Boolean"}
@@ -84,7 +84,7 @@
                        "description": "The Response content of a status 200. The property `variablesInResultEnabled` in the request body was `false` (Default).",
                        "value": [{
                          "resultType": "ProcessDefinition",
-                         "execution": null,
+                         "execution": {},
                          "processInstance": {
                            "links": [],
                              "id": "aProcInstId",
@@ -108,7 +108,7 @@
                          "ended": false,
                          "tenantId": "aTenantId"
                        },
-                       "processInstance": null,
+                       "processInstance": {},
                        "variables" : {
                          "aVariable" : {"value" : "aNewValue", "type": "String",
                                        "valueInfo" : { "transient" : true }

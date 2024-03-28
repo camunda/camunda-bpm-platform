@@ -35,8 +35,8 @@
                            "operator": "neq"
                          }
                        ],
-                       "processInstanceBusinessKeyIn": "aBusinessKey,anotherBusinessKey",
-                       "assigneeIn": "anAssignee,anotherAssignee",
+                       "processInstanceBusinessKeyIn": ["aBusinessKey", "anotherBusinessKey"],
+                       "assigneeIn": ["anAssignee", "anotherAssignee"],
                        "priority": 10,
                        "sorting": [
                          {

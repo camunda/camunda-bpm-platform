@@ -27,21 +27,21 @@
                        "dueDates": [
                          {
                            "operator": "gt",
-                           "value": "2018-07-17T17:00:00.000+0200"
+                           "value": "2018-07-17T17:00:00.000+02:00"
                          },
                          {
                            "operator": "lt",
-                           "value": "2018-07-17T18:00:00.000+0200"
+                           "value": "2018-07-17T18:00:00.000+02:00"
                          }
                        ],
                        "createTimes": [
                          {
                            "operator": "gt",
-                           "value": "2012-05-05T10:00:00.000+0200"
+                           "value": "2012-05-05T10:00:00.000+02:00"
                          },
                          {
                            "operator": "lt",
-                           "value": "2012-07-16T15:00:00.000+0200"
+                           "value": "2012-07-16T15:00:00.000+02:00"
                          }
                        ],
                        "sorting": [
@@ -71,7 +71,7 @@
                          {
                            "id": "aJobId",
                            "jobDefinitionId": "aJobDefinitionId",
-                           "dueDate": "2018-07-17T17:05:00.000+0200",
+                           "dueDate": "2018-07-17T17:05:00.000+02:00",
                            "processInstanceId": "aProcessInstanceId",
                            "processDefinitionId": "aProcessDefinitionId",
                            "processDefinitionKey": "aPDKey",
@@ -82,12 +82,12 @@
                            "suspended": false,
                            "priority": 10,
                            "tenantId": null,
-                           "createTime": "2018-05-05T17:00:00+0200"
+                           "createTime": "2018-05-05T17:00:00+02:00"
                          },
                          {
                            "id": "anotherJobId",
                            "jobDefinitionId": "anotherJobDefinitionId",
-                           "dueDate": "2018-07-17T17:55:00.000+0200",
+                           "dueDate": "2018-07-17T17:55:00.000+02:00",
                            "processInstanceId": "aProcessInstanceId",
                            "processDefinitionId": "anotherPDId",
                            "processDefinitionKey": "anotherPDKey",
@@ -98,7 +98,7 @@
                            "suspended": true,
                            "priority": 8,
                            "tenantId": null,
-                           "createTime": "2018-05-05T17:00:00+0200"
+                           "createTime": "2018-05-05T17:00:00+02:00"
                          }
                        ]
                      }']
