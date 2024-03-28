@@ -1780,6 +1780,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       if (POSTGRES_DB_PRODUCT_NAME.equals(databaseProductName)) {
         databaseProductName = checkForCrdb(connection);
       }
+
       LOG.debugDatabaseproductName(databaseProductName);
       databaseType = databaseTypeMappings.getProperty(databaseProductName);
       ensureNotNull("couldn't deduct database type from database product name '" + databaseProductName + "'", "databaseType", databaseType);
@@ -1837,6 +1838,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (result.next()) {
           String versionData = result.getString(1);
           if (versionData != null && versionData.toLowerCase().contains("cockroachdb")) {
+            try (PreparedStatement prepStatement = connection.prepareStatement("ALTER TABLE t CONFIGURE ZONE USING gc.ttlseconds = 600;")) {
+              prepStatement.execute();
+            }
+
             return CRDB_DB_PRODUCT_NAME;
           }
         }
