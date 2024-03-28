@@ -1977,7 +1977,7 @@
         </interface>
     </interfaces>
     <socket-binding-groups>
-        <socket-binding-group name="standard-sockets" default-interface="public">
+        <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
             <!-- Needed for server groups using the 'default' profile  -->
             <socket-binding name="ajp" port="${jboss.ajp.port}"/>
             <socket-binding name="http" port="${jboss.http.port}"/>
@@ -1988,7 +1988,7 @@
                 <remote-destination host="localhost" port="${jboss.mail-smtp.port}"/>
             </outbound-socket-binding>
         </socket-binding-group>
-        <socket-binding-group name="ha-sockets" default-interface="public">
+        <socket-binding-group name="ha-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
             <socket-binding name="ajp" port="${jboss.ajp.port:8009}"/>
             <socket-binding name="http" port="${jboss.http.port:8080}"/>
             <socket-binding name="https" port="${jboss.https.port:8443}"/>
@@ -2004,7 +2004,7 @@
                 <remote-destination host="localhost" port="25"/>
             </outbound-socket-binding>
         </socket-binding-group>
-        <socket-binding-group name="full-sockets" default-interface="public">
+        <socket-binding-group name="full-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
             <socket-binding name="ajp" port="${jboss.ajp.port:8009}"/>
             <socket-binding name="http" port="${jboss.http.port:8080}"/>
             <socket-binding name="https" port="${jboss.https.port:8443}"/>
@@ -2016,7 +2016,7 @@
                 <remote-destination host="localhost" port="25"/>
             </outbound-socket-binding>
         </socket-binding-group>
-        <socket-binding-group name="full-ha-sockets" default-interface="public">
+        <socket-binding-group name="full-ha-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
             <socket-binding name="ajp" port="${jboss.ajp.port:8009}"/>
             <socket-binding name="http" port="${jboss.http.port:8080}"/>
             <socket-binding name="https" port="${jboss.https.port:8443}"/>
@@ -2034,7 +2034,7 @@
                 <remote-destination host="localhost" port="25"/>
             </outbound-socket-binding>
         </socket-binding-group>
-        <socket-binding-group name="load-balancer-sockets" default-interface="public">
+        <socket-binding-group name="load-balancer-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
             <socket-binding name="http" port="${jboss.http.port:8080}"/>
             <socket-binding name="https" port="${jboss.https.port:8443}"/>
             <socket-binding name="mcmp-management" interface="private" port="${jboss.mcmp.port:8090}"/>
