@@ -43,7 +43,7 @@ public abstract class PvmAtomicOperationCreateScope implements PvmAtomicOperatio
       execution.setActive(false);
       execution.setActivity(null);
       LOG.createScope(execution, propagatingExecution);
-      propagatingExecution.initialize();
+      propagatingExecution.initialize(null, false);
 
     } else {
       propagatingExecution = execution;

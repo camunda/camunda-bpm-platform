@@ -243,7 +243,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
   @Override
   public abstract CmmnExecution createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey);
 
-  public abstract void initialize();
+  public abstract void initialize(Map<String, Object> variables, boolean fireHistoricStartEvent);
 
   public abstract void initializeTimerDeclarations();
 
@@ -276,14 +276,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
   }
 
   protected void start(Map<String, Object> variables, VariableMap formProperties) {
-
-    initialize();
-
-    fireHistoricProcessStartEvent();
-
-    if (variables != null) {
-      setVariables(variables);
-    }
+    initialize(variables, true);
 
     if (formProperties != null) {
       FormPropertyHelper.initFormPropertiesOnScope(formProperties, this);
@@ -300,12 +293,9 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
    * @param variables the variables which are used for the start
    */
   public void startWithoutExecuting(Map<String, Object> variables) {
-    initialize();
-
-    fireHistoricProcessStartEvent();
+    initialize(variables, true);
 
     setActivityInstanceId(getId());
-    setVariables(variables);
 
     initializeTimerDeclarations();
 
