@@ -204,6 +204,11 @@
         <artifactId>camunda-bpm-assert</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.camunda.spin</groupId>
+        <artifactId>camunda-spin-bom</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- dmn engine dependencies
        -->
@@ -268,13 +273,6 @@
         <groupId>org.camunda.connect</groupId>
         <artifactId>camunda-connect-bom</artifactId>
         <version>${version.camunda.connect}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-      <dependency>
-        <groupId>org.camunda.spin</groupId>
-        <artifactId>camunda-spin-bom</artifactId>
-        <version>${version.camunda.spin}</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
