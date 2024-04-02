@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.spin</groupId>
     <artifactId>camunda-spin-root</artifactId>
-    <version>1.24.0-SNAPSHOT</version>
+    <version>7.21.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-spin-core</artifactId>

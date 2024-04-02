@@ -1,6 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+<!-- 
+  TODO parent should be updated to: <version>1.24.0-SNAPSHOT</version>
+  it throws error: 
+  Failed to execute goal org.eclipse.transformer:transformer-maven-plugin:0.5.0:transform (transform-jakarta-sources) on project camunda-spin-dataformat-xml-dom-jakarta: Exception transforming directory: Exception loading transformer rules: ${org.camunda.bpm:camunda-engine:jar}
+ -->
   <parent>
     <groupId>org.camunda.spin</groupId>
     <artifactId>camunda-spin-root</artifactId>
