@@ -279,22 +279,6 @@
         </plugin>
 
         <plugin>
-          <groupId>org.eclipse.transformer</groupId>
-          <artifactId>transformer-maven-plugin</artifactId>
-          <version>0.5.0</version>
-          <configuration>
-            <rules>
-              <jakartaDefaults>true</jakartaDefaults>
-              <renames>
-                <rename>jar:file:${org.camunda.bpm:camunda-engine:jar}!/META-INF/jakarta-renames.properties</rename>
-                <rename>jar:file:${org.camunda.bpm:camunda-engine:jar}!/META-INF/camunda-renames.properties</rename>
-              </renames>
-            </rules>
-            <classifier>jakarta</classifier>
-          </configuration>
-        </plugin>
-
-        <plugin>
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
           <version>${version.eirslett.frontend.maven.plugin}</version>

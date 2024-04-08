@@ -64,7 +64,7 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-xml-dom-jakarta</artifactId>
-      <version>${version.camunda.spin}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
