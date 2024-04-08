@@ -8,6 +8,6 @@
     <module name="java.logging" />
     <module name="jdk.unsupported" />
     <module name="sun.jdk" />
-    <module name="org.graalvm.truffle.truffle-api" />
+    <module name="org.graalvm.truffle.truffle-api" services="export" export="true" />
   </dependencies>
 </module>
