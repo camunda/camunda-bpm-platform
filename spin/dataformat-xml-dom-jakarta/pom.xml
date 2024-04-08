@@ -263,7 +263,7 @@
         <groupId>org.eclipse.transformer</groupId>
         <artifactId>transformer-maven-plugin</artifactId>
         <configuration>
-          <rules>
+          <rules combine.self="override">
             <jakartaDefaults>true</jakartaDefaults>
           </rules>
         </configuration>
