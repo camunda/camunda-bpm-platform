@@ -220,7 +220,7 @@ public class JobExecutorLogger extends ProcessEngineLogger {
   public void failedAcquisitions(String processEngine, AcquiredJobs acquiredJobs) {
     logDebug(
             "033",
-            "No of Jobs failed to Lock during Acquisition of jobs for the process engine '{}' : {}", processEngine, acquiredJobs.getNumberOfJobsFailedToLock());
+            "Jobs failed to Lock during Acquisition of jobs for the process engine '{}' : {}", processEngine, acquiredJobs.getNumberOfJobsFailedToLock());
   }
 
   public void jobsToAcquire(String processEngine, int numJobsToAcquire) {

@@ -172,7 +172,7 @@ public abstract class JobExecutor {
 
   public void logRejectedExecution(ProcessEngineImpl engine, int numJobs) {
     if(engine != null){
-      LOG.rejectedJobExecutions(engine.getName(),numJobs);
+      LOG.rejectedJobExecutions(engine.getName(), numJobs);
       if (engine.getProcessEngineConfiguration().isMetricsEnabled()) {
         engine.getProcessEngineConfiguration()
                 .getMetricsRegistry()
