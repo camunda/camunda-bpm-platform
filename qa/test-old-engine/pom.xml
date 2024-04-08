@@ -259,6 +259,13 @@
           <artifactId>geronimo-jta_1.1_spec</artifactId>
           <scope>test</scope>
         </dependency>
+
+        <dependency>
+          <groupId>org.jboss</groupId>
+          <artifactId>jboss-vfs</artifactId>
+          <version>3.1.0.Final</version>
+          <scope>test</scope>
+        </dependency>
       </dependencies>
 
       <build>
