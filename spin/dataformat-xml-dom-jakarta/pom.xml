@@ -43,6 +43,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.glassfish.jaxb</groupId>
       <artifactId>jaxb-runtime</artifactId>
       <version>${jaxb-runtime.version}</version>
@@ -248,9 +253,20 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>properties</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.eclipse.transformer</groupId>
         <artifactId>transformer-maven-plugin</artifactId>
-        <version>0.5.0</version>
         <configuration>
           <rules>
             <jakartaDefaults>true</jakartaDefaults>
