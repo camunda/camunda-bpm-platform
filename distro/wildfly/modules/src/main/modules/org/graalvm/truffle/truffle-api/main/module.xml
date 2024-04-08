@@ -9,6 +9,6 @@
     <module name="java.sql" />
     <module name="jdk.unsupported" />
     <module name="sun.jdk" />
-    <module name="org.graalvm.sdk.graal-sdk" />
+    <module name="org.graalvm.sdk.graal-sdk" services="export" export="true" />
   </dependencies>
 </module>

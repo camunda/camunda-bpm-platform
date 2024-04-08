@@ -9,9 +9,9 @@
     <module name="jdk.unsupported" />
     <module name="sun.jdk" />
     <module name="org.camunda.spin.camunda-spin-core" />
-    <module name="org.graalvm.regex.regex" />
-    <module name="org.graalvm.truffle.truffle-api" />
-    <module name="org.graalvm.sdk.graal-sdk" />
+    <module name="org.graalvm.regex.regex" services="export" export="true" />
+    <module name="org.graalvm.truffle.truffle-api" services="export" export="true" />
+    <module name="org.graalvm.sdk.graal-sdk" services="export" export="true" />
     <module name="com.ibm.icu.icu4j" />
   </dependencies>
 </module>
