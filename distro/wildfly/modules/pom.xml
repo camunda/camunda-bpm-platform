@@ -175,7 +175,7 @@
                   <mapper>
                     <chainedmapper>
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
-                      <regexpmapper from="^(org.camunda.spin.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${version.camunda.spin}.jar" handledirsep="yes" />
+                      <regexpmapper from="^(org.camunda.spin.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${project.version}.jar" handledirsep="yes" />
                     </chainedmapper>
                   </mapper>
                 </copy>
@@ -267,7 +267,7 @@
                   <include name="**/module.xml" />
                 </replace>
 
-                <replace dir="target/modules" token="@version.camunda.spin@" value="${version.camunda.spin}">
+                <replace dir="target/modules" token="@project.version@" value="${project.version}">
                   <include name="**/module.xml" />
                 </replace>
 

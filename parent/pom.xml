@@ -225,7 +225,7 @@
            <versions>
             <camunda.osgi.version.clean>${project.version}</camunda.osgi.version.clean>
             <camunda.connect.version.clean>${version.camunda.connect}</camunda.connect.version.clean>
-            <camunda.spin.version.clean>${version.camunda.spin}</camunda.spin.version.clean>
+            <camunda.spin.version.clean>${project.version}</camunda.spin.version.clean>
             <camunda.commons.version.clean>${version.camunda.commons}</camunda.commons.version.clean>
            </versions>
           </configuration>
