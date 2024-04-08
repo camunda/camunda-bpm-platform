@@ -149,7 +149,7 @@ public class ExternalTaskHandlerIT {
       variables.put(variableName, variableValue);
 
       client.setVariables(task.getProcessInstanceId(), variables);
-      client.complete(task, variables);
+      client.complete(task);
     });
 
     // when
@@ -180,7 +180,7 @@ public class ExternalTaskHandlerIT {
       variables.put(variableName, variableValue);
 
       client.setVariables(task, variables);
-      client.complete(task, variables);
+      client.complete(task);
     });
 
     // when

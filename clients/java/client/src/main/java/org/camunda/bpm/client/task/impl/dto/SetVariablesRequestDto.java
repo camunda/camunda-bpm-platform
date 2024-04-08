@@ -24,14 +24,14 @@ import java.util.Map;
 
 public class SetVariablesRequestDto extends RequestDto {
 
-    protected Map<String, TypedValueField> variables;
+    protected Map<String, TypedValueField> modifications;
 
-    public SetVariablesRequestDto(String workerId, Map<String, TypedValueField> variables) {
+    public SetVariablesRequestDto(String workerId, Map<String, TypedValueField> modifications) {
         super(workerId);
-        this.variables = variables;
+        this.modifications = modifications;
     }
 
-    public Map<String, TypedValueField> getVariables() {
-        return variables;
+    public Map<String, TypedValueField> getModifications() {
+        return modifications;
     }
 }
