@@ -16,7 +16,6 @@
   <name>camunda Spin - DOM XML data format Jakarta</name>
 
   <properties>
-    <xml.bind-api.version>4.0.0</xml.bind-api.version>
     <jaxb-runtime.version>4.0.1</jaxb-runtime.version>
   </properties>
 
@@ -35,10 +34,11 @@
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-utils</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
+      <version>${version.jakarta.xml.bind-api}</version>
       <scope>provided</scope>
     </dependency>
 
