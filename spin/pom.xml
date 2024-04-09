@@ -23,11 +23,10 @@
   </modules>
 
   <properties>
-    <jruby.version>9.1.17.0</jruby.version>
     <json-junit-fluent.version>1.1.6</json-junit-fluent.version>
     <json-path.version>2.9.0</json-path.version>
-    <jython.version>2.5.3</jython.version>
     <powermock.version>2.0.9</powermock.version>
+    <mockito.version>3.3.3</mockito.version>
     <spin.version.old>1.22.0</spin.version.old>
 
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
@@ -36,6 +35,13 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-core-internal-dependencies</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
 
       <dependency>
         <groupId>org.camunda.commons</groupId>
@@ -54,22 +60,16 @@
       </dependency>
 
       <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>${version.junit}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.assertj</groupId>
-        <artifactId>assertj-core</artifactId>
-        <version>${version.assertj}</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.powermock</groupId>
         <artifactId>powermock-module-junit4</artifactId>
         <version>${powermock.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
+      </dependency>      
 
       <dependency>
         <groupId>org.powermock</groupId>
@@ -84,33 +84,9 @@
       </dependency>
 
       <dependency>
-        <groupId>org.python</groupId>
-        <artifactId>jython</artifactId>
-        <version>${jython.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.jruby</groupId>
-        <artifactId>jruby-complete</artifactId>
-        <version>${jruby.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.graalvm.js</groupId>
-        <artifactId>js</artifactId>
-        <version>${version.graal.js}</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.graalvm.js</groupId>
         <artifactId>js-scriptengine</artifactId>
         <version>${version.graal.js}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-classic</artifactId>
-        <version>${version.logback}</version>
       </dependency>
 
       <dependency>
