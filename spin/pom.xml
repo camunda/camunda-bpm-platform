@@ -23,21 +23,12 @@
   </modules>
 
   <properties>
-    <assertj.version>2.9.1</assertj.version>
-    <commons.version>1.13.0</commons.version>
-    <graal.js.version>21.1.0</graal.js.version>
-    <groovy.version>2.4.13</groovy.version>
-    <jackson.version>2.15.2</jackson.version>
-    <jaxb-impl.version>2.3.6</jaxb-impl.version>
     <jruby.version>9.1.17.0</jruby.version>
     <json-junit-fluent.version>1.1.6</json-junit-fluent.version>
     <json-path.version>2.9.0</json-path.version>
-    <junit.version>4.13.1</junit.version>
     <jython.version>2.5.3</jython.version>
-    <logback.version>1.2.11</logback.version>
     <powermock.version>2.0.9</powermock.version>
     <spin.version.old>1.22.0</spin.version.old>
-    <xml.bind-api.version>2.3.3</xml.bind-api.version>
 
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
     <additionalparam>-Xdoclint:none</additionalparam>
@@ -49,7 +40,7 @@
       <dependency>
         <groupId>org.camunda.commons</groupId>
         <artifactId>camunda-commons-bom</artifactId>
-        <version>${commons.version}</version>
+        <version>${version.camunda.commons}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -57,7 +48,7 @@
       <dependency>
         <groupId>com.fasterxml.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
-        <version>${jackson.version}</version>
+        <version>${version.jackson}</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
@@ -65,13 +56,13 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>${junit.version}</version>
+        <version>${version.junit}</version>
       </dependency>
 
       <dependency>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-core</artifactId>
-        <version>${assertj.version}</version>
+        <version>${version.assertj}</version>
       </dependency>
 
       <dependency>
@@ -89,7 +80,7 @@
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy-all</artifactId>
-        <version>${groovy.version}</version>
+        <version>${version.groovy}</version>
       </dependency>
 
       <dependency>
@@ -107,19 +98,19 @@
       <dependency>
         <groupId>org.graalvm.js</groupId>
         <artifactId>js</artifactId>
-        <version>${graal.js.version}</version>
+        <version>${version.graal.js}</version>
       </dependency>
 
       <dependency>
         <groupId>org.graalvm.js</groupId>
         <artifactId>js-scriptengine</artifactId>
-        <version>${graal.js.version}</version>
+        <version>${version.graal.js}</version>
       </dependency>
 
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>${logback.version}</version>
+        <version>${version.logback}</version>
       </dependency>
 
       <dependency>
@@ -131,13 +122,13 @@
       <dependency>
         <groupId>jakarta.xml.bind</groupId>
         <artifactId>jakarta.xml.bind-api</artifactId>
-        <version>${xml.bind-api.version}</version>
+        <version>${version.xml.bind-api}</version>
       </dependency>
 
       <dependency>
         <groupId>com.sun.xml.bind</groupId>
         <artifactId>jaxb-impl</artifactId>
-        <version>${jaxb-impl.version}</version>
+        <version>${version.xml.jaxb-impl}</version>
       </dependency>
 
       <dependency>
