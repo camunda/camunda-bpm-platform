@@ -16,10 +16,14 @@
  */
 package org.camunda.test.results;
 
-import static org.camunda.bpm.TestResult.Status.ERROR;
-import static org.camunda.bpm.TestResult.Status.FAILED;
-import static org.camunda.bpm.TestResult.Status.IGNORED;
-import static org.camunda.bpm.TestResult.Status.PASSED;
+import static org.camunda.bpm.TestCase.Status.ERROR;
+import static org.camunda.bpm.TestCase.Status.FAILED;
+import static org.camunda.bpm.TestCase.Status.IGNORED;
+import static org.camunda.bpm.TestCase.Status.PASSED;
+import static org.camunda.test.results.PrintFormat.CSV;
+import static org.camunda.test.results.PrintFormat.JSON;
+import static org.camunda.test.results.PrintOutput.CONSOLE;
+import static org.camunda.test.results.PrintOutput.FILE;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,15 +32,17 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.camunda.bpm.TestResult;
-import org.camunda.bpm.TestResult.Status;
+import org.camunda.bpm.TestCase;
+import org.camunda.bpm.TestCase.Status;
 
 public class TestResults {
 
-  private final List<TestResult> testResults;
+  private final List<TestCase> testCases;
+  private final long total;
 
-  private TestResults(List<TestResult> testResults) {
-    this.testResults = testResults;
+  private TestResults(List<TestCase> testCases) {
+    this.testCases = testCases;
+    this.total = testCases.size();
   }
 
   public static TestResults of(String filename) {
@@ -44,49 +50,49 @@ public class TestResults {
     var testElements = Elements.getTestElements(document);
 
     var testResults = testElements.stream()
-        .map(TestResult::of)
+        .map(TestCase::of)
         .collect(Collectors.toList());
 
     return new TestResults(testResults);
   }
 
   public void print() {
-    System.out.println(this);
+    print(JSON, CONSOLE);
   }
 
-  public void printToFile() {
-    var resultsJson = toString();
-    try {
-      writeToFile(resultsJson, "test_results.json");
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+  public void printToCSV() {
+    print(CSV, FILE);
+  }
+
+  public void print(PrintFormat format, PrintOutput output) {
+    var content = format.toString(this);
+    output.execute(content);
   }
 
   public TestResults lessThan(long duration) {
-    return new TestResults(testResults.stream()
+    return new TestResults(testCases.stream()
         .filter(testResult -> testResult.getDuration() < duration)
         .collect(Collectors.toList())
     );
   }
 
   public TestResults greaterThan(long duration) {
-    return new TestResults(testResults.stream()
+    return new TestResults(testCases.stream()
         .filter(testResult -> testResult.getDuration() > duration)
         .collect(Collectors.toList())
     );
   }
 
   public TestResults naturalOrder() {
-    return new TestResults(testResults.stream()
-        .sorted(Comparator.comparingLong(TestResult::getDuration))
+    return new TestResults(testCases.stream()
+        .sorted(Comparator.comparingLong(TestCase::getDuration))
         .collect(Collectors.toList())
     );
   }
 
   public TestResults reverseOrder() {
-    return new TestResults(testResults.stream()
-        .sorted(Comparator.comparingLong(TestResult::getDuration).reversed())
+    return new TestResults(testCases.stream()
+        .sorted(Comparator.comparingLong(TestCase::getDuration).reversed())
         .collect(Collectors.toList())
     );
   }
@@ -108,17 +114,17 @@ public class TestResults {
   }
 
   public long count() {
-    return testResults.size();
+    return testCases.size();
   }
 
   public TestResults limit(long limit) {
-    return new TestResults(testResults.stream()
+    return new TestResults(testCases.stream()
         .limit(limit)
         .collect(Collectors.toList()));
   }
 
   private TestResults status(Status status) {
-    return new TestResults(testResults.stream()
+    return new TestResults(testCases.stream()
         .filter(testResult -> testResult.getStatus() == status)
         .collect(Collectors.toList())
     );
@@ -132,26 +138,26 @@ public class TestResults {
     result += "    \"testResults\" : [";
     result += "\n";
 
-    for (int i=0; i < testResults.size() ; i++) {
-      var testResult = testResults.get(i);
+    for (int i = 0; i < testCases.size() ; i++) {
+      var testResult = testCases.get(i);
       result += "      { \"name\": " + "\"" + testResult.getName() + "\"" +  ", \"status\" : " + "\"" + testResult.getStatus() + "\"" + ", \"duration\" : " + testResult.getDuration() + " }";
 
-      if (i != testResults.size() - 1) {
+      if (i != testCases.size() - 1) {
         result += ",";
       }
 
       result += "\n";
     }
 
-    result += "  ]";
+    result += "  ],";
     result += "\n";
+    result += "  \"total\" : " + total + "\n";
     result += "}";
 
     return result;
   }
 
-  private void writeToFile(String content, String filename) throws IOException {
-    Path path = Paths.get(filename);
-    Files.write(path, content.getBytes());
+  public List<TestCase> getTestCases() {
+    return testCases;
   }
 }

@@ -19,19 +19,19 @@ package org.camunda.bpm;
 
 import org.w3c.dom.Element;
 
-public class TestResult {
+public class TestCase {
 
   private final String name;
   private final Status status;
   private final long duration;
 
-  private TestResult(String name, Status status, long duration) {
+  private TestCase(String name, Status status, long duration) {
     this.name = name;
     this.status = status;
     this.duration = duration;
   }
 
-  public static TestResult of(Element element) {
+  public static TestCase of(Element element) {
 
     if (!"test".equals(element.getTagName())) {
       throw new IllegalArgumentException("Cannot instantiate a test result out of an element that is not `test`: found " + element.getTagName());
@@ -41,7 +41,7 @@ public class TestResult {
     var testName = element.getAttribute("name");
     var result = Status.parse(element.getAttribute("status"));
 
-    return new TestResult(testName, result, duration);
+    return new TestCase(testName, result, duration);
   }
 
   public String getName() {

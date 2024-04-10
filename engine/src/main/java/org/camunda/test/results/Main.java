@@ -19,14 +19,13 @@ package org.camunda.test.results;
 
 public class Main {
 
-  public static void main(String args[]) {
+  public static void main(String[] args) {
     String filename = "/Users/petros/IdeaProjects/camunda-bpm-platform/engine/test_results.xml";
     var testResults = TestResults.of(filename);
 
     testResults
         .reverseOrder()
         .greaterThan(1000)
-        .limit(500)
         .print();
   }
 }
