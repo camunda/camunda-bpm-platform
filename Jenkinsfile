@@ -40,10 +40,9 @@ pipeline {
           suppressErrors: false,
           runSteps: {
             skipTests = ""
-              if (changeRequest() && !pullRequest.labels.contains('ci:skipTests')) {
-                 skipTests = "-DskipTests "
-              } 
-
+            if (changeRequest() && pullRequest.labels.contains('ci:skipTests')) {
+               skipTests = "-DskipTests "
+            }
             withVault([vaultSecrets: [
                 [
                     path        : 'secret/products/cambpm/ci/xlts.dev',
@@ -70,6 +69,11 @@ pipeline {
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json')
+            if (changeRequest() && pullRequest.labels.contains('ci:distro')) {
+              cambpmArchiveArtifacts(
+                     '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-*.zip',
+                     '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-*.tar.gz')
+            }
 
             cambpmStash("platform-stash-runtime",
                         ".m2/org/camunda/**/*-SNAPSHOT/**",
