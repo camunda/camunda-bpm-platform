@@ -68,7 +68,6 @@ public class SpringJobExecutor extends JobExecutor {
           ((ThreadPoolTaskExecutor) taskExecutor).getMaxPoolSize(),
           ((ThreadPoolTaskExecutor) taskExecutor).getActiveCount());
     }
-  }
 	}
 
 	@Override
