@@ -141,7 +141,7 @@
            <additionalDependency>
              <groupId>junit</groupId>
              <artifactId>junit</artifactId>
-             <version>${junit.version}</version>
+             <version>${version.junit}</version>
            </additionalDependency>
           </additionalDependencies>
         </configuration>
