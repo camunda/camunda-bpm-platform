@@ -27,7 +27,7 @@ pipeline {
     stage('ASSEMBLY') {
       when {
         expression {
-          env.BRANCH_NAME == cambpmDefaultBranch() || (changeRequest() && !pullRequest.labels.contains('ci:no-build'))
+          env.BRANCH_NAME == cambpmDefaultBranch() || (env.CHANGE_ID != null && !pullRequest.labels.contains('ci:no-build'))
         }
       }
       environment {
@@ -40,7 +40,7 @@ pipeline {
           suppressErrors: false,
           runSteps: {
             skipTests = ""
-            if (changeRequest() && pullRequest.labels.contains('ci:skipTests')) {
+            if (env.CHANGE_ID != null && pullRequest.labels.contains('ci:skipTests')) {
                skipTests = "-DskipTests "
             }
             withVault([vaultSecrets: [
@@ -69,7 +69,7 @@ pipeline {
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json')
-            if (changeRequest() && pullRequest.labels.contains('ci:distro')) {
+            if (env.CHANGE_ID != null && pullRequest.labels.contains('ci:distro')) {
               cambpmArchiveArtifacts(
                      '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-*.zip',
                      '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-*.tar.gz')
