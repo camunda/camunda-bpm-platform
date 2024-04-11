@@ -16,9 +16,6 @@
  */
 package org.camunda.bpm.engine.test.util;
 
-import java.util.List;
-import java.util.function.Consumer;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngines;
@@ -29,6 +26,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.runtime.Job;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public class ProcessEngineBootstrapRule extends TestWatcher {
 
@@ -52,11 +52,21 @@ public class ProcessEngineBootstrapRule extends TestWatcher {
     this.processEngine = bootstrapEngine(configurationResource);
   }
 
+  public static ProcessEngineBootstrapRule cached() {
+    return new CachedProcessEngineBootstrapRule();
+  }
+
   public ProcessEngine bootstrapEngine(String configurationResource) {
     ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource(configurationResource);
+
     configureEngine(processEngineConfiguration);
-    return processEngineConfiguration.buildProcessEngine();
+
+    return buildProcessEngine(processEngineConfiguration);
+  }
+
+  public ProcessEngine buildProcessEngine(ProcessEngineConfigurationImpl engineConfig) {
+    return engineConfig.buildProcessEngine();
   }
 
   public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {

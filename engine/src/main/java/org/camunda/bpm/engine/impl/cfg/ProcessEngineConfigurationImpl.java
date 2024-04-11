@@ -30,17 +30,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import javax.naming.InitialContext;
 import javax.script.ScriptEngineManager;
@@ -1155,9 +1146,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   @Override
   public ProcessEngine buildProcessEngine() {
+    long start = System.currentTimeMillis();
     init();
     processEngine = new ProcessEngineImpl(this);
     invokePostProcessEngineBuild(processEngine);
+    long finish = System.currentTimeMillis();
+
+    //TODO Remove console log here once done
+    System.out.println("Built engine with name: " + processEngine.getName() + " in " +  (finish - start) / 1000.0 + " sec");
     return processEngine;
   }
 
