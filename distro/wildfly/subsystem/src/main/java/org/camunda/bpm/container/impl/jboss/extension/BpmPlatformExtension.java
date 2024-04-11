@@ -16,24 +16,27 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension;
 
-import org.camunda.bpm.container.impl.jboss.extension.resource.BpmPlatformRootDefinition;
-import org.jboss.as.controller.Extension;
-import org.jboss.as.controller.ExtensionContext;
-import org.jboss.as.controller.ModelVersion;
 import org.jboss.as.controller.PathElement;
-import org.jboss.as.controller.SubsystemRegistration;
 import org.jboss.as.controller.descriptions.StandardResourceDescriptionResolver;
 import org.jboss.as.controller.parsing.ExtensionParsingContext;
-
 import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.SUBSYSTEM_NAME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUBSYSTEM;
+
+import org.wildfly.subsystem.SubsystemConfiguration;
+import org.wildfly.subsystem.SubsystemExtension;
+import org.wildfly.subsystem.SubsystemPersistence;
 
 /**
  * Defines the bpm-platform subsystem for Wildfly 8+ application server
  *
  * @author Daniel Meyer
  */
-public class BpmPlatformExtension implements Extension {
+public class BpmPlatformExtension extends SubsystemExtension<MySchema>{
+
+  public BpmPlatformExtension() {
+    super(SubsystemConfiguration.of(SUBSYSTEM_NAME, MysubsystemModel.CURRENT, MySubsystemRegistrar::new),
+        SubsystemPersistence.of(MySchema.CURRENT));
+  }
 
   public static final int BPM_PLATFORM_SUBSYSTEM_MAJOR_VERSION = 1;
   public static final int BPM_PLATFORM_SUBSYSTEM_MINOR_VERSION = 1;
@@ -51,12 +54,13 @@ public class BpmPlatformExtension implements Extension {
   public static final PathElement JOB_EXECUTOR_PATH = PathElement.pathElement(ModelConstants.JOB_EXECUTOR);
   public static final PathElement JOB_ACQUISTIONS_PATH = PathElement.pathElement(ModelConstants.JOB_ACQUISITIONS);
 
-  @Override
-  public void initialize(ExtensionContext context) {
-    SubsystemRegistration subsystem = context.registerSubsystem(SUBSYSTEM_NAME, ModelVersion.create(BPM_PLATFORM_SUBSYSTEM_MAJOR_VERSION, BPM_PLATFORM_SUBSYSTEM_MINOR_VERSION));
-    subsystem.registerSubsystemModel(BpmPlatformRootDefinition.INSTANCE);
-    subsystem.registerXMLElementWriter(parser);
-  }
+//  @Override
+//  public void initialize(ExtensionContext context) {
+//    SubsystemRegistration subsystem = context.registerSubsystem(SUBSYSTEM_NAME,
+//        ModelVersion.create(BPM_PLATFORM_SUBSYSTEM_MAJOR_VERSION, BPM_PLATFORM_SUBSYSTEM_MINOR_VERSION));
+//    subsystem.registerSubsystemModel(BpmPlatformRootDefinition.INSTANCE);
+//    subsystem.registerXMLElementWriter(parser);
+//  }
 
   @Override
   public void initializeParsers(ExtensionParsingContext context) {

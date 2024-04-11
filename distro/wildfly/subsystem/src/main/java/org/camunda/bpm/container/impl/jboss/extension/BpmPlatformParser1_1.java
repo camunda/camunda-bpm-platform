@@ -21,7 +21,6 @@ import org.jboss.as.connector.util.AbstractParser;
 import org.jboss.as.connector.util.ParserException;
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinition;
-import org.jboss.as.controller.parsing.ParseUtils;
 import org.jboss.as.controller.persistence.SubsystemMarshallingContext;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
@@ -384,30 +383,30 @@ public class BpmPlatformParser1_1 extends AbstractParser {
     @Override
     public void readElement(XMLExtendedStreamReader reader, List<ModelNode> operations) throws XMLStreamException {
       // Require no attributes
-      ParseUtils.requireNoAttributes(reader);
-
-      final ModelNode subsystemAddress = new ModelNode();
-      subsystemAddress.add(SUBSYSTEM, ModelConstants.SUBSYSTEM_NAME);
-      subsystemAddress.protect();
-
-      final ModelNode subsystemAdd = new ModelNode();
-      subsystemAdd.get(OP).set(ADD);
-      subsystemAdd.get(OP_ADDR).set(subsystemAddress);
-      operations.add(subsystemAdd);
-
-
-      while(reader.hasNext() && !reader.isEndElement()) {
-        switch (reader.getLocalName()) {
-          case SUBSYSTEM: {
-            try {
-              final BpmPlatformParser1_1 parser = new BpmPlatformParser1_1();
-              parser.parse(reader, operations, subsystemAddress);
-            } catch (Exception e) {
-              throw new XMLStreamException(e);
-            }
-          }
-        }
-      }
+//      ParseUtils.requireNoAttributes(reader);
+//
+//      final ModelNode subsystemAddress = new ModelNode();
+//      subsystemAddress.add(SUBSYSTEM, ModelConstants.SUBSYSTEM_NAME);
+//      subsystemAddress.protect();
+//
+//      final ModelNode subsystemAdd = new ModelNode();
+//      subsystemAdd.get(OP).set(ADD);
+//      subsystemAdd.get(OP_ADDR).set(subsystemAddress);
+//      operations.add(subsystemAdd);
+//
+//
+//      while(reader.hasNext() && !reader.isEndElement()) {
+//        switch (reader.getLocalName()) {
+//          case SUBSYSTEM: {
+//            try {
+//              final BpmPlatformParser1_1 parser = new BpmPlatformParser1_1();
+//              parser.parse(reader, operations, subsystemAddress);
+//            } catch (Exception e) {
+//              throw new XMLStreamException(e);
+//            }
+//          }
+//        }
+//      }
     }
 
     @Override
