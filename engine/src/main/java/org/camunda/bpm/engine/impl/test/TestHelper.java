@@ -16,17 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.test;
 
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -59,7 +48,15 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.cache.ProcessEngineFactory;
+import org.camunda.bpm.engine.test.cache.event.ProcessEngineCacheHitEvent;
+import org.camunda.bpm.engine.test.cache.listener.ProcessEngineObserverFactory;
 import org.slf4j.Logger;
+
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.*;
 
 
 /**
@@ -519,14 +516,21 @@ public abstract class TestHelper {
 
   public static ProcessEngine getProcessEngine(String configurationResource) {
     ProcessEngine processEngine = processEngines.get(configurationResource);
-    if (processEngine==null) {
+
+    if (processEngine == null) {
       LOG.debug("==== BUILDING PROCESS ENGINE ========================================================================");
-      processEngine = ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource(configurationResource)
-        .buildProcessEngine();
+      var processEngineConfiguration = ProcessEngineConfiguration
+              .createProcessEngineConfigurationFromResource(configurationResource);
+
+      processEngine = ProcessEngineFactory.create(processEngineConfiguration);
+
       LOG.debug("==== PROCESS ENGINE CREATED =========================================================================");
       processEngines.put(configurationResource, processEngine);
     }
+
+    ProcessEngineObserverFactory.getInstance()
+            .update(new ProcessEngineCacheHitEvent(processEngine, processEngine.getProcessEngineConfiguration()));
+
     return processEngine;
   }
 

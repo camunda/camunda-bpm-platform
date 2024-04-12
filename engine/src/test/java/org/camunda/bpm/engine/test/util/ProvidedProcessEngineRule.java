@@ -21,6 +21,9 @@ import java.util.concurrent.Callable;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.cache.ProcessEngineFactory;
+import org.camunda.bpm.engine.test.cache.event.ProcessEngineCacheHitEvent;
+import org.camunda.bpm.engine.test.cache.listener.ProcessEngineObserverFactory;
 
 public class ProvidedProcessEngineRule extends ProcessEngineRule {
 
@@ -56,6 +59,8 @@ public class ProvidedProcessEngineRule extends ProcessEngineRule {
     if (processEngineProvider != null) {
       try {
         this.processEngine = processEngineProvider.call();
+        ProcessEngineObserverFactory.getInstance()
+                .update(new ProcessEngineCacheHitEvent(processEngine, processEngine.getProcessEngineConfiguration()));
       } catch (Exception e) {
         throw new RuntimeException("Could not get process engine", e);
       }
@@ -67,11 +72,15 @@ public class ProvidedProcessEngineRule extends ProcessEngineRule {
   
   protected static ProcessEngine getOrInitializeCachedProcessEngine() {
     if (cachedProcessEngine == null) {
-      cachedProcessEngine = ProcessEngineConfiguration
-          .createProcessEngineConfigurationFromResource("camunda.cfg.xml")
-          .buildProcessEngine();
+      cachedProcessEngine = getProcessEngine("camunda.cfg.xml");
     }
     return cachedProcessEngine;
+  }
+
+  protected static ProcessEngine getProcessEngine(String resource) {
+    var config = ProcessEngineConfiguration
+            .createProcessEngineConfigurationFromResource(resource);
+    return ProcessEngineFactory.create(config);
   }
 
 }

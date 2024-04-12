@@ -105,13 +105,11 @@ public class ObjectChangeTracker<T> {
         }
 
         if (original instanceof List) {
-            ArrayList<?> list = new ArrayList<>(original);
-            return list;
+            return new ArrayList<>(original);
         }
 
         if (original instanceof Set) {
-            HashSet<?> set = new HashSet<>(original);
-            return set;
+            return new HashSet<>(original);
         }
 
         // TODO might need to add more collections to clone here

@@ -7,13 +7,14 @@ import java.util.List;
 
 public class ProcessEngineObserver {
 
-    private List<ProcessEngineEventListener> listeners;
+    private final List<ProcessEngineEventListener> listeners;
 
     public ProcessEngineObserver() {
         this.listeners = new ArrayList<>();
 
-        this.listeners.add(new ProcessEngineEventLogListener());
-        this.listeners.add(new ProcessEngineEventAssignConfigListener());
+        this.listeners.add(new LogListener());
+        this.listeners.add(new AssignConfigListener());
+        this.listeners.add(new CustomConfigListener());
     }
 
     public void update(ProcessEngineEvent event) {

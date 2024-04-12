@@ -1,14 +1,14 @@
 package org.camunda.bpm.engine.test.cache.listener;
 
 import org.camunda.bpm.engine.test.cache.TestContext;
+import org.camunda.bpm.engine.test.cache.event.ProcessEngineConfigEvent;
 import org.camunda.bpm.engine.test.cache.event.ProcessEngineEvent;
 
 import java.util.EnumSet;
 
-import static org.camunda.bpm.engine.test.cache.event.ProcessEngineEvent.Type.CACHE_HIT;
-import static org.camunda.bpm.engine.test.cache.event.ProcessEngineEvent.Type.CREATED;
+import static org.camunda.bpm.engine.test.cache.event.ProcessEngineEvent.Type.*;
 
-public class ProcessEngineEventAssignConfigListener implements ProcessEngineEventListener {
+public class AssignConfigListener implements ProcessEngineEventListener {
 
     private static final EnumSet<ProcessEngineEvent.Type> ALLOWED_EVENTS = EnumSet.of(CREATED, CACHE_HIT);
 
@@ -18,8 +18,10 @@ public class ProcessEngineEventAssignConfigListener implements ProcessEngineEven
             return;
         }
 
+        var e = (ProcessEngineConfigEvent) event;
+
         TestContext.getInstance()
-                .setExecutionConfig(event.config());
+                .setExecutionConfig(e.config());
     }
 
     private boolean isNotAllowed(ProcessEngineEvent event) {

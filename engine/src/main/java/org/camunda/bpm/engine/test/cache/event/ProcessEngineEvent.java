@@ -6,10 +6,9 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 public interface ProcessEngineEvent {
 
     ProcessEngine engine();
-    ProcessEngineConfiguration config();
     Type type();
 
     enum Type {
-        CREATED, CACHE_HIT
+        CREATED, CACHE_HIT, CUSTOM_ENGINE_CONFIG
     }
 }

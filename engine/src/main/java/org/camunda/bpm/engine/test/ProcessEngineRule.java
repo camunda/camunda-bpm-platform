@@ -16,24 +16,7 @@
  */
 package org.camunda.bpm.engine.test;
 
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import org.camunda.bpm.engine.AuthorizationService;
-import org.camunda.bpm.engine.CaseService;
-import org.camunda.bpm.engine.DecisionService;
-import org.camunda.bpm.engine.ExternalTaskService;
-import org.camunda.bpm.engine.FilterService;
-import org.camunda.bpm.engine.FormService;
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineServices;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.*;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.telemetry.PlatformTelemetryRegistry;
@@ -41,9 +24,13 @@ import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.junit.Assume;
-import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -100,7 +87,7 @@ import org.junit.runners.model.Statement;
  *
  * @author Tom Baeyens
  */
-public class ProcessEngineRule extends TestWatcher implements ProcessEngineServices {
+public class ProcessEngineRule extends ConfigurableCacheProcessEngineRule implements ProcessEngineServices {
 
   protected String configurationResource = "camunda.cfg.xml";
   protected String configurationResourceCompat = "activiti.cfg.xml";
@@ -161,6 +148,8 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
     }
     deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, description.getTestClass(), methodName,
         description.getAnnotation(Deployment.class));
+
+    super.starting(description);
   }
 
   @Override
@@ -258,6 +247,8 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
     clearServiceReferences();
 
     PlatformTelemetryRegistry.clear();
+
+    super.finished(description);
   }
 
   public void setCurrentTime(Date currentTime) {

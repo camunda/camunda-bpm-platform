@@ -1,6 +1,7 @@
 package org.camunda.bpm.engine.test.cache;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.test.cache.event.ProcessEngineCacheHitEvent;
 import org.camunda.bpm.engine.test.cache.event.ProcessEngineCreatedEvent;
@@ -15,15 +16,19 @@ public class ProcessEngineFactory {
     private static final Map<String, ProcessEngine> ENGINE_CACHE = new HashMap<>();
     private static final ProcessEngineObserver OBSERVER = ProcessEngineObserverFactory.getInstance();
 
-    public static ProcessEngine create(ProcessEngineConfigurationImpl engineConfig) {
-        if (EnvironmentVariables.enableEngineCache()) {
+    public static ProcessEngine create(ProcessEngineConfiguration engineConfig) {
+        return create(engineConfig, EnvironmentVariables.enableEngineCache());
+    }
+
+    public static ProcessEngine create(ProcessEngineConfiguration engineConfig, boolean useCache) {
+        if (useCache) {
             return getOrCreate(engineConfig);
         }
 
         return engineConfig.buildProcessEngine();
     }
 
-    private static ProcessEngine getOrCreate(ProcessEngineConfigurationImpl engineConfig) {
+    private static ProcessEngine getOrCreate(ProcessEngineConfiguration engineConfig) {
         String name = engineConfig.getProcessEngineName();
 
         if (!ENGINE_CACHE.containsKey(name)) {

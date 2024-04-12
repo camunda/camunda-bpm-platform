@@ -49,7 +49,8 @@ import org.junit.rules.RuleChain;
  */
 public class CompetingHistoryCleanupAcquisitionTest extends ConcurrencyTestHelper {
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(this::configureEngine);
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(this::configureEngine, false);
+
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 

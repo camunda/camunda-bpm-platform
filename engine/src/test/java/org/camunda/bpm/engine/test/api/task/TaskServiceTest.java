@@ -114,8 +114,10 @@ public class TaskServiceTest {
   protected static final String USER_TASK_THROW_ESCALATION = "throw-escalation";
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
-      configuration.setJavaSerializationFormatEnabled(true));
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(config ->
+      config.setJavaSerializationFormatEnabled(true)
+  );
+
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 

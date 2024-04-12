@@ -24,7 +24,10 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.test.ConfigurableCacheProcessEngineRule;
 import org.camunda.bpm.engine.test.cache.ProcessEngineFactory;
+import org.camunda.bpm.engine.test.cache.event.ProcessEngineCustomConfigEvent;
+import org.camunda.bpm.engine.test.cache.listener.ProcessEngineObserverFactory;
 import org.junit.runner.Description;
 
 import java.util.List;
@@ -34,6 +37,7 @@ public class ProcessEngineBootstrapRule extends ConfigurableCacheProcessEngineRu
 
   private ProcessEngine processEngine;
   protected Consumer<ProcessEngineConfigurationImpl> processEngineConfigurator;
+  protected boolean useCache = true;
 
   public ProcessEngineBootstrapRule() {
     this("camunda.cfg.xml");
@@ -47,6 +51,11 @@ public class ProcessEngineBootstrapRule extends ConfigurableCacheProcessEngineRu
     this("camunda.cfg.xml", processEngineConfigurator);
   }
 
+  public ProcessEngineBootstrapRule(Consumer<ProcessEngineConfigurationImpl> processEngineConfigurator, boolean useCache) {
+    this("camunda.cfg.xml", processEngineConfigurator);
+    this.useCache = useCache;
+  }
+
   public ProcessEngineBootstrapRule(String configurationResource, Consumer<ProcessEngineConfigurationImpl> processEngineConfigurator) {
     this.processEngineConfigurator = processEngineConfigurator;
     this.processEngine = bootstrapEngine(configurationResource);
@@ -56,9 +65,14 @@ public class ProcessEngineBootstrapRule extends ConfigurableCacheProcessEngineRu
     ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource(configurationResource);
 
-    configureEngine(processEngineConfiguration);
+    var engine = ProcessEngineFactory.create(processEngineConfiguration, useCache);
+    boolean isCustomConfigured = (processEngineConfigurator != null);
 
-    return ProcessEngineFactory.create(processEngineConfiguration);
+    if (isCustomConfigured) {
+      notifyCustomConfig(engine, processEngineConfigurator);
+    }
+
+    return engine;
   }
 
   public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
@@ -92,6 +106,11 @@ public class ProcessEngineBootstrapRule extends ConfigurableCacheProcessEngineRu
         }
       });
     }
+  }
+
+  private void notifyCustomConfig(ProcessEngine engine, Consumer<ProcessEngineConfigurationImpl> customConfigurator) {
+    ProcessEngineObserverFactory.getInstance()
+            .update(new ProcessEngineCustomConfigEvent(engine, customConfigurator));
   }
 
 }

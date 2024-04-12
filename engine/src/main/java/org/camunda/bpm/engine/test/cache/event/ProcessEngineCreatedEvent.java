@@ -3,14 +3,14 @@ package org.camunda.bpm.engine.test.cache.event;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 
-import static org.camunda.bpm.engine.test.cache.event.ProcessEngineEvent.Type.CACHE_HIT;
+import static org.camunda.bpm.engine.test.cache.event.ProcessEngineEvent.Type.CREATED;
 
-public class ProcessEngineCacheHitEvent implements ProcessEngineEvent {
+public class ProcessEngineCreatedEvent implements ProcessEngineConfigEvent {
 
     private final ProcessEngine engine;
     private final ProcessEngineConfiguration config;
 
-    public ProcessEngineCacheHitEvent(ProcessEngine engine, ProcessEngineConfiguration config) {
+    public ProcessEngineCreatedEvent(ProcessEngine engine, ProcessEngineConfiguration config) {
         this.engine = engine;
         this.config = config;
     }
@@ -25,11 +25,11 @@ public class ProcessEngineCacheHitEvent implements ProcessEngineEvent {
 
     @Override
     public Type type() {
-        return CACHE_HIT;
+        return CREATED;
     }
 
     @Override
     public String toString() {
-        return "ProcessEngineCacheHitEvent [engine=" + engine.getName() + ", config=" + config + "]";
+        return "ProcessEngineCreatedEvent [engine=" + engine.getName() + ", config=" + config + "]";
     }
 }
