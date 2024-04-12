@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.util;
+package org.camunda.bpm.engine.test.cache;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 

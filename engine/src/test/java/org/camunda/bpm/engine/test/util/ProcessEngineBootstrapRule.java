@@ -24,13 +24,13 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.runtime.Job;
-import org.junit.rules.TestWatcher;
+import org.camunda.bpm.engine.test.cache.ProcessEngineFactory;
 import org.junit.runner.Description;
 
 import java.util.List;
 import java.util.function.Consumer;
 
-public class ProcessEngineBootstrapRule extends TestWatcher {
+public class ProcessEngineBootstrapRule extends ConfigurableCacheProcessEngineRule {
 
   private ProcessEngine processEngine;
   protected Consumer<ProcessEngineConfigurationImpl> processEngineConfigurator;
@@ -52,21 +52,13 @@ public class ProcessEngineBootstrapRule extends TestWatcher {
     this.processEngine = bootstrapEngine(configurationResource);
   }
 
-  public static ProcessEngineBootstrapRule cached() {
-    return new CachedProcessEngineBootstrapRule();
-  }
-
   public ProcessEngine bootstrapEngine(String configurationResource) {
     ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource(configurationResource);
 
     configureEngine(processEngineConfiguration);
 
-    return buildProcessEngine(processEngineConfiguration);
-  }
-
-  public ProcessEngine buildProcessEngine(ProcessEngineConfigurationImpl engineConfig) {
-    return engineConfig.buildProcessEngine();
+    return ProcessEngineFactory.create(processEngineConfiguration);
   }
 
   public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
@@ -86,6 +78,7 @@ public class ProcessEngineBootstrapRule extends TestWatcher {
     processEngine.close();
     ProcessEngines.unregister(processEngine);
     processEngine = null;
+    super.finished(description);
   }
 
   private void deleteHistoryCleanupJob() {

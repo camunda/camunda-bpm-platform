@@ -41,7 +41,7 @@ import org.junit.rules.RuleChain;
 
 public class AdminUsersTest {
 
-  protected ProcessEngineBootstrapRule bootstrapRule = ProcessEngineBootstrapRule.cached();
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule();
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);

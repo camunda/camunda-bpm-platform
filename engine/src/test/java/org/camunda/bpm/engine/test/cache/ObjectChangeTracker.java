@@ -1,4 +1,4 @@
-package org.camunda.bpm.engine.test.util;
+package org.camunda.bpm.engine.test.cache;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.slf4j.Logger;
@@ -83,7 +83,7 @@ public class ObjectChangeTracker<T> {
         if (Collection.class.isAssignableFrom(field.getType())) {
             // For collections, clone the original collection to capture its initial state
             Collection<?> originalCollection = (Collection<?>) field.get(object);
-            Collection<?> cloned = cloneCollection(originalCollection);
+            Collection<?> cloned = copy(originalCollection);
 
             initialState.put(field.getName(), cloned);
         }  else if (Map.class.isAssignableFrom(field.getType())) {
@@ -99,7 +99,7 @@ public class ObjectChangeTracker<T> {
         initialState.clear();
     }
 
-    public static Collection<?> cloneCollection(Collection<?> original) {
+    public static Collection<?> copy(Collection<?> original) {
         if (original == null) {
             return null;
         }
