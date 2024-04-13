@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ConfigurableCacheProcessEngineRule;
+import org.camunda.bpm.engine.test.cache.EnvironmentVariables;
 import org.camunda.bpm.engine.test.cache.ProcessEngineFactory;
 import org.camunda.bpm.engine.test.cache.event.ProcessEngineCustomConfigEvent;
 import org.camunda.bpm.engine.test.cache.listener.ProcessEngineObserverFactory;
@@ -37,7 +38,7 @@ public class ProcessEngineBootstrapRule extends ConfigurableCacheProcessEngineRu
 
   private ProcessEngine processEngine;
   protected Consumer<ProcessEngineConfigurationImpl> processEngineConfigurator;
-  protected boolean useCache = true;
+  protected boolean useCache = EnvironmentVariables.enableEngineCache();
 
   public ProcessEngineBootstrapRule() {
     this("camunda.cfg.xml");
@@ -69,7 +70,11 @@ public class ProcessEngineBootstrapRule extends ConfigurableCacheProcessEngineRu
     boolean isCustomConfigured = (processEngineConfigurator != null);
 
     if (isCustomConfigured) {
-      notifyCustomConfig(engine, processEngineConfigurator);
+      if (useCache) {
+        notifyCustomConfig(engine, processEngineConfigurator);
+      } else {
+        configureEngine(processEngineConfiguration);
+      }
     }
 
     return engine;

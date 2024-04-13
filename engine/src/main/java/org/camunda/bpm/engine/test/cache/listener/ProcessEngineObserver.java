@@ -1,24 +1,33 @@
 package org.camunda.bpm.engine.test.cache.listener;
 
 import org.camunda.bpm.engine.test.cache.event.ProcessEngineEvent;
+import org.camunda.bpm.engine.test.cache.event.ProcessEngineEvent.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.camunda.bpm.engine.test.cache.event.ProcessEngineEvent.Type.*;
 
 public class ProcessEngineObserver {
 
-    private final List<ProcessEngineEventListener> listeners;
+    private static final Logger LOG = LoggerFactory.getLogger(ProcessEngineObserver.class);
+
+    private final Map<Type, ProcessEngineEventListener<? extends ProcessEngineEvent>> mappings;
 
     public ProcessEngineObserver() {
-        this.listeners = new ArrayList<>();
+        mappings = new HashMap<>();
 
-        this.listeners.add(new LogListener());
-        this.listeners.add(new AssignConfigListener());
-        this.listeners.add(new CustomConfigListener());
+        mappings.put(CACHE_HIT, new CacheHitEventListener());
+        mappings.put(CREATED, new CreatedEventListener());
+        mappings.put(CUSTOM_ENGINE_CONFIG, new CustomConfigListener());
     }
 
     public void update(ProcessEngineEvent event) {
-        listeners.forEach(listener -> listener.onEvent(event));
+        LOG.info("Process Engine Event: {}", event);
+        ProcessEngineEventListener<ProcessEngineEvent> listener = (ProcessEngineEventListener<ProcessEngineEvent>) mappings.get(event.type());
+        listener.onEvent(event);
     }
 
 }

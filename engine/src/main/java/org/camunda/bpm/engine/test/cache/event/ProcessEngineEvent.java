@@ -9,6 +9,6 @@ public interface ProcessEngineEvent {
     Type type();
 
     enum Type {
-        CREATED, CACHE_HIT, CUSTOM_ENGINE_CONFIG
+        ALL, CREATED, CACHE_HIT, CUSTOM_ENGINE_CONFIG
     }
 }

@@ -4,6 +4,6 @@ import org.camunda.bpm.engine.test.cache.event.ProcessEngineEvent;
 
 public interface ProcessEngineEventListener<T extends ProcessEngineEvent> {
 
-    void onEvent(ProcessEngineEvent event);
+    void onEvent(T event);
 
 }
