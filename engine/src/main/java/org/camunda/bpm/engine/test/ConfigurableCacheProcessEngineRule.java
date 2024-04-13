@@ -20,7 +20,7 @@ public class ConfigurableCacheProcessEngineRule extends TestWatcher {
         // This method will be called before each test method starts
         LOG.info("Starting test: {}", description.getMethodName());
 
-        if (ENABLE_CACHE) {
+        if (ENABLE_CACHE && currentConfigIsSet()) {
             fetchCurrentConfigAndTrack();
         }
 
@@ -32,7 +32,7 @@ public class ConfigurableCacheProcessEngineRule extends TestWatcher {
         // This method will be called after each test method finishes
         LOG.info("Finishing test: {}", description.getMethodName());
 
-        if (ENABLE_CACHE) {
+        if (ENABLE_CACHE && currentConfigIsSet()) {
             restoreAndClearCurrentConfig();
         }
     }
@@ -65,5 +65,10 @@ public class ConfigurableCacheProcessEngineRule extends TestWatcher {
 
         testContext.clearCurrentExecutionConfig();
         testContext.clearCustomConfig();
+    }
+
+    protected boolean currentConfigIsSet() {
+        var testContext = TestContext.getInstance();
+        return testContext.getCurrentExecutionConfig() != null;
     }
 }

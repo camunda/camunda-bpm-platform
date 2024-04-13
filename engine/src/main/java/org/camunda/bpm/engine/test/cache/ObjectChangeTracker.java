@@ -1,6 +1,7 @@
 package org.camunda.bpm.engine.test.cache;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +90,7 @@ public class ObjectChangeTracker<T> {
         }  else if (Map.class.isAssignableFrom(field.getType())) {
             // For maps, clone the original map to capture its initial state
             Map<?, ?> originalMap = (Map<?, ?>) field.get(object);
-            initialState.put(field.getName(), originalMap != null ? new HashMap<>(originalMap) : null);
+            initialState.put(field.getName(), copyMap(originalMap));
         } else {
             initialState.put(field.getName(), field.get(object));
         }
@@ -115,5 +116,14 @@ public class ObjectChangeTracker<T> {
         // TODO might need to add more collections to clone here
 
         return original;
+    }
+
+    private static Map<?, ?> copyMap(Map<?, ?> originalMap) {
+
+        if (originalMap instanceof SpringBeanFactoryProxyMap) { // ignore
+            return originalMap;
+        }
+
+        return originalMap != null ? new HashMap<>(originalMap) : null;
     }
 }
