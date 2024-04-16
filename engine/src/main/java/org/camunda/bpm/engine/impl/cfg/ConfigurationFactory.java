@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static org.camunda.bpm.engine.impl.cfg.ConfigurationFactory.EnvironmentVariable.enableXmlParsingCache;
+
 public class ConfigurationFactory {
 
     private static final String KEY = "prefix";
@@ -35,7 +37,7 @@ public class ConfigurationFactory {
     public static Configuration create(Reader reader, Properties properties, Environment environment) {
         String key = getKey(properties, environment);
 
-        if (CONFIG_BY_KEY.containsKey(key)) {
+        if (enableXmlParsingCache() && CONFIG_BY_KEY.containsKey(key)) {
             return CONFIG_BY_KEY.get(key);
         }
 
@@ -51,6 +53,17 @@ public class ConfigurationFactory {
 
     private static String getKey(Properties properties, Environment environment) {
         return properties.get(KEY) + environment.getId();
+    }
+
+    static class EnvironmentVariable {
+
+        public static boolean ENABLE_XML_PARSING_CACHE = true;
+
+        public static boolean enableXmlParsingCache() {
+            //TODO use Environment variable as external config to control cache
+            return ENABLE_XML_PARSING_CACHE;
+        }
+
     }
 
 
