@@ -1892,10 +1892,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
           initSqlSessionFactoryProperties(properties, databaseTablePrefix, databaseType);
 
-          XMLConfigBuilder parser = new XMLConfigBuilder(reader, "", properties);
-          Configuration configuration = parser.getConfiguration();
-          configuration.setEnvironment(environment);
-          configuration = parser.parse();
+          Configuration configuration = ConfigurationFactory.create(reader, properties, environment);
 
           configuration.setDefaultStatementTimeout(jdbcStatementTimeout);
 
