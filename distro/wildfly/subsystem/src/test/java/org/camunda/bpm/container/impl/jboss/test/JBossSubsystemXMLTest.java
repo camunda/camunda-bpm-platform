@@ -104,9 +104,9 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   public JBossSubsystemXMLTest() {
     super(ModelConstants.SUBSYSTEM_NAME, new BpmPlatformExtension(), getSubsystemRemoveOrderComparator());
   }
-  
+
   private static Map<String, String> EXPRESSION_PROPERTIES = new HashMap<>();
-  
+
   static {
     EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.process-engine.test.isDefault", "true");
     EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.process-engine.test.datasource", "java:jboss/datasources/ExampleDS");
@@ -126,7 +126,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.job-executor.job-acquisition.default.acquisition-strategy", "SEQUENTIAL");
     EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.job-executor.job-acquisition.default.property.lockTimeInMillis", "300000");
     EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.job-executor.job-acquisition.default.property.waitTimeInMillis", "5000");
-    EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.job-executor.job-acquisition.default.property.maxJobsPerAcquisition", "3");                                             
+    EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.job-executor.job-acquisition.default.property.maxJobsPerAcquisition", "3");
   }
 
   @Test
@@ -258,6 +258,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
         .build();
 
     ServiceContainer container = services.getContainer();
+    container.dumpServices();
     ServiceController<?> serviceController = container.getService(PLATFORM_BPM_PLATFORM_PLUGINS_SERVICE_NAME);
     assertNotNull(serviceController);
     Object platformPlugins = serviceController.getValue();
@@ -560,7 +561,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   public void testParseAndMarshalModelWithRequiredOptionsOnly() throws Exception {
     parseAndMarshalSubsystemModelFromFile(SUBSYSTEM_WITH_REQUIRED_OPTIONS);
   }
-  
+
   @Test
   public void testParseAndMarshalModelWithAllAvailableOptionsWithExpressions() throws Exception {
     System.getProperties().putAll(EXPRESSION_PROPERTIES);
@@ -572,7 +573,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
       }
     }
   }
-  
+
   @Test
   public void testParseSubsystemXmlWithAllOptionsWithExpressions() throws Exception {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_ALL_OPTIONS_WITH_EXPRESSIONS);
@@ -602,7 +603,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
           .setSubsystemXml(subsystemXml)
           .build();
       ServiceContainer container = services.getContainer();
-  
+
       assertNotNull("platform service should be installed", container.getRequiredService(PLATFORM_SERVICE_NAME));
       assertNotNull("process engine service should be bound in JNDI", container.getRequiredService(PROCESS_ENGINE_SERVICE_BINDING_SERVICE_NAME));
 
@@ -621,7 +622,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
 
       // check we have parsed the plugin configurations
       List<ProcessEnginePluginXml> pluginConfigurations = metadata.getPluginConfigurations();
-      
+
       assertEquals(1, pluginConfigurations.size());
 
       ProcessEnginePluginXml processEnginePluginXml = pluginConfigurations.get(0);
@@ -636,7 +637,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
       }
     }
   }
-  
+
   // HELPERS
 
   /**
@@ -714,15 +715,15 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
       }
     };
   }
-  
+
   private void assertExpressionType(ModelNode operation, String... elements) {
     assertModelType(ModelType.EXPRESSION, operation, elements);
   }
-  
+
   private void assertStringType(ModelNode operation, String... elements) {
     assertModelType(ModelType.STRING, operation, elements);
   }
-  
+
   private void assertModelType(ModelType type, ModelNode operation, String... elements) {
     for (String element : elements) {
       assertEquals(type, operation.get(element).getType());

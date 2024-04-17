@@ -40,6 +40,7 @@ import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessApplication
 import org.camunda.bpm.container.impl.jboss.service.ProcessApplicationDeploymentService;
 import org.camunda.bpm.container.impl.jboss.service.ProcessApplicationStartService;
 import org.camunda.bpm.container.impl.jboss.service.ProcessApplicationStopService;
+import org.camunda.bpm.container.impl.jboss.service.ProcessApplicationStopServiceCopy;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.jboss.util.JBossCompatibilityExtension;
 import org.camunda.bpm.container.impl.jboss.util.ProcessesXmlWrapper;
@@ -63,6 +64,8 @@ import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.vfs.VirtualFile;
+import org.wildfly.subsystem.service.ServiceInstaller;
+import org.wildfly.subsystem.service.ServiceInstaller.UnaryBuilder;
 
 
 /**
@@ -98,10 +101,17 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     final ServiceName paStopServiceName = ServiceNames.forProcessApplicationStopService(moduleName);
     final ServiceName noViewStartService = ServiceNames.forNoViewProcessApplicationStartService(moduleName);
 
+//    org.wildfly.service.ServiceDependency<V> ds ;
+//    ServiceInstaller.builder(ds).install(phaseContext.getRequirementServiceTarget());
+    ProcessApplicationStopServiceCopy c = new ProcessApplicationStopServiceCopy();
+   UnaryBuilder<ProcessApplicationStopServiceCopy, ProcessApplicationStopServiceCopy> builder = ServiceInstaller.builder(c);
+   builder.asActive();
+
     List<ServiceName> deploymentServiceNames = new ArrayList<>();
 
     ServiceBuilder<?> stopServiceBuilder = phaseContext.getRequirementServiceTarget().addService(paStopServiceName);
     Consumer<ProcessApplicationStopService> paStopProvider = stopServiceBuilder.provides(paStopServiceName);
+    UnaryBuilder<ProcessApplicationStopServiceCopy, ProcessApplicationStopServiceCopy> provider = builder.provides(paStopServiceName);
     stopServiceBuilder.requires(phaseContext.getPhaseServiceName());
     Supplier<BpmPlatformPlugins> platformPluginsSupplier = stopServiceBuilder.requires(ServiceNames.forBpmPlatformPlugins());
 

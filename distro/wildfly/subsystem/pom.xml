@@ -72,6 +72,20 @@
 
     <dependency>
       <groupId>org.wildfly.core</groupId>
+      <artifactId>wildfly-subsystem</artifactId>
+      <version>${version.wildfly.core}</version>
+            <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.wildfly.core</groupId>
+      <artifactId>wildfly-service</artifactId>
+      <version>${version.wildfly.core}</version>
+            <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.wildfly.core</groupId>
       <artifactId>wildfly-subsystem-test-framework</artifactId>
       <version>${version.wildfly.core}</version>
       <scope>test</scope>
@@ -82,6 +96,11 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.msc</groupId>
+      <artifactId>jboss-msc</artifactId>
+      <version>1.5.4.Final</version>
     </dependency>
   </dependencies>
 
