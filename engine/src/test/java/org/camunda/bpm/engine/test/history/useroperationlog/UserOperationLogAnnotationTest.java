@@ -20,9 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.HistoryService;
@@ -48,7 +49,7 @@ public class UserOperationLogAnnotationTest {
   protected static final String ANNOTATION = "anAnnotation";
   protected static final String TASK_NAME = "aTaskName";
   protected static final String OPERATION_ID = "operationId";
-  protected final Date CREATE_TIME = new Date(1363608000000L);
+  protected final Date CREATE_TIME = new GregorianCalendar(2013, Calendar.MARCH, 18, 13, 0, 0).getTime();
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule engineTestRule = new ProcessEngineTestRule(engineRule);
