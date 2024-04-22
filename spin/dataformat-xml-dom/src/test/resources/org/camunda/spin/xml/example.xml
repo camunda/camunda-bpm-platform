@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<customers xmlns="http://camunda.org/example" xmlns:ex="http://camunda.org/example" order="order1" ex:dueUntil="20150112">
+  <date name="20140512" />
+  <file xmlns=""/>
+  <customer id="customer1">
+    <name>Kermit</name>
+    <contractStartDate>1354539722</contractStartDate>
+  </customer>
+  <customer id="customer2">
+    <name>Waldo</name>
+    <contractStartDate>1320325322</contractStartDate>
+  </customer>
+  <customer id="customer3">
+    <name>Johnny</name>
+    <contractStartDate>1286110922</contractStartDate>
+  </customer>
+  <info xmlns=""/>
+  <info xmlns=""/>
+</customers>
