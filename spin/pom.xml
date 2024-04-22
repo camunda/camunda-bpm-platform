@@ -24,7 +24,6 @@
 
   <properties>
     <json-junit-fluent.version>1.1.6</json-junit-fluent.version>
-    <json-path.version>2.9.0</json-path.version>
     <powermock.version>2.0.9</powermock.version>
     <mockito.version>3.3.3</mockito.version>
     <spin.version.old>1.22.0</spin.version.old>
@@ -110,7 +109,7 @@
       <dependency>
         <groupId>com.jayway.jsonpath</groupId>
         <artifactId>json-path</artifactId>
-        <version>${json-path.version}</version>
+        <version>${version.json-path}</version>
       </dependency>
 
     </dependencies>

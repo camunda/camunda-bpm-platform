@@ -29,6 +29,10 @@
     <version.groovy>2.4.21</version.groovy>
     <version.graal.js>21.1.0</version.graal.js>
     <version.icu.icu4j>68.2</version.icu.icu4j>
+    <!-- json-smart and accessors-smart are runtime dependencies of json-path -->
+    <version.json-path>2.9.0</version.json-path>
+    <version.json-smart>2.5.0</version.json-smart>
+    <version.accessors-smart>2.5.0</version.accessors-smart>
     <version.gson>2.8.9</version.gson>
     <version.openjpa>2.4.3</version.openjpa>
     <version.hibernate>5.6.5.Final</version.hibernate>
@@ -75,6 +79,7 @@
 
     <!-- OSGi bundles properties -->
     <camunda.artifact />
+<!--    TODO can be removed for spin? -->
     <camunda.osgi.import.camunda.spin.version>version="[$(version;==;${camunda.spin.version.clean}),$(version;=+;${camunda.spin.version.clean}))"</camunda.osgi.import.camunda.spin.version>
     <camunda.osgi.import.camunda.connect.version>version="[$(version;==;${camunda.connect.version.clean}),$(version;=+;${camunda.connect.version.clean}))"</camunda.osgi.import.camunda.connect.version>
     <camunda.osgi.import.camunda.commons.version>version="[$(version;==;${camunda.commons.version.clean}),$(version;=+;${camunda.commons.version.clean}))"</camunda.osgi.import.camunda.commons.version>
