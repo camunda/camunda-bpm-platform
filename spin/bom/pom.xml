@@ -10,7 +10,6 @@
 
   <groupId>org.camunda.spin</groupId>
   <artifactId>camunda-spin-bom</artifactId>
-  <!-- <version>${project.version}</version> -->
   <name>camunda spin - bom</name>
   <packaging>pom</packaging>
 
