@@ -54,7 +54,7 @@
                            "version": 2
                          },
                          "tenantId":"aTenantId",
-			             "taskState": "aTaskState"
+			 "taskState": "aTaskState"
                        }
                      }'] />
 
