@@ -204,6 +204,13 @@
         <artifactId>camunda-bpm-assert</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.camunda.commons</groupId>
+        <artifactId>camunda-commons-bom</artifactId>
+        <version>${project.version}</version>
+        <!-- <scope>import</scope> -->
+        <!-- <type>pom</type> -->
+      </dependency>
 
       <!-- dmn engine dependencies
        -->
@@ -243,17 +250,6 @@
         <groupId>org.camunda.bpm.springboot</groupId>
         <artifactId>camunda-bpm-spring-boot-starter-external-task-client</artifactId>
         <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <!--
-            make sure everybody uses the same commons version
-        -->
-        <groupId>org.camunda.commons</groupId>
-        <artifactId>camunda-commons-bom</artifactId>
-        <version>${version.camunda.commons}</version>
-        <scope>import</scope>
-        <type>pom</type>
       </dependency>
 
       <!-- camunda-commons-typed-values: part of the platform and shares the same version -->
