@@ -21,10 +21,6 @@ values ('1000', CURRENT_TIMESTAMP, '7.21.0');
 alter table ACT_RU_EXT_TASK
   add CREATE_TIME_ datetime2;
 
-alter table ACT_RU_TASK add column TASK_STATE_ nvarchar(64);
-
-alter table ACT_HI_TASKINST add column TASK_STATE_ nvarchar(64);
-
 alter table ACT_RU_JOB
   add ROOT_PROC_INST_ID_ nvarchar(64);
 

@@ -162,9 +162,6 @@ public abstract class MockProvider {
   public static final String ANOTHER_EXAMPLE_TENANT_ID = "anotherTenantId";
   public static final String EXAMPLE_TENANT_ID_LIST = EXAMPLE_TENANT_ID + "," + ANOTHER_EXAMPLE_TENANT_ID;
 
-  /**
-   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
-   */
   // task State
   public static final String EXAMPLE_HISTORIC_TASK_STATE = "aTaskState";
 

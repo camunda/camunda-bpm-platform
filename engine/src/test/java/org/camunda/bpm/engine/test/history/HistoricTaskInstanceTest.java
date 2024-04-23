@@ -64,6 +64,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
 
     // Set priority to non-default value
     Task runtimeTask = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+    assertEquals("Created", runtimeTask.getTaskState());
     runtimeTask.setPriority(1234);
 
     // Set due-date
@@ -88,10 +89,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     assertNull(historicTaskInstance.getCaseDefinitionId());
     assertNull(historicTaskInstance.getCaseInstanceId());
     assertNull(historicTaskInstance.getCaseExecutionId());
-    /**
-     * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
-     */
-    assertEquals("Created", historicTaskInstance.getTaskState());
+    assertEquals("Updated", historicTaskInstance.getTaskState());
 
     // the activity instance id is set
     assertEquals(((TaskEntity)runtimeTask).getExecution().getActivityInstanceId(), historicTaskInstance.getActivityInstanceId());
@@ -306,6 +304,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     // task exists & has no assignee:
     HistoricTaskInstance hti = historyService.createHistoricTaskInstanceQuery().singleResult();
     assertNull(hti.getAssignee());
+    assertEquals("Created", hti.getTaskState());
 
     // assign task to jonny:
     taskService.setAssignee(task.getId(), "jonny");
@@ -314,8 +313,15 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     hti = historyService.createHistoricTaskInstanceQuery().singleResult();
     assertEquals("jonny", hti.getAssignee());
     assertNull(hti.getOwner());
+    assertEquals("Updated", hti.getTaskState());
 
     taskService.deleteTask(task.getId());
+    HistoricTaskInstance htiDeleted = historyService
+            .createHistoricTaskInstanceQuery()
+            .taskId(task.getId())
+            .singleResult();
+    assertEquals("Deleted", htiDeleted.getTaskState());
+
     historyService.deleteHistoricTaskInstance(hti.getId());
   }
 

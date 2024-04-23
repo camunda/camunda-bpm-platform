@@ -113,7 +113,6 @@ public interface HistoricTaskInstance {
 
   /**
    * Task State also referred as lifeCycleState
-   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
    */
   String getTaskState();
 }

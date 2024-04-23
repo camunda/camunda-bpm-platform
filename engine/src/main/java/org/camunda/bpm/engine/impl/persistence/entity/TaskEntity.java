@@ -129,7 +129,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   protected String tenantId;
   /**
    * Task State of task
-   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
    */
   protected String taskState;
 
@@ -194,8 +193,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public static final String CASE_INSTANCE_ID = "caseInstanceId";
 
   /**
-   * Task state that will be stored in running and history task table
-   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
+   * Task state that will be stored in runtime and historic task table
    */
   public static final String TASK_STATE_INIT = "Init";
   public static final String TASK_STATE_CREATED = "Created";
@@ -208,7 +206,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
    */
   public TaskEntity() {
     this.lifecycleState = TaskState.STATE_CREATED;
-    this.taskState = getTaskStateText(this.lifecycleState);
+    this.taskState = TaskState.STATE_CREATED.taskState;
   }
 
   /**
@@ -217,14 +215,14 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public TaskEntity(String id) {
     this(TaskState.STATE_INIT);
     this.id = id;
-    this.taskState = TaskState.STATE_INIT.name();
+    this.taskState = TaskState.STATE_INIT.taskState;
   }
 
   protected TaskEntity(TaskState initialState) {
     this.isIdentityLinksInitialized = true;
     this.setCreateTime(ClockUtil.getCurrentTime());
     this.lifecycleState = initialState;
-    this.taskState = getTaskStateText(this.lifecycleState);
+    this.taskState = this.lifecycleState.taskState;
   }
 
   /**
@@ -457,6 +455,9 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
     if (tenantId != null) {
       persistentState.put("tenantId", this.tenantId);
+    }
+    if (taskState != null) {
+      persistentState.put("taskState", this.taskState);
     }
 
     persistentState.put("suspensionState", this.suspensionState);
@@ -1185,7 +1186,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   public boolean transitionTo(TaskState state) {
     this.lifecycleState = state;
-    this.taskState = getTaskStateText(this.lifecycleState);
+    this.taskState = this.lifecycleState.taskState;
 
     switch (state) {
     case STATE_CREATED:
@@ -1799,34 +1800,19 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     EscalationHandler.propagateEscalation(activityExecution, escalationCode);
   }
 
-  /**
-   * Returns task State name as per enum
-   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
-   */
-  public String getTaskStateText(TaskState state){
-
-    switch (state) {
-      case STATE_CREATED:
-        return TaskEntity.TASK_STATE_CREATED;
-
-      case STATE_COMPLETED:
-        return TaskEntity.TASK_STATE_COMPLETED;
-
-      case STATE_DELETED:
-        return TaskEntity.TASK_STATE_DELETED;
-
-      case STATE_INIT:
-      default:
-        return TaskEntity.TASK_STATE_INIT;
-    }
-  }
-
   public static enum TaskState {
 
-    STATE_INIT,
-    STATE_CREATED,
-    STATE_COMPLETED,
-    STATE_DELETED
+    STATE_INIT ("Init"),
+    STATE_CREATED ("Created"),
+    STATE_COMPLETED ("Completed"),
+    STATE_DELETED ("Deleted"),
+    STATE_UPDATED ("Updated");
+
+    private String taskState;
+
+    private TaskState(String taskState) {
+      this.taskState = taskState;
+    }
   }
 
 }

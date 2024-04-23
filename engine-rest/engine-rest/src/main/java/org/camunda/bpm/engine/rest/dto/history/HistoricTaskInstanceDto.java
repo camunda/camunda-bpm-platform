@@ -54,7 +54,6 @@ public class HistoricTaskInstanceDto {
   protected String rootProcessInstanceId;
   /**
    * Returns task State of history tasks
-   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
    */
   protected String taskState;
 
@@ -164,7 +163,6 @@ public class HistoricTaskInstanceDto {
 
   /**
    * Returns task State of history tasks
-   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
    */
   public String getTaskState() { return taskState; }
 

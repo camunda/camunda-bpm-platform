@@ -2539,9 +2539,6 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
     String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
     String returnedCaseExecutionId = from(content).getString("[0].caseExecutionId");
     String returnedTenantId = from(content).getString("[0].tenantId");
-    /**
-     * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
-     */
     String returnedTaskState = from(content).getString("[0].taskState");
     Date returnedRemovalTime = DateTimeUtil.parseDate(from(content).getString("[0].removalTime"));
     String returnedRootProcessInstanceId = from(content).getString("[0].rootProcessInstanceId");

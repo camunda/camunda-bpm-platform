@@ -51,7 +51,6 @@ public class TaskDto {
   private String tenantId;
   /**
    * Returns task State of task
-   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
    */
   private String taskState;
 
@@ -199,9 +198,6 @@ public class TaskDto {
     this.tenantId = tenantId;
   }
 
-  /**
-   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
-   */
   public String getTaskState() {
     return taskState;
   }

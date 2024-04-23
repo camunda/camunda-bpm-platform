@@ -165,9 +165,6 @@ public class MockTaskBuilder {
     return this;
   }
 
-  /**
-   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4046
-   */
   public MockTaskBuilder taskState(String taskState) {
     this.taskState = taskState;
     return this;
