@@ -55,6 +55,7 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+      <version>${project.version}</version>
       <optional>true</optional>
     </dependency>
 
