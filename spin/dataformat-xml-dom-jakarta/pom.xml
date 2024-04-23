@@ -4,14 +4,13 @@
   <parent>
     <groupId>org.camunda.spin</groupId>
     <artifactId>camunda-spin-root</artifactId>
-    <version>1.24.0-SNAPSHOT</version>
+    <version>7.22.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-spin-dataformat-xml-dom-jakarta</artifactId>
   <name>camunda Spin - DOM XML data format Jakarta</name>
 
   <properties>
-    <xml.bind-api.version>4.0.0</xml.bind-api.version>
     <jaxb-runtime.version>4.0.1</jaxb-runtime.version>
   </properties>
 
@@ -30,10 +29,11 @@
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-utils</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
+      <version>${version.jakarta.xml.bind-api}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -243,11 +243,22 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>properties</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.eclipse.transformer</groupId>
         <artifactId>transformer-maven-plugin</artifactId>
-        <version>0.5.0</version>
         <configuration>
-          <rules>
+          <rules combine.self="override">
             <jakartaDefaults>true</jakartaDefaults>
           </rules>
         </configuration>
