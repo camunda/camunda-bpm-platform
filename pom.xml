@@ -76,6 +76,7 @@
         <module>engine-dmn</module>
         <module>juel</module>
         <module>spin</module>
+        <module>commons</module>
 
         <module>test-utils/testcontainers</module>
         <module>test-utils/junit5-extension</module>
@@ -269,6 +270,7 @@
         <module>engine-dmn</module>
         <module>juel</module>
         <module>spin</module>
+        <module>commons</module>
 
         <module>javaee/ejb-client</module>
         <module>javaee/ejb-client-jakarta</module>
