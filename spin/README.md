@@ -6,8 +6,8 @@ camunda-spin
   <a href="https://docs.camunda.org/manual/reference/spin/">Documentation</a> |
   <a href="https://forum.camunda.org/">Forum</a> |
   <a href="https://app.camunda.com/jira/browse/CAM">Issues</a> |
-  <a href="LICENSE">License</a> |
-  <a href="CONTRIBUTING.md">Contribute</a>
+  <a href="../LICENSE">License</a> |
+  <a href="../CONTRIBUTING.md">Contribute</a>
 </p>
 
 Library for simple XML and JSON processing on the JVM (Java Virtual Machine), targeting Java and
@@ -77,4 +77,4 @@ Have a look at our [contribution guide](https://github.com/camunda/camunda-bpm-p
 
 # License:
 
-The source files in this repository are made available under the [Apache License Version 2.0](./LICENSE).
+The source files in this repository are made available under the [Apache License Version 2.0](../LICENSE).
