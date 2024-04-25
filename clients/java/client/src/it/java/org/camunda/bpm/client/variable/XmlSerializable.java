@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.client.variable;
 
-import jakarta.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 class XmlSerializable extends XmlSerializableNoAnnotation {
