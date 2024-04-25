@@ -574,7 +574,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
 
   public void noDeploymentLockPropertyFound() {
     logError(
-        "068", "No deployment lock property found in databse");
+        "068", "No deployment lock property found in database");
   }
 
   public void debugJobExecuted(JobEntity jobEntity) {
@@ -624,7 +624,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   public ProcessEngineException deleteProcessDefinitionWithProcessInstancesException(String processDefinitionId, Long processInstanceCount) {
     return new ProcessEngineException(exceptionMessage(
         "076",
-        "Deletion of process definition without cascading failed. Process definition with id: {} can't be deleted, since there exists {} dependening process instances.",
+        "Deletion of process definition without cascading failed. Process definition with id: {} can't be deleted, because there are {} dependent process instances.",
         processDefinitionId, processInstanceCount
         ));
   }
@@ -640,7 +640,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
 
   public void noHistoryCleanupLockPropertyFound() {
     logError(
-        "078", "No history cleanup lock property found in databse");
+        "078", "No history cleanup lock property found in database");
   }
 
   public void logUpdateUnrelatedCaseDefinitionEntity(String thisKey, String thatKey, String thisDeploymentId, String thatDeploymentId) {
