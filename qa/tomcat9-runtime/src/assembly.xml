@@ -12,13 +12,6 @@
 
   <dependencySets>
    <dependencySet>
-      <outputDirectory>/</outputDirectory>
-      <includes>
-        <include>org.camunda.bpm:license-book:zip</include>
-      </includes>
-      <unpack>true</unpack>
-    </dependencySet>
-   <dependencySet>
       <outputDirectory>server/</outputDirectory>
       <includes>
         <include>org.apache.tomcat:tomcat:tar.gz</include>
@@ -31,7 +24,7 @@
       <unpack>true</unpack>
     </dependencySet>
     <dependencySet>
-      <outputDirectory>server/apache-tomcat-${version.tomcat}/lib</outputDirectory>
+      <outputDirectory>server/apache-tomcat-${version.tomcat9}/lib</outputDirectory>
       <includes>
 
         <include>com.h2database:h2:jar</include>
@@ -115,63 +108,13 @@
 
   <files>
     <file>
-      <source>src/README.txt</source>
-      <filtered>true</filtered>
-      <lineEnding>crlf</lineEnding>
-      <outputDirectory></outputDirectory>
-    </file>
-    <file>
-      <source>../../license/LICENSE</source>
-      <filtered>true</filtered>
-      <lineEnding>crlf</lineEnding>
-      <outputDirectory></outputDirectory>
-    </file>
-    <file>
-      <source>../../license/NOTICE</source>
-      <filtered>true</filtered>
-      <lineEnding>crlf</lineEnding>
-      <outputDirectory></outputDirectory>
-    </file>
-    <file>
-      <source>src/start-camunda.bat</source>
-      <filtered>true</filtered>
-      <outputDirectory></outputDirectory>
-    </file>
-    <file>
-      <source>src/start-camunda.sh</source>
-      <filtered>true</filtered>
-      <outputDirectory></outputDirectory>
-      <fileMode>0755</fileMode>
-    </file>
-    <file>
-      <source>src/shutdown-camunda.bat</source>
-      <filtered>true</filtered>
-      <outputDirectory></outputDirectory>
-    </file>
-    <file>
-      <source>src/shutdown-camunda.sh</source>
-      <filtered>true</filtered>
-      <outputDirectory></outputDirectory>
-      <fileMode>0755</fileMode>
-    </file>
-
-    <file>
-      <source>src/conf/server.xml</source>
-      <outputDirectory>server/apache-tomcat-${version.tomcat}/conf/</outputDirectory>
+      <source>src/main/conf/server.xml</source>
+      <outputDirectory>server/apache-tomcat-${version.tomcat9}/conf/</outputDirectory>
     </file>
     
     <file>
-      <source>src/conf/bpm-platform.xml</source>
-      <outputDirectory>server/apache-tomcat-${version.tomcat}/conf/</outputDirectory>
-    </file>
-      
-    <file>
-      <source>src/tomcat/setenv.bat</source>
-      <outputDirectory>server/apache-tomcat-${version.tomcat}/bin/</outputDirectory>
-    </file>
-    <file>
-      <source>src/tomcat/setenv.sh</source>
-      <outputDirectory>server/apache-tomcat-${version.tomcat}/bin/</outputDirectory>
+      <source>src/main/conf/bpm-platform.xml</source>
+      <outputDirectory>server/apache-tomcat-${version.tomcat9}/conf/</outputDirectory>
     </file>
   </files>
 </assembly>
