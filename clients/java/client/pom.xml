@@ -106,7 +106,7 @@
 
     <dependency>
       <groupId>org.camunda.spin</groupId>
-      <artifactId>camunda-spin-dataformat-xml-dom-jakarta</artifactId>
+      <artifactId>camunda-spin-dataformat-xml-dom-all</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -157,12 +157,7 @@
       <scope>provided</scope>
     </dependency>
     
-        <dependency>
-      <groupId>jakarta.xml.bind</groupId>
-      <artifactId>jakarta.xml.bind-api</artifactId>
-      <version>${version.jakarta.xml.bind-api}</version>
-      <scope>provided</scope>
-    </dependency>
+
 
     <dependency>
       <groupId>org.mockito</groupId>
