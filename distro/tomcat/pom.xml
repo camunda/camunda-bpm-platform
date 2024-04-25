@@ -34,6 +34,7 @@
       </activation>
       <modules>
         <module>assembly</module>
+        <module>assembly-jakarta</module>
       </modules>
     </profile>
     <profile>
@@ -44,6 +45,7 @@
       <modules>
         <module>distro</module>
         <module>webapp</module>
+        <module>webapp-jakarta</module>
       </modules>
     </profile>
   </profiles>

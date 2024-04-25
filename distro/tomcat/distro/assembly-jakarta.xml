@@ -14,7 +14,7 @@
     <dependencySet>
       <unpack>true</unpack>
       <includes>
-        <include>org.camunda.bpm.tomcat:camunda-tomcat-assembly</include>
+        <include>org.camunda.bpm.tomcat:camunda-tomcat-assembly-jakarta</include>
       </includes>
       <outputDirectory />
     </dependencySet>
@@ -34,25 +34,25 @@
 
     <dependencySet>
         <includes>
-            <include>org.camunda.bpm:camunda-engine-rest:war:*</include>
+            <include>org.camunda.bpm:camunda-engine-rest-jakarta:war:*</include>
         </includes>
-        <outputDirectory>server/apache-tomcat-${version.tomcat9}/webapps/engine-rest</outputDirectory>
+        <outputDirectory>server/apache-tomcat-${version.tomcat}/webapps/engine-rest</outputDirectory>
         <unpack>true</unpack>
     </dependencySet>
 
     <dependencySet>
         <includes>
-            <include>org.camunda.bpm.webapp:camunda-webapp-tomcat:war:*</include>
+            <include>org.camunda.bpm.webapp:camunda-webapp-tomcat-jakarta:war:*</include>
         </includes>
-        <outputDirectory>server/apache-tomcat-${version.tomcat9}/webapps/camunda</outputDirectory>
+        <outputDirectory>server/apache-tomcat-${version.tomcat}/webapps/camunda</outputDirectory>
         <unpack>true</unpack>
     </dependencySet>
 
     <dependencySet>
         <includes>
-            <include>org.camunda.bpm.example:camunda-example-invoice:war:*</include>
+            <include>org.camunda.bpm.example:camunda-example-invoice-jakarta:war:*</include>
         </includes>
-        <outputDirectory>server/apache-tomcat-${version.tomcat9}/webapps/camunda-invoice</outputDirectory>
+        <outputDirectory>server/apache-tomcat-${version.tomcat}/webapps/camunda-invoice</outputDirectory>
         <unpack>true</unpack>
     </dependencySet>
 
@@ -61,7 +61,7 @@
   <fileSets>
     <fileSet>
       <directory>../../camunda-welcome</directory>
-      <outputDirectory>server/apache-tomcat-${version.tomcat9}/webapps/camunda-welcome</outputDirectory>
+      <outputDirectory>server/apache-tomcat-${version.tomcat}/webapps/camunda-welcome</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>

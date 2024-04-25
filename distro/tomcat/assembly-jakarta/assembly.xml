@@ -31,7 +31,7 @@
       <unpack>true</unpack>
     </dependencySet>
     <dependencySet>
-      <outputDirectory>server/apache-tomcat-${version.tomcat9}/lib</outputDirectory>
+      <outputDirectory>server/apache-tomcat-${version.tomcat}/lib</outputDirectory>
       <includes>
 
         <include>com.h2database:h2:jar</include>
@@ -157,21 +157,21 @@
 
     <file>
       <source>src/conf/server.xml</source>
-      <outputDirectory>server/apache-tomcat-${version.tomcat9}/conf/</outputDirectory>
+      <outputDirectory>server/apache-tomcat-${version.tomcat}/conf/</outputDirectory>
     </file>
     
     <file>
       <source>src/conf/bpm-platform.xml</source>
-      <outputDirectory>server/apache-tomcat-${version.tomcat9}/conf/</outputDirectory>
+      <outputDirectory>server/apache-tomcat-${version.tomcat}/conf/</outputDirectory>
     </file>
       
     <file>
       <source>src/tomcat/setenv.bat</source>
-      <outputDirectory>server/apache-tomcat-${version.tomcat9}/bin/</outputDirectory>
+      <outputDirectory>server/apache-tomcat-${version.tomcat}/bin/</outputDirectory>
     </file>
     <file>
       <source>src/tomcat/setenv.sh</source>
-      <outputDirectory>server/apache-tomcat-${version.tomcat9}/bin/</outputDirectory>
+      <outputDirectory>server/apache-tomcat-${version.tomcat}/bin/</outputDirectory>
     </file>
   </files>
 </assembly>

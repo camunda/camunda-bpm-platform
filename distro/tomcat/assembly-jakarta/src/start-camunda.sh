@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export CATALINA_HOME="$(dirname "$0")/server/apache-tomcat-${version.tomcat9}"
+export CATALINA_HOME="$(dirname "$0")/server/apache-tomcat-${version.tomcat}"
 
 UNAME=`which uname`
 if [ -n "$UNAME" -a "`$UNAME`" = "Darwin" ]
@@ -27,4 +27,4 @@ else
   (sleep 5; $BROWSER "http://localhost:8080/camunda-welcome/index.html";) &
 fi
 
-/bin/sh "$(dirname "$0")/server/apache-tomcat-${version.tomcat9}/bin/startup.sh"
+/bin/sh "$(dirname "$0")/server/apache-tomcat-${version.tomcat}/bin/startup.sh"
