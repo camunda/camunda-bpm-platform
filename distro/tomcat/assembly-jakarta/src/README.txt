@@ -34,7 +34,7 @@ Contents:
         installed. 
 
         run the
-            server/apache-tomcat-${version.tomcat9}/bin/startup.{bat/sh}
+            server/apache-tomcat-${version.tomcat}/bin/startup.{bat/sh}
         script to start up the the server.
 
         After starting the server, you can access the 
@@ -54,6 +54,6 @@ Contents:
 ==================
 
 Camunda Platform version: ${project.version}
-Apache Tomcat Server version: ${version.tomcat9}
+Apache Tomcat Server version: ${version.tomcat}
 
 =================

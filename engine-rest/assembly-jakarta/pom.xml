@@ -93,6 +93,24 @@
           </execution>
 
           <execution>
+            <id>tomcat</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly-war-tomcat.xml</descriptor>
+              </descriptors>
+              <finalName>camunda-engine-rest-jakarta-${project.version}</finalName>
+              <attach>true</attach>
+              <classifier>tomcat</classifier>
+              <outputDirectory>target/</outputDirectory>
+              <workDirectory>target/assembly/work</workDirectory>
+            </configuration>
+          </execution>
+
+          <execution>
             <id>classes</id>
             <phase>package</phase>
             <goals>
