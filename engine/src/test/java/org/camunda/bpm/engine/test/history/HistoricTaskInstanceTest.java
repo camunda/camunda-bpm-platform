@@ -23,10 +23,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -1131,5 +1128,29 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     // then
     assertEquals(0, query.processInstanceBusinessKeyIn(businessKey1, businessKey2).processInstanceBusinessKey(unexistingBusinessKey).count());
     assertEquals(1, query.processInstanceBusinessKeyIn(businessKey2, businessKey3).processInstanceBusinessKey(businessKey2).count());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/multiprocess/rootProcess.bpmn",
+      "org/camunda/bpm/engine/test/api/multiprocess/secondLevelProcess.bpmn",
+      "org/camunda/bpm/engine/test/api/multiprocess/thirdLevelProcess.bpmn" })
+  public void testQueryByRootProcessInstanceId_2() {
+    // given process definitions
+
+    // when
+    String rootProcessId = runtimeService.startProcessInstanceByKey("root-process").getId();
+    runtimeService.startProcessInstanceByKey("process-3");
+    while (historyService.createHistoricProcessInstanceQuery().unfinished().count() > 0) {
+      taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+    }
+
+    // then
+    var allTaskInstances = historyService.createHistoricTaskInstanceQuery().list();
+    assertEquals(8, allTaskInstances.size());
+    assertEquals(6, allTaskInstances.stream().filter(task -> task.getRootProcessInstanceId().equals(rootProcessId)).count());
+
+    assertEquals(6, historyService.createHistoricTaskInstanceQuery().rootProcessInstanceId(rootProcessId).count());
+    var taskInstances = historyService.createHistoricTaskInstanceQuery().rootProcessInstanceId(rootProcessId).list();
+    assertEquals(6, taskInstances.size());
   }
 }
