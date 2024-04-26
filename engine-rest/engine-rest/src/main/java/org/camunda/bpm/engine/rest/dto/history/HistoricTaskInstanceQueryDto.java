@@ -100,6 +100,7 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected String taskId;
   protected String taskParentTaskId;
   protected String processInstanceId;
+  protected String rootProcessInstanceId;
   protected String processInstanceBusinessKey;
   protected String[] processInstanceBusinessKeyIn;
   protected String processInstanceBusinessKeyLike;
@@ -185,6 +186,11 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   @CamundaQueryParam("processInstanceId")
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+  }
+
+  @CamundaQueryParam("rootProcessInstanceId")
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
   @CamundaQueryParam("processInstanceBusinessKey")
@@ -494,6 +500,9 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     }
     if (processInstanceId != null) {
       query.processInstanceId(processInstanceId);
+    }
+    if (rootProcessInstanceId != null) {
+      query.rootProcessInstanceId(rootProcessInstanceId);
     }
     if (processInstanceBusinessKey != null) {
       query.processInstanceBusinessKey(processInstanceBusinessKey);
