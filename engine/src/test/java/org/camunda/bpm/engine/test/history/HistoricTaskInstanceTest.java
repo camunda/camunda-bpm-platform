@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -1131,5 +1132,28 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     // then
     assertEquals(0, query.processInstanceBusinessKeyIn(businessKey1, businessKey2).processInstanceBusinessKey(unexistingBusinessKey).count());
     assertEquals(1, query.processInstanceBusinessKeyIn(businessKey2, businessKey3).processInstanceBusinessKey(businessKey2).count());
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/history/multiprocess/rootProcess.bpmn",
+      "org/camunda/bpm/engine/test/api/history/multiprocess/secondLevelProcess.bpmn",
+      "org/camunda/bpm/engine/test/api/history/multiprocess/thirdLevelProcess.bpmn" })
+  @Test
+  public void testQueryByRootProcessInstanceId() {
+    // given
+    String rootProcessId = runtimeService.startProcessInstanceByKey("root-process").getId();
+    runtimeService.startProcessInstanceByKey("process-3");
+    while (historyService.createHistoricProcessInstanceQuery().unfinished().count() > 0) {
+      taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+    }
+    List<HistoricTaskInstance> allTaskInstances = historyService.createHistoricTaskInstanceQuery().list();
+
+    // when
+    HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery().rootProcessInstanceId(rootProcessId);
+
+    // then
+    assertEquals(8, allTaskInstances.size());
+    assertEquals(6, allTaskInstances.stream().filter(task -> task.getRootProcessInstanceId().equals(rootProcessId)).count());
+    assertEquals(6, historicTaskInstanceQuery.count());
+    assertEquals(6, historicTaskInstanceQuery.list().size());
   }
 }

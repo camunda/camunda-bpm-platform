@@ -46,6 +46,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected String processDefinitionKey;
   protected String processDefinitionName;
   protected String processInstanceId;
+  protected String rootProcessInstanceId;
   protected String processInstanceBusinessKey;
   protected String[] processInstanceBusinessKeys;
   protected String processInstanceBusinessKeyLike;
@@ -135,6 +136,12 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public HistoricTaskInstanceQueryImpl processInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQueryImpl rootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
     return this;
   }
 
@@ -783,6 +790,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public String getProcessInstanceId() {
     return processInstanceId;
+  }
+
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
   }
 
   public String getProcessInstanceBusinessKey() {
