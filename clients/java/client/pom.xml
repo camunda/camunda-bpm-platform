@@ -106,7 +106,7 @@
 
     <dependency>
       <groupId>org.camunda.spin</groupId>
-      <artifactId>camunda-spin-dataformat-xml-dom-all</artifactId>
+      <artifactId>camunda-spin-dataformat-all</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
