@@ -18,8 +18,20 @@ package org.camunda.bpm.engine.impl.metrics.util;
 
 import org.camunda.bpm.engine.management.Metrics;
 
-public class MetricsUtil {
+import java.util.HashSet;
+import java.util.Set;
 
+import static org.camunda.bpm.engine.management.Metrics.*;
+import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
+
+public class MetricsUtil {
+  public static final Set<String> METRICS_TO_REPORT = new HashSet<>();
+  static {
+    METRICS_TO_REPORT.add(ROOT_PROCESS_INSTANCE_START);
+    METRICS_TO_REPORT.add(EXECUTED_DECISION_INSTANCES);
+    METRICS_TO_REPORT.add(EXECUTED_DECISION_ELEMENTS);
+    METRICS_TO_REPORT.add(ACTIVTY_INSTANCE_START);
+  }
   /**
    * Resolves the internal name of the metric by the public name.
    *
