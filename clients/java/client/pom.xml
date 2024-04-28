@@ -27,6 +27,7 @@
 
     <cargo.timeout>240000</cargo.timeout>
     <cargo.deploy.timeout>60000</cargo.deploy.timeout>
+    <version.camunda.spin>1.23.0</version.camunda.spin>  
   </properties>
 
   <dependencyManagement>
@@ -107,7 +108,7 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-all</artifactId>
-      <version>${project.version}</version>
+      <version>${version.camunda.spin}</version>
       <scope>test</scope>
     </dependency>
 
@@ -154,13 +155,6 @@
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
       <version>${version.xml.jaxb-impl4}</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>jakarta.xml.bind</groupId>
-      <artifactId>jakarta.xml.bind-api</artifactId>
-      <version>${version.jakarta.xml.bind-api}</version>
       <scope>provided</scope>
     </dependency>
 
