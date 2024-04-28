@@ -5,9 +5,24 @@
       id = "getTelemetryData"
       tag = "Telemetry"
       summary = "Fetch Telemetry Data"
-      desc = "Fetches Telemetry Data." />
+      desc = "Fetches metrics count based on the start and end date" />
 
-  "parameters" : [],
+    "parameters" : [
+    <@lib.parameter
+        name = "startDate"
+        location = "query"
+        type = "string"
+        format = "date-time"
+        desc = "The start date (inclusive)."/>
+
+    <@lib.parameter
+        name = "endDate"
+        location = "query"
+        type = "string"
+        format = "date-time"
+        last = true
+        desc = "The end date (exclusive)."/>
+    ],
 
   "responses" : {
 

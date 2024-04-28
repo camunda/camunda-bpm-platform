@@ -1304,7 +1304,14 @@ public interface ManagementService {
    */
   void deleteMetrics(Date timestamp);
 
-
+  /**
+   * Fetches metric count from persistence storage
+   *
+   *
+   * @param metricsName name of metrics
+   * @param startDate start date of date range
+   * @param endDate end date of date range
+   */
   Number getMetricsSum(String metricsName, Date startDate, Date endDate);
 
   /**
