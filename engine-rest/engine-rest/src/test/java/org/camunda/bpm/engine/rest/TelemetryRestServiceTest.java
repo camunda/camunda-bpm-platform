@@ -190,7 +190,7 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
 
   @Test
   public void shouldGetTelemetryData() throws JsonProcessingException {
-    when(managementServiceMock.getTelemetryData()).thenReturn(MockProvider.EXAMPLE_TELEMETRY_DATA);
+    when(managementServiceMock.getTelemetryData(null, null, null)).thenReturn(MockProvider.EXAMPLE_TELEMETRY_DATA);
 
     given()
     .then()
@@ -252,7 +252,7 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
     when(internals.getWebapps()).thenReturn(new HashSet<>());
     // license key may be null and is therefore not mocked
 
-    when(managementServiceMock.getTelemetryData()).thenReturn(telemetryData);
+    when(managementServiceMock.getTelemetryData(null, null, null)).thenReturn(telemetryData);
 
     given()
     .then()

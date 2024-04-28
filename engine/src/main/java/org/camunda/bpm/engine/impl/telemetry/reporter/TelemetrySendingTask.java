@@ -22,9 +22,8 @@ import static org.camunda.bpm.engine.impl.util.ConnectUtil.addRequestTimeoutConf
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.assembleRequestParameters;
 import static org.camunda.bpm.engine.impl.util.StringUtil.hasText;
 import java.net.HttpURLConnection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimerTask;
+import java.util.*;
+
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.IsTelemetryEnabledCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -92,12 +91,12 @@ public class TelemetrySendingTask extends TimerTask {
 
     TelemetryUtil.toggleLocalTelemetry(true, telemetryRegistry, metricsRegistry);
 
-    performDataSend(() -> updateAndSendData(true, true));
+    performDataSend(() -> updateAndSendData(true, true, null));
   }
 
-  public TelemetryDataImpl updateAndSendData(boolean sendData, boolean addLegacyNames) {
+  public TelemetryDataImpl updateAndSendData(boolean sendData, boolean addLegacyNames, String metricFilter) {
     updateStaticData();
-    InternalsImpl dynamicData = resolveDynamicData(sendData, addLegacyNames);
+    InternalsImpl dynamicData = resolveDynamicData(sendData, addLegacyNames, metricFilter);
     TelemetryDataImpl mergedData = new TelemetryDataImpl(staticData);
     mergedData.mergeInternals(dynamicData);
 
@@ -198,10 +197,10 @@ public class TelemetrySendingTask extends TimerTask {
     }
   }
 
-  protected InternalsImpl resolveDynamicData(boolean reset, boolean addLegacyNames) {
+  protected InternalsImpl resolveDynamicData(boolean reset, boolean addLegacyNames, String metricFilter) {
     InternalsImpl result = new InternalsImpl();
 
-    Map<String, Metric> metrics = calculateMetrics(reset, addLegacyNames);
+    Map<String, Metric> metrics = calculateMetrics(reset, addLegacyNames, metricFilter);
     result.setMetrics(metrics);
 
     // command counts are modified after the metrics are retrieved, because
@@ -228,14 +227,21 @@ public class TelemetrySendingTask extends TimerTask {
     return commandsToReport;
   }
 
-  protected Map<String, Metric> calculateMetrics(boolean reset, boolean addLegacyNames) {
+  protected Map<String, Metric> calculateMetrics(boolean reset, boolean addLegacyNames, String metricFilter) {
 
     Map<String, Metric> metrics = new HashMap<>();
 
     if (metricsRegistry != null) {
       Map<String, Meter> telemetryMeters = metricsRegistry.getTelemetryMeters();
 
-      for (String metricToReport : MetricsUtil.METRICS_TO_REPORT) {
+      Set<String> metricsToReport = MetricsUtil.METRICS_TO_REPORT;
+      if (metricFilter != null)
+        metricsToReport = Collections.singleton(MetricsUtil.resolveInternalName(metricFilter));
+
+      for (String metricToReport : metricsToReport) {
+
+        if (telemetryMeters.get(metricToReport) == null)
+          continue;
         long value = telemetryMeters.get(metricToReport).get(reset);
 
         if (addLegacyNames) {

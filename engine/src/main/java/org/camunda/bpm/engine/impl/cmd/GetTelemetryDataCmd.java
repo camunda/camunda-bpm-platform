@@ -26,6 +26,12 @@ import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 
 public class GetTelemetryDataCmd implements Command<TelemetryDataImpl> {
 
+  String metricFilter;
+
+  public GetTelemetryDataCmd(String metricFilter){
+    this.metricFilter = metricFilter;
+  }
+
   ProcessEngineConfigurationImpl configuration;
 
   @Override
@@ -36,7 +42,7 @@ public class GetTelemetryDataCmd implements Command<TelemetryDataImpl> {
 
     TelemetryReporter telemetryReporter = configuration.getTelemetryReporter();
     if (telemetryReporter != null) {
-      return telemetryReporter.getTelemetrySendingTask().updateAndSendData(false, false);
+      return telemetryReporter.getTelemetrySendingTask().updateAndSendData(false, false, metricFilter);
     } else {
       throw ProcessEngineLogger.TELEMETRY_LOGGER.exceptionWhileRetrievingTelemetryDataRegistryNull();
     }

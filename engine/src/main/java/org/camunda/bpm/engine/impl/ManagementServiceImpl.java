@@ -586,11 +586,15 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   }
 
   @Override
-  public TelemetryData getTelemetryData(Date startDate, Date endDate) {
-    TelemetryDataImpl telemetryData = commandExecutor.execute(new GetTelemetryDataCmd());
+  public TelemetryData getTelemetryData(String metricFilter, Date startDate, Date endDate) {
+    TelemetryDataImpl telemetryData = commandExecutor.execute(new GetTelemetryDataCmd(metricFilter));
     if (startDate != null || endDate != null) {
       Map<String, Metric> metrics = new HashMap<>();
-      for (String metric : MetricsUtil.METRICS_TO_REPORT) {
+      Set<String> metricsNeedToReturn = MetricsUtil.METRICS_TO_REPORT;
+      if (metricFilter != null)
+        metricsNeedToReturn = Collections.singleton(metricFilter);
+
+      for (String metric : metricsNeedToReturn) {
         String metricPublicName = MetricsUtil.resolvePublicName(metric);
         metrics.put(metricPublicName, new MetricImpl((long) getMetricsSum(metricPublicName, startDate, endDate)));
       }

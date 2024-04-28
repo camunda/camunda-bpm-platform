@@ -1460,6 +1460,6 @@ public interface ManagementService {
    *
    * @see <a href="https://docs.camunda.org/manual/latest/introduction/telemetry/#collected-data">Camunda Documentation: Telemetry</a>
    */
-  TelemetryData getTelemetryData(Date startDate, Date endDate);
+  TelemetryData getTelemetryData(String metricFilter, Date startDate, Date endDate);
 
 }

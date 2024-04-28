@@ -56,7 +56,7 @@ public class TelemetryRestServiceImpl extends AbstractRestProcessEngineAware imp
     ManagementService managementService = getProcessEngine().getManagementService();
     DateConverter dateConverter = new DateConverter();
     dateConverter.setObjectMapper(objectMapper);
-    TelemetryData data = managementService.getTelemetryData(MetricsUtil.extractStartDate(uriInfo.getQueryParameters(), dateConverter),
+    TelemetryData data = managementService.getTelemetryData(uriInfo.getQueryParameters().getFirst("metricsFilter"), MetricsUtil.extractStartDate(uriInfo.getQueryParameters(), dateConverter),
             MetricsUtil.extractEndDate(uriInfo.getQueryParameters(), dateConverter));
 
     return TelemetryDataDto.fromEngineDto(data);
