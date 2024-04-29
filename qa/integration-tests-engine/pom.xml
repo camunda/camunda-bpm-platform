@@ -496,7 +496,7 @@
     </profile>
 
     <profile>
-      <id>tomcat</id>
+      <id>tomcat9</id>
       <dependencyManagement>
         <dependencies>
           <!-- import internal dependencies before JBoss to preserve internal versions, e.g. for JUnit -->
