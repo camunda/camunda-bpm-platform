@@ -228,7 +228,7 @@
         </executions>
       </plugin>
 
-      <!-- <plugin>
+      <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
@@ -241,9 +241,9 @@
             </goals>
           </execution>
         </executions>
-      </plugin> -->
+      </plugin>
 
-      <!-- <plugin>
+      <plugin>
         <groupId>org.codehaus.cargo</groupId>
         <artifactId>cargo-maven3-plugin</artifactId>
         <executions>
@@ -263,9 +263,9 @@
           </execution>
         </executions>
         <configuration>
-          <skip>${skipTests}</skip> -->
+          <skip>${skipTests}</skip>
           <!-- Container configuration -->
-         <!-- <container>
+          <container>
             <type>installed</type>
             <containerId>tomcat9x</containerId>
             <append>false</append>
@@ -313,7 +313,6 @@
           <wait>false</wait>
         </configuration>
       </plugin>
-      -->
 
     </plugins>
 
