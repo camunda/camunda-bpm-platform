@@ -114,20 +114,6 @@
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-all</artifactId>
       <version>${project.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.camunda.spin</groupId>
-          <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.camunda.spin</groupId>
-          <artifactId>camunda-spin-dataformat-xml-dom</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.camunda.spin</groupId>
-          <artifactId>camunda-spin-dataformat-xml-dom-jakarta</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
