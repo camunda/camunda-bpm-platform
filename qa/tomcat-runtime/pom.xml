@@ -57,7 +57,7 @@
 
   <profiles>
     <profile>
-      <id>tomcat</id>
+      <id>tomcat9</id>
       <build>
         <resources>
           <resource>
@@ -99,7 +99,7 @@
                 <inherited>false</inherited>
                 <configuration>
                   <includeScope>runtime</includeScope>
-                  <outputDirectory>target/server/apache-tomcat-${version.tomcat}/lib</outputDirectory>
+                  <outputDirectory>target/server/apache-tomcat-${version.tomcat9}/lib</outputDirectory>
                 </configuration>
               </execution>
             </executions>
@@ -123,7 +123,7 @@
                 </goals>
                 <configuration>
                   <overwrite>true</overwrite>
-                  <outputDirectory>target/server/apache-tomcat-${version.tomcat}</outputDirectory>
+                  <outputDirectory>target/server/apache-tomcat-${version.tomcat9}</outputDirectory>
                 </configuration>
               </execution>
             </executions>
