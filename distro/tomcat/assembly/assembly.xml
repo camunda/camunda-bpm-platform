@@ -56,7 +56,8 @@
         <include>org.slf4j:slf4j-jdk14:jar:*</include>
 
         <include>org.camunda.bpm:camunda-engine-plugin-*:jar</include>
-        <include>org.camunda.spin:*:jar</include>
+        <include>org.camunda.spin:camunda-spin-core*:jar</include>
+        <include>org.camunda.spin:camunda-spin-dataformat-all*:jar</include>
         <include>org.camunda.connect:*:jar</include>
         <include>org.camunda.commons:*:jar</include>
 
@@ -97,7 +98,8 @@
         <include>org.slf4j:slf4j-jdk14:jar:*</include>
 
         <include>org.camunda.bpm:camunda-engine-plugin-*:jar</include>
-        <include>org.camunda.spin:*:jar</include>
+        <include>org.camunda.spin:camunda-spin-core*:jar</include>
+        <include>org.camunda.spin:camunda-spin-dataformat-all*:jar</include>
         <include>org.camunda.connect:*:jar</include>
         <include>org.camunda.commons:*:jar</include>
 
