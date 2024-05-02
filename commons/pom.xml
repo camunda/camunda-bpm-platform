@@ -18,6 +18,7 @@
     <module>logging</module>
     <module>utils</module>
     <module>testing</module>
+    <module>typed-values</module>
   </modules>
 
   <properties>
