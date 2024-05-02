@@ -102,6 +102,7 @@
         <module>distro/run</module>
 
         <module>clients/java</module>
+        <module>clients/nodejs</module>
 
         <module>internal-dependencies</module>
         <module>database</module>
@@ -281,6 +282,7 @@
         <module>distro/webjar</module>
 
         <module>clients/java</module>
+        <module>clients/nodejs</module>
 
         <module>test-utils/junit5-extension</module>
         <module>test-utils/junit5-extension-dmn</module>

@@ -5,3 +5,5 @@ dist/
 .idea
 *.iml
 coverage/
+/test/.run-camunda/
+/node

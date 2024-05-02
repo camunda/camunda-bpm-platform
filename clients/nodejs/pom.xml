@@ -1,9 +1,172 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
+  <name>Camunda Platform - NodeJS External Task Client</name>
 
-  <groupId>org.camunda</groupId>
-  <artifactId>camunda-external-task-client-js</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <artifactId>camunda-external-task-client-nodejs</artifactId>
+  <inceptionYear>2018</inceptionYear>
 
-  <!-- DO NOT REMOVE! This file is used for compliance reasons -->
+  <packaging>pom</packaging>
+
+  <parent>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-parent</artifactId>
+    <relativePath>../../parent</relativePath>
+    <version>7.22.0-SNAPSHOT</version>
+  </parent>
+
+  <properties>
+    <skip.deploy>true</skip.deploy>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <configuration>
+          <workingDirectory>./</workingDirectory>
+          <installDirectory>./</installDirectory>
+          <environmentVariables>
+            <CAMUNDA_VERSION>7.21</CAMUNDA_VERSION> <!-- todo: replace with development version -1 --> <!-- todo: check against snapshot -->
+          </environmentVariables>
+        </configuration>
+        <executions>
+          <execution>
+            <id>install node and npm</id>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>install-npm-packages</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <arguments>ci</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>license-check</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <arguments>run license-check</arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>test-xtac</id>
+      <activation>
+        <property>
+          <name>!skipTests</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>install-npm-packages-integration-test</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <arguments>ci</arguments>
+                  <workingDirectory>./test</workingDirectory>
+                </configuration>
+              </execution>
+              <execution>
+                <id>run-unit-tests</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <arguments>run test</arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>run-integration-tests</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <arguments>run test</arguments>
+                  <workingDirectory>./test</workingDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>release-xtac-deploy</id>
+      <activation>
+        <property>
+          <name>!env.SKIP_DEPLOY</name>
+        </property>
+      </activation>
+      <properties>
+        <skip.deploy>false</skip.deploy>
+      </properties>
+    </profile>
+    <profile>
+      <id>release-xtac</id>
+      <activation>
+        <property>
+          <!-- environment variable only set during release -->
+          <name>env.RELEASE_VERSION</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>release-registry-login</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <skip>${skip.deploy}</skip>
+                  <arguments>config set //registry.npmjs.org/:_authToken ${NPM_REGISTRY_AUTH_TOKEN}</arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>release-publish</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <arguments>publish --dry-run=${skip.deploy}</arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 </project>

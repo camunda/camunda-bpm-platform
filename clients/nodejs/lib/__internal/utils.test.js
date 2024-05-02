@@ -27,7 +27,7 @@ import {
   serializeVariable,
 } from "./utils.js";
 
-import File from "../File";
+import File from "../File.js";
 
 describe("utils", () => {
   describe("isFunction", () => {

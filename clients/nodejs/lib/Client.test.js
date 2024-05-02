@@ -37,7 +37,7 @@ const advanceTimersByTime = async (msToRun) => {
 };
 
 jest.mock("got");
-jest.mock("../lib/Variables");
+jest.mock("./Variables.js");
 
 const customClientOptions = {
   baseUrl: "http://localhost:XXXX/engine-rest/",

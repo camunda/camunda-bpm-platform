@@ -4,3 +4,6 @@ examples/
 .idea/
 coverage/
 .github/
+/node/
+/scripts/
+/pom.xml
