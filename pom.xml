@@ -72,7 +72,6 @@
         <module>javaee/jobexecutor-rar</module>
 
         <module>model-api</module>
-        <module>typed-values</module>
         <module>engine-dmn</module>
         <module>juel</module>
         <module>spin</module>
@@ -266,7 +265,6 @@
         <module>engine-spring</module>
         <module>engine-rest</module>
 
-        <module>typed-values</module>
         <module>engine-dmn</module>
         <module>juel</module>
         <module>spin</module>
