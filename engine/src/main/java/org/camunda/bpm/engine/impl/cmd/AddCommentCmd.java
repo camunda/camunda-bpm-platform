@@ -16,9 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.Date;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
@@ -30,9 +32,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Event;
-
-import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -78,10 +77,7 @@ public class AddCommentCmd implements Command<Comment>, Serializable {
       provideRemovalTime(comment);
     }
 
-    String eventMessage = message.replaceAll("\\s+", " ");
-    if (eventMessage.length() > 163) {
-      eventMessage = eventMessage.substring(0, 160) + "...";
-    }
+    String eventMessage = comment.toEventMessage(message);
     comment.setMessage(eventMessage);
 
     comment.setFullMessage(message);
