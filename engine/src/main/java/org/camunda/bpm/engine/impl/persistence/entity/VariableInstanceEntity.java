@@ -157,7 +157,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     }
 
     // clear value
-    clearValueFields();
+    clearValueFields(true);
 
     if (!isTransient) {
       // delete variable
@@ -280,19 +280,19 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   public void setValue(TypedValue value) {
     // clear value fields
-    clearValueFields();
+    clearValueFields(false);
 
     typedValueField.setValue(value);
   }
 
-  public void clearValueFields() {
+  public void clearValueFields(boolean deleteVariable) {
     this.longValue = null;
     this.doubleValue = null;
     this.textValue = null;
     this.textValue2 = null;
     typedValueField.clear();
 
-    if(byteArrayField.getByteArrayId() != null) {
+    if(deleteVariable && byteArrayField.getByteArrayId() != null) {
       deleteByteArrayValue();
       setByteArrayValueId(null);
     }
