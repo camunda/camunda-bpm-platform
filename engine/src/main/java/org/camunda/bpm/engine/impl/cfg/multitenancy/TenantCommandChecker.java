@@ -30,7 +30,16 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.*;
+import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -328,6 +337,12 @@ public class TenantCommandChecker implements CommandChecker {
   public void checkDeleteTask(TaskEntity task) {
     if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("delete the task '"+ task.getId() + "'");
+    }
+  }
+
+  public void checkUpdateTask(TaskEntity task) {
+    if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("update the task '" + task.getId() + "'");
     }
   }
 

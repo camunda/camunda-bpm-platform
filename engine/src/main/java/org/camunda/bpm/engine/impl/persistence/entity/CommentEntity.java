@@ -201,6 +201,14 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
     this.removalTime = removalTime;
   }
 
+  public String toEventMessage(String message) {
+    String eventMessage = message.replaceAll("\\s+", " ");
+    if (eventMessage.length() > 163) {
+      eventMessage = eventMessage.substring(0, 160) + "...";
+    }
+    return eventMessage;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()

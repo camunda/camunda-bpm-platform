@@ -16,6 +16,36 @@
  */
 package org.camunda.bpm.engine.impl.cfg.auth;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_TASK;
+import static org.camunda.bpm.engine.authorization.Permissions.TASK_ASSIGN;
+import static org.camunda.bpm.engine.authorization.Permissions.TASK_WORK;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
+import static org.camunda.bpm.engine.authorization.Resources.BATCH;
+import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.DECISION_REQUIREMENTS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Resources.TASK;
+
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
+import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.SystemPermissions;
+import org.camunda.bpm.engine.authorization.TaskPermissions;
+import org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -29,23 +59,19 @@ import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.*;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
-
-import static org.camunda.bpm.engine.authorization.Authorization.ANY;
-import static org.camunda.bpm.engine.authorization.Permissions.*;
-import static org.camunda.bpm.engine.authorization.Resources.*;
-
-import org.camunda.bpm.engine.authorization.Permission;
-import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
-import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
-import org.camunda.bpm.engine.authorization.Resources;
-import org.camunda.bpm.engine.authorization.SystemPermissions;
-import org.camunda.bpm.engine.authorization.TaskPermissions;
-import org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions;
 
 /**
  * {@link CommandChecker} that uses the {@link AuthorizationManager} to perform
@@ -734,6 +760,10 @@ public class AuthorizationCommandChecker implements CommandChecker {
     if (executionId == null && caseExecutionId == null) {
       getAuthorizationManager().checkAuthorization(DELETE, TASK, taskId);
     }
+  }
+
+  public void checkUpdateTask(TaskEntity task) {
+    getAuthorizationManager().checkAuthorization(UPDATE, TASK, task.getId());
   }
 
   public void checkUserOperationLog(UserOperationLogEntry entry,

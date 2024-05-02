@@ -122,6 +122,9 @@ public interface UserOperationLogEntry {
   String OPERATION_TYPE_SET_VARIABLE = "SetVariable";
   String OPERATION_TYPE_SET_VARIABLES = "SetVariables";
 
+  String OPERATION_TYPE_UPDATE_COMMENT = "UpdateComment";
+  String OPERATION_TYPE_DELETE_COMMENT = "DeleteComment";
+
   String OPERATION_TYPE_REMOVE_VARIABLE = "RemoveVariable";
   String OPERATION_TYPE_MODIFY_VARIABLE = "ModifyVariable";
 
