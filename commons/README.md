@@ -9,7 +9,7 @@ camunda commons is a collection of shared libraries used by camunda open source 
 
 * [camunda commons logging][logging]
 * [camunda commons utils][utils]
-* ~~camunda commons typed values~~ - migrated to [camunda-bpm-platform][typed-values]
+* [camunda-bpm-platform][typed-values]
 
 
 ## Getting started
@@ -57,4 +57,4 @@ The source files in this repository are made available under the <a href="LICENS
 
 [logging]: logging/
 [utils]: utils/
-[typed-values]: https://github.com/camunda/camunda-bpm-platform/tree/master/typed-values
+[typed-values]: typed-values/
