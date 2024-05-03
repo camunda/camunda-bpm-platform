@@ -1,0 +1,27 @@
+name: Bump versions
+on:
+  workflow_dispatch:
+    inputs:
+      oldVersion:
+        description: 'Old Version (search)'
+        required: true
+        default: '2.X.0'
+      newVersion:
+        description: 'New Version (replace)'
+        required: true
+        default: '2.X.0'
+
+jobs:
+  bump-versions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Bump versions
+        uses: camunda/bump-versions-action@v1.7
+        with:
+          path: "/examples"
+          files: "*/**/package.json"
+          sliceVersion: 0
+          oldVersion: ${{ github.event.inputs.oldVersion }}
+          newVersion: ${{ github.event.inputs.newVersion }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}

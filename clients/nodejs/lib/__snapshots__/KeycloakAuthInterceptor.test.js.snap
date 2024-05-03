@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`KeycloakAuthInterceptor should add auth token to intercepted config 1`] = `
+{
+  "headers": {
+    "Authorization": "Bearer 1234567890",
+  },
+  "key": "some value",
+}
+`;

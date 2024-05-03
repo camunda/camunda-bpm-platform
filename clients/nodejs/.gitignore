@@ -1,0 +1,7 @@
+node_modules/
+tmp/
+docs/api/
+dist/
+.idea
+*.iml
+coverage/

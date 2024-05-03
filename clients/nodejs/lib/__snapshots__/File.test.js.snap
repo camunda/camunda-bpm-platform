@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`File constructor should create instance with proper values 1`] = `
+File {
+  "__readFile": [Function],
+  "content": "",
+  "createTypedValue": [Function],
+  "encoding": "utf-8",
+  "filename": "somefile",
+  "load": [Function],
+  "localPath": "foo",
+  "mimetype": "application/json",
+}
+`;
+
+exports[`File constructor should create instance with proper values when typedValue is provided 1`] = `
+File {
+  "__readFile": [Function],
+  "content": "",
+  "createTypedValue": [Function],
+  "encoding": "utf-8",
+  "filename": "somefile",
+  "load": [Function],
+  "localPath": "foo",
+  "mimetype": "application/json",
+}
+`;

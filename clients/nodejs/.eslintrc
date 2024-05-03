@@ -1,0 +1,12 @@
+{
+  "extends": [
+    "plugin:bpmn-io/node",
+    "plugin:prettier/recommended",
+    "plugin:camunda-licensed/apache"
+  ],
+  "env": {
+      "node": true,
+      "jest": true,
+      "es6": true
+  }
+}

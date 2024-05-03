@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BasicAuthInterceptor should add basic auth header to intercepted config 1`] = `
+{
+  "headers": {
+    "Authorization": "Basic c29tZSB1c2VybmFtZTpzb21lIHBhc3N3b3Jk",
+  },
+  "key": "some value",
+}
+`;

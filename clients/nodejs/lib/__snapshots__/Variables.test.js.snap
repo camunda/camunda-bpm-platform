@@ -1,0 +1,278 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Variables getters get('foo') should return value of key foo 1`] = `"FooValue"`;
+
+exports[`Variables getters getAll() should return values of all variables 1`] = `
+{
+  "bar": 2,
+  "baz": {
+    "name": "baz",
+  },
+  "blax": File {
+    "__readFile": [Function],
+    "content": "",
+    "createTypedValue": [Function],
+    "engineService": undefined,
+    "filename": "path",
+    "load": [Function],
+    "remotePath": "/execution/undefined/localVariables/blax/data",
+  },
+  "foo": "FooValue",
+  "qux": 2018-01-23T12:42:45.435Z,
+  "zex": File {
+    "__readFile": [Function],
+    "content": "",
+    "createTypedValue": [Function],
+    "engineService": undefined,
+    "filename": "data",
+    "load": [Function],
+    "remotePath": "/execution/undefined/localVariables/zex/data",
+  },
+}
+`;
+
+exports[`Variables getters getAllTyped() should return all variables 1`] = `
+{
+  "bar": {
+    "type": "integer",
+    "value": 2,
+    "valueInfo": {},
+  },
+  "baz": {
+    "type": "json",
+    "value": {
+      "name": "baz",
+    },
+    "valueInfo": {},
+  },
+  "blax": {
+    "type": "file",
+    "value": File {
+      "__readFile": [Function],
+      "content": "",
+      "createTypedValue": [Function],
+      "engineService": undefined,
+      "filename": "path",
+      "load": [Function],
+      "remotePath": "/execution/undefined/localVariables/blax/data",
+    },
+    "valueInfo": {
+      "filename": "path",
+    },
+  },
+  "foo": {
+    "type": "string",
+    "value": "FooValue",
+    "valueInfo": {},
+  },
+  "qux": {
+    "type": "date",
+    "value": 2018-01-23T12:42:45.435Z,
+    "valueInfo": {},
+  },
+  "zex": {
+    "type": "file",
+    "value": File {
+      "__readFile": [Function],
+      "content": "",
+      "createTypedValue": [Function],
+      "engineService": undefined,
+      "filename": "data",
+      "load": [Function],
+      "remotePath": "/execution/undefined/localVariables/zex/data",
+    },
+    "valueInfo": {},
+  },
+}
+`;
+
+exports[`Variables getters getDirtyVariables() should return all dirty variables 1`] = `
+{
+  "blax": {
+    "type": "file",
+    "value": "c29tZSBjb250ZW50",
+    "valueInfo": {
+      "filename": "path",
+    },
+  },
+}
+`;
+
+exports[`Variables getters getTyped('foo') should return the typed value of key foo 1`] = `
+{
+  "type": "string",
+  "value": "FooValue",
+  "valueInfo": {},
+}
+`;
+
+exports[`Variables read-only should have getters and setters if readOnly is not true 1`] = `
+[
+  "getTyped",
+  "get",
+  "getAll",
+  "getAllTyped",
+  "getDirtyVariables",
+  "setTyped",
+  "set",
+  "setTransient",
+  "setAll",
+  "setAllTyped",
+]
+`;
+
+exports[`Variables read-only should only have getters if readOnly is true 1`] = `
+[
+  "getTyped",
+  "get",
+  "getAll",
+  "getAllTyped",
+  "getDirtyVariables",
+]
+`;
+
+exports[`Variables setters set("foo", "fooValue")) should set variable with key "foo" and value "fooValue": dirty variables 1`] = `{}`;
+
+exports[`Variables setters set("foo", "fooValue")) should set variable with key "foo" and value "fooValue": dirty variables 2`] = `
+{
+  "foo": {
+    "type": "string",
+    "value": "fooValue",
+    "valueInfo": {},
+  },
+}
+`;
+
+exports[`Variables setters set("foo", "fooValue")) should set variable with key "foo" and value "fooValue": variables 1`] = `{}`;
+
+exports[`Variables setters set("foo", "fooValue")) should set variable with key "foo" and value "fooValue": variables 2`] = `
+{
+  "foo": {
+    "type": "string",
+    "value": "fooValue",
+    "valueInfo": {},
+  },
+}
+`;
+
+exports[`Variables setters setAll(someValues)  should add someValues to variables: dirty variables 1`] = `{}`;
+
+exports[`Variables setters setAll(someValues)  should add someValues to variables: dirty variables 2`] = `
+{
+  "bar": {
+    "type": "integer",
+    "value": 2,
+    "valueInfo": {},
+  },
+  "foo": {
+    "type": "string",
+    "value": "FooValue",
+    "valueInfo": {},
+  },
+}
+`;
+
+exports[`Variables setters setAll(someValues)  should add someValues to variables: variables 1`] = `{}`;
+
+exports[`Variables setters setAll(someValues)  should add someValues to variables: variables 2`] = `
+{
+  "bar": {
+    "type": "integer",
+    "value": 2,
+    "valueInfo": {},
+  },
+  "foo": {
+    "type": "string",
+    "value": "FooValue",
+    "valueInfo": {},
+  },
+}
+`;
+
+exports[`Variables setters setAllTyped(someTypedValues) should add someTypedValues to variables: dirty variables 1`] = `{}`;
+
+exports[`Variables setters setAllTyped(someTypedValues) should add someTypedValues to variables: dirty variables 2`] = `
+{
+  "bar": {
+    "type": "string",
+    "value": "barValue",
+    "valueInfo": {},
+  },
+  "foo": {
+    "type": "string",
+    "value": "fooValue",
+    "valueInfo": {},
+  },
+}
+`;
+
+exports[`Variables setters setAllTyped(someTypedValues) should add someTypedValues to variables: variables 1`] = `{}`;
+
+exports[`Variables setters setAllTyped(someTypedValues) should add someTypedValues to variables: variables 2`] = `
+{
+  "bar": {
+    "type": "string",
+    "value": "barValue",
+    "valueInfo": {},
+  },
+  "foo": {
+    "type": "string",
+    "value": "fooValue",
+    "valueInfo": {},
+  },
+}
+`;
+
+exports[`Variables setters setTransient("fooTransient", "fooValueTransient")) should set variable with key "fooTransient" and value "fooValueTransient" and transient "true": dirty variables 1`] = `{}`;
+
+exports[`Variables setters setTransient("fooTransient", "fooValueTransient")) should set variable with key "fooTransient" and value "fooValueTransient" and transient "true": dirty variables 2`] = `
+{
+  "fooTransient": {
+    "type": "string",
+    "value": "fooValueTransient",
+    "valueInfo": {
+      "transient": true,
+    },
+  },
+}
+`;
+
+exports[`Variables setters setTransient("fooTransient", "fooValueTransient")) should set variable with key "fooTransient" and value "fooValueTransient" and transient "true": variables 1`] = `{}`;
+
+exports[`Variables setters setTransient("fooTransient", "fooValueTransient")) should set variable with key "fooTransient" and value "fooValueTransient" and transient "true": variables 2`] = `
+{
+  "fooTransient": {
+    "type": "string",
+    "value": "fooValueTransient",
+    "valueInfo": {
+      "transient": true,
+    },
+  },
+}
+`;
+
+exports[`Variables setters setTyped("baz",someTypeValue) should set typed value with key "baz": dirty variables 1`] = `{}`;
+
+exports[`Variables setters setTyped("baz",someTypeValue) should set typed value with key "baz": dirty variables 2`] = `
+{
+  "baz": {
+    "type": "json",
+    "value": "{"name":"bazname"}",
+    "valueInfo": {},
+  },
+}
+`;
+
+exports[`Variables setters setTyped("baz",someTypeValue) should set typed value with key "baz": variables 1`] = `{}`;
+
+exports[`Variables setters setTyped("baz",someTypeValue) should set typed value with key "baz": variables 2`] = `
+{
+  "baz": {
+    "type": "json",
+    "value": {
+      "name": "bazname",
+    },
+    "valueInfo": {},
+  },
+}
+`;

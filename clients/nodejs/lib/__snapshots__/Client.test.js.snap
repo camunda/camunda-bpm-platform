@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Client executeTask should call handler with task and taskService 1`] = `
+[
+  {},
+  {
+    "engineService": EngineService {
+      "baseUrl": "http://localhost:XXXX/engine-rest",
+      "complete": [Function],
+      "fetchAndLock": [Function],
+      "get": [Function],
+      "handleFailure": [Function],
+      "interceptors": undefined,
+      "lock": [Function],
+      "post": [Function],
+      "request": [Function],
+      "workerId": "foobarId",
+    },
+    "processInstanceId": undefined,
+    "readOnly": true,
+  },
+]
+`;
+
+exports[`Client subscribe should call the API with the custom configs 1`] = `
+[
+  {
+    "maxTasks": 3,
+    "sorting": [
+      {
+        "sortBy": "createTime",
+        "sortOrder": "asc",
+      },
+    ],
+    "topics": [
+      {
+        "includeExtensionProperties": true,
+        "localVariables": true,
+        "lockDuration": 3000,
+        "processDefinitionId": "processId",
+        "processDefinitionIdIn": [
+          "processId",
+          "processId2",
+        ],
+        "processDefinitionKey": "processKey",
+        "processDefinitionKeyIn": [
+          "processKey",
+          "processKey2",
+        ],
+        "processDefinitionVersionTag": "versionTag",
+        "tenantIdIn": [
+          "tenantId",
+        ],
+        "topicName": "foo",
+        "variables": [
+          "fooVariable",
+          "barVariable",
+        ],
+        "withoutTenantId": true,
+      },
+    ],
+    "usePriority": true,
+  },
+]
+`;

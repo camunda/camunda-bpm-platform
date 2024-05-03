@@ -1,0 +1,6 @@
+test/
+__mocks__/
+examples/
+.idea/
+coverage/
+.github/

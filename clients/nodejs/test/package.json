@@ -1,0 +1,26 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "main": "integration.test.js",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "pretest": "node scripts/setup",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "posttest": "node scripts/clearSetup"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.2.2",
+    "form-data": "^4.0.0",
+    "got": "^13.0.0",
+    "jest": "29.3.1",
+    "run-camunda": "7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {},
+    "moduleNameMapper": {
+      "#(.*)": "<rootDir>/node_modules/$1"
+    }
+  }
+}

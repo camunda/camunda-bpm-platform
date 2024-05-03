@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`utils deserializeVariable value should be a File instance if type is file 1`] = `
+{
+  "type": "file",
+  "value": File {
+    "__readFile": [Function],
+    "content": "",
+    "createTypedValue": [Function],
+    "engineService": {},
+    "filename": "data",
+    "load": [Function],
+    "remotePath": "/execution/process_instance_id/localVariables/variable_key/data",
+  },
+  "valueInfo": {},
+}
+`;
