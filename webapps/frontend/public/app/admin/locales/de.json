@@ -1,4 +1,95 @@
 ﻿{
+  "dateLocales": {
+    "calendar": {
+      "lastDay": "[Gestern um] LT",
+      "lastWeek": "[Letzten] dddd [um] LT",
+      "nextDay": "[Morgen um] LT",
+      "nextWeek": "dddd [um] LT",
+      "sameDay": "[Heute um] LT",
+      "sameElse": "L"
+    },
+    "longDateFormat": {
+      "L": "DD/MM/YYYY",
+      "LL": "D MMMM YYYY",
+      "LLL": "D MMMM YYYY LT",
+      "LLLL": "dddd, D MMMM YYYY LT",
+      "LT": "HH:mm"
+    },
+    "months": [
+      "Januar",
+      "Februar",
+      "März",
+      "April",
+      "Mai",
+      "Juni",
+      "Juli",
+      "August",
+      "September",
+      "Oktober",
+      "November",
+      "Dezember"
+    ],
+    "monthsShort": [
+      "Jan",
+      "Feb",
+      "Mär",
+      "Apr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Okt",
+      "Nov",
+      "Dez"
+    ],
+    "relativeTime": {
+      "M": "einem Monat",
+      "MM": "%d Monate",
+      "d": "einem Tag",
+      "dd": "%d Tagen",
+      "future": "in %s",
+      "h": "einer Stunde",
+      "hh": "%d Stunden",
+      "m": "einer Minute",
+      "mm": "%d Minuten",
+      "past": "vor %s",
+      "s": "ein paar Sekunden",
+      "y": "einem Jahr",
+      "yy": "%d Jahren"
+    },
+    "week": {
+      "dow": 1,
+      "doy": 4
+    },
+    "weekdays": [
+      "Sonntag",
+      "Montag",
+      "Dienstag",
+      "Mittwoch",
+      "Donnerstag",
+      "Freitag",
+      "Samstag"
+    ],
+    "weekdaysMin": [
+      "So",
+      "Mo",
+      "Di",
+      "Mi",
+      "Do",
+      "Fr",
+      "Sa"
+    ],
+    "weekdaysShort": [
+      "Son",
+      "Mon",
+      "Die",
+      "Mit",
+      "Don",
+      "Fre",
+      "Sam"
+    ]
+  },
   "labels": {
     "ABORT": "Abbrechen",
     "ADMIN_APP": "Admin",
@@ -168,7 +259,7 @@
     "EXECUTION_METRICS_TW": "Task Benutzer (Task Users, kurz TU)",
 	  "EXECUTION_METRICS_MONTHLY_TABLE_TITLE": "Statistik der letzten 12 Monate",
     "EXECUTION_METRICS_SHOW_LEGACY": "Zeige ursprüngliche Metriken (FNI/EDE)",
-    "EXECUTION_METRICS_ANNUAL_TABLE_TITLE": "Statistik der letzten 12 Monate",
+    "EXECUTION_METRICS_ANNUAL_TABLE_TITLE": "Ausführungs-Metriken je Vertragsjahr",
     "EXECUTION_METRICS_COPY_HEADER": "Kopieren",
     "EXECUTION_METRICS_COPY_TOOLTIP": "Kopieren mit Diagnosedaten",
     "EXECUTION_METRICS_ANNUAL_FORMAT": "{{from}} bis {{to}}",
