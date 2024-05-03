@@ -6,8 +6,8 @@ camunda-connect
   <a href="https://docs.camunda.org/manual/latest/reference/connect/">Documentation</a> |
   <a href="https://forum.camunda.org/">Forum</a> |
   <a href="https://jira.camunda.com/browse/CAM">Issues</a> |
-  <a href="LICENSE">License</a> |
-  <a href="CONTRIBUTING.md">Contribute</a>
+  <a href="../LICENSE">License</a> |
+  <a href="../CONTRIBUTING.md">Contribute</a>
 </p>
 
 Simple API for connecting HTTP Services and other things.
@@ -29,7 +29,7 @@ Have a look at our [contribution guide](https://github.com/camunda/camunda-bpm-p
 
 # License:
 
-The source files in this repository are made available under the <a href="LICENSE">Apache License, Version 2.0</a>.
+The source files in this repository are made available under the <a href="../LICENSE">Apache License, Version 2.0</a>.
 
 
 
