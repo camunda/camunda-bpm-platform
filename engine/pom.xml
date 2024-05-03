@@ -120,11 +120,13 @@
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-connectors-all</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -795,6 +797,7 @@
         <dependency>
           <groupId>org.camunda.connect</groupId>
           <artifactId>camunda-connect-connectors-all</artifactId>
+          <version>${project.version}</version>
         </dependency>
       </dependencies>
       <build>

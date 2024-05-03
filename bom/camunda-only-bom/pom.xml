@@ -214,6 +214,11 @@
         <artifactId>camunda-commons-bom</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.camunda.connect</groupId>
+        <artifactId>camunda-connect-bom</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- dmn engine dependencies
        -->
@@ -263,13 +268,6 @@
       </dependency>
 
       <!-- optional dependencies -->
-      <dependency>
-        <groupId>org.camunda.connect</groupId>
-        <artifactId>camunda-connect-bom</artifactId>
-        <version>${version.camunda.connect}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
       <dependency>
         <groupId>org.camunda.template-engines</groupId>
         <artifactId>camunda-template-engines-freemarker</artifactId>

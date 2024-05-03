@@ -28,7 +28,6 @@
     <version.mybatis>3.5.15</version.mybatis>
     <version.joda-time>2.12.5</version.joda-time>
     <version.uuid-generator>4.3.0</version.uuid-generator>
-    <version.camunda.connect>1.6.0</version.camunda.connect>
     <version.camunda.freemarker.template.engine>2.2.0</version.camunda.freemarker.template.engine>
     <version.feel-scala>1.17.5</version.feel-scala>
   </properties>
@@ -73,6 +72,7 @@
 
         <module>model-api</module>
         <module>engine-dmn</module>
+        <module>connect</module>
         <module>juel</module>
         <module>spin</module>
         <module>commons</module>
@@ -266,6 +266,7 @@
         <module>engine-rest</module>
 
         <module>engine-dmn</module>
+        <module>connect</module>
         <module>juel</module>
         <module>spin</module>
         <module>commons</module>

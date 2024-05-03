@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.connect</groupId>
     <artifactId>camunda-connect-bom</artifactId>
-    <version>1.7.0-SNAPSHOT</version>
+    <version>7.22.0-SNAPSHOT</version>
     <relativePath>bom</relativePath>
   </parent>
 
@@ -15,7 +15,6 @@
 
   <properties>
     <assertj.version>2.9.1</assertj.version>
-    <commons.version>1.13.0</commons.version>
     <commons-codec.version>1.15</commons-codec.version>
     <connect.version.old>1.6.0</connect.version.old>
     <httpclient.version>4.5.13</httpclient.version>
@@ -43,7 +42,7 @@
       <dependency>
         <groupId>org.camunda.commons</groupId>
         <artifactId>camunda-commons-bom</artifactId>
-        <version>${commons.version}</version>
+        <version>${project.version}</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
