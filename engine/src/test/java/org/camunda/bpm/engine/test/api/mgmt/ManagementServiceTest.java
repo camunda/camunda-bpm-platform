@@ -31,6 +31,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
@@ -43,6 +45,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.metrics.util.MetricsUtil;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -58,6 +61,8 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.telemetry.Metric;
+import org.camunda.bpm.engine.telemetry.TelemetryData;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.After;
@@ -1008,6 +1013,58 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
 
     // then
     assertThat(managementService.isTelemetryEnabled()).isTrue();
+  }
+
+  @Test
+  public void returnDefault4MetricsInTelemetry() {
+    //given
+
+    //when
+    TelemetryData telemetryData = managementService.getTelemetryData(null, null, null);
+
+    //then
+    Map<String, Metric> metrics = telemetryData.getProduct().getInternals().getMetrics();
+    assertThat(metrics.size()).isEqualTo(4);
+    assertThat(metrics.keySet()).isEqualTo(new HashSet<>(MetricsUtil.METRICS_TO_REPORT.stream().map(MetricsUtil::resolvePublicName).collect(Collectors.toList())));
+  }
+
+  @Test
+  public void returnFilteredMetricsDataInTelemetry() {
+    //given
+
+    //when
+    TelemetryData telemetryData = managementService.getTelemetryData("process-instances", null, null);
+
+    //then
+    Map<String, Metric> metrics = telemetryData.getProduct().getInternals().getMetrics();
+    assertThat(metrics.size()).isEqualTo(1);
+    assertThat(metrics.containsKey("process-instances")).isEqualTo(true);
+  }
+
+  @Test
+  public void returnDefault4MetricsInTelemetryWithDateFilter() {
+    //given
+
+    //when
+    TelemetryData telemetryData = managementService.getTelemetryData(null, new Date(), new Date());
+
+    //then
+    Map<String, Metric> metrics = telemetryData.getProduct().getInternals().getMetrics();
+    assertThat(metrics.size()).isEqualTo(4);
+    assertThat(metrics.keySet()).isEqualTo(new HashSet<>(MetricsUtil.METRICS_TO_REPORT.stream().map(MetricsUtil::resolvePublicName).collect(Collectors.toList())));
+  }
+
+  @Test
+  public void returnFilteredMetricsDataInTelemetryWithDateFilter() {
+    //given
+
+    //when
+    TelemetryData telemetryData = managementService.getTelemetryData("task-users", new Date(), new Date());
+
+    //then
+    Map<String, Metric> metrics = telemetryData.getProduct().getInternals().getMetrics();
+    assertThat(metrics.size()).isEqualTo(1);
+    assertThat(metrics.containsKey("task-users")).isEqualTo(true);
   }
 
   @Test
