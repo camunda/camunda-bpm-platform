@@ -30,15 +30,8 @@ public class MessageCorrelationResultWithVariableDto extends MessageCorrelationR
 
   public static MessageCorrelationResultWithVariableDto fromMessageCorrelationResultWithVariables(MessageCorrelationResultWithVariables result) {
     MessageCorrelationResultWithVariableDto dto = new MessageCorrelationResultWithVariableDto();
-
+    setExecutionAndProcessInstance(dto, result);
     if (result != null) {
-      dto.setResultType(result.getResultType());
-      if (result.getProcessInstance() != null) {
-        dto.setProcessInstance(ProcessInstanceDto.fromProcessInstance(result.getProcessInstance()));
-      } else if (result.getExecution() != null) {
-        dto.setExecution(ExecutionDto.fromExecution(result.getExecution()));
-      }
-
       dto.variables = VariableValueDto.fromMap(result.getVariables(), true);
     }
     return dto;
