@@ -129,12 +129,6 @@
     </profile>
     <profile>
       <id>release-xtac</id>
-      <activation>
-        <property>
-          <!-- environment variable only set during release -->
-          <name>env.RELEASE_VERSION</name>
-        </property>
-      </activation>
       <build>
         <plugins>
           <plugin>
