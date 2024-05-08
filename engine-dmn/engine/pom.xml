@@ -20,6 +20,7 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-utils</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
