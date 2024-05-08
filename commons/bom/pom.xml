@@ -37,11 +37,5 @@
     </dependencies>
   </dependencyManagement>
 
-  <scm>
-    <url>https://github.com/camunda/camunda-commons</url>
-    <connection>scm:git:git@github.com:camunda/camunda-commons.git</connection>
-    <developerConnection>scm:git:git@github.com:camunda/camunda-commons.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
 
 </project>
