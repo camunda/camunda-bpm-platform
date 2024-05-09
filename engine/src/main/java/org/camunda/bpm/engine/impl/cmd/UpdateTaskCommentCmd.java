@@ -29,6 +29,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
+ * see https://github.com/camunda/camunda-bpm-platform/issues/2551
+ *
  * Command to update a comment by a given task ID.
  */
 public class UpdateTaskCommentCmd implements Command<Object>, Serializable {

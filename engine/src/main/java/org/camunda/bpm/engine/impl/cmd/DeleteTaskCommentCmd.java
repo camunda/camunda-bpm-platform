@@ -28,6 +28,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
 /**
+ * see https://github.com/camunda/camunda-bpm-platform/issues/2551
+ *
  * Command to delete a comment by a given commentId and taskId.
  */
 public class DeleteTaskCommentCmd implements Command<Object>, Serializable {

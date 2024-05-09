@@ -29,6 +29,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
+ * see https://github.com/camunda/camunda-bpm-platform/issues/2551
+ *
  * Command to update a comment by a given processInstance ID.
  */
 public class UpdateProcessInstanceCommentCmd implements Command<Object>, Serializable {

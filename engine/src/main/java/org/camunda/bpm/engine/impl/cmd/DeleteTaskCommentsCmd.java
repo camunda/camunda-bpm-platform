@@ -29,6 +29,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.task.Comment;
 
 /**
+ * see https://github.com/camunda/camunda-bpm-platform/issues/2551
+ *
  * Command to delete comments by a given task ID.
  */
 public class DeleteTaskCommentsCmd implements Command<Void>, Serializable {
