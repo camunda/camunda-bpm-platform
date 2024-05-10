@@ -44,7 +44,8 @@
     <tomcat.connector.ajp.redirectPort>48443</tomcat.connector.ajp.redirectPort>
     <tomcat.server.port>48005</tomcat.server.port>
 
-    <tomcat.runtime.location>../tomcat-runtime/target/server/apache-tomcat-${version.tomcat9}</tomcat.runtime.location>
+    <tomcat.runtime.location>../tomcat-runtime/target/server/apache-tomcat-${version.tomcat}</tomcat.runtime.location>
+    <tomcat9.runtime.location>../tomcat9-runtime/target/server/apache-tomcat-${version.tomcat9}</tomcat9.runtime.location>
 
   </properties>
 
@@ -127,7 +128,7 @@
     <profile>
       <id>tomcat9</id>
       <modules>
-        <module>tomcat-runtime</module>
+        <module>tomcat9-runtime</module>
       </modules>
     </profile>
 

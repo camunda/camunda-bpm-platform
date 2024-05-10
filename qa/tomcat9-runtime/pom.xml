@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>camunda-qa-tomcat-runtime</artifactId>
+  <artifactId>camunda-qa-tomcat9-runtime</artifactId>
   <packaging>pom</packaging>
 
-  <name>Camunda Platform - QA Tomcat Test Runtime</name>
+  <name>Camunda Platform - QA Tomcat 9 Test Runtime</name>
 
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
@@ -40,6 +40,7 @@
       <artifactId>jython</artifactId>
       <scope>runtime</scope>
     </dependency>
+
     <dependency>
       <groupId>org.jruby</groupId>
       <artifactId>jruby-complete</artifactId>
@@ -57,7 +58,7 @@
 
   <profiles>
     <profile>
-      <id>tomcat</id>
+      <id>tomcat9</id>
       <build>
         <resources>
           <resource>
@@ -81,7 +82,7 @@
                   <artifactItems>
                     <artifactItem>
                       <groupId>org.camunda.bpm.tomcat</groupId>
-                      <artifactId>camunda-tomcat-assembly-jakarta</artifactId>
+                      <artifactId>camunda-tomcat-assembly</artifactId>
                       <version>${project.version}</version>
                       <type>tar.gz</type>
                       <overWrite>true</overWrite>
@@ -99,7 +100,7 @@
                 <inherited>false</inherited>
                 <configuration>
                   <includeScope>runtime</includeScope>
-                  <outputDirectory>target/server/apache-tomcat-${version.tomcat}/lib</outputDirectory>
+                  <outputDirectory>target/server/apache-tomcat-${version.tomcat9}/lib</outputDirectory>
                 </configuration>
               </execution>
             </executions>
@@ -123,7 +124,7 @@
                 </goals>
                 <configuration>
                   <overwrite>true</overwrite>
-                  <outputDirectory>target/server/apache-tomcat-${version.tomcat}</outputDirectory>
+                  <outputDirectory>target/server/apache-tomcat-${version.tomcat9}</outputDirectory>
                 </configuration>
               </execution>
             </executions>
