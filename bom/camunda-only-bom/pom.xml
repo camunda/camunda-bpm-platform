@@ -255,13 +255,6 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- camunda-commons-typed-values: part of the platform and shares the same version -->
-      <dependency>
-        <groupId>org.camunda.commons</groupId>
-        <artifactId>camunda-commons-typed-values</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
       <!-- optional dependencies -->
       <dependency>
         <groupId>org.camunda.connect</groupId>
