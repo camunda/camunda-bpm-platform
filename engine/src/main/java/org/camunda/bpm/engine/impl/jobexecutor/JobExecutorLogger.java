@@ -259,4 +259,10 @@ public class JobExecutorLogger extends ProcessEngineLogger {
             "Arithmetic exception occurred while computing remaining available thread count for logging.");
   }
 
+  public void totalQueueCapacityCalculationError() {
+    logWarn(
+            "040",
+            "Arithmetic exception occurred while computing total queue capacity for logging.");
+  }
+
 }

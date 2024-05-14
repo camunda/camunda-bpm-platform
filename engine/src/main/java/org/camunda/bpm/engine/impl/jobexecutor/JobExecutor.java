@@ -20,6 +20,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.camunda.bpm.container.impl.jmx.services.JmxManagedThreadPool;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -193,6 +195,17 @@ public abstract class JobExecutor {
         LOG.availableThreadsCalculationError();
       }
       }
+  }
+
+  public int calculateTotalQueueCapacity(int availableItems, int remainingCapacity) {
+    int totalQueueCapacity = 0;
+    try {
+      totalQueueCapacity = Math.addExact(availableItems, remainingCapacity);
+    } catch (ArithmeticException arithmeticException) {
+      //arithmetic exception occurred while computing Total Queue Capacity for logging.
+      LOG.totalQueueCapacityCalculationError();
+    }
+    return totalQueueCapacity;
   }
 
   // getters and setters //////////////////////////////////////////////////////

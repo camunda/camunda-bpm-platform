@@ -112,6 +112,8 @@ public class JmxManagedThreadPool extends SeExecutorService implements JmxManage
     return threadPoolQueue.size();
   }
 
+  public int getQueueAddlCapacity() { return threadPoolQueue.remainingCapacity(); }
+
   public ThreadPoolExecutor getThreadPoolExecutor() {
     return threadPoolExecutor;
   }
