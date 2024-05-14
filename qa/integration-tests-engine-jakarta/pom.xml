@@ -17,7 +17,7 @@
     <wildfly.container.adapter.version>5.0.1.Final</wildfly.container.adapter.version>
     <version.spring.framework>${version.spring.framework6}</version.spring.framework>
 
-    <version.arquillian>1.8.0.Final</version.arquillian>
+    <version.arquillian>1.7.0.Final</version.arquillian>
 
     <redirect.test.output>true</redirect.test.output>
   </properties>
