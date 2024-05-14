@@ -17,7 +17,7 @@
     <wildfly.container.adapter.version>5.0.1.Final</wildfly.container.adapter.version>
     <version.spring.framework>${version.spring.framework6}</version.spring.framework>
 
-    <version.arquillian>1.7.0.Final</version.arquillian>
+    <version.arquillian>1.8.0.Final</version.arquillian>
 
     <redirect.test.output>true</redirect.test.output>
   </properties>
@@ -98,6 +98,14 @@
     <dependency>
       <groupId>com.github.tomakehurst</groupId>
       <artifactId>wiremock-jre8-standalone</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- CDI Implementation for Tomcat 10 -->
+    <dependency>
+      <groupId>org.jboss.weld.servlet</groupId>
+      <artifactId>weld-servlet-shaded</artifactId>
+      <version>4.0.3.Final</version>
       <scope>test</scope>
     </dependency>
 
@@ -334,6 +342,22 @@
             </configuration>
           </execution>
           <execution>
+            <id>copy-test-sources-tomcat</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/generated-test-sources/java-tomcat</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${basedir}/../integration-tests-engine/src/test/java-tomcat</directory>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
             <id>copy-test-sources-wildfly</id>
             <phase>process-sources</phase>
             <goals>
@@ -385,6 +409,33 @@
             </configuration>
           </execution>
           <execution>
+            <id>copy-test-resources-tomcat</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/generated-test-resources/resources-tomcat</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${basedir}/../integration-tests-engine/src/test/resources-tomcat</directory>
+                  <filtering>false</filtering>
+                  <!-- Do not copy the tomcat 9 arquillian xml -->
+                  <excludes>
+                    <exclude>**/arquillian.xml</exclude>
+                  </excludes>
+                </resource>
+
+                <!-- Use the tomcat 10 arquillian.xml instead -->
+                <resource>
+                  <directory>${basedir}/src/test/resources-tomcat</directory>
+                  <filtering>false</filtering>
+                </resource>
+
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
             <id>copy-test-resources-wildfly</id>
             <phase>process-sources</phase>
             <goals>
@@ -421,6 +472,7 @@
         <groupId>org.eclipse.transformer</groupId>
         <artifactId>transformer-maven-plugin</artifactId>
         <executions>
+          <!-- transform sources -->
           <execution>
             <id>transform-jakarta-test-sources</id>
             <phase>generate-test-sources</phase>
@@ -429,6 +481,16 @@
             </goals>
             <configuration>
               <transformDirectory>${project.build.directory}/generated-test-sources/jakarta</transformDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>transform-jakarta-test-sources-tomcat</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+            <configuration>
+              <transformDirectory>${project.build.directory}/generated-test-sources/java-tomcat</transformDirectory>
             </configuration>
           </execution>
           <execution>
@@ -451,6 +513,7 @@
               <transformDirectory>${project.build.directory}/generated-test-sources/java-wildfly-servlet</transformDirectory>
             </configuration>
           </execution>
+         <!-- transform resources -->
           <execution>
             <id>transform-jakarta-test-resources</id>
             <phase>generate-test-resources</phase>
@@ -469,6 +532,16 @@
             </goals>
             <configuration>
               <transformDirectory>${project.build.directory}/generated-test-resources/resources-wildfly</transformDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>transform-jakarta-test-resources-tomcat</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+            <configuration>
+              <transformDirectory>${project.build.directory}/generated-test-resources/resources-tomcat</transformDirectory>
             </configuration>
           </execution>
         </executions>
@@ -509,6 +582,128 @@
   </build>
 
   <profiles>
+
+    <profile>
+      <id>tomcat</id>
+      <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>org.camunda.bpm</groupId>
+            <artifactId>camunda-core-internal-dependencies</artifactId>
+            <version>${project.version}</version>
+            <scope>import</scope>
+            <type>pom</type>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
+
+      <dependencies>
+        <dependency>
+          <!-- make sure this comes after runtime in the reactor build -->
+          <groupId>org.camunda.bpm.qa</groupId>
+          <artifactId>camunda-qa-tomcat-runtime</artifactId>
+          <version>${project.version}</version>
+          <scope>provided</scope>
+          <type>pom</type>
+        </dependency>
+
+        <!-- This dependency can be updated when arquillian releases the managed tomcat 10 artifact -->
+        <dependency>
+          <groupId>org.jboss.arquillian.container</groupId>
+          <artifactId>arquillian-tomcat-managed-8</artifactId>
+          <version>1.1.0.Final</version>
+          <scope>test</scope>
+        </dependency>
+
+        <!-- switch to use Jakarta Servlet 5.0 protocol -->
+        <dependency>
+          <groupId>org.jboss.arquillian.protocol</groupId>
+          <artifactId>arquillian-protocol-servlet-jakarta</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.jboss.arquillian.junit</groupId>
+          <artifactId>arquillian-junit-container</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+      </dependencies>
+
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources-tomcat</directory>
+            <filtering>true</filtering>
+          </testResource>
+          <testResource>
+            <directory>${project.build.directory}/generated-test-resources/resources-tomcat</directory>
+            <filtering>true</filtering>
+          </testResource>
+        </testResources>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-test-source</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>add-test-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>${project.build.directory}/generated-test-sources/java-tomcat</source>
+                  </sources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <configuration>
+              <delimiters>
+                <delimiter>${*}</delimiter>
+              </delimiters>
+              <useDefaultDelimiters>false</useDefaultDelimiters>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <!-- no EE stuff on tomcat :) -->
+                <exclude>**/ear/**</exclude>
+                <exclude>**/ejb/**</exclude>
+                <exclude>**/jar/**</exclude>
+                <exclude>**/transactions/**</exclude>
+                <exclude>**/jpa/**</exclude>
+                <!-- No EJB RequestContext available -->
+                <exclude>**/JobExecutorRequestContextTest.java</exclude>
+                <!-- Not supported by arquillian tomcat container -->
+                <exclude>**/TestWarDeploymentWithBrokenBpmnXml.java</exclude>
+                <exclude>**/TestDeploymentWithDroolsTaskFails.java</exclude>
+                <exclude>**/TestProcessEnginesXmlFails.java</exclude>
+
+                <exclude>**/TestWarDeploymentWithProcessEnginePlugin.java</exclude>
+
+                <exclude>**/*_JBOSS.java</exclude>
+                <exclude>**/EjbPALifecycleCallbacksTest.java</exclude>
+
+                <exclude>**/PythonPaClassImportTest.java</exclude>
+
+                <exclude>**/MigrationContextSwitchBeansTest.java</exclude>
+
+                <exclude>**/ManagedJobExecutorTest.java</exclude>
+              </excludes>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
 
     <profile>
       <id>wildfly</id>

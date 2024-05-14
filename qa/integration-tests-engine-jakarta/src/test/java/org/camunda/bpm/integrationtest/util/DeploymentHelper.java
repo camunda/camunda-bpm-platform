@@ -17,6 +17,7 @@
 package org.camunda.bpm.integrationtest.util;
 
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 
 public class DeploymentHelper extends AbstractDeploymentHelper {
 
@@ -33,11 +34,32 @@ public class DeploymentHelper extends AbstractDeploymentHelper {
   }
 
   public static JavaArchive[] getWeld() {
-    return getWeld(CAMUNDA_ENGINE_CDI);
+    return getWeldShaded(CAMUNDA_ENGINE_CDI);
   }
 
   public static JavaArchive[] getEngineSpring() {
     return getEngineSpring(CAMUNDA_ENGINE_SPRING);
+  }
+
+  protected static JavaArchive[] getWeldShaded(String engineCdiArtifactName) {
+    if(CACHED_WELD_ASSETS != null) {
+      return CACHED_WELD_ASSETS;
+    } else {
+
+      JavaArchive[] resolvedArchives = Maven.configureResolver()
+              .workOffline()
+              .loadPomFromFile("pom.xml")
+              .resolve(engineCdiArtifactName, "org.jboss.weld.servlet:weld-servlet-shaded")
+              .withTransitivity()
+              .as(JavaArchive.class);
+
+      if(resolvedArchives.length == 0) {
+        throw new RuntimeException("could not resolve org.jboss.weld.servlet:weld-servlet-shaded");
+      } else {
+        CACHED_WELD_ASSETS = resolvedArchives;
+        return CACHED_WELD_ASSETS;
+      }
+    }
   }
 
 }
