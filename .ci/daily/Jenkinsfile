@@ -81,8 +81,6 @@ pipeline {
                   "'!distro/wildfly/modules,!distro/wildfly26/modules,!engine-rest/engine-rest-openapi' -DskipTests=true -Dskip.frontend.build=true",
                   withNpm: true,
                   jdkVersion: 'jdk-17-latest')
-              },
-              postSuccess: {
                 def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
                 cambpmPublishDocs("\"target/site/apidocs/\"", projectVersion, "javadoc")
               }
@@ -101,8 +99,6 @@ pipeline {
                   "package -Dmaven.test.skip -pl '!engine-rest,!assembly'",
                   withNpm: true,
                   jdkVersion: 'jdk-11-latest')
-              },
-              postSuccess: {
                 def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
                 cambpmPublishDocs("\"engine-rest/docs/target/index.html\"", projectVersion, "rest")
               }
