@@ -221,6 +221,7 @@ module.exports = [
         $scope.validationInProgress = false; // not yet started the validation
 
         var previousAssigneeInput;
+
         function validateAssignee(targetElement, done) {
           done = done || angular.noop;
           var newId = targetElement.value;
@@ -358,7 +359,7 @@ module.exports = [
 
         $scope.hasAssignee = function() {
           // empty string is also a valid assignee
-          return $scope.task.assignee != null;
+          return $scope.task?.assignee != null;
         };
 
         $scope.editGroups = function() {
