@@ -676,6 +676,10 @@
     "USER_MEMBERSHIP_TENANT_SELECT_TENANTS": "Select Tenants",
     "USER_MEMBERSHIP_TENANT_TENANT_ID": "Tenant ID",
     "USER_MEMBERSHIP_TENANT_TENANT_NAME": "Tenant Name",
-    "VALUE": "Value"
+    "VALUE": "Value",
+    "SEARCH_LESS_THAN": "<",
+    "SEARCH_LESS_THAN_EQUALS": "<=",
+    "SEARCH_GREATER_THAN": ">",
+    "SEARCH_GREATER_THAN_EQUALS": ">="
   }
 }

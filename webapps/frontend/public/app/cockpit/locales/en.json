@@ -2554,6 +2554,10 @@
     "VARIABLE_UPLOAD_PROGRESS": "Upload progress: {{progress}}%",
     "VARIABLE_UPLOAD_SELECT_FILE": "Select a file containing the binary content for the variable",
     "VARIABLE_UPLOAD_UPLOAD": "Upload",
-    "WITHOUT_DUE_DATE": "Without Due Date"
+    "WITHOUT_DUE_DATE": "Without Due Date",
+    "SEARCH_LESS_THAN": "<",
+    "SEARCH_LESS_THAN_EQUALS": "<=",
+    "SEARCH_GREATER_THAN": ">",
+    "SEARCH_GREATER_THAN_EQUALS": ">="
   }
 }
