@@ -302,7 +302,7 @@
               <!-- Container configuration -->
               <container>
                 <type>installed</type>
-                <containerId>tomcat9x</containerId>
+                <containerId>tomcat8x</containerId>
                 <append>false</append>
                 <home>${tomcat.runtime}</home>
                 <timeout>${cargo.timeout}</timeout>
