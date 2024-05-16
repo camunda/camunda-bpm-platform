@@ -352,8 +352,6 @@
       </build>
     </profile>
 
-    <!-- TODO add Tomcat 10 profile not working -->
-
     <profile>
       <id>tomcat</id>
       <properties>
@@ -378,10 +376,17 @@
         <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine-rest-jakarta</artifactId>
-          <scope>test</scope>
-          <type>war</type>
-          <classifier>tomcat</classifier>
           <version>${project.version}</version>
+          <type>war</type>
+          <scope>test</scope>
+          <classifier>tomcat</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.camunda.bpm.example</groupId>
+          <artifactId>camunda-example-invoice-jakarta</artifactId>
+          <version>${project.version}</version>
+          <type>war</type>
+          <scope>test</scope>
         </dependency>
       </dependencies>
 

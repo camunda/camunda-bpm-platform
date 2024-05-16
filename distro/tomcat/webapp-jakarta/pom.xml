@@ -15,7 +15,7 @@
   <properties>
     <skip-third-party-bom>false</skip-third-party-bom>
 
-    <version.resteasy>6.2.8.Final</version.resteasy>
+    <version.resteasy>6.2.3.Final</version.resteasy>
   </properties>
 
   <dependencies>

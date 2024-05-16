@@ -53,7 +53,6 @@
         <include>org.graalvm.sdk:graal-sdk:jar:*</include>
         <include>com.ibm.icu:icu4j:jar:*</include>
         <include>org.slf4j:slf4j-api:jar:*</include>
-        <include>org.slf4j:slf4j-jdk14:jar:*</include>
 
         <include>org.camunda.bpm:camunda-engine-plugin-*:jar</include>
         <include>org.camunda.spin:camunda-spin-core*:jar</include>
@@ -95,7 +94,6 @@
         <include>org.graalvm.sdk:graal-sdk:jar:*</include>
         <include>com.ibm.icu:icu4j:jar:*</include>
         <include>org.slf4j:slf4j-api:jar:*</include>
-        <include>org.slf4j:slf4j-jdk14:jar:*</include>
 
         <include>org.camunda.bpm:camunda-engine-plugin-*:jar</include>
         <include>org.camunda.spin:camunda-spin-core*:jar</include>

@@ -29,10 +29,16 @@
       <useTransitiveFiltering>true</useTransitiveFiltering>
       <scope>provided</scope>
       <includes>
-        <include>jakarta.servlet:jakarta.servlet-api:jar:jar</include>
+
+        <!-- Jakarta APIs -->
+        <include>jakarta.servlet:jakarta.servlet-api:jar</include>
         <include>jakarta.activation:jakarta.activation-api:jar</include>
         <include>jakarta.ws.rs:jakarta.ws.rs-api:jar</include>
         <include>jakarta.xml.bind:jakarta.xml.bind-api:jar</include>
+
+        <!-- Resteasy -->
+        <include>org.jboss.resteasy:resteasy-*</include>
+
       </includes>
       <excludes>
         <exclude>org.camunda.bpm:camunda-engine-rest-core-jakarta:jar:tests</exclude>
@@ -55,6 +61,7 @@
     </dependencySet>
   </dependencySets>
 
+  <!-- Adds the web.xml that triggers the rest listeners for tomcat -->
   <fileSets>
     <fileSet>
       <directory>src/main/runtime/tomcat/webapp</directory>
