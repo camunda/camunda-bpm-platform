@@ -14,9 +14,12 @@
   <packaging>pom</packaging>
 
   <properties>
+    <assertj.version>2.9.1</assertj.version>
     <commons-codec.version>1.15</commons-codec.version>
     <connect.version.old>1.6.0</connect.version.old>
     <httpclient.version>4.5.13</httpclient.version>
+    <junit.version>4.13.1</junit.version>
+    <logback.version>1.2.11</logback.version>
     <mockito.version>1.9.5</mockito.version>
     <wiremock.version>1.58</wiremock.version>
     <maven-bundle-plugin.version>5.1.1</maven-bundle-plugin.version>
@@ -59,19 +62,19 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>${version.junit}</version>
+        <version>${junit.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-core</artifactId>
-        <version>${version.assertj}</version>
+        <version>${assertj.version}</version>
       </dependency>
 
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>${version.logback}</version>
+        <version>${logback.version}</version>
       </dependency>
 
       <dependency>
