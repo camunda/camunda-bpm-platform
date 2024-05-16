@@ -100,9 +100,9 @@
   </profiles>
 
   <scm>
-    <url>https://github.com/camunda/camunda-template-engine</url>
-    <connection>scm:git:git@github.com:camunda/camunda-template-engine.git</connection>
-    <developerConnection>scm:git:git@github.com:camunda/camunda-template-engine.git</developerConnection>
+    <url>https://github.com/camunda/camunda-bpm-platform</url>
+    <connection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</connection>
+    <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
