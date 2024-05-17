@@ -241,6 +241,25 @@ pipeline {
             ])
           }
         }
+        stage('engine-IT-tomcat-10-postgresql-142') {
+          when {
+            expression {
+              cambpmWithLabels('all-as', 'tomcat')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'postgresql_142',
+              runSteps: {
+                cambpmRunMaven('qa/', 'clean install -Ptomcat,postgresql,engine-integration-jakarta', runtimeStash: true, archiveStash: true, jdkVersion: 'jdk-17-latest')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+                cambpmArchiveArtifacts('qa/tomcat-runtime/target/**/standalone/log/**')
+              }
+            ])
+          }
+        }
         stage('engine-IT-wildfly-postgresql-142') {
           when {
             expression {
@@ -344,6 +363,26 @@ pipeline {
               postFailure: {
                 cambpmPublishTestResult()
                 cambpmArchiveArtifacts('qa/integration-tests-webapps/shared-engine/target/selenium-screenshots/*')
+              }
+            ])
+          }
+        }
+        stage('webapp-IT-tomcat-10-h2') {
+          when {
+            expression {
+              cambpmWithLabels('webapp-integration', 'h2')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'chrome_112',
+              runSteps: {
+                cambpmRunMaven('qa/', 'clean install -Ptomcat,h2,webapps-integration', runtimeStash: true, archiveStash: true, jdkVersion: 'jdk-17-latest')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+                cambpmArchiveArtifacts('qa/integration-tests-webapps/shared-engine/target/selenium-screenshots/*')
+                cambpmArchiveArtifacts('qa/integration-tests-webapps/shared-engine/target/*')
               }
             ])
           }
