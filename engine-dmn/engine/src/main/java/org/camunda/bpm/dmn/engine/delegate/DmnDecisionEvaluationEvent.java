@@ -42,4 +42,10 @@ public interface DmnDecisionEvaluationEvent {
    * @return the number of executed decision elements during the evaluation
    */
   long getExecutedDecisionElements();
+
+  /**
+   * GIT Issue: https://github.com/camunda/camunda-bpm-platform/issues/2749
+   * @return the decisionInstanceId generated part of DMN evaluation
+   */
+  String getDecisionInstanceId();
 }

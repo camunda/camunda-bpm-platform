@@ -16,10 +16,7 @@
  */
 package org.camunda.bpm.dmn.engine.el;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
@@ -256,7 +253,7 @@ public class ExpressionLanguageTest extends DmnEngineTest {
     inputs.putValue("a", mapVar);
     inputs.putValue("b", "B_FROM_CONTEXT");
 
-    DmnDecisionResult result = dmnEngine.evaluateDecision(decision, inputs.asVariableContext());
+    DmnDecisionResult result = dmnEngine.evaluateDecision(decision, inputs.asVariableContext(), null);
 
     assertThat((String) result.getSingleEntry()).isEqualTo("B_FROM_MAP");
   }
@@ -270,10 +267,12 @@ public class ExpressionLanguageTest extends DmnEngineTest {
     List<String> listVar = new ArrayList<>(1);
     listVar.add("0_FROM_LIST");
     inputs.putValue("a", listVar);
+    String decisionInstanceId = UUID.randomUUID().toString();
 
-    DmnDecisionResult result = dmnEngine.evaluateDecision(decision, inputs.asVariableContext());
+    DmnDecisionResult result = dmnEngine.evaluateDecision(decision, inputs.asVariableContext(), decisionInstanceId);
 
     assertThat((String) result.getSingleEntry()).isEqualTo("0_FROM_LIST");
+    assertThat(result.getDmnDecisionInstanceId()).isEqualTo(decisionInstanceId);
   }
 
   protected DmnEngine createEngineWithDefaultExpressionLanguage(String expressionLanguage) {
