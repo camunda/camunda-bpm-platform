@@ -70,7 +70,6 @@ public class EvaluateDecisionCmd implements Command<DmnDecisionResult> {
     }
 
     writeUserOperationLog(commandContext, decisionDefinition);
-
     return doEvaluateDecision(decisionDefinition, variables);
 
   }

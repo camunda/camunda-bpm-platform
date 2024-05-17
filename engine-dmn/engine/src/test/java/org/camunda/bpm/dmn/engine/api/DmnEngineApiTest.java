@@ -25,6 +25,7 @@ import static org.mockito.Mockito.mock;
 
 import java.io.InputStream;
 import java.util.Map;
+import java.util.UUID;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionLogic;
@@ -602,7 +603,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
     }
 
     try {
-      dmnEngine.evaluateDecision(null, emptyVariableContext());
+      dmnEngine.evaluateDecision(null, emptyVariableContext(), null);
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
     }
     catch(IllegalArgumentException e) {
@@ -658,7 +659,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
     }
 
     try {
-      dmnEngine.evaluateDecision(decision, (VariableContext) null);
+      dmnEngine.evaluateDecision(decision, (VariableContext) null, null);
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
     }
     catch(IllegalArgumentException e) {
@@ -682,7 +683,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   @DecisionResource(resource = ONE_RULE_DMN)
   public void shouldFailEvaluatingDecisionWithEmptyVariableContext() {
     try {
-      dmnEngine.evaluateDecision(decision, emptyVariableContext());
+      dmnEngine.evaluateDecision(decision, emptyVariableContext(), null);
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
     }
     catch(DmnEvaluationException e) {
@@ -770,11 +771,25 @@ public class DmnEngineApiTest extends DmnEngineTest {
   @Test
   @DecisionResource(resource = ONE_RULE_DMN)
   public void shouldEvaluateDecisionWithVariableContext() {
-    DmnDecisionResult results = dmnEngine.evaluateDecision(decision, createVariables().putValue("input", INPUT_VALUE).asVariableContext());
+    DmnDecisionResult results = dmnEngine.evaluateDecision(decision, createVariables().putValue("input", INPUT_VALUE).asVariableContext(), null);
 
     assertThat((String) results.getSingleEntry())
       .isNotNull()
       .isEqualTo(EXPECTED_OUTPUT_VALUE);
+  }
+
+  @Test
+  @DecisionResource(resource = ONE_RULE_DMN)
+  public void shouldEvaluateDecisionWithDecisionInstanceId() {
+    String decisionInstanceId = UUID.randomUUID().toString();
+    DmnDecisionResult results = dmnEngine.evaluateDecision(decision, createVariables().putValue("input", INPUT_VALUE).asVariableContext(), decisionInstanceId);
+
+    assertThat((String) results.getSingleEntry())
+      .isNotNull()
+      .isEqualTo(EXPECTED_OUTPUT_VALUE);
+    assertThat(results.getDmnDecisionInstanceId())
+      .isNotNull()
+      .isEqualTo(decisionInstanceId);
   }
 
   @Test
