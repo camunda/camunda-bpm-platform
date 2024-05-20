@@ -18,6 +18,7 @@
     <commons-codec.version>1.15</commons-codec.version>
     <connect.version.old>1.6.0</connect.version.old>
     <httpclient.version>4.5.13</httpclient.version>
+    <httpcore.version>4.4.13</httpcore.version>
     <junit.version>4.13.1</junit.version>
     <logback.version>1.2.11</logback.version>
     <mockito.version>1.9.5</mockito.version>
@@ -51,6 +52,12 @@
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
         <version>${httpclient.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpcore</artifactId>
+        <version>${httpcore.version}</version>
       </dependency>
 
       <dependency>
