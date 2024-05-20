@@ -66,7 +66,7 @@
     <servlet-name>Resteasy</servlet-name>
     <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
     <init-param>
-      <param-name>javax.ws.rs.Application</param-name>
+      <param-name>jakarta.ws.rs.Application</param-name>
       <param-value>org.camunda.bpm.engine.rest.impl.application.DefaultApplication</param-value>
     </init-param>
     <async-supported>true</async-supported>
