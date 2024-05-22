@@ -189,4 +189,17 @@ public interface Task {
    */
   void setTenantId(String tenantId);
 
+  /**
+   * Returns the task's state.
+   *
+   * @return the task's state
+   */
+  String getTaskState();
+
+  /**
+   * Sets the task state for this task.
+   *
+   * @param taskState the taskState to set
+   */
+  void setTaskState(String taskState);
 }
