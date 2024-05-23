@@ -37,6 +37,9 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   /** Only select historic task instances for the given process instance. */
   HistoricTaskInstanceQuery processInstanceId(String processInstanceId);
 
+  /** Only select historic task instances for the given root process instance. */
+  HistoricTaskInstanceQuery rootProcessInstanceId(String rootProcessInstanceId);
+
   /** Only select historic tasks for the given process instance business key */
   HistoricTaskInstanceQuery processInstanceBusinessKey(String processInstanceBusinessKey);
 

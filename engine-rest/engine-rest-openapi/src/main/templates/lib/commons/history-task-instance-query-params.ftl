@@ -47,6 +47,10 @@
     "type": "string",
     "desc": "Filter by process instance id."
   },
+  "rootProcessInstanceId": {
+    "type": "string",
+    "desc": "Filter by root process instance id."
+  },
   "processInstanceBusinessKey": {
     "type": "string",
     "desc": "Filter by process instance business key."

@@ -3250,26 +3250,26 @@ public abstract class MockProvider {
   public static MessageCorrelationResult createMessageCorrelationResult(MessageCorrelationResultType type) {
     MessageCorrelationResult result = mock(MessageCorrelationResult.class);
     when(result.getResultType()).thenReturn(type);
-    if (result.getResultType().equals(MessageCorrelationResultType.Execution)) {
-      Execution ex = createMockExecution();
-      when(result.getExecution()).thenReturn(ex);
-    } else {
-      ProcessInstance instance = createMockInstance();
-      when(result.getProcessInstance()).thenReturn(instance);
-    }
+
+    Execution ex = createMockExecution();
+    when(result.getExecution()).thenReturn(ex);
+
+    ProcessInstance instance = createMockInstance();
+    when(result.getProcessInstance()).thenReturn(instance);
+
     return result;
   }
 
   public static MessageCorrelationResultWithVariables createMessageCorrelationResultWithVariables(MessageCorrelationResultType type) {
     MessageCorrelationResultWithVariables result = mock(MessageCorrelationResultWithVariables.class);
     when(result.getResultType()).thenReturn(type);
-    if (result.getResultType().equals(MessageCorrelationResultType.Execution)) {
-      Execution ex = createMockExecution();
-      when(result.getExecution()).thenReturn(ex);
-    } else {
-      ProcessInstance instance = createMockInstance();
-      when(result.getProcessInstance()).thenReturn(instance);
-    }
+
+    Execution ex = createMockExecution();
+    when(result.getExecution()).thenReturn(ex);
+
+    ProcessInstance instance = createMockInstance();
+    when(result.getProcessInstance()).thenReturn(instance);
+
     when(result.getVariables()).thenReturn(createMockSerializedVariables());
     return result;
   }

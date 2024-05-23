@@ -1,6 +1,6 @@
 <module xmlns="urn:jboss:module:1.0" name="org.camunda.commons.camunda-commons-logging">
   <resources>
-    <resource-root path="camunda-commons-logging-@version.camunda.commons@.jar" />
+    <resource-root path="camunda-commons-logging-@project.version@.jar" />
   </resources>
 
   <dependencies>

@@ -552,6 +552,38 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
   }
 
   @Test
+  public void testQueryByRootProcessInstanceId() {
+    String rootProcessInstanceId = MockProvider.EXAMPLE_HISTORIC_TASK_INST_ROOT_PROC_INST_ID;
+
+    given().queryParam("rootProcessInstanceId", rootProcessInstanceId)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).rootProcessInstanceId(rootProcessInstanceId);
+  }
+
+  @Test
+  public void testQueryByRootProcessInstanceIdAsPost() {
+    String rootProcessInstanceId = MockProvider.EXAMPLE_HISTORIC_TASK_INST_ROOT_PROC_INST_ID;
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("rootProcessInstanceId", rootProcessInstanceId);
+
+    given().contentType(POST_JSON_CONTENT_TYPE)
+        .body(params)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).rootProcessInstanceId(rootProcessInstanceId);
+  }
+
+  @Test
   public void testQueryByProcessInstanceBusinessKey() {
     String processInstanceBusinessKey = MockProvider.EXAMPLE_HISTORIC_TASK_INST_PROC_INST_BUSINESS_KEY;
 

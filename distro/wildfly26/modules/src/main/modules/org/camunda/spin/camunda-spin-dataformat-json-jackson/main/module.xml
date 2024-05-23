@@ -1,6 +1,6 @@
 <module xmlns="urn:jboss:module:1.0" name="org.camunda.spin.camunda-spin-dataformat-json-jackson">
   <resources>
-    <resource-root path="camunda-spin-dataformat-json-jackson-@version.camunda.spin@.jar" />
+    <resource-root path="camunda-spin-dataformat-json-jackson-@project.version@.jar" />
   </resources>
 
   <dependencies>
