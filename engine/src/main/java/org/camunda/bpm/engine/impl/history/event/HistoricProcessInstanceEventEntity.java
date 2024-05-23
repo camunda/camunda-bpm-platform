@@ -54,6 +54,9 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
 
   protected String state;
 
+  /** completed HPI that has been restarted */
+  protected String restartedProcessInstanceId;
+
   // getters / setters ////////////////////////////////////////
 
   public String getEndActivityId() {
@@ -126,6 +129,14 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
 
   public void setState(String state) {
     this.state = state;
+  }
+
+  public String getRestartedProcessInstanceId() {
+      return restartedProcessInstanceId;
+  }
+
+  public void setRestartedProcessInstanceId(String restartedProcessInstanceId) {
+      this.restartedProcessInstanceId = restartedProcessInstanceId;
   }
 
   @Override

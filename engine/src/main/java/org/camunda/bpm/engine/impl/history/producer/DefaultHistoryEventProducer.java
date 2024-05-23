@@ -204,6 +204,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setCaseInstanceId(caseInstanceId);
     evt.setTenantId(tenantId);
     evt.setRootProcessInstanceId(execution.getRootProcessInstanceId());
+    evt.setRestartedProcessInstanceId(execution.getRestartedProcessInstanceId());
 
     if (execution.getSuperCaseExecution() != null) {
       evt.setSuperCaseInstanceId(execution.getSuperCaseExecution().getCaseInstanceId());
