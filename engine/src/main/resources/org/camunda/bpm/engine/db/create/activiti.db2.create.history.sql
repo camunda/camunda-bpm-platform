@@ -35,6 +35,7 @@ create table ACT_HI_PROCINST (
     DELETE_REASON_ varchar(4000),
     TENANT_ID_ varchar(64),
     STATE_ varchar(255),
+    RESTARTED_PROC_INST_ID_ varchar(64),
     primary key (ID_)
 );
 
