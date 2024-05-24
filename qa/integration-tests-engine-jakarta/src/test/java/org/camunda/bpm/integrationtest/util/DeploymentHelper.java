@@ -50,7 +50,7 @@ public class DeploymentHelper extends AbstractDeploymentHelper {
               .workOffline()
               .loadPomFromFile("pom.xml")
               .resolve(engineCdiArtifactName, "org.jboss.weld.servlet:weld-servlet-shaded")
-              .withTransitivity()
+              .withoutTransitivity()
               .as(JavaArchive.class);
 
       if(resolvedArchives.length == 0) {
