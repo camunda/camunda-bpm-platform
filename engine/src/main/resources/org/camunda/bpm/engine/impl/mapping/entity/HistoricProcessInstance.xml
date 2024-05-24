@@ -55,7 +55,8 @@
       CASE_INST_ID_,
       DELETE_REASON_,
       TENANT_ID_,
-      STATE_
+      STATE_,
+      RESTARTED_PROC_INST_ID_
     ) values (
       #{id ,jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
@@ -75,7 +76,8 @@
       #{caseInstanceId, jdbcType=VARCHAR},
       #{deleteReason, jdbcType=VARCHAR},
       #{tenantId, jdbcType=VARCHAR},
-      #{state, jdbcType=VARCHAR}
+      #{state, jdbcType=VARCHAR},
+      #{restartedProcessInstanceId, jdbcType=VARCHAR}
     )
   </insert>
 
