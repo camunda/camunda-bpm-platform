@@ -20,8 +20,6 @@
     <version.arquillian>1.7.0.Final</version.arquillian>
 
     <redirect.test.output>true</redirect.test.output>
-
-    <weld.version>5.1.0.Final</weld.version>
   </properties>
 
   <!-- import shrinkwrap and arquillian bom for artifact versions,
@@ -68,13 +66,6 @@
         <type>pom</type>
       </dependency>
 
-      <!-- Deployed programmatically by DeploymentHelper -->
-      <dependency>
-        <groupId>org.jboss.weld.servlet</groupId>
-        <artifactId>weld-servlet-core</artifactId>
-        <version>${weld.version}</version>
-      </dependency>
-
     </dependencies>
   </dependencyManagement>
 
@@ -107,6 +98,14 @@
     <dependency>
       <groupId>com.github.tomakehurst</groupId>
       <artifactId>wiremock-jre8-standalone</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- CDI Implementation for Tomcat 10 -->
+    <dependency>
+      <groupId>org.jboss.weld.servlet</groupId>
+      <artifactId>weld-servlet-shaded</artifactId>
+      <version>4.0.3.Final</version>
       <scope>test</scope>
     </dependency>
 
@@ -157,8 +156,6 @@
       <version>3.1.0</version>
       <scope>test</scope>
     </dependency>
-
-    <!-- CDI engine & Client -->
 
     <dependency>
       <groupId>org.camunda.bpm.javaee</groupId>
@@ -612,29 +609,6 @@
           <type>pom</type>
         </dependency>
 
-        <dependency>
-          <groupId>jakarta.enterprise.concurrent</groupId>
-          <artifactId>jakarta.enterprise.concurrent-api</artifactId>
-          <version>3.0.3</version>
-        </dependency>
-
-        <dependency>
-          <groupId>jakarta.transaction</groupId>
-          <artifactId>jakarta.transaction-api</artifactId>
-          <version>2.0.1</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.jboss.weld.servlet</groupId>
-          <artifactId>weld-servlet-core</artifactId>
-        </dependency>
-
-        <dependency>
-          <groupId>jakarta.inject</groupId>
-          <artifactId>jakarta.inject-api</artifactId>
-          <version>2.0.1</version>
-        </dependency>
-
         <!-- This dependency can be updated when arquillian releases the managed tomcat 10 artifact -->
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
@@ -701,7 +675,6 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <skipTests>${skipTests-webapps}</skipTests>
               <excludes>
                 <!-- no EE stuff on tomcat :) -->
                 <exclude>**/ear/**</exclude>
