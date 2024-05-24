@@ -214,6 +214,27 @@ pipeline {
             ])
           }
         }
+        stage('engine-IT-tomcat-10-postgresql-142') {
+          when {
+            expression {
+              cambpmWithLabels('all-as', 'tomcat')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'postgresql_142',
+              runSteps: {
+                cambpmRunMaven('qa/', 'clean install -Ptomcat,postgresql,engine-integration-jakarta', runtimeStash: true, archiveStash: true,
+                  // we need to use JDK 17 for Spring 6
+                  jdkVersion: 'jdk-17-latest')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+                cambpmArchiveArtifacts('qa/tomcat-runtime/target/**/standalone/log/server.log')
+              }
+            ])
+          }
+        }
         stage('engine-IT-tomcat-9-postgresql-142') {
           when {
             expression {
@@ -224,7 +245,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'postgresql_142',
               runSteps: {
-                cambpmRunMaven('qa/', 'clean install -Ptomcat,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
+                cambpmRunMaven('qa/', 'clean install -Ptomcat9,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
               },
               postFailure: {
                 cambpmPublishTestResult()
