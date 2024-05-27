@@ -64,12 +64,12 @@ public class RuntimeContainerJobExecutor extends JobExecutor {
 
     if (executorService instanceof JmxManagedThreadPool) {
       int totalQueueCapacity = calculateTotalQueueCapacity(((JmxManagedThreadPool) executorService).getQueueCount(),
-              ((JmxManagedThreadPool) executorService).getQueueAddlCapacity());
+          ((JmxManagedThreadPool) executorService).getQueueAddlCapacity());
 
       logJobExecutionInfo(processEngine, ((JmxManagedThreadPool) executorService).getQueueCount(),
-              totalQueueCapacity,
-            ((JmxManagedThreadPool) executorService).getMaximumPoolSize(),
-            ((JmxManagedThreadPool) executorService).getActiveCount());
+          totalQueueCapacity,
+          ((JmxManagedThreadPool) executorService).getMaximumPoolSize(),
+          ((JmxManagedThreadPool) executorService).getActiveCount());
     }
   }
 

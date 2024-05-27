@@ -62,11 +62,13 @@ public class SpringJobExecutor extends JobExecutor {
       logRejectedExecution(processEngine, jobIds.size());
       rejectedJobsHandler.jobsRejected(jobIds, processEngine, this);
     }
-    if (taskExecutor instanceof ThreadPoolTaskExecutor) {
-      logJobExecutionInfo(processEngine, ((ThreadPoolTaskExecutor) taskExecutor).getQueueSize(),
-          ((ThreadPoolTaskExecutor) taskExecutor).getQueueCapacity(),
-          ((ThreadPoolTaskExecutor) taskExecutor).getMaxPoolSize(),
-          ((ThreadPoolTaskExecutor) taskExecutor).getActiveCount());
+	finally {
+      if (taskExecutor instanceof ThreadPoolTaskExecutor) {
+        logJobExecutionInfo(processEngine, ((ThreadPoolTaskExecutor) taskExecutor).getQueueSize(),
+            ((ThreadPoolTaskExecutor) taskExecutor).getQueueCapacity(),
+            ((ThreadPoolTaskExecutor) taskExecutor).getMaxPoolSize(),
+            ((ThreadPoolTaskExecutor) taskExecutor).getActiveCount());
+	  }
     }
 	}
 
