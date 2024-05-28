@@ -1,0 +1,2 @@
+org.camunda.bpm.spring.boot.starter.oauth2.CamundaSpringSecurityOAuth2AutoConfiguration
+org.camunda.bpm.spring.boot.starter.oauth2.CamundaSpringSecurityDisableAutoConfiguration
