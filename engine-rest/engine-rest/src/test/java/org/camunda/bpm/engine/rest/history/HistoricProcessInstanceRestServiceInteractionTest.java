@@ -44,6 +44,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.HashSet;
 import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -549,11 +550,7 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
     // given
     HistoricProcessInstanceQueryImpl mockedQuery = mock(HistoricProcessInstanceQueryImpl.class);
     when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(mockedQuery);
-
-    String payload = "{ \"orQueries\": [{" +
-        "\"processDefinitionKey\": \"aKey\", " +
-        "\"processInstanceBusinessKey\": \"aBusinessKey\"}] }";
-
+    String payload = "{\"orQueries\": [{ \"processDefinitionKey\": \"aKey\", \"processInstanceBusinessKey\": \"aBusinessKey\", \"completed\": true ,\"active\": true}]}";
     // when
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -572,6 +569,7 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
     // then
     assertThat(argument.getValue().getProcessDefinitionKey()).isEqualTo("aKey");
     assertThat(argument.getValue().getBusinessKey()).isEqualTo("aBusinessKey");
+    assertThat(argument.getValue().getState()).isEqualTo(new HashSet<>(Arrays.asList("COMPLETED", "ACTIVE")));
   }
 
   protected void verifyBatchJson(String batchJson) {
