@@ -30,13 +30,13 @@ import org.camunda.bpm.container.impl.jboss.service.MscRuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugins;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
-import org.jboss.as.controller.CapabilityServiceBuilder;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.server.AbstractDeploymentChainStep;
 import org.jboss.as.server.DeploymentProcessorTarget;
 import org.jboss.as.server.deployment.Phase;
 import org.jboss.dmr.ModelNode;
+import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController.Mode;
 
 
@@ -67,7 +67,7 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
     }, OperationContext.Stage.RUNTIME);
 
     // create and register the MSC container delegate.
-    CapabilityServiceBuilder<?> processEngineBuilder = context.getCapabilityServiceTarget().addService(ServiceNames.forMscRuntimeContainerDelegate());
+    ServiceBuilder<?> processEngineBuilder = context.getServiceTarget().addService(ServiceNames.forMscRuntimeContainerDelegate());
     Consumer<RuntimeContainerDelegate> delegateProvider = processEngineBuilder.provides(ServiceNames.forMscRuntimeContainerDelegate());
     processEngineBuilder.setInitialMode(Mode.ACTIVE);
     MscRuntimeContainerDelegate processEngineService = new MscRuntimeContainerDelegate(delegateProvider);
@@ -76,7 +76,7 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     // discover and register Camunda Platform plugins
     BpmPlatformPlugins plugins = BpmPlatformPlugins.load(getClass().getClassLoader());
-    CapabilityServiceBuilder<?> pluginsBuilder = context.getCapabilityServiceTarget().addService(ServiceNames.forBpmPlatformPlugins());
+    ServiceBuilder<?> pluginsBuilder = context.getServiceTarget().addService(ServiceNames.forBpmPlatformPlugins());
     Consumer<BpmPlatformPlugins> pluginsProvider = pluginsBuilder.provides(ServiceNames.forBpmPlatformPlugins());
     MscBpmPlatformPlugins managedPlugins = new MscBpmPlatformPlugins(plugins, pluginsProvider);
     pluginsBuilder.setInitialMode(Mode.ACTIVE);
