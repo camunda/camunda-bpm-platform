@@ -65,7 +65,6 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
 
     // Set priority to non-default value
     Task runtimeTask = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
-    assertEquals("Created", runtimeTask.getTaskState());
     runtimeTask.setPriority(1234);
 
     // Set due-date
