@@ -19,6 +19,7 @@ engine-webapp-unit:
   - 'db2_115'
   - 'sqlserver_2017'
   - 'sqlserver_2019'
+  - 'sqlserver_2022'
   stages:
   - 'db-unit'
 engine-rest:
@@ -38,7 +39,7 @@ daily-stages:
   - 'mysql_80'
   - 'oracle_19'
   - 'db2_115'
-  - 'sqlserver_2019'
+  - 'sqlserver_2022'
   stages:
   - 'sql-scripts'
   - 'instance-migration'
