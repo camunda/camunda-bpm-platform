@@ -113,6 +113,25 @@ public class DeleteProcessDefinitionTest extends ConcurrencyTestCase {
     assertThat(runtimeService.createEventSubscriptionQuery().count()).isEqualTo(1);
   }
 
+  @Test
+  public void testConditional() {
+    // given a scenario in which we have an orphan subscription for a conditional event
+    String resource = "org/camunda/bpm/engine/test/api/repository/processWithConditionalStartEvent.bpmn20.xml";
+    List<ProcessDefinition> processDefinitions = deployProcessDefinitionTwice(resource);
+    assertThat(processDefinitions.size()).isEqualTo(2);
+    deleteProcessDefinitionsSimultaneously(processDefinitions.get(0).getId(), processDefinitions.get(1).getId());
+
+    assertThat(repositoryService.createProcessDefinitionQuery().list()).isEmpty();
+    assertThat(runtimeService.createEventSubscriptionQuery().count()).isEqualTo(1); // Orphan subscription
+
+    // when we redeploy the same process
+    repositoryService.createDeployment().addClasspathResource(resource).deploy();
+
+    // then we should only have the new subscription and not the orphan one
+    assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(1);
+    assertThat(runtimeService.createEventSubscriptionQuery().count()).isEqualTo(1);
+  }
+
   protected static class ControllableDeleteProcessDefinitionCommand extends ControllableCommand<Void> {
 
     protected String processDefinitionId;
