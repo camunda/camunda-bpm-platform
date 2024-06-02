@@ -39,6 +39,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 
+import static org.camunda.bpm.engine.impl.RestartProcessInstancesBatchConfigurationJsonConverter.PROCESS_DEFINITION_ID;
+
 /**
  * Common methods for batch job handlers based on list of ids, providing serialization, configuration instantiation, etc.
  *
@@ -172,6 +174,8 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
 
       if (jobConfiguration.getIds() != null && jobConfiguration.getIds().size() == 1) {
         job.setProcessInstanceId(jobConfiguration.getIds().get(0));
+        String processDefinitionId = JsonUtil.getString(JsonUtil.asObject(batch.getConfigurationBytes()), PROCESS_DEFINITION_ID, null);
+        job.setProcessDefinitionId(processDefinitionId);
       }
 
       job.setDeploymentId(deploymentId);
