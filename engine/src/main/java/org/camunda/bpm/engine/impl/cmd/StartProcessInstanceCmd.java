@@ -61,8 +61,6 @@ public class StartProcessInstanceCmd implements Command<ProcessInstanceWithVaria
       processInstance.setTenantId(instantiationBuilder.getTenantId());
     }
 
-    processInstance.setRestartedProcessInstanceId(instantiationBuilder.getRestartedProcessInstanceId());
-
     final ExecutionVariableSnapshotObserver variablesListener = new ExecutionVariableSnapshotObserver(processInstance);
 
     processInstance.start(instantiationBuilder.getVariables());
