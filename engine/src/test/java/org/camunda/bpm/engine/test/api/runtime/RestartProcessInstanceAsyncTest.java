@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
@@ -1148,6 +1149,33 @@ public class RestartProcessInstanceAsyncTest {
 
     Assertions.assertThat(batch.getExecutionStartTime()).isEqualToIgnoringMillis(TEST_DATE);
     Assertions.assertThat(historicBatch.getExecutionStartTime()).isEqualToIgnoringMillis(TEST_DATE);
+  }
+
+  @Test
+  public void shouldSetProcessInstanceAndDefinitionIdInHistoryJobLog() {
+    // given
+
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance = runtimeService.createProcessInstanceById(processDefinition.getId())
+            .startBeforeActivity("userTask1")
+            .execute();
+    runtimeService.deleteProcessInstance(processInstance.getId(), "test");
+    Batch batch = runtimeService.restartProcessInstances(processDefinition.getId())
+            .startAfterActivity("userTask2")
+            .processInstanceIds(processInstance.getId())
+            .executeAsync();
+    helper.executeSeedJob(batch);
+    List<Job> executionJobs = helper.getExecutionJobs(batch);
+
+    // when
+    helper.executeJob(executionJobs.get(0));
+
+    // then
+    HistoricJobLog jobLog = historyService.createHistoricJobLogQuery().jobDefinitionType(Batch.TYPE_PROCESS_INSTANCE_RESTART).list().get(0);
+    System.out.println(jobLog);
+
+    assertEquals(processInstance.getProcessDefinitionId(), jobLog.getProcessDefinitionId());
+    assertEquals(processInstance.getRootProcessInstanceId(), jobLog.getProcessInstanceId());
   }
 
   protected void assertBatchCreated(Batch batch, int processInstanceCount) {
