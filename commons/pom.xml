@@ -52,7 +52,7 @@
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.2.11</version>
+        <version>${version.logback}</version>
       </dependency>
 
       <dependency>
@@ -131,10 +131,10 @@
   </profiles>
 
   <scm>
-    <url>https://github.com/camunda/camunda-commons</url>
-    <connection>scm:git:git@github.com:camunda/camunda-commons.git</connection>
-    <developerConnection>scm:git:git@github.com:camunda/camunda-commons.git</developerConnection>
-    <tag>1.2.0-alpha1</tag>
+    <url>https://github.com/camunda/camunda-bpm-platform</url>
+    <connection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</connection>
+    <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</developerConnection>
+    <tag>HEAD</tag>
   </scm>
 
 </project>
