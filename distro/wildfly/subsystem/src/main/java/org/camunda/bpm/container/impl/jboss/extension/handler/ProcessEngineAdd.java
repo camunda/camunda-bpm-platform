@@ -123,43 +123,4 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
     return propertyMap;
   }
 
-  @Override
-  protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
-    System.out.println("org.camunda.bpm.container.impl.jboss.extension.handler.ProcessEngineAdd.populateModel(ModelNode, ModelNode)");
-    System.out.println(model.toJSONString(false));
-    super.populateModel(operation, model);
-    System.out.println(model.toJSONString(false));
-    System.out.println("populateModel1 end");
-  }
-
-  @Override
-  protected void populateModel(ModelNode operation, Resource resource) throws OperationFailedException {
-    System.out.println("org.camunda.bpm.container.impl.jboss.extension.handler.ProcessEngineAdd.populateModel(ModelNode, Resource)");
-    System.out.println(resource.getModel().toJSONString(false));
-    super.populateModel(operation, resource);
-    System.out.println(resource.getModel().toJSONString(false));
-
-    System.out.println("populateModel2 end");
-
-  }
-
-  @Override
-  protected void populateModel(OperationContext context, ModelNode operation, Resource resource)
-      throws OperationFailedException {
-    System.out.println(
-        "org.camunda.bpm.container.impl.jboss.extension.handler.ProcessEngineAdd.populateModel(OperationContext, ModelNode, Resource)");
-    System.out.println(resource.getModel().toJSONString(false));
-    super.populateModel(context, operation, resource);
-    System.out.println(resource.getModel().toJSONString(false));
-    System.out.println("populateModel3 end");
-  }
-
-
-@Override
-protected Resource createResource(OperationContext context, ModelNode operation) {
-  System.out.println("org.camunda.bpm.container.impl.jboss.extension.handler.ProcessEngineAdd.createResource(OperationContext, ModelNode)");
-  System.out.println(operation.toJSONString(false));
-  System.out.println("createResource end");
-  return super.createResource(context, operation);
-}
 }
