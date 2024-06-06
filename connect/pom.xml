@@ -15,7 +15,6 @@
   <packaging>pom</packaging>
 
   <properties>
-    <commons-codec.version>1.15</commons-codec.version>
     <connect.version.old>7.22.0</connect.version.old>
     <mockito.version>1.9.5</mockito.version>
     <wiremock.version>1.58</wiremock.version>
@@ -37,15 +36,9 @@
     <dependencies>
 
       <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpclient</artifactId>
+        <groupId>org.apache.httpcomponents.client5</groupId>
+        <artifactId>httpclient5</artifactId>
         <version>${version.httpclient}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>commons-codec</groupId>
-        <artifactId>commons-codec</artifactId>
-        <version>${commons-codec.version}</version>
       </dependency>
 
       <dependency>

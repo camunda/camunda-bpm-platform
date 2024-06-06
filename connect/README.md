@@ -2,7 +2,7 @@ camunda-connect
 ===============
 
 <p>
-  <a href="http://camunda.com/">Home</a> |
+  <a href="https://camunda.com/">Home</a> |
   <a href="https://docs.camunda.org/manual/latest/reference/connect/">Documentation</a> |
   <a href="https://forum.camunda.org/">Forum</a> |
   <a href="https://jira.camunda.com/browse/CAM">Issues</a> |
@@ -12,14 +12,14 @@ camunda-connect
 
 Simple API for connecting HTTP Services and other things.
 
-# List of connectors
+# List of Connectors
 
-* HTTP Connector
-* SOAP HTTP Connector
+* HTTP Connector (using Apache HttpClient 5.x)
+* SOAP HTTP Connector (using Apache HttpClient 5.x)
 
 # Using a Connector
 
-camunda Connect API aims at two usage scenarios, usage in a generic system such as Camunda Platform
+Camunda Connect API aims at two usage scenarios, usage in a generic system such as Camunda Platform
 process engine and standalone usage via API. Please see the [official documentation](https://docs.camunda.org/manual/latest/reference/connect/) for more information.
 
 # Contributing
@@ -27,10 +27,6 @@ process engine and standalone usage via API. Please see the [official documentat
 Have a look at our [contribution guide](https://github.com/camunda/camunda-bpm-platform/blob/master/CONTRIBUTING.md) for how to contribute to this repository.
 
 
-# License:
+# License
 
 The source files in this repository are made available under the <a href="../LICENSE">Apache License, Version 2.0</a>.
-
-
-
-[CONTRIBUTING.md]: https://github.com/camunda/camunda-bpm-platform/blob/master/CONTRIBUTING.md
