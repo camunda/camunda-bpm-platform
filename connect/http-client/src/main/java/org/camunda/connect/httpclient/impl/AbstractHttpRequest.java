@@ -19,14 +19,14 @@ package org.camunda.connect.httpclient.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpOptions;
-import org.apache.http.client.methods.HttpPatch;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpTrace;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.classic.methods.HttpOptions;
+import org.apache.hc.client5.http.classic.methods.HttpPatch;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.classic.methods.HttpTrace;
 import org.camunda.connect.httpclient.HttpBaseRequest;
 import org.camunda.connect.httpclient.HttpResponse;
 import org.camunda.connect.impl.AbstractConnectorRequest;
@@ -34,7 +34,7 @@ import org.camunda.connect.spi.Connector;
 
 public class AbstractHttpRequest<Q extends HttpBaseRequest<?, ?>, R extends HttpResponse> extends AbstractConnectorRequest<R> {
 
-  private final HttpConnectorLogger LOG = HttpLogger.HTTP_LOGGER;
+  private static final HttpConnectorLogger LOG = HttpLogger.HTTP_LOGGER;
 
   public AbstractHttpRequest(Connector connector) {
     super(connector);
@@ -64,12 +64,11 @@ public class AbstractHttpRequest<Q extends HttpBaseRequest<?, ?>, R extends Http
   public Q header(String field, String value) {
     if (field == null || field.isEmpty() || value == null || value.isEmpty()) {
       LOG.ignoreHeader(field, value);
-    }
-    else {
+    } else {
       Map<String, String> headers = getRequestParameter(HttpBaseRequest.PARAM_NAME_REQUEST_HEADERS);
 
       if (headers == null) {
-        headers = new HashMap<String, String>();
+        headers = new HashMap<>();
         setRequestParameter(HttpBaseRequest.PARAM_NAME_REQUEST_HEADERS, headers);
       }
       headers.put(field, value);
@@ -82,8 +81,7 @@ public class AbstractHttpRequest<Q extends HttpBaseRequest<?, ?>, R extends Http
     Map<String, String> headers = getHeaders();
     if (headers != null) {
       return headers.get(field);
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -163,7 +161,7 @@ public class AbstractHttpRequest<Q extends HttpBaseRequest<?, ?>, R extends Http
       Map<String, Object> config = getConfigOptions();
 
       if (config == null) {
-        config = new HashMap<String, Object>();
+        config = new HashMap<>();
         setRequestParameter(HttpBaseRequest.PARAM_NAME_REQUEST_CONFIG, config);
       }
       config.put(field, value);
