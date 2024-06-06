@@ -485,6 +485,9 @@
               <exclude>org.mybatis:mybatis:*</exclude>
               <exclude>commons-logging:*</exclude>
               <exclude>joda-time:*</exclude>
+              <exclude>org.apache.httpcomponents:httpclient</exclude>
+              <exclude>org.apache.httpcomponents:httpcore</exclude>
+              <exclude>commons-codec:commons-codec</exclude>
             </excludes>
           </artifactSet>
           <relocations>
