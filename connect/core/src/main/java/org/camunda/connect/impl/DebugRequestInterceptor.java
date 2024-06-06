@@ -17,8 +17,8 @@
 package org.camunda.connect.impl;
 
 import org.camunda.connect.spi.ConnectorInvocation;
-import org.camunda.connect.spi.ConnectorRequestInterceptor;
 import org.camunda.connect.spi.ConnectorRequest;
+import org.camunda.connect.spi.ConnectorRequestInterceptor;
 
 /**
  * <p>
@@ -60,8 +60,7 @@ public class DebugRequestInterceptor implements ConnectorRequestInterceptor {
     target = invocation.getTarget();
     if (proceed) {
       return invocation.proceed();
-    }
-    else {
+    } else {
       return response;
     }
   }

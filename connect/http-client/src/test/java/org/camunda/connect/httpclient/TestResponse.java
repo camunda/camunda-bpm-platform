@@ -16,27 +16,28 @@
  */
 package org.camunda.connect.httpclient;
 
-import java.io.IOException;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicHttpResponse;
 
-import org.apache.http.HttpVersion;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.message.BasicHttpResponse;
 
-public class TestResponse extends BasicHttpResponse implements CloseableHttpResponse {
+
+public class TestResponse extends BasicHttpResponse implements ClassicHttpResponse {
+
+  private HttpEntity entity;
 
   public TestResponse() {
-    this(HttpVersion.HTTP_1_1, 200, "OK");
+    this(200, "OK");
   }
 
-  public TestResponse(ProtocolVersion ver, int code, String reason) {
-    super(ver, code, reason);
+  public TestResponse(int code, String reason) {
+    super(code, reason);
   }
 
-  public TestResponse statusCode(int statusCode) {
-    setStatusCode(statusCode);
+  public TestResponse code(int code) {
+    setCode(code);
     return this;
   }
 
@@ -52,15 +53,24 @@ public class TestResponse extends BasicHttpResponse implements CloseableHttpResp
   public TestResponse payload(String payload, ContentType contentType) {
     if (payload != null) {
       setEntity(new StringEntity(payload, contentType));
-    }
-    else {
+    } else {
       setEntity(null);
     }
     return this;
   }
 
-  public void close() throws IOException {
-
+  @Override
+  public HttpEntity getEntity() {
+    return entity;
   }
 
+  @Override
+  public void setEntity(HttpEntity entity) {
+    this.entity = entity;
+  }
+
+  @Override
+  public void close() {
+    /* NOP */
+  }
 }
