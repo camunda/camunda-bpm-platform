@@ -39,7 +39,7 @@ public class HttpResponseTest {
 
   @Test
   public void testResponseCode() {
-    testResponse.statusCode(123);
+    testResponse.code(123);
     HttpResponse response = getResponse();
     assertThat(response.getStatusCode()).isEqualTo(123);
   }
