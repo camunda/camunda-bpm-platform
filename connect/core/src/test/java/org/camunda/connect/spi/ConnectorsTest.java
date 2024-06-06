@@ -18,8 +18,6 @@ package org.camunda.connect.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Set;
-
 import org.camunda.connect.Connectors;
 import org.camunda.connect.dummy.DummyConnector;
 import org.junit.Test;
