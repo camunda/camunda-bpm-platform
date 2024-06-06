@@ -22,6 +22,6 @@ public abstract class SoapHttpLogger extends BaseLogger {
 
   public static final String PROJECT_CODE = "SOAPC";
 
-  public static SoapHttpConnectorLogger SOAP_CONNECTOR_LOGGER = createLogger(SoapHttpConnectorLogger.class, PROJECT_CODE, "org.camunda.bpm.connect.soap.httpclient.connector", "01");
+  public static final SoapHttpConnectorLogger SOAP_HTTP_CONNECTOR_LOGGER = createLogger(SoapHttpConnectorLogger.class, PROJECT_CODE, "org.camunda.bpm.connect.soap.httpclient.connector", "01");
 
 }

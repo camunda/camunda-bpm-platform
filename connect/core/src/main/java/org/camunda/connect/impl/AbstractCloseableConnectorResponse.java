@@ -30,7 +30,7 @@ import org.camunda.connect.spi.CloseableConnectorResponse;
  */
 public abstract class AbstractCloseableConnectorResponse extends AbstractConnectorResponse implements CloseableConnectorResponse {
 
-  private final static ConnectCoreLogger LOG = ConnectLogger.CORE_LOGGER;
+  private static final ConnectCoreLogger LOG = ConnectLogger.CORE_LOGGER;
 
   /**
    * Implements the default close behavior
