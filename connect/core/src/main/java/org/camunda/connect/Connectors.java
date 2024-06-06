@@ -40,7 +40,7 @@ public class Connectors {
   public static String SOAP_HTTP_CONNECTOR_ID = "soap-http-connector";
 
   /** The global instance of the manager */
-  static Connectors INSTANCE = new Connectors();
+  private static final Connectors INSTANCE = new Connectors();
 
   /**
    * Provides the global instance of the Connectors manager.
@@ -54,27 +54,24 @@ public class Connectors {
    * @return the connector for the default http connector id or null if
    * no connector is registered for this id
    */
-  @SuppressWarnings("unchecked")
   public static <C extends Connector<? extends ConnectorRequest<?>>> C http() {
-    return (C) INSTANCE.getConnectorById(HTTP_CONNECTOR_ID);
+    return getConnector(HTTP_CONNECTOR_ID);
   }
 
   /**
    * @return the connector for the default soap http connector id or null
    * if no connector is registered for this id
    */
-  @SuppressWarnings("unchecked")
   public static <C extends Connector<? extends ConnectorRequest<?>>> C soap() {
-    return (C) INSTANCE.getConnectorById(SOAP_HTTP_CONNECTOR_ID);
+    return getConnector(SOAP_HTTP_CONNECTOR_ID);
   }
 
   /**
    * @return the connector for the given id or null if no connector is
    * registered for this id
    */
-  @SuppressWarnings("unchecked")
   public static <C extends Connector<? extends ConnectorRequest<?>>> C getConnector(String connectorId) {
-    return (C) INSTANCE.getConnectorById(connectorId);
+    return INSTANCE.getConnectorById(connectorId);
   }
 
   /**
@@ -126,7 +123,7 @@ public class Connectors {
    */
   public Set<Connector<? extends ConnectorRequest<?>>> getAllAvailableConnectors() {
     ensureConnectorProvidersInitialized();
-    return new HashSet<Connector<?>>(availableConnectors.values());
+    return new HashSet<>(availableConnectors.values());
   }
 
   /**
@@ -153,9 +150,9 @@ public class Connectors {
   }
 
   protected void initializeConnectors(ClassLoader classLoader) {
-    Map<String, Connector<?>> connectors = new HashMap<String, Connector<?>>();
+    Map<String, Connector<?>> connectors = new HashMap<>();
 
-    if(classLoader == null) {
+    if (classLoader == null) {
       classLoader = Connectors.class.getClassLoader();
     }
 
@@ -181,8 +178,7 @@ public class Connectors {
     String connectorId = provider.getConnectorId();
     if (connectors.containsKey(connectorId)) {
       throw LOG.multipleConnectorProvidersFound(connectorId);
-    }
-    else {
+    } else {
       Connector<?> connectorInstance = provider.createConnectorInstance();
       LOG.connectorProviderDiscovered(provider, connectorId, connectorInstance);
       connectors.put(connectorId, connectorInstance);

@@ -30,7 +30,7 @@ public interface ConnectorInvocation {
    * The underlying raw request.
    * @return the raw request as executed by the connector
    */
-  public Object getTarget();
+  Object getTarget();
 
   /**
    * <p>The connector request as created through the API. Accessing the request from an
@@ -42,7 +42,7 @@ public interface ConnectorInvocation {
    *
    * @return the connector request
    */
-  public ConnectorRequest<?> getRequest();
+  ConnectorRequest<?> getRequest();
 
   /**
    * Makes the request proceed through the interceptor chain.
@@ -52,6 +52,6 @@ public interface ConnectorInvocation {
    * @return the result of the invocation.
    * @throws Exception
    */
-  public Object proceed() throws Exception;
+  Object proceed() throws Exception;
 
 }
