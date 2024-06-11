@@ -19,6 +19,7 @@ package org.camunda.connect.httpclient.impl;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.config.RequestConfig.Builder;
@@ -69,15 +70,33 @@ public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R e
   @Override
   public R execute(Q request) {
     HttpRequestBase httpRequest = createHttpRequest(request);
-
     HttpRequestInvocation invocation = new HttpRequestInvocation(httpRequest, request, requestInterceptors, httpClient);
-
     try {
-      return createResponse((CloseableHttpResponse) invocation.proceed());
-    } catch (Exception e) {
-      throw LOG.unableToExecuteRequest(e);
-    }
+	  
+      R invocationResult = createResponse((CloseableHttpResponse) invocation.proceed());
+	  handleErrorResponse(request , invocationResult);
+	  return invocationResult;
+			
+	   } catch (Exception e) {
+	    throw LOG.unableToExecuteRequest(e);
+	  }
+  }
 
+ private void handleErrorResponse(Q request,R invocationResult ) {
+     Map<String, Object> configOptions = request.getConfigOptions();	
+	   
+     if( configOptions != null && invocationResult != null)  {
+	
+	    int statusCode = invocationResult.getStatusCode();
+	    String connectorResponse = invocationResult.getResponse();
+	    Optional<Object> handleHttpError = Optional.ofNullable(configOptions.get("throw-http-error"));  
+			
+	    if (handleHttpError.isPresent() && handleHttpError.get().toString()
+	        .equalsIgnoreCase("TRUE") && statusCode >= 400 && statusCode <= 599) {  
+		    
+	         throw LOG.unableToExecuteRequest(statusCode,connectorResponse);
+	    }	
+     }
   }
 
   protected abstract R createResponse(CloseableHttpResponse response);
