@@ -213,6 +213,7 @@
         <groupId>org.camunda.spin</groupId>
         <artifactId>camunda-spin-dataformat-all</artifactId>
         <version>${project.version}</version>
+        <!-- Excluding dependencies that are shaded in camunda-spin-dataformat-all -->
         <exclusions>
           <exclusion>
             <groupId>org.camunda.spin</groupId>
