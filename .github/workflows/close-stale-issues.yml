@@ -11,4 +11,4 @@ on:
 
 jobs:
   call-reusable-flow:
-    uses: camunda/automation-platform-github-actions/.github/workflows/stale.yml
+    uses: camunda/automation-platform-github-actions/.github/workflows/close-stale-issues.yml
