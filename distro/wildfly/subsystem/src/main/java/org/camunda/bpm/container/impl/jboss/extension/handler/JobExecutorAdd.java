@@ -53,7 +53,7 @@ public class JobExecutorAdd extends AbstractAddStepHandler {
 
   private JobExecutorAdd() {
     super(SubsystemAttributeDefinitons.JOB_EXECUTOR_ATTRIBUTES);
-}
+  }
 
   @Override
   protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model)

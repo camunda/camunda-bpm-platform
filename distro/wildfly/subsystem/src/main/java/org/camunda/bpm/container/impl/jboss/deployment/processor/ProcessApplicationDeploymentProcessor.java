@@ -100,7 +100,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
 
     List<ServiceName> deploymentServiceNames = new ArrayList<>();
 
-    ServiceBuilder<?> stopServiceBuilder =  phaseContext.getServiceTarget().addService(paStopServiceName);
+    ServiceBuilder<?> stopServiceBuilder = phaseContext.getServiceTarget().addService(paStopServiceName);
     Consumer<ProcessApplicationStopService> paStopProvider = stopServiceBuilder.provides(paStopServiceName);
     stopServiceBuilder.requires(phaseContext.getPhaseServiceName());
     Supplier<BpmPlatformPlugins> platformPluginsSupplier = stopServiceBuilder.requires(ServiceNames.forBpmPlatformPlugins());
@@ -182,8 +182,8 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     AnnotationInstance preUndeploy = ProcessApplicationAttachments.getPreUndeployDescription(deploymentUnit);
 
     // register the managed process application start service
-    ServiceBuilder<?> processApplicationStartServiceBuilder =  phaseContext.getServiceTarget().addService(paStartServiceName);
-    Consumer<ProcessApplicationStartService> paStartProvider =processApplicationStartServiceBuilder.provides(paStartServiceName);
+    ServiceBuilder<?> processApplicationStartServiceBuilder = phaseContext.getServiceTarget().addService(paStartServiceName);
+    Consumer<ProcessApplicationStartService> paStartProvider = processApplicationStartServiceBuilder.provides(paStartServiceName);
 
     processApplicationStartServiceBuilder.requires(phaseContext.getPhaseServiceName());
     Supplier<BpmPlatformPlugins> platformPluginsSupplierStartService = processApplicationStartServiceBuilder.requires(ServiceNames.forBpmPlatformPlugins());
