@@ -18,6 +18,7 @@ package org.camunda.connect.httpclient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.camunda.connect.ConnectorRequestException;
 import org.camunda.connect.httpclient.impl.HttpConnectorImpl;
 import org.camunda.connect.impl.DebugRequestInterceptor;
 import org.junit.Before;
@@ -88,5 +89,69 @@ public class HttpResponseTest {
   protected HttpResponse getResponse() {
     return connector.createRequest().url("http://camunda.com").get().execute();
   }
+
+  @Test
+  public void testSuccessfulResponseCode() {
+    testResponse.statusCode(200);
+    HttpResponse response = getResponse();
+    assertThat(response.getStatusCode()).isEqualTo(200);
+  }
+  
+  @Test
+  public void testResponseErrorCodeForMalformedRequest() {
+    testResponse.statusCode(400);
+    HttpResponse response = getResponse();
+    assertThat(response.getStatusCode()).isEqualTo(400);
+  }
+  
+  @Test
+  public void testResponseErrorCodeForServerError() {
+    testResponse.statusCode(500);
+    HttpResponse response = getResponse();
+    assertThat(response.getStatusCode()).isEqualTo(500);
+  }
+  
+  @Test
+  public void testServerErrorResponseWithConfigOptionSet() {
+    try {
+      // when
+    	testResponse.statusCode(500);
+    	connector.createRequest().configOption("throw-http-error", "TRUE")
+    	    .url("http://camunda.com").get()
+    	    .execute();
+    } catch (ConnectorRequestException e) {
+     // then
+      assertThat(e).hasMessageContaining("Unable to execute HTTP request");
+      assertThat(e).hasCauseExactlyInstanceOf(ConnectorRequestException.class);
+    }
+  }
+  
+  @Test
+  public void testMalformedRequestWithConfigOptionSet() {
+    try {
+      // when
+    	testResponse.statusCode(400);
+    	connector.createRequest().configOption("throw-http-error", "TRUE")
+    	    .url("http://camunda.com").get()
+    	    .execute();
+    } catch (ConnectorRequestException e) {
+     // then
+      assertThat(e).hasMessageContaining("Unable to execute HTTP request");
+      assertThat(e).hasCauseExactlyInstanceOf(ConnectorRequestException.class);
+    }
+  }
+  
+  @Test
+  public void testSuccessResponseWithConfigOptionSet() {
+     // when
+      testResponse.statusCode(200);
+      connector.createRequest().configOption("throw-http-error", "TRUE")
+    	    .url("http://camunda.com").get()
+    	    .execute();
+      HttpResponse response = getResponse();
+     // then
+      assertThat(response.getStatusCode()).isEqualTo(200);
+  }
+
 
 }
