@@ -217,7 +217,7 @@ public class JobExecutorLogger extends ProcessEngineLogger {
     return new ProcessEngineException(exceptionMessage("031", "Invalid configuration for job executor priority range. Reason: {}", reason));
   }
 
-  public void failedAcquisitions(String processEngine, AcquiredJobs acquiredJobs) {
+  public void failedAcquisitionLocks(String processEngine, AcquiredJobs acquiredJobs) {
     logDebug(
             "033",
             "Jobs failed to Lock during Acquisition of jobs for the process engine '{}' : {}", processEngine, acquiredJobs.getNumberOfJobsFailedToLock());
@@ -226,7 +226,7 @@ public class JobExecutorLogger extends ProcessEngineLogger {
   public void jobsToAcquire(String processEngine, int numJobsToAcquire) {
     logDebug(
             "034",
-            "Attempting to acquire {} jobs for the process engine '{}' : {}", numJobsToAcquire , processEngine);
+            "Attempting to acquire {} jobs for the process engine '{}'", numJobsToAcquire , processEngine);
   }
 
   public void rejectedJobExecutions(String processEngine, int numJobsRejected) {

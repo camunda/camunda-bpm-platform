@@ -175,7 +175,7 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
     jobExecutor.logAcquisitionFailureJobs(currentProcessEngine, acquiredJobs.getNumberOfJobsFailedToLock());
 
     LOG.acquiredJobs(currentProcessEngine.getName(), acquiredJobs);
-    LOG.failedAcquisitions(currentProcessEngine.getName(), acquiredJobs);
+    LOG.failedAcquisitionLocks(currentProcessEngine.getName(), acquiredJobs);
 
     return acquiredJobs;
   }
