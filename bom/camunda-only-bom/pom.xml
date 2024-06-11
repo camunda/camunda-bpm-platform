@@ -210,6 +210,29 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.camunda.spin</groupId>
+        <artifactId>camunda-spin-dataformat-all</artifactId>
+        <version>${project.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.camunda.spin</groupId>
+            <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.camunda.spin</groupId>
+            <artifactId>camunda-spin-dataformat-xml-dom</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
         <groupId>org.camunda.commons</groupId>
         <artifactId>camunda-commons-bom</artifactId>
         <version>${project.version}</version>
