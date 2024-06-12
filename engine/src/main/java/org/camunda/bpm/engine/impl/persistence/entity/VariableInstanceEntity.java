@@ -17,10 +17,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.application.InvocationContext;
@@ -157,7 +154,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     }
 
     // clear value
-    clearValueFields(true);
+    clearValueFieldsBasedOnType(true);
 
     if (!isTransient) {
       // delete variable
@@ -278,24 +275,50 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     return typedValueField.getTypedValue(deserializeValue, isTransient);
   }
 
-  public void setValue(TypedValue value) {
-    // clear value fields
-    clearValueFields(false);
+  public void setValue(TypedValue newValue) {
+    clearValueFieldsBasedOnType(newValue);
 
-    typedValueField.setValue(value);
+    typedValueField.setValue(newValue);
   }
 
-  public void clearValueFields(boolean deleteVariable) {
+  public void clearValueFieldsBasedOnType(TypedValue newValue) {
+    if (variableWillChangeType(newValue)) {
+      clearValueFieldsBasedOnType(true);
+    } else {
+      clearValueFieldsBasedOnType(false);
+    }
+  }
+
+  public void clearValueFieldsBasedOnType(boolean deleteVariable) {
     this.longValue = null;
     this.doubleValue = null;
     this.textValue = null;
     this.textValue2 = null;
     typedValueField.clear();
 
-    if(deleteVariable && byteArrayField.getByteArrayId() != null) {
+    if (deleteVariable && byteArrayField.getByteArrayId() != null) {
       deleteByteArrayValue();
       setByteArrayValueId(null);
     }
+  }
+
+  public boolean variableWillChangeType(TypedValue newValue) {
+    String currentTypeName = typedValueField.getTypeName();
+    String newTypeName = getTypeName(newValue);
+
+    return !Objects.equals(currentTypeName, newTypeName);
+  }
+
+  public String getTypeName(TypedValue value) {
+    if (value.getType() != null) {
+      return value.getType().getName();
+    }
+
+    // Fetches the class name from the value if the type is null
+    return value.getValue()
+            .getClass()
+            .getSimpleName()
+            .toLowerCase();
   }
 
   public String getTypeName() {
