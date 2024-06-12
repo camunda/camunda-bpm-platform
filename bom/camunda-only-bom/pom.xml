@@ -219,6 +219,11 @@
         <artifactId>camunda-template-engines-freemarker</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.camunda.connect</groupId>
+        <artifactId>camunda-connect-bom</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- dmn engine dependencies
        -->
@@ -258,22 +263,6 @@
         <groupId>org.camunda.bpm.springboot</groupId>
         <artifactId>camunda-bpm-spring-boot-starter-external-task-client</artifactId>
         <version>${project.version}</version>
-      </dependency>
-
-      <!-- camunda-commons-typed-values: part of the platform and shares the same version -->
-      <dependency>
-        <groupId>org.camunda.commons</groupId>
-        <artifactId>camunda-commons-typed-values</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- optional dependencies -->
-      <dependency>
-        <groupId>org.camunda.connect</groupId>
-        <artifactId>camunda-connect-bom</artifactId>
-        <version>${version.camunda.connect}</version>
-        <scope>import</scope>
-        <type>pom</type>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -212,6 +212,7 @@
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- explicit Spring dependencies for applications

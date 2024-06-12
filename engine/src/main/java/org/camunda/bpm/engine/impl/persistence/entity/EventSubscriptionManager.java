@@ -221,6 +221,13 @@ public class EventSubscriptionManager extends AbstractManager {
     return getDbEntityManager().selectList(query, params);
   }
 
+  public List<EventSubscriptionEntity> findStartEventSubscriptionsByConfigurationLike(String configuration) {
+    final String query = "selectStartEventSubscriptionsByConfigurationLike";
+    Map<String,String> params = new HashMap<>();
+    params.put("configuration", configuration);
+    return getDbEntityManager().selectList(query, params);
+  }
+
   @SuppressWarnings("unchecked")
   public List<EventSubscriptionEntity> findEventSubscriptionsByNameAndTenantId(String type, String eventName, String tenantId) {
     final String query = "selectEventSubscriptionsByNameAndTenantId";
