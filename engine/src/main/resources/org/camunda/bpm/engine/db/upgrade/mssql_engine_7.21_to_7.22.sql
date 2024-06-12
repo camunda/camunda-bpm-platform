@@ -17,3 +17,7 @@
 
 insert into ACT_GE_SCHEMA_LOG
 values ('1100', CURRENT_TIMESTAMP, '7.22.0');
+
+alter table ACT_RU_TASK add TASK_STATE_ nvarchar(64);
+
+alter table ACT_HI_TASKINST add TASK_STATE_ nvarchar(64);
