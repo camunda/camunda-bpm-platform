@@ -189,4 +189,9 @@ public interface Task {
    */
   void setTenantId(String tenantId);
 
+  /** Returns if an attachment exists for the task */
+  boolean hasAttachment();
+  /** Signifies if a comment exists for the task */
+  boolean hasComment();
+
 }

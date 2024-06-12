@@ -53,7 +53,9 @@
                            "binding": "version",
                            "version": 2
                          },
-                         "tenantId":"aTenantId"
+                         "tenantId":"aTenantId",
+                         "attachment":false,
+                         "comment":false
                        }
                      }'] />
 

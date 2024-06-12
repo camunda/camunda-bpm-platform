@@ -1104,4 +1104,9 @@ public interface TaskQuery extends Query<TaskQuery, Task> {
    *                                this exception, {@link #or()} must be invoked first.
    */
   TaskQuery endOr();
+
+  /**
+   * Evaluates existence of attachment and comments associated with the task, defaults to false.
+   */
+  TaskQuery withCommentAttachmentInfo();
 }

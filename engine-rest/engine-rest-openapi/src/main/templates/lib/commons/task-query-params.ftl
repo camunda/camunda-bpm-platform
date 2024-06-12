@@ -657,5 +657,12 @@
   <@lib.parameter name = "parentTaskId"
       location = "query"
       type = "string"
-      last = last
       desc = "Restrict query to all tasks that are sub tasks of the given task. Takes a task id." />
+
+  <@lib.parameter name = "withCommentAttachmentInfo"
+      location = "query"
+      type = "boolean"
+      defaultValue = "false"
+      last = last
+      desc = "Check if task has attachments and/or comments. Value may only be `true`, as
+                  `false` is the default behavior." />

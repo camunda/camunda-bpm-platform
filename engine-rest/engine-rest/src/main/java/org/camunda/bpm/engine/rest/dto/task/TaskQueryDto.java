@@ -212,6 +212,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   private List<TaskQueryDto> orQueries;
 
+  private Boolean withCommentAttachmentInfo;
+
   public TaskQueryDto() {
 
   }
@@ -708,6 +710,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.variableValuesIgnoreCase = variableValuesCaseInsensitive;
   }
 
+  @CamundaQueryParam(value = "withCommentAttachmentInfo", converter = BooleanConverter.class)
+  public void setWithCommentAttachmentInfo(Boolean withCommentAttachmentInfo) {
+    this.withCommentAttachmentInfo = withCommentAttachmentInfo;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -1078,6 +1085,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return variableValuesIgnoreCase;
   }
 
+  public Boolean getWithCommentAttachmentInfo() { return withCommentAttachmentInfo;}
+
   @Override
   protected void applyFilters(TaskQuery query) {
     if (orQueries != null) {
@@ -1441,6 +1450,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid case variable comparator specified: " + op);
         }
       }
+    }
+    if (withCommentAttachmentInfo != null && withCommentAttachmentInfo) {
+      query.withCommentAttachmentInfo();
     }
   }
 

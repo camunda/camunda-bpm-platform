@@ -129,8 +129,18 @@
     <@lib.property
         name = "tenantId"
         type = "string"
-        last = true
         desc = "If not `null`, the tenant id of the task." />
+
+    <@lib.property
+        name = "attachment"
+        type = "boolean"
+        desc = "Specifies if an attachment exists for the task." />
+
+    <@lib.property
+        name = "comment"
+        type = "boolean"
+        last = true
+        desc = "Specifies if an comment exists for the task." />
 
 </@lib.dto>
 </#macro>

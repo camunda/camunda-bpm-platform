@@ -187,6 +187,8 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     boolean returnedSuspensionState = from(content).getBoolean("[0].suspended");
     String returnedFormKey = from(content).getString("[0].formKey");
     String returnedTenantId = from(content).getString("[0].tenantId");
+    boolean returnedAttachmentsInfo = from(content).getBoolean("[0].attachment");
+    boolean returnedCommentsInfo = from(content).getBoolean("[0].comment");
 
     assertThat(MockProvider.EXAMPLE_TASK_NAME).isEqualTo(returnedTaskName);
     assertThat(MockProvider.EXAMPLE_TASK_ID).isEqualTo(returnedId);
@@ -210,6 +212,8 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     assertThat(MockProvider.EXAMPLE_TASK_SUSPENSION_STATE).isEqualTo(returnedSuspensionState);
     assertThat(MockProvider.EXAMPLE_FORM_KEY).isEqualTo(returnedFormKey);
     assertThat(MockProvider.EXAMPLE_TENANT_ID).isEqualTo(returnedTenantId);
+    assertThat(MockProvider.EXAMPLE_TASK_ATTACHMENT_STATE).isEqualTo(returnedAttachmentsInfo);
+    assertThat(MockProvider.EXAMPLE_TASK_COMMENT_STATE).isEqualTo(returnedCommentsInfo);
 
   }
 
@@ -521,6 +525,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("withCandidateUsers", true);
     parameters.put("withoutCandidateUsers", true);
     parameters.put("withoutDueDate", true);
+    parameters.put("withCommentAttachmentInfo", true);
 
     return parameters;
   }
@@ -586,6 +591,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).withCandidateUsers();
     verify(mockQuery).withoutCandidateUsers();
     verify(mockQuery).withoutDueDate();
+    verify(mockQuery).withCommentAttachmentInfo();
   }
 
   @Test
