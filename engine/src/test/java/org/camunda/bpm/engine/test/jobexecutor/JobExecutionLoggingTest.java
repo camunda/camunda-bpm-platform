@@ -62,7 +62,7 @@ public class JobExecutionLoggingTest {
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml"})
   public void shouldLogJobsQueuedForExecution() {
-    // replace job executor with one that has custom threadpool executor values
+    // replace job executor with one that has custom threadpool executor settings
     JobExecutionLoggingTest.TestJobExecutor testJobExecutor = new JobExecutionLoggingTest.TestJobExecutor();
     testJobExecutor.setMaxJobsPerAcquisition(10);
     processEngineConfiguration.setJobExecutor(testJobExecutor);
@@ -73,7 +73,7 @@ public class JobExecutionLoggingTest {
       runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
     }
 
-    // execute the jobs
+    // when executing the jobs
     processEngineConfiguration.getJobExecutor().start();
     testRule.waitForJobExecutorToProcessAllJobs(5000L);
     processEngineConfiguration.getJobExecutor().shutdown();
@@ -88,7 +88,7 @@ public class JobExecutionLoggingTest {
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml"})
   public void shouldLogJobsInExecution() {
-    // replace job executor with one that has custom threadpool executor values
+    // replace job executor with one that has custom threadpool executor settings
     JobExecutionLoggingTest.TestJobExecutor testJobExecutor = new JobExecutionLoggingTest.TestJobExecutor();
     testJobExecutor.setMaxJobsPerAcquisition(10);
     processEngineConfiguration.setJobExecutor(testJobExecutor);
@@ -99,7 +99,7 @@ public class JobExecutionLoggingTest {
       runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
     }
 
-    // execute the jobs
+    // when executing the jobs
     processEngineConfiguration.getJobExecutor().start();
     testRule.waitForJobExecutorToProcessAllJobs(5000L);
     processEngineConfiguration.getJobExecutor().shutdown();
@@ -114,7 +114,7 @@ public class JobExecutionLoggingTest {
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml"})
   public void shouldLogAvailableJobExecutionThreads() {
-    // replace job executor with one that has custom threadpool executor values
+    // replace job executor with one that has custom threadpool executor settings
     JobExecutionLoggingTest.TestJobExecutor testJobExecutor = new JobExecutionLoggingTest.TestJobExecutor();
     testJobExecutor.setMaxJobsPerAcquisition(10);
     processEngineConfiguration.setJobExecutor(testJobExecutor);
@@ -125,12 +125,12 @@ public class JobExecutionLoggingTest {
       runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
     }
 
-    // execute the jobs
+    // when executing the jobs
     processEngineConfiguration.getJobExecutor().start();
     testRule.waitForJobExecutorToProcessAllJobs(5000L);
     processEngineConfiguration.getJobExecutor().shutdown();
 
-    // look for 2 count of available 1job execution threads
+    // look for 2 count of available job execution threads
     List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog("Available job execution threads for the process engine 'default' : 2");
 
     // then 2 threads will be available for 3 number of times because of queuing action post the core-pool-size limit is met
@@ -140,15 +140,17 @@ public class JobExecutionLoggingTest {
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/jobexecutor/delegateThrowsException.bpmn20.xml" })
   public void shouldLogJobExecutionRejections() {
-    //given a job
-    runtimeService.startProcessInstanceByKey("testProcess");
+    // given three jobs
+    for (int i = 0; i < 3; i++) {
+      runtimeService.startProcessInstanceByKey("testProcess");
+    }
 
     // replace job executor with one that rejects all jobs
     JobExecutionLoggingTest.RejectionJobExecutor rejectionExecutor = new JobExecutionLoggingTest.RejectionJobExecutor();
     processEngineConfiguration.setJobExecutor(rejectionExecutor);
     rejectionExecutor.registerProcessEngine(processEngineConfiguration.getProcessEngine());
 
-    // execute the jobs
+    // when executing the jobs
     processEngineConfiguration.getJobExecutor().start();
     testRule.waitForJobExecutorToProcessAllJobs(5000L);
     processEngineConfiguration.getJobExecutor().shutdown();

@@ -42,7 +42,9 @@ public class JobAcquisitionLoggingTest {
 
   @After
   public void tearDown() {
-    List<Job> jobs = managementService.createJobQuery().processDefinitionKey("loggingTestProcess").list();
+    List<Job> jobs = managementService.createJobQuery().processDefinitionKey("simpleAsyncProcess").list();
+
+    // remove simple async process jobs
     for (Job job : jobs) {
       managementService.deleteJob(job.getId());
     }
@@ -51,28 +53,42 @@ public class JobAcquisitionLoggingTest {
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml" })
   public void shouldLogJobsAttemptingToAcquire() {
-    runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
+    // given five jobs
+    for (int i = 0; i < 5; i++) {
+      runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
+    }
 
+    // given max-job-acquisition threshold to three
     processEngineConfiguration.getJobExecutor().setMaxJobsPerAcquisition(3);
 
+    // when executing the jobs
     processEngineConfiguration.getJobExecutor().start();
     testRule.waitForJobExecutorToProcessAllJobs();
     processEngineConfiguration.getJobExecutor().shutdown();
 
+    // look for log where it states that "acquiring three jobs"
     List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog("Attempting to acquire 3 jobs for the process engine 'default'");
-    assertThat(filteredLogList.size()).isGreaterThan(0);
+
+    // then find the expected logs
+    assertThat(filteredLogList.size()).isGreaterThan(4);
   }
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml" })
   public void shouldLogFailedAcquisitionLocks() {
-    runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
+    // given five jobs
+    for (int i = 0; i < 5; i++) {
+      runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
+    }
 
+    // when executing the jobs
     processEngineConfiguration.getJobExecutor().start();
     testRule.waitForJobExecutorToProcessAllJobs();
     processEngineConfiguration.getJobExecutor().shutdown();
 
-    List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog("Jobs failed to Lock during Acquisition of jobs for the process engine ");
-    assertThat(filteredLogList.size()).isGreaterThan(0);
+    List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog("Jobs failed to Lock during Acquisition of jobs for the process engine 'default' : 0");
+
+    // then get logs that states there were no faults during job acquisition locks
+    assertThat(filteredLogList.size()).isGreaterThan(4);
   }
 }
