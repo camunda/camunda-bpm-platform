@@ -235,6 +235,11 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   protected String superCaseExecutionId;
 
   /**
+   * The name of the process definition key
+   */
+  protected String processDefinitionKey;
+
+  /**
    * Contains observers which are observe the execution.
    * @since 7.6
    */
@@ -263,6 +268,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
     // initialize the new execution
     createdExecution.setProcessDefinition(getProcessDefinition());
+    createdExecution.setProcessDefinitionKey(getProcessDefinitionKey());
     createdExecution.setProcessInstance(getProcessInstance());
     createdExecution.setActivity(getActivity());
     createdExecution.setSuspensionState(getSuspensionState());
@@ -1936,24 +1942,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     return getProcessDefinition().getTenantId();
   }
 
-  /**
-   * reference to a process definition entity within Execution Entity
-   * 
-   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4049
-   */
-  
-  protected transient ProcessDefinitionEntity processDefinitionKey;
-  
-  /**
-   * persisted reference to the process definition.
-   *
-   * @see #getProcessDefinitionKey()
-   * 
-   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4049
-   */
-
-  @Override
+   public void setProcessDefinitionKey(String processDefinitionKey) {
+     this.processDefinitionKey = processDefinitionKey;
+  }
+   
   public String getProcessDefinitionKey() {
-		return getProcessDefinition().getKey();
-	}
+    return processDefinitionKey;
+  }
+  
 }
