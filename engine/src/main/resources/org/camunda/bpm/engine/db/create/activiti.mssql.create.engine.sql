@@ -98,6 +98,7 @@ create table ACT_RU_EXECUTION (
     CACHED_ENT_STATE_ int,
     SEQUENCE_COUNTER_ numeric(19,0),
     TENANT_ID_ nvarchar(64),
+    PROC_DEF_KEY_ nvarchar(255),
     primary key (ID_)
 );
 
