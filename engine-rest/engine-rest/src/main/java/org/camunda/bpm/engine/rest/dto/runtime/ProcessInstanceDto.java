@@ -28,9 +28,6 @@ public class ProcessInstanceDto extends LinkableDto {
   private boolean ended;
   private boolean suspended;
   private String tenantId;
-  /**
-   * GIT Issue : https://github.com/camunda/camunda-bpm-platform/issues/4049
-   */
   private String definitionKey;
 
   public ProcessInstanceDto() {
