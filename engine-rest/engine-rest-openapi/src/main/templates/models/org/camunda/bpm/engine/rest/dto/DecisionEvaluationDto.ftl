@@ -1,6 +1,3 @@
-<#--
-GIT Issue: https://github.com/camunda/camunda-bpm-platform/issues/2749
--->
 <#macro dto_macro docsUrl="">
     <@lib.dto>
         <@lib.property
@@ -11,8 +8,7 @@ GIT Issue: https://github.com/camunda/camunda-bpm-platform/issues/2749
         <@lib.property
             name = "result"
             type = "array"
-            addProperty = "\"additionalProperties\": true"
             last = true
-            dto = "VariableValueDto" />
+            dto = "DecisionResultDto" />
     </@lib.dto>
 </#macro>

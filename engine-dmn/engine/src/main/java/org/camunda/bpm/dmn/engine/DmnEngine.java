@@ -253,6 +253,21 @@ public interface DmnEngine {
    * @param decision the {@link DmnDecision} to evaluate
    * @param variableContext the variables context which is available during the evaluation
    *                        of expressions in the table
+   * @return the {@link DmnDecisionResult} of this evaluation
+   *
+   * @throws DmnEngineException
+   *           if the decision logic is not supported
+   * @throws DmnEngineException
+   *           if an error occurs during the evaluation
+   */
+  DmnDecisionResult evaluateDecision(DmnDecision decision, VariableContext variableContext);
+
+  /**
+   * Evaluates a decision. The decision can be implemented as any kind of supported decision logic (e.g., decision table, literal expression).
+   *
+   * @param decision the {@link DmnDecision} to evaluate
+   * @param variableContext the variables context which is available during the evaluation
+   *                        of expressions in the table
    * @param decisionInstanceId the variable that contains the decisionInstanceId for decision evaluation
    * @return the {@link DmnDecisionResult} of this evaluation
    *

@@ -166,9 +166,6 @@ public class DecisionDefinitionResourceImpl implements DecisionDefinitionResourc
     }
   }
 
-  /**
-   * GIT Issue: https://github.com/camunda/camunda-bpm-platform/issues/2749
-   */
   public DecisionEvaluationDto evaluateDecisionWithId(UriInfo context, EvaluateDecisionDto parameters) {
     DecisionService decisionService = engine.getDecisionService();
 
