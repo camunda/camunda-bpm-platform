@@ -233,6 +233,13 @@
     	and (CONFIGURATION_ = #{parameter.configuration})
   </select>
 
+  <select id="selectStartEventSubscriptionsByConfigurationLike" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    select *
+    from ${prefix}ACT_RU_EVENT_SUBSCR
+    where (CONFIGURATION_ like #{parameter.configuration})
+      and EXECUTION_ID_ is null
+  </select>
+
   <select id="selectEventSubscriptionsByNameAndTenantId" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select *
     from ${prefix}ACT_RU_EVENT_SUBSCR
