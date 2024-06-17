@@ -293,22 +293,11 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
   }
 
   protected List<EventSubscriptionEntity> getOrphanSubscriptionEvents(ProcessDefinitionEntity processDefinition) {
-    Map<String, EventSubscriptionDeclaration> eventSubscriptionDeclarations = processDefinition.getProperties().get(BpmnProperties.EVENT_SUBSCRIPTION_DECLARATIONS);
-
-    // if finding subscriptions by name and tenant ID impacts performance, we could think about another way of filtering
-    // (for example doing "configuration" LIKE "processDefinition.key%")
-    if (!eventSubscriptionDeclarations.isEmpty()) {
-      return eventSubscriptionDeclarations.values()
-          .stream()
-          .filter(EventSubscriptionDeclaration::hasEventName)
-          .flatMap(declaration -> getEventSubscriptionManager().findEventSubscriptionsByNameAndTenantId(
-                  declaration.getEventType(), declaration.getUnresolvedEventName(), processDefinition.getTenantId())
-              .stream())
-          .filter(this::isOrphan)
-          .collect(Collectors.toList());
-    }
-
-    return Collections.emptyList();
+    String configurationLike = processDefinition.getKey() + ":%:%";
+    return getEventSubscriptionManager().findStartEventSubscriptionsByConfigurationLike(configurationLike)
+        .stream()
+        .filter(this::isOrphan)
+        .collect(Collectors.toList());
   }
 
   protected boolean isOrphan(EventSubscriptionEntity entity) {
