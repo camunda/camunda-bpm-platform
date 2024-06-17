@@ -51,7 +51,7 @@ public class JobExecutorAdd extends AbstractAddStepHandler {
 
   public static final JobExecutorAdd INSTANCE = new JobExecutorAdd();
 
-  private JobExecutorAdd() {
+  protected JobExecutorAdd() {
     super(SubsystemAttributeDefinitons.JOB_EXECUTOR_ATTRIBUTES);
   }
 

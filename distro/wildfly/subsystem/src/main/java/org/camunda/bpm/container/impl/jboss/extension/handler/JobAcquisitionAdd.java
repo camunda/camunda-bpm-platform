@@ -45,7 +45,7 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler {
 
   public static final JobAcquisitionAdd INSTANCE = new JobAcquisitionAdd();
 
-  private JobAcquisitionAdd() {
+  protected JobAcquisitionAdd() {
     super(SubsystemAttributeDefinitons.JOB_ACQUISITION_ATTRIBUTES);
   }
 

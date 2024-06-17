@@ -33,7 +33,6 @@ import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathAddress;
-import org.jboss.as.controller.registry.Resource;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
 import org.jboss.msc.service.ServiceBuilder;
@@ -49,7 +48,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
 
   public static final ProcessEngineAdd INSTANCE = new ProcessEngineAdd();
 
-  private ProcessEngineAdd() {
+  protected ProcessEngineAdd() {
     super(SubsystemAttributeDefinitons.PROCESS_ENGINE_ATTRIBUTES);
   }
 
