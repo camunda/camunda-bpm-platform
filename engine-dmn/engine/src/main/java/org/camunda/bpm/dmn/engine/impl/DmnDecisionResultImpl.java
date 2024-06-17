@@ -36,9 +36,6 @@ public class DmnDecisionResultImpl implements DmnDecisionResult {
 
   protected final List<DmnDecisionResultEntries> ruleResults;
 
-  /**
-   * GIT Issue: https://github.com/camunda/camunda-bpm-platform/issues/2749
-   */
   protected String dmnDecisionInstanceId;
 
   public DmnDecisionResultImpl(List<DmnDecisionResultEntries> ruleResults) {

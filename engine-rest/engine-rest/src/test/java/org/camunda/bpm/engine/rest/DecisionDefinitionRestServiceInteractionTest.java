@@ -89,9 +89,6 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
 
   protected static final String EVALUATE_DECISION_URL = SINGLE_DECISION_DEFINITION_URL + "/evaluate";
   protected static final String EVALUATE_DECISION_BY_KEY_URL = SINGLE_DECISION_DEFINITION_BY_KEY_URL + "/evaluate";
-  /**
-   * GIT Issue: https://github.com/camunda/camunda-bpm-platform/issues/2749
-   */
   protected static final String EVALUATE_DECISION_WITH_DECINST_ID_URL = SINGLE_DECISION_DEFINITION_BY_KEY_URL + "/evaluate-with-id";
   protected static final String EVALUATE_DECISION_BY_KEY_AND_TENANT_ID_URL = SINGLE_DECISION_DEFINITION_BY_KEY_AND_TENANT_ID_URL + "/evaluate";
   protected static final String UPDATE_HISTORY_TIME_TO_LIVE_URL = SINGLE_DECISION_DEFINITION_URL + "/history-time-to-live";

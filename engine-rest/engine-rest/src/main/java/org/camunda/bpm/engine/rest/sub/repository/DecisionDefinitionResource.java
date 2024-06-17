@@ -60,9 +60,6 @@ public interface DecisionDefinitionResource {
 
   //This api evaluates dmn decision and returns the associated decisionInstanceId in the response
 
-  /**
-   * GIT Issue: https://github.com/camunda/camunda-bpm-platform/issues/2749
-   */
   @POST
   @Path("/evaluate-with-id")
   @Consumes(MediaType.APPLICATION_JSON)

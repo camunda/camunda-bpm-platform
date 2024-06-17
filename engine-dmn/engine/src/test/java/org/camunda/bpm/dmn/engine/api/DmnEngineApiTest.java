@@ -603,7 +603,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
     }
 
     try {
-      dmnEngine.evaluateDecision(null, emptyVariableContext(), null);
+      dmnEngine.evaluateDecision(null, emptyVariableContext());
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
     }
     catch(IllegalArgumentException e) {
@@ -659,7 +659,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
     }
 
     try {
-      dmnEngine.evaluateDecision(decision, (VariableContext) null, null);
+      dmnEngine.evaluateDecision(decision, (VariableContext) null);
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
     }
     catch(IllegalArgumentException e) {
@@ -683,7 +683,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   @DecisionResource(resource = ONE_RULE_DMN)
   public void shouldFailEvaluatingDecisionWithEmptyVariableContext() {
     try {
-      dmnEngine.evaluateDecision(decision, emptyVariableContext(), null);
+      dmnEngine.evaluateDecision(decision, emptyVariableContext());
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
     }
     catch(DmnEvaluationException e) {
@@ -771,7 +771,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   @Test
   @DecisionResource(resource = ONE_RULE_DMN)
   public void shouldEvaluateDecisionWithVariableContext() {
-    DmnDecisionResult results = dmnEngine.evaluateDecision(decision, createVariables().putValue("input", INPUT_VALUE).asVariableContext(), null);
+    DmnDecisionResult results = dmnEngine.evaluateDecision(decision, createVariables().putValue("input", INPUT_VALUE).asVariableContext());
 
     assertThat((String) results.getSingleEntry())
       .isNotNull()

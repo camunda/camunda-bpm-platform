@@ -30,9 +30,6 @@ public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEven
   protected long executedDecisionInstances;
   protected long executedDecisionElements;
 
-  /**
-   * GIT Issue: https://github.com/camunda/camunda-bpm-platform/issues/2749
-   */
   protected String decisionInstanceId;
 
   @Override

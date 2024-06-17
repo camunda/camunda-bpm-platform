@@ -64,7 +64,6 @@
     <dependency>
       <groupId>org.camunda.bpm.juel</groupId>
       <artifactId>camunda-juel</artifactId>
-      <version>7.20.0</version>
     </dependency>
 
     <dependency>

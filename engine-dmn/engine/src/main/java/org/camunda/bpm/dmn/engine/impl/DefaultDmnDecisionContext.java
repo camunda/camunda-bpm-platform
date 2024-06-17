@@ -54,7 +54,6 @@ public class DefaultDmnDecisionContext {
 
   public DefaultDmnDecisionContext(DefaultDmnEngineConfiguration configuration) {
     evaluationListeners = configuration.getDecisionEvaluationListeners();
-
     evaluationHandlers = new HashMap<Class<? extends DmnDecisionLogic>, DmnDecisionLogicEvaluationHandler>();
     evaluationHandlers.put(DmnDecisionTableImpl.class, new DecisionTableEvaluationHandler(configuration));
     evaluationHandlers.put(DmnDecisionLiteralExpressionImpl.class, new DecisionLiteralExpressionEvaluationHandler(configuration));
@@ -92,7 +91,6 @@ public class DefaultDmnDecisionContext {
     }
     /**
      * Setting generated decisionInstanceId to the events to persist the generated value as ID for ACT_HI_DECINST table
-     * GIT Issue: https://github.com/camunda/camunda-bpm-platform/issues/2749
      */
     generateDecisionEvaluationEvent(evaluatedEvents, decisionInstanceId);
     evaluatedResult.setDmnDecisionInstanceId(decisionInstanceId);

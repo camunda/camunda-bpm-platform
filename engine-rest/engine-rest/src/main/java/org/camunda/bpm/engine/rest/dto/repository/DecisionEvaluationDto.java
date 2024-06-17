@@ -5,9 +5,6 @@ import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import java.util.List;
 import java.util.Map;
 
-/**
- * GIT Issue: https://github.com/camunda/camunda-bpm-platform/issues/2749
- */
 public class DecisionEvaluationDto {
     protected String decisionInstanceId;
     protected List<Map<String, VariableValueDto>> result;

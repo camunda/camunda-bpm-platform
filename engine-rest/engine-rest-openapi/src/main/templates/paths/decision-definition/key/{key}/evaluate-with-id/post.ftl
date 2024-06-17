@@ -1,6 +1,3 @@
-<#--
-GIT Issue: https://github.com/camunda/camunda-bpm-platform/issues/2749
--->
 <#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo

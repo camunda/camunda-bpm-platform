@@ -113,7 +113,7 @@ public interface DmnDecisionResult extends List<DmnDecisionResultEntries>, Seria
 
   /** Returns the value of decisionInstanceId that's part of DMN decision evaluation
    * @return the decisionInstanceId generated
-   * GIT Issue: https://github.com/camunda/camunda-bpm-platform/issues/2749
+   * Returns null for a standalone dmn engine
    */
   String getDmnDecisionInstanceId();
 
