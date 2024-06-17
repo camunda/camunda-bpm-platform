@@ -37,12 +37,16 @@ public class MessageCorrelationResultDto {
 
   public static MessageCorrelationResultDto fromMessageCorrelationResult(MessageCorrelationResult result) {
     MessageCorrelationResultDto dto = new MessageCorrelationResultDto();
+    return setExecutionAndProcessInstance(dto, result);
+  }
+
+  public static MessageCorrelationResultDto setExecutionAndProcessInstance(MessageCorrelationResultDto dto, MessageCorrelationResult result) {
     if (result != null) {
-      dto.resultType = result.getResultType();
-      if (result.getProcessInstance() != null) {
-        dto.processInstance = ProcessInstanceDto.fromProcessInstance(result.getProcessInstance());
-      } else if (result.getExecution() != null) {
-        dto.execution = ExecutionDto.fromExecution(result.getExecution());
+      dto.setResultType(result.getResultType());
+      if (result.getResultType() == MessageCorrelationResultType.Execution && result.getExecution() != null) {
+        dto.setExecution(ExecutionDto.fromExecution(result.getExecution()));
+      } else if (result.getResultType() == MessageCorrelationResultType.ProcessDefinition && result.getProcessInstance() != null) {
+        dto.setProcessInstance(ProcessInstanceDto.fromProcessInstance(result.getProcessInstance()));
       }
     }
     return dto;

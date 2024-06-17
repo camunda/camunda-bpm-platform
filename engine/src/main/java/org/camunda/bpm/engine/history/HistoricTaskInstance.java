@@ -111,4 +111,8 @@ public interface HistoricTaskInstance {
   /** The time the historic task instance will be removed. */
   Date getRemovalTime();
 
+  /**
+   * Task State also referred as lifeCycleState
+   */
+  String getTaskState();
 }
