@@ -178,7 +178,7 @@ public class ExecutionTree implements Execution {
 
   @Override
   public String getProcessDefinitionKey() {
-	return wrappedExecution.getProcessDefinitionKey();
+    return wrappedExecution.getProcessDefinitionKey();
   }
 
 }
