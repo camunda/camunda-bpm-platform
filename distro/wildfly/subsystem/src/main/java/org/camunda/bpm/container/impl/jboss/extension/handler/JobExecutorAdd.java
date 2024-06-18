@@ -51,6 +51,10 @@ public class JobExecutorAdd extends AbstractAddStepHandler {
 
   public static final JobExecutorAdd INSTANCE = new JobExecutorAdd();
 
+  protected JobExecutorAdd() {
+    super(SubsystemAttributeDefinitons.JOB_EXECUTOR_ATTRIBUTES);
+  }
+
   @Override
   protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model)
       throws OperationFailedException {
@@ -62,7 +66,7 @@ public class JobExecutorAdd extends AbstractAddStepHandler {
     performRuntimeThreadPool(context, model, jobExecutorThreadPoolName, jobExecutorThreadPoolServiceName);
 
     ServiceName serviceName = ServiceNames.forMscExecutorService();
-    ServiceBuilder<?> builder = context.getCapabilityServiceTarget().addService(serviceName);
+    ServiceBuilder<?> builder = context.getServiceTarget().addService(serviceName);
     Consumer<ExecutorService> provider = builder.provides(serviceName);
     Supplier<ManagedQueueExecutorService> supplier = builder.requires(jobExecutorThreadPoolServiceName);
     MscExecutorService service = new MscExecutorService(supplier, provider);
@@ -74,7 +78,7 @@ public class JobExecutorAdd extends AbstractAddStepHandler {
   protected void performRuntimeThreadPool(OperationContext context, ModelNode model, String name,
       ServiceName jobExecutorThreadPoolServiceName) throws OperationFailedException {
 
-    ServiceTarget serviceTarget = context.getCapabilityServiceTarget();
+    ServiceTarget serviceTarget = context.getServiceTarget();
 
     ThreadFactoryService threadFactory = new ThreadFactoryService();
     threadFactory.setThreadGroupName(THREAD_POOL_GRP_NAME + name);
