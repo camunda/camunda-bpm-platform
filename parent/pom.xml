@@ -44,7 +44,7 @@
     <version.jakarta.xml.bind-api>4.0.2</version.jakarta.xml.bind-api>
     <version.httpclient>4.5.14</version.httpclient>
 
-    <version.slf4j>1.7.26</version.slf4j>
+    <version.slf4j>2.0.13</version.slf4j>
     <version.logback>1.5.6</version.logback>
     <version.junit>4.13.1</version.junit>
     <version.assertj>2.9.1</version.assertj>
