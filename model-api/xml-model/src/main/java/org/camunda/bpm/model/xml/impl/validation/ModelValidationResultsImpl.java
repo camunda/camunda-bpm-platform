@@ -20,17 +20,13 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.camunda.bpm.model.xml.instance.DomElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.camunda.bpm.model.xml.type.ModelElementType;
-import org.camunda.bpm.model.xml.validation.ValidationResultFormatter;
 import org.camunda.bpm.model.xml.validation.ValidationResult;
+import org.camunda.bpm.model.xml.validation.ValidationResultFormatter;
 import org.camunda.bpm.model.xml.validation.ValidationResults;
 
 /**
  * @author Daniel Meyer
- *
  */
 public class ModelValidationResultsImpl implements ValidationResults {
 
@@ -39,7 +35,10 @@ public class ModelValidationResultsImpl implements ValidationResults {
   protected int errorCount;
   protected int warningCount;
 
-  public ModelValidationResultsImpl(Map<ModelElementInstance, List<ValidationResult>> collectedResults, int errorCount, int warningCount) {
+  public ModelValidationResultsImpl(
+      Map<ModelElementInstance, List<ValidationResult>> collectedResults,
+      int errorCount,
+      int warningCount) {
     this.collectedResults = collectedResults;
     this.errorCount = errorCount;
     this.warningCount = warningCount;
@@ -76,8 +75,49 @@ public class ModelValidationResultsImpl implements ValidationResults {
   }
 
   @Override
+  public void write(StringWriter writer, ValidationResultFormatter formatter, int maxSize) {
+    int printedCount = 0;
+    int previousLength = 0;
+    for (var entry : collectedResults.entrySet()) {
+      var element = entry.getKey();
+      var results = entry.getValue();
+
+      formatter.formatElement(writer, element);
+
+      for (var result : results) {
+        formatter.formatResult(writer, result);
+
+        // Size and Length are not necessarily the same, depending on the encoding of the string.
+        int currentSize = writer.getBuffer().toString().getBytes().length;
+        int currentLength = writer.getBuffer().length();
+        if (!canAccommodateResult(maxSize, currentSize, printedCount)) {
+          writer.getBuffer().setLength(previousLength);
+          writer.append(suffixWithNumberOfRemainingResults(printedCount));
+          return;
+        }
+        printedCount++;
+        previousLength = currentLength;
+      }
+    }
+  }
+
+  private boolean canAccommodateResult(int maxSize, int currentSize, int printedCount) {
+    boolean lastItemToPrint = printedCount == errorCount + warningCount - 1;
+    if (lastItemToPrint && currentSize <= maxSize) {
+      return true;
+    }
+    
+    int suffixLength = suffixWithNumberOfRemainingResults(printedCount).length();
+    return currentSize + suffixLength <= maxSize;
+  }
+
+  private String suffixWithNumberOfRemainingResults(int printedCount) {
+    int remaining = errorCount + warningCount - printedCount;
+    return String.format(" and %d more errors and/or warnings", remaining);
+  }
+
+  @Override
   public Map<ModelElementInstance, List<ValidationResult>> getResults() {
     return collectedResults;
   }
-
 }
