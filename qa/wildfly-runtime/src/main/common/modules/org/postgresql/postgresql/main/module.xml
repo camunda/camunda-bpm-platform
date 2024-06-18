@@ -4,7 +4,13 @@
   </resources>
   
   <dependencies>
-    <module name="javax.api"/>
-    <module name="javax.transaction.api" />
+    <module name="java.base"/>
+    <module name="java.desktop"/>
+    <module name="java.management"/>
+    <module name="java.naming"/>
+    <module name="java.security.jgss"/>
+    <module name="java.security.sasl"/>
+    <module name="java.sql"/>
+    <module name="jakarta.transaction.api" />
   </dependencies>
 </module>
