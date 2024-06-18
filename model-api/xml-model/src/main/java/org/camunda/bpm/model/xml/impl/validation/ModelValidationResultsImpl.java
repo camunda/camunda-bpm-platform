@@ -17,6 +17,7 @@
 package org.camunda.bpm.model.xml.impl.validation;
 
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -42,6 +43,15 @@ public class ModelValidationResultsImpl implements ValidationResults {
     this.collectedResults = collectedResults;
     this.errorCount = errorCount;
     this.warningCount = warningCount;
+  }
+
+  public ModelValidationResultsImpl(ValidationResults... validationResults) {
+    collectedResults = new HashMap<>();
+    for (var entry : validationResults) {
+      collectedResults.putAll(entry.getResults());
+      errorCount += entry.getErrorCount();
+      warningCount += entry.getWarinigCount();
+    }
   }
 
   @Override
@@ -106,7 +116,7 @@ public class ModelValidationResultsImpl implements ValidationResults {
     if (lastItemToPrint && currentSize <= maxSize) {
       return true;
     }
-    
+
     int suffixLength = suffixWithNumberOfRemainingResults(printedCount).length();
     return currentSize + suffixLength <= maxSize;
   }
