@@ -34,7 +34,6 @@ import org.junit.Test;
 
 /**
  * @author Daniel Meyer
- *
  */
 public class ModelValidationTest {
 
@@ -102,6 +101,31 @@ public class ModelValidationTest {
   }
 
   @Test
+  public void shouldWriteResultsUntilMaxSize() {
+    // Given
+    int maxSize = 120;
+    List<ModelElementValidator<?>> validators = new ArrayList<>();
+
+    // adds 7 elements with warnings of size 30, and an element prefix of size 8 -> total for 1 error = 37
+    validators.add(new IsAdultWarner());
+
+    var results = modelInstance.validate(validators);
+    var stringWriter = new StringWriter();
+
+    // When
+    results.write(stringWriter, new TestResultFormatter(), maxSize);
+
+    // it has enough size to print 3 warnings, but it will only print 2,
+    // because it needs to accommodate the suffix too in the max size.
+    assertThat(stringWriter.toString())
+        .describedAs("2 lines for 2 element names, 2 line for 2 warnings and one for the suffix")
+        .hasLineCount(5)
+        .describedAs(
+            "shall contain only one error/warning and mention the count of the missing ones")
+        .endsWith(" and 5 more errors and/or warnings");
+  }
+
+  @Test
   public void shouldReturnResults() {
     List<ModelElementValidator<?>> validators = new ArrayList<ModelElementValidator<?>>();
 
@@ -116,21 +140,20 @@ public class ModelValidationTest {
     Map<ModelElementInstance, List<ValidationResult>> resultsByElement = results.getResults();
     assertThat(resultsByElement.size()).isEqualTo(7);
 
-    for (Entry<ModelElementInstance, List<ValidationResult>> resultEntry : resultsByElement.entrySet()) {
+    for (var resultEntry : resultsByElement.entrySet()) {
       Bird element = (Bird) resultEntry.getKey();
       List<ValidationResult> validationResults = resultEntry.getValue();
       assertThat(element).isNotNull();
       assertThat(validationResults).isNotNull();
 
-      if(element.getId().equals("tweety")) {
+      if (element.getId().equals("tweety")) {
         assertThat(validationResults.size()).isEqualTo(2);
         ValidationResult error = validationResults.remove(0);
         assertThat(error.getType()).isEqualTo(ValidationResultType.ERROR);
         assertThat(error.getCode()).isEqualTo(20);
         assertThat(error.getMessage()).isEqualTo("Bird tweety is illegal");
         assertThat(error.getElement()).isEqualTo(element);
-      }
-      else {
+      } else {
         assertThat(validationResults.size()).isEqualTo(1);
       }
 
