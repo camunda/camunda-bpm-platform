@@ -100,9 +100,10 @@ public class ModelValidationResultsImpl implements ValidationResults {
         // Size and Length are not necessarily the same, depending on the encoding of the string.
         int currentSize = writer.getBuffer().toString().getBytes().length;
         int currentLength = writer.getBuffer().length();
-        if (!canAccommodateResult(maxSize, currentSize, printedCount)) {
+        if (!canAccommodateResult(maxSize, currentSize, printedCount, formatter)) {
           writer.getBuffer().setLength(previousLength);
-          writer.append(suffixWithNumberOfRemainingResults(printedCount));
+          int remaining = errorCount + warningCount - printedCount;
+          formatter.formatSuffixWithOmittedResultsCount(writer, remaining);
           return;
         }
         printedCount++;
@@ -111,19 +112,15 @@ public class ModelValidationResultsImpl implements ValidationResults {
     }
   }
 
-  private boolean canAccommodateResult(int maxSize, int currentSize, int printedCount) {
-    boolean lastItemToPrint = printedCount == errorCount + warningCount - 1;
-    if (lastItemToPrint && currentSize <= maxSize) {
+  private boolean canAccommodateResult(
+      int maxSize, int currentSize, int printedCount, ValidationResultFormatter formatter) {
+    boolean isLastItemToPrint = printedCount == errorCount + warningCount - 1;
+    if (isLastItemToPrint && currentSize <= maxSize) {
       return true;
     }
-
-    int suffixLength = suffixWithNumberOfRemainingResults(printedCount).length();
-    return currentSize + suffixLength <= maxSize;
-  }
-
-  private String suffixWithNumberOfRemainingResults(int printedCount) {
     int remaining = errorCount + warningCount - printedCount;
-    return String.format(" and %d more errors and/or warnings", remaining);
+    int suffixLength = formatter.getFormattedSuffixWithOmittedResultsSize(remaining);
+    return currentSize + suffixLength <= maxSize;
   }
 
   @Override

@@ -122,7 +122,7 @@ public class ModelValidationTest {
         .hasLineCount(5)
         .describedAs(
             "shall contain only one error/warning and mention the count of the missing ones")
-        .endsWith(" and 5 more errors and/or warnings");
+        .endsWith(String.format(TestResultFormatter.OMITTED_RESULTS_SUFFIX_FORMAT, 5));
   }
 
   @Test

@@ -21,8 +21,8 @@ import java.io.StringWriter;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 /**
- * SPI which can be implemented to print out a summary of a validation result.
- * See {@link ValidationResults#write(StringWriter, ValidationResultFormatter)}
+ * SPI which can be implemented to print out a summary of a validation result. See {@link
+ * ValidationResults#write(StringWriter, ValidationResultFormatter)}
  *
  * @author Daniel Meyer
  * @since 7.6
@@ -45,4 +45,25 @@ public interface ValidationResultFormatter {
    */
   void formatResult(StringWriter writer, ValidationResult result);
 
+  /**
+   * formats a suffix with the count of omitted errors/warnings, to be used when writing with a
+   * maximum output size limit. See {@link ValidationResults#write(StringWriter,
+   * ValidationResultFormatter, int)}
+   *
+   * @param writer the writer
+   * @param count the count of results omitted from the writer output
+   */
+  default void formatSuffixWithOmittedResultsCount(StringWriter writer, int count) {
+    // Do NOTHING by default
+  }
+
+  /**
+   * returns the size of the formatted suffix (donating the count of omitted results) in bytes
+   *
+   * @param count the count of results to be omitted from the writer output
+   * @return the size of the formatted suffix in bytes
+   */
+  default int getFormattedSuffixWithOmittedResultsSize(int count) {
+    return 0;
+  }
 }
