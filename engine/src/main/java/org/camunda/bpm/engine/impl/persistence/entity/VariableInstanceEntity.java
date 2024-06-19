@@ -17,7 +17,11 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.application.InvocationContext;
@@ -154,7 +158,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     }
 
     // clear value
-    clearValueFieldsBasedOnType(true);
+    clearValueFields(true);
 
     if (!isTransient) {
       // delete variable
@@ -283,13 +287,13 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   public void clearValueFieldsBasedOnType(TypedValue newValue) {
     if (variableWillChangeType(newValue)) {
-      clearValueFieldsBasedOnType(true);
+      clearValueFields(true);
     } else {
-      clearValueFieldsBasedOnType(false);
+      clearValueFields(false);
     }
   }
 
-  public void clearValueFieldsBasedOnType(boolean deleteVariable) {
+  public void clearValueFields(boolean deleteVariable) {
     this.longValue = null;
     this.doubleValue = null;
     this.textValue = null;

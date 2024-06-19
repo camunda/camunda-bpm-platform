@@ -153,8 +153,7 @@ public class VariableInstanceTest extends PluggableProcessEngineTest {
         VariableMap variables = Variables.createVariables()
                 .putValue(variableName, variableValue);
 
-        String businessKey = processDefinitionKey; // for simplicity’s sake, same businessKey with processDefinitionKey
-        return runtimeService.startProcessInstanceByKey(processDefinitionKey, businessKey, variables);
+        return runtimeService.startProcessInstanceByKey(processDefinitionKey, variables);
     }
 
     private ProcessInstance startProcessInstanceWithObjectVariable(String processDefinitionKey, String variableName, Object variableValue) {
