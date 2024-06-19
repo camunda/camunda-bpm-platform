@@ -24,13 +24,21 @@
           it would be great to be able to copy the stacktrace from here
           using the clipboard widget but it comes from an API endpoint...
         -->
-        <a ng-if="incident.rootCauseIncidentMessage"
-           ng-click="viewVariable(incident)"
-           uib-tooltip="{{'PLUGIN_INCIDENTS_TAB_TOOLTIP_STACKTRACE'|translate}}"
-           tooltip-placement="top"
-           class="auto-cutoff">
-          {{ incident.rootCauseIncidentMessage }}
-        </a>
+        <div ng-if="incident.rootCauseIncidentMessage">
+          <a ng-if="incidentsContext !== 'history' || incident.historyConfiguration"
+             ng-click="viewVariable(incident)"
+             uib-tooltip="{{'PLUGIN_INCIDENTS_TAB_TOOLTIP_STACKTRACE'|translate}}"
+             tooltip-placement="top"
+             class="auto-cutoff">
+            {{ incident.rootCauseIncidentMessage }}
+          </a>
+          <span ng-if="incidentsContext === 'history' && !incident.historyConfiguration"
+             uib-tooltip="{{'PLUGIN_INCIDENTS_TAB_TOOLTIP_STACKTRACE'|translate}}"
+             tooltip-placement="top"
+             class="auto-cutoff">
+            {{ incident.rootCauseIncidentMessage }}
+          </span>
+        </div>
         <a ng-if="!incident.rootCauseIncidentMessage"
            ng-click="viewVariable(incident)"
            uib-tooltip="{{'PLUGIN_INCIDENTS_TAB_TOOLTIP_STACKTRACE'|translate}}"
