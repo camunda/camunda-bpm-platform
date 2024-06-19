@@ -10,6 +10,6 @@
 
     <module name="org.camunda.connect.camunda-connect-core" />
 
-    <module name="org.apache.httpcomponents.httpclient" />
+    <module name="org.apache.httpcomponents.client5.httpclient5" />
   </dependencies>
 </module>

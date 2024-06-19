@@ -71,14 +71,11 @@ public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R e
 
   @Override
   public R execute(Q request) {
-    BasicClassicHttpRequest httpRequest = createHttpRequest(request);
-
     R invocationResult;
-    HttpRequestBase httpRequest = createHttpRequest(request);
+    BasicClassicHttpRequest httpRequest = createHttpRequest(request);
     HttpRequestInvocation invocation = new HttpRequestInvocation(httpRequest, request, requestInterceptors, httpClient);
     try {
-      return createResponse((ClassicHttpResponse) invocation.proceed());
-      invocationResult = createResponse((CloseableHttpResponse) invocation.proceed());
+      invocationResult = createResponse((ClassicHttpResponse) invocation.proceed());
     } catch (Exception e) {
       throw LOG.unableToExecuteRequest(e);
     }

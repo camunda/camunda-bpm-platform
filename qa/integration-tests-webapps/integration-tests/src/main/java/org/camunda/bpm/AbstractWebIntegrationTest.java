@@ -16,21 +16,21 @@
  */
 package org.camunda.bpm;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.MediaType;
 
+import kong.unirest.ObjectMapper;
 import org.camunda.bpm.util.TestUtil;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.openqa.selenium.chrome.ChromeDriverService;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.client.apache4.ApacheHttpClient4;
-import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
 
 /**
  *
@@ -59,11 +59,33 @@ public abstract class AbstractWebIntegrationTest {
 
   protected static ChromeDriverService service;
 
-  protected ApacheHttpClient4 client;
   protected String httpPort;
   
   protected String csrfToken;
   protected String sessionId;
+
+  @BeforeClass
+  public static void setUpClass() {
+    Unirest.config().reset().enableCookieManagement(false).setObjectMapper(new ObjectMapper() {
+      final com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+
+      public String writeValue(Object value) {
+        try {
+          return mapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+          throw new RuntimeException(e);
+        }
+      }
+
+      public <T> T readValue(String value, Class<T> valueType) {
+        try {
+          return mapper.readValue(value, valueType);
+        } catch (JsonProcessingException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    });
+  }
 
   @Before
   public void before() throws Exception {
@@ -73,7 +95,7 @@ public abstract class AbstractWebIntegrationTest {
 
   @After
   public void destroyClient() {
-    client.destroy();
+    // Unirest manages its own connection pool, no explicit cleanup needed
   }
 
   public void createClient(String ctxPath) throws Exception {
@@ -81,52 +103,49 @@ public abstract class AbstractWebIntegrationTest {
 
     appBasePath = testProperties.getApplicationPath("/" + ctxPath);
     LOGGER.info("Connecting to application " + appBasePath);
-
-    ClientConfig clientConfig = new DefaultApacheHttpClient4Config();
-    clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-    client = ApacheHttpClient4.create(clientConfig);
   }
 
   protected void getTokens() {
     // first request, first set of cookies
-    ClientResponse clientResponse = client.resource(appBasePath + TASKLIST_PATH).get(ClientResponse.class);
-    List<String> cookieValues = getCookieHeaders(clientResponse);
-    clientResponse.close();
+    HttpResponse<String> response = Unirest.get(appBasePath + TASKLIST_PATH).asString();
+    List<String> cookieValues = response.getHeaders().get("Set-Cookie");
 
     String startCsrfCookie = getCookie(cookieValues, XSRF_TOKEN_IDENTIFIER);
     String startSessionCookie = getCookie(cookieValues, JSESSIONID_IDENTIFIER);
-    
+
     // login with user, update session cookie
-    clientResponse = client.resource(appBasePath + "api/admin/auth/user/default/login/cockpit")
-        .entity("username=demo&password=demo", MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+    response = Unirest.post(appBasePath + "api/admin/auth/user/default/login/cockpit")
+        .body("username=demo&password=demo")
+        .header("Content-Type", MediaType.APPLICATION_FORM_URLENCODED)
         .header(COOKIE_HEADER, createCookieHeader(startCsrfCookie, startSessionCookie))
         .header(X_XSRF_TOKEN_HEADER, startCsrfCookie)
-        .accept(MediaType.APPLICATION_JSON)
-        .post(ClientResponse.class);
-    cookieValues = clientResponse.getHeaders().get("Set-Cookie");
-    clientResponse.close();
-    
+        .header("Accept", MediaType.APPLICATION_JSON)
+        .asString();
+    cookieValues = response.getHeaders().get("Set-Cookie");
+
     sessionId = getCookie(cookieValues, JSESSIONID_IDENTIFIER);
-    
+
     // update CSRF cookie
-    clientResponse = client.resource(appBasePath + "api/engine/engine")
+    response = Unirest.get(appBasePath + "api/engine/engine")
         .header(COOKIE_HEADER, createCookieHeader(startCsrfCookie, sessionId))
         .header(X_XSRF_TOKEN_HEADER, startCsrfCookie)
-        .get(ClientResponse.class);
-    
-    cookieValues = getCookieHeaders(clientResponse);
-    clientResponse.close();
-    
+        .asString();
+
+    cookieValues = response.getHeaders().get("Set-Cookie");
+
     csrfToken = getCookie(cookieValues, XSRF_TOKEN_IDENTIFIER);
   }
 
-  protected List<String> getCookieHeaders(ClientResponse response) {
+  protected List<String> getCookieHeaders(HttpResponse<?> response) {
     return response.getHeaders().get("Set-Cookie");
   }
   
   protected String getCookie(List<String> cookieValues, String cookieName) {
     String cookieValue = getCookieValue(cookieValues, cookieName);
-    int valueEnd = cookieValue.contains(";") ? cookieValue.indexOf(';') : cookieValue.length() - 1;
+    if (cookieValue == null || cookieValue.isEmpty() || cookieValue.length() <= cookieName.length()) {
+      return "";
+    }
+    int valueEnd = cookieValue.contains(";") ? cookieValue.indexOf(';') : cookieValue.length();
     return cookieValue.substring(cookieName.length(), valueEnd);
   }
   
@@ -138,38 +157,63 @@ public abstract class AbstractWebIntegrationTest {
     return XSRF_TOKEN_IDENTIFIER + csrf + "; " + JSESSIONID_IDENTIFIER + session;
   }
 
-  protected String getXsrfTokenHeader(ClientResponse response) {
+  protected String getXsrfTokenHeader(HttpResponse<?> response) {
     return response.getHeaders().getFirst(X_XSRF_TOKEN_HEADER);
   }
 
-  protected String getXsrfCookieValue(ClientResponse response) {
+  protected String getXsrfCookieValue(HttpResponse<?> response) {
     return getCookieValue(response, XSRF_TOKEN_IDENTIFIER);
   }
   
-  protected String getCookieValue(ClientResponse response, String cookieName) {
+  protected String getCookieValue(HttpResponse<?> response, String cookieName) {
     return getCookieValue(getCookieHeaders(response), cookieName);
   }
 
-  protected String getCookieValue(List<String> cookies, String cookieName) {
-    for (String cookie : cookies) {
-      if (cookie.startsWith(cookieName)) {
-        return cookie;
+  protected String getCookieValue(List<String> cookieValues, String cookieName) {
+    if (cookieValues != null) {
+      for (String cookieValue : cookieValues) {
+        if (cookieValue != null && cookieValue.contains(cookieName)) {
+          return cookieValue;
+        }
       }
     }
-
     return "";
   }
 
-  protected void preventRaceConditions() throws InterruptedException {
-    // just wait some seconds before starting because of Wildfly / Cargo race conditions
-    Thread.sleep(5 * 1000);
-  }
-
+  // Helper methods for common test operations
   protected String getWebappCtxPath() {
-    return testProperties.getStringProperty("http.ctx-path.webapp", null);
+    return testProperties.getWebappCtxPath();
   }
 
   protected String getRestCtxPath() {
-    return testProperties.getStringProperty("http.ctx-path.rest", null);
+    return testProperties.getRestCtxPath();
+  }
+
+  protected void preventRaceConditions() {
+    try {
+      Thread.sleep(500); // Simple delay to prevent race conditions
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+  }
+
+  // Helper method to create HTTP GET requests with authentication
+  protected HttpResponse<String> executeAuthenticatedGet(String path) {
+    return Unirest.get(appBasePath + path)
+        .header(COOKIE_HEADER, createCookieHeader())
+        .header(X_XSRF_TOKEN_HEADER, csrfToken)
+        .header("Accept", MediaType.APPLICATION_JSON)
+        .asString();
+  }
+
+  // Helper method to create HTTP POST requests with authentication
+  protected HttpResponse<String> executeAuthenticatedPost(String path, String body, String contentType) {
+    return Unirest.post(appBasePath + path)
+        .body(body)
+        .header("Content-Type", contentType)
+        .header(COOKIE_HEADER, createCookieHeader())
+        .header(X_XSRF_TOKEN_HEADER, csrfToken)
+        .header("Accept", MediaType.APPLICATION_JSON)
+        .asString();
   }
 }

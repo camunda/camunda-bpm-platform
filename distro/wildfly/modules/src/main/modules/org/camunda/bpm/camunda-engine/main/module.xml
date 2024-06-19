@@ -19,6 +19,7 @@
     <module name="jakarta.servlet.api" />
 
     <module name="org.jboss.vfs" />
+    <module name="org.slf4j" />
 
     <module name="org.mybatis.mybatis" />
     <module name="com.fasterxml.uuid.java-uuid-generator"/>
