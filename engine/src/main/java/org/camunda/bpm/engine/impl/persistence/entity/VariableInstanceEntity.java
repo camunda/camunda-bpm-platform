@@ -310,7 +310,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     String currentTypeName = typedValueField.getTypeName();
     String newTypeName = getTypeName(newValue);
 
-    return !Objects.equals(currentTypeName, newTypeName);
+    return !currentTypeName.equals(newTypeName);
   }
 
   public String getTypeName(TypedValue value) {
