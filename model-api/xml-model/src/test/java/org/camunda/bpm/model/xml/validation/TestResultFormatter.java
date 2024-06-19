@@ -24,19 +24,19 @@ import org.camunda.bpm.model.xml.testmodel.instance.FlyingAnimal;
 
 /**
  * @author Daniel Meyer
- *
  */
 @SuppressWarnings("resource")
 public class TestResultFormatter implements ValidationResultFormatter {
+
+  public static final String OMITTED_RESULTS_SUFFIX_FORMAT = "and %d more errors and/or warnings";
 
   @Override
   public void formatElement(StringWriter writer, ModelElementInstance element) {
     Formatter formatter = new Formatter(writer);
 
-    if(element instanceof FlyingAnimal) {
-      formatter.format("%s\n", ((FlyingAnimal)element).getId());
-    }
-    else {
+    if (element instanceof FlyingAnimal) {
+      formatter.format("%s\n", ((FlyingAnimal) element).getId());
+    } else {
       formatter.format("%s\n", element.getElementType().getTypeName());
     }
 
@@ -46,8 +46,17 @@ public class TestResultFormatter implements ValidationResultFormatter {
   @Override
   public void formatResult(StringWriter writer, ValidationResult result) {
     new Formatter(writer)
-      .format("\t%s (%d): %s\n", result.getType(), result.getCode(), result.getMessage())
-      .flush();
+        .format("\t%s (%d): %s\n", result.getType(), result.getCode(), result.getMessage())
+        .flush();
   }
 
+  @Override
+  public void formatSuffixWithOmittedResultsCount(StringWriter writer, int count) {
+    new Formatter(writer).format(OMITTED_RESULTS_SUFFIX_FORMAT, count).flush();
+  }
+
+  @Override
+  public int getFormattedSuffixWithOmittedResultsSize(int count) {
+    return String.format(OMITTED_RESULTS_SUFFIX_FORMAT, count).getBytes().length;
+  }
 }
