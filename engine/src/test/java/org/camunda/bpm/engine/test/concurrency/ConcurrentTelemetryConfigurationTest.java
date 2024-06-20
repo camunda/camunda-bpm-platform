@@ -22,7 +22,6 @@ import static org.junit.Assert.assertNull;
 
 import java.sql.Connection;
 
-import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -76,12 +75,6 @@ public class ConcurrentTelemetryConfigurationTest extends ConcurrencyTestCase {
     assertNull(thread1.getException());
     if (testRule.isOptimisticLockingExceptionSuppressible()) {
       assertNull(thread2.getException());
-      assertThat(managementService.isTelemetryEnabled()).isFalse();
-    } else {
-      // When CockroachDB is used, the CrdbTransactionRetryException can't be ignored,
-      // if retries = 0 and the ProcessEngineBootstrapCommand (telemetry initialization)
-      // must be manually retried
-      assertThat(thread2.getException()).isInstanceOf(CrdbTransactionRetryException.class);
       assertThat(managementService.isTelemetryEnabled()).isFalse();
     }
   }

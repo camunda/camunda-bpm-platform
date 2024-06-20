@@ -425,7 +425,7 @@ public class ProcessEngineTestRule extends TestWatcher {
    * Currently, the method only returns false when CockroachDB is used
    * since this database implements its own OLE mechanism.
    */
-  public boolean isOptimisticLockingExceptionSuppressible() {
+  public boolean isOptimisticLockingExceptionSuppressible() { // TODO: remove this usagesww
     return !DbSqlSessionFactory.CRDB.equals(getDatabaseType());
   }
 

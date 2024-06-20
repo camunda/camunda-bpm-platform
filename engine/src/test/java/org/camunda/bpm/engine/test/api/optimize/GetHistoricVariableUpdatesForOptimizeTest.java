@@ -362,12 +362,9 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
    * Excluded on h2, because the test takes quite some time there (30-40 seconds)
    * and the fixed problem did not occur on h2.
    * <p>
-   * Excluded on CRDB since the problem does not occur on it. The test also times out
-   * when INSERT-ing the Process Variables due the the slowness of the SQL statements on CRDB.
-   * See CAM-12239 for the performance.
    */
   @Test
-  @RequiredDatabase(excludes = {DbSqlSessionFactory.H2, DbSqlSessionFactory.CRDB})
+  @RequiredDatabase(excludes = DbSqlSessionFactory.H2)
   public void testFetchLargeNumberOfObjectVariables() {
     // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")

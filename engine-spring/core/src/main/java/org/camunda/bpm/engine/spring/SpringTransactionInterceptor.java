@@ -16,17 +16,11 @@
  */
 package org.camunda.bpm.engine.spring;
 
-import java.sql.SQLException;
-import java.util.logging.Logger;
-
-import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -71,18 +65,7 @@ public class SpringTransactionInterceptor extends CommandInterceptor {
       // don't use lambdas here => CAM-12810
       return (T) transactionTemplate.execute((TransactionCallback) status -> next.execute(command));
     } catch (TransactionSystemException ex) {
-      // When CockroachDB is used, a CRDB concurrency error may occur on transaction commit.
-      // To ensure that these errors are still detected as OLEs, we must catch them and wrap
-      // them in a CrdbTransactionRetryException
-      Throwable cause = ex.getCause();
-      if (cause instanceof SQLException && processEngineConfiguration != null
-              && DbSqlSession.isCrdbConcurrencyConflictOnCommit((SQLException) cause, processEngineConfiguration)) {
-        throw ProcessEngineLogger.PERSISTENCE_LOGGER.crdbTransactionRetryExceptionOnCommit(cause);
-
-      } else {
-        throw ExceptionUtil.wrapPersistenceException(ex);
-
-      }
+      throw ExceptionUtil.wrapPersistenceException(ex);
     }
   }
 }

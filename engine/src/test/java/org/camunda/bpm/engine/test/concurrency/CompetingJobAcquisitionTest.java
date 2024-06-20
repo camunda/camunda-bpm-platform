@@ -16,11 +16,9 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -105,11 +103,6 @@ public class CompetingJobAcquisitionTest {
       assertNull(threadTwo.exception);
       // but the job was not acquired
       assertEquals(0, threadTwo.jobs.size());
-    } else {
-      // on CockroachDb, the `commandRetries` property is 0 by default. So any retryable commands,
-      // like the `FetchExternalTasksCmd` will not be retried, but report
-      // a `CrdbTransactionRetryException` to the caller.
-      assertThat(threadTwo.exception).isInstanceOf(CrdbTransactionRetryException.class);
     }
   }
 

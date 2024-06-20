@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.test.concurrency;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
@@ -87,10 +86,6 @@ public abstract class AbstractCompetingTransactionsOptimisticLockingTest {
     assertThat(thread1.exception).isNotNull();
     if (getTestRule().isOptimisticLockingExceptionSuppressible()) {
       assertThat(thread1.exception).isInstanceOf(OptimisticLockingException.class);
-    } else {
-      // on CRDB, the transaction needs to be rolled back and retried,
-      // so a CrdbTransactionRetryException is thrown.
-      assertThat(thread1.exception).isInstanceOf(CrdbTransactionRetryException.class);
     }
   }
 

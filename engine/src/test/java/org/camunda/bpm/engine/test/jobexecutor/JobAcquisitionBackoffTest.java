@@ -129,10 +129,6 @@ public class JobAcquisitionBackoffTest {
       // we don't know the exact wait time,
       // since there is random jitter applied
       JobAcquisitionTestHelper.assertInBetween(BASE_BACKOFF_TIME, BASE_BACKOFF_TIME + BASE_BACKOFF_TIME / 2, waitEvent.getTimeBetweenAcquisitions());
-    } else {
-      // In CRDB, Job Acquisition failures result in a complete rollback and retry of the transaction.
-      // This causes the BackoffJobAcquisitionStrategy to propose an Idle time of 5000ms.
-      Assert.assertEquals(5000, jobExecutor2WaitEvents.get(0).getTimeBetweenAcquisitions());
     }
 
     // when performing another cycle of acquisition
@@ -168,12 +164,6 @@ public class JobAcquisitionBackoffTest {
       // and again increased its backoff
       Assert.assertEquals(2, jobExecutor2WaitEvents.size());
       JobAcquisitionTestHelper.assertInBetween(expectedBackoffTime, expectedBackoffTime + expectedBackoffTime / 2, secondWaitEvent.getTimeBetweenAcquisitions());
-    } else {
-      // on CRDB, thread 2 has tried to acquire 3 jobs this time
-      Assert.assertEquals(3, secondAcquisitionAttempt.getNumJobsToAcquire());
-      // and again the BackoffJobAcquisitionStrategy propose an Idle time (of 10000ms this time)
-      Assert.assertEquals(2, jobExecutor2WaitEvents.size());
-      Assert.assertEquals(10000, secondWaitEvent.getTimeBetweenAcquisitions());
     }
   }
 
@@ -214,7 +204,6 @@ public class JobAcquisitionBackoffTest {
     JobAcquisitionTestHelper.activateInstances(engineRule.getProcessEngine(), 12);
 
     // backoff has not decreased yet;
-    // on CRDB, an Idle wait time of 5000ms is introduced
     Assert.assertTrue(jobExecutor2WaitEvents.get(0).getTimeBetweenAcquisitions() > 0);
     acquisitionThread2.makeContinueAndWaitForSync(); // acquire
     acquisitionThread2.makeContinueAndWaitForSync(); // continue after acquisition with next cycle
@@ -223,15 +212,6 @@ public class JobAcquisitionBackoffTest {
       for (int i = 1; i < BACKOFF_DECREASE_THRESHOLD; i++) {
         // backoff has not decreased yet
         Assert.assertTrue(jobExecutor2WaitEvents.get(i).getTimeBetweenAcquisitions() > 0);
-
-        acquisitionThread2.makeContinueAndWaitForSync(); // acquire
-        acquisitionThread2.makeContinueAndWaitForSync(); // continue after acquisition with next cycle
-      }
-    } else {
-      for (int i = 1; i < BACKOFF_DECREASE_THRESHOLD; i++) {
-        // on CRDB, thread2 immediately retries to acquire jobs
-        // since there have been no failures, or jobs acquired since the first try
-        Assert.assertTrue(jobExecutor2WaitEvents.get(i).getTimeBetweenAcquisitions() == 0);
 
         acquisitionThread2.makeContinueAndWaitForSync(); // acquire
         acquisitionThread2.makeContinueAndWaitForSync(); // continue after acquisition with next cycle

@@ -13,16 +13,6 @@
 
   <profiles>
     <profile>
-      <id>cockroachdb</id>
-      <properties>
-        <database.host>localhost</database.host>
-        <database.port>26257</database.port>
-        <database.name>postgres</database.name>
-        <database.username>root</database.username>
-        <database.password></database.password>
-      </properties>
-    </profile>
-    <profile>
       <id>db2</id>
       <properties>
         <database.host>localhost</database.host>
