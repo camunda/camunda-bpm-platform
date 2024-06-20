@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -317,10 +318,21 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
       return true;
     }
 
-    var currentType = typedValueField.getValue().getClass();
-    var newType = newValue.getValue().getClass();
+    var currentTypeName = getTypeName(getTypedValue());
+    var newTypeName = getTypeName(newValue);
 
-    return !currentType.equals(newType);
+    return !Objects.equals(currentTypeName, newTypeName);
+  }
+
+  protected String getTypeName(TypedValue typedValue) {
+    // Fetches the class name from the value if the type is null
+    var value = typedValue.getValue();
+
+    if (value == null) {
+      return null;
+    }
+
+    return value.getClass().toString();
   }
 
   public String getTypeName() {
