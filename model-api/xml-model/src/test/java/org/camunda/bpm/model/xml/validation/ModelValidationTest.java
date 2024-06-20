@@ -20,13 +20,9 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.validation.ModelValidationResultsImpl;
-import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.testmodel.TestModelParser;
 import org.camunda.bpm.model.xml.testmodel.instance.Bird;
 import org.junit.Before;
@@ -50,9 +46,7 @@ public class ModelValidationTest {
 
   @Test
   public void shouldValidateWithEmptyList() {
-    List<ModelElementValidator<?>> validators = new ArrayList<ModelElementValidator<?>>();
-
-    ValidationResults results = modelInstance.validate(validators);
+    ValidationResults results = modelInstance.validate(List.of());
 
     assertThat(results).isNotNull();
     assertThat(results.hasErrors()).isFalse();
@@ -60,9 +54,7 @@ public class ModelValidationTest {
 
   @Test
   public void shouldCollectWarnings() {
-    List<ModelElementValidator<?>> validators = new ArrayList<ModelElementValidator<?>>();
-
-    validators.add(new IsAdultWarner());
+    List<ModelElementValidator<?>> validators = List.of(new IsAdultWarner());
 
     ValidationResults results = modelInstance.validate(validators);
 
@@ -74,9 +66,7 @@ public class ModelValidationTest {
 
   @Test
   public void shouldCollectErrors() {
-    List<ModelElementValidator<?>> validators = new ArrayList<ModelElementValidator<?>>();
-
-    validators.add(new IllegalBirdValidator("tweety"));
+    List<ModelElementValidator<?>> validators = List.of(new IllegalBirdValidator("tweety"));
 
     ValidationResults results = modelInstance.validate(validators);
 
@@ -88,9 +78,7 @@ public class ModelValidationTest {
 
   @Test
   public void shouldWriteResults() {
-    List<ModelElementValidator<?>> validators = new ArrayList<ModelElementValidator<?>>();
-
-    validators.add(new IllegalBirdValidator("tweety"));
+    List<ModelElementValidator<?>> validators = List.of(new IllegalBirdValidator("tweety"));
 
     ValidationResults results = modelInstance.validate(validators);
 
@@ -132,7 +120,7 @@ public class ModelValidationTest {
 
     // has 7 warnings
     var results1 = modelInstance.validate(List.of(new IsAdultWarner()));
-    //has 1 error
+    // has 1 error
     var results2 = modelInstance.validate(List.of(new IllegalBirdValidator("tweety")));
     var stringWriter = new StringWriter();
 
@@ -152,17 +140,15 @@ public class ModelValidationTest {
 
   @Test
   public void shouldReturnResults() {
-    List<ModelElementValidator<?>> validators = new ArrayList<ModelElementValidator<?>>();
-
-    validators.add(new IllegalBirdValidator("tweety"));
-    validators.add(new IsAdultWarner());
+    List<ModelElementValidator<?>> validators =
+        List.of(new IllegalBirdValidator("tweety"), new IsAdultWarner());
 
     ValidationResults results = modelInstance.validate(validators);
 
     assertThat(results.getErrorCount()).isEqualTo(1);
     assertThat(results.getWarinigCount()).isEqualTo(7);
 
-    Map<ModelElementInstance, List<ValidationResult>> resultsByElement = results.getResults();
+    var resultsByElement = results.getResults();
     assertThat(resultsByElement.size()).isEqualTo(7);
 
     for (var resultEntry : resultsByElement.entrySet()) {
