@@ -23,9 +23,9 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.camunda.bpm.model.xml.ModelInstance;
+import org.camunda.bpm.model.xml.impl.validation.ModelValidationResultsImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.testmodel.TestModelParser;
 import org.camunda.bpm.model.xml.testmodel.instance.Bird;
@@ -104,10 +104,10 @@ public class ModelValidationTest {
   public void shouldWriteResultsUntilMaxSize() {
     // Given
     int maxSize = 120;
-    List<ModelElementValidator<?>> validators = new ArrayList<>();
 
-    // adds 7 elements with warnings of size 30, and an element prefix of size 8 -> total for 1 error = 37
-    validators.add(new IsAdultWarner());
+    // adds 7 elements with warnings of size 30, and an element prefix of size 8
+    // total size for 1 warning = 38
+    List<ModelElementValidator<?>> validators = List.of(new IsAdultWarner());
 
     var results = modelInstance.validate(validators);
     var stringWriter = new StringWriter();
@@ -123,6 +123,31 @@ public class ModelValidationTest {
         .describedAs(
             "shall contain only one error/warning and mention the count of the missing ones")
         .endsWith(String.format(TestResultFormatter.OMITTED_RESULTS_SUFFIX_FORMAT, 5));
+  }
+
+  @Test
+  public void shouldCombineDifferentValidationResults() {
+    // Given
+    int maxSize = 120;
+
+    // has 7 warnings
+    var results1 = modelInstance.validate(List.of(new IsAdultWarner()));
+    //has 1 error
+    var results2 = modelInstance.validate(List.of(new IllegalBirdValidator("tweety")));
+    var stringWriter = new StringWriter();
+
+    // When
+    var results = new ModelValidationResultsImpl(results1, results2);
+    results.write(stringWriter, new TestResultFormatter(), maxSize);
+
+    // it has enough size to print 3 warnings, but it will only print 2,
+    // because it needs to accommodate the suffix too in the max size.
+    assertThat(stringWriter.toString())
+        .describedAs("2 lines for 2 element names, 2 line for 2 warnings and one for the suffix")
+        .hasLineCount(5)
+        .describedAs(
+            "shall contain only one error/warning and mention the count of the missing ones")
+        .endsWith(String.format(TestResultFormatter.OMITTED_RESULTS_SUFFIX_FORMAT, 6));
   }
 
   @Test
