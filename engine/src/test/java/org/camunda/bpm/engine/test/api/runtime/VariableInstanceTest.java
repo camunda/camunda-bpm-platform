@@ -19,17 +19,30 @@ package org.camunda.bpm.engine.test.api.runtime;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class VariableInstanceTest extends PluggableProcessEngineTest {
+
+    private List<String> deploymentIds = new ArrayList<>();
+
+    @After
+    public void tearDown() throws Exception {
+        deploymentIds.forEach(deploymentId -> repositoryService.deleteDeployment(deploymentId, true));
+    }
 
     @Test
     @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
@@ -149,6 +162,57 @@ public class VariableInstanceTest extends PluggableProcessEngineTest {
         assertThat(variable.getTextValue2()).isEqualTo("java.lang.String");
     }
 
+    @Test
+    public void shouldNotDeleteByteArrayWhenTypeDoesNotChange() {
+        // given a process with a MySerializable variable type
+        deployProcess(Bpmn.createExecutableProcess("testProcess")
+                .startEvent().camundaAsyncAfter()
+                .scriptTask()
+                .scriptFormat("groovy")
+                .scriptText("println 'var ' + myVar")
+                .scriptTask()
+                .scriptFormat("groovy")
+                .scriptText("execution.setVariable('myVar', new org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable('updated value'))")
+                .userTask()
+                .endEvent()
+                .done());
+
+        // And a process instance with a variable with initial value
+        var pi = runtimeService.startProcessInstanceByKey("testProcess", Variables.createVariables().putValue(
+                "myVar", new MySerializable("initial value"))
+        );
+
+        var variable = (VariableInstanceEntity) runtimeService.createVariableInstanceQuery()
+                .processInstanceIdIn(pi.getId())
+                .singleResult();
+
+        var byteArrayIdBeforeUpdate = variable.getByteArrayValueId();
+
+        // when the script task is executed and the variable is updated with a new variable with the
+        // same type (MySerializable) and different value
+        String id = managementService.createJobQuery().singleResult().getId();
+        managementService.executeJob(id);
+
+        testRule.waitForJobExecutorToProcessAllJobs(5000);
+
+        variable = (VariableInstanceEntity) runtimeService.createVariableInstanceQuery()
+                .processInstanceIdIn(pi.getId())
+                .singleResult();
+
+        // then
+        assertThat(variable.getTextValue2())
+                .withFailMessage("The type of the variable didn't change and should be MySerializable")
+                .isEqualTo("org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable");
+
+        assertThat(((MySerializable)variable.getValue()).getName())
+                .withFailMessage("The variable changed value")
+                .isEqualTo("updated value");
+
+        assertThat(variable.getByteArrayValueId())
+                .withFailMessage("The byte array should not be deleted (id changed) since the type did not change")
+                .isEqualTo(byteArrayIdBeforeUpdate);
+    }
+
     private ProcessInstance startProcessInstanceWithVariable(String processDefinitionKey, String variableName, Object variableValue) {
         VariableMap variables = Variables.createVariables()
                 .putValue(variableName, variableValue);
@@ -173,5 +237,12 @@ public class VariableInstanceTest extends PluggableProcessEngineTest {
                 .create();
 
         runtimeService.setVariable(executionId, variableName, value);
+    }
+
+    protected void deployProcess(BpmnModelInstance process) {
+        org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+                .addModelInstance("testProcess.bpmn", process)
+                .deploy();
+        deploymentIds.add(deployment.getId());
     }
 }
