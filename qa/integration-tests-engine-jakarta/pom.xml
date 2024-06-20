@@ -711,7 +711,8 @@
 
                 <exclude>**/ManagedJobExecutorTest.java</exclude>
 
-                <!-- TODO Please delete the following exclusion after the Tomcat 10 issue with Arquillian -->
+                <!-- TODO Please delete the following exclusions after the Tomcat 10 issue with Arquillian -->
+                <!-- See Relevant issue: https://github.com/camunda/camunda-bpm-platform/issues/4434 -->
                 <exclude>**/CallActivityContextSwitchTest.java</exclude>
                 <exclude>**/TestMultipleClasspathRoots.java</exclude>
                 <exclude>**/TestResourceName.java</exclude>
