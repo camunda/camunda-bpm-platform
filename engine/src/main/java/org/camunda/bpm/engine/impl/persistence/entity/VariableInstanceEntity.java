@@ -306,6 +306,17 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public boolean variableWillChangeType(TypedValue newValue) {
+
+    // Type changes when nullifying an existing non-null value variable
+    if (typedValueField.getValue() != null && newValue.getValue() == null) {
+      return true;
+    }
+
+    // type changes setting a non-null value to an existing null-value variable
+    if (newValue.getValue() != null && typedValueField.getValue() == null) {
+      return true;
+    }
+
     var currentType = typedValueField.getValue().getClass();
     var newType = newValue.getValue().getClass();
 
