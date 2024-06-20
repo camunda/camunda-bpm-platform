@@ -306,22 +306,10 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public boolean variableWillChangeType(TypedValue newValue) {
-    String currentTypeName = typedValueField.getTypeName();
-    String newTypeName = getTypeName(newValue);
+    var currentType = typedValueField.getValue().getClass();
+    var newType = newValue.getValue().getClass();
 
-    return !currentTypeName.equals(newTypeName);
-  }
-
-  public String getTypeName(TypedValue value) {
-    if (value.getType() != null) {
-      return value.getType().getName();
-    }
-
-    // Fetches the class name from the value if the type is null
-    return value.getValue()
-            .getClass()
-            .getSimpleName()
-            .toLowerCase();
+    return !currentType.equals(newType);
   }
 
   public String getTypeName() {
