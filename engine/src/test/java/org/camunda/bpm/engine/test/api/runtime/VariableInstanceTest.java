@@ -37,7 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class VariableInstanceTest extends PluggableProcessEngineTest {
 
-    private List<String> deploymentIds = new ArrayList<>();
+    private final List<String> deploymentIds = new ArrayList<>();
 
     @After
     public void tearDown() throws Exception {
@@ -179,8 +179,8 @@ public class VariableInstanceTest extends PluggableProcessEngineTest {
 
         // And a process instance with a variable with initial value
         var pi = runtimeService.startProcessInstanceByKey("testProcess", Variables.createVariables().putValue(
-                "myVar", new MySerializable("initial value"))
-        );
+                "myVar", new MySerializable("initial value")
+        ));
 
         var variable = (VariableInstanceEntity) runtimeService.createVariableInstanceQuery()
                 .processInstanceIdIn(pi.getId())
@@ -211,6 +211,112 @@ public class VariableInstanceTest extends PluggableProcessEngineTest {
         assertThat(variable.getByteArrayValueId())
                 .withFailMessage("The byte array should not be deleted (id changed) since the type did not change")
                 .isEqualTo(byteArrayIdBeforeUpdate);
+    }
+
+    @Test
+    public void shouldDeleteByteArrayOnNullifyOfExistingNonNullVariable() {
+        // given a process with a MySerializable variable type with a null value
+        deployProcess(Bpmn.createExecutableProcess("testProcess")
+                .startEvent().camundaAsyncAfter()
+                .scriptTask()
+                .scriptFormat("groovy")
+                .scriptText("println 'var ' + myVar")
+                .scriptTask()
+                .scriptFormat("groovy")
+                .scriptText("execution.setVariable('myVar', null)") // The new value is null
+                .userTask()
+                .endEvent()
+                .done());
+
+        var pi = runtimeService.startProcessInstanceByKey("testProcess", Variables.createVariables().putValue(
+                "myVar", new MySerializable("not null value") // non-null existing variable
+        ));
+
+        var variable = (VariableInstanceEntity) runtimeService.createVariableInstanceQuery()
+                .processInstanceIdIn(pi.getId())
+                .singleResult();
+
+        var byteArrayIdBeforeUpdate = variable.getByteArrayValueId();
+
+        assertThat(variable.getByteArrayValue()).isNotNull();
+
+        // when variable is updated from non-null to null
+        String id = managementService.createJobQuery().singleResult().getId();
+        managementService.executeJob(id);
+
+        testRule.waitForJobExecutorToProcessAllJobs(5000);
+
+        variable = (VariableInstanceEntity) runtimeService.createVariableInstanceQuery()
+                .processInstanceIdIn(pi.getId())
+                .singleResult();
+
+        // then
+        assertThat(variable.getTypeName())
+                .withFailMessage("The type of the variable should be null after the update")
+                .isEqualTo("null");
+
+        assertThat(((MySerializable) variable.getValue()))
+                .withFailMessage("The variable changed value to null")
+                .isNull();
+
+        assertThat(variable.getByteArrayValueId())
+                .withFailMessage("The byte array should be deleted (id changed) since the type changes when nullifying an existing non-null value")
+                .isNotEqualTo(byteArrayIdBeforeUpdate);
+    }
+
+    @Test
+    public void shouldDeleteByteArrayOnUpdateOfExistingNullVariable() {
+        // given a process with a MySerializable variable type with a null value
+        deployProcess(Bpmn.createExecutableProcess("testProcess")
+                .startEvent().camundaAsyncAfter()
+                .scriptTask()
+                .scriptFormat("groovy")
+                .scriptText("println 'var ' + myVar")
+                .scriptTask()
+                .scriptFormat("groovy")                                                     // The new value is not null
+                .scriptText("execution.setVariable('myVar', new org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable('non null value'))")
+                .userTask()
+                .endEvent()
+                .done());
+
+        var pi = runtimeService.startProcessInstanceByKey("testProcess", Variables.createVariables().putValue(
+                "myVar", null // existing null variable
+        ));
+
+        var variable = (VariableInstanceEntity) runtimeService.createVariableInstanceQuery()
+                .processInstanceIdIn(pi.getId())
+                .singleResult();
+
+        // the bytearray does not exist for a null value
+        assertThat(variable.getByteArrayValueId()).isNull();
+        assertThat(variable.getByteArrayValue()).isNull();
+
+        // when variable is updated from null to non-null
+        String id = managementService.createJobQuery().singleResult().getId();
+        managementService.executeJob(id);
+
+        testRule.waitForJobExecutorToProcessAllJobs(5000);
+
+        variable = (VariableInstanceEntity) runtimeService.createVariableInstanceQuery()
+                .processInstanceIdIn(pi.getId())
+                .singleResult();
+
+        // then
+        assertThat(variable.getTextValue2())
+                .withFailMessage("The type name of the variable should be set on the text value 2 field")
+                .isEqualTo("org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable");
+
+        assertThat(((MySerializable)variable.getValue()).getName())
+                .withFailMessage("The variable changed value")
+                .isEqualTo("non null value");
+
+        assertThat(variable.getByteArrayValue())
+                .withFailMessage("The new byte array value should not be null after the update")
+                .isNotNull();
+
+        assertThat(variable.getByteArrayValueId())
+                .withFailMessage("The byte array id should not be null after the update ")
+                .isNotNull();
     }
 
     private ProcessInstance startProcessInstanceWithVariable(String processDefinitionKey, String variableName, Object variableValue) {
