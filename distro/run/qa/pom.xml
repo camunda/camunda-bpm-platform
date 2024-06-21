@@ -19,7 +19,7 @@
 
     <version.jersey-json>1.15</version.jersey-json>
     <version.jersey-apache-client>1.15</version.jersey-apache-client>
-    <version.httpcomponents>5.2.4</version.httpcomponents>
+    <version.httpcomponents>5.3.1</version.httpcomponents>
     <version.junit>4.13.1</version.junit>
     <version.chromedriver>112.0.5615.49</version.chromedriver>
   </properties>
