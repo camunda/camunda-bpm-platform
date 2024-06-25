@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.authorization.TaskPermissions;
+import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -103,12 +104,10 @@ public class CmmnDisabledTest {
     assertNotNull(processDefinition);
     assertEquals(1, processDefinition.getVersion());
 
-    try {
-      repositoryService.createCaseDefinitionQuery().singleResult();
-      fail("Cmmn Disabled: It should not be possible to query for a case definition.");
-    } catch (Exception e) {
-      // expected
-    }
+    List<CaseDefinition> caseDefinitionList = repositoryService.createCaseDefinitionQuery().list();
+    assertEquals(0, caseDefinitionList.size());
+    long caseDefinitionCount =  repositoryService.createCaseDefinitionQuery().count();
+    assertEquals(0, caseDefinitionCount);
 
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
