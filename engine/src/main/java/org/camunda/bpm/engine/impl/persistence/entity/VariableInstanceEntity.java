@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
-import java.util.Objects;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
