@@ -46,19 +46,19 @@
       },
       {
         "key": "gt",
-        "value": ">"
+        "value": "SEARCH_GREATER_THAN"
       },
       {
         "key": "gteq",
-        "value": ">="
+        "value": "SEARCH_GREATER_THAN_EQUALS"
       },
       {
         "key": "lt",
-        "value": "<"
+        "value": "SEARCH_LESS_THAN"
       },
       {
         "key": "lteq",
-        "value": "<="
+        "value": "SEARCH_LESS_THAN_EQUALS"
       },
       {
         "key": "like",
@@ -76,19 +76,19 @@
       },
       {
         "key": "gt",
-        "value": ">"
+        "value": "SEARCH_GREATER_THAN"
       },
       {
         "key": "gteq",
-        "value": ">="
+        "value": "SEARCH_GREATER_THAN_EQUALS"
       },
       {
         "key": "lt",
-        "value": "<"
+        "value": "SEARCH_LESS_THAN"
       },
       {
         "key": "lteq",
-        "value": "<="
+        "value": "SEARCH_LESS_THAN_EQUALS"
       },
       {
         "key": "like",
@@ -106,19 +106,19 @@
       },
       {
         "key": "gt",
-        "value": ">"
+        "value": "SEARCH_GREATER_THAN"
       },
       {
         "key": "gteq",
-        "value": ">="
+        "value": "SEARCH_GREATER_THAN_EQUALS"
       },
       {
         "key": "lt",
-        "value": "<"
+        "value": "SEARCH_LESS_THAN"
       },
       {
         "key": "lteq",
-        "value": "<="
+        "value": "SEARCH_LESS_THAN_EQUALS"
       }
     ],
     "boolean":    [

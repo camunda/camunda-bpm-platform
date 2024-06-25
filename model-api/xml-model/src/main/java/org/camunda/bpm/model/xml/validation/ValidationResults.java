@@ -56,8 +56,17 @@ public interface ValidationResults {
    * Utility method to print out a summary of the validation results.
    *
    * @param writer a {@link StringWriter} to which the result should be printed
-   * @param printer formatter for printing elements and validation results
+   * @param formatter formatter for printing elements and validation results
    */
-  void write(StringWriter writer, ValidationResultFormatter printer);
+  void write(StringWriter writer, ValidationResultFormatter formatter);
+
+  /**
+   * Utility method to print out a summary of the validation results.
+   *
+   * @param writer a {@link StringWriter} to which the result should be printed
+   * @param formatter formatter for printing elements and validation results
+   * @param maxSize the maximum size (in bytes) that is allowed to be written to the writer
+   */
+  void write(StringWriter writer, ValidationResultFormatter formatter, int maxSize);
 
 }

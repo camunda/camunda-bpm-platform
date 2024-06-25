@@ -42,9 +42,14 @@ import org.camunda.bpm.engine.impl.persistence.entity.util.TypedValueUpdateListe
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
+import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializerFactory;
 import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+
+import static org.camunda.bpm.engine.impl.persistence.entity.util.TypedValueField.getSerializers;
 
 /**
  * @author Tom Baeyens
@@ -157,7 +162,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     }
 
     // clear value
-    clearValueFields();
+    clearValueFields(true);
 
     if (!isTransient) {
       // delete variable
@@ -279,20 +284,45 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public void setValue(TypedValue value) {
-    // clear value fields
-    clearValueFields();
+    TypedValue newValue = value;
 
-    typedValueField.setValue(value);
+    ValueType newType = null;
+    if (newValue instanceof UntypedValueImpl) {
+      newValue = getSerializers()
+          .findSerializerForValue(newValue, getFallbackSerializerFactory())
+          .convertToTypedValue((UntypedValueImpl) newValue);
+      newType = newValue.getType();
+    }
+
+    String oldTypeAsString = typedValueField.getTypeName();
+    clearValueFields(!isObjectTyped(newType, oldTypeAsString));
+    typedValueField.setValue(newValue);
   }
 
-  public void clearValueFields() {
+  /**
+   * The engine should only remove byte arrays in case the type
+   * changes but keep it when old and new types are object.
+   *
+   * @param newType of the variable overriding the old.
+   * @param oldTypeAsString of the variable previously set.
+   * @return {@code true} if old and new variable are both object typed.
+   */
+  protected boolean isObjectTyped(ValueType newType, String oldTypeAsString) {
+    return ValueType.OBJECT.equals(newType) && newType.getName().equals(oldTypeAsString);
+  }
+
+  protected VariableSerializerFactory getFallbackSerializerFactory() {
+    return Context.getProcessEngineConfiguration().getFallbackSerializerFactory();
+  }
+
+  public void clearValueFields(boolean deleteVariable) {
     this.longValue = null;
     this.doubleValue = null;
     this.textValue = null;
     this.textValue2 = null;
     typedValueField.clear();
 
-    if(byteArrayField.getByteArrayId() != null) {
+    if (deleteVariable && byteArrayField.getByteArrayId() != null) {
       deleteByteArrayValue();
       setByteArrayValueId(null);
     }
