@@ -315,6 +315,7 @@
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
     <result property="state" column="STATE_" jdbcType="VARCHAR"/>
+    <result property="restartedProcessInstanceId" column="RESTARTED_PROC_INST_ID_" jdbcType="VARCHAR"/>
   </resultMap>
   
   <resultMap type="org.camunda.bpm.engine.impl.util.ImmutablePair" id="deploymentIdMapping">

@@ -160,6 +160,7 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
            + ", processDefinitionId=" + processDefinitionId
            + ", processInstanceId=" + processInstanceId
            + ", tenantId=" + tenantId
+           + ", restartedProcessInstanceId=" + restartedProcessInstanceId
            + "]";
   }
 
