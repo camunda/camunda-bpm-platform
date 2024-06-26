@@ -272,11 +272,6 @@ public interface CommandChecker {
   void checkDeleteTask(TaskEntity task);
 
   /**
-   * Check if it is allowed to update a task
-   */
-  void checkUpdateTask(TaskEntity task);
-
-  /**
    * Checks if it is allowed to read the given decision definition.
    */
   void checkReadDecisionDefinition(DecisionDefinitionEntity decisionDefinition);

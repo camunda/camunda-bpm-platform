@@ -19,19 +19,24 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.CommentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.task.Comment;
 
 /**
- * see https://github.com/camunda/camunda-bpm-platform/issues/2551
- *
- * Command to delete a comment by a given commentId and processInstanceId.
+ * Command to delete a comment by a given commentId and processInstanceId or to delete all comments
+ * of a given processInstanceId
  */
+
 public class DeleteProcessInstanceCommentCmd implements Command<Object>, Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -43,24 +48,59 @@ public class DeleteProcessInstanceCommentCmd implements Command<Object>, Seriali
     this.commentId = commentId;
   }
 
+  public DeleteProcessInstanceCommentCmd(String processInstanceId) {
+    this.processInstanceId = processInstanceId;
+  }
+
   public Object execute(CommandContext commandContext) {
-    ensureNotNull("commentId", commentId);
-
-    CommentEntity comment = commandContext.getCommentManager()
-        .findCommentByProcessInstanceIdAndCommentId(processInstanceId, commentId);
-
-    if (comment != null) {
-      TaskEntity task = getTask(comment, commandContext);
-      checkUpdateProcessInstance(processInstanceId, commandContext);
-      commandContext.getDbEntityManager().delete(comment);
-
-      PropertyChange propertyChange = new PropertyChange("comment", null, comment.getMessage());
-      commandContext.getOperationLogManager()
-          .logCommentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_COMMENT, task, propertyChange);
-      task.triggerUpdateEvent();
+    if (processInstanceId == null && commentId == null) {
+      throw new ProcessEngineException("Both process instance and comment ids are null");
     }
 
+    ensureNotNull("processInstanceId", processInstanceId);
+
+    if (commentId != null && processInstanceId != null) {
+      CommentEntity comment = commandContext.getCommentManager()
+          .findCommentByProcessInstanceIdAndCommentId(processInstanceId, commentId);
+      if (comment != null) {
+
+        TaskEntity task = getTask(comment, commandContext);
+
+        checkTaskAssign(task, commandContext);
+        commandContext.getDbEntityManager().delete(comment);
+        logOperation(comment, task, null, commandContext);
+        task.triggerUpdateEvent();
+      }
+    } else {
+      ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+      ensureNotNull("No processInstance exists with processInstanceId: " + processInstanceId, "processInstance: ",
+          processInstance);
+
+      List<Comment> comments = commandContext.getCommentManager().findCommentsByProcessInstanceId(processInstanceId);
+      if (!comments.isEmpty()) {
+        TaskEntity task = commandContext.getTaskManager().findTaskById(comments.get(0).getTaskId());
+        checkTaskAssign(task, commandContext);
+        commandContext.getCommentManager()
+            .deleteCommentsByProcessInstanceIds(Collections.singletonList(processInstanceId));
+        logOperation(null, null, processInstance, commandContext);
+      }
+    }
     return null;
+  }
+
+  private void logOperation(CommentEntity comment,
+                            TaskEntity task,
+                            ExecutionEntity processInstance,
+                            CommandContext commandContext) {
+    PropertyChange propertyChange = new PropertyChange("comment", null,
+        (comment != null) ? comment.getMessage() : null);
+    if (task != null) {
+      commandContext.getOperationLogManager()
+          .logCommentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_COMMENT, task, propertyChange);
+    } else {
+      commandContext.getOperationLogManager()
+          .logCommentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_COMMENT, processInstance, propertyChange);
+    }
   }
 
   private TaskEntity getTask(CommentEntity comment, CommandContext commandContext) {
@@ -70,9 +110,9 @@ public class DeleteProcessInstanceCommentCmd implements Command<Object>, Seriali
     return task;
   }
 
-  protected void checkUpdateProcessInstance(String processInstanceId, CommandContext commandContext) {
+  protected void checkTaskAssign(TaskEntity task, CommandContext commandContext) {
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkUpdateProcessInstanceById(processInstanceId);
+      checker.checkTaskAssign(task);
     }
   }
 }

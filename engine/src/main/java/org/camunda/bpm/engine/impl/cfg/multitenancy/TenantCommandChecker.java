@@ -340,12 +340,6 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
-  public void checkUpdateTask(TaskEntity task) {
-    if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
-      throw LOG.exceptionCommandWithUnauthorizedTenant("update the task '" + task.getId() + "'");
-    }
-  }
-
   public void checkTaskAssign(TaskEntity task) {
     if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("assign the task '"+ task.getId() + "'");

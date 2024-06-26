@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
-import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
@@ -47,7 +47,7 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to delete a task.");
     } catch (AuthorizationException e) {
       // then
-      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'UPDATE'",
+      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
           e.getMessage());
     }
 
@@ -62,7 +62,7 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
     createTask(TASK_ID);
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
     Comment createdComment = taskService.createComment(TASK_ID, processInstanceId, "aComment");
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+    createGrantAuthorization(TASK, TASK_ID, userId, UPDATE);
 
     // when
     taskService.deleteProcessInstanceComment(processInstanceId, createdComment.getId());
@@ -89,7 +89,7 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to delete a comment.");
     } catch (AuthorizationException e) {
       // then
-      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'UPDATE'",
+      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
           e.getMessage());
     }
 
@@ -106,7 +106,7 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
     taskService.createComment(TASK_ID, processInstanceId, "aCommentOne");
     taskService.createComment(TASK_ID, processInstanceId, "aCommentTwo");
 
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+    createGrantAuthorization(TASK, TASK_ID, userId, UPDATE);
 
     // when
     taskService.deleteProcessInstanceComments(processInstanceId);
@@ -133,7 +133,7 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to delete a task.");
     } catch (AuthorizationException e) {
       // then
-      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'UPDATE'",
+      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
           e.getMessage());
     }
 
@@ -151,7 +151,7 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
     String commentMessage = "OriginalCommentMessage";
     String updatedMessage = "UpdatedCommentMessage";
     Comment comment = taskService.createComment(taskId, processInstanceId, commentMessage);
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+    createGrantAuthorization(TASK, TASK_ID, userId, UPDATE);
 
     // when
     taskService.updateProcessInstanceComment(processInstanceId, comment.getId(), updatedMessage);

@@ -19,6 +19,8 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
+import java.util.List;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -26,12 +28,13 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.CommentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.task.Comment;
 
 /**
- * see https://github.com/camunda/camunda-bpm-platform/issues/2551
- *
- * Command to delete a comment by a given commentId and taskId.
+ * Command to delete a comment by a given commentId and taskId or to delete all comments
+ * of a given task Id
  */
+
 public class DeleteTaskCommentCmd implements Command<Object>, Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -43,22 +46,48 @@ public class DeleteTaskCommentCmd implements Command<Object>, Serializable {
     this.commentId = commentId;
   }
 
+  public DeleteTaskCommentCmd(String taskId) {
+    this.taskId = taskId;
+  }
+
   public Object execute(CommandContext commandContext) {
-    ensureNotNull("commentId", commentId);
+    if (commentId == null && taskId == null) {
+      throw new ProcessEngineException("Both task and comment ids are null");
+    }
 
-    CommentEntity comment = commandContext.getCommentManager().findCommentByTaskIdAndCommentId(taskId, commentId);
-    if (comment != null) {
-      TaskEntity task = getTask(comment, commandContext);
+    ensureNotNull("taskId", taskId);
 
-      checkUpdateTask(task, commandContext);
-      commandContext.getDbEntityManager().delete(comment);
+    TaskEntity task = null;
+    CommentEntity comment = null;
+    if (commentId != null && taskId != null) {
+      comment = commandContext.getCommentManager().findCommentByTaskIdAndCommentId(taskId, commentId);
+      if (comment != null) {
+        task = getTask(comment, commandContext);
+        checkTaskAssign(task, commandContext);
+        commandContext.getDbEntityManager().delete(comment);
+      }
+    } else {
+      task = commandContext.getTaskManager().findTaskById(taskId);
+      ensureNotNull("No task exists with taskId: " + taskId, "task", task);
+      List<Comment> comments = commandContext.getCommentManager().findCommentsByTaskId(taskId);
+      if (!comments.isEmpty()) {
+        checkTaskAssign(task, commandContext);
+        commandContext.getCommentManager().deleteCommentsByTaskId(taskId);
+      }
+    }
 
-      PropertyChange propertyChange = new PropertyChange("comment", null, comment.getMessage());
+    if (task != null) {
       commandContext.getOperationLogManager()
-          .logCommentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_COMMENT, task, propertyChange);
+          .logCommentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_COMMENT, task,
+              getCommentPropertyChange(comment != null ? comment.getMessage() : null));
       task.triggerUpdateEvent();
     }
+
     return null;
+  }
+
+  private PropertyChange getCommentPropertyChange(String message) {
+    return new PropertyChange("comment", null, message);
   }
 
   private TaskEntity getTask(CommentEntity comment, CommandContext commandContext) {
@@ -68,9 +97,9 @@ public class DeleteTaskCommentCmd implements Command<Object>, Serializable {
     return task;
   }
 
-  protected void checkUpdateTask(TaskEntity task, CommandContext commandContext) {
+  protected void checkTaskAssign(TaskEntity task, CommandContext commandContext) {
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkUpdateTask(task);
+      checker.checkTaskAssign(task);
     }
   }
 }

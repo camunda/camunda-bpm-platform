@@ -762,10 +762,6 @@ public class AuthorizationCommandChecker implements CommandChecker {
     }
   }
 
-  public void checkUpdateTask(TaskEntity task) {
-    getAuthorizationManager().checkAuthorization(UPDATE, TASK, task.getId());
-  }
-
   public void checkUserOperationLog(UserOperationLogEntry entry,
                                     ProcessDefinitionPermissions processDefinitionPermission,
                                     UserOperationLogCategoryPermissions operationLogCategoryPermission) {

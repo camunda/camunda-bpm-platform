@@ -161,6 +161,8 @@ public class CommentManager extends AbstractHistoricManager {
     parameters.put("action", entity.getAction());
     parameters.put("id", entity.getId());
     parameters.put("userId", entity.getUserId());
+    parameters.put("revision", entity.getRevision());
+    parameters.put("revisionNext", entity.getRevisionNext());
 
     getDbEntityManager().update(CommentEntity.class, "updateComment", parameters);
   }

@@ -411,6 +411,7 @@ public class DbSqlSessionFactory implements SessionFactory {
       addDatabaseSpecificStatement(postgresLikeDatabase, "selectCommentsByTaskId", "selectCommentsByTaskId_postgres");
       addDatabaseSpecificStatement(postgresLikeDatabase, "selectCommentsByProcessInstanceId", "selectCommentsByProcessInstanceId_postgres");
       addDatabaseSpecificStatement(postgresLikeDatabase, "selectCommentByTaskIdAndCommentId", "selectCommentByTaskIdAndCommentId_postgres");
+      addDatabaseSpecificStatement(postgresLikeDatabase, "selectCommentByProcessInstanceIdAndCommentId", "selectCommentByProcessInstanceIdAndCommentId_postgres");
       addDatabaseSpecificStatement(postgresLikeDatabase, "selectEventsByTaskId", "selectEventsByTaskId_postgres");
       addDatabaseSpecificStatement(postgresLikeDatabase, "selectFilterByQueryCriteria", "selectFilterByQueryCriteria_postgres");
       addDatabaseSpecificStatement(postgresLikeDatabase, "selectFilter", "selectFilter_postgres");

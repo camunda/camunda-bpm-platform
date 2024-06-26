@@ -281,28 +281,12 @@ public class TaskServiceTest {
   }
 
   @Test
-  public void testDeleteTaskCommentNullCommentId() {
-    Task task = taskService.newTask();
-    taskService.saveTask(task);
-    String taskId = task.getId();
-    try {
-      taskService.deleteTaskComment(taskId, null);
-
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("commentId is null", ae.getMessage());
-    } finally {
-      taskService.deleteTask(task.getId(), true);
-    }
-  }
-
-  @Test
   public void testDeleteTaskCommentNullTaskIdAndCommentId() {
     try {
       taskService.deleteTaskComment(null, null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("commentId is null", ae.getMessage());
+      testRule.assertTextPresent("Both task and comment ids are null", ae.getMessage());
     }
   }
 
@@ -346,7 +330,7 @@ public class TaskServiceTest {
       taskService.deleteTaskComments(null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("Both task and comment ids are null", ae.getMessage());
     }
   }
 
@@ -420,7 +404,7 @@ public class TaskServiceTest {
       taskService.updateTaskComment(null, comment.getId(), "updatedMessage");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("Both process instance and task ids are null", ae.getMessage());
     } finally {
       taskService.deleteTask(taskId, true);
     }
@@ -481,27 +465,12 @@ public class TaskServiceTest {
   }
 
   @Test
-  public void testDeleteProcessInstanceCommentNullCommentId() {
-    Task task = taskService.newTask();
-    taskService.saveTask(task);
-    String taskId = task.getId();
-    try {
-      taskService.deleteProcessInstanceComment(taskId, null);
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("commentId is null", ae.getMessage());
-    } finally {
-      taskService.deleteTask(taskId, true);
-    }
-  }
-
-  @Test
   public void testDeleteProcessInstanceCommentNullTaskIdAndCommentId() {
     try {
       taskService.deleteProcessInstanceComment(null, null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("commentId is null", ae.getMessage());
+      testRule.assertTextPresent("Both process instance and comment ids are null", ae.getMessage());
     }
   }
 
@@ -544,7 +513,7 @@ public class TaskServiceTest {
       taskService.deleteProcessInstanceComments(null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("processInstanceId is null", ae.getMessage());
+      testRule.assertTextPresent("Both process instance and comment ids are null", ae.getMessage());
     }
   }
 
@@ -617,7 +586,7 @@ public class TaskServiceTest {
       taskService.updateProcessInstanceComment(null, comment.getId(), "updatedMessage");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("processInstanceId is null", ae.getMessage());
+      testRule.assertTextPresent("Both process instance and task ids are null", ae.getMessage());
     } finally {
       taskService.deleteTask(task.getId(), true);
     }

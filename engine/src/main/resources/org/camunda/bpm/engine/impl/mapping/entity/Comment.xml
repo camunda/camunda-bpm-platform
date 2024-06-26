@@ -24,7 +24,7 @@
   <!-- COMMENT INSERT -->
 
   <insert id="insertComment" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
-    insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, ROOT_PROC_INST_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_, TENANT_ID_, REMOVAL_TIME_)
+    insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, ROOT_PROC_INST_ID_, PROC_INST_ID_,ACTION_, MESSAGE_, FULL_MSG_, TENANT_ID_, REMOVAL_TIME_, REV_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{type ,jdbcType=VARCHAR},
@@ -37,12 +37,13 @@
       #{message ,jdbcType=VARCHAR},
       #{fullMessageBytes ,jdbcType=BLOB},
       #{tenantId ,jdbcType=VARCHAR},
-      #{removalTime, jdbcType=TIMESTAMP}
+      #{removalTime, jdbcType=TIMESTAMP},
+      1
     )
   </insert>
 
   <insert id="insertComment_postgres" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
-    insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, ROOT_PROC_INST_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_, TENANT_ID_, REMOVAL_TIME_)
+    insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, ROOT_PROC_INST_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_, TENANT_ID_, REMOVAL_TIME_, REV_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{type ,jdbcType=VARCHAR},
@@ -55,20 +56,22 @@
       #{message ,jdbcType=VARCHAR},
       #{fullMessageBytes ,jdbcType=BINARY},
       #{tenantId ,jdbcType=VARCHAR},
-      #{removalTime, jdbcType=TIMESTAMP}
+      #{removalTime, jdbcType=TIMESTAMP},
+      1
     )
   </insert>
 
   <!-- UPDATE -->
-  <update id="updateComment" parameterType="java.util.Map">
+  <update id="updateComment" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
     update
       ${prefix}ACT_HI_COMMENT
     set MESSAGE_ = #{message ,jdbcType=VARCHAR},
         FULL_MSG_= #{fullMessageBytes ,jdbcType=BLOB},
         TIME_    = #{time ,jdbcType=TIMESTAMP},
         ACTION_  = #{action ,jdbcType=VARCHAR},
-        USER_ID_ = #{userId ,jdbcType=VARCHAR}
-    where ID_ = #{id}
+        USER_ID_ = #{userId ,jdbcType=VARCHAR},
+        REV_ = #{revisionNext, jdbcType=INTEGER}
+    where ID_ = #{id} and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
   <update id="updateCommentsByRootProcessInstanceId"
@@ -227,7 +230,7 @@
   <delete id="deleteComment" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
     delete
     from ${prefix}ACT_HI_COMMENT
-    where ID_ = #{id}
+    where ID_ = #{id} and REV_ = #{revision}
   </delete>
 
   <delete id="deleteCommentsByTaskId" parameterType="string">
@@ -349,6 +352,7 @@
     <result property="fullMessageBytes" column="FULL_MSG_" jdbcType="BLOB" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
   </resultMap>
 
   <resultMap id="commentResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
@@ -364,6 +368,7 @@
     <result property="fullMessageBytes" column="FULL_MSG_" jdbcType="BINARY" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
   </resultMap>
 
   <!-- COMMENT SELECT -->
@@ -475,6 +480,13 @@
   </select>
 
   <select id="selectCommentByProcessInstanceIdAndCommentId" parameterType="map" resultMap="commentResultMap">
+    select *
+    from ${prefix}ACT_HI_COMMENT
+    where PROC_INST_ID_ = #{processInstanceId,jdbcType=VARCHAR}
+      and ID_ = #{id,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectCommentByProcessInstanceIdAndCommentId_postgres" parameterType="map" resultMap="commentResultMap_postgres">
     select *
     from ${prefix}ACT_HI_COMMENT
     where PROC_INST_ID_ = #{processInstanceId,jdbcType=VARCHAR}

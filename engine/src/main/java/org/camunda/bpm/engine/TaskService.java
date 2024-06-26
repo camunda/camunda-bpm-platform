@@ -1108,32 +1108,81 @@ public interface TaskService {
   Comment createComment(String taskId, String processInstanceId, String message);
 
   /**
-   * Deletes a comment by a given taskId and comment ID
+   * Deletes a comment of a given taskId and commentId
+   *
+   * @param taskId    id of a task of a comment that is intended to be deleted
+   * @param commentId id of a comment that is intended to be deleted
+   * @throws NotFoundException       if no task with the given id exists
+   * @throws BadUserRequestException if task id or error code were null or empty
+   * @throws ProcessEngineException  when task and comment don't exist with the given taskId and commentId
+   * @throws AuthorizationException  If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
+   *                                 or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
+   *                                 (if the task is part of a running process instance).
    */
   void deleteTaskComment(String taskId, String commentId);
 
   /**
    * Deletes a comment by a given processInstanceId and comment ID
+   *
+   * @param processInstanceId id of a processInstance of a comment that is intended to be deleted
+   * @param commentId         id of a comment that is intended to be deleted
+   * @throws NotFoundException      if no task with the given process instance id exists
+   * @throws ProcessEngineException when given process instance id and comment id are passed as null
+   * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
+   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
+   *                                (if the task is part of a running process instance).
    */
   void deleteProcessInstanceComment(String processInstanceId, String commentId);
 
   /**
-   * Deletes comments by a given task ID
+   * Deletes all comments by a given task ID
+   *
+   * @param taskId id of a task of all comments that are intended to be deleted
+   * @throws NotFoundException      when the task doesn't exist with a given task id
+   * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
+   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
+   *                                (if the task is part of a running process instance).
    */
   void deleteTaskComments(String taskId);
 
   /**
-   * Deletes comments by a given processInstance ID
+   * Deletes all comments by a given processInstance ID
+   *
+   * @param processInstanceId id of a process instance of comments that are intended to be deleted
+   * @throws NotFoundException      when the process instance doesn't exist with a given process instance id
+   * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
+   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
+   *                                (if the task is part of a running process instance).
    */
   void deleteProcessInstanceComments(String processInstanceId);
 
   /**
-   * Updates comment on a given task ID
+   * Updates a comment on a given task ID
+   *
+   * @param taskId    id of a task of a comment that is intended to be updated
+   * @param commentId id of a comment that is intended to be updated
+   * @param message   new message that needs to be updated
+   * @throws NotFoundException      if no task with the given taskId id exists
+   * @throws NotFoundException      if no comment found to be updated for a given comment id
+   * @throws ProcessEngineException when given task id and comment id are passed as null
+   * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
+   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
+   *                                (if the task is part of a running process instance).
    */
   void updateTaskComment(String taskId, String commentId, String message);
 
   /**
    * Updates comment on a given processInstance ID
+   *
+   * @param processInstanceId id of a process instance of a comment that is intended to be updated
+   * @param commentId         id of a comment that is intended to be updated
+   * @param message           new message that needs to be updated
+   * @throws NotFoundException      if no process instance with the given processInstanceId id exists
+   * @throws NotFoundException      if no comment found to be updated for a given comment id
+   * @throws ProcessEngineException when given process instance id and comment id are passed as null
+   * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
+   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
+   *                                (if the task is part of a running process instance).
    */
   void updateProcessInstanceComment(String processInstanceId, String commentId, String message);
 
