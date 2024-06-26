@@ -377,7 +377,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'chrome_112',
               runSteps: {
-                cambpmRunMaven('qa/', 'clean install -Ptomcat,h2,webapps-integration -DskipTests-webapps=true', runtimeStash: true, archiveStash: true, jdkVersion: 'jdk-17-latest')
+                cambpmRunMaven('qa/', 'clean install -Ptomcat,h2,webapps-integration', runtimeStash: true, archiveStash: true)
               },
               postFailure: {
                 cambpmPublishTestResult()

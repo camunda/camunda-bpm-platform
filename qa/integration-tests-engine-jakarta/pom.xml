@@ -685,7 +685,6 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <skipTests>${skipTests-webapps}</skipTests>
               <excludes>
                 <!-- no EE stuff on tomcat :) -->
                 <exclude>**/ear/**</exclude>
