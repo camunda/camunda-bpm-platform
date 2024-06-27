@@ -150,6 +150,16 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
+      <dependency>
+        <groupId>org.apache.groovy</groupId>
+        <artifactId>groovy-dateutil</artifactId>
+        <version>${version.groovy}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.groovy</groupId>
+        <artifactId>groovy-datetime</artifactId>
+        <version>${version.groovy}</version>
+      </dependency>
 
       <dependency>
         <groupId>org.graalvm.js</groupId>

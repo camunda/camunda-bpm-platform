@@ -118,6 +118,14 @@
       <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-templates</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-dateutil</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-datetime</artifactId>
+    </dependency>
 
   </dependencies>
 

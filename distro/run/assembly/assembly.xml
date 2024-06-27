@@ -49,6 +49,8 @@
         <include>org.apache.groovy:groovy-json:jar:*</include>
         <include>org.apache.groovy:groovy-xml:jar:*</include>
         <include>org.apache.groovy:groovy-templates:jar:*</include>
+        <include>org.apache.groovy:groovy-dateutil:jar:*</include>
+        <include>org.apache.groovy:groovy-datetime:jar:*</include>
       </includes>
     </dependencySet>
   </dependencySets>
