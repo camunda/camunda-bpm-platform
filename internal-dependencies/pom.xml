@@ -387,11 +387,6 @@
         <artifactId>mssqlserver</artifactId>
         <version>${version.testcontainers}</version>
       </dependency>
-      <dependency>
-        <groupId>org.testcontainers</groupId>
-        <artifactId>cockroachdb</artifactId>
-        <version>${version.testcontainers}</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 </project>

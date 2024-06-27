@@ -32,7 +32,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.exceptions.PersistenceException;
@@ -44,7 +43,6 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.AbstractPersistenceSession;
 import org.camunda.bpm.engine.impl.db.DbEntity;
@@ -139,12 +137,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     // do not perform locking if H2 database is used. H2 uses table level locks
     // by default which may cause deadlocks if the deploy command needs to get a new
     // Id using the DbIdGenerator while performing a deployment.
-    //
-    // On CockroachDB, pessimistic locks are disabled since this database uses
-    // a stricter, SERIALIZABLE transaction isolation which ensures a serialized
-    // manner of transaction execution, making our use-case of pessimistic locks
-    // redundant.
-    if (!DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.CRDB, DbSqlSessionFactory.H2)) {
+    if (!DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.H2)) {
       String mappedStatement = dbSqlSessionFactory.mapStatement(statement);
       executeSelectForUpdate(mappedStatement, parameter);
     } else {
@@ -200,9 +193,6 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
       operation.setFailure(failure);
 
       State failedState = State.FAILED_ERROR;
-      if (isCrdbConcurrencyConflict(failure)) {
-        failedState = State.FAILED_CONCURRENT_MODIFICATION_CRDB;
-      }
       operation.setState(failedState);
     } else {
       operation.setRowsAffected(rowsAffected);
@@ -238,9 +228,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     DbOperation dependencyOperation = operation.getDependentOperation();
 
     State failedState;
-    if (isCrdbConcurrencyConflict(failure)) {
-      failedState = State.FAILED_CONCURRENT_MODIFICATION_CRDB;
-    } else if (isConcurrentModificationException(operation, failure)) {
+    if (isConcurrentModificationException(operation, failure)) {
       failedState = DatabaseUtil.checkDatabaseRollsBackTransactionOnError()
           ? State.FAILED_CONCURRENT_MODIFICATION_EXCEPTION
           : State.FAILED_CONCURRENT_MODIFICATION;
@@ -281,56 +269,6 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
       for (Map.Entry<String, Class> reference : ((HasDbReferences)entity).getReferencedEntitiesIdAndClass().entrySet()) {
         DbEntity referencedEntity = selectById(reference.getValue(), reference.getKey());
         if (referencedEntity == null) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * In cases where CockroachDB is used, and a failed operation is detected,
-   * the method checks if the exception was caused by a CockroachDB
-   * <code>TransactionRetryException</code>.
-   *
-   * @param cause for which an operation failed
-   * @return true if the failure was due to a CRDB <code>TransactionRetryException</code>.
-   *          Otherwise, it's false.
-   */
-  public static boolean isCrdbConcurrencyConflict(Throwable cause) {
-    // only check when CRDB is used
-    if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.CRDB)) {
-      return ExceptionUtil.checkCrdbTransactionRetryException(cause);
-    }
-
-    return false;
-  }
-
-  /**
-   * In cases where CockroachDB is used, and a failed operation is detected,
-   * the method checks if the exception was caused by a CockroachDB
-   * <code>TransactionRetryException</code>. This method may be used when a
-   * CRDB Error occurs on commit, and a Command Context is not available, as
-   * it has already been closed. This is the case with Spring/JTA transaction
-   * interceptors.
-   *
-   * @param cause for which an operation failed
-   * @param configuration of the Process Engine
-   * @return true if the failure was due to a CRDB <code>TransactionRetryException</code>.
-   *          Otherwise, it's false.
-   */
-  public static boolean isCrdbConcurrencyConflictOnCommit(Exception cause, ProcessEngineConfigurationImpl configuration) {
-    // only check when CRDB is used
-    if (DatabaseUtil.checkDatabaseType(configuration, DbSqlSessionFactory.CRDB)) {
-      // with Java EE (JTA) transactions, the real cause is suppressed,
-      // and replaced with a RollbackException. We need to look into the
-      // suppressed exceptions to find the CRDB TransactionRetryError.
-      List<Throwable> causes = new ArrayList<>(Arrays.asList(cause.getSuppressed()));
-      causes.add(cause);
-      for (Throwable throwable : causes) {
-        if (throwable instanceof SQLException &&
-            ExceptionUtil.checkCrdbTransactionRetryException((SQLException) throwable)) {
           return true;
         }
       }
@@ -649,7 +587,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
         schema = dbSqlSessionFactory.getDatabaseSchema();
       }
 
-      if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES, DbSqlSessionFactory.CRDB)) {
+      if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES)) {
         tableName = tableName.toLowerCase();
       }
 
@@ -684,8 +622,8 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
           String schema = getDbSqlSessionFactory().getDatabaseSchema();
           String tableNameFilter = prependDatabaseTablePrefix("ACT_%");
 
-          // for postgres or cockroachdb, we have to use lower case
-          if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES, DbSqlSessionFactory.CRDB)) {
+          // for postgres, we have to use lower case
+          if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES)) {
             schema = schema == null ? schema : schema.toLowerCase();
             tableNameFilter = tableNameFilter.toLowerCase();
           }
