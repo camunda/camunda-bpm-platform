@@ -18,10 +18,7 @@ package org.camunda.bpm.engine.test.concurrency;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.OptimisticLockingException;
-import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -100,16 +97,7 @@ public class ConcurrentHistoryCleanupReconfigureTest extends ConcurrencyTestHelp
 
     // there were no failures for the first job reconfiguration
     assertThat(engineOne.getException()).isNull();
-    if (testRule.isOptimisticLockingExceptionSuppressible()) {
-      assertThat(engineTwo.getException()).isNull();
-    } else {
-      // on CockroachDB, a concurrent reconfiguration of the HistoryCleanupJobs will result
-      // in an un-ignorable CrdbTransactionRetryException and the whole command will need to be retried.
-      // By default, the CRDB-related `commandRetries` property is 0. So any retryable commands,
-      // like the `BootstrapEngineCommand` will not be retried, but report a `CrdbTransactionRetryException`
-      // to the caller.
-      assertThat(engineTwo.getException()).isInstanceOf(CrdbTransactionRetryException.class);
-    }
+    assertThat(engineTwo.getException()).isNull();
   }
 
   public class EngineOne extends ControllableCommand<Void> {

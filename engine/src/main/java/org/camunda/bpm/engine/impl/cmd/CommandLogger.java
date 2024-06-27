@@ -302,12 +302,6 @@ public class CommandLogger extends ProcessEngineLogger {
         variableName));
   }
 
-  public void crdbTransactionRetryAttempt(Throwable cause) {
-    logDebug("045",
-      "A CockroachDB transaction retry attempt will be made. Reason: {}",
-      cause.getMessage());
-  }
-
   public void debugNotAllowedToResolveCalledProcess(String calledProcessId, String callingProcessId, String callActivityId, Throwable cause) {
     logDebug("046",
       "Resolving a called process definition {} for {} in {} was not possible. Reason: {}",

@@ -18,14 +18,12 @@ package org.camunda.bpm.engine.test.concurrency;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
@@ -119,13 +117,6 @@ public class CompetingExternalTaskFetchingTest {
     thread2.proceedAndWaitTillDone();
     assertEquals(0, thread2.fetchedTasks.size());
     // but does not fail with an OptimisticLockingException
-    if (testRule.isOptimisticLockingExceptionSuppressible()) {
-      assertNull(thread2.exception);
-    } else {
-      // on CockroachDb, the `commandRetries` property is 0 by default. So any retryable commands,
-      // like the `FetchExternalTasksCmd` will not be retried, but report
-      // a `CrdbTransactionRetryException` to the caller.
-      assertTrue(thread2.exception instanceof CrdbTransactionRetryException);
-    }
+    assertNull(thread2.exception);
   }
 }

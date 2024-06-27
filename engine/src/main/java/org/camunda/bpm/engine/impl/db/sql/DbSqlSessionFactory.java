@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl.db.sql;
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -41,8 +42,7 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final String MYSQL = "mysql";
   public static final String POSTGRES = "postgres";
   public static final String MARIADB = "mariadb";
-  public static final String CRDB = "cockroachdb";
-  public static final String[] SUPPORTED_DATABASES = {MSSQL, DB2, ORACLE, H2, MYSQL, POSTGRES, MARIADB, CRDB};
+  public static final String[] SUPPORTED_DATABASES = {MSSQL, DB2, ORACLE, H2, MYSQL, POSTGRES, MARIADB};
 
   protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<>();
 
@@ -342,8 +342,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     }
 
     // postgres specific
-    // use the same specific for cockroachdb since it supports the postgres wire protocol
-    for (String postgresLikeDatabase : Arrays.asList(POSTGRES, CRDB)) {
+    for (String postgresLikeDatabase : List.of(POSTGRES)) {
       databaseSpecificLimitBeforeStatements.put(postgresLikeDatabase, "");
       optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements.put(postgresLikeDatabase, "");
       databaseSpecificLimitAfterStatements.put(postgresLikeDatabase, "LIMIT #{maxResults} OFFSET #{firstResult}");
@@ -492,11 +491,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     }
     databaseSpecificDaysComparator.put(POSTGRES, "EXTRACT (DAY FROM #{currentTimestamp} - ${date}) >= ${days}");
     databaseSpecificNumericCast.put(POSTGRES, "");
-
-    // cockroachdb
-    // CRDB doesn't currently support DAY extraction from intervals. The following is a workaround:
-    databaseSpecificDaysComparator.put(CRDB, "CAST( EXTRACT (HOUR FROM #{currentTimestamp} - ${date}) / 24 AS INT ) >= ${days}");
-    databaseSpecificNumericCast.put(CRDB, "::NUMERIC");
 
     // oracle
     databaseSpecificLimitBeforeStatements.put(ORACLE, "select * from ( select a.*, ROWNUM rnum from (");
