@@ -133,6 +133,16 @@
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-connectors-all</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.camunda.connect</groupId>
+          <artifactId>camunda-connect-http-client</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.camunda.connect</groupId>
+          <artifactId>camunda-connect-soap-http-client</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
