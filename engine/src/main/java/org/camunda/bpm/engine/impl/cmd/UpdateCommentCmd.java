@@ -81,7 +81,7 @@ public class UpdateCommentCmd implements Command<Object>, Serializable {
     TaskEntity task = commandContext.getTaskManager().findTaskById(taskId);
     ensureNotNull("No task exists with taskId: " + taskId, "task", task);
 
-    checkTaskAssign(task, commandContext);
+    checkTaskWork(task, commandContext);
     updateComment(commandContext, comment);
     return  task;
   }
@@ -97,9 +97,9 @@ public class UpdateCommentCmd implements Command<Object>, Serializable {
     return new PropertyChange("comment", comment.getMessage(), message);
   }
 
-  protected void checkTaskAssign(TaskEntity task, CommandContext commandContext) {
+  protected void checkTaskWork(TaskEntity task, CommandContext commandContext) {
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkTaskAssign(task);
+      checker.checkTaskWork(task);
     }
   }
 

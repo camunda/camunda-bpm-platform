@@ -47,7 +47,7 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to delete a task.");
     } catch (AuthorizationException e) {
       // then
-      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
+      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_WORK' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
           e.getMessage());
     }
 
@@ -89,7 +89,7 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to delete a comment.");
     } catch (AuthorizationException e) {
       // then
-      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
+      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_WORK' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
           e.getMessage());
     }
 
@@ -133,7 +133,7 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to delete a task.");
     } catch (AuthorizationException e) {
       // then
-      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
+      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_WORK' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
           e.getMessage());
     }
 

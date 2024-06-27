@@ -44,7 +44,7 @@ public class TaskCommentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       testRule.assertTextPresent(
-          "The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
+          "The user with id 'test' does not have one of the following permissions: 'TASK_WORK' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
           e.getMessage());
     }
 
@@ -83,7 +83,7 @@ public class TaskCommentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       testRule.assertTextPresent(
-          "The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
+          "The user with id 'test' does not have one of the following permissions: 'TASK_WORK' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
           e.getMessage());
     }
 
@@ -124,7 +124,7 @@ public class TaskCommentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       testRule.assertTextPresent(
-          "The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
+          "The user with id 'test' does not have one of the following permissions: 'TASK_WORK' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
           e.getMessage());
     }
 

@@ -63,7 +63,7 @@ public class DeleteTaskCommentCmd implements Command<Object>, Serializable {
       comment = commandContext.getCommentManager().findCommentByTaskIdAndCommentId(taskId, commentId);
       if (comment != null) {
         task = getTask(comment, commandContext);
-        checkTaskAssign(task, commandContext);
+        checkTaskWork(task, commandContext);
         commandContext.getDbEntityManager().delete(comment);
       }
     } else {
@@ -71,7 +71,7 @@ public class DeleteTaskCommentCmd implements Command<Object>, Serializable {
       ensureNotNull("No task exists with taskId: " + taskId, "task", task);
       List<Comment> comments = commandContext.getCommentManager().findCommentsByTaskId(taskId);
       if (!comments.isEmpty()) {
-        checkTaskAssign(task, commandContext);
+        checkTaskWork(task, commandContext);
         commandContext.getCommentManager().deleteCommentsByTaskId(taskId);
       }
     }
@@ -97,9 +97,9 @@ public class DeleteTaskCommentCmd implements Command<Object>, Serializable {
     return task;
   }
 
-  protected void checkTaskAssign(TaskEntity task, CommandContext commandContext) {
+  protected void checkTaskWork(TaskEntity task, CommandContext commandContext) {
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkTaskAssign(task);
+      checker.checkTaskWork(task);
     }
   }
 }

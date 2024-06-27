@@ -66,7 +66,7 @@ public class DeleteProcessInstanceCommentCmd implements Command<Object>, Seriali
 
         TaskEntity task = getTask(comment, commandContext);
 
-        checkTaskAssign(task, commandContext);
+        checkTaskWork(task, commandContext);
         commandContext.getDbEntityManager().delete(comment);
         logOperation(comment, task, null, commandContext);
         task.triggerUpdateEvent();
@@ -79,7 +79,7 @@ public class DeleteProcessInstanceCommentCmd implements Command<Object>, Seriali
       List<Comment> comments = commandContext.getCommentManager().findCommentsByProcessInstanceId(processInstanceId);
       if (!comments.isEmpty()) {
         TaskEntity task = commandContext.getTaskManager().findTaskById(comments.get(0).getTaskId());
-        checkTaskAssign(task, commandContext);
+        checkTaskWork(task, commandContext);
         commandContext.getCommentManager()
             .deleteCommentsByProcessInstanceIds(Collections.singletonList(processInstanceId));
         logOperation(null, null, processInstance, commandContext);
@@ -110,9 +110,9 @@ public class DeleteProcessInstanceCommentCmd implements Command<Object>, Seriali
     return task;
   }
 
-  protected void checkTaskAssign(TaskEntity task, CommandContext commandContext) {
+  protected void checkTaskWork(TaskEntity task, CommandContext commandContext) {
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkTaskAssign(task);
+      checker.checkTaskWork(task);
     }
   }
 }
