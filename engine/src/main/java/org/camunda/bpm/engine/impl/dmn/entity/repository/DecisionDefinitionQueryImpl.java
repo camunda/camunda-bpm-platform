@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl.dmn.entity.repository;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -30,6 +31,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
+import org.camunda.bpm.engine.impl.context.Context;
 
 public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitionQuery, DecisionDefinition> implements DecisionDefinitionQuery {
 
@@ -267,18 +269,24 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
 
   @Override
   public long executeCount(CommandContext commandContext) {
-    checkQueryOk();
-    return commandContext
-      .getDecisionDefinitionManager()
-      .findDecisionDefinitionCountByQueryCriteria(this);
+    if (isDmnEnabled()) {
+      checkQueryOk();
+      return commandContext
+              .getDecisionDefinitionManager()
+              .findDecisionDefinitionCountByQueryCriteria(this);
+    }
+    return 0;
   }
 
   @Override
   public List<DecisionDefinition> executeList(CommandContext commandContext, Page page) {
-    checkQueryOk();
-    return commandContext
-      .getDecisionDefinitionManager()
-      .findDecisionDefinitionsByQueryCriteria(this, page);
+    if (isDmnEnabled()) {
+      checkQueryOk();
+      return commandContext
+              .getDecisionDefinitionManager()
+              .findDecisionDefinitionsByQueryCriteria(this, page);
+    }
+    return Collections.emptyList();
   }
 
   @Override
@@ -289,6 +297,12 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
     if (latest && ( (id != null) || (name != null) || (nameLike != null) || (version != null) || (deploymentId != null) ) ){
       throw new NotValidException("Calling latest() can only be used in combination with key(String) and keyLike(String)");
     }
+  }
+
+  public static boolean isDmnEnabled(){
+    return Context.getCommandContext()
+            .getProcessEngineConfiguration()
+            .isDmnEnabled();
   }
 
   // getters ////////////////////////////////////////////
