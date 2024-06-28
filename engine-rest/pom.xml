@@ -56,9 +56,9 @@
         <type>pom</type>
       </dependency>
       <dependency>
-        <groupId>org.apache.httpcomponents.client5</groupId>
+        <groupId>org.apache.httpcomponents.core5</groupId>
         <artifactId>httpcore5</artifactId>
-        <version>${version.httpclient}</version>
+        <version>5.2.4</version>
       </dependency>
       <dependency>
         <groupId>commons-codec</groupId>
