@@ -73,17 +73,17 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.httpcomponents.client5</groupId>
-      <artifactId>httpclient5</artifactId>
-      <version>${version.httpclient}</version>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.5.14</version>
       <scope>test</scope>
     </dependency>
 
-    <!--<dependency>
+    <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-apache-client4</artifactId>
       <scope>test</scope>
-    </dependency>-->
+    </dependency>
 
     <dependency>
       <groupId>com.sun.jersey</groupId>
