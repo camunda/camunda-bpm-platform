@@ -194,7 +194,7 @@ public class DecisionRequirementsDefinitionQueryImpl extends AbstractQuery<Decis
 
   @Override
   public long executeCount(CommandContext commandContext) {
-    if (DecisionDefinitionQueryImpl.isDmnEnabled()) {
+    if (commandContext.getProcessEngineConfiguration().isDmnEnabled()) {
       checkQueryOk();
       return commandContext
               .getDecisionRequirementsDefinitionManager()
@@ -205,7 +205,7 @@ public class DecisionRequirementsDefinitionQueryImpl extends AbstractQuery<Decis
 
   @Override
   public List<DecisionRequirementsDefinition> executeList(CommandContext commandContext, Page page) {
-    if (DecisionDefinitionQueryImpl.isDmnEnabled()) {
+    if (commandContext.getProcessEngineConfiguration().isDmnEnabled()) {
       checkQueryOk();
       return commandContext
               .getDecisionRequirementsDefinitionManager()

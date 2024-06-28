@@ -30,7 +30,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.util.CompareUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
-import org.camunda.bpm.engine.impl.context.Context;
 
 /**
  * @author Roman Smirnov
@@ -205,7 +204,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
   @Override
   public long executeCount(CommandContext commandContext) {
-    if (isCmmnEnabled()) {
+    if (isCmmnEnabled(commandContext)) {
       checkQueryOk();
       return commandContext
               .getCaseDefinitionManager()
@@ -216,7 +215,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
   @Override
   public List<CaseDefinition> executeList(CommandContext commandContext, Page page) {
-    if (isCmmnEnabled()) {
+    if (isCmmnEnabled(commandContext)) {
       checkQueryOk();
       return commandContext
               .getCaseDefinitionManager()
@@ -235,8 +234,8 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
     }
   }
 
-  public boolean isCmmnEnabled(){
-    return Context.getCommandContext()
+  private boolean isCmmnEnabled(CommandContext commandContext) {
+    return commandContext
             .getProcessEngineConfiguration()
             .isCmmnEnabled();
   }
