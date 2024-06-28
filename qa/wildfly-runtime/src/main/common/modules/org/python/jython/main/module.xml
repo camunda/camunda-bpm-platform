@@ -4,7 +4,13 @@
   </resources>
 
   <dependencies>
-    <module name="javax.api" />
+    <module name="java.base" />
+    <module name="java.desktop" />
+    <module name="java.naming" />
+    <module name="java.scripting" />
+    <module name="java.sql" />
+    <module name="jdk.unsupported" />
+    <module name="jdk.xml.dom"/>
     <module name="org.camunda.spin.camunda-spin-core" />
   </dependencies>
 </module>

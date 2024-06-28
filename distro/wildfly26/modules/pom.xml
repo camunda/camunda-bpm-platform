@@ -13,9 +13,6 @@
 
   <properties>
     <org.jboss.shrinkwrap.resolver.version>1.0.0-beta-5</org.jboss.shrinkwrap.resolver.version>
-    <version.json-path>2.9.0</version.json-path>
-    <version.json-smart>2.5.0</version.json-smart>
-    <version.accessors-smart>2.5.0</version.accessors-smart>
     <!-- generate a bom of compile time dependencies for the license book.
     Note: Every compile time dependency will end up in the license book. Please
     declare only dependencies that are actually needed -->
@@ -58,11 +55,13 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-xml-dom</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -73,11 +72,13 @@
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-http-client</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-soap-http-client</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- script engine dependencies -->
@@ -189,7 +190,7 @@
                   <mapper>
                     <chainedmapper>
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
-                      <regexpmapper from="^(org.camunda.spin.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${version.camunda.spin}.jar" handledirsep="yes" />
+                      <regexpmapper from="^(org.camunda.spin.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${project.version}.jar" handledirsep="yes" />
                     </chainedmapper>
                   </mapper>
                 </copy>
@@ -200,7 +201,7 @@
                   <mapper>
                     <chainedmapper>
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
-                      <regexpmapper from="^(org.camunda.connect.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${version.camunda.connect}.jar" handledirsep="yes" />
+                      <regexpmapper from="^(org.camunda.connect.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${project.version}.jar" handledirsep="yes" />
                     </chainedmapper>
                   </mapper>
                 </copy>
@@ -216,7 +217,7 @@
                     <chainedmapper>
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
                       <mapper>
-                        <regexpmapper from="^(org.camunda.commons.*)\/((camunda-commons-(utils|logging)-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${version.camunda.commons}.jar" handledirsep="yes" />
+                        <regexpmapper from="^(org.camunda.commons.*)\/((camunda-commons-(utils|logging)-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${project.version}.jar" handledirsep="yes" />
                         <regexpmapper from="^(org.camunda.commons.*)\/((camunda-commons-typed-values-)[0-9\.]*).*.jar$$" to="\1/\3${project.version}.jar" handledirsep="yes" />
                       </mapper>
                     </chainedmapper>
@@ -229,7 +230,7 @@
                   <mapper>
                     <chainedmapper>
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
-                      <regexpmapper from="^(org.camunda.template-engines.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${version.camunda.freemarker.template.engine}.jar" handledirsep="yes" />
+                      <regexpmapper from="^(org.camunda.template-engines.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${project.version}.jar" handledirsep="yes" />
                     </chainedmapper>
                   </mapper>
                 </copy>
@@ -277,19 +278,19 @@
                   <include name="**/module.xml" />
                 </replace>
 
-                <replace dir="target/modules" token="@version.camunda.commons@" value="${version.camunda.commons}">
+                <replace dir="target/modules" token="@project.version@" value="${project.version}">
                   <include name="**/module.xml" />
                 </replace>
 
-                <replace dir="target/modules" token="@version.camunda.spin@" value="${version.camunda.spin}">
+                <replace dir="target/modules" token="@project.version@" value="${project.version}">
                   <include name="**/module.xml" />
                 </replace>
 
-                <replace dir="target/modules" token="@version.camunda.connect@" value="${version.camunda.connect}">
+                <replace dir="target/modules" token="@project.version@" value="${project.version}">
                   <include name="**/module.xml" />
                 </replace>
 
-                <replace dir="target/modules" token="@version.camunda.freemarker.template.engine@" value="${version.camunda.freemarker.template.engine}">
+                <replace dir="target/modules" token="@project.version@" value="${project.version}">
                   <include name="**/module.xml" />
                 </replace>
 
@@ -298,6 +299,10 @@
                 </replace>
 
                 <replace dir="target/modules" token="@version.groovy@" value="${version.groovy}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.httpclient@" value="${version.httpclient}">
                   <include name="**/module.xml" />
                 </replace>
 

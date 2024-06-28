@@ -18,10 +18,12 @@ package org.camunda.bpm.engine.impl.bpmn.deployer;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -228,11 +230,11 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
    * subscriptions and add new ones for the new deployed process definitions.
    */
   protected void adjustStartEventSubscriptions(ProcessDefinitionEntity newLatestProcessDefinition, ProcessDefinitionEntity oldLatestProcessDefinition) {
-  	removeObsoleteTimers(newLatestProcessDefinition);
-  	addTimerDeclarations(newLatestProcessDefinition);
+    removeObsoleteTimers(newLatestProcessDefinition);
+    removeObsoleteEventSubscriptions(newLatestProcessDefinition, oldLatestProcessDefinition);
 
-  	removeObsoleteEventSubscriptions(newLatestProcessDefinition, oldLatestProcessDefinition);
-  	addEventSubscriptions(newLatestProcessDefinition);
+    addTimerDeclarations(newLatestProcessDefinition);
+    addEventSubscriptions(newLatestProcessDefinition);
   }
 
   @SuppressWarnings("unchecked")
@@ -255,29 +257,51 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     }
   }
 
-  protected void removeObsoleteEventSubscriptions(ProcessDefinitionEntity processDefinition, ProcessDefinitionEntity latestProcessDefinition) {
-    // remove all subscriptions for the previous version
-    if (latestProcessDefinition != null) {
-      EventSubscriptionManager eventSubscriptionManager = getEventSubscriptionManager();
+  protected void removeObsoleteEventSubscriptions(ProcessDefinitionEntity newLatestProcessDefinition, ProcessDefinitionEntity latestProcessDefinition) {
+    List<EventSubscriptionEntity> orphanSubscriptions = getOrphanSubscriptionEvents(newLatestProcessDefinition);
+    if(!orphanSubscriptions.isEmpty()) { // remove orphan subscriptions if any
+      for (EventSubscriptionEntity eventSubscriptionEntity : orphanSubscriptions) {
+        getEventSubscriptionManager().deleteEventSubscription(eventSubscriptionEntity);
+      }
+    }
 
-      List<EventSubscriptionEntity> subscriptionsToDelete = new ArrayList<>();
-
-      List<EventSubscriptionEntity> messageEventSubscriptions = eventSubscriptionManager
-          .findEventSubscriptionsByConfiguration(EventType.MESSAGE.name(), latestProcessDefinition.getId());
-      subscriptionsToDelete.addAll(messageEventSubscriptions);
-
-      List<EventSubscriptionEntity> signalEventSubscriptions = eventSubscriptionManager
-          .findEventSubscriptionsByConfiguration(EventType.SIGNAL.name(), latestProcessDefinition.getId());
-      subscriptionsToDelete.addAll(signalEventSubscriptions);
-
-      List<EventSubscriptionEntity> conditionalEventSubscriptions = eventSubscriptionManager
-          .findEventSubscriptionsByConfiguration(EventType.CONDITONAL.name(), latestProcessDefinition.getId());
-      subscriptionsToDelete.addAll(conditionalEventSubscriptions);
-
-      for (EventSubscriptionEntity eventSubscriptionEntity : subscriptionsToDelete) {
+    if (latestProcessDefinition != null) { // remove all subscriptions for the previous version
+      List<EventSubscriptionEntity> previousSubscriptions = getPreviousSubscriptionEvents(latestProcessDefinition);
+      for (EventSubscriptionEntity eventSubscriptionEntity : previousSubscriptions) {
         eventSubscriptionEntity.delete();
       }
     }
+  }
+
+  protected List<EventSubscriptionEntity> getPreviousSubscriptionEvents(ProcessDefinitionEntity latestProcessDefinition) {
+    EventSubscriptionManager eventSubscriptionManager = getEventSubscriptionManager();
+
+    List<EventSubscriptionEntity> subscriptionsToDelete = new ArrayList<>();
+
+    List<EventSubscriptionEntity> messageEventSubscriptions = eventSubscriptionManager
+        .findEventSubscriptionsByConfiguration(EventType.MESSAGE.name(), latestProcessDefinition.getId());
+    subscriptionsToDelete.addAll(messageEventSubscriptions);
+
+    List<EventSubscriptionEntity> signalEventSubscriptions = eventSubscriptionManager
+        .findEventSubscriptionsByConfiguration(EventType.SIGNAL.name(), latestProcessDefinition.getId());
+    subscriptionsToDelete.addAll(signalEventSubscriptions);
+
+    List<EventSubscriptionEntity> conditionalEventSubscriptions = eventSubscriptionManager
+        .findEventSubscriptionsByConfiguration(EventType.CONDITONAL.name(), latestProcessDefinition.getId());
+    subscriptionsToDelete.addAll(conditionalEventSubscriptions);
+    return subscriptionsToDelete;
+  }
+
+  protected List<EventSubscriptionEntity> getOrphanSubscriptionEvents(ProcessDefinitionEntity processDefinition) {
+    String configurationLike = processDefinition.getKey() + ":%:%";
+    return getEventSubscriptionManager().findStartEventSubscriptionsByConfigurationLike(configurationLike)
+        .stream()
+        .filter(this::isOrphan)
+        .collect(Collectors.toList());
+  }
+
+  protected boolean isOrphan(EventSubscriptionEntity entity) {
+    return entity.getConfiguration() != null && getProcessDefinitionManager().findLatestProcessDefinitionById(entity.getConfiguration()) == null;
   }
 
   public void addEventSubscriptions(ProcessDefinitionEntity processDefinition) {
@@ -327,7 +351,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     for (EventSubscriptionEntity cachedSubscription : cachedSubscriptions) {
       if (eventSubscription.getUnresolvedEventName().equals(cachedSubscription.getEventName()) &&
           hasTenantId(cachedSubscription, tenantId) &&
-          !subscriptionForSameMessageName.equals(cachedSubscription) &&
+          !cachedSubscription.equals(subscriptionForSameMessageName) &&
           !isSubscriptionOfDifferentTypeAsDeclaration(cachedSubscription, eventSubscription)) {
 
         subscriptionForSameMessageName = cachedSubscription;

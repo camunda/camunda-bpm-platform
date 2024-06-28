@@ -250,12 +250,6 @@
         </plugins>
       </build>
     </profile>
-    <profile>
-      <id>cockroachdb</id>
-      <properties>
-        <skip-test-fixture>true</skip-test-fixture>
-      </properties>
-    </profile>
   </profiles>
 
 </project>

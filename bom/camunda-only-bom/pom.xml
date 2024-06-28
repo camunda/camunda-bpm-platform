@@ -204,6 +204,50 @@
         <artifactId>camunda-bpm-assert</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.camunda.spin</groupId>
+        <artifactId>camunda-spin-bom</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.spin</groupId>
+        <artifactId>camunda-spin-dataformat-all</artifactId>
+        <version>${project.version}</version>
+        <!-- Excluding dependencies that are shaded in camunda-spin-dataformat-all -->
+        <exclusions>
+          <exclusion>
+            <groupId>org.camunda.spin</groupId>
+            <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.camunda.spin</groupId>
+            <artifactId>camunda-spin-dataformat-xml-dom</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.commons</groupId>
+        <artifactId>camunda-commons-bom</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.template-engines</groupId>
+        <artifactId>camunda-template-engines-freemarker</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.connect</groupId>
+        <artifactId>camunda-connect-bom</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- dmn engine dependencies
        -->
@@ -243,45 +287,6 @@
         <groupId>org.camunda.bpm.springboot</groupId>
         <artifactId>camunda-bpm-spring-boot-starter-external-task-client</artifactId>
         <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <!--
-            make sure everybody uses the same commons version
-        -->
-        <groupId>org.camunda.commons</groupId>
-        <artifactId>camunda-commons-bom</artifactId>
-        <version>${version.camunda.commons}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-
-      <!-- camunda-commons-typed-values: part of the platform and shares the same version -->
-      <dependency>
-        <groupId>org.camunda.commons</groupId>
-        <artifactId>camunda-commons-typed-values</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- optional dependencies -->
-      <dependency>
-        <groupId>org.camunda.connect</groupId>
-        <artifactId>camunda-connect-bom</artifactId>
-        <version>${version.camunda.connect}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-      <dependency>
-        <groupId>org.camunda.spin</groupId>
-        <artifactId>camunda-spin-bom</artifactId>
-        <version>${version.camunda.spin}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-      <dependency>
-        <groupId>org.camunda.template-engines</groupId>
-        <artifactId>camunda-template-engines-freemarker</artifactId>
-        <version>${version.camunda.freemarker.template.engine}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

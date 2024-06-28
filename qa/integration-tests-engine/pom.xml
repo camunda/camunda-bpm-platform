@@ -175,11 +175,13 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -210,6 +212,7 @@
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- explicit Spring dependencies for applications

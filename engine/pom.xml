@@ -89,11 +89,13 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-typed-values</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -119,11 +121,23 @@
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-connectors-all</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.camunda.connect</groupId>
+          <artifactId>camunda-connect-http-client</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.camunda.connect</groupId>
+          <artifactId>camunda-connect-soap-http-client</artifactId>
+        </exclusion>
+      </exclusions>
       <scope>runtime</scope>
     </dependency>
 
@@ -245,6 +259,7 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-testing</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -480,6 +495,9 @@
               <exclude>org.mybatis:mybatis:*</exclude>
               <exclude>commons-logging:*</exclude>
               <exclude>joda-time:*</exclude>
+              <exclude>org.apache.httpcomponents:httpclient</exclude>
+              <exclude>org.apache.httpcomponents:httpcore</exclude>
+              <exclude>commons-codec:commons-codec</exclude>
             </excludes>
           </artifactSet>
           <relocations>
@@ -784,6 +802,7 @@
         <dependency>
           <groupId>org.camunda.spin</groupId>
           <artifactId>camunda-spin-dataformat-all</artifactId>
+          <version>${project.version}</version>
         </dependency>
         <dependency>
           <groupId>org.camunda.bpm</groupId>
@@ -792,6 +811,17 @@
         <dependency>
           <groupId>org.camunda.connect</groupId>
           <artifactId>camunda-connect-connectors-all</artifactId>
+          <version>${project.version}</version>
+          <exclusions>
+            <exclusion>
+              <groupId>org.camunda.connect</groupId>
+              <artifactId>camunda-connect-http-client</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.camunda.connect</groupId>
+              <artifactId>camunda-connect-soap-http-client</artifactId>
+            </exclusion>
+          </exclusions>
         </dependency>
       </dependencies>
       <build>

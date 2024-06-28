@@ -162,6 +162,9 @@ public abstract class MockProvider {
   public static final String ANOTHER_EXAMPLE_TENANT_ID = "anotherTenantId";
   public static final String EXAMPLE_TENANT_ID_LIST = EXAMPLE_TENANT_ID + "," + ANOTHER_EXAMPLE_TENANT_ID;
 
+  // task State
+  public static final String EXAMPLE_HISTORIC_TASK_STATE = "aTaskState";
+
   public static final String EXAMPLE_TENANT_NAME = "aTenantName";
 
   // case activity ids
@@ -1060,7 +1063,7 @@ public abstract class MockProvider {
       .caseExecutionId(EXAMPLE_CASE_EXECUTION_ID)
       .formKey(EXAMPLE_FORM_KEY)
       .camundaFormRef(EXAMPLE_FORM_KEY, EXAMPLE_FORM_REF_BINDING, EXAMPLE_FORM_REF_VERSION)
-      .tenantId(EXAMPLE_TENANT_ID);
+      .tenantId(EXAMPLE_TENANT_ID).taskState(EXAMPLE_HISTORIC_TASK_STATE);
   }
 
   public static List<Task> createMockTasks() {
@@ -2579,6 +2582,7 @@ public abstract class MockProvider {
     when(taskInstance.getTenantId()).thenReturn(tenantId);
     when(taskInstance.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_TASK_INST_REMOVAL_TIME));
     when(taskInstance.getRootProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_ROOT_PROC_INST_ID);
+    when(taskInstance.getTaskState()).thenReturn(EXAMPLE_HISTORIC_TASK_STATE);
 
     return taskInstance;
   }
@@ -3251,26 +3255,26 @@ public abstract class MockProvider {
   public static MessageCorrelationResult createMessageCorrelationResult(MessageCorrelationResultType type) {
     MessageCorrelationResult result = mock(MessageCorrelationResult.class);
     when(result.getResultType()).thenReturn(type);
-    if (result.getResultType().equals(MessageCorrelationResultType.Execution)) {
-      Execution ex = createMockExecution();
-      when(result.getExecution()).thenReturn(ex);
-    } else {
-      ProcessInstance instance = createMockInstance();
-      when(result.getProcessInstance()).thenReturn(instance);
-    }
+
+    Execution ex = createMockExecution();
+    when(result.getExecution()).thenReturn(ex);
+
+    ProcessInstance instance = createMockInstance();
+    when(result.getProcessInstance()).thenReturn(instance);
+
     return result;
   }
 
   public static MessageCorrelationResultWithVariables createMessageCorrelationResultWithVariables(MessageCorrelationResultType type) {
     MessageCorrelationResultWithVariables result = mock(MessageCorrelationResultWithVariables.class);
     when(result.getResultType()).thenReturn(type);
-    if (result.getResultType().equals(MessageCorrelationResultType.Execution)) {
-      Execution ex = createMockExecution();
-      when(result.getExecution()).thenReturn(ex);
-    } else {
-      ProcessInstance instance = createMockInstance();
-      when(result.getProcessInstance()).thenReturn(instance);
-    }
+
+    Execution ex = createMockExecution();
+    when(result.getExecution()).thenReturn(ex);
+
+    ProcessInstance instance = createMockInstance();
+    when(result.getProcessInstance()).thenReturn(instance);
+
     when(result.getVariables()).thenReturn(createMockSerializedVariables());
     return result;
   }

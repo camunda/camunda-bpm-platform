@@ -49,6 +49,10 @@ public class TaskDto {
   private String formKey;
   private CamundaFormRef camundaFormRef;
   private String tenantId;
+  /**
+   * Returns task State of task
+   */
+  private String taskState;
 
   public String getId() {
     return id;
@@ -194,6 +198,13 @@ public class TaskDto {
     this.tenantId = tenantId;
   }
 
+  public String getTaskState() {
+    return taskState;
+  }
+  public void setTaskState(String taskState) {
+    this.taskState = taskState;
+  }
+
   public static TaskDto fromEntity(Task task) {
     TaskDto dto = new TaskDto();
     dto.id = task.getId();
@@ -221,6 +232,7 @@ public class TaskDto {
     dto.caseInstanceId = task.getCaseInstanceId();
     dto.suspended = task.isSuspended();
     dto.tenantId = task.getTenantId();
+    dto.taskState = task.getTaskState();
 
     try {
       dto.formKey = task.getFormKey();
