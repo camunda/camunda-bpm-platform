@@ -1172,7 +1172,6 @@ public class RestartProcessInstanceAsyncTest {
 
     // then
     HistoricJobLog jobLog = historyService.createHistoricJobLogQuery().jobDefinitionType(Batch.TYPE_PROCESS_INSTANCE_RESTART).list().get(0);
-    System.out.println(jobLog);
 
     assertEquals(processInstance.getProcessDefinitionId(), jobLog.getProcessDefinitionId());
     assertEquals(processInstance.getRootProcessInstanceId(), jobLog.getProcessInstanceId());
