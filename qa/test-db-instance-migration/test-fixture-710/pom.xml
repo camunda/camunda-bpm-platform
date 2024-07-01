@@ -15,6 +15,7 @@
     <camunda.version.previous>7.9.0</camunda.version.previous>
     
     <version.h2>${version.h2-v1}</version.h2>
+    <version.groovy.old>2.4.21</version.groovy.old>
   </properties>
 
   <dependencyManagement>
@@ -53,6 +54,7 @@
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-jsr223</artifactId>
+      <version>${version.groovy.old}</version>
     </dependency>
   </dependencies>
 
