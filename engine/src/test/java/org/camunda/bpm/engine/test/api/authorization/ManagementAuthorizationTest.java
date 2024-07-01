@@ -544,7 +544,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
     // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
+    TelemetryData telemetryData = managementService.getTelemetryData(null, null, null);
 
     // then
     assertThat(telemetryData).isNotNull();
@@ -556,7 +556,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
 
     // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
+    TelemetryData telemetryData = managementService.getTelemetryData(null, null, null);
 
     // then
     assertThat(telemetryData).isNotNull();
@@ -569,7 +569,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
 
     // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
+    TelemetryData telemetryData = managementService.getTelemetryData(null, null, null);
 
     // then
     assertThat(telemetryData).isNotNull();
@@ -582,7 +582,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
 
     assertThatThrownBy(() -> {
       // when
-      managementService.getTelemetryData();
+      managementService.getTelemetryData(null, null, null);
     })
     // then
       .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.READ));

@@ -21,17 +21,9 @@ import static org.camunda.bpm.engine.impl.util.ConnectUtil.PARAM_NAME_RESPONSE_S
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.addRequestTimeoutConfiguration;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.assembleRequestParameters;
 import static org.camunda.bpm.engine.impl.util.StringUtil.hasText;
-import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
-import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
-import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
-import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
-
 import java.net.HttpURLConnection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimerTask;
+import java.util.*;
+
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.IsTelemetryEnabledCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -58,16 +50,8 @@ import org.camunda.connect.spi.ConnectorRequest;
 
 public class TelemetrySendingTask extends TimerTask {
 
-  protected static final Set<String> METRICS_TO_REPORT = new HashSet<>();
   protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
   protected static final String UUID4_PATTERN = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}";
-
-  static {
-    METRICS_TO_REPORT.add(ROOT_PROCESS_INSTANCE_START);
-    METRICS_TO_REPORT.add(EXECUTED_DECISION_INSTANCES);
-    METRICS_TO_REPORT.add(EXECUTED_DECISION_ELEMENTS);
-    METRICS_TO_REPORT.add(ACTIVTY_INSTANCE_START);
-  }
 
   protected CommandExecutor commandExecutor;
   protected String telemetryEndpoint;
@@ -107,12 +91,12 @@ public class TelemetrySendingTask extends TimerTask {
 
     TelemetryUtil.toggleLocalTelemetry(true, telemetryRegistry, metricsRegistry);
 
-    performDataSend(() -> updateAndSendData(true, true));
+    performDataSend(() -> updateAndSendData(true, true, null));
   }
 
-  public TelemetryDataImpl updateAndSendData(boolean sendData, boolean addLegacyNames) {
+  public TelemetryDataImpl updateAndSendData(boolean sendData, boolean addLegacyNames, String metricFilter) {
     updateStaticData();
-    InternalsImpl dynamicData = resolveDynamicData(sendData, addLegacyNames);
+    InternalsImpl dynamicData = resolveDynamicData(sendData, addLegacyNames, metricFilter);
     TelemetryDataImpl mergedData = new TelemetryDataImpl(staticData);
     mergedData.mergeInternals(dynamicData);
 
@@ -206,17 +190,17 @@ public class TelemetrySendingTask extends TimerTask {
     if (metricsRegistry != null) {
       Map<String, Metric> metrics = internals.getMetrics();
 
-      for (String metricToReport : METRICS_TO_REPORT) {
+      for (String metricToReport : MetricsUtil.METRICS_TO_REPORT) {
         Metric metricValue = metrics.get(metricToReport);
         metricsRegistry.markTelemetryOccurrence(metricToReport, metricValue.getCount());
       }
     }
   }
 
-  protected InternalsImpl resolveDynamicData(boolean reset, boolean addLegacyNames) {
+  protected InternalsImpl resolveDynamicData(boolean reset, boolean addLegacyNames, String metricFilter) {
     InternalsImpl result = new InternalsImpl();
 
-    Map<String, Metric> metrics = calculateMetrics(reset, addLegacyNames);
+    Map<String, Metric> metrics = calculateMetrics(reset, addLegacyNames, metricFilter);
     result.setMetrics(metrics);
 
     // command counts are modified after the metrics are retrieved, because
@@ -243,14 +227,21 @@ public class TelemetrySendingTask extends TimerTask {
     return commandsToReport;
   }
 
-  protected Map<String, Metric> calculateMetrics(boolean reset, boolean addLegacyNames) {
+  protected Map<String, Metric> calculateMetrics(boolean reset, boolean addLegacyNames, String metricFilter) {
 
     Map<String, Metric> metrics = new HashMap<>();
 
     if (metricsRegistry != null) {
       Map<String, Meter> telemetryMeters = metricsRegistry.getTelemetryMeters();
 
-      for (String metricToReport : METRICS_TO_REPORT) {
+      Set<String> metricsToReport = MetricsUtil.METRICS_TO_REPORT;
+      if (metricFilter != null)
+        metricsToReport = Collections.singleton(MetricsUtil.resolveInternalName(metricFilter));
+
+      for (String metricToReport : metricsToReport) {
+
+        if (telemetryMeters.get(metricToReport) == null)
+          continue;
         long value = telemetryMeters.get(metricToReport).get(reset);
 
         if (addLegacyNames) {

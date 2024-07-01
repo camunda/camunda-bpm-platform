@@ -107,7 +107,7 @@ public class ManagementServiceGetTelemetryDataTest {
     managementService.toggleTelemetry(true);
 
     // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
+    TelemetryData telemetryData = managementService.getTelemetryData(null, null, null);
 
     // then
     assertThat(telemetryData).isNotNull();
@@ -120,7 +120,7 @@ public class ManagementServiceGetTelemetryDataTest {
     managementService.toggleTelemetry(false);
 
     // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
+    TelemetryData telemetryData = managementService.getTelemetryData(null, null, null);
 
     // then
     assertThat(telemetryData).isNotNull();
@@ -133,7 +133,7 @@ public class ManagementServiceGetTelemetryDataTest {
     managementService.setLicenseKeyForTelemetry(new LicenseKeyDataImpl(null, null, null, null, null, "test license"));
 
     // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
+    TelemetryData telemetryData = managementService.getTelemetryData(null, null, null);
 
     // then
     assertThat(telemetryData.getProduct().getInternals().getLicenseKey().getRaw()).isEqualTo("test license");
@@ -146,7 +146,7 @@ public class ManagementServiceGetTelemetryDataTest {
     managementService.addWebappToTelemetry("admin");
 
     // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
+    TelemetryData telemetryData = managementService.getTelemetryData(null, null, null);
 
     // then
     assertThat(telemetryData.getProduct().getInternals().getWebapps()).containsExactlyInAnyOrder("cockpit", "admin");
@@ -158,7 +158,7 @@ public class ManagementServiceGetTelemetryDataTest {
     managementService.addApplicationServerInfoToTelemetry("Apache Tomcat/10.0.1");
 
     // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
+    TelemetryData telemetryData = managementService.getTelemetryData(null, null, null);
 
     // then
     ApplicationServer applicationServer = telemetryData.getProduct().getInternals().getApplicationServer();
@@ -171,7 +171,7 @@ public class ManagementServiceGetTelemetryDataTest {
     // given default telemetry data and empty telemetry registry
 
     // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
+    TelemetryData telemetryData = managementService.getTelemetryData(null, null, null);
 
     // then
     assertThat(telemetryData.getProduct().getInternals().getCommands()).isEmpty();
@@ -184,8 +184,8 @@ public class ManagementServiceGetTelemetryDataTest {
     managementService.isTelemetryEnabled();
 
     // when invoking getter twice
-    managementService.getTelemetryData();
-    TelemetryData telemetryData = managementService.getTelemetryData();
+    managementService.getTelemetryData(null, null, null);
+    TelemetryData telemetryData = managementService.getTelemetryData(null, null, null);
 
     // then count should not reset
     assertThat(telemetryData.getProduct().getInternals().getCommands().get(IS_TELEMETRY_ENABLED_CMD_NAME).getCount()).isEqualTo(1);
@@ -196,7 +196,7 @@ public class ManagementServiceGetTelemetryDataTest {
     // given default telemetry data and empty telemetry registry
 
     // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
+    TelemetryData telemetryData = managementService.getTelemetryData(null, null, null);
 
     // then
     Map<String, Metric> metrics = telemetryData.getProduct().getInternals().getMetrics();
@@ -215,8 +215,8 @@ public class ManagementServiceGetTelemetryDataTest {
     engineRule.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
 
     // when invoking getter twice
-    managementService.getTelemetryData();
-    TelemetryData telemetryData = managementService.getTelemetryData();
+    managementService.getTelemetryData(null, null, null);
+    TelemetryData telemetryData = managementService.getTelemetryData(null, null, null);
 
     // then count should not reset
     assertThat(telemetryData.getProduct().getInternals().getMetrics().get(FLOW_NODE_INSTANCES).getCount()).isEqualTo(2);
@@ -232,7 +232,7 @@ public class ManagementServiceGetTelemetryDataTest {
     engineRule.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
 
     // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
+    TelemetryData telemetryData = managementService.getTelemetryData(null, null, null);
 
     // then
     assertThat(telemetryData.getProduct().getInternals().getMetrics().get(PROCESS_INSTANCES).getCount()).isEqualTo(1);
@@ -247,7 +247,7 @@ public class ManagementServiceGetTelemetryDataTest {
     engineRule.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
 
     // when
-    TelemetryData telemetryDataAfterPiStart = managementService.getTelemetryData();
+    TelemetryData telemetryDataAfterPiStart = managementService.getTelemetryData(null, null, null);
 
     // then
     assertThat(telemetryDataAfterPiStart.getProduct().getInternals().getMetrics().get(PROCESS_INSTANCES).getCount()).isEqualTo(1);
@@ -263,7 +263,7 @@ public class ManagementServiceGetTelemetryDataTest {
     managementService.isTelemetryEnabled();
 
     // when
-    TelemetryData telemetryDataAfterPiStart = managementService.getTelemetryData();
+    TelemetryData telemetryDataAfterPiStart = managementService.getTelemetryData(null, null, null);
 
     // then
     assertThat(telemetryDataAfterPiStart.getProduct().getInternals().getCommands().get(IS_TELEMETRY_ENABLED_CMD_NAME).getCount()).isEqualTo(1);
@@ -279,7 +279,7 @@ public class ManagementServiceGetTelemetryDataTest {
     managementService.isTelemetryEnabled();
 
     // when
-    TelemetryData telemetryDataAfterPiStart = managementService.getTelemetryData();
+    TelemetryData telemetryDataAfterPiStart = managementService.getTelemetryData(null, null, null);
 
     // then
     assertThat(telemetryDataAfterPiStart.getProduct().getInternals().getCommands().get(IS_TELEMETRY_ENABLED_CMD_NAME).getCount()).isEqualTo(1);
@@ -291,7 +291,7 @@ public class ManagementServiceGetTelemetryDataTest {
     configuration.setTelemetryReporter(null);
 
     // when
-    assertThatThrownBy(() -> managementService.getTelemetryData())
+    assertThatThrownBy(() -> managementService.getTelemetryData(null, null, null))
       .isInstanceOf(ProcessEngineException.class)
       .hasMessageContaining("Error while retrieving telemetry data. Telemetry registry was not initialized.");
   }
@@ -307,12 +307,12 @@ public class ManagementServiceGetTelemetryDataTest {
     managementService.toggleTelemetry(true);
 
     // execute commands after telemetry is activated
-    managementService.getTelemetryData();
-    managementService.getTelemetryData();
+    managementService.getTelemetryData(null, null, null);
+    managementService.getTelemetryData(null, null, null);
     managementService.isTelemetryEnabled();
 
     // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
+    TelemetryData telemetryData = managementService.getTelemetryData(null, null, null);
 
     // then command counts produced before telemetry was enabled should be deleted
     Map<String, Command> commands = telemetryData.getProduct().getInternals().getCommands();
@@ -338,7 +338,7 @@ public class ManagementServiceGetTelemetryDataTest {
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
+    TelemetryData telemetryData = managementService.getTelemetryData(null, null, null);
 
     // then metrics produced before telemetry was enabled should be deleted
     Map<String, Metric> metrics = telemetryData.getProduct().getInternals().getMetrics();
@@ -358,7 +358,7 @@ public class ManagementServiceGetTelemetryDataTest {
     ClockUtil.offset(1000L);
 
     // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
+    TelemetryData telemetryData = managementService.getTelemetryData(null, null, null);
 
     // then
     assertThat(telemetryData.getProduct().getInternals().getDataCollectionStartDate()).isBefore(beforeGetTelemetry);
@@ -367,10 +367,10 @@ public class ManagementServiceGetTelemetryDataTest {
   @Test
   public void shouldNotResetCollectionTimeFrameAfterGetTelemetryWhenTelemetryDisabled() {
     // given default telemetry data and empty telemetry registry
-    TelemetryData initialTelemetryData = managementService.getTelemetryData();
+    TelemetryData initialTelemetryData = managementService.getTelemetryData(null, null, null);
 
     // when fetching telemetry data again
-    TelemetryData secondTelemetryData = managementService.getTelemetryData();
+    TelemetryData secondTelemetryData = managementService.getTelemetryData(null, null, null);
 
     // then the data collection time frame should not reset after the first call
     assertThat(initialTelemetryData.getProduct().getInternals().getDataCollectionStartDate()).isEqualTo(secondTelemetryData.getProduct().getInternals().getDataCollectionStartDate());
@@ -379,7 +379,7 @@ public class ManagementServiceGetTelemetryDataTest {
   @Test
   public void shouldResetDataCollectionTimeFrameWhenTelemetryEnabled() {
     // given the collection date is set at engine startup
-    Date dataCollectionStartDateBeforeToggle = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
+    Date dataCollectionStartDateBeforeToggle = managementService.getTelemetryData(null, null, null).getProduct().getInternals().getDataCollectionStartDate();
     // pass at least one second between the two telemetry calls because MySQL has only second precision
     ClockUtil.offset(1000L);
 
@@ -387,7 +387,7 @@ public class ManagementServiceGetTelemetryDataTest {
     managementService.toggleTelemetry(true);
 
     // then
-    Date dataCollectionStartDateAfterToggle = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
+    Date dataCollectionStartDateAfterToggle = managementService.getTelemetryData(null, null, null).getProduct().getInternals().getDataCollectionStartDate();
 
     assertThat(dataCollectionStartDateBeforeToggle).isBefore(dataCollectionStartDateAfterToggle);
   }
@@ -398,10 +398,10 @@ public class ManagementServiceGetTelemetryDataTest {
     // activate telemetry
     managementService.toggleTelemetry(true);
 
-    TelemetryData initialTelemetryData = managementService.getTelemetryData();
+    TelemetryData initialTelemetryData = managementService.getTelemetryData(null, null, null);
 
     // when fetching telemetry data again
-    TelemetryData secondTelemetryData = managementService.getTelemetryData();
+    TelemetryData secondTelemetryData = managementService.getTelemetryData(null, null, null);
 
     // then the data collection time frame should not reset after the first call
     assertThat(initialTelemetryData.getProduct().getInternals().getDataCollectionStartDate()).isEqualTo(secondTelemetryData.getProduct().getInternals().getDataCollectionStartDate());
@@ -412,13 +412,13 @@ public class ManagementServiceGetTelemetryDataTest {
     // given default telemetry data and empty telemetry registry
     // telemetry activated
     managementService.toggleTelemetry(true);
-    Date beforeToggleTelemetry = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
+    Date beforeToggleTelemetry = managementService.getTelemetryData(null, null, null).getProduct().getInternals().getDataCollectionStartDate();
 
     // when
     managementService.toggleTelemetry(false);
 
     // then
-    Date afterToggleTelemetry = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
+    Date afterToggleTelemetry = managementService.getTelemetryData(null, null, null).getProduct().getInternals().getDataCollectionStartDate();
 
     assertThat(beforeToggleTelemetry).isNotNull();
     assertThat(beforeToggleTelemetry).isEqualTo(afterToggleTelemetry);
@@ -429,11 +429,11 @@ public class ManagementServiceGetTelemetryDataTest {
     // given default telemetry data and empty telemetry registry
     // telemetry activated
     managementService.toggleTelemetry(true);
-    Date beforeToggleTelemetry = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
+    Date beforeToggleTelemetry = managementService.getTelemetryData(null, null, null).getProduct().getInternals().getDataCollectionStartDate();
 
     // when
     managementService.toggleTelemetry(true);
-    Date afterToggleTelemetry = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
+    Date afterToggleTelemetry = managementService.getTelemetryData(null, null, null).getProduct().getInternals().getDataCollectionStartDate();
 
     // then
     assertThat(beforeToggleTelemetry).isNotNull();

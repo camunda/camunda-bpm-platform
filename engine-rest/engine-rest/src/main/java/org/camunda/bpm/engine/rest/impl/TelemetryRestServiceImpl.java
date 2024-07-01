@@ -19,10 +19,14 @@ package org.camunda.bpm.engine.rest.impl;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.rest.TelemetryRestService;
 import org.camunda.bpm.engine.rest.dto.TelemetryConfigurationDto;
+import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.telemetry.TelemetryDataDto;
+import org.camunda.bpm.engine.rest.util.MetricsUtil;
 import org.camunda.bpm.engine.telemetry.TelemetryData;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import javax.ws.rs.core.UriInfo;
 
 public class TelemetryRestServiceImpl extends AbstractRestProcessEngineAware implements TelemetryRestService {
 
@@ -48,9 +52,12 @@ public class TelemetryRestServiceImpl extends AbstractRestProcessEngineAware imp
   }
 
   @Override
-  public TelemetryDataDto getTelemetryData() {
+  public TelemetryDataDto getTelemetryData(UriInfo uriInfo) {
     ManagementService managementService = getProcessEngine().getManagementService();
-    TelemetryData data = managementService.getTelemetryData();
+    DateConverter dateConverter = new DateConverter();
+    dateConverter.setObjectMapper(objectMapper);
+    TelemetryData data = managementService.getTelemetryData(uriInfo.getQueryParameters().getFirst("metricsFilter"), MetricsUtil.extractStartDate(uriInfo.getQueryParameters(), dateConverter),
+            MetricsUtil.extractEndDate(uriInfo.getQueryParameters(), dateConverter));
 
     return TelemetryDataDto.fromEngineDto(data);
   }
