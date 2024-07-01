@@ -38,6 +38,7 @@ public class TelemetryConfigureCmd implements Command<Void> {
     this.telemetryEnabled = telemetryEnabled;
   }
 
+  @Override
   public Void execute(CommandContext commandContext) {
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
@@ -64,6 +65,7 @@ public class TelemetryConfigureCmd implements Command<Void> {
     boolean isReportedActivated = processEngineConfiguration.isTelemetryReporterActivate();
     TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
 
+    // FIXME
     // telemetry enabled or set for the first time
     if (currentValue == null || (!currentValue.booleanValue() && telemetryEnabled)) {
       if (isReportedActivated) {

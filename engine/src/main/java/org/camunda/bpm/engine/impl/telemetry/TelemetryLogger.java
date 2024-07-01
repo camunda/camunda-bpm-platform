@@ -23,52 +23,6 @@ import org.camunda.bpm.engine.telemetry.TelemetryData;
 
 public class TelemetryLogger extends ProcessEngineLogger {
 
-  public void startTelemetrySendingTask() {
-    logDebug(
-        "001", "Start telemetry sending task.");
-  }
-
-  public void exceptionWhileSendingTelemetryData(Exception e) {
-    logWarn("002",
-        "Could not send telemetry data. Reason: {} with message '{}'. Set this logger to DEBUG/FINE for the full stacktrace.",
-        e.getClass().getSimpleName(),
-        e.getMessage());
-    logDebug(
-        "003", "{} occurred while sending telemetry data.",
-        e.getClass().getCanonicalName(),
-        e);
-  }
-
-  public ProcessEngineException unexpectedResponseWhileSendingTelemetryData(int responseCode) {
-    return new ProcessEngineException(
-      exceptionMessage("004", "Unexpected response code {} when sending telemetry data", responseCode));
-  }
-
-  public void unexpectedResponseWhileSendingTelemetryData() {
-    logDebug("005", "Unexpected 'null' response while sending telemetry data.");
-  }
-
-  public void sendingTelemetryData(String data) {
-    logDebug("006", "Sending telemetry data: {}", data);
-  }
-
-  public void databaseTelemetryPropertyMissingInfo(boolean telemetryEnabled) {
-    logInfo(
-        "007",
-        "`camunda.telemetry.enabled` property is missing in the database, creating the property with value: {}",
-        Boolean.toString(telemetryEnabled));
-  }
-
-  public void databaseTelemetryPropertyMissingInfo() {
-    logInfo(
-        "008",
-        "`camunda.telemetry.enabled` property is missing in the database");
-  }
-
-  public void telemetryDisabled() {
-    logDebug(
-        "009", "Sending telemetry is disabled.");
-  }
 
   public ProcessEngineException schedulingTaskFails(Exception e) {
     return new ProcessEngineException(

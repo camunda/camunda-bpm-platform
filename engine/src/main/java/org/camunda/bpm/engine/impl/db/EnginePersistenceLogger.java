@@ -741,34 +741,6 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
     ));
   }
 
-  public void noTelemetryLockPropertyFound() {
-    logDebug(
-        "091", "No telemetry lock property found in the database");
-  }
-
-  public void noTelemetryPropertyFound() {
-    logDebug(
-        "092", "No telemetry property found in the database");
-  }
-
-  public void creatingTelemetryPropertyInDatabase(Boolean telemetryEnabled) {
-    logDebug(
-        "093",
-        "Creating the telemetry property in database with the value: {}", telemetryEnabled);
-  }
-
-  public void errorFetchingTelemetryPropertyInDatabase(Exception exception) {
-    logDebug(
-        "094",
-        "Error while fetching the telemetry property from the database: {}", exception.getMessage());
-  }
-
-  public void errorConfiguringTelemetryProperty(Exception exception) {
-    logDebug(
-        "095",
-        "Error while configuring the telemetry property: {}", exception.getMessage());
-  }
-
   public void noInstallationIdPropertyFound() {
     logDebug(
         "096", "No installation id property found in database");

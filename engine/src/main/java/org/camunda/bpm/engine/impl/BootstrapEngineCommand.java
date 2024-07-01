@@ -105,61 +105,6 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
         .isHistoryCleanupEnabled();
   }
 
-  public void initializeTelemetryProperty(CommandContext commandContext) {
-    try {
-
-      checkTelemetryLockExists(commandContext);
-
-      acquireExclusiveTelemetryLock(commandContext);
-      PropertyEntity databaseTelemetryProperty = databaseTelemetryConfiguration(commandContext);
-
-      ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-      if (databaseTelemetryProperty == null) {
-        LOG.noTelemetryPropertyFound();
-        createTelemetryProperty(commandContext);
-      }
-
-      // reset collected dynamic data
-      if ((databaseTelemetryProperty == null && processEngineConfiguration.isInitializeTelemetry())
-          || (databaseTelemetryProperty != null && Boolean.parseBoolean(databaseTelemetryProperty.getValue()))) {
-        TelemetryUtil.toggleLocalTelemetry(true,
-            processEngineConfiguration.getTelemetryRegistry(),
-            processEngineConfiguration.getMetricsRegistry());
-      }
-
-    } catch (Exception e) {
-      LOG.errorConfiguringTelemetryProperty(e);
-    }
-  }
-
-  protected void checkTelemetryLockExists(CommandContext commandContext) {
-    PropertyEntity telemetryLockProperty = commandContext.getPropertyManager().findPropertyById("telemetry.lock");
-    if (telemetryLockProperty == null) {
-      LOG.noTelemetryLockPropertyFound();
-    }
-  }
-
-  protected PropertyEntity databaseTelemetryConfiguration(CommandContext commandContext) {
-    try {
-      return commandContext.getPropertyManager().findPropertyById(TELEMETRY_PROPERTY_NAME);
-    } catch (Exception e) {
-      LOG.errorFetchingTelemetryPropertyInDatabase(e);
-      return null;
-    }
-  }
-
-  protected void createTelemetryProperty(CommandContext commandContext) {
-    Boolean telemetryEnabled = commandContext.getProcessEngineConfiguration().isInitializeTelemetry();
-    PropertyEntity property = null;
-    if (telemetryEnabled != null) {
-      property = new PropertyEntity(TELEMETRY_PROPERTY_NAME, Boolean.toString(telemetryEnabled));
-    } else {
-      property = new PropertyEntity(TELEMETRY_PROPERTY_NAME, "null");
-    }
-    commandContext.getPropertyManager().insert(property);
-    LOG.creatingTelemetryPropertyInDatabase(telemetryEnabled);
-  }
-
   public void initializeInstallationId(CommandContext commandContext) {
     checkInstallationIdLockExists(commandContext);
 
@@ -242,12 +187,6 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
         ProcessEngineLogger.TELEMETRY_LOGGER.schedulingTaskFailsOnEngineStart(e);
       }
     }
-  }
-
-  protected void acquireExclusiveTelemetryLock(CommandContext commandContext) {
-    PropertyManager propertyManager = commandContext.getPropertyManager();
-    //exclusive lock
-    propertyManager.acquireExclusiveLockForTelemetry();
   }
 
   protected void acquireExclusiveInstallationIdLock(CommandContext commandContext) {

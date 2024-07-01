@@ -16,22 +16,17 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.reporter;
 
-import static org.camunda.bpm.engine.impl.util.ConnectUtil.METHOD_NAME_POST;
-import static org.camunda.bpm.engine.impl.util.ConnectUtil.PARAM_NAME_RESPONSE_STATUS_CODE;
-import static org.camunda.bpm.engine.impl.util.ConnectUtil.addRequestTimeoutConfiguration;
-import static org.camunda.bpm.engine.impl.util.ConnectUtil.assembleRequestParameters;
-import static org.camunda.bpm.engine.impl.util.StringUtil.hasText;
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
 
-import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
+
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.IsTelemetryEnabledCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -45,14 +40,10 @@ import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.CommandImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.MetricImpl;
-import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.impl.util.JsonUtil;
-import org.camunda.bpm.engine.impl.util.TelemetryUtil;
 import org.camunda.bpm.engine.telemetry.Command;
 import org.camunda.bpm.engine.telemetry.Metric;
-import org.camunda.connect.spi.CloseableConnectorResponse;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
 
@@ -98,16 +89,7 @@ public class TelemetrySendingTask extends TimerTask {
 
   @Override
   public void run() {
-    LOG.startTelemetrySendingTask();
-
-    if (!isTelemetryEnabled()) {
-      LOG.telemetryDisabled();
-      return;
-    }
-
-    TelemetryUtil.toggleLocalTelemetry(true, telemetryRegistry, metricsRegistry);
-
-    performDataSend(() -> updateAndSendData(true, true));
+  // nothing
   }
 
   public TelemetryDataImpl updateAndSendData(boolean sendData, boolean addLegacyNames) {
@@ -116,17 +98,10 @@ public class TelemetrySendingTask extends TimerTask {
     TelemetryDataImpl mergedData = new TelemetryDataImpl(staticData);
     mergedData.mergeInternals(dynamicData);
 
-    if(sendData) {
-      try {
-        sendData(mergedData);
-        // reset data collection time frame on successful submit
-        updateDataCollectionStartDate();
-      } catch (Exception e) {
-        // so that we send it again the next time
-        restoreDynamicData(dynamicData);
-        throw e;
-      }
-    }
+    // TODO do we want to reset the data collection
+      // reset data collection time frame on successful submit
+      // updateDataCollectionStartDate();
+
     return mergedData;
   }
 
@@ -156,38 +131,6 @@ public class TelemetrySendingTask extends TimerTask {
     return telemetryEnabled != null && telemetryEnabled.booleanValue();
   }
 
-  protected void sendData(TelemetryDataImpl dataToSend) {
-
-      String telemetryData = JsonUtil.asString(dataToSend);
-      Map<String, Object> requestParams = assembleRequestParameters(METHOD_NAME_POST,
-          telemetryEndpoint,
-          "application/json",
-          telemetryData);
-      requestParams = addRequestTimeoutConfiguration(requestParams, telemetryRequestTimeout);
-
-      ConnectorRequest<?> request = httpConnector.createRequest();
-      request.setRequestParameters(requestParams);
-
-      LOG.sendingTelemetryData(telemetryData);
-      CloseableConnectorResponse response = (CloseableConnectorResponse) request.execute();
-
-      if (response == null) {
-        LOG.unexpectedResponseWhileSendingTelemetryData();
-      } else {
-        int responseCode = (int) response.getResponseParameter(PARAM_NAME_RESPONSE_STATUS_CODE);
-
-        if (isSuccessStatusCode(responseCode)) {
-          if (responseCode != HttpURLConnection.HTTP_ACCEPTED) {
-            LOG.unexpectedResponseSuccessCode(responseCode);
-          }
-
-          LOG.telemetrySentSuccessfully();
-
-        } else {
-          throw LOG.unexpectedResponseWhileSendingTelemetryData(responseCode);
-        }
-      }
-  }
 
   /**
    * @return true if status code is 2xx
@@ -265,43 +208,5 @@ public class TelemetrySendingTask extends TimerTask {
     return metrics;
   }
 
-  protected void performDataSend(Runnable runnable) {
-    if (validateData(staticData)) {
-      int triesLeft = telemetryRequestRetries + 1;
-      boolean requestSuccessful = false;
-      do {
-        try {
-          triesLeft--;
-
-          runnable.run();
-
-          requestSuccessful = true;
-        } catch (Exception e) {
-          LOG.exceptionWhileSendingTelemetryData(e);
-        }
-      } while (!requestSuccessful && triesLeft > 0);
-    } else {
-      LOG.sendingTelemetryDataFails(staticData);
-    }
-  }
-
-  protected Boolean validateData(TelemetryDataImpl dataToSend) {
-    // validate product data
-    ProductImpl product = dataToSend.getProduct();
-    String installationId = dataToSend.getInstallation();
-    String edition = product.getEdition();
-    String version = product.getVersion();
-    String name = product.getName();
-
-    // ensure that data is not null or empty strings
-    boolean validProductData = hasText(name) && hasText(version) && hasText(edition) && hasText(installationId);
-
-    // validate installation id
-    if (validProductData) {
-      validProductData = validProductData && installationId.matches(UUID4_PATTERN);
-    }
-
-    return validProductData;
-  }
 
 }

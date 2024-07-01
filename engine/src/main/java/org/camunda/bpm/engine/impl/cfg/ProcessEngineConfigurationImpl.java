@@ -1041,18 +1041,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableOptimisticLockingOnForeignKeyViolation = true;
 
   // telemetry ///////////////////////////////////////////////////////
-  /**
-   * Sets the initial property value of telemetry configuration only once
-   * when it has never been enabled/disabled before.
-   * Subsequent changes can be done only via the
-   * {@link ManagementService#toggleTelemetry(boolean) Telemetry} API in {@link ManagementService}
-   * Telemetry is deactivated by default.
-   */
-  protected boolean initializeTelemetry = false;
-  /** The endpoint which telemetry is sent to */
-  protected String telemetryEndpoint = "https://api.telemetry.camunda.cloud/pings";
-  /** The number of times the telemetry request is retried in case it fails **/
-  protected int telemetryRequestRetries = 2;
   protected TelemetryReporter telemetryReporter;
   /** Determines if the telemetry reporter thread runs. For telemetry to be sent,
    * this flag must be set to <code>true</code> and telemetry must be enabled via API
@@ -1063,10 +1051,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   /** default: once every 24 hours */
   protected long telemetryReportingPeriod = 24 * 60 * 60;
   protected TelemetryDataImpl telemetryData;
-  /** the connection and socket timeout configuration of the telemetry request
-   * in milliseconds
-   *  default: 15 seconds */
-  protected int telemetryRequestTimeout = 15 * 1000;
 
   // Exception Codes ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2951,28 +2935,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (telemetryData == null) {
       initTelemetryData();
     }
-    try {
-      if (telemetryHttpConnector == null) {
-        telemetryHttpConnector = Connectors.getConnector(Connectors.HTTP_CONNECTOR_ID);
-      }
-    } catch (Exception e) {
-      ProcessEngineLogger.TELEMETRY_LOGGER.unexpectedExceptionDuringHttpConnectorConfiguration(e);
-    }
-    if (telemetryHttpConnector == null) {
-      ProcessEngineLogger.TELEMETRY_LOGGER.unableToConfigureHttpConnectorWarning();
-    } else {
       if (telemetryReporter == null) {
         telemetryReporter = new TelemetryReporter(commandExecutorTxRequired,
-                                                  telemetryEndpoint,
-                                                  telemetryRequestRetries,
+                                                  null,
+                                                  0,
                                                   telemetryReportingPeriod,
                                                   telemetryData,
-                                                  telemetryHttpConnector,
+                                                  null,
                                                   telemetryRegistry,
                                                   metricsRegistry,
-                                                  telemetryRequestTimeout);
+                                                  0);
       }
-    }
   }
 
   protected void initTelemetryData() {
