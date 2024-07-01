@@ -5,6 +5,7 @@ SET BASEDIR=%~dp0
 SET PARENTDIR=%BASEDIR%..\
 SET DEPLOYMENTDIR=%PARENTDIR%configuration/resources
 SET WEBAPPS_PATH=%BASEDIR%webapps
+SET OAUTH2_PATH=%BASEDIR%oauth2
 SET REST_PATH=%BASEDIR%rest
 SET SWAGGER_PATH=%BASEDIR%swaggerui
 SET EXAMPLE_PATH=%BASEDIR%example
@@ -79,6 +80,12 @@ IF [%~1]==[--webapps] (
   SET optionalComponentChosen=true
   SET classPath=%WEBAPPS_PATH%,%classPath%
   ECHO WebApps enabled
+)
+
+IF [%~1]==[--oauth2] (
+  SET optionalComponentChosen=true
+  SET classPath=%OAUTH2_PATH%,%classPath%
+  ECHO OAuth2 enabled
 )
 
 IF [%~1]==[--rest] (
@@ -170,6 +177,7 @@ ECHO Usage: run.bat [start^|stop] (options...)
 :ArgsHelp
 ECHO Options:
 ECHO   --webapps    - Enables the Camunda Platform Webapps
+ECHO   --oauth2     - Enables the Camunda Platform Spring Security OAuth2 integration
 ECHO   --rest       - Enables the REST API
 ECHO   --swaggerui  - Enables the Swagger UI
 ECHO   --example    - Enables the example application

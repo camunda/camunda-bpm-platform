@@ -101,6 +101,7 @@
       </activation>
       <modules>
         <module>modules/webapps</module>
+        <module>modules/oauth2</module>
         <module>distro</module>
         <module>qa</module>
       </modules>
