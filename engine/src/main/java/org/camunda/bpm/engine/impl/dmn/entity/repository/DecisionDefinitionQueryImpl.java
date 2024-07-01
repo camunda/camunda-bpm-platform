@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
-import org.camunda.bpm.engine.impl.context.Context;
 
 public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitionQuery, DecisionDefinition> implements DecisionDefinitionQuery {
 
@@ -269,7 +268,7 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
 
   @Override
   public long executeCount(CommandContext commandContext) {
-    if (isDmnEnabled()) {
+    if (isDmnEnabled(commandContext)) {
       checkQueryOk();
       return commandContext
               .getDecisionDefinitionManager()
@@ -280,7 +279,7 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
 
   @Override
   public List<DecisionDefinition> executeList(CommandContext commandContext, Page page) {
-    if (isDmnEnabled()) {
+    if (isDmnEnabled(commandContext)) {
       checkQueryOk();
       return commandContext
               .getDecisionDefinitionManager()
@@ -299,8 +298,8 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
     }
   }
 
-  public static boolean isDmnEnabled(){
-    return Context.getCommandContext()
+  private boolean isDmnEnabled(CommandContext commandContext) {
+    return commandContext
             .getProcessEngineConfiguration()
             .isDmnEnabled();
   }
