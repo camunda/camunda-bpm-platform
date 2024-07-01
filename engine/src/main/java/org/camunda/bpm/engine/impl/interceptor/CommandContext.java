@@ -197,11 +197,6 @@ public class CommandContext {
               transactionContext.commit();
             }
           } catch (Throwable exception) {
-
-            if (DbSqlSession.isCrdbConcurrencyConflict(exception)) {
-              exception = ProcessEngineLogger.PERSISTENCE_LOGGER.crdbTransactionRetryExceptionOnCommit(exception);
-            }
-
             commandInvocationContext.trySetThrowable(exception);
           }
 

@@ -219,7 +219,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutorImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
-import org.camunda.bpm.engine.impl.interceptor.CrdbTransactionRetryInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.ExceptionCodeInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
@@ -469,22 +468,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * Separate command executor to be used for db schema operations. Must always use NON-JTA transactions
    */
   protected CommandExecutor commandExecutorSchemaOperations;
-
-  /**
-   * Allows for specific commands to be retried when using CockroachDB. This is due to the fact that
-   * OptimisticLockingExceptions can't be handled on CockroachDB and transactions must be rolled back.
-   * The commands where CockroachDB retries are possible are:
-   *
-   * <ul>
-   *   <li>BootstrapEngineCommand</li>
-   *   <li>AcquireJobsCmd</li>
-   *   <li>DeployCmd</li>
-   *   <li>FetchExternalTasksCmd</li>
-   *   <li>HistoryCleanupCmd</li>
-   *   <li>HistoryLevelSetupCommand</li>
-   * </ul>
-   */
-  protected int commandRetries = 0;
 
   // SESSION FACTORIES ////////////////////////////////////////////////////////
 
@@ -1735,7 +1718,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected static final String MY_SQL_PRODUCT_NAME = "MySQL";
   protected static final String MARIA_DB_PRODUCT_NAME = "MariaDB";
   protected static final String POSTGRES_DB_PRODUCT_NAME = "PostgreSQL";
-  protected static final String CRDB_DB_PRODUCT_NAME = "CockroachDB";
 
   protected static Properties getDefaultDatabaseTypeMappings() {
     Properties databaseTypeMappings = new Properties();
@@ -1744,7 +1726,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     databaseTypeMappings.setProperty(MARIA_DB_PRODUCT_NAME, "mariadb");
     databaseTypeMappings.setProperty("Oracle", "oracle");
     databaseTypeMappings.setProperty(POSTGRES_DB_PRODUCT_NAME, "postgres");
-    databaseTypeMappings.setProperty(CRDB_DB_PRODUCT_NAME, "cockroachdb");
     databaseTypeMappings.setProperty("Microsoft SQL Server", "mssql");
     databaseTypeMappings.setProperty("DB2", "db2");
     databaseTypeMappings.setProperty("DB2", "db2");
@@ -1778,7 +1759,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         databaseProductName = checkForMariaDb(databaseMetaData, databaseProductName);
       }
       if (POSTGRES_DB_PRODUCT_NAME.equals(databaseProductName)) {
-        databaseProductName = checkForCrdb(connection);
+        databaseProductName = POSTGRES_DB_PRODUCT_NAME;
       }
       LOG.debugDatabaseproductName(databaseProductName);
       databaseType = databaseTypeMappings.getProperty(databaseProductName);
@@ -1828,23 +1809,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     return databaseName;
-  }
-
-  protected String checkForCrdb(Connection connection) {
-    try {
-      try (PreparedStatement preparedStatement = connection.prepareStatement("select version() as version;")) {
-        ResultSet result = preparedStatement.executeQuery();
-        if (result.next()) {
-          String versionData = result.getString(1);
-          if (versionData != null && versionData.toLowerCase().contains("cockroachdb")) {
-            return CRDB_DB_PRODUCT_NAME;
-          }
-        }
-      }
-    } catch (SQLException ignore) {
-    }
-
-    return POSTGRES_DB_PRODUCT_NAME;
   }
 
   protected void initDatabaseVendorAndVersion(DatabaseMetaData databaseMetaData) throws SQLException {
@@ -5415,15 +5379,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public ProcessEngineConfigurationImpl setCommandRetries(int commandRetries) {
-    this.commandRetries = commandRetries;
-    return this;
-  }
-
-  public int getCommandRetries() {
-    return commandRetries;
-  }
-
   public boolean isReevaluateTimeCycleWhenDue() {
     return reevaluateTimeCycleWhenDue;
   }
@@ -5440,10 +5395,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public ProcessEngineConfigurationImpl setRemovalTimeUpdateChunkSize(int removalTimeUpdateChunkSize) {
     this.removalTimeUpdateChunkSize = removalTimeUpdateChunkSize;
     return this;
-  }
-
-  protected CrdbTransactionRetryInterceptor getCrdbRetryInterceptor() {
-    return new CrdbTransactionRetryInterceptor(commandRetries);
   }
 
   /**

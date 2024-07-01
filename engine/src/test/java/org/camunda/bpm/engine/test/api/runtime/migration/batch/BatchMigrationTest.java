@@ -388,7 +388,6 @@ public class BatchMigrationTest {
   }
 
   @Test
-  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
   public void testMigrationJobsExecutionByJobExecutorWithAuthorizationEnabledAndTenant() {
     ProcessEngineConfigurationImpl processEngineConfiguration = engineRule.getProcessEngineConfiguration();
 

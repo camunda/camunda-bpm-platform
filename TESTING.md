@@ -75,7 +75,7 @@ There is a special profile for the WildFly Application Servers:
 
 # Testing a Given Database
 
-Camunda supports all database technologies listed on [Supported Database Products](https://docs.camunda.org/manual/latest/introduction/supported-environments/#supported-database-products), and in all environments, they are operating in as specified. Support means we guarantee the Camunda Platform integrates well with the database technology’s JDBC behavior (there are some [documented](https://docs.camunda.org/manual/latest/user-guide/process-engine/database/) limitations, e.g., isolation level `READ_COMMITTED` is required for all databases except CockroachDB, which in turns requires `SERIALIZABLE`). We test a database technology with a specific database, i.e., we test it in one environment, not all possible environments that you can imagine (e.g., we test Postgres on local Docker containers, but not as hosted databases on AWS or Azure).
+Camunda supports all database technologies listed on [Supported Database Products](https://docs.camunda.org/manual/latest/introduction/supported-environments/#supported-database-products), and in all environments, they are operating in as specified. Support means we guarantee the Camunda Platform integrates well with the database technology’s JDBC behavior (there are some [documented](https://docs.camunda.org/manual/latest/user-guide/process-engine/database/) limitations, e.g., isolation level `READ_COMMITTED` is required for all databases). We test a database technology with a specific database, i.e., we test it in one environment, not all possible environments that you can imagine (e.g., we test Postgres on local Docker containers, but not as hosted databases on AWS or Azure).
 
 # No Maven? No problem!
 
@@ -137,7 +137,6 @@ sure that the database image is configured according to [this guide](https://doc
 * PostgreSQL
 * MariaDB
 * MySQL
-* CockroachDB
 * MS-SQL 2017/2019 ([MSSQL-specific configuraion guide](https://docs.camunda.org/manual/latest/user-guide/process-engine/database/mssql-configuration/))
 
 To execute the process engine test suite with a certain database (e.g. PostgreSQL), you should call Maven in the 
