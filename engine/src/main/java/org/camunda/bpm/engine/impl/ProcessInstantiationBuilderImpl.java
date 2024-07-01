@@ -50,6 +50,8 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
   protected String processDefinitionTenantId;
   protected boolean isProcessDefinitionTenantIdSet = false;
 
+  protected String restartedProcessInstanceId;
+
   protected ProcessInstanceModificationBuilderImpl modificationBuilder;
 
   protected ProcessInstantiationBuilderImpl(CommandExecutor commandExecutor) {
@@ -204,6 +206,14 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
 
   public void setModificationBuilder(ProcessInstanceModificationBuilderImpl modificationBuilder) {
     this.modificationBuilder = modificationBuilder;
+  }
+
+  public void setRestartedProcessInstanceId(String restartedProcessInstanceId){
+    this.restartedProcessInstanceId = restartedProcessInstanceId;
+  }
+
+  public String getRestartedProcessInstanceId(){
+      return restartedProcessInstanceId;
   }
 
   public static ProcessInstantiationBuilder createProcessInstanceById(CommandExecutor commandExecutor, String processDefinitionId) {

@@ -235,6 +235,11 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   protected String superCaseExecutionId;
 
   /**
+   * Completed HPI that is being restarted through this ExecutionEntity
+   */
+  protected String restartedProcessInstanceId;
+
+  /**
    * Contains observers which are observe the execution.
    * @since 7.6
    */
@@ -968,6 +973,14 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   public void setSuperCaseExecutionId(String superCaseExecutionId) {
     this.superCaseExecutionId = superCaseExecutionId;
+  }
+
+  public String getRestartedProcessInstanceId(){
+    return restartedProcessInstanceId;
+  }
+
+  public void setRestartedProcessInstanceId(String restartedProcessInstanceId){
+    this.restartedProcessInstanceId = restartedProcessInstanceId;
   }
 
   @Override

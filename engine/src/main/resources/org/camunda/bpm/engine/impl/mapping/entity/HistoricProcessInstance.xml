@@ -55,7 +55,8 @@
       CASE_INST_ID_,
       DELETE_REASON_,
       TENANT_ID_,
-      STATE_
+      STATE_,
+      RESTARTED_PROC_INST_ID_
     ) values (
       #{id ,jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
@@ -75,7 +76,8 @@
       #{caseInstanceId, jdbcType=VARCHAR},
       #{deleteReason, jdbcType=VARCHAR},
       #{tenantId, jdbcType=VARCHAR},
-      #{state, jdbcType=VARCHAR}
+      #{state, jdbcType=VARCHAR},
+      #{restartedProcessInstanceId, jdbcType=VARCHAR}
     )
   </insert>
 
@@ -313,6 +315,7 @@
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
     <result property="state" column="STATE_" jdbcType="VARCHAR"/>
+    <result property="restartedProcessInstanceId" column="RESTARTED_PROC_INST_ID_" jdbcType="VARCHAR"/>
   </resultMap>
   
   <resultMap type="org.camunda.bpm.engine.impl.util.ImmutablePair" id="deploymentIdMapping">

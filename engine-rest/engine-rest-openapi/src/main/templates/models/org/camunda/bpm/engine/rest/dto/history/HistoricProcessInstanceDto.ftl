@@ -101,7 +101,6 @@
       name = "state"
       type = "string"
       enumValues = ["ACTIVE", "SUSPENDED", "COMPLETED", "EXTERNALLY_TERMINATED", "INTERNALLY_TERMINATED"]
-      last = true
       desc = "Last state of the process instance, possible values are:
 
               `ACTIVE` - running process instance
@@ -113,6 +112,12 @@
               `EXTERNALLY_TERMINATED` - terminated externally, for instance through REST API
 
               `INTERNALLY_TERMINATED` - terminated internally, for instance by terminating boundary event"/>
+
+  <@lib.property
+      name = "restartedProcessInstanceId"
+      type = "string"
+      desc = "The id of the original process instance which was restarted."
+      last = true />
 
 </@lib.dto>
 </#macro>
