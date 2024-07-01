@@ -59,4 +59,9 @@ public class HttpConnectorLogger extends ConnectLogger {
     logInfo("009", "Ignoring request configuration option with name '{}' and value '{}'", field, value);
   }
 
+  public ConnectorRequestException unableToExecuteRequest(int statusCode , String connectorResponse) {
+	    return new ConnectorRequestException(exceptionMessage("010", "Unable to execute HTTP request with Status Code : " 
+				+ statusCode + " , Response :" + connectorResponse));
+  }
+
 }
