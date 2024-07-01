@@ -37,7 +37,7 @@
         <include>jakarta.xml.bind:jakarta.xml.bind-api:jar</include>
 
         <!-- Resteasy -->
-        <include>org.jboss.resteasy:resteasy-*</include>
+        <include>org.jboss.resteasy:resteasy-core</include>
 
       </includes>
       <excludes>
