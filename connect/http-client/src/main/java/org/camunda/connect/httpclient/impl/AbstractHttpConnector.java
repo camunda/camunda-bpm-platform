@@ -69,7 +69,7 @@ public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R e
 
   @Override
   public R execute(Q request) {
-    R invocationResult = null;
+    R invocationResult;
     HttpRequestBase httpRequest = createHttpRequest(request);
     HttpRequestInvocation invocation = new HttpRequestInvocation(httpRequest, request, requestInterceptors, httpClient);
     try {
