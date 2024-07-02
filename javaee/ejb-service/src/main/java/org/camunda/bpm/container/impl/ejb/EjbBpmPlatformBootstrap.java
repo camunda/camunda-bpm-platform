@@ -28,7 +28,6 @@ import org.camunda.bpm.container.impl.deployment.UnregisterBpmPlatformPluginsSte
 import org.camunda.bpm.container.impl.deployment.jobexecutor.StartJobExecutorStep;
 import org.camunda.bpm.container.impl.deployment.jobexecutor.StopJobExecutorStep;
 import org.camunda.bpm.container.impl.ejb.deployment.EjbJarParsePlatformXmlStep;
-import org.camunda.bpm.container.impl.ejb.deployment.EjbPlatformXmlStartProcessEnginesStep;
 import org.camunda.bpm.container.impl.ejb.deployment.StartJcaExecutorServiceStep;
 import org.camunda.bpm.container.impl.ejb.deployment.StopJcaExecutorServiceStep;
 import javax.annotation.PostConstruct;
@@ -71,7 +70,6 @@ public class EjbBpmPlatformBootstrap {
       .addStep(new DiscoverBpmPlatformPluginsStep())
       .addStep(new StartJcaExecutorServiceStep(executorServiceBean))
       .addStep(new StartJobExecutorStep())
-      .addStep(new EjbPlatformXmlStartProcessEnginesStep())
       .execute();
 
     processEngineService = containerDelegate.getProcessEngineService();

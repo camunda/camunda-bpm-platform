@@ -26,16 +26,15 @@ public class TelemetryUtil {
       TelemetryRegistry telemetryRegistry,
       MetricsRegistry metricsRegistry) {
 
-    boolean previouslyActivated = telemetryRegistry.setTelemetryLocallyActivated(telemetryActivated);
+    // TODO do we need to clear the counts as some point?
 
-    if (!previouslyActivated && telemetryActivated) {
       if (telemetryRegistry != null) {
         telemetryRegistry.clearCommandCounts();
       }
       if (metricsRegistry != null) {
         metricsRegistry.clearTelemetryMetrics();
       }
-    }
+
 
   }
 }
