@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl.cmmn.entity.repository;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NotValidException;
@@ -203,18 +204,24 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
   @Override
   public long executeCount(CommandContext commandContext) {
-    checkQueryOk();
-    return commandContext
-      .getCaseDefinitionManager()
-      .findCaseDefinitionCountByQueryCriteria(this);
+    if (isCmmnEnabled(commandContext)) {
+      checkQueryOk();
+      return commandContext
+              .getCaseDefinitionManager()
+              .findCaseDefinitionCountByQueryCriteria(this);
+    }
+    return 0;
   }
 
   @Override
   public List<CaseDefinition> executeList(CommandContext commandContext, Page page) {
-    checkQueryOk();
-    return commandContext
-      .getCaseDefinitionManager()
-      .findCaseDefinitionsByQueryCriteria(this, page);
+    if (isCmmnEnabled(commandContext)) {
+      checkQueryOk();
+      return commandContext
+              .getCaseDefinitionManager()
+              .findCaseDefinitionsByQueryCriteria(this, page);
+    }
+    return Collections.emptyList();
   }
 
   @Override
@@ -227,6 +234,11 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
     }
   }
 
+  private boolean isCmmnEnabled(CommandContext commandContext) {
+    return commandContext
+            .getProcessEngineConfiguration()
+            .isCmmnEnabled();
+  }
   // getters ////////////////////////////////////////////
 
   public String getId() {
