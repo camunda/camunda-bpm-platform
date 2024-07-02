@@ -108,6 +108,16 @@ public class CommentManager extends AbstractHistoricManager {
     return (CommentEntity) getDbEntityManager().selectOne("selectCommentByTaskIdAndCommentId", parameters);
   }
 
+  public CommentEntity findCommentByProcessInstanceIdAndCommentId(String processInstanceId, String commentId) {
+    checkHistoryEnabled();
+
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put("processInstanceId", processInstanceId);
+    parameters.put("id", commentId);
+
+    return (CommentEntity) getDbEntityManager().selectOne("selectCommentByProcessInstanceIdAndCommentId", parameters);
+  }
+
   public DbOperation addRemovalTimeToCommentsByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime, Integer batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
@@ -140,6 +150,19 @@ public class CommentManager extends AbstractHistoricManager {
     return getDbEntityManager()
       .deletePreserveOrder(CommentEntity.class, "deleteCommentsByRemovalTime",
         new ListQueryParameterObject(parameters, 0, batchSize));
+  }
+
+  public void updateCommentMessage(CommentEntity entity) {
+    checkHistoryEnabled();
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("message", entity.getMessage());
+    parameters.put("fullMessageBytes", entity.getFullMessageBytes());
+    parameters.put("time", entity.getTime());
+    parameters.put("action", entity.getAction());
+    parameters.put("id", entity.getId());
+    parameters.put("userId", entity.getUserId());
+
+    getDbEntityManager().update(CommentEntity.class, "updateComment", parameters);
   }
 
 }

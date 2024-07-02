@@ -1107,6 +1107,36 @@ public interface TaskService {
   /** Creates a comment to a task and/or process instance and returns the comment. */
   Comment createComment(String taskId, String processInstanceId, String message);
 
+  /**
+   * Deletes a comment by a given taskId and comment ID
+   */
+  void deleteTaskComment(String taskId, String commentId);
+
+  /**
+   * Deletes a comment by a given processInstanceId and comment ID
+   */
+  void deleteProcessInstanceComment(String processInstanceId, String commentId);
+
+  /**
+   * Deletes comments by a given task ID
+   */
+  void deleteTaskComments(String taskId);
+
+  /**
+   * Deletes comments by a given processInstance ID
+   */
+  void deleteProcessInstanceComments(String processInstanceId);
+
+  /**
+   * Updates comment on a given task ID
+   */
+  void updateTaskComment(String taskId, String commentId, String message);
+
+  /**
+   * Updates comment on a given processInstance ID
+   */
+  void updateProcessInstanceComment(String processInstanceId, String commentId, String message);
+
   /** The comments related to the given task. */
   List<Comment> getTaskComments(String taskId);
 

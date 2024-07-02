@@ -20,9 +20,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
-  
+
   <!-- COMMENT INSERT -->
-  
+
   <insert id="insertComment" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
     insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, ROOT_PROC_INST_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_, TENANT_ID_, REMOVAL_TIME_)
     values (
@@ -60,6 +60,17 @@
   </insert>
 
   <!-- UPDATE -->
+  <update id="updateComment" parameterType="java.util.Map">
+    update
+      ${prefix}ACT_HI_COMMENT
+    set MESSAGE_ = #{message ,jdbcType=VARCHAR},
+        FULL_MSG_= #{fullMessageBytes ,jdbcType=BLOB},
+        TIME_    = #{time ,jdbcType=TIMESTAMP},
+        ACTION_  = #{action ,jdbcType=VARCHAR},
+        USER_ID_ = #{userId ,jdbcType=VARCHAR}
+    where ID_ = #{id}
+  </update>
+
   <update id="updateCommentsByRootProcessInstanceId"
           parameterType="java.util.Map">
       update
@@ -213,13 +224,19 @@
 
   <!-- COMMENT DELETE -->
 
+  <delete id="deleteComment" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
+    delete
+    from ${prefix}ACT_HI_COMMENT
+    where ID_ = #{id}
+  </delete>
+
   <delete id="deleteCommentsByTaskId" parameterType="string">
-    delete from ${prefix}ACT_HI_COMMENT where TASK_ID_ = #{taskId} 
+    delete from ${prefix}ACT_HI_COMMENT where TASK_ID_ = #{taskId}
   </delete>
 
   <delete id="deleteCommentsByIds" parameterType="java.util.Map">
     delete from ${prefix}ACT_HI_COMMENT
-    where 
+    where
     <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size > 0">
       TASK_ID_ in (
         select ID_
@@ -348,20 +365,25 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
-  
+
   <!-- COMMENT SELECT -->
+  <select id="selectComment" parameterType="string" resultMap="commentResultMap">
+    select *
+    from ${prefix}ACT_HI_COMMENT
+    where ID_ = #{id}
+  </select>
 
   <select id="selectCommentsByTaskId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
-    select * 
-    from ${prefix}ACT_HI_COMMENT 
+    select *
+    from ${prefix}ACT_HI_COMMENT
     where TASK_ID_ = #{parameter,jdbcType=VARCHAR}
       and TYPE_ = 'comment'
     order by TIME_ desc
   </select>
 
   <select id="selectCommentsByTaskId_postgres" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="commentResultMap_postgres">
-    select * 
-    from ${prefix}ACT_HI_COMMENT 
+    select *
+    from ${prefix}ACT_HI_COMMENT
     where TASK_ID_ = #{parameter,jdbcType=VARCHAR}
       and TYPE_ = 'comment'
     order by TIME_ desc
@@ -370,7 +392,7 @@
   <select id="selectEventsByTaskId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
     <include refid="selectEventsByTaskIdSql"/>
   </select>
-  
+
   <select id="selectEventsByTaskId_postgres" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="commentResultMap_postgres">
     <include refid="selectEventsByTaskIdSql"/>
   </select>
@@ -427,29 +449,36 @@
   </sql>
 
   <select id="selectCommentsByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
-    select * 
-    from ${prefix}ACT_HI_COMMENT 
+    select *
+    from ${prefix}ACT_HI_COMMENT
     where PROC_INST_ID_ = #{parameter,jdbcType=VARCHAR}
     order by TIME_ desc
   </select>
 
   <select id="selectCommentsByProcessInstanceId_postgres" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="commentResultMap_postgres">
-    select * 
-    from ${prefix}ACT_HI_COMMENT 
+    select *
+    from ${prefix}ACT_HI_COMMENT
     where PROC_INST_ID_ = #{parameter,jdbcType=BINARY}
     order by TIME_ desc
   </select>
 
   <select id="selectCommentByTaskIdAndCommentId" parameterType="map" resultMap="commentResultMap">
-    select * from ${prefix}ACT_HI_COMMENT 
+    select * from ${prefix}ACT_HI_COMMENT
     where TASK_ID_ = #{taskId,jdbcType=VARCHAR}
       and ID_ =  #{id,jdbcType=VARCHAR}
   </select>
 
   <select id="selectCommentByTaskIdAndCommentId_postgres" parameterType="map" resultMap="commentResultMap_postgres">
-    select * from ${prefix}ACT_HI_COMMENT 
+    select * from ${prefix}ACT_HI_COMMENT
     where TASK_ID_ = #{taskId,jdbcType=VARCHAR}
       and ID_ =  #{id,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectCommentByProcessInstanceIdAndCommentId" parameterType="map" resultMap="commentResultMap">
+    select *
+    from ${prefix}ACT_HI_COMMENT
+    where PROC_INST_ID_ = #{processInstanceId,jdbcType=VARCHAR}
+      and ID_ = #{id,jdbcType=VARCHAR}
   </select>
 
 </mapper>

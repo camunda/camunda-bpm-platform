@@ -493,6 +493,34 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
 
+  public void logCommentOperation(String operation, TaskEntity task, PropertyChange propertyChange) {
+    if (isUserOperationLogEnabled()) {
+      UserOperationLogContext context = new UserOperationLogContext();
+
+      UserOperationLogContextEntryBuilder entryBuilder = UserOperationLogContextEntryBuilder.entry(operation,
+              EntityTypes.COMMENT)
+          .category(UserOperationLogEntry.CATEGORY_TASK_WORKER)
+          .inContextOf(task, Collections.singletonList(propertyChange));
+      context.addEntry(entryBuilder.create());
+
+      fireUserOperationLog(context);
+    }
+  }
+
+  public void logCommentOperation(String operation, ExecutionEntity processInstance, PropertyChange propertyChange) {
+    if (isUserOperationLogEnabled()) {
+      UserOperationLogContext context = new UserOperationLogContext();
+
+      UserOperationLogContextEntryBuilder entryBuilder = UserOperationLogContextEntryBuilder.entry(operation,
+              EntityTypes.COMMENT)
+          .category(UserOperationLogEntry.CATEGORY_TASK_WORKER)
+          .inContextOf(processInstance, Collections.singletonList(propertyChange));
+      context.addEntry(entryBuilder.create());
+
+      fireUserOperationLog(context);
+    }
+  }
+
   public void logVariableOperation(String operation, String executionId, String taskId, PropertyChange propertyChange) {
     if(isUserOperationLogEnabled()) {
 

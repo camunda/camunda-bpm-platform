@@ -17,11 +17,16 @@
 package org.camunda.bpm.engine.rest;
 
 import static io.restassured.RestAssured.given;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_PROCESS_INSTANCE_COMMENT_FULL_MESSAGE;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_PROCESS_INSTANCE_COMMENT_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricProcessInstance;
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.DATE_FORMAT_WITH_TIMEZONE;
+import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -62,6 +67,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
@@ -141,6 +147,8 @@ public class ProcessInstanceRestServiceInteractionTest extends AbstractRestServi
   protected static final String SINGLE_PROCESS_INSTANCE_URL = PROCESS_INSTANCE_URL + "/{id}";
   protected static final String PROCESS_INSTANCE_VARIABLES_URL = SINGLE_PROCESS_INSTANCE_URL + "/variables";
   protected static final String PROCESS_INSTANCE_COMMENTS_URL = SINGLE_PROCESS_INSTANCE_URL + "/comment";
+  protected static final String SINGLE_PROCESS_INSTANCE_SINGLE_COMMENT_URL =
+      PROCESS_INSTANCE_COMMENTS_URL + "/{commentId}";
   protected static final String DELETE_PROCESS_INSTANCES_ASYNC_URL = PROCESS_INSTANCE_URL + "/delete";
   protected static final String DELETE_PROCESS_INSTANCES_ASYNC_HIST_QUERY_URL = PROCESS_INSTANCE_URL + "/delete-historic-query-based";
   protected static final String SET_JOB_RETRIES_ASYNC_URL = PROCESS_INSTANCE_URL + "/job-retries";
@@ -836,6 +844,339 @@ public class ProcessInstanceRestServiceInteractionTest extends AbstractRestServi
       .body("$.size()", equalTo(0))
     .when()
       .get(PROCESS_INSTANCE_COMMENTS_URL);
+  }
+
+  @Test
+  public void testDeleteInstanceCommentThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock)
+        .deleteProcessInstanceComment(EXAMPLE_PROCESS_INSTANCE_ID, EXAMPLE_PROCESS_INSTANCE_COMMENT_ID);
+
+    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+        .pathParam("commentId", EXAMPLE_PROCESS_INSTANCE_COMMENT_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .when()
+        .delete(SINGLE_PROCESS_INSTANCE_SINGLE_COMMENT_URL);
+  }
+
+  @Test
+  public void testDeleteInstanceComment() {
+    mockHistoryFull();
+
+    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+        .pathParam("commentId", EXAMPLE_PROCESS_INSTANCE_COMMENT_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .delete(SINGLE_PROCESS_INSTANCE_SINGLE_COMMENT_URL);
+  }
+
+  @Test
+  public void testDeleteInstanceCommentWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+        .pathParam("commentId", EXAMPLE_PROCESS_INSTANCE_COMMENT_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body(containsString("History is not enabled"))
+        .when()
+        .delete(SINGLE_PROCESS_INSTANCE_SINGLE_COMMENT_URL);
+  }
+
+  @Test
+  public void testDeleteInstanceCommentForNonExistingCommentId() {
+    mockHistoryFull();
+    doThrow(new NotValidException()).when(taskServiceMock)
+        .deleteProcessInstanceComment(EXAMPLE_PROCESS_INSTANCE_ID, NON_EXISTING_ID);
+
+    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+        .pathParam("commentId", NON_EXISTING_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body(containsString(
+            "Deletion is not possible. No comment exists for processInstanceId '" + EXAMPLE_PROCESS_INSTANCE_ID
+                + "' and comment id '" + NON_EXISTING_ID + "'."))
+        .when()
+        .delete(SINGLE_PROCESS_INSTANCE_SINGLE_COMMENT_URL);
+  }
+
+  @Test
+  public void testDeleteInstanceCommentForNonExistingCommentIdWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+        .pathParam("commentId", NON_EXISTING_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body(containsString("History is not enabled"))
+        .when()
+        .delete(SINGLE_PROCESS_INSTANCE_SINGLE_COMMENT_URL);
+  }
+
+  @Test
+  public void testDeleteInstanceCommentForNonExistingProcessInstance() {
+    mockHistoryFull();
+    historicProcessInstanceQueryMock = mock(HistoricProcessInstanceQuery.class);
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(historicProcessInstanceQueryMock);
+    when(historicProcessInstanceQueryMock.processInstanceId(eq(NON_EXISTING_ID))).thenReturn(
+        historicProcessInstanceQueryMock);
+    when(historicProcessInstanceQueryMock.singleResult()).thenReturn(null);
+
+    given().pathParam("id", NON_EXISTING_ID)
+        .pathParam("commentId", EXAMPLE_PROCESS_INSTANCE_COMMENT_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body(containsString("No process instance found for id " + NON_EXISTING_ID))
+        .when()
+        .delete(SINGLE_PROCESS_INSTANCE_SINGLE_COMMENT_URL);
+  }
+
+  @Test
+  public void testDeleteInstanceCommentForNonExistingTaskWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given().pathParam("id", NON_EXISTING_ID)
+        .pathParam("commentId", EXAMPLE_PROCESS_INSTANCE_COMMENT_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body(containsString("History is not enabled"))
+        .when()
+        .delete(SINGLE_PROCESS_INSTANCE_SINGLE_COMMENT_URL);
+  }
+
+  @Test
+  public void testDeleteProcessInstanceCommentsThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock)
+        .deleteProcessInstanceComments(MockProvider.EXAMPLE_TASK_ID);
+
+    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .when()
+        .delete(PROCESS_INSTANCE_COMMENTS_URL);
+  }
+
+  @Test
+  public void testDeleteProcessInstanceComments() {
+    mockHistoryFull();
+    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .delete(PROCESS_INSTANCE_COMMENTS_URL);
+  }
+
+  @Test
+  public void testDeleteProcessInstanceCommentsWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body(containsString("History is not enabled"))
+        .when()
+        .delete(PROCESS_INSTANCE_COMMENTS_URL);
+  }
+
+  @Test
+  public void testDeleteProcessInstanceCommentsForNonExistingTask() {
+    mockHistoryFull();
+    historicProcessInstanceQueryMock = mock(HistoricProcessInstanceQuery.class);
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(historicProcessInstanceQueryMock);
+    when(historicProcessInstanceQueryMock.processInstanceId(eq(NON_EXISTING_ID))).thenReturn(
+        historicProcessInstanceQueryMock);
+    when(historicProcessInstanceQueryMock.singleResult()).thenReturn(null);
+
+    given().pathParam("id", NON_EXISTING_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body(containsString("No process instance found for id " + NON_EXISTING_ID))
+        .when()
+        .delete(PROCESS_INSTANCE_COMMENTS_URL);
+  }
+
+  @Test
+  public void testDeleteProcessInstanceCommentsForNonExistingTaskWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given().pathParam("id", NON_EXISTING_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body(containsString("History is not enabled"))
+        .when()
+        .delete(PROCESS_INSTANCE_COMMENTS_URL);
+  }
+
+  @Test
+  public void testUpdateProcessInstanceCommentCommentIdNull() {
+    mockHistoryFull();
+
+    String message = "expected exception";
+    doThrow(new NullValueException(message)).when(taskServiceMock)
+        .updateProcessInstanceComment(EXAMPLE_PROCESS_INSTANCE_ID, null, EXAMPLE_PROCESS_INSTANCE_COMMENT_FULL_MESSAGE);
+
+    Map<String, Object> json = new HashMap<>();
+
+    json.put("id", null);
+    json.put("message", EXAMPLE_PROCESS_INSTANCE_COMMENT_FULL_MESSAGE);
+
+    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+        .body(json)
+        .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when()
+        .put(PROCESS_INSTANCE_COMMENTS_URL);
+  }
+
+  @Test
+  public void testUpdateProcessInstanceCommentMessageIsNull() {
+    mockHistoryFull();
+
+    String message = "expected exception";
+    doThrow(new NullValueException(message)).when(taskServiceMock)
+        .updateProcessInstanceComment(EXAMPLE_PROCESS_INSTANCE_ID, EXAMPLE_PROCESS_INSTANCE_COMMENT_ID, null);
+
+    Map<String, Object> json = new HashMap<>();
+
+    json.put("id", EXAMPLE_PROCESS_INSTANCE_COMMENT_ID);
+    json.put("message", null);
+
+    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+        .body(json)
+        .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when()
+        .put(PROCESS_INSTANCE_COMMENTS_URL);
+  }
+
+  @Test
+  public void testUpdateProcessInstanceComment() {
+    mockHistoryFull();
+    Map<String, Object> json = new HashMap<>();
+
+    json.put("id", EXAMPLE_PROCESS_INSTANCE_COMMENT_ID);
+    json.put("message", EXAMPLE_PROCESS_INSTANCE_COMMENT_FULL_MESSAGE);
+
+    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+        .body(json)
+        .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .put(PROCESS_INSTANCE_COMMENTS_URL);
+
+    verify(taskServiceMock).updateProcessInstanceComment(EXAMPLE_PROCESS_INSTANCE_ID,
+        EXAMPLE_PROCESS_INSTANCE_COMMENT_ID, EXAMPLE_PROCESS_INSTANCE_COMMENT_FULL_MESSAGE);
+  }
+
+  @Test
+  public void testUpdateProcessInstanceCommentExtraProperties() {
+    mockHistoryFull();
+
+    Map<String, Object> json = new HashMap<>();
+    //Only id and message are used
+    json.put("id", EXAMPLE_PROCESS_INSTANCE_COMMENT_ID);
+    json.put("userId", "anyUserId");
+    json.put("time", withTimezone("2014-01-01T00:00:00"));
+    json.put("message", EXAMPLE_PROCESS_INSTANCE_COMMENT_FULL_MESSAGE);
+    json.put("removalTime", withTimezone("2014-05-01T00:00:00"));
+    json.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+
+    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+        .body(json)
+        .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .put(PROCESS_INSTANCE_COMMENTS_URL);
+
+    verify(taskServiceMock).updateProcessInstanceComment(EXAMPLE_PROCESS_INSTANCE_ID,
+        EXAMPLE_PROCESS_INSTANCE_COMMENT_ID, EXAMPLE_PROCESS_INSTANCE_COMMENT_FULL_MESSAGE);
+  }
+
+  @Test
+  public void testUpdateProcessInstanceCommentProcessInstanceIdNotFound() {
+    mockHistoryFull();
+    historicProcessInstanceQueryMock = mock(HistoricProcessInstanceQuery.class);
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(historicProcessInstanceQueryMock);
+    when(historicProcessInstanceQueryMock.processInstanceId(eq(NON_EXISTING_ID))).thenReturn(
+        historicProcessInstanceQueryMock);
+    when(historicProcessInstanceQueryMock.singleResult()).thenReturn(null);
+
+    Map<String, Object> json = new HashMap<>();
+
+    json.put("id", EXAMPLE_PROCESS_INSTANCE_ID);
+    json.put("message", EXAMPLE_PROCESS_INSTANCE_COMMENT_FULL_MESSAGE);
+
+    given().pathParam("id", NON_EXISTING_ID)
+        .body(json)
+        .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body(containsString("No process instance found for id " + NON_EXISTING_ID))
+        .when()
+        .put(PROCESS_INSTANCE_COMMENTS_URL);
+  }
+
+  @Test
+  public void testUpdateProcessInstanceCommentThrowsAuthorizationException() {
+    mockHistoryFull();
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock)
+        .updateProcessInstanceComment(EXAMPLE_PROCESS_INSTANCE_ID, EXAMPLE_PROCESS_INSTANCE_COMMENT_ID,
+            EXAMPLE_PROCESS_INSTANCE_COMMENT_FULL_MESSAGE);
+
+    Map<String, Object> json = new HashMap<>();
+    json.put("id", EXAMPLE_PROCESS_INSTANCE_COMMENT_ID);
+    json.put("message", EXAMPLE_PROCESS_INSTANCE_COMMENT_FULL_MESSAGE);
+
+    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+        .body(json)
+        .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .contentType(ContentType.JSON)
+        .when()
+        .put(PROCESS_INSTANCE_COMMENTS_URL);
+
   }
 
   @Test

@@ -20,14 +20,16 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
@@ -75,6 +77,52 @@ public class TaskCommentResourceImpl implements TaskCommentResource {
     }
 
     return CommentDto.fromComment(comment);
+  }
+
+  public void deleteComment(String commentId) {
+    ensureHistoryEnabled(Status.FORBIDDEN);
+    ensureTaskExists(Status.NOT_FOUND);
+
+    TaskService taskService = engine.getTaskService();
+    try {
+      taskService.deleteTaskComment(taskId, commentId);
+    } catch (NotValidException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND,
+          "Deletion is not possible. No comment exists for task id '" + taskId + "' and comment id '" + commentId
+              + "'.");
+    }
+  }
+
+  public void updateComment(CommentDto comment) {
+    ensureHistoryEnabled(Status.FORBIDDEN);
+    ensureTaskExists(Status.NOT_FOUND);
+
+    try {
+      engine.getTaskService().updateTaskComment(taskId, comment.getId(), comment.getMessage());
+    } catch (NotValidException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND,
+          "Update is not possible. No comment exists for task id '" + taskId + "' and comment id '" + comment.getId()
+              + "'.");
+    } catch (AuthorizationException e) {
+      throw e;
+    } catch (NullValueException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Not enough parameters submitted");
+    }
+  }
+
+  public void deleteComments() {
+    ensureHistoryEnabled(Status.FORBIDDEN);
+    ensureTaskExists(Status.NOT_FOUND);
+    TaskService taskService = engine.getTaskService();
+
+    try {
+      taskService.deleteTaskComments(taskId);
+    } catch (NotValidException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND,
+          "Deletion of comments not possible for task id '" + taskId + "'.");
+    }
   }
 
   public CommentDto createComment(UriInfo uriInfo, CommentDto commentDto) {
