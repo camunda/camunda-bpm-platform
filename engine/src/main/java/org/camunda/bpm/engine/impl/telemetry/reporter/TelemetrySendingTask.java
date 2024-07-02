@@ -44,8 +44,6 @@ import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.telemetry.Command;
 import org.camunda.bpm.engine.telemetry.Metric;
-import org.camunda.connect.spi.Connector;
-import org.camunda.connect.spi.ConnectorRequest;
 
 public class TelemetrySendingTask extends TimerTask {
 
@@ -61,30 +59,18 @@ public class TelemetrySendingTask extends TimerTask {
   }
 
   protected CommandExecutor commandExecutor;
-  protected String telemetryEndpoint;
   protected TelemetryDataImpl staticData;
-  protected Connector<? extends ConnectorRequest<?>> httpConnector;
-  protected int telemetryRequestRetries;
   protected TelemetryRegistry telemetryRegistry;
   protected MetricsRegistry metricsRegistry;
-  protected int telemetryRequestTimeout;
 
   public TelemetrySendingTask(CommandExecutor commandExecutor,
-                              String telemetryEndpoint,
-                              int telemetryRequestRetries,
                               TelemetryDataImpl data,
-                              Connector<? extends ConnectorRequest<?>> httpConnector,
                               TelemetryRegistry telemetryRegistry,
-                              MetricsRegistry metricsRegistry,
-                              int telemetryRequestTimeout) {
+                              MetricsRegistry metricsRegistry) {
     this.commandExecutor = commandExecutor;
-    this.telemetryEndpoint = telemetryEndpoint;
-    this.telemetryRequestRetries = telemetryRequestRetries;
     this.staticData = data;
-    this.httpConnector = httpConnector;
     this.telemetryRegistry = telemetryRegistry;
     this.metricsRegistry = metricsRegistry;
-    this.telemetryRequestTimeout = telemetryRequestTimeout;
   }
 
   @Override
@@ -131,13 +117,6 @@ public class TelemetrySendingTask extends TimerTask {
     return telemetryEnabled != null && telemetryEnabled.booleanValue();
   }
 
-
-  /**
-   * @return true if status code is 2xx
-   */
-  protected boolean isSuccessStatusCode(int statusCode) {
-    return (statusCode / 100) == 2;
-  }
 
   protected void restoreDynamicData(InternalsImpl internals) {
     Map<String, Command> commands = internals.getCommands();

@@ -42,5 +42,4 @@ public class GetTelemetryDataCmd implements Command<TelemetryDataImpl> {
     }
   }
 
-  
 }

@@ -33,7 +33,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
-import org.camunda.bpm.engine.impl.util.TelemetryUtil;
 
 /**
  * @author Nikola Koevski
@@ -57,7 +56,6 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
       createHistoryCleanupJob(commandContext);
     }
 
-    initializeTelemetryProperty(commandContext);
     // installationId needs to be updated in the telemetry data
     updateTelemetryData(commandContext);
     startTelemetryReporter(commandContext);
