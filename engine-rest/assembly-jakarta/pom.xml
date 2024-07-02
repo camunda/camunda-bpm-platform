@@ -18,6 +18,8 @@
     runtime-specific-WARs are in provided scope -->
     <skip-third-party-bom>false</skip-third-party-bom>
     <third-party-bom-scopes>compile|provided</third-party-bom-scopes>
+
+    <version.resteasy>6.2.3.Final</version.resteasy>
   </properties>
 
   <dependencyManagement>
@@ -29,6 +31,15 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
+
+      <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-bom</artifactId>
+        <version>${version.resteasy}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -47,6 +58,7 @@
       <classifier>sources</classifier>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest-core-jakarta</artifactId>
@@ -55,11 +67,28 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- Jakarta API -->
+
     <dependency>
       <groupId>jakarta.ws.rs</groupId>
       <artifactId>jakarta.ws.rs-api</artifactId>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Resteasy -->
+
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -87,6 +116,24 @@
               <finalName>camunda-engine-rest-jakarta-${project.version}</finalName>
               <attach>true</attach>
               <classifier>wildfly</classifier>
+              <outputDirectory>target/</outputDirectory>
+              <workDirectory>target/assembly/work</workDirectory>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>tomcat</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly-war-tomcat.xml</descriptor>
+              </descriptors>
+              <finalName>camunda-engine-rest-jakarta-${project.version}</finalName>
+              <attach>true</attach>
+              <classifier>tomcat</classifier>
               <outputDirectory>target/</outputDirectory>
               <workDirectory>target/assembly/work</workDirectory>
             </configuration>

@@ -137,7 +137,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest</artifactId>
+      <artifactId>camunda-engine-rest-jakarta</artifactId>
       <scope>test</scope>
       <type>war</type>
       <classifier>tomcat</classifier>
@@ -262,7 +262,7 @@
           <!-- Container configuration -->
           <container>
             <type>installed</type>
-            <containerId>tomcat9x</containerId>
+            <containerId>tomcat10x</containerId>
             <append>false</append>
             <home>${tomcat.runtime}</home>
             <timeout>${cargo.timeout}</timeout>
@@ -288,7 +288,7 @@
           <deployables>
             <deployable>
               <groupId>org.camunda.bpm</groupId>
-              <artifactId>camunda-engine-rest</artifactId>
+              <artifactId>camunda-engine-rest-jakarta</artifactId>
               <type>war</type>
               <classifier>tomcat</classifier>
               <pingURL>

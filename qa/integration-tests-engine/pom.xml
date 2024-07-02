@@ -497,7 +497,7 @@
     </profile>
 
     <profile>
-      <id>tomcat</id>
+      <id>tomcat9</id>
       <dependencyManagement>
         <dependencies>
           <!-- import internal dependencies before JBoss to preserve internal versions, e.g. for JUnit -->
@@ -521,7 +521,7 @@
         <dependency>
           <!-- make sure this comes after runtime in the reactor build -->
           <groupId>org.camunda.bpm.qa</groupId>
-          <artifactId>camunda-qa-tomcat-runtime</artifactId>
+          <artifactId>camunda-qa-tomcat9-runtime</artifactId>
           <version>${project.version}</version>
           <scope>provided</scope>
           <type>pom</type>
