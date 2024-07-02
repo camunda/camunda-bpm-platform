@@ -23,6 +23,11 @@
     <differenceType>8001</differenceType>
     <className>org/camunda/bpm/engine/variable/**/*</className>
   </difference>
+  <!-- 8001: class removed due to clean-up after end of support -->
+  <difference>
+    <differenceType>8001</differenceType>
+    <className>org/camunda/bpm/engine/CrdbTransactionRetryException</className>
+  </difference>
   <!-- 5001: superclass removed -->
   <!-- new interface introduced in hierarchy, previous superclass renamed -->
   <difference>

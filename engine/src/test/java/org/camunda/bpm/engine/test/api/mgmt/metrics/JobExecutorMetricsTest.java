@@ -27,11 +27,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.CallerRunsRejectedJobsHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestHelper.ThreadControl;
@@ -81,20 +79,7 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
 
     long acquiredJobs = managementService.createMetricsQuery()
         .name(Metrics.JOB_ACQUIRED_SUCCESS).sum();
-    if (testRule.isOptimisticLockingExceptionSuppressible()) {
-      assertEquals(3, acquiredJobs);
-    } else {
-      // see CAM-12480 for more details:
-      // on CRDB , the jobs may fail multiple times due to a self-referencing foreign
-      // key constraint on the ACT_RU_EXECUTION table, which causes a "TransactionRetryError"
-      // during job execution. This leads to the JobAccquisition thread to perform multiple acquisitions
-      // on the same jobs until they are successfull, leading to a larger number of job acquisition metrics.
-      assertTrue(acquiredJobs >= 3);
-      // however, only 3 jobs are successfully executed
-      long successfulJobs = managementService.createMetricsQuery()
-        .name(Metrics.JOB_SUCCESSFUL).sum();
-      assertTrue(successfulJobs == 3);
-    }
+    assertEquals(3, acquiredJobs);
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/metrics/asyncServiceTaskProcess.bpmn20.xml")
@@ -141,17 +126,7 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
     long acquiredJobsFailure = managementService.createMetricsQuery()
         .name(Metrics.JOB_ACQUIRED_FAILURE).sum();
 
-    if (testRule.isOptimisticLockingExceptionSuppressible()) {
-      assertEquals(3, acquiredJobsFailure);
-    } else {
-      // in the case of CRDB, when jobs are acquired concurrently, any concurrency conflicts when
-      // attempting to lock the same jobs will result in a rollback of one of the concurrent transactions,
-      // and a retry of the associated AcquireJobsCmd. Hence, an AcquireJobsCmd can only complete successfully
-      // on CockroachDB when there are no concurrency conflicts, i.e. no failed job acquisition attempts.
-      // As a result, it's not possible to determine how many unsuccessfully attempts were performed since
-      // they are never persisted.
-      assertEquals(0, acquiredJobsFailure);
-    }
+    assertEquals(3, acquiredJobsFailure);
 
     // cleanup
     jobExecutor1.shutdown();
@@ -160,14 +135,6 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
     processEngineConfiguration.getDbMetricsReporter().reportNow();
   }
 
-  /**
-   * see CAM-12480 and CAM-12461 for more details:
-   * on CRDB , the jobs may fail multiple times due to a self-referencing foreign
-   * key constraint on the ACT_RU_EXECUTION table, which causes a "TransactionRetryError"
-   * during job execution. This leads to the JobAccquisition thread to perform multiple acquisitions
-   * on the same jobs until they are successfull, leading to a time-out while executing the jobs.
-   */
-  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/metrics/asyncServiceTaskProcess.bpmn20.xml")
   @Test
   public void testJobExecutionMetricReporting() {
@@ -216,23 +183,11 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
       .name(Metrics.JOB_LOCKED_EXCLUSIVE).sum();
 
     assertEquals(6, jobsSuccessful);
-    if (testRule.isOptimisticLockingExceptionSuppressible()) {
-      assertEquals(0, jobsFailed);
-      // the respective follow-up jobs are exclusive and have been executed right away without
-      // acquisition
-      assertEquals(3, jobCandidatesForAcquisition);
-      assertEquals(3, exclusiveFollowupJobs);
-    } else {
-      // on CRDB there can be additional job failures due to a self-referencing foreign
-      // key constraint on the ACT_RU_EXECUTION table which causes a TransactionRetryError
-      if (jobsFailed > 0) {
-        // this leads to more job retries and acquisitions
-        assertTrue(jobCandidatesForAcquisition >= 3);
-      } else {
-        assertEquals(3, jobCandidatesForAcquisition);
-      }
-      assertEquals(3, exclusiveFollowupJobs);
-    }
+    assertEquals(0, jobsFailed);
+    // the respective follow-up jobs are exclusive and have been executed right away without
+    // acquisition
+    assertEquals(3, jobCandidatesForAcquisition);
+    assertEquals(3, exclusiveFollowupJobs);
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/metrics/asyncServiceTaskProcess.bpmn20.xml")

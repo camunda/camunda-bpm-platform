@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.test.concurrency.partitioning;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -85,13 +84,8 @@ public class CompetingHistoricByteArrayPartitioningTest extends AbstractPartitio
     asyncThread.waitUntilDone();
 
     // then
-    if (testRule.isOptimisticLockingExceptionSuppressible()) {
-      assertThat(runtimeService.createVariableInstanceQuery().singleResult().getName()).isEqualTo(VARIABLE_NAME);
-      assertThat(new String((byte[]) runtimeService.createVariableInstanceQuery().singleResult().getValue())).isEqualTo(ANOTHER_VARIABLE_VALUE);
-    } else {
-      // with CockroachDB, the OLE can't be ignored, the TX will fail and be rolled-back
-      assertThat(asyncThread.getException()).isInstanceOf(CrdbTransactionRetryException.class);
-    }
+    assertThat(runtimeService.createVariableInstanceQuery().singleResult().getName()).isEqualTo(VARIABLE_NAME);
+    assertThat(new String((byte[]) runtimeService.createVariableInstanceQuery().singleResult().getValue())).isEqualTo(ANOTHER_VARIABLE_VALUE);
   }
 
   public class AsyncThread extends ControllableCommand<Void> {

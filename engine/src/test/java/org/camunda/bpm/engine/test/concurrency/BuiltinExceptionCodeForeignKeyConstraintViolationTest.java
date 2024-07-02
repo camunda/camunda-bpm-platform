@@ -75,12 +75,7 @@ public class BuiltinExceptionCodeForeignKeyConstraintViolationTest extends Concu
     }
   }
 
-  /**
-   * This test case doesn't lead to a foreign key constraint violation on CRDB.
-   * Instead, a deadlock error is detected.
-   */
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-  @RequiredDatabase(excludes = {DbSqlSessionFactory.CRDB})
   @Test
   public void shouldReturnForeignKeyConstraintErrorCode() {
     // given

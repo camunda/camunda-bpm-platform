@@ -38,24 +38,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
-/**
- * When CockroachDB is used, this test is ignored since this scenario behaves in a serialized manner there.
- * The HistoryCleanupJob retries are set first, and then the BootstrapCommand reconfigures
- * the HistoryCleanupJob, overwriting the retires and stack trace. The following diagram explains this
- * in more detail:
- *
- * TX1 (job retries)              | TX2 (Bootstrap command)
- * ------------------------------------------------------------------------------------------------------
- * READ HistoryCleanupJob         |
- * WRITE Job Retries              |
- *     ---> CRDB TX Write Intent  | -> READ (check for HistoryCleanupJob) -> CRDB TX Block
- * Thread SYNC                    |
- * COMMIT                         | -> CRDB TX Unblock
- *                                |    Continue regular execution to reconfigure HistoryCleanupJob
- *                                |     * Set default retries (3)
- *                                |     * Clear exception stacktrace
- */
-@RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
 public class ConcurrentHistoryCleanupUpdateOfFailingJobTest extends ConcurrencyTestHelper {
 
   @ClassRule

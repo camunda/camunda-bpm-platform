@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandCounterInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
@@ -36,9 +35,6 @@ public class StandaloneProcessEngineConfiguration extends ProcessEngineConfigura
 
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequired() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
-    if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
-      defaultCommandInterceptorsTxRequired.add(getCrdbRetryInterceptor());
-    }
     if (!isDisableExceptionCode()) {
       defaultCommandInterceptorsTxRequired.add(getExceptionCodeInterceptor());
     }
@@ -51,9 +47,6 @@ public class StandaloneProcessEngineConfiguration extends ProcessEngineConfigura
 
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequiresNew() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
-    if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
-      defaultCommandInterceptorsTxRequired.add(getCrdbRetryInterceptor());
-    }
     if (!isDisableExceptionCode()) {
       defaultCommandInterceptorsTxRequired.add(getExceptionCodeInterceptor());
     }

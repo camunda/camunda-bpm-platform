@@ -116,12 +116,6 @@ public class JobAcquisitionTest {
     List<RecordedWaitEvent> jobExecutor2WaitEvents = jobExecutor2.getAcquireJobsRunnable().getWaitEvents();
     Assert.assertEquals(1, jobExecutor2WaitEvents.size());
 
-    if (testRule.isOptimisticLockingExceptionSuppressible()) {
-      Assert.assertEquals(0, jobExecutor2WaitEvents.get(0).getTimeBetweenAcquisitions());
-    } else {
-      // In CRDB, Job Acquisition failures result in a complete rollback and retry of the transaction.
-      // This causes the BackoffJobAcquisitionStrategy to propose an Idle time of 5000ms.
-      Assert.assertEquals(5000, jobExecutor2WaitEvents.get(0).getTimeBetweenAcquisitions());
-    }
+    Assert.assertEquals(0, jobExecutor2WaitEvents.get(0).getTimeBetweenAcquisitions());
   }
 }

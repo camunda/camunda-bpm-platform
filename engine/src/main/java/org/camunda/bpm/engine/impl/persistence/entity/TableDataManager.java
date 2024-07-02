@@ -267,7 +267,7 @@ public class TableDataManager extends AbstractManager {
             .getConnection()
             .getMetaData();
 
-        if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES, DbSqlSessionFactory.CRDB)) {
+        if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES)) {
           tableName = tableName.toLowerCase();
         }
 

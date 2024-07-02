@@ -76,7 +76,6 @@ public abstract class DbOperation implements Recyclable {
 
   public boolean isFailed() {
     return state == State.FAILED_CONCURRENT_MODIFICATION
-        || state == State.FAILED_CONCURRENT_MODIFICATION_CRDB
         || state == State.FAILED_CONCURRENT_MODIFICATION_EXCEPTION
         || state == State.FAILED_ERROR;
   }
@@ -114,12 +113,6 @@ public abstract class DbOperation implements Recyclable {
      * Applies to databases with isolation level READ_COMMITTED.
      */
     FAILED_CONCURRENT_MODIFICATION,
-
-    /**
-     * Indicates that the operation was not performed and was a concurrency
-     * conflict. Applies to CockroachDB (with isolation level SERIALIZABLE).
-     */
-    FAILED_CONCURRENT_MODIFICATION_CRDB,
 
     /**
      * Indicates that the operation was not performed and was a concurrency

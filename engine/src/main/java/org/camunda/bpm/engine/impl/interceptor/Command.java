@@ -16,21 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.interceptor;
 
-import org.camunda.bpm.engine.CrdbTransactionRetryException;
-
 /**
  * @author Tom Baeyens
  */
-public interface Command <T> {
+public interface Command<T> {
 
   T execute(CommandContext commandContext);
 
-  /**
-   * @return true if the {@link CrdbTransactionRetryInterceptor}
-   *   can make a transparent retry of this command upon failure
-   *   with a {@link CrdbTransactionRetryException} (only used when running on CockroachDB).
-   */
-  default boolean isRetryable() {
-    return false;
-  }
 }

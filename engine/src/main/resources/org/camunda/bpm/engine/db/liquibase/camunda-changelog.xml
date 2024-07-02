@@ -22,7 +22,6 @@
                    xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
 
-  <property name="db.name" value="cockroachdb" dbms="cockroachdb"/>
   <property name="db.name" value="db2" dbms="db2"/>
   <property name="db.name" value="h2" dbms="h2"/>
   <property name="db.name" value="mariadb" dbms="mariadb"/>
