@@ -69,34 +69,28 @@ public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R e
 
   @Override
   public R execute(Q request) {
+    R invocationResult = null;
     HttpRequestBase httpRequest = createHttpRequest(request);
     HttpRequestInvocation invocation = new HttpRequestInvocation(httpRequest, request, requestInterceptors, httpClient);
     try {
-	  
-      R invocationResult = createResponse((CloseableHttpResponse) invocation.proceed());
-	  handleErrorResponse(request , invocationResult);
-	  return invocationResult;
-			
-	   } catch (Exception e) {
+      invocationResult = createResponse((CloseableHttpResponse) invocation.proceed());
+    } catch (Exception e) {
 	    throw LOG.unableToExecuteRequest(e);
-	  }
+    }
+    handleErrorResponse(request , invocationResult);
+    return invocationResult;
   }
 
- private void handleErrorResponse(Q request,R invocationResult ) {
-     Map<String, Object> configOptions = request.getConfigOptions();	
-	   
-     if( configOptions != null && invocationResult != null)  {
-	
-	    int statusCode = invocationResult.getStatusCode();
-	    String connectorResponse = invocationResult.getResponse();
-	    Optional<Object> handleHttpError = Optional.ofNullable(configOptions.get("throw-http-error"));  
-			
-	    if (handleHttpError.isPresent() && handleHttpError.get().toString()
-	        .equalsIgnoreCase("TRUE") && statusCode >= 400 && statusCode <= 599) {  
-		    
-	         throw LOG.unableToExecuteRequest(statusCode,connectorResponse);
-	    }	
-     }
+  private void handleErrorResponse(Q request,R invocationResult ) {
+    Map<String, Object> configOptions = request.getConfigOptions();
+    if (configOptions != null && invocationResult != null) {
+      int statusCode = invocationResult.getStatusCode();
+      String connectorResponse = invocationResult.getResponse();
+      Object handleHttpError = Optional.ofNullable(configOptions.get("throw-http-error")).orElse("FALSE");
+      if (Boolean.parseBoolean(handleHttpError.toString()) && statusCode >= 400 && statusCode <= 599) {
+        throw LOG.httpRequestError(statusCode,connectorResponse);
+      }
+    }
   }
 
   protected abstract R createResponse(CloseableHttpResponse response);
