@@ -97,7 +97,6 @@ public class TelemetryDynamicDataTest {
     // when
     processEngineInMem =  new StandaloneInMemProcessEngineConfiguration()
         .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
-        .setInitializeTelemetry(true)
         .buildProcessEngine();
 
     // then
