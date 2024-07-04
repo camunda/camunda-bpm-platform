@@ -20,6 +20,13 @@
       <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
     </dependencySet>
     <dependencySet>
+      <outputDirectory>internal/oauth2/</outputDirectory>
+      <includes>
+        <include>org.camunda.bpm.run:camunda-bpm-run-modules-oauth2</include>
+      </includes>
+      <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+    </dependencySet>
+    <dependencySet>
       <outputDirectory>internal/example/</outputDirectory>
       <includes>
         <include>org.camunda.bpm.run:camunda-bpm-run-modules-example-invoice</include>
@@ -121,6 +128,10 @@
     <fileSet>
       <directory>../modules/rest/target/dependency/</directory>
       <outputDirectory>internal/rest/</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>../modules/oauth2/target/dependency/</directory>
+      <outputDirectory>internal/oauth2/</outputDirectory>
     </fileSet>
     <!-- create empty resource folder -->
     <fileSet>

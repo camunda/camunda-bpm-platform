@@ -57,7 +57,8 @@ public class ComponentAvailabilityIT {
       { new String[]{"--rest", "--example"}, true, false, true },
       { new String[]{"--webapps"}, false, true, false },
       { new String[]{"--rest", "--webapps"}, true, true, false },
-      { new String[]{"--rest", "--webapps", "--example"}, true, true, true }
+      { new String[]{"--rest", "--webapps", "--example"}, true, true, true },
+      { new String[]{"--rest", "--webapps", "--example", "--oauth2"}, true, true, true }
     });
   }
 
