@@ -91,7 +91,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-cdi</artifactId>
+      <artifactId>camunda-engine-cdi-jakarta</artifactId>
     </dependency>
 
     <dependency>
@@ -108,6 +108,7 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-plugin-spin</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -125,11 +126,13 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-plugin-connect</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-connectors-all</artifactId>
+      <version>${project.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.camunda.connect</groupId>
@@ -140,7 +143,6 @@
           <artifactId>camunda-connect-soap-http-client</artifactId>
         </exclusion>
       </exclusions>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>

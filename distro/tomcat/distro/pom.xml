@@ -15,6 +15,15 @@
   <dependencies>
 
     <dependency>
+      <groupId>org.camunda.bpm.distro</groupId>
+      <artifactId>camunda-sql-scripts</artifactId>
+      <version>${project.version}</version>
+      <type>jar</type>
+    </dependency>
+
+    <!-- Tomcat 10 dependencies -->
+
+    <dependency>
       <groupId>org.camunda.bpm.tomcat</groupId>
       <artifactId>camunda-tomcat-assembly</artifactId>
       <version>${project.version}</version>
@@ -22,30 +31,23 @@
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.bpm.distro</groupId>
-      <artifactId>camunda-sql-scripts</artifactId>
+      <groupId>org.camunda.bpm.webapp</groupId>
+      <artifactId>camunda-webapp-tomcat-jakarta</artifactId>
       <version>${project.version}</version>
-      <type>jar</type>
+      <type>war</type>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest</artifactId>
+      <artifactId>camunda-engine-rest-jakarta</artifactId>
       <version>${project.version}</version>
       <classifier>tomcat</classifier>
       <type>war</type>
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.bpm.webapp</groupId>
-      <artifactId>camunda-webapp-tomcat</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-    </dependency>
-
-    <dependency>
       <groupId>org.camunda.bpm.example</groupId>
-      <artifactId>camunda-example-invoice</artifactId>
+      <artifactId>camunda-example-invoice-jakarta</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
@@ -59,7 +61,7 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
-            <id>distro</id>
+            <id>distro-tomcat10</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>

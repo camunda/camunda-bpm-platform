@@ -18,7 +18,7 @@
     <jakarta.webapp>${project.build.directory}/generated-resources/jakarta-webapp</jakarta.webapp>
     <jakarta.runtime>${project.build.directory}/generated-resources/jakarta-runtime</jakarta.runtime>
 
-    <version.resteasy>6.2.3.Final</version.resteasy>
+    <version.resteasy>6.2.8.Final</version.resteasy>
     <version.jetty>11.0.14</version.jetty>
     <version.jersey2>3.1.1</version.jersey2>
 
