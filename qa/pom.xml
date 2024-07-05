@@ -76,6 +76,7 @@
         <module>wildfly-runtime</module>
         <module>wildfly26-runtime</module>
         <module>tomcat-runtime</module>
+        <module>tomcat9-runtime</module>
         <module>integration-tests-webapps</module>
         <module>integration-tests-engine</module>
         <module>test-db-util</module>
