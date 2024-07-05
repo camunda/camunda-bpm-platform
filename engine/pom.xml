@@ -427,9 +427,9 @@
         <configuration>
           <failIfNoTests>false</failIfNoTests>
           <trimStackTrace>false</trimStackTrace>
-          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          <redirectTestOutputToFile>false</redirectTestOutputToFile>
           <includes>
-           <include>%regex[.*(${test.includes}).*Test.*.class]</include>
+           <include>%regex[.*(${test.includes}).*TransactionIsolationLevelTest.*.class]</include>
           </includes>
           <excludes>
             <exclude>**/*TestCase.java</exclude>
@@ -692,7 +692,7 @@
             <configuration>
               <failIfNoTests>false</failIfNoTests>
               <trimStackTrace>false</trimStackTrace>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>false</redirectTestOutputToFile>
               <excludes combine.children="append">
                 <exclude>**/CompetingMessageCorrelationTest.java</exclude>
               </excludes>
@@ -711,7 +711,7 @@
             <configuration>
               <failIfNoTests>false</failIfNoTests>
               <trimStackTrace>false</trimStackTrace>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>false</redirectTestOutputToFile>
               <excludes combine.children="append">
                 <exclude>**/CompetingMessageCorrelationTest.java</exclude>
               </excludes>

@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.util;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -38,6 +39,17 @@ public class DatabaseHelper {
       }
     });
     return transactionIsolation[0];
+  }
+
+  public static void setTransactionIsolationLevel(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(commandContext -> {
+      try {
+        commandContext.getDbSqlSession().getSqlSession().getConnection().setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+      } catch (SQLException e) {
+
+      }
+      return null;
+    });
   }
 
   public static String getDatabaseType(ProcessEngineConfigurationImpl processEngineConfiguration) {
