@@ -37,7 +37,6 @@ import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.telemetry.ApplicationServer;
-import org.camunda.bpm.engine.telemetry.Command;
 import org.camunda.bpm.engine.telemetry.Metric;
 import org.camunda.bpm.engine.telemetry.TelemetryData;
 import org.camunda.bpm.engine.test.Deployment;
@@ -295,60 +294,6 @@ public class ManagementServiceGetTelemetryDataTest {
       .isInstanceOf(ProcessEngineException.class)
       .hasMessageContaining("Error while retrieving telemetry data. Telemetry registry was not initialized.");
   }
-
-  @Test
-  public void shouldResetCollectedCommandsDataWhenTelemetryEnabled() {
-    // given default telemetry data and empty telemetry registry
-
-    // executed commands before telemetry is activated
-    managementService.getHistoryLevel();
-    managementService.getLicenseKey();
-
-    managementService.toggleTelemetry(true);
-
-    // execute commands after telemetry is activated
-    managementService.getTelemetryData();
-    managementService.getTelemetryData();
-    managementService.isTelemetryEnabled();
-
-    // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
-
-    // then command counts produced before telemetry was enabled should be deleted
-    Map<String, Command> commands = telemetryData.getProduct().getInternals().getCommands();
-    assertThat(commands.size()).isEqualTo(3);
-    assertThat(commands.get(GET_TELEMETRY_DATA_CMD_NAME).getCount()).isEqualTo(2);
-    assertThat(commands.get(IS_TELEMETRY_ENABLED_CMD_NAME).getCount()).isEqualTo(1);
-    assertThat(commands.get(TELEMETRY_CONFIGURE_CMD_NAME).getCount()).isEqualTo(1);
-    assertThat(commands.get(GET_HISTORY_LEVEL_CMD_NAME)).isNull();
-    assertThat(commands.get(GET_LICENSE_KEY_CMD_NAME)).isNull();
-  }
-
-  @Test
-  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-  public void shouldResetCollectedMetricsDataWhenTelemetryEnabled() {
-    // given default telemetry data and empty telemetry registry
-    // produce metrics before telemetry is enabled
-    runtimeService.startProcessInstanceByKey("oneTaskProcess");
-
-    // activating telemetry
-    managementService.toggleTelemetry(true);
-
-    // produce metrics after telemetry is enabled
-    runtimeService.startProcessInstanceByKey("oneTaskProcess");
-
-    // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
-
-    // then metrics produced before telemetry was enabled should be deleted
-    Map<String, Metric> metrics = telemetryData.getProduct().getInternals().getMetrics();
-    assertThat(metrics.size()).isEqualTo(4);
-    assertThat(metrics.get(FLOW_NODE_INSTANCES).getCount()).isEqualTo(2);
-    assertThat(metrics.get(PROCESS_INSTANCES).getCount()).isEqualTo(1);
-    assertThat(metrics.get(DECISION_INSTANCES).getCount()).isEqualTo(0);
-    assertThat(metrics.get(EXECUTED_DECISION_ELEMENTS).getCount()).isEqualTo(0);
-  }
-
   @Test
   public void shouldSetDataCollectionTimeFrameToEngineStartTimeWhenTelemetryDisabled() {
     // given default telemetry data and empty telemetry registry

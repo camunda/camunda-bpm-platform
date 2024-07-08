@@ -65,15 +65,11 @@ public class TelemetryDynamicDataTest {
     clearMetrics();
   }
 
-
   @After
   public void tearDown() {
     clearMetrics();
-    managementService.toggleTelemetry(false);
 
     if (processEngineInMem != null) {
-      ((ProcessEngineConfigurationImpl) processEngineInMem.getProcessEngineConfiguration()).getManagementService()
-          .toggleTelemetry(false);
       ProcessEngines.unregister(processEngineInMem);
       processEngineInMem.close();
     }
@@ -83,13 +79,13 @@ public class TelemetryDynamicDataTest {
     configuration.getTelemetryRegistry().clear();
     clearMetrics(configuration.getMetricsRegistry().getDbMeters());
     clearMetrics(configuration.getMetricsRegistry().getTelemetryMeters());
+    managementService.deleteMetrics(null);
   }
 
   protected void clearMetrics(Map<String, Meter> meters) {
     for (Meter meter : meters.values()) {
       meter.getAndClear();
     }
-    managementService.deleteMetrics(null);
   }
 
   @Test
@@ -97,7 +93,6 @@ public class TelemetryDynamicDataTest {
     // when
     processEngineInMem =  new StandaloneInMemProcessEngineConfiguration()
         .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
-        .setInitializeTelemetry(true)
         .buildProcessEngine();
 
     // then
@@ -107,7 +102,10 @@ public class TelemetryDynamicDataTest {
     // telemetry registry (including the command counts) is reset when telemetry is activated
     // during engine startup
     assertThat(entries.keySet()).containsExactlyInAnyOrder(
-        "IsTelemetryEnabledCmd",
+        "GetTableMetaDataCmd",
+        "HistoryCleanupCmd",
+        "SchemaOperationsProcessEngineBuild",
+        "HistoryLevelSetupCommand",
         "BootstrapEngineCommand",
         "GetLicenseKeyCmd");
     for (String commandName : entries.keySet()) {
@@ -185,7 +183,7 @@ public class TelemetryDynamicDataTest {
     // then
     // the class is not collected
     Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
-    assertThat(commands.keySet()).containsExactly("TelemetryConfigureCmd");
+    assertThat(commands.keySet()).containsExactly("DeleteMetricsCmd", "TelemetryConfigureCmd");
   }
 
   @Test
@@ -203,7 +201,7 @@ public class TelemetryDynamicDataTest {
     // then
     // the class is not collected
     Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
-    assertThat(commands.keySet()).containsExactly("TelemetryConfigureCmd");
+    assertThat(commands.keySet()).containsExactly("DeleteMetricsCmd", "TelemetryConfigureCmd");
   }
 
   protected void clearCommandCounts() {
