@@ -42,9 +42,7 @@
 
     <property name="databaseTablePrefix" value="SCHEMA1." />
 
-    <!-- telemetry configuration -->
-    <property name="telemetryEndpoint" value="http://localhost:8081/pings"/>
-    <property name="enforceHistoryTimeToLive" value="false" />   
+    <property name="enforceHistoryTimeToLive" value="false" />
 
   </bean>
 
