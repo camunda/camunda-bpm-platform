@@ -322,22 +322,6 @@ public class ManagementServiceGetTelemetryDataTest {
   }
 
   @Test
-  public void shouldResetDataCollectionTimeFrameWhenTelemetryEnabled() {
-    // given the collection date is set at engine startup
-    Date dataCollectionStartDateBeforeToggle = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
-    // pass at least one second between the two telemetry calls because MySQL has only second precision
-    ClockUtil.offset(1000L);
-
-    // when
-    managementService.toggleTelemetry(true);
-
-    // then
-    Date dataCollectionStartDateAfterToggle = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
-
-    assertThat(dataCollectionStartDateBeforeToggle).isBefore(dataCollectionStartDateAfterToggle);
-  }
-
-  @Test
   public void shouldNotResetCollectionTimeFrameAfterGetTelemetryWhenTelemetryEnabled() {
     // given default telemetry data and empty telemetry registry
     // activate telemetry

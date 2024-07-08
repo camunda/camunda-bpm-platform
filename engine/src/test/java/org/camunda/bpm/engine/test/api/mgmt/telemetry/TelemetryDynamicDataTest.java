@@ -183,7 +183,7 @@ public class TelemetryDynamicDataTest {
     // then
     // the class is not collected
     Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
-    assertThat(commands.keySet()).containsExactly("DeleteMetricsCmd", "TelemetryConfigureCmd");
+    assertThat(commands.keySet()).containsExactlyInAnyOrder("DeleteMetricsCmd", "TelemetryConfigureCmd");
   }
 
   @Test
@@ -201,7 +201,7 @@ public class TelemetryDynamicDataTest {
     // then
     // the class is not collected
     Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
-    assertThat(commands.keySet()).containsExactly("DeleteMetricsCmd", "TelemetryConfigureCmd");
+    assertThat(commands.keySet()).containsExactlyInAnyOrder("DeleteMetricsCmd", "TelemetryConfigureCmd");
   }
 
   protected void clearCommandCounts() {
