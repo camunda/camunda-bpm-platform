@@ -19,20 +19,16 @@ package org.camunda.bpm.engine.impl.telemetry.reporter;
 import java.util.Timer;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.cmd.IsTelemetryEnabledCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
-import org.camunda.connect.spi.Connector;
-import org.camunda.connect.spi.ConnectorRequest;
 
 public class TelemetryReporter {
 
   protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
 
-  protected long reportingIntervalInSeconds;
   /**
    * Report after 5 minutes the first time so that we get an initial ping
    * quickly. 5 minutes delay so that other modules (e.g. those collecting the app
@@ -50,44 +46,27 @@ public class TelemetryReporter {
   protected Timer timer;
 
   protected CommandExecutor commandExecutor;
-  protected String telemetryEndpoint;
-  protected int telemetryRequestRetries;
   protected TelemetryDataImpl data;
-  protected Connector<? extends ConnectorRequest<?>> httpConnector;
   protected TelemetryRegistry telemetryRegistry;
   protected MetricsRegistry metricsRegistry;
-  protected int telemetryRequestTimeout;
 
   public TelemetryReporter(CommandExecutor commandExecutor,
-                           String telemetryEndpoint,
-                           int telemetryRequestRetries,
-                           long telemetryReportingPeriod,
                            TelemetryDataImpl data,
-                           Connector<? extends ConnectorRequest<?>> httpConnector,
                            TelemetryRegistry telemetryRegistry,
-                           MetricsRegistry metricsRegistry,
-                           int telemetryRequestTimeout) {
+                           MetricsRegistry metricsRegistry) {
     this.commandExecutor = commandExecutor;
-    this.telemetryEndpoint = telemetryEndpoint;
-    this.telemetryRequestRetries = telemetryRequestRetries;
-    this.reportingIntervalInSeconds = telemetryReportingPeriod;
     this.data = data;
-    this.httpConnector = httpConnector;
     this.telemetryRegistry = telemetryRegistry;
     this.metricsRegistry = metricsRegistry;
-    this.telemetryRequestTimeout = telemetryRequestTimeout;
     initTelemetrySendingTask();
   }
 
+
   protected void initTelemetrySendingTask() {
     telemetrySendingTask = new TelemetrySendingTask(commandExecutor,
-                                                    telemetryEndpoint,
-                                                    telemetryRequestRetries,
                                                     data,
-                                                    httpConnector,
                                                     telemetryRegistry,
-                                                    metricsRegistry,
-                                                    telemetryRequestTimeout);
+                                                    metricsRegistry);
   }
 
   public synchronized void start() {
@@ -95,21 +74,15 @@ public class TelemetryReporter {
       initTelemetrySendingTask();
 
       timer = new Timer("Camunda BPM Runtime Telemetry Reporter", true);
-      long reportingIntervalInMillis =  reportingIntervalInSeconds * 1000;
       long initialReportingDelay = getInitialReportingDelaySeconds() * 1000;
 
       try {
-        timer.scheduleAtFixedRate(telemetrySendingTask, initialReportingDelay, reportingIntervalInMillis);
+        timer.schedule(telemetrySendingTask, initialReportingDelay);
       } catch (Exception e) {
         timer = null;
         throw LOG.schedulingTaskFails(e);
       }
     }
-  }
-
-  public synchronized void reschedule() {
-    stop(false);
-    start();
   }
 
   public synchronized void stop() {
@@ -129,6 +102,7 @@ public class TelemetryReporter {
     }
   }
 
+  // TODO remove
   public void reportNow() {
     if (telemetrySendingTask != null) {
       telemetrySendingTask.run();
@@ -139,10 +113,6 @@ public class TelemetryReporter {
     return timer != null;
   }
 
-  public long getReportingIntervalInSeconds() {
-    return reportingIntervalInSeconds;
-  }
-
   public TelemetrySendingTask getTelemetrySendingTask() {
     return telemetrySendingTask;
   }
@@ -151,17 +121,9 @@ public class TelemetryReporter {
     this.telemetrySendingTask = telemetrySendingTask;
   }
 
-  public String getTelemetryEndpoint() {
-    return telemetryEndpoint;
-  }
-
-  public Connector<? extends ConnectorRequest<?>> getHttpConnector() {
-    return httpConnector;
-  }
 
   public long getInitialReportingDelaySeconds() {
-    Boolean enabled = commandExecutor.execute(new IsTelemetryEnabledCmd());
-    return enabled == null ? EXTENDED_INIT_REPORT_DELAY_SECONDS : DEFAULT_INIT_REPORT_DELAY_SECONDS;
+    return DEFAULT_INIT_REPORT_DELAY_SECONDS;
   }
 
 }

@@ -202,6 +202,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     getAuthorizationManager().checkAuthorization(suspensionStatePermission);
   }
 
+  @Override
   public void checkReadProcessInstance(String processInstanceId) {
     ExecutionEntity execution = findExecutionById(processInstanceId);
     if (execution != null) {
@@ -209,6 +210,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
   public void checkDeleteProcessInstance(ExecutionEntity execution) {
     ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
 
@@ -281,6 +283,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     getAuthorizationManager().checkAuthorization(suspensionStatePermission);
   }
 
+  @Override
   public void checkUpdateJob(JobEntity job) {
     if (job.getProcessDefinitionKey() == null) {
       // "standalone" job: nothing to do!
@@ -324,6 +327,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
   public void checkMigrateProcessInstance(ExecutionEntity processInstance, ProcessDefinition targetProcessDefinition) {
   }
 
+  @Override
   public void checkReadProcessInstance(ExecutionEntity execution) {
     ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
 
@@ -358,6 +362,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
   public void checkReadJob(JobEntity job) {
     if (job.getProcessDefinitionKey() == null) {
       // "standalone" job: nothing to do!
@@ -438,6 +443,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
   public void checkUpdateTaskVariable(TaskEntity task) {
     String taskId = task.getId();
 
@@ -512,14 +518,17 @@ public class AuthorizationCommandChecker implements CommandChecker {
     getAuthorizationManager().checkAuthorization(DELETE_HISTORY, BATCH, batch.getId());
   }
 
+  @Override
   public void checkSuspendBatch(BatchEntity batch) {
     getAuthorizationManager().checkAuthorization(UPDATE, BATCH, batch.getId());
   }
 
+  @Override
   public void checkActivateBatch(BatchEntity batch) {
     getAuthorizationManager().checkAuthorization(UPDATE, BATCH, batch.getId());
   }
 
+  @Override
   public void checkReadHistoricBatch() {
     getAuthorizationManager().checkAuthorization(READ_HISTORY, BATCH);
   }
@@ -528,22 +537,26 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   // create permission ////////////////////////////////////////////////
 
+  @Override
   public void checkCreateDeployment() {
     getAuthorizationManager().checkAuthorization(CREATE, DEPLOYMENT);
   }
 
   // read permission //////////////////////////////////////////////////
 
+  @Override
   public void checkReadDeployment(String deploymentId) {
     getAuthorizationManager().checkAuthorization(READ, DEPLOYMENT, deploymentId);
   }
 
   // delete permission //////////////////////////////////////////////////
 
+  @Override
   public void checkDeleteDeployment(String deploymentId) {
     getAuthorizationManager().checkAuthorization(DELETE, DEPLOYMENT, deploymentId);
   }
 
+  @Override
   public void checkReadDecisionDefinition(DecisionDefinitionEntity decisionDefinition) {
     getAuthorizationManager().checkAuthorization(READ, DECISION_DEFINITION, decisionDefinition.getKey());
   }
@@ -552,6 +565,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     getAuthorizationManager().checkAuthorization(UPDATE, DECISION_DEFINITION, decisionDefinition.getKey());
   }
 
+  @Override
   public void checkReadDecisionRequirementsDefinition(DecisionRequirementsDefinitionEntity decisionRequirementsDefinition) {
     getAuthorizationManager().checkAuthorization(READ, DECISION_REQUIREMENTS_DEFINITION, decisionRequirementsDefinition.getKey());
   }
@@ -566,6 +580,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   // delete permission ////////////////////////////////////////
 
+  @Override
   public void checkDeleteHistoricTaskInstance(HistoricTaskInstanceEntity task) {
     // deleting unexisting historic task instance should be silently ignored
     // see javaDoc HistoryService.deleteHistoricTaskInstance
@@ -578,33 +593,40 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   // delete permission /////////////////////////////////////////////////
 
+  @Override
   public void checkDeleteHistoricProcessInstance(HistoricProcessInstance instance) {
     getAuthorizationManager().checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, instance.getProcessDefinitionKey());
   }
 
+  @Override
   public void checkDeleteHistoricCaseInstance(HistoricCaseInstance instance) {
   }
 
+  @Override
   public void checkDeleteHistoricDecisionInstance(String decisionDefinitionKey) {
     getAuthorizationManager().checkAuthorization(DELETE_HISTORY, DECISION_DEFINITION, decisionDefinitionKey);
   }
 
+  @Override
   public void checkDeleteHistoricDecisionInstance(HistoricDecisionInstance decisionInstance) {
     getAuthorizationManager().checkAuthorization(
         DELETE_HISTORY, DECISION_DEFINITION, decisionInstance.getDecisionDefinitionKey()
     );
   }
 
+  @Override
   public void checkReadHistoricJobLog(HistoricJobLogEventEntity historicJobLog) {
     if (historicJobLog.getProcessDefinitionKey() != null) {
       getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, historicJobLog.getProcessDefinitionKey());
     }
   }
 
+  @Override
   public void checkReadHistoryAnyProcessDefinition() {
     getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, ANY);
   }
 
+  @Override
   public void checkReadHistoryProcessDefinition(String processDefinitionKey) {
     getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, processDefinitionKey);
   }
@@ -617,6 +639,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
   public void checkReadCaseInstance(CaseExecution caseExecution) {
   }
 
+  @Override
   public void checkTaskAssign(TaskEntity task) {
 
     String taskId = task.getId();
@@ -664,10 +687,12 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   // create permission /////////////////////////////////////////////
 
+  @Override
   public void checkCreateTask(TaskEntity entity) {
     getAuthorizationManager().checkAuthorization(CREATE, TASK);
   }
 
+  @Override
   public void checkCreateTask() {
     getAuthorizationManager().checkAuthorization(CREATE, TASK);
   }
@@ -718,6 +743,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
   public void checkDeleteTask(TaskEntity task) {
     String taskId = task.getId();
 
@@ -819,16 +845,6 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkReadTelemetryData() {
-    getAuthorizationManager().checkAuthorization(SystemPermissions.READ, Resources.SYSTEM);
-  }
-
-  @Override
-  public void checkConfigureTelemetry() {
-    getAuthorizationManager().checkAuthorization(SystemPermissions.SET, Resources.SYSTEM);
-  }
-
-  @Override
-  public void checkReadTelemetryCollectionStatusData() {
     getAuthorizationManager().checkAuthorization(SystemPermissions.READ, Resources.SYSTEM);
   }
 

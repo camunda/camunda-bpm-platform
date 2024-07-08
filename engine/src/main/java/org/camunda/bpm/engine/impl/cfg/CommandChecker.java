@@ -372,16 +372,6 @@ public interface CommandChecker {
    */
   void checkReadTelemetryData();
 
-  /**
-   * Checks if it is allowed to toggle telemetry collection.
-   */
-  void checkConfigureTelemetry();
-
-  /**
-   * Checks if it is allowed to read the status (ON/OFF) of the telemetry collection.
-   */
-  void checkReadTelemetryCollectionStatusData();
-
   /*
    * Checks if it is allowed to read the history level.
    */

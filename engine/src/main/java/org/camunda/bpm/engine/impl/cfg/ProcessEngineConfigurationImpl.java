@@ -26,8 +26,6 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -386,9 +384,6 @@ import org.camunda.bpm.engine.runtime.WhitelistingDeserializationTypeValidator;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.mock.MocksResolverFactory;
 import org.camunda.bpm.engine.variable.Variables;
-import org.camunda.connect.Connectors;
-import org.camunda.connect.spi.Connector;
-import org.camunda.connect.spi.ConnectorRequest;
 
 /**
  * @author Tom Baeyens
@@ -1024,32 +1019,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableOptimisticLockingOnForeignKeyViolation = true;
 
   // telemetry ///////////////////////////////////////////////////////
-  /**
-   * Sets the initial property value of telemetry configuration only once
-   * when it has never been enabled/disabled before.
-   * Subsequent changes can be done only via the
-   * {@link ManagementService#toggleTelemetry(boolean) Telemetry} API in {@link ManagementService}
-   * Telemetry is deactivated by default.
-   */
-  protected boolean initializeTelemetry = false;
-  /** The endpoint which telemetry is sent to */
-  protected String telemetryEndpoint = "https://api.telemetry.camunda.cloud/pings";
-  /** The number of times the telemetry request is retried in case it fails **/
-  protected int telemetryRequestRetries = 2;
   protected TelemetryReporter telemetryReporter;
   /** Determines if the telemetry reporter thread runs. For telemetry to be sent,
    * this flag must be set to <code>true</code> and telemetry must be enabled via API
    * (see {@link ManagementService#toggleTelemetry(boolean)}. */
   protected boolean isTelemetryReporterActivate = true;
-  /** http client used for sending telemetry */
-  protected Connector<? extends ConnectorRequest<?>> telemetryHttpConnector;
-  /** default: once every 24 hours */
-  protected long telemetryReportingPeriod = 24 * 60 * 60;
   protected TelemetryDataImpl telemetryData;
-  /** the connection and socket timeout configuration of the telemetry request
-   * in milliseconds
-   *  default: 15 seconds */
-  protected int telemetryRequestTimeout = 15 * 1000;
 
   // Exception Codes ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2915,27 +2890,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (telemetryData == null) {
       initTelemetryData();
     }
-    try {
-      if (telemetryHttpConnector == null) {
-        telemetryHttpConnector = Connectors.getConnector(Connectors.HTTP_CONNECTOR_ID);
-      }
-    } catch (Exception e) {
-      ProcessEngineLogger.TELEMETRY_LOGGER.unexpectedExceptionDuringHttpConnectorConfiguration(e);
-    }
-    if (telemetryHttpConnector == null) {
-      ProcessEngineLogger.TELEMETRY_LOGGER.unableToConfigureHttpConnectorWarning();
-    } else {
-      if (telemetryReporter == null) {
-        telemetryReporter = new TelemetryReporter(commandExecutorTxRequired,
-                                                  telemetryEndpoint,
-                                                  telemetryRequestRetries,
-                                                  telemetryReportingPeriod,
-                                                  telemetryData,
-                                                  telemetryHttpConnector,
-                                                  telemetryRegistry,
-                                                  metricsRegistry,
-                                                  telemetryRequestTimeout);
-      }
+    if (telemetryReporter == null) {
+      telemetryReporter = new TelemetryReporter(commandExecutorTxRequired,
+                                                telemetryData,
+                                                telemetryRegistry,
+                                                metricsRegistry);
     }
   }
 
@@ -5298,42 +5257,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public boolean isInitializeTelemetry() {
-    return initializeTelemetry;
-  }
-
-  public ProcessEngineConfigurationImpl setInitializeTelemetry(boolean telemetryInitialized) {
-    this.initializeTelemetry = telemetryInitialized;
-    return this;
-  }
-
-  public String getTelemetryEndpoint() {
-    return telemetryEndpoint;
-  }
-
-  public ProcessEngineConfigurationImpl setTelemetryEndpoint(String telemetryEndpoint) {
-    this.telemetryEndpoint = telemetryEndpoint;
-    return this;
-  }
-
-  public int getTelemetryRequestRetries() {
-    return telemetryRequestRetries;
-  }
-
-  public ProcessEngineConfigurationImpl setTelemetryRequestRetries(int telemetryRequestRetries) {
-    this.telemetryRequestRetries = telemetryRequestRetries;
-    return this;
-  }
-
-  public long getTelemetryReportingPeriod() {
-    return telemetryReportingPeriod;
-  }
-
-  public ProcessEngineConfigurationImpl setTelemetryReportingPeriod(long telemetryReportingPeriod) {
-    this.telemetryReportingPeriod = telemetryReportingPeriod;
-    return this;
-  }
-
   public TelemetryReporter getTelemetryReporter() {
     return telemetryReporter;
   }
@@ -5352,30 +5275,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public Connector<? extends ConnectorRequest<?>> getTelemetryHttpConnector() {
-    return telemetryHttpConnector;
-  }
-
-  public ProcessEngineConfigurationImpl setTelemetryHttpConnector(Connector<? extends ConnectorRequest<?>> telemetryHttp) {
-    this.telemetryHttpConnector = telemetryHttp;
-    return this;
-  }
-
   public TelemetryDataImpl getTelemetryData() {
     return telemetryData;
   }
 
   public ProcessEngineConfigurationImpl setTelemetryData(TelemetryDataImpl telemetryData) {
     this.telemetryData = telemetryData;
-    return this;
-  }
-
-  public int getTelemetryRequestTimeout() {
-    return telemetryRequestTimeout;
-  }
-
-  public ProcessEngineConfigurationImpl setTelemetryRequestTimeout(int telemetryRequestTimeout) {
-    this.telemetryRequestTimeout = telemetryRequestTimeout;
     return this;
   }
 
