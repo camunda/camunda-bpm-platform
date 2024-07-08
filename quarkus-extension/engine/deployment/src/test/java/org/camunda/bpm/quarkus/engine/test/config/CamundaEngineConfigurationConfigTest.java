@@ -52,7 +52,6 @@ public class CamundaEngineConfigurationConfigTest {
     assertThat(config.genericConfig.get("cmmn-enabled")).isEqualTo("false");
     assertThat(config.genericConfig.get("dmn-enabled")).isEqualTo("false");
     assertThat(config.genericConfig.get("history")).isEqualTo("none");
-    assertThat(config.genericConfig.get("initialize-telemetry")).isEqualTo("false");
   }
 
   @Test
@@ -66,7 +65,6 @@ public class CamundaEngineConfigurationConfigTest {
     assertThat(configuration.isCmmnEnabled()).isEqualTo(false);
     assertThat(configuration.isDmnEnabled()).isEqualTo(false);
     assertThat(configuration.getHistory()).isEqualTo("none");
-    assertThat(configuration.isInitializeTelemetry()).isEqualTo(false);
   }
 
 }
