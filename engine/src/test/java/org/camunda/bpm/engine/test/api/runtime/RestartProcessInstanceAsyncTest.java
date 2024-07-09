@@ -1165,10 +1165,13 @@ public class RestartProcessInstanceAsyncTest {
             .processInstanceIds(processInstance.getId())
             .executeAsync();
     helper.executeSeedJob(batch);
-    List<Job> executionJobs = helper.getExecutionJobs(batch);
+
+    Job executionJob = helper.getExecutionJobs(batch).get(0);
+    assertEquals(processInstance.getProcessDefinitionId(), executionJob.getProcessDefinitionId());
+    assertEquals(processInstance.getRootProcessInstanceId(), executionJob.getProcessInstanceId());
 
     // when
-    helper.executeJob(executionJobs.get(0));
+    helper.executeJob(executionJob);
 
     // then
     HistoricJobLog jobLog = historyService.createHistoricJobLogQuery().jobDefinitionType(Batch.TYPE_PROCESS_INSTANCE_RESTART).list().get(0);
