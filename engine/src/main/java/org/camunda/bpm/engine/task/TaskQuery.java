@@ -1104,4 +1104,11 @@ public interface TaskQuery extends Query<TaskQuery, Task> {
    *                                this exception, {@link #or()} must be invoked first.
    */
   TaskQuery endOr();
+
+  /**
+   * Evaluates existence of attachment and comments associated with the task, defaults to false.
+   * Adding the filter will do additional attachment and comments queries to the database,
+   * it might slow down the query in case of tables having high volume of data.
+   */
+  TaskQuery withCommentAttachmentInfo();
 }

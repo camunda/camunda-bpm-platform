@@ -33,6 +33,7 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByPri
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByProcessInstanceId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySortingAndCount;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -55,6 +56,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.filter.Filter;
@@ -72,6 +74,7 @@ import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -5602,7 +5605,39 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     assertThat(taskResult.getLastUpdated()).isAfter(beforeSave);
     assertThat(taskResult.getLastUpdated()).isAfter(taskResult.getCreateTime());
   }
-
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void shouldNotFindAttachmentAndCommentInfoWithoutQueryParam() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    task.setAssignee("myself");
+    // when
+    taskService.createComment(task.getId(), processInstance.getId(), "testComment");
+    taskService.createAttachment("foo", task.getId(), processInstance.getId(), "testAttachment", "testDesc", "http://camunda.org");
+    // then
+    Task taskResult = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertThat(taskResult).isNotNull();
+    assertFalse(taskResult.hasComment());
+    assertFalse(taskResult.hasAttachment());
+  }
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void shouldFindAttachmentAndCommentInfoWithQueryParam() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    // when
+    taskService.createComment(task.getId(), processInstance.getId(), "testComment");
+    taskService.createAttachment("foo", task.getId(), processInstance.getId(), "testAttachment",  "testDesc", "http://camunda.org");
+    // then
+    Task taskResult = taskService.createTaskQuery().processInstanceId(processInstance.getId()).withCommentAttachmentInfo().singleResult();
+    assertThat(taskResult).isNotNull();
+    assertTrue(taskResult.hasComment());
+    assertTrue(taskResult.hasAttachment());
+  }
   // ---------------------- HELPER ------------------------------
 
   // make sure that time passes between two fast operations
