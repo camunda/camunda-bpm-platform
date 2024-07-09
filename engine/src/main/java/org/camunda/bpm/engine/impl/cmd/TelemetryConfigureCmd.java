@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
 /**
  * @deprecated Command is empty
- * as sending telemetry data feature is removed.
+ * The sending telemetry data feature is removed.
  * Please any remove usages of the command.
  */
 public class TelemetryConfigureCmd implements Command<Void> {

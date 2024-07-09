@@ -23,8 +23,8 @@ import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 
 /**
  * @deprecated Always returns <code>false</code>
- * as sending telemetry data feature is removed.
- * Please any remove usages of the command.
+ * The sending telemetry data feature is removed.
+ * Please remove any usages of the command.
  */
 @Deprecated
 public class IsTelemetryEnabledCmd implements Command<Boolean> {
