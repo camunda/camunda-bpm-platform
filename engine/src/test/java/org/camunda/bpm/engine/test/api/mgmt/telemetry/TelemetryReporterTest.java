@@ -181,8 +181,10 @@ public class TelemetryReporterTest {
         .enableFeelLegacyBehavior(false)
         .init();
 
-
     configuration.setTelemetryData(defaultTelemetryData);
+
+    // clean up license after finishing the tests
+    managementService.deleteLicenseKey();
   }
 
   protected void clearMetrics() {
