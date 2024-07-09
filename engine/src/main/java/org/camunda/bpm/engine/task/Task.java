@@ -202,4 +202,9 @@ public interface Task {
    * @param taskState the taskState to set
    */
   void setTaskState(String taskState);
+  /** Returns if an attachment exists for the task */
+  boolean hasAttachment();
+  /** Signifies if a comment exists for the task */
+  boolean hasComment();
+
 }
