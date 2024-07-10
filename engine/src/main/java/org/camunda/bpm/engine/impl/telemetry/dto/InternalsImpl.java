@@ -51,9 +51,6 @@ public class InternalsImpl implements Internals {
 
   protected JdkImpl jdk;
 
-  @SerializedName(value = SERIALIZED_TELEMETRY_ENABLED)
-  protected Boolean telemetryEnabled;
-
   public InternalsImpl() {
     this(null, null, null, null);
   }
@@ -72,11 +69,11 @@ public class InternalsImpl implements Internals {
     this.camundaIntegration = internals.camundaIntegration == null ? null : new HashSet<>(internals.getCamundaIntegration());
     this.commands = new HashMap<>(internals.getCommands());
     this.metrics = internals.metrics == null ? null : new HashMap<>(internals.getMetrics());
-    this.telemetryEnabled = internals.telemetryEnabled;
     this.webapps = internals.webapps;
     this.dataCollectionStartDate = internals.dataCollectionStartDate;
   }
 
+  @Override
   public DatabaseImpl getDatabase() {
     return database;
   }
@@ -85,6 +82,7 @@ public class InternalsImpl implements Internals {
     this.database = database;
   }
 
+  @Override
   public ApplicationServerImpl getApplicationServer() {
     return applicationServer;
   }
@@ -102,6 +100,7 @@ public class InternalsImpl implements Internals {
     this.dataCollectionStartDate = dataCollectionStartDate;
   }
 
+  @Override
   public Map<String, Command> getCommands() {
     return commands;
   }
@@ -118,6 +117,7 @@ public class InternalsImpl implements Internals {
     commands.put(commandName, new CommandImpl(count));
   }
 
+  @Override
   public Map<String, Metric> getMetrics() {
     return metrics;
   }
@@ -139,6 +139,7 @@ public class InternalsImpl implements Internals {
     this.metrics = other.metrics;
   }
 
+  @Override
   public JdkImpl getJdk() {
     return jdk;
   }
@@ -147,6 +148,7 @@ public class InternalsImpl implements Internals {
     this.jdk = jdk;
   }
 
+  @Override
   public Set<String> getCamundaIntegration() {
     return camundaIntegration;
   }
@@ -155,6 +157,7 @@ public class InternalsImpl implements Internals {
     this.camundaIntegration = camundaIntegration;
   }
 
+  @Override
   public LicenseKeyDataImpl getLicenseKey() {
     return licenseKey;
   }
@@ -163,14 +166,7 @@ public class InternalsImpl implements Internals {
     this.licenseKey = licenseKey;
   }
 
-  public Boolean isTelemetryEnabled() {
-    return telemetryEnabled;
-  }
-
-  public void setTelemetryEnabled(Boolean telemetryEnabled) {
-    this.telemetryEnabled = telemetryEnabled;
-  }
-
+  @Override
   public Set<String> getWebapps() {
     return webapps;
   }
