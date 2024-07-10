@@ -23,6 +23,7 @@ import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMEN
 import static org.camunda.bpm.engine.management.Metrics.FLOW_NODE_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.PROCESS_INSTANCES;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
@@ -34,6 +35,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.telemetry.ApplicationServer;
 import org.camunda.bpm.engine.telemetry.Metric;
 import org.camunda.bpm.engine.telemetry.TelemetryData;
@@ -101,6 +103,23 @@ public class ManagementServiceGetTelemetryDataTest {
   @Test
   public void shouldReturnLicenseKey() {
     // given
+    managementService.setLicenseKeyForTelemetry(new LicenseKeyDataImpl("customer a", "UNIFIED", "2029-09-01", false, Collections.singletonMap("camundaBPM", "true"), "raw license"));
+
+    // when
+    TelemetryData telemetryData = managementService.getTelemetryData();
+
+    // then
+    assertThat(telemetryData.getProduct().getInternals().getLicenseKey().getCustomer()).isEqualTo("customer a");
+    assertThat(telemetryData.getProduct().getInternals().getLicenseKey().getType()).isEqualTo("UNIFIED");
+    assertThat(telemetryData.getProduct().getInternals().getLicenseKey().getValidUntil()).isEqualTo("2029-09-01");
+    assertThat(telemetryData.getProduct().getInternals().getLicenseKey().getFeatures()).isEqualTo(Collections.singletonMap("camundaBPM", "true"));
+    assertThat(telemetryData.getProduct().getInternals().getLicenseKey().getRaw()).isEqualTo("raw license");
+    assertThat(telemetryData.getProduct().getInternals().getLicenseKey().isUnlimited()).isFalse();
+  }
+
+  @Test
+  public void shouldReturnLicenseKeyRaw() {
+    // given
     managementService.setLicenseKeyForTelemetry(new LicenseKeyDataImpl(null, null, null, null, null, "test license"));
 
     // when
@@ -108,6 +127,47 @@ public class ManagementServiceGetTelemetryDataTest {
 
     // then
     assertThat(telemetryData.getProduct().getInternals().getLicenseKey().getRaw()).isEqualTo("test license");
+  }
+
+  @Test
+  public void shouldReturnProductInfo() {
+    // given default configuration
+
+    // when
+    TelemetryData telemetryData = managementService.getTelemetryData();
+
+    // then
+    assertThat(telemetryData.getProduct().getName()).isEqualTo("Camunda BPM Runtime");
+    assertThat(telemetryData.getProduct().getEdition()).isEqualTo("community");
+    assertThat(telemetryData.getProduct().getVersion()).isEqualTo(ParseUtil.parseProcessEngineVersion(true).getVersion());
+  }
+
+  @Test
+  public void shouldReturnDatabaseInfo() {
+    // given default configuration
+
+    // when
+    TelemetryData telemetryData = managementService.getTelemetryData();
+
+    // then
+    assertThat(telemetryData.getProduct().getInternals().getDatabase().getVendor())
+        .isEqualTo(engineRule.getProcessEngineConfiguration().getDatabaseVendor());
+    assertThat(telemetryData.getProduct().getInternals().getDatabase().getVersion())
+        .isEqualTo(engineRule.getProcessEngineConfiguration().getDatabaseVersion());
+  }
+
+  @Test
+  public void shouldReturnJDKInfo() {
+    // given default configuration
+
+    // when
+    TelemetryData telemetryData = managementService.getTelemetryData();
+
+    // then
+    assertThat(telemetryData.getProduct().getInternals().getJdk().getVendor())
+        .isEqualTo(ParseUtil.parseJdkDetails().getVendor());
+    assertThat(telemetryData.getProduct().getInternals().getJdk().getVersion())
+        .isEqualTo(ParseUtil.parseJdkDetails().getVersion());
   }
 
   @Test
@@ -159,7 +219,8 @@ public class ManagementServiceGetTelemetryDataTest {
     TelemetryData telemetryData = managementService.getTelemetryData();
 
     // then count should not reset
-    assertThat(telemetryData.getProduct().getInternals().getCommands().get(IS_TELEMETRY_ENABLED_CMD_NAME).getCount()).isEqualTo(1);
+    assertThat(telemetryData.getProduct().getInternals().getCommands().get(IS_TELEMETRY_ENABLED_CMD_NAME).getCount())
+        .isEqualTo(1);
   }
 
   @Test
@@ -171,7 +232,8 @@ public class ManagementServiceGetTelemetryDataTest {
 
     // then
     Map<String, Metric> metrics = telemetryData.getProduct().getInternals().getMetrics();
-    assertThat(metrics).containsOnlyKeys(FLOW_NODE_INSTANCES, PROCESS_INSTANCES, EXECUTED_DECISION_ELEMENTS, DECISION_INSTANCES);
+    assertThat(metrics).containsOnlyKeys(FLOW_NODE_INSTANCES, PROCESS_INSTANCES, EXECUTED_DECISION_ELEMENTS,
+        DECISION_INSTANCES);
     assertThat(metrics.get(FLOW_NODE_INSTANCES).getCount()).isZero();
     assertThat(metrics.get(PROCESS_INSTANCES).getCount()).isZero();
     assertThat(metrics.get(EXECUTED_DECISION_ELEMENTS).getCount()).isZero();
@@ -205,7 +267,8 @@ public class ManagementServiceGetTelemetryDataTest {
     TelemetryData telemetryDataAfterPiStart = managementService.getTelemetryData();
 
     // then
-    assertThat(telemetryDataAfterPiStart.getProduct().getInternals().getMetrics().get(PROCESS_INSTANCES).getCount()).isEqualTo(1);
+    assertThat(telemetryDataAfterPiStart.getProduct().getInternals().getMetrics().get(PROCESS_INSTANCES).getCount())
+        .isEqualTo(1);
   }
 
   @Test
@@ -220,7 +283,8 @@ public class ManagementServiceGetTelemetryDataTest {
     TelemetryData telemetryDataAfterPiStart = managementService.getTelemetryData();
 
     // then
-    assertThat(telemetryDataAfterPiStart.getProduct().getInternals().getCommands().get(IS_TELEMETRY_ENABLED_CMD_NAME).getCount()).isEqualTo(1);
+    assertThat(telemetryDataAfterPiStart.getProduct().getInternals().getCommands().get(IS_TELEMETRY_ENABLED_CMD_NAME)
+        .getCount()).isEqualTo(1);
   }
 
   @Test
@@ -229,10 +293,10 @@ public class ManagementServiceGetTelemetryDataTest {
     configuration.setTelemetryReporter(null);
 
     // when
-    assertThatThrownBy(() -> managementService.getTelemetryData())
-      .isInstanceOf(ProcessEngineException.class)
-      .hasMessageContaining("Error while retrieving telemetry data. Telemetry registry was not initialized.");
+    assertThatThrownBy(() -> managementService.getTelemetryData()).isInstanceOf(ProcessEngineException.class)
+        .hasMessageContaining("Error while retrieving telemetry data. Telemetry registry was not initialized.");
   }
+
   @Test
   public void shouldSetDataCollectionTimeFrameToEngineStartTimeWhenTelemetryDisabled() {
     // given default telemetry data and empty telemetry registry
@@ -257,7 +321,8 @@ public class ManagementServiceGetTelemetryDataTest {
     TelemetryData secondTelemetryData = managementService.getTelemetryData();
 
     // then the data collection time frame should not reset after the first call
-    assertThat(initialTelemetryData.getProduct().getInternals().getDataCollectionStartDate()).isEqualTo(secondTelemetryData.getProduct().getInternals().getDataCollectionStartDate());
+    assertThat(initialTelemetryData.getProduct().getInternals().getDataCollectionStartDate())
+        .isEqualTo(secondTelemetryData.getProduct().getInternals().getDataCollectionStartDate());
   }
 
   @Test
@@ -271,20 +336,23 @@ public class ManagementServiceGetTelemetryDataTest {
     TelemetryData secondTelemetryData = managementService.getTelemetryData();
 
     // then the data collection time frame should not reset after the first call
-    assertThat(initialTelemetryData.getProduct().getInternals().getDataCollectionStartDate()).isEqualTo(secondTelemetryData.getProduct().getInternals().getDataCollectionStartDate());
+    assertThat(initialTelemetryData.getProduct().getInternals().getDataCollectionStartDate())
+        .isEqualTo(secondTelemetryData.getProduct().getInternals().getDataCollectionStartDate());
   }
 
   @Test
   public void shouldNotResetCollectionTimeFrameAfterToggleTelemetry() {
     // given default telemetry data and empty telemetry registry
     // and default configuration
-    Date beforeToggleTelemetry = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
+    Date beforeToggleTelemetry = managementService.getTelemetryData().getProduct().getInternals()
+        .getDataCollectionStartDate();
 
     // when
     managementService.toggleTelemetry(false);
 
     // then
-    Date afterToggleTelemetry = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
+    Date afterToggleTelemetry = managementService.getTelemetryData().getProduct().getInternals()
+        .getDataCollectionStartDate();
 
     assertThat(beforeToggleTelemetry).isNotNull();
     assertThat(beforeToggleTelemetry).isEqualTo(afterToggleTelemetry);
