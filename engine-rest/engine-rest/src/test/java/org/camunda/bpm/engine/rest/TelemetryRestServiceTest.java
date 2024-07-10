@@ -81,23 +81,6 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void shouldEnableTelemetry() {
-    Map<String, Object> requestBody = new HashMap<>();
-    requestBody.put("enableTelemetry", true);
-
-    given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(requestBody)
-    .then()
-      .expect()
-        .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-      .post(TELEMETRY_CONFIG_URL);
-
-    verify(managementServiceMock).toggleTelemetry(true);
-  }
-
-  @Test
   public void shouldFetchDisabledTelemetryConfiguration() {
     when(managementServiceMock.isTelemetryEnabled()).thenReturn(false);
 
