@@ -46,6 +46,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.metrics.util.MetricsUtil;
 import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
@@ -59,6 +60,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.telemetry.Command;
@@ -97,8 +99,6 @@ public class TelemetryReporterTest {
   protected static final String TELEMETRY_CONFIGURE_CMD = "TelemetryConfigureCmd";
   protected static final String GET_TELEMETRY_DATA_CMD = "GetTelemetryDataCmd";
 
-  protected static final String TELEMETRY_ENDPOINT = "http://localhost:8084/pings";
-  protected static final String TELEMETRY_ENDPOINT_PATH = "/pings";
   protected static final String VALID_UUID_V4 = "cb07ce31-c8e3-4f5f-94c2-1b28175c2022";
 
   public static String DMN_FILE = "org/camunda/bpm/engine/test/api/mgmt/metrics/ExecutedDecisionElementsTest.dmn11.xml";
@@ -257,7 +257,7 @@ public class TelemetryReporterTest {
     PlatformTelemetryRegistry.setApplicationServer(applicationServerVersion);
     LicenseKeyDataImpl licenseKey = new LicenseKeyDataImpl("customer a", "UNIFIED", "2029-09-01", false, Collections.singletonMap("camundaBPM", "true"), "raw license");
 
-    ProcessEngineConfigurationImpl configuration = createEngine(true);
+    ProcessEngineConfigurationImpl configuration = createEngine();
 
     configuration.getRepositoryService().createDeployment().addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml").deploy();
 
@@ -570,7 +570,7 @@ public class TelemetryReporterTest {
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-  public void shouldRecordUserOperationLog() {
+  public void shouldNotRecordUserOperationLog() {
     // given
     configuration.getIdentityService().setAuthenticatedUserId("admin");
 
@@ -582,6 +582,7 @@ public class TelemetryReporterTest {
   }
 
   @Test
+  @RequiredDatabase(includes = DbSqlSessionFactory.H2) // it's h2-specific test
   public void shouldSendTelemetryWhenDbMetricsDisabled() {
     // given
     boolean telemetryInitialized = true;
@@ -659,22 +660,20 @@ public class TelemetryReporterTest {
     // assert data
   }
 
-
   // HELPER METHODS
 
-  protected ProcessEngineConfigurationImpl createEngine(Boolean initTelemetry) {
+  protected ProcessEngineConfigurationImpl createEngine() {
     ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
-    buildEngine(processEngineConfiguration, initTelemetry);
+    buildEngine(processEngineConfiguration);
     return processEngineConfiguration;
   }
 
-  protected void buildEngine(ProcessEngineConfigurationImpl processEngineConfiguration, Boolean initTelemetry) {
+  protected void buildEngine(ProcessEngineConfigurationImpl processEngineConfiguration) {
     processEngineConfiguration
         .setProcessEngineName("standalone")
         .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
     standaloneProcessEngine = processEngineConfiguration.buildProcessEngine();
   }
-
 
   protected TelemetryDataImpl createDataToSendWithCustomValues(String name, String version, String edition, String installationId) {
     DatabaseImpl database = new DatabaseImpl("mySpecialDb", "v.1.2.3");
@@ -689,8 +688,7 @@ public class TelemetryReporterTest {
     internals.setMetrics(metrics);
 
     ProductImpl product = new ProductImpl(name, version, edition, internals);
-    TelemetryDataImpl data = new TelemetryDataImpl(installationId, product);
-    return data;
+    return new TelemetryDataImpl(installationId, product);
   }
 
   protected TelemetryDataImpl extendData(TelemetryDataImpl telemetryData, Consumer<TelemetryDataBuilder> configuration) {
@@ -796,9 +794,7 @@ public class TelemetryReporterTest {
 
     public TelemetryDataBuilder webapps(String... webapps) {
       Set<String> webappSet = new HashSet<>();
-      for (String webapp : webapps) {
-        webappSet.add(webapp);
-      }
+      Collections.addAll(webappSet, webapps);
 
       data.getProduct().getInternals().setWebapps(webappSet);
       return this;
@@ -826,8 +822,7 @@ public class TelemetryReporterTest {
     Calendar calendar = Calendar.getInstance();
     calendar.setTime(date);
     calendar.add(Calendar.HOUR_OF_DAY, 1);
-    Date newDate = calendar.getTime();
-    return newDate;
+    return calendar.getTime();
   }
 
   protected BpmnModelInstance createProcessWithBusinessRuleTask(String processId, String decisionRef) {
@@ -844,11 +839,9 @@ public class TelemetryReporterTest {
   }
 
   protected void executeDataValidationTest(String name, String version, String edition, String installationId) {
-    managementService.toggleTelemetry(true);
     TelemetryDataImpl invalidData = createDataToSendWithCustomValues(name, version, edition, installationId);
 
-    standaloneReporter = new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
-      invalidData,
+    standaloneReporter = new TelemetryReporter(invalidData,
       configuration.getTelemetryRegistry(),
       configuration.getMetricsRegistry());
 

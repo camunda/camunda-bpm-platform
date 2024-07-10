@@ -117,7 +117,6 @@ public class TelemetryDynamicDataTest {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void shouldCountAfterCleaning() {
     // given
-    managementService.toggleTelemetry(true);
     clearCommandCounts();
     Map<String, CommandCounter> entries = configuration.getTelemetryRegistry().getCommands();
 
@@ -141,8 +140,7 @@ public class TelemetryDynamicDataTest {
 
   @Test
   public void shouldCollectInnerClasses() {
-    // given
-    managementService.toggleTelemetry(true);
+    // given default configuration
 
     // when
     configuration.getCommandExecutorTxRequired().execute(new InnerClassCmd());
@@ -158,8 +156,7 @@ public class TelemetryDynamicDataTest {
 
   @Test
   public void shouldNotCollectAnonymousClasses() {
-    // given
-    managementService.toggleTelemetry(true);
+    // given default configuration
 
     // when
     // execute anonymous class
@@ -183,13 +180,12 @@ public class TelemetryDynamicDataTest {
     // then
     // the class is not collected
     Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
-    assertThat(commands.keySet()).containsExactlyInAnyOrder("DeleteMetricsCmd", "TelemetryConfigureCmd");
+    assertThat(commands.keySet()).containsExactlyInAnyOrder("DeleteMetricsCmd");
   }
 
   @Test
   public void shouldNotCollectLambdas() {
-    // given
-    managementService.toggleTelemetry(true);
+    // given default configuration
 
     // when
     // execute command as lambda
@@ -201,7 +197,7 @@ public class TelemetryDynamicDataTest {
     // then
     // the class is not collected
     Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
-    assertThat(commands.keySet()).containsExactlyInAnyOrder("DeleteMetricsCmd", "TelemetryConfigureCmd");
+    assertThat(commands.keySet()).containsExactlyInAnyOrder("DeleteMetricsCmd");
   }
 
   protected void clearCommandCounts() {

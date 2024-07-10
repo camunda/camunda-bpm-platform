@@ -26,7 +26,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -921,15 +920,6 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
     assertThat(tableMetaData.getColumnTypes().get(createTimeIndex)).isIn("TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME", "DATETIME2");
   }
 
-  private void assertOneOf(String[] possibleValues, String currentValue) {
-    for (String value : possibleValues) {
-      if (currentValue.equals(value)) {
-        return;
-      }
-    }
-    fail("Value '" + currentValue + "' should be one of: " + Arrays.deepToString(possibleValues));
-  }
-
   @Test
   public void testGetTablePage() {
     String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
@@ -994,19 +984,6 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
 
     // when
     managementService.toggleTelemetry(true);
-
-    // then
-    assertThat(managementService.isTelemetryEnabled()).isFalse();
-  }
-
-  @Test
-  public void shouldReturnFalseWhenToggleTelemetryDisabled() {
-    // given default configuration
-
-    managementService.toggleTelemetry(true);
-
-    // when
-    managementService.toggleTelemetry(false);
 
     // then
     assertThat(managementService.isTelemetryEnabled()).isFalse();

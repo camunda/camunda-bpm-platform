@@ -27,11 +27,9 @@ import java.util.Date;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
-import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
@@ -48,21 +46,14 @@ import org.junit.Test;
 
 public class ManagementServiceGetTelemetryDataTest {
 
-  protected static final String TELEMETRY_CONFIGURE_CMD_NAME = "TelemetryConfigureCmd";
   protected static final String IS_TELEMETRY_ENABLED_CMD_NAME = "IsTelemetryEnabledCmd";
-  protected static final String GET_TELEMETRY_DATA_CMD_NAME = "GetTelemetryDataCmd";
-  protected static final String GET_HISTORY_LEVEL_CMD_NAME = "GetHistoryLevelCmd";
-  protected static final String GET_LICENSE_KEY_CMD_NAME = "GetLicenseKeyCmd";
 
   @Rule
   public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
-
   protected ProcessEngineConfigurationImpl configuration;
   protected ManagementServiceImpl managementService;
-  protected RuntimeService runtimeService;
 
-  protected TelemetryRegistry telemetryRegistry;
   protected MetricsRegistry metricsRegistry;
 
   protected TelemetryDataImpl defaultTelemetryData;
@@ -72,8 +63,6 @@ public class ManagementServiceGetTelemetryDataTest {
   public void setup() {
     configuration = engineRule.getProcessEngineConfiguration();
     managementService = (ManagementServiceImpl) engineRule.getManagementService();
-    runtimeService = engineRule.getRuntimeService();
-    telemetryRegistry = configuration.getTelemetryRegistry();
     metricsRegistry = configuration.getMetricsRegistry();
 
     defaultTelemetryData = new TelemetryDataImpl(configuration.getTelemetryData());
@@ -84,10 +73,6 @@ public class ManagementServiceGetTelemetryDataTest {
 
   @After
   public void tearDown() {
-    if (Boolean.TRUE.equals(managementService.isTelemetryEnabled())) {
-      managementService.toggleTelemetry(false);
-    }
-
     clearTelemetry();
 
     configuration.setTelemetryData(defaultTelemetryData);
@@ -98,19 +83,6 @@ public class ManagementServiceGetTelemetryDataTest {
     metricsRegistry.clearTelemetryMetrics();
     managementService.deleteMetrics(null);
     configuration.getTelemetryRegistry().clear();
-  }
-
-  @Test
-  public void shouldReturnTelemetryData_TelemetryEnabled() {
-    // given
-    managementService.toggleTelemetry(true);
-
-    // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
-
-    // then
-    assertThat(telemetryData).isNotNull();
-    assertThat(telemetryData.getInstallation()).isNotEmpty();
   }
 
   @Test
@@ -224,24 +196,8 @@ public class ManagementServiceGetTelemetryDataTest {
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-  public void shouldCollectMetrics_TelemetryEnabled() {
-    // given
-    managementService.toggleTelemetry(true);
-
-    engineRule.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
-
-    // when
-    TelemetryData telemetryData = managementService.getTelemetryData();
-
-    // then
-    assertThat(telemetryData.getProduct().getInternals().getMetrics().get(PROCESS_INSTANCES).getCount()).isEqualTo(1);
-  }
-
-  @Test
-  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void shouldCollectMetrics_TelemetryDisabled() {
-    // given
-    managementService.toggleTelemetry(false);
+    // given default configuration
 
     engineRule.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
 
@@ -254,25 +210,8 @@ public class ManagementServiceGetTelemetryDataTest {
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-  public void shouldCollectCommands_TelemetryEnabled() {
-    // given
-    managementService.toggleTelemetry(true);
-
-    // trigger Command invocation
-    managementService.isTelemetryEnabled();
-
-    // when
-    TelemetryData telemetryDataAfterPiStart = managementService.getTelemetryData();
-
-    // then
-    assertThat(telemetryDataAfterPiStart.getProduct().getInternals().getCommands().get(IS_TELEMETRY_ENABLED_CMD_NAME).getCount()).isEqualTo(1);
-  }
-
-  @Test
-  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void shouldCollectCommands_TelemetryDisabled() {
-    // given
-    managementService.toggleTelemetry(false);
+    // given default configuration
 
     // trigger Command invocation
     managementService.isTelemetryEnabled();
@@ -322,10 +261,9 @@ public class ManagementServiceGetTelemetryDataTest {
   }
 
   @Test
-  public void shouldNotResetCollectionTimeFrameAfterGetTelemetryWhenTelemetryEnabled() {
+  public void shouldNotResetCollectionTimeFrameAfterGetTelemetry() {
     // given default telemetry data and empty telemetry registry
-    // activate telemetry
-    managementService.toggleTelemetry(true);
+    // and default configuration
 
     TelemetryData initialTelemetryData = managementService.getTelemetryData();
 
@@ -339,8 +277,7 @@ public class ManagementServiceGetTelemetryDataTest {
   @Test
   public void shouldNotResetCollectionTimeFrameAfterToggleTelemetry() {
     // given default telemetry data and empty telemetry registry
-    // telemetry activated
-    managementService.toggleTelemetry(true);
+    // and default configuration
     Date beforeToggleTelemetry = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
 
     // when
@@ -349,22 +286,6 @@ public class ManagementServiceGetTelemetryDataTest {
     // then
     Date afterToggleTelemetry = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
 
-    assertThat(beforeToggleTelemetry).isNotNull();
-    assertThat(beforeToggleTelemetry).isEqualTo(afterToggleTelemetry);
-  }
-
-  @Test
-  public void shouldNotResetCollectionTimeFrameOnActivateTelemetryWhenAlreadyActivated() {
-    // given default telemetry data and empty telemetry registry
-    // telemetry activated
-    managementService.toggleTelemetry(true);
-    Date beforeToggleTelemetry = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
-
-    // when
-    managementService.toggleTelemetry(true);
-    Date afterToggleTelemetry = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
-
-    // then
     assertThat(beforeToggleTelemetry).isNotNull();
     assertThat(beforeToggleTelemetry).isEqualTo(afterToggleTelemetry);
   }

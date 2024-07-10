@@ -23,21 +23,23 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.camunda.commons.testing.WatchLogger;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
+@RequiredDatabase(includes = DbSqlSessionFactory.H2) // it's h2-specific test
 public class TelemetryConfigurationTest {
 
   @Rule
   public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
 
   protected ProcessEngineConfigurationImpl inMemoryConfiguration;
-
 
   @After
   public void reset() {
@@ -46,7 +48,6 @@ public class TelemetryConfigurationTest {
       processEngineImpl.close();
       processEngineImpl = null;
     }
-
   }
 
   @Test
@@ -97,7 +98,6 @@ public class TelemetryConfigurationTest {
   @WatchLogger(loggerNames = {"org.camunda.bpm.engine.persistence"}, level = "DEBUG")
   public void shouldNotLogDefaultTelemetryValue() {
     // given
-    Boolean telemetryInitializedValue = null;
     inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
     inMemoryConfiguration
         .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
@@ -106,7 +106,7 @@ public class TelemetryConfigurationTest {
     inMemoryConfiguration.buildProcessEngine();
 
     // then
-    assertThat(loggingRule.getFilteredLog("Creating the telemetry property in database with the value: " + telemetryInitializedValue).size()).isZero();
+    assertThat(loggingRule.getFilteredLog("Creating the telemetry property in database with the value: ").size()).isZero();
   }
 
 }

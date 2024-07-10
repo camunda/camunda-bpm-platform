@@ -486,11 +486,11 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   // configure telemetry /////////////////////////////////////
 
   @Test
-  public void shouldNotToggleTelemetryEnabledWithoutAuthorization() {
+  public void shouldNotThrowExceptionWhenToggleTelemetry() {
     // given
 
     // when
-    managementService.toggleTelemetry(false);
+    managementService.toggleTelemetry(true);
 
     // then
     assertThat(managementService.isTelemetryEnabled()).isFalse();
