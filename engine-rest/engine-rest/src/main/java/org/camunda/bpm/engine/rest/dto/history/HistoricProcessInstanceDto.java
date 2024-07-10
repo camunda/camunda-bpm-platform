@@ -40,6 +40,7 @@ public class HistoricProcessInstanceDto {
   private String caseInstanceId;
   private String tenantId;
   private String state;
+  private String restartedProcessInstanceId;
 
   public String getId() {
     return id;
@@ -129,6 +130,15 @@ public class HistoricProcessInstanceDto {
     this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
+  public String getRestartedProcessInstanceId() {
+      return restartedProcessInstanceId;
+  }
+
+  public void setRestartedProcessInstanceId(String restartedProcessInstanceId) {
+    this.restartedProcessInstanceId = restartedProcessInstanceId;
+  }
+
+
   public static HistoricProcessInstanceDto fromHistoricProcessInstance(HistoricProcessInstance historicProcessInstance) {
 
     HistoricProcessInstanceDto dto = new HistoricProcessInstanceDto();
@@ -152,6 +162,7 @@ public class HistoricProcessInstanceDto {
     dto.caseInstanceId = historicProcessInstance.getCaseInstanceId();
     dto.tenantId = historicProcessInstance.getTenantId();
     dto.state = historicProcessInstance.getState();
+    dto.restartedProcessInstanceId = historicProcessInstance.getRestartedProcessInstanceId();
 
     return dto;
   }

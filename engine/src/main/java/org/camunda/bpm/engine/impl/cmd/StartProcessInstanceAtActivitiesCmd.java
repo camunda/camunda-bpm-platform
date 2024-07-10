@@ -79,6 +79,8 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
       processInstance.setTenantId(instantiationBuilder.getTenantId());
     }
 
+    processInstance.setRestartedProcessInstanceId(instantiationBuilder.getRestartedProcessInstanceId());
+
     processInstance.setSkipCustomListeners(modificationBuilder.isSkipCustomListeners());
     VariableMap variables = modificationBuilder.getProcessVariables();
 

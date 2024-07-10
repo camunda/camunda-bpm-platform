@@ -103,6 +103,8 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
             getProcessInstantiationBuilder(commandExecutor, processDefinitionId);
         applyProperties(instantiationBuilder, processDefinition, historicProcessInstance);
 
+        instantiationBuilder.setRestartedProcessInstanceId(processInstanceId);
+
         ProcessInstanceModificationBuilderImpl modificationBuilder =
             instantiationBuilder.getModificationBuilder();
 
@@ -167,7 +169,6 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
     if (!builder.isWithoutBusinessKey()) {
       instantiationBuilder.businessKey(processInstance.getBusinessKey());
     }
-
   }
 
   protected VariableMap collectVariables(CommandContext commandContext,
