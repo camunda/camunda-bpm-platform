@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl.telemetry.reporter;
 import java.util.Timer;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
@@ -35,26 +34,17 @@ public class TelemetryReporter {
    * server name) can contribute their data.
    */
   public static long DEFAULT_INIT_REPORT_DELAY_SECONDS = 5 * 60;
-  /**
-   * Report after 3 hours for the first time so that other modules (e.g. those
-   * collecting the app server name) can contribute their data and test cases
-   * which accidentally enable reporting are very unlikely to send data.
-   */
-  public static long EXTENDED_INIT_REPORT_DELAY_SECONDS = 3 * 60 * 60;
 
   protected TelemetrySendingTask telemetrySendingTask;
   protected Timer timer;
 
-  protected CommandExecutor commandExecutor;
   protected TelemetryDataImpl data;
   protected TelemetryRegistry telemetryRegistry;
   protected MetricsRegistry metricsRegistry;
 
-  public TelemetryReporter(CommandExecutor commandExecutor,
-                           TelemetryDataImpl data,
+  public TelemetryReporter(TelemetryDataImpl data,
                            TelemetryRegistry telemetryRegistry,
                            MetricsRegistry metricsRegistry) {
-    this.commandExecutor = commandExecutor;
     this.data = data;
     this.telemetryRegistry = telemetryRegistry;
     this.metricsRegistry = metricsRegistry;
@@ -63,8 +53,7 @@ public class TelemetryReporter {
 
 
   protected void initTelemetrySendingTask() {
-    telemetrySendingTask = new TelemetrySendingTask(commandExecutor,
-                                                    data,
+    telemetrySendingTask = new TelemetrySendingTask(data,
                                                     telemetryRegistry,
                                                     metricsRegistry);
   }
