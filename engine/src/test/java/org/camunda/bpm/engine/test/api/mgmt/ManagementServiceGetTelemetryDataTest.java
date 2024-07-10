@@ -88,6 +88,7 @@ public class ManagementServiceGetTelemetryDataTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void shouldReturnTelemetryData_TelemetryDisabled() {
     // given
     managementService.toggleTelemetry(false);
@@ -209,6 +210,7 @@ public class ManagementServiceGetTelemetryDataTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void shouldNotResetCommandCount() {
     // given default telemetry data and empty telemetry registry
     // create command data
@@ -273,6 +275,7 @@ public class ManagementServiceGetTelemetryDataTest {
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @SuppressWarnings("deprecation")
   public void shouldCollectCommands_TelemetryDisabled() {
     // given default configuration
 
@@ -341,6 +344,7 @@ public class ManagementServiceGetTelemetryDataTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void shouldNotResetCollectionTimeFrameAfterToggleTelemetry() {
     // given default telemetry data and empty telemetry registry
     // and default configuration
