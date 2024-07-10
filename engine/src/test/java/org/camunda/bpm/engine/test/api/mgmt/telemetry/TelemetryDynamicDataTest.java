@@ -128,12 +128,12 @@ public class TelemetryDynamicDataTest {
 
     // then
     assertThat(entries.size()).isEqualTo(4);
-    String [] expectedExcutedCommands = {"StartProcessInstanceCmd",
+    String [] expectedExecutedCommands = {"StartProcessInstanceCmd",
                                          "SetExecutionVariablesCmd",
                                          "TaskQueryImpl",
                                          "CompleteTaskCmd"};
-    assertThat(entries.keySet()).contains(expectedExcutedCommands);
-    for (String commandName : expectedExcutedCommands) {
+    assertThat(entries.keySet()).contains(expectedExecutedCommands);
+    for (String commandName : expectedExecutedCommands) {
       assertThat(entries.get(commandName).get()).isEqualTo(1);
     }
   }
@@ -149,8 +149,8 @@ public class TelemetryDynamicDataTest {
     // then
     // the class is properly formatted
     Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
-    String [] expectedExcutedCommands = {"TelemetryDynamicDataTest_InnerClassCmd"};
-    assertThat(commands.keySet()).contains(expectedExcutedCommands);
+    String [] expectedExecutedCommands = {"TelemetryDynamicDataTest_InnerClassCmd"};
+    assertThat(commands.keySet()).contains(expectedExecutedCommands);
     assertThat(commands.get("TelemetryDynamicDataTest_InnerClassCmd").get()).isEqualTo(2L);
   }
 
