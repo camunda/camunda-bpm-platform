@@ -20,8 +20,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 
@@ -32,11 +30,6 @@ public class TelemetryRegistry {
   protected LicenseKeyDataImpl licenseKey;
   protected String camundaIntegration;
   protected Set<String> webapps = new HashSet<>();
-
-  // keeps track of the local telemetry activation state
-  // note that in the database the value may have already changed
-  // by another process engine, so this doesn't have to be in sync
-  protected AtomicBoolean telemetryLocallyActivated = new AtomicBoolean(false);
 
   public synchronized ApplicationServerImpl getApplicationServer() {
     if (applicationServer == null) {
@@ -99,17 +92,6 @@ public class TelemetryRegistry {
     if (!webapps.contains(webapp)) {
       webapps.add(webapp);
     }
-  }
-
-  public boolean isTelemetryLocallyActivated() {
-    return telemetryLocallyActivated.get();
-  }
-
-  /**
-   * @return previous value
-   */
-  public boolean setTelemetryLocallyActivated(boolean activated) {
-    return this.telemetryLocallyActivated.getAndSet(activated);
   }
 
   public void clearCommandCounts() {

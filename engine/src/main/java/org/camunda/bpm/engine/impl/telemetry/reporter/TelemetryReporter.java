@@ -75,26 +75,10 @@ public class TelemetryReporter {
   }
 
   public synchronized void stop() {
-    stop(true);
-  }
-
-  public synchronized void stop(boolean report) {
     if (isScheduled()) {
       // cancel the timer
       timer.cancel();
       timer = null;
-
-      if (report) {
-        // collect and send manually for the last time
-        reportNow();
-      }
-    }
-  }
-
-  // TODO remove
-  public void reportNow() {
-    if (telemetrySendingTask != null) {
-      telemetrySendingTask.run();
     }
   }
 
