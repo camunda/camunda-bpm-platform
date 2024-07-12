@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
+import org.camunda.bpm.engine.impl.diagnostics.CamundaIntegration;
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
