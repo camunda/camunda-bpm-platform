@@ -351,6 +351,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.JdkImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
+import org.camunda.bpm.engine.impl.telemetry.reporter.DiagnosticsCollector;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
@@ -1018,7 +1019,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // OLEs for foreign key constraint violations on databases that rollback on SQL exceptions, e.g. PostgreSQL
   protected boolean enableOptimisticLockingOnForeignKeyViolation = true;
 
-  // telemetry ///////////////////////////////////////////////////////
+  // diagnostics ///////////////////////////////////////////////////////
+  protected DiagnosticsCollector diagnosticsCollector;
   protected TelemetryReporter telemetryReporter;
   /** Determines if the telemetry reporter thread runs. For telemetry to be sent,
    * this flag must be set to <code>true</code> and telemetry must be enabled via API
@@ -2889,6 +2891,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
     if (telemetryData == null) {
       initTelemetryData();
+    }
+    if (diagnosticsCollector != null) {
+      diagnosticsCollector = new DiagnosticsCollector(telemetryData, telemetryRegistry, metricsRegistry);
     }
     if (telemetryReporter == null) {
       telemetryReporter = new TelemetryReporter(telemetryData,
@@ -5254,6 +5259,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public ProcessEngineConfigurationImpl setDmnReturnBlankTableOutputAsNull(boolean dmnReturnBlankTableOutputAsNull) {
     this.dmnReturnBlankTableOutputAsNull = dmnReturnBlankTableOutputAsNull;
     return this;
+  }
+
+  public DiagnosticsCollector getDiagnosticsCollector() {
+    return diagnosticsCollector;
+  }
+  public void setDiagnosticsCollector(DiagnosticsCollector diagnosticsCollector) {
+    this.diagnosticsCollector = diagnosticsCollector;
   }
 
   public TelemetryReporter getTelemetryReporter() {

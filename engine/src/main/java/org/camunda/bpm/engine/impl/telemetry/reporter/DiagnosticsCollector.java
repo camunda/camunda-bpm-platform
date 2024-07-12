@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimerTask;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.metrics.util.MetricsUtil;
@@ -39,7 +38,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.telemetry.Command;
 import org.camunda.bpm.engine.telemetry.Metric;
 
-public class TelemetrySendingTask extends TimerTask {
+public class DiagnosticsCollector {
 
   protected static final Set<String> METRICS_TO_REPORT = new HashSet<>();
 
@@ -54,7 +53,7 @@ public class TelemetrySendingTask extends TimerTask {
   protected TelemetryRegistry telemetryRegistry;
   protected MetricsRegistry metricsRegistry;
 
-  public TelemetrySendingTask(TelemetryDataImpl data,
+  public DiagnosticsCollector(TelemetryDataImpl data,
                               TelemetryRegistry telemetryRegistry,
                               MetricsRegistry metricsRegistry) {
     this.staticData = data;
@@ -62,13 +61,9 @@ public class TelemetrySendingTask extends TimerTask {
     this.metricsRegistry = metricsRegistry;
   }
 
-  @Override
-  public void run() {
-  }
-
-  public TelemetryDataImpl updateAndSendData(boolean sendData, boolean addLegacyNames) {
+  public TelemetryDataImpl updateAndSendData() {
     updateStaticData();
-    InternalsImpl dynamicData = resolveDynamicData(sendData, addLegacyNames);
+    InternalsImpl dynamicData = resolveDynamicData();
     TelemetryDataImpl mergedData = new TelemetryDataImpl(staticData);
     mergedData.mergeInternals(dynamicData);
 
@@ -88,29 +83,29 @@ public class TelemetrySendingTask extends TimerTask {
     internals.setWebapps(telemetryRegistry.getWebapps());
   }
 
-  protected InternalsImpl resolveDynamicData(boolean reset, boolean addLegacyNames) {
+  protected InternalsImpl resolveDynamicData() {
     InternalsImpl result = new InternalsImpl();
 
-    Map<String, Metric> metrics = calculateMetrics(reset, addLegacyNames);
+    Map<String, Metric> metrics = calculateMetrics();
     result.setMetrics(metrics);
 
     // command counts are modified after the metrics are retrieved, because
     // metric retrieval can fail and resetting the command count is a side effect
     // that we would otherwise have to undo
-    Map<String, Command> commands = fetchAndResetCommandCounts(reset);
+    Map<String, Command> commands = fetchAndResetCommandCounts();
     result.setCommands(commands);
 
     return result;
   }
 
-  protected Map<String, Command> fetchAndResetCommandCounts(boolean reset) {
+  protected Map<String, Command> fetchAndResetCommandCounts() {
     Map<String, Command> commandsToReport = new HashMap<>();
     Map<String, CommandCounter> originalCounts = telemetryRegistry.getCommands();
 
     synchronized (originalCounts) {
 
       for (Map.Entry<String, CommandCounter> counter : originalCounts.entrySet()) {
-        long occurrences = counter.getValue().get(reset);
+        long occurrences = counter.getValue().get();
         commandsToReport.put(counter.getKey(), new CommandImpl(occurrences));
       }
     }
@@ -118,7 +113,7 @@ public class TelemetrySendingTask extends TimerTask {
     return commandsToReport;
   }
 
-  protected Map<String, Metric> calculateMetrics(boolean reset, boolean addLegacyNames) {
+  protected Map<String, Metric> calculateMetrics() {
 
     Map<String, Metric> metrics = new HashMap<>();
 
@@ -126,11 +121,7 @@ public class TelemetrySendingTask extends TimerTask {
       Map<String, Meter> telemetryMeters = metricsRegistry.getTelemetryMeters();
 
       for (String metricToReport : METRICS_TO_REPORT) {
-        long value = telemetryMeters.get(metricToReport).get(reset);
-
-        if (addLegacyNames) {
-          metrics.put(metricToReport, new MetricImpl(value));
-        }
+        long value = telemetryMeters.get(metricToReport).get();
 
         // add public names
         metrics.put(MetricsUtil.resolvePublicName(metricToReport), new MetricImpl(value));

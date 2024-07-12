@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
-import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
+import org.camunda.bpm.engine.impl.telemetry.reporter.DiagnosticsCollector;
 
 public class GetTelemetryDataCmd implements Command<TelemetryDataImpl> {
 
@@ -34,9 +34,9 @@ public class GetTelemetryDataCmd implements Command<TelemetryDataImpl> {
 
     configuration = commandContext.getProcessEngineConfiguration();
 
-    TelemetryReporter telemetryReporter = configuration.getTelemetryReporter();
-    if (telemetryReporter != null) {
-      return telemetryReporter.getTelemetrySendingTask().updateAndSendData(false, false);
+    DiagnosticsCollector diagnosticsCollector = configuration.getDiagnosticsCollector();
+    if (diagnosticsCollector != null) {
+      return diagnosticsCollector.updateAndSendData();
     } else {
       throw ProcessEngineLogger.TELEMETRY_LOGGER.exceptionWhileRetrievingTelemetryDataRegistryNull();
     }

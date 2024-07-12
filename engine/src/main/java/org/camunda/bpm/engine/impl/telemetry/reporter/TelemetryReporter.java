@@ -35,7 +35,7 @@ public class TelemetryReporter {
    */
   public static long DEFAULT_INIT_REPORT_DELAY_SECONDS = 5 * 60;
 
-  protected TelemetrySendingTask telemetrySendingTask;
+  protected DiagnosticsCollector telemetrySendingTask;
   protected Timer timer;
 
   protected TelemetryDataImpl data;
@@ -53,44 +53,26 @@ public class TelemetryReporter {
 
 
   protected void initTelemetrySendingTask() {
-    telemetrySendingTask = new TelemetrySendingTask(data,
+    telemetrySendingTask = new DiagnosticsCollector(data,
                                                     telemetryRegistry,
                                                     metricsRegistry);
   }
 
   public synchronized void start() {
-    if (!isScheduled()) { // initialize timer only if not scheduled yet
-      initTelemetrySendingTask();
-
-      timer = new Timer("Camunda BPM Runtime Telemetry Reporter", true);
-      long initialReportingDelay = getInitialReportingDelaySeconds() * 1000;
-
-      try {
-        timer.schedule(telemetrySendingTask, initialReportingDelay);
-      } catch (Exception e) {
-        timer = null;
-        throw LOG.schedulingTaskFails(e);
-      }
-    }
   }
 
   public synchronized void stop() {
-    if (isScheduled()) {
-      // cancel the timer
-      timer.cancel();
-      timer = null;
-    }
   }
 
   public boolean isScheduled() {
     return timer != null;
   }
 
-  public TelemetrySendingTask getTelemetrySendingTask() {
+  public DiagnosticsCollector getTelemetrySendingTask() {
     return telemetrySendingTask;
   }
 
-  public void setTelemetrySendingTask(TelemetrySendingTask telemetrySendingTask) {
+  public void setTelemetrySendingTask(DiagnosticsCollector telemetrySendingTask) {
     this.telemetrySendingTask = telemetrySendingTask;
   }
 
