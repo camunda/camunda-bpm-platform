@@ -116,7 +116,7 @@ public class TelemetryConfigurationTest {
     inMemoryConfiguration.buildProcessEngine();
 
     // then the license key is picked up
-    assertThat(inMemoryConfiguration.getTelemetryRegistry().getLicenseKey())
+    assertThat(inMemoryConfiguration.getDiagnosticsRegistry().getLicenseKey())
         .isEqualToComparingFieldByField(new LicenseKeyDataImpl(null, null, null, null, null, "my company;unlimited"));
   }
 

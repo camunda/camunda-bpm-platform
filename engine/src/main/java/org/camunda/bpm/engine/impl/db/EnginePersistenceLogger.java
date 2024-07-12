@@ -782,13 +782,6 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
             "as pessimistic locks are disabled on this database.");
   }
 
-  public void errorFetchingTelemetryInitialMessagePropertyInDatabase(Exception exception) {
-    logDebug(
-        "107",
-        "Error while fetching the telemetry initial message status property from the database: {}", exception.getMessage());
-  }
-
-
   public void logTaskWithoutExecution(String taskId) {
     logDebug("108",
       "Execution of external task {} is null. This indicates that the task was concurrently completed or deleted. "

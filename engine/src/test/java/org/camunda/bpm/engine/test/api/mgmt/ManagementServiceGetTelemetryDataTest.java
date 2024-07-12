@@ -76,9 +76,9 @@ public class ManagementServiceGetTelemetryDataTest {
   }
 
   protected void clearTelemetry() {
-    metricsRegistry.clearTelemetryMetrics();
+    metricsRegistry.clearDiagnosticsMetrics();
     managementService.deleteMetrics(null);
-    configuration.getTelemetryRegistry().clear();
+    configuration.getDiagnosticsRegistry().clear();
   }
 
   @Test
@@ -98,7 +98,7 @@ public class ManagementServiceGetTelemetryDataTest {
   @Test
   public void shouldReturnLicenseKey() {
     // given
-    managementService.setLicenseKeyForTelemetry(new LicenseKeyDataImpl("customer a", "UNIFIED", "2029-09-01", false, Collections.singletonMap("camundaBPM", "true"), "raw license"));
+    managementService.setLicenseKeyForDiagnostics(new LicenseKeyDataImpl("customer a", "UNIFIED", "2029-09-01", false, Collections.singletonMap("camundaBPM", "true"), "raw license"));
 
     // when
     TelemetryData telemetryData = managementService.getTelemetryData();
@@ -115,7 +115,7 @@ public class ManagementServiceGetTelemetryDataTest {
   @Test
   public void shouldReturnLicenseKeyRaw() {
     // given
-    managementService.setLicenseKeyForTelemetry(new LicenseKeyDataImpl(null, null, null, null, null, "test license"));
+    managementService.setLicenseKeyForDiagnostics(new LicenseKeyDataImpl(null, null, null, null, null, "test license"));
 
     // when
     TelemetryData telemetryData = managementService.getTelemetryData();

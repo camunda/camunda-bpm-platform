@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl.cmd;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 
 /**
  * @deprecated Always returns <code>false</code>
@@ -29,7 +28,6 @@ import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 @Deprecated
 public class IsTelemetryEnabledCmd implements Command<Boolean> {
 
-  protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
 
   @Override
   public Boolean execute(CommandContext commandContext) {

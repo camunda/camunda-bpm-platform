@@ -30,15 +30,15 @@ public class GetTelemetryDataCmd implements Command<TelemetryDataImpl> {
 
   @Override
   public TelemetryDataImpl execute(CommandContext commandContext) {
-    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkReadTelemetryData);
+    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkReadDiagnosticsData);
 
     configuration = commandContext.getProcessEngineConfiguration();
 
     DiagnosticsCollector diagnosticsCollector = configuration.getDiagnosticsCollector();
     if (diagnosticsCollector != null) {
-      return diagnosticsCollector.updateAndSendData();
+      return diagnosticsCollector.updateAndFetchData();
     } else {
-      throw ProcessEngineLogger.TELEMETRY_LOGGER.exceptionWhileRetrievingTelemetryDataRegistryNull();
+      throw ProcessEngineLogger.CMD_LOGGER.exceptionWhileRetrievingDiagnosticsDataRegistryNull();
     }
   }
 

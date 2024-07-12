@@ -23,7 +23,7 @@ import java.util.Set;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 
-public class TelemetryRegistry {
+public class DiagnosticsRegistry {
 
   protected Map<String, CommandCounter> commands = new HashMap<>();
   protected ApplicationServerImpl applicationServer;
@@ -33,7 +33,7 @@ public class TelemetryRegistry {
 
   public synchronized ApplicationServerImpl getApplicationServer() {
     if (applicationServer == null) {
-      applicationServer = PlatformTelemetryRegistry.getApplicationServer();
+      applicationServer = PlatformDiagnosticsRegistry.getApplicationServer();
     }
     return applicationServer;
   }

@@ -512,7 +512,7 @@ public class TenantCommandChecker implements CommandChecker {
   }
 
   @Override
-  public void checkReadTelemetryData() {
+  public void checkReadDiagnosticsData() {
   }
 
   @Override

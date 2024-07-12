@@ -844,7 +844,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   @Override
-  public void checkReadTelemetryData() {
+  public void checkReadDiagnosticsData() {
     getAuthorizationManager().checkAuthorization(SystemPermissions.READ, Resources.SYSTEM);
   }
 

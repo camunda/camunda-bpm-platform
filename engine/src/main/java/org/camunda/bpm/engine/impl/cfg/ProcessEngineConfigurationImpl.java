@@ -345,7 +345,7 @@ import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 import org.camunda.bpm.engine.impl.scripting.engine.VariableScopeResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
-import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
+import org.camunda.bpm.engine.impl.telemetry.DiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.DatabaseImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.JdkImpl;
@@ -1170,7 +1170,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initPermissionProvider();
     initHostName();
     initMetrics();
-    initTelemetry();
+    initDiagnostics();
     initMigration();
     initCommandCheckers();
     initDefaultUserPermissionForTask();
@@ -2879,15 +2879,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
-  protected void initTelemetry() {
-    if (telemetryRegistry == null) {
-      telemetryRegistry = new TelemetryRegistry();
+  protected void initDiagnostics() {
+    if (diagnosticsRegistry == null) {
+      diagnosticsRegistry = new DiagnosticsRegistry();
     }
     if (telemetryData == null) {
       initTelemetryData();
     }
     if (diagnosticsCollector == null) {
-      diagnosticsCollector = new DiagnosticsCollector(telemetryData, telemetryRegistry, metricsRegistry);
+      diagnosticsCollector = new DiagnosticsCollector(telemetryData, diagnosticsRegistry, metricsRegistry);
     }
   }
 
@@ -2896,10 +2896,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     JdkImpl jdk = ParseUtil.parseJdkDetails();
 
-    InternalsImpl internals = new InternalsImpl(database, telemetryRegistry.getApplicationServer(), telemetryRegistry.getLicenseKey(), jdk);
+    InternalsImpl internals = new InternalsImpl(database, diagnosticsRegistry.getApplicationServer(), diagnosticsRegistry.getLicenseKey(), jdk);
     internals.setDataCollectionStartDate(ClockUtil.getCurrentTime());
 
-    String camundaIntegration = telemetryRegistry.getCamundaIntegration();
+    String camundaIntegration = diagnosticsRegistry.getCamundaIntegration();
     if (camundaIntegration != null && !camundaIntegration.isEmpty()) {
       internals.getCamundaIntegration().add(camundaIntegration);
     }

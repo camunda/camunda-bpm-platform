@@ -33,8 +33,7 @@ public class InternalsImpl implements Internals {
   public static final String SERIALIZED_APPLICATION_SERVER = "application-server";
   public static final String SERIALIZED_CAMUNDA_INTEGRATION = "camunda-integration";
   public static final String SERIALIZED_LICENSE_KEY = "license-key";
-  public static final String SERIALIZED_TELEMETRY_ENABLED = "telemetry-enabled";
-  public static final String SERIALIZED_TELEMETRY_DATA_COLLECTION_START_DATE = "data-collection-start-date";
+  public static final String SERIALIZED_DATA_COLLECTION_START_DATE = "data-collection-start-date";
 
   protected DatabaseImpl database;
   @SerializedName(value = SERIALIZED_APPLICATION_SERVER)
@@ -43,7 +42,7 @@ public class InternalsImpl implements Internals {
   protected LicenseKeyDataImpl licenseKey;
   @SerializedName(value = SERIALIZED_CAMUNDA_INTEGRATION)
   protected Set<String> camundaIntegration;
-  @SerializedName(value = SERIALIZED_TELEMETRY_DATA_COLLECTION_START_DATE)
+  @SerializedName(value = SERIALIZED_DATA_COLLECTION_START_DATE)
   protected Date dataCollectionStartDate;
   protected Map<String, Command> commands;
   protected Map<String, Metric> metrics;

@@ -40,7 +40,6 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
 
   private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
-  protected static final String TELEMETRY_PROPERTY_NAME = "camunda.telemetry.enabled";
   protected static final String INSTALLATION_PROPERTY_NAME = "camunda.installation.id";
 
   @Override
@@ -160,7 +159,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     String licenseKey = managementService.getLicenseKey();
     if (licenseKey != null) {
       LicenseKeyDataImpl licenseKeyData = LicenseKeyDataImpl.fromRawString(licenseKey);
-      managementService.setLicenseKeyForTelemetry(licenseKeyData);
+      managementService.setLicenseKeyForDiagnostics(licenseKeyData);
       telemetryData.getProduct().getInternals().setLicenseKey(licenseKeyData);
     }
   }

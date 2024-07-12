@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.metrics.util.MetricsUtil;
 import org.camunda.bpm.engine.impl.telemetry.CommandCounter;
-import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
+import org.camunda.bpm.engine.impl.telemetry.DiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.CommandImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
@@ -50,18 +50,18 @@ public class DiagnosticsCollector {
   }
 
   protected TelemetryDataImpl staticData;
-  protected TelemetryRegistry telemetryRegistry;
+  protected DiagnosticsRegistry diagnosticsRegistry;
   protected MetricsRegistry metricsRegistry;
 
   public DiagnosticsCollector(TelemetryDataImpl data,
-                              TelemetryRegistry telemetryRegistry,
+                              DiagnosticsRegistry diagnosticsRegistry,
                               MetricsRegistry metricsRegistry) {
     this.staticData = data;
-    this.telemetryRegistry = telemetryRegistry;
+    this.diagnosticsRegistry = diagnosticsRegistry;
     this.metricsRegistry = metricsRegistry;
   }
 
-  public TelemetryDataImpl updateAndSendData() {
+  public TelemetryDataImpl updateAndFetchData() {
     updateStaticData();
     InternalsImpl dynamicData = resolveDynamicData();
     TelemetryDataImpl mergedData = new TelemetryDataImpl(staticData);
@@ -74,13 +74,13 @@ public class DiagnosticsCollector {
     InternalsImpl internals = staticData.getProduct().getInternals();
 
     if (internals.getApplicationServer() == null) {
-      ApplicationServerImpl applicationServer = telemetryRegistry.getApplicationServer();
+      ApplicationServerImpl applicationServer = diagnosticsRegistry.getApplicationServer();
       internals.setApplicationServer(applicationServer);
     }
 
     // license key and Webapps data is fed from the outside to the registry but needs to be constantly updated
-    internals.setLicenseKey(telemetryRegistry.getLicenseKey());
-    internals.setWebapps(telemetryRegistry.getWebapps());
+    internals.setLicenseKey(diagnosticsRegistry.getLicenseKey());
+    internals.setWebapps(diagnosticsRegistry.getWebapps());
   }
 
   protected InternalsImpl resolveDynamicData() {
@@ -100,7 +100,7 @@ public class DiagnosticsCollector {
 
   protected Map<String, Command> fetchAndResetCommandCounts() {
     Map<String, Command> commandsToReport = new HashMap<>();
-    Map<String, CommandCounter> originalCounts = telemetryRegistry.getCommands();
+    Map<String, CommandCounter> originalCounts = diagnosticsRegistry.getCommands();
 
     synchronized (originalCounts) {
 
@@ -118,7 +118,7 @@ public class DiagnosticsCollector {
     Map<String, Metric> metrics = new HashMap<>();
 
     if (metricsRegistry != null) {
-      Map<String, Meter> telemetryMeters = metricsRegistry.getTelemetryMeters();
+      Map<String, Meter> telemetryMeters = metricsRegistry.getDiagnosticsMeters();
 
       for (String metricToReport : METRICS_TO_REPORT) {
         long value = telemetryMeters.get(metricToReport).get();

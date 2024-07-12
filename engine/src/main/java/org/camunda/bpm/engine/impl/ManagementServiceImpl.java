@@ -81,7 +81,7 @@ import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionState
 import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
-import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
+import org.camunda.bpm.engine.impl.telemetry.DiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
@@ -683,7 +683,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
    * @return whether the web application was successfully added or not
    */
   public boolean addWebappToTelemetry(String webapp) {
-    TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
+    DiagnosticsRegistry telemetryRegistry = processEngineConfiguration.getDiagnosticsRegistry();
     if (telemetryRegistry != null) {
       telemetryRegistry.addWebapp(webapp);
       return true;
@@ -698,7 +698,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
    *          a String containing information about the application server
    */
   public void addApplicationServerInfoToTelemetry(String appServerInfo) {
-    TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
+    DiagnosticsRegistry telemetryRegistry = processEngineConfiguration.getDiagnosticsRegistry();
     if (telemetryRegistry != null) {
       telemetryRegistry.setApplicationServer(appServerInfo);
     }
@@ -711,29 +711,29 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
    *          a data object containing various pieces of information
    *          about the installed license
    */
-  public void setLicenseKeyForTelemetry(LicenseKeyDataImpl licenseKeyData) {
-    TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
-    if (telemetryRegistry != null) {
-      telemetryRegistry.setLicenseKey(licenseKeyData);
+  public void setLicenseKeyForDiagnostics(LicenseKeyDataImpl licenseKeyData) {
+    DiagnosticsRegistry diagnosticsRegistry = processEngineConfiguration.getDiagnosticsRegistry();
+    if (diagnosticsRegistry != null) {
+      diagnosticsRegistry.setLicenseKey(licenseKeyData);
     }
   }
 
-  public LicenseKeyDataImpl getLicenseKeyFromTelemetry() {
-    TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
-    if (telemetryRegistry != null) {
-      return telemetryRegistry.getLicenseKey();
+  public LicenseKeyDataImpl getLicenseKeyFromDiagnostics() {
+    DiagnosticsRegistry diagnosticsRegistry = processEngineConfiguration.getDiagnosticsRegistry();
+    if (diagnosticsRegistry != null) {
+      return diagnosticsRegistry.getLicenseKey();
     }
     return null;
   }
 
-  public void clearTelemetryData() {
-    TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
-    if (telemetryRegistry != null) {
-      telemetryRegistry.clear();
+  public void clearDiagnosticsData() {
+    DiagnosticsRegistry diagnosticsRegistry = processEngineConfiguration.getDiagnosticsRegistry();
+    if (diagnosticsRegistry != null) {
+      diagnosticsRegistry.clear();
     }
     MetricsRegistry metricsRegistry = ((ProcessEngineConfigurationImpl) processEngineConfiguration).getMetricsRegistry();
     if(metricsRegistry != null) {
-      metricsRegistry.clearTelemetryMetrics();
+      metricsRegistry.clearDiagnosticsMetrics();
     }
     deleteMetrics(null);
   }

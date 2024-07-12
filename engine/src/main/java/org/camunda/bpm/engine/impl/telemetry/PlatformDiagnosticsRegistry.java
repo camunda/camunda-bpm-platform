@@ -16,14 +16,23 @@
  */
 package org.camunda.bpm.engine.impl.telemetry;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 
-public class TelemetryLogger extends ProcessEngineLogger {
+public class PlatformDiagnosticsRegistry {
 
-  public ProcessEngineException exceptionWhileRetrievingTelemetryDataRegistryNull() {
-    return new ProcessEngineException(
-        exceptionMessage("019", "Error while retrieving telemetry data. Telemetry registry was not initialized."));
+  protected static ApplicationServerImpl applicationServer;
+
+  public static synchronized ApplicationServerImpl getApplicationServer() {
+    return applicationServer;
   }
 
+  public static synchronized void setApplicationServer(String applicationServerVersion) {
+    if (applicationServer == null) {
+      applicationServer = new ApplicationServerImpl(applicationServerVersion);
+    }
+  }
+
+  public static synchronized void clear() {
+    applicationServer = null;
+  }
 }

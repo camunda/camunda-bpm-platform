@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.telemetry.CommandCounter;
-import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
+import org.camunda.bpm.engine.impl.telemetry.DiagnosticsRegistry;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -76,9 +76,9 @@ public class TelemetryDynamicDataTest {
   }
 
   public void clearMetrics() {
-    configuration.getTelemetryRegistry().clear();
+    configuration.getDiagnosticsRegistry().clear();
     clearMetrics(configuration.getMetricsRegistry().getDbMeters());
-    clearMetrics(configuration.getMetricsRegistry().getTelemetryMeters());
+    clearMetrics(configuration.getMetricsRegistry().getDiagnosticsMeters());
     managementService.deleteMetrics(null);
   }
 
@@ -96,7 +96,7 @@ public class TelemetryDynamicDataTest {
         .buildProcessEngine();
 
     // then
-    TelemetryRegistry telemetryRegistry = processEngineInMem.getProcessEngineConfiguration().getTelemetryRegistry();
+    DiagnosticsRegistry telemetryRegistry = processEngineInMem.getProcessEngineConfiguration().getDiagnosticsRegistry();
     Map<String, CommandCounter> entries = telemetryRegistry.getCommands();
     // note: There are more commands executed during engine start, but the
     // telemetry registry (including the command counts) is reset when telemetry is activated
@@ -118,7 +118,7 @@ public class TelemetryDynamicDataTest {
   public void shouldCountAfterCleaning() {
     // given
     clearCommandCounts();
-    Map<String, CommandCounter> entries = configuration.getTelemetryRegistry().getCommands();
+    Map<String, CommandCounter> entries = configuration.getDiagnosticsRegistry().getCommands();
 
     // when
     String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
@@ -148,7 +148,7 @@ public class TelemetryDynamicDataTest {
 
     // then
     // the class is properly formatted
-    Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
+    Map<String, CommandCounter> commands = configuration.getDiagnosticsRegistry().getCommands();
     String [] expectedExecutedCommands = {"TelemetryDynamicDataTest_InnerClassCmd"};
     assertThat(commands.keySet()).contains(expectedExecutedCommands);
     assertThat(commands.get("TelemetryDynamicDataTest_InnerClassCmd").get()).isEqualTo(2L);
@@ -179,7 +179,7 @@ public class TelemetryDynamicDataTest {
 
     // then
     // the class is not collected
-    Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
+    Map<String, CommandCounter> commands = configuration.getDiagnosticsRegistry().getCommands();
     assertThat(commands.keySet()).containsExactlyInAnyOrder("DeleteMetricsCmd");
   }
 
@@ -196,12 +196,12 @@ public class TelemetryDynamicDataTest {
 
     // then
     // the class is not collected
-    Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
+    Map<String, CommandCounter> commands = configuration.getDiagnosticsRegistry().getCommands();
     assertThat(commands.keySet()).containsExactlyInAnyOrder("DeleteMetricsCmd");
   }
 
   protected void clearCommandCounts() {
-    configuration.getTelemetryRegistry().clearCommandCounts();
+    configuration.getDiagnosticsRegistry().clearCommandCounts();
   }
 
   protected static class InnerClassCmd implements Command<Void> {
