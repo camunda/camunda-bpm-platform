@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
+import org.camunda.bpm.engine.impl.diagnostics.DiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,10 +52,10 @@ public class SimpleApplicationIT {
   @Test
   public void shouldNotDetermineApplicationServer() {
 
-    TelemetryRegistry telemetryRegistry = processEngine.getProcessEngineConfiguration().getTelemetryRegistry();
+    DiagnosticsRegistry diagnosticsRegistry = processEngine.getProcessEngineConfiguration().getDiagnosticsRegistry();
 
     // then
-    ApplicationServerImpl applicationServer = telemetryRegistry.getApplicationServer();
+    ApplicationServerImpl applicationServer = diagnosticsRegistry.getApplicationServer();
     assertThat(applicationServer).isNull();
   }
 
