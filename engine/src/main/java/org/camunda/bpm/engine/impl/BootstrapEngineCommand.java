@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
-import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 
 /**
  * @author Nikola Koevski
@@ -58,7 +57,6 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
 
     // installationId needs to be updated in the telemetry data
     updateTelemetryData(commandContext);
-    startTelemetryReporter(commandContext);
 
     return null;
   }
@@ -164,26 +162,6 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
       LicenseKeyDataImpl licenseKeyData = LicenseKeyDataImpl.fromRawString(licenseKey);
       managementService.setLicenseKeyForTelemetry(licenseKeyData);
       telemetryData.getProduct().getInternals().setLicenseKey(licenseKeyData);
-    }
-  }
-
-  protected void startTelemetryReporter(CommandContext commandContext) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-
-    TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
-    boolean telemetryReporterActivate = processEngineConfiguration.isTelemetryReporterActivate();
-
-    // Start telemetry if the reporter is generally activated via the engine configuration.
-    // Note that there are two conditions for telemetry to be sent: The reporter runs and
-    // telemetry is enabled via API. If the latter is not the case, the reporter will do nothing.
-    // However, it is important that it is always running so that it will detect if telemetry
-    // was enabled by another engine in the cluster.
-    if (telemetryReporter != null && telemetryReporterActivate) {
-      try {
-        telemetryReporter.start();
-      } catch (Exception e) {
-        ProcessEngineLogger.TELEMETRY_LOGGER.schedulingTaskFailsOnEngineStart(e);
-      }
     }
   }
 

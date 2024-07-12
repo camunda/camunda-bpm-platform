@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.test.api.mgmt;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.management.Metrics.DECISION_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
 import static org.camunda.bpm.engine.management.Metrics.FLOW_NODE_INSTANCES;
@@ -27,13 +26,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
-import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.telemetry.ApplicationServer;
@@ -59,7 +56,6 @@ public class ManagementServiceGetTelemetryDataTest {
   protected MetricsRegistry metricsRegistry;
 
   protected TelemetryDataImpl defaultTelemetryData;
-  protected TelemetryReporter defaultTelemetryReporter;
 
   @Before
   public void setup() {
@@ -68,7 +64,6 @@ public class ManagementServiceGetTelemetryDataTest {
     metricsRegistry = configuration.getMetricsRegistry();
 
     defaultTelemetryData = new TelemetryDataImpl(configuration.getTelemetryData());
-    defaultTelemetryReporter = configuration.getTelemetryReporter();
 
     clearTelemetry();
   }
@@ -78,7 +73,6 @@ public class ManagementServiceGetTelemetryDataTest {
     clearTelemetry();
 
     configuration.setTelemetryData(defaultTelemetryData);
-    configuration.setTelemetryReporter(defaultTelemetryReporter);
   }
 
   protected void clearTelemetry() {
@@ -288,16 +282,6 @@ public class ManagementServiceGetTelemetryDataTest {
     // then
     assertThat(telemetryDataAfterPiStart.getProduct().getInternals().getCommands().get(IS_TELEMETRY_ENABLED_CMD_NAME)
         .getCount()).isEqualTo(1);
-  }
-
-  @Test
-  public void shouldThrowExceptionOnNullTelemetryReporter() {
-    // given
-    configuration.setTelemetryReporter(null);
-
-    // when
-    assertThatThrownBy(() -> managementService.getTelemetryData()).isInstanceOf(ProcessEngineException.class)
-        .hasMessageContaining("Error while retrieving telemetry data. Telemetry registry was not initialized.");
   }
 
   @Test

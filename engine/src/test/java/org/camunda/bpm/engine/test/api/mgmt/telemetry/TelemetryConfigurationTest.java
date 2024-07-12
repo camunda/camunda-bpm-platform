@@ -27,36 +27,25 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
-import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
-import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.camunda.commons.testing.WatchLogger;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 public class TelemetryConfigurationTest {
 
-  @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule =
-      new ProcessEngineBootstrapRule(configuration ->
-          configuration
-            .setTelemetryReporterActivate(true)
-      );
 
-  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule);
 
   @Rule
   public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
@@ -72,10 +61,6 @@ public class TelemetryConfigurationTest {
     configuration = engineRule.getProcessEngineConfiguration();
     managementService = configuration.getManagementService();
     identityService = configuration.getIdentityService();
-
-    // clean up the registry data
-//    configuration.getTelemetryRegistry().clear();
-
   }
 
   @After
@@ -87,30 +72,6 @@ public class TelemetryConfigurationTest {
       processEngineImpl.close();
       processEngineImpl = null;
     }
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void shouldStartEngineWithTelemetryDefaults() {
-    //give defaults
-    // then
-    assertThat(managementService.isTelemetryEnabled()).isFalse();
-
-    // the telemetry reporter is always scheduled
-    assertThat(configuration.isTelemetryReporterActivate()).isTrue();
-    assertThat(configuration.getTelemetryReporter().isScheduled()).isTrue();
-    assertThat(configuration.getTelemetryReporter().getInitialReportingDelaySeconds()).isEqualTo(TelemetryReporter.DEFAULT_INIT_REPORT_DELAY_SECONDS);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void shouldKeepReporterRunningAfterTelemetryIsDisabled() {
-    // when
-    managementService.toggleTelemetry(false);
-
-    // then
-    TelemetryReporter telemetryReporter = configuration.getTelemetryReporter();
-    assertThat(telemetryReporter.isScheduled()).isTrue();
   }
 
   @Test
@@ -138,7 +99,7 @@ public class TelemetryConfigurationTest {
 
   @Test
   @RequiredDatabase(includes = DbSqlSessionFactory.H2) // it's h2-specific test
-  public void shouldStartEngineWithTelemetryEnabledAndLicenseKeyAlreadyPresent() {
+  public void shouldStartEngineWithLicenseKeyAlreadyPresent() {
     // given license key persisted
     String testLicenseKey = "signature=;my company;unlimited";
     inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();

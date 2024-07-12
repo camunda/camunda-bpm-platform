@@ -21,22 +21,6 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 public class TelemetryLogger extends ProcessEngineLogger {
 
-  public ProcessEngineException schedulingTaskFails(Exception e) {
-    return new ProcessEngineException(
-        exceptionMessage("010", "Cannot schedule the telemetry task."), e);
-  }
-
-  public void schedulingTaskFailsOnEngineStart(Exception e) {
-    logWarn("013",
-        "Could not start telemetry task. Reason: {} with message '{}'. Set this logger to DEBUG/FINE for the full stacktrace.",
-        e.getClass().getSimpleName(),
-        e.getMessage());
-    logDebug(
-        "014", "{} occurred while starting the telemetry task.",
-        e.getClass().getCanonicalName(),
-        e);
-  }
-
   public ProcessEngineException exceptionWhileRetrievingTelemetryDataRegistryNull() {
     return new ProcessEngineException(
         exceptionMessage("019", "Error while retrieving telemetry data. Telemetry registry was not initialized."));
