@@ -29,8 +29,8 @@ import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.camunda.bpm.engine.impl.cfg.BeansConfigurationHelper;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.diagnostics.DiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.telemetry.DiagnosticsRegistry;
 import org.camunda.bpm.engine.runtime.DeserializationTypeValidator;
 import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
 

@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.rest.util;
 import static org.camunda.bpm.engine.rest.util.EngineUtil.getProcessEngineProvider;
 
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
-import org.camunda.bpm.engine.impl.telemetry.PlatformDiagnosticsRegistry;
+import org.camunda.bpm.engine.impl.diagnostics.PlatformDiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 

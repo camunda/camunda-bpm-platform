@@ -14,38 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.telemetry;
+package org.camunda.bpm.engine.impl.diagnostics;
 
-import java.util.concurrent.atomic.AtomicLong;
+import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 
-public class CommandCounter {
+public class PlatformDiagnosticsRegistry {
 
-  protected String name;
-  protected AtomicLong count = new AtomicLong(0);
+  protected static ApplicationServerImpl applicationServer;
 
-  public CommandCounter(String name) {
-    this.name = name;
+  public static synchronized ApplicationServerImpl getApplicationServer() {
+    return applicationServer;
   }
 
-  public String getName() {
-    return name;
+  public static synchronized void setApplicationServer(String applicationServerVersion) {
+    if (applicationServer == null) {
+      applicationServer = new ApplicationServerImpl(applicationServerVersion);
+    }
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public static synchronized void clear() {
+    applicationServer = null;
   }
-
-
-  public void mark() {
-    count.incrementAndGet();
-  }
-
-  public void mark(long times) {
-    count.addAndGet(times);
-  }
-
-  public long get() {
-    return count.get();
-  }
-
 }

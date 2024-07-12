@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.telemetry.reporter;
+package org.camunda.bpm.engine.impl.diagnostics;
 
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
@@ -28,8 +28,6 @@ import java.util.Set;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.metrics.util.MetricsUtil;
-import org.camunda.bpm.engine.impl.telemetry.CommandCounter;
-import org.camunda.bpm.engine.impl.telemetry.DiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.CommandImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;

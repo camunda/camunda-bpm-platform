@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.impl.interceptor;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.telemetry.DiagnosticsRegistry;
+import org.camunda.bpm.engine.impl.diagnostics.DiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.util.ClassNameUtil;
 
 public class CommandCounterInterceptor extends CommandInterceptor {
