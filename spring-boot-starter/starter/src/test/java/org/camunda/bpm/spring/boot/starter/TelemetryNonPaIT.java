@@ -41,7 +41,7 @@ public class TelemetryNonPaIT extends AbstractCamundaAutoConfigurationIT {
 
   @Test
   public void shouldSubmitApplicationServerData() {
-    DiagnosticsRegistry diagnosticsRegistry = processEngine.getProcessEngineConfiguration().getDiagnosticsRegistry();
+    DiagnosticsRegistry diagnosticsRegistry = ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).getDiagnosticsRegistry();
 
     // then
     ApplicationServerImpl applicationServer = diagnosticsRegistry.getApplicationServer();

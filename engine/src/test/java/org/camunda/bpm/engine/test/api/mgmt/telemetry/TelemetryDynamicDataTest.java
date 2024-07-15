@@ -96,7 +96,7 @@ public class TelemetryDynamicDataTest {
         .buildProcessEngine();
 
     // then
-    DiagnosticsRegistry telemetryRegistry = processEngineInMem.getProcessEngineConfiguration().getDiagnosticsRegistry();
+    DiagnosticsRegistry telemetryRegistry = ((ProcessEngineConfigurationImpl) processEngineInMem.getProcessEngineConfiguration()).getDiagnosticsRegistry();
     Map<String, CommandCounter> entries = telemetryRegistry.getCommands();
     // note: There are more commands executed during engine start, but the
     // telemetry registry (including the command counts) is reset when telemetry is activated

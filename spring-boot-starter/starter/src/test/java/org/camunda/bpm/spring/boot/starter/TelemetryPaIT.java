@@ -18,6 +18,7 @@ package org.camunda.bpm.spring.boot.starter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.diagnostics.DiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 import org.camunda.bpm.spring.boot.starter.test.pa.TestProcessApplication;
@@ -38,7 +39,7 @@ public class TelemetryPaIT extends AbstractCamundaAutoConfigurationIT {
 
   @Test
   public void shouldSubmitApplicationServerData() {
-    DiagnosticsRegistry diagnosticsRegistry = processEngine.getProcessEngineConfiguration().getDiagnosticsRegistry();
+    DiagnosticsRegistry diagnosticsRegistry = ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).getDiagnosticsRegistry();
 
     // then
     ApplicationServerImpl applicationServer = diagnosticsRegistry.getApplicationServer();

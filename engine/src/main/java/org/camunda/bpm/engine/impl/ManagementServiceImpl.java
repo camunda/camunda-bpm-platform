@@ -683,7 +683,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
    * @return whether the web application was successfully added or not
    */
   public boolean addWebappToTelemetry(String webapp) {
-    DiagnosticsRegistry telemetryRegistry = processEngineConfiguration.getDiagnosticsRegistry();
+    DiagnosticsRegistry telemetryRegistry = ((ProcessEngineConfigurationImpl) processEngineConfiguration).getDiagnosticsRegistry();
     if (telemetryRegistry != null) {
       telemetryRegistry.addWebapp(webapp);
       return true;
@@ -698,7 +698,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
    *          a String containing information about the application server
    */
   public void addApplicationServerInfoToTelemetry(String appServerInfo) {
-    DiagnosticsRegistry telemetryRegistry = processEngineConfiguration.getDiagnosticsRegistry();
+    DiagnosticsRegistry telemetryRegistry = ((ProcessEngineConfigurationImpl) processEngineConfiguration).getDiagnosticsRegistry();
     if (telemetryRegistry != null) {
       telemetryRegistry.setApplicationServer(appServerInfo);
     }
@@ -712,14 +712,14 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
    *          about the installed license
    */
   public void setLicenseKeyForDiagnostics(LicenseKeyDataImpl licenseKeyData) {
-    DiagnosticsRegistry diagnosticsRegistry = processEngineConfiguration.getDiagnosticsRegistry();
+    DiagnosticsRegistry diagnosticsRegistry = ((ProcessEngineConfigurationImpl) processEngineConfiguration).getDiagnosticsRegistry();
     if (diagnosticsRegistry != null) {
       diagnosticsRegistry.setLicenseKey(licenseKeyData);
     }
   }
 
   public LicenseKeyDataImpl getLicenseKeyFromDiagnostics() {
-    DiagnosticsRegistry diagnosticsRegistry = processEngineConfiguration.getDiagnosticsRegistry();
+    DiagnosticsRegistry diagnosticsRegistry = ((ProcessEngineConfigurationImpl) processEngineConfiguration).getDiagnosticsRegistry();
     if (diagnosticsRegistry != null) {
       return diagnosticsRegistry.getLicenseKey();
     }
@@ -727,7 +727,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   }
 
   public void clearDiagnosticsData() {
-    DiagnosticsRegistry diagnosticsRegistry = processEngineConfiguration.getDiagnosticsRegistry();
+    DiagnosticsRegistry diagnosticsRegistry = ((ProcessEngineConfigurationImpl) processEngineConfiguration).getDiagnosticsRegistry();
     if (diagnosticsRegistry != null) {
       diagnosticsRegistry.clear();
     }

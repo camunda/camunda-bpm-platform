@@ -29,7 +29,6 @@ import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.camunda.bpm.engine.impl.cfg.BeansConfigurationHelper;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.diagnostics.DiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.runtime.DeserializationTypeValidator;
 import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
@@ -411,8 +410,6 @@ public abstract class ProcessEngineConfiguration {
 
   /** An unique installation identifier */
   protected String installationId;
-
-  protected DiagnosticsRegistry diagnosticsRegistry;
 
   /**
    * On failing activities we can skip output mapping. This might be helpful if output mapping uses variables that might not
@@ -1053,15 +1050,6 @@ public abstract class ProcessEngineConfiguration {
 
   public ProcessEngineConfiguration setInstallationId(String installationId) {
     this.installationId = installationId;
-    return this;
-  }
-
-  public DiagnosticsRegistry getDiagnosticsRegistry() {
-    return diagnosticsRegistry;
-  }
-
-  public ProcessEngineConfiguration setDiagnosticsRegistry(DiagnosticsRegistry diagnosticsRegistry) {
-    this.diagnosticsRegistry = diagnosticsRegistry;
     return this;
   }
 
