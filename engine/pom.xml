@@ -429,7 +429,7 @@
           <trimStackTrace>false</trimStackTrace>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <includes>
-            <include>SequentialJobAcquisitionTest</include>
+           <include>%regex[.*(${test.includes}).*Test.*.class]</include>
           </includes>
           <excludes>
             <exclude>**/*TestCase.java</exclude>
