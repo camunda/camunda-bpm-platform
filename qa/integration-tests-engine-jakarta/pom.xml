@@ -713,20 +713,8 @@
                 <!-- TODO Please delete the following exclusions after the Tomcat 10 issue with Arquillian -->
                 <!-- See Relevant issue: https://github.com/camunda/camunda-bpm-platform/issues/4434 -->
                 <exclude>**/CallActivityContextSwitchTest.java</exclude>
-                <exclude>**/TestMultipleClasspathRoots.java</exclude>
-                <exclude>**/TestResourceName.java</exclude>
-                <exclude>**/TestWarDeploymentDeployChangedOnlyWithJarAsLib.java</exclude>
-                <exclude>**/TestWarDeploymentWithDiagram.java</exclude>
-                <exclude>**/TestWarDeploymentWithoutDiagram.java</exclude>
-                <exclude>**/TestWarDeploymentWithoutProcessDefinitions.java</exclude>
-                <exclude>**/TestWarDeploymentWithoutProcessesXml.java</exclude>
                 <exclude>**/CdiBeanCallActivityResolutionTest.java</exclude>
-                <exclude>**/CdiBeanCaseTaskResolutionTest.java</exclude>
-                <exclude>**/CallActivityContextSwitchTest.java</exclude>
-                <exclude>**/FailingJobBoundaryTimerWithDelegateVariablesTest.java</exclude>
-                <exclude>**/SignalEventCatchBoundaryWithVariablesTest.java</exclude>
-                <exclude>**/TimerRecalculationTest.java</exclude>
-                <exclude>**/CdiProcessApplicationEventSupportTest.java</exclude>
+
                 <!-- TODO and weld-servlet-shaded is resolved with integration-tests-engine-jakarta -->
 
               </excludes>

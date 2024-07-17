@@ -554,7 +554,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-tomcat</source>
+                    <source>src/test/java-tomcat9</source>
                   </sources>
                 </configuration>
               </execution>
