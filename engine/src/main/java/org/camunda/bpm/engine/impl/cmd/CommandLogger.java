@@ -358,7 +358,7 @@ public class CommandLogger extends ProcessEngineLogger {
 
   public ProcessEngineException exceptionWhileRetrievingDiagnosticsDataRegistryNull() {
     return new ProcessEngineException(
-        exceptionMessage("019", "Error while retrieving diagnostics data. Diagnostics registry was not initialized."));
+        exceptionMessage("055", "Error while retrieving diagnostics data. Diagnostics registry was not initialized."));
   }
 
 }

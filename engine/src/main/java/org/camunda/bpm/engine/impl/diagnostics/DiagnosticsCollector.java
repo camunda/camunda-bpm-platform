@@ -22,7 +22,6 @@ import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTAN
 import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.camunda.bpm.engine.impl.metrics.Meter;
@@ -38,14 +37,10 @@ import org.camunda.bpm.engine.telemetry.Metric;
 
 public class DiagnosticsCollector {
 
-  protected static final Set<String> METRICS_TO_REPORT = new HashSet<>();
-
-  static {
-    METRICS_TO_REPORT.add(ROOT_PROCESS_INSTANCE_START);
-    METRICS_TO_REPORT.add(EXECUTED_DECISION_INSTANCES);
-    METRICS_TO_REPORT.add(EXECUTED_DECISION_ELEMENTS);
-    METRICS_TO_REPORT.add(ACTIVTY_INSTANCE_START);
-  }
+  protected static final Set<String> METRICS_TO_REPORT = Set.of(ROOT_PROCESS_INSTANCE_START,
+                                                                EXECUTED_DECISION_INSTANCES,
+                                                                EXECUTED_DECISION_ELEMENTS,
+                                                                ACTIVTY_INSTANCE_START);
 
   protected TelemetryDataImpl staticData;
   protected DiagnosticsRegistry diagnosticsRegistry;
