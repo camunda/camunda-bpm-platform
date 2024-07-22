@@ -24,6 +24,10 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
+import org.camunda.bpm.integrationtest.util.DeploymentHelper;
+import org.camunda.bpm.integrationtest.util.TestConstants;
+import org.camunda.bpm.integrationtest.util.TestContainer;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.junit.Assert;
 
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -51,24 +55,49 @@ import org.junit.runner.RunWith;
 public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment(name="mainDeployment")
-  public static WebArchive createProcessArchiveDeplyoment() {
-    return initWebArchiveDeployment("mainDeployment.war")
-      .addClass(DelegateBefore.class)
-      .addClass(DelegateAfter.class)
-      .addAsResource("org/camunda/bpm/integrationtest/functional/context/CallActivityContextSwitchTest.mainProcessSync.bpmn20.xml")
-      .addAsResource("org/camunda/bpm/integrationtest/functional/context/CallActivityContextSwitchTest.mainProcessSyncNoWait.bpmn20.xml")
-      .addAsResource("org/camunda/bpm/integrationtest/functional/context/CallActivityContextSwitchTest.mainProcessASync.bpmn20.xml")
-      .addAsResource("org/camunda/bpm/integrationtest/functional/context/CallActivityContextSwitchTest.mainProcessASyncBefore.bpmn20.xml")
-      .addAsResource("org/camunda/bpm/integrationtest/functional/context/CallActivityContextSwitchTest.mainProcessASyncAfter.bpmn20.xml");
+  public static WebArchive createProcessArchiveDeployment() {
+    var webArchive = ShrinkWrap.create(WebArchive.class, "mainDeployment.war")
+            .addAsWebInfResource("org/camunda/bpm/integrationtest/beans.xml", "beans.xml")
+            .addAsLibraries(DeploymentHelper.getEngineCdi())
+            .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
+
+            .addClass(AbstractFoxPlatformIntegrationTest.class)
+
+            .addClass(TestConstants.class)
+            .addClass(DelegateBefore.class)
+            .addClass(DelegateAfter.class)
+
+            .addAsResource("org/camunda/bpm/integrationtest/functional/context/CallActivityContextSwitchTest.mainProcessSync.bpmn20.xml")
+            .addAsResource("org/camunda/bpm/integrationtest/functional/context/CallActivityContextSwitchTest.mainProcessSyncNoWait.bpmn20.xml")
+            .addAsResource("org/camunda/bpm/integrationtest/functional/context/CallActivityContextSwitchTest.mainProcessASync.bpmn20.xml")
+            .addAsResource("org/camunda/bpm/integrationtest/functional/context/CallActivityContextSwitchTest.mainProcessASyncBefore.bpmn20.xml")
+            .addAsResource("org/camunda/bpm/integrationtest/functional/context/CallActivityContextSwitchTest.mainProcessASyncAfter.bpmn20.xml");
+
+    TestContainer.addContainerSpecificResourcesEmbedCdiLib(webArchive);
+
+    return webArchive;
   }
 
   @Deployment(name="calledDeployment")
   public static WebArchive createSecondProcessArchiveDeployment() {
-    return initWebArchiveDeployment("calledDeployment.war")
-      .addClass(CalledProcessDelegate.class)
-      .addAsResource("org/camunda/bpm/integrationtest/functional/context/CallActivityContextSwitchTest.calledProcessSync.bpmn20.xml")
-      .addAsResource("org/camunda/bpm/integrationtest/functional/context/CallActivityContextSwitchTest.calledProcessSyncNoWait.bpmn20.xml")
-      .addAsResource("org/camunda/bpm/integrationtest/functional/context/CallActivityContextSwitchTest.calledProcessASync.bpmn20.xml");
+    var webArchive = ShrinkWrap.create(WebArchive.class, "calledDeployment.war")
+            .addAsWebInfResource("org/camunda/bpm/integrationtest/beans.xml", "beans.xml")
+            .addAsLibraries(DeploymentHelper.getEngineCdi())
+            .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
+
+            .addClass(AbstractFoxPlatformIntegrationTest.class)
+
+            .addClass(TestConstants.class)
+
+            .addClass(CalledProcessDelegate.class)
+
+            .addAsResource("org/camunda/bpm/integrationtest/functional/context/CallActivityContextSwitchTest.calledProcessSync.bpmn20.xml")
+            .addAsResource("org/camunda/bpm/integrationtest/functional/context/CallActivityContextSwitchTest.calledProcessSyncNoWait.bpmn20.xml")
+            .addAsResource("org/camunda/bpm/integrationtest/functional/context/CallActivityContextSwitchTest.calledProcessASync.bpmn20.xml");
+
+    TestContainer.addContainerSpecificResourcesEmbedCdiLib(webArchive);
+
+    return webArchive;
   }
 
   @Inject

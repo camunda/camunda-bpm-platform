@@ -23,6 +23,7 @@ import org.camunda.bpm.integrationtest.functional.cdi.beans.ConditionalFlowBean;
 import org.camunda.bpm.integrationtest.functional.cdi.beans.ProcessVariableBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.DeploymentHelper;
+import org.camunda.bpm.integrationtest.util.TestConstants;
 import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -43,18 +44,40 @@ public class CdiBeanCallActivityResolutionTest extends AbstractFoxPlatformIntegr
 
   @Deployment(name="pa1")
   public static WebArchive createCallingProcessDeployment() {
-    return initWebArchiveDeployment("pa1.war")
+    WebArchive archive = ShrinkWrap.create(WebArchive.class, "pa1.war")
+            .addAsWebInfResource("org/camunda/bpm/integrationtest/beans.xml", "beans.xml")
+            .addAsLibraries(DeploymentHelper.getEngineCdi())
+            .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
+
             .addClass(ConditionalFlowBean.class)
+            .addClass(AbstractFoxPlatformIntegrationTest.class)
+            .addClass(TestConstants.class)
+
             .addAsResource("org/camunda/bpm/integrationtest/functional/cdi/CdiBeanCallActivityResolutionTest.callingProcess.bpmn20.xml")
             .addAsResource("org/camunda/bpm/integrationtest/functional/cdi/CdiBeanCallActivityResolutionTest.callingProcessConditionalFlow.bpmn20.xml");
+
+    TestContainer.addContainerSpecificResourcesEmbedCdiLib(archive);
+
+    return archive;
 
   }
 
   @Deployment(name="pa2")
   public static WebArchive createCalledProcessDeployment() {
-    return initWebArchiveDeployment("pa2.war")
+    WebArchive archive = ShrinkWrap.create(WebArchive.class, "pa2.war")
+            .addAsWebInfResource("org/camunda/bpm/integrationtest/beans.xml", "beans.xml")
+            .addAsLibraries(DeploymentHelper.getEngineCdi())
+            .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
+
             .addClass(ProcessVariableBean.class)
+            .addClass(AbstractFoxPlatformIntegrationTest.class)
+            .addClass(TestConstants.class)
+
             .addAsResource("org/camunda/bpm/integrationtest/functional/cdi/CdiBeanCallActivityResolutionTest.calledProcess.bpmn20.xml");
+
+    TestContainer.addContainerSpecificResourcesEmbedCdiLib(archive);
+
+    return archive;
   }
 
   @Deployment(name="clientDeployment")
@@ -64,7 +87,7 @@ public class CdiBeanCallActivityResolutionTest extends AbstractFoxPlatformIntegr
             .addClass(AbstractFoxPlatformIntegrationTest.class)
             .addAsLibraries(DeploymentHelper.getEngineCdi());
 
-    TestContainer.addContainerSpecificResourcesForNonPa(deployment);
+    TestContainer.addContainerSpecificResourcesForNonPaEmbedCdiLib(deployment);
 
     return deployment;
   }
