@@ -34,6 +34,7 @@
                            "links": [],
                            "id": "anId",
                            "definitionId": "aProcDefId",
+                           "definitionKey": "aProcDefKey",
                            "businessKey": "aKey",
                            "caseInstanceId": "aCaseInstanceId",
                            "ended": false,

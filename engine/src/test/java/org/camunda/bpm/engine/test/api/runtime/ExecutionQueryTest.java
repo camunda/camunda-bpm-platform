@@ -98,6 +98,7 @@ public class ExecutionQueryTest extends PluggableProcessEngineTest {
     // Concurrent process with 3 executions for each process instance
     assertEquals(12, runtimeService.createExecutionQuery().processDefinitionKey(CONCURRENT_PROCESS_KEY).list().size());
     assertEquals(1, runtimeService.createExecutionQuery().processDefinitionKey(SEQUENTIAL_PROCESS_KEY).list().size());
+    assertNotNull(runtimeService.createExecutionQuery().processDefinitionKey(SEQUENTIAL_PROCESS_KEY).singleResult().getProcessDefinitionKey());
   }
 
   @Test
