@@ -41,6 +41,7 @@
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 
     <property name="databaseTablePrefix" value="SCHEMA1." />
+    <property name="transactionIsolationLevel" value="serializable" />
 
     <!-- telemetry configuration -->
     <property name="telemetryEndpoint" value="http://localhost:8081/pings"/>

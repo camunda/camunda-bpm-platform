@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine.test.util;
 
+import static org.junit.Assert.assertEquals;
+
+import java.sql.Connection;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -34,8 +37,8 @@ public class TransactionIsolationLevelTest {
   public void getAndSetTransactionIsolationLevel() {
     ProcessEngineConfigurationImpl processEngineConfiguration = processEngineRule.getProcessEngineConfiguration();
     LOG.warn("Database type: {}", DatabaseHelper.getDatabaseType(processEngineConfiguration));
-    LOG.warn("Transaction isolation level before: {}", DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration));
-    DatabaseHelper.setTransactionIsolationLevel(processEngineConfiguration);
-    LOG.warn("Transaction isolation level after: {}", DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration));
+    int transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
+    LOG.warn("Transaction isolation level: {}", transactionIsolationLevel);
+    assertEquals(Connection.TRANSACTION_SERIALIZABLE, transactionIsolationLevel);
   }
 }

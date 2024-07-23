@@ -130,7 +130,6 @@ import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantCommandChecker;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
 import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneTransactionContextFactory;
-import org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd;
 import org.camunda.bpm.engine.impl.cmmn.CaseServiceImpl;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
@@ -417,6 +416,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected static final Map<Object, Object> DEFAULT_BEANS_MAP = new HashMap<>();
 
   protected static final String PRODUCT_NAME = "Camunda BPM Runtime";
+  protected static final Map<String, Integer> TRANSACTION_ISOLATION_LEVEL_MAPPING = Map.of(
+      "readCommitted", Connection.TRANSACTION_READ_COMMITTED,
+      "readUncommitted", Connection.TRANSACTION_READ_UNCOMMITTED,
+      "repeatableRead", Connection.TRANSACTION_REPEATABLE_READ, 
+      "serializable", Connection.TRANSACTION_SERIALIZABLE);
 
   public static SqlSessionFactory cachedSqlSessionFactory;
 
@@ -440,7 +444,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   // Command executor and interceptor stack
   /**
-   * the configurable list which will be {@link #initInterceptorChain(java.util.List) processed} to build the {@link #commandExecutorTxRequired}
+   * the configurable list which will be {@link #initInterceptorChain(List) processed} to build the {@link #commandExecutorTxRequired}
    */
   protected List<CommandInterceptor> customPreCommandInterceptorsTxRequired;
   protected List<CommandInterceptor> customPostCommandInterceptorsTxRequired;
@@ -766,7 +770,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected DmnHistoryEventProducer dmnHistoryEventProducer;
 
   /**
-   * As an instance of {@link org.camunda.bpm.engine.impl.history.handler.CompositeHistoryEventHandler}
+   * As an instance of {@link CompositeHistoryEventHandler}
    * it contains all the provided history event handlers that process history events.
    */
   protected HistoryEventHandler historyEventHandler;
@@ -1278,7 +1282,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     //validate number of threads
     if (historyCleanupDegreeOfParallelism < 1 || historyCleanupDegreeOfParallelism > MAX_THREADS_NUMBER) {
       throw LOG.invalidPropertyValue("historyCleanupDegreeOfParallelism", String.valueOf(historyCleanupDegreeOfParallelism),
-        String.format("value for number of threads for history cleanup should be between 1 and %s", HistoryCleanupCmd.MAX_THREADS_NUMBER));
+        String.format("value for number of threads for history cleanup should be between 1 and %s", MAX_THREADS_NUMBER));
     }
 
     if (historyCleanupBatchWindowStartTime != null) {
@@ -1724,10 +1728,44 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         // ACT-233: connection pool of Ibatis is not properely initialized if this is not called!
         ((PooledDataSource) dataSource).forceCloseAll();
       }
+
+      if (transactionIsolationLevel == null || transactionIsolationLevel.isBlank() || !TRANSACTION_ISOLATION_LEVEL_MAPPING.containsKey(transactionIsolationLevel)) {
+          int currentIsolationLevel = getCurrentTransactionIsolationLevel();
+          if (currentIsolationLevel != Connection.TRANSACTION_READ_COMMITTED) {
+            // LOG WARNING
+          }
+      } else {
+          final int isolationLevel = TRANSACTION_ISOLATION_LEVEL_MAPPING.get(transactionIsolationLevel);
+          if (isolationLevel != Connection.TRANSACTION_READ_COMMITTED) {
+            // LOG WARNING
+          }
+        setDefaultTransactionIsolationLevel(isolationLevel);
+      }
     }
 
     if (databaseType == null) {
       initDatabaseType();
+    }
+  }
+
+  protected Integer getCurrentTransactionIsolationLevel() {
+    try (Connection connection = dataSource.getConnection()) {
+      return connection.getTransactionIsolation();
+    } catch (SQLException e) {
+      // LOG WARNING
+      return null;
+    }
+  }
+
+  protected void setDefaultTransactionIsolationLevel(int isolationLevel) {
+    if(dataSource instanceof PooledDataSource) {
+      ((PooledDataSource) dataSource).setDefaultTransactionIsolationLevel(isolationLevel);
+    } else {
+      try (Connection connection = dataSource.getConnection()) {
+        connection.setTransactionIsolation(isolationLevel);
+      } catch (SQLException e) {
+        // LOG WARNING
+      }
     }
   }
 
