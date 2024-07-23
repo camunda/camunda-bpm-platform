@@ -47,12 +47,14 @@ public class TaskMeterLogEntity implements DbEntity, HasDbReferences, Serializab
   }
 
   protected long createHashAsLong(String assignee) {
-    String algorithm = "MD5";
+    String algorithm = "SHA-256";
     try {
-      // create a 64 bit (8 byte) hash from an MD5 hash (128 bit) and convert to a long (8 byte)
+      // create a 64 bit (8 byte) hash from a SHA-256 hash (256 bit) and convert to a long (8 byte)
       MessageDigest digest = MessageDigest.getInstance(algorithm);
       digest.update(assignee.getBytes(StandardCharsets.UTF_8));
-      return ByteBuffer.wrap(digest.digest(), 0, 8).getLong();
+      // Use only the first 8 bytes of the SHA-256 hash to fit into a long
+      byte[] hashBytes = Arrays.copyOf(digest.digest(), 8);
+      return ByteBuffer.wrap(hashBytes).getLong();
     } catch (NoSuchAlgorithmException e) {
       throw new ProcessEngineException("Cannot lookup hash algorithm '" + algorithm + "'");
     }
