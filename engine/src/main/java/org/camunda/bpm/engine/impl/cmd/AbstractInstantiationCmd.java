@@ -86,6 +86,14 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
     return variablesLocal;
   }
 
+  public String getAncestorActivityInstanceId() {
+    return ancestorActivityInstanceId;
+  }
+
+  public void setAncestorActivityInstanceId(String ancestorActivityInstanceId) {
+    this.ancestorActivityInstanceId = ancestorActivityInstanceId;
+  }
+
   public Void execute(final CommandContext commandContext) {
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
 

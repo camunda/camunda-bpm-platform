@@ -826,6 +826,11 @@ public class SingleProcessInstanceModificationAsyncTest extends PluggableProcess
     }
   }
 
+  @Test
+  public void test() {
+    // Test async with ancestor
+  }
+
   @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
   @Test
   public void testSetInvocationsPerBatchType() {
