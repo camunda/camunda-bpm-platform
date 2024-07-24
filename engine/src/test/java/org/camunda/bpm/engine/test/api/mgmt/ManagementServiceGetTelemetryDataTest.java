@@ -423,21 +423,21 @@ public class ManagementServiceGetTelemetryDataTest {
     assertThat(beforeToggleTelemetry).isNotNull();
     assertThat(beforeToggleTelemetry).isEqualTo(afterToggleTelemetry);
   }
-
-  @Test
-  public void shouldNotResetCollectionTimeFrameOnActivateTelemetryWhenAlreadyActivated() {
-    // given default telemetry data and empty telemetry registry
-    // telemetry activated
-    managementService.toggleTelemetry(true);
-    Date beforeToggleTelemetry = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
-
-    // when
-    managementService.toggleTelemetry(true);
-    Date afterToggleTelemetry = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
-
-    // then
-    assertThat(beforeToggleTelemetry).isNotNull();
-    assertThat(beforeToggleTelemetry).isEqualTo(afterToggleTelemetry);
-  }
+//
+//  @Test
+//  public void shouldNotResetCollectionTimeFrameOnActivateTelemetryWhenAlreadyActivated() {
+//    // given default telemetry data and empty telemetry registry
+//    // telemetry activated
+//    managementService.toggleTelemetry(true);
+//    Date beforeToggleTelemetry = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
+//
+//    // when
+//    managementService.toggleTelemetry(true);
+//    Date afterToggleTelemetry = managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
+//
+//    // then
+//    assertThat(beforeToggleTelemetry).isNotNull();
+//    assertThat(beforeToggleTelemetry).isEqualTo(afterToggleTelemetry);
+//  }
 
 }

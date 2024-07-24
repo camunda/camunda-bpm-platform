@@ -349,13 +349,6 @@
       </dependency>
 
       <dependency>
-        <groupId>com.github.tomakehurst</groupId>
-        <artifactId>wiremock-jre8-standalone</artifactId>
-        <version>${version.wiremock-jre8}</version>
-        <scope>test</scope>
-      </dependency>
-
-      <dependency>
         <groupId>org.skyscreamer</groupId>
         <artifactId>jsonassert</artifactId>
         <version>1.5.0</version>

@@ -1007,7 +1007,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
     managementService.toggleTelemetry(true);
 
     // then
-    assertThat(managementService.isTelemetryEnabled()).isTrue();
+    assertThat(managementService.isTelemetryEnabled()).isFalse();
   }
 
   @Test
@@ -1052,6 +1052,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
   protected PropertyEntity getTelemetryProperty(ProcessEngineConfigurationImpl configuration) {
       return configuration.getCommandExecutorTxRequired()
         .execute(new Command<PropertyEntity>() {
+          @Override
           public PropertyEntity execute(CommandContext commandContext) {
             return commandContext.getPropertyManager().findPropertyById("camunda.telemetry.enabled");
           }

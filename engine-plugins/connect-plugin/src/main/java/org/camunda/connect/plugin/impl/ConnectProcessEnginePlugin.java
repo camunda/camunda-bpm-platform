@@ -35,7 +35,6 @@ public class ConnectProcessEnginePlugin extends AbstractProcessEnginePlugin {
 
     addConnectorParseListener(processEngineConfiguration);
 
-    processEngineConfiguration.setTelemetryHttpConnector(Connectors.getConnector(Connectors.HTTP_CONNECTOR_ID));
   }
 
   private void addConnectorParseListener(ProcessEngineConfigurationImpl processEngineConfiguration) {
