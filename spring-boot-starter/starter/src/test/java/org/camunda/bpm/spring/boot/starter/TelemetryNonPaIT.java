@@ -21,8 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Set;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
-import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
+import org.camunda.bpm.engine.impl.diagnostics.CamundaIntegration;
+import org.camunda.bpm.engine.impl.diagnostics.DiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
@@ -41,10 +41,10 @@ public class TelemetryNonPaIT extends AbstractCamundaAutoConfigurationIT {
 
   @Test
   public void shouldSubmitApplicationServerData() {
-    TelemetryRegistry telemetryRegistry = processEngine.getProcessEngineConfiguration().getTelemetryRegistry();
+    DiagnosticsRegistry diagnosticsRegistry = ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).getDiagnosticsRegistry();
 
     // then
-    ApplicationServerImpl applicationServer = telemetryRegistry.getApplicationServer();
+    ApplicationServerImpl applicationServer = diagnosticsRegistry.getApplicationServer();
     assertThat(applicationServer).isNotNull();
     assertThat(applicationServer.getVendor()).isEqualTo("Apache Tomcat");
     assertThat(applicationServer.getVersion()).isNotNull();

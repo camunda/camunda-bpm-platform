@@ -16,130 +16,90 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt.telemetry;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
-import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.camunda.commons.testing.WatchLogger;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import org.junit.rules.RuleChain;
 
 public class TelemetryConfigurationTest {
 
-  protected static final String TELEMETRY_ENDPOINT = "http://localhost:8086/pings";
+
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule);
 
   @Rule
   public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
 
+  protected ProcessEngineConfigurationImpl configuration;
+  protected ManagementService managementService;
+  protected IdentityService identityService;
+
   protected ProcessEngineConfigurationImpl inMemoryConfiguration;
 
-  WireMockServer wireMockServer;
+  @Before
+  public void init() {
+    configuration = engineRule.getProcessEngineConfiguration();
+    managementService = configuration.getManagementService();
+    identityService = configuration.getIdentityService();
+  }
 
   @After
-  public void reset() {
+  public void tearDown() {
+    identityService.clearAuthentication();
     if (inMemoryConfiguration != null) {
-      if (Boolean.TRUE.equals(inMemoryConfiguration.getManagementService().isTelemetryEnabled())) {
-        inMemoryConfiguration.getManagementService().toggleTelemetry(false);
-      }
+      inMemoryConfiguration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP);
       ProcessEngineImpl processEngineImpl = inMemoryConfiguration.getProcessEngine();
       processEngineImpl.close();
       processEngineImpl = null;
     }
-
-    if (wireMockServer != null) {
-      wireMockServer.stop();
-    }
   }
 
   @Test
-  public void shouldStartEngineWithTelemetryDefaults() {
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @SuppressWarnings("deprecation")
+  public void shouldNotRecordUserOperationLog() {
     // given
-    inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
-    inMemoryConfiguration
-        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
+    configuration.getIdentityService().setAuthenticatedUserId("admin");
 
     // when
-    inMemoryConfiguration.buildProcessEngine();
+    managementService.toggleTelemetry(true);
 
     // then
-    assertThat(inMemoryConfiguration.isInitializeTelemetry()).isFalse();
-    assertThat(inMemoryConfiguration.getManagementService().isTelemetryEnabled()).isFalse();
-
-    // the telemetry reporter is always scheduled
-    assertThat(inMemoryConfiguration.isTelemetryReporterActivate()).isTrue();
-    assertThat(inMemoryConfiguration.getTelemetryReporter().isScheduled()).isTrue();
-    assertThat(inMemoryConfiguration.getTelemetryReporter().getInitialReportingDelaySeconds()).isEqualTo(TelemetryReporter.DEFAULT_INIT_REPORT_DELAY_SECONDS);
+    assertThat(configuration.getHistoryService().createUserOperationLogQuery().list()).isEmpty();
   }
 
   @Test
-  public void shouldStartEngineWithTelemetryDisabled() {
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.persistence"}, level = "DEBUG")
+  public void shouldNotLogDefaultTelemetryValue() {
     // given
-    inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
-    inMemoryConfiguration
-        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
-        .setInitializeTelemetry(false);
-
-    // when
-    inMemoryConfiguration.buildProcessEngine();
 
     // then
-    assertThat(inMemoryConfiguration.isInitializeTelemetry()).isFalse();
-    assertThat(inMemoryConfiguration.getManagementService().isTelemetryEnabled()).isFalse();
-
-    // the telemetry reporter is always scheduled
-    assertThat(inMemoryConfiguration.isTelemetryReporterActivate()).isTrue();
-    assertThat(inMemoryConfiguration.getTelemetryReporter().isScheduled()).isTrue();
-    assertThat(inMemoryConfiguration.getTelemetryReporter().getInitialReportingDelaySeconds()).isEqualTo(TelemetryReporter.DEFAULT_INIT_REPORT_DELAY_SECONDS);
+    assertThat(loggingRule.getFilteredLog(" telemetry ").size()).isZero();
   }
 
   @Test
-  public void shouldStartEngineWithTelemetryEnabled() {
-    // given
-    inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
-    inMemoryConfiguration
-        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
-        .setTelemetryEndpoint(TELEMETRY_ENDPOINT)
-        .setInitializeTelemetry(true);
-
-    // when
-    inMemoryConfiguration.buildProcessEngine();
-
-    // then
-    assertThat(inMemoryConfiguration.isInitializeTelemetry()).isTrue();
-    assertThat(inMemoryConfiguration.getManagementService().isTelemetryEnabled()).isTrue();
-    assertThat(inMemoryConfiguration.getTelemetryReporter().getInitialReportingDelaySeconds()).isEqualTo(TelemetryReporter.DEFAULT_INIT_REPORT_DELAY_SECONDS);
-  }
-
-  @Test
-  public void shouldStartEngineWithChangedTelemetryEndpoint() {
-    // given
-    inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
-    inMemoryConfiguration
-        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
-        .setTelemetryEndpoint(TELEMETRY_ENDPOINT);
-
-    // when
-    inMemoryConfiguration.buildProcessEngine();
-
-    // then
-    assertThat(inMemoryConfiguration.getTelemetryEndpoint()).isEqualTo(TELEMETRY_ENDPOINT);
-  }
-
-  @Test
-  public void shouldStartEngineWithTelemetryEnabledAndLicenseKeyAlreadyPresent() {
+  @RequiredDatabase(includes = DbSqlSessionFactory.H2) // it's h2-specific test
+  public void shouldStartEngineWithLicenseKeyAlreadyPresent() {
     // given license key persisted
     String testLicenseKey = "signature=;my company;unlimited";
     inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
@@ -147,103 +107,17 @@ public class TelemetryConfigurationTest {
         .setJdbcUrl("jdbc:h2:mem:camunda-test" + getClass().getSimpleName())
         // keep data alive at process engine close
         .setDatabaseSchemaUpdate(ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_CREATE)
-        .setInitializeTelemetry(false)
         .setDbMetricsReporterActivate(false);
     ProcessEngine processEngine = inMemoryConfiguration.buildProcessEngine();
     processEngine.getManagementService().setLicenseKey(testLicenseKey);
     processEngine.close();
 
-    // when an engine with telemetry is started
-    inMemoryConfiguration
-        .setInitializeTelemetry(true)
-        .setTelemetryEndpoint(TELEMETRY_ENDPOINT);
+    // when
     inMemoryConfiguration.buildProcessEngine();
 
     // then the license key is picked up
-    assertThat(inMemoryConfiguration.getTelemetryRegistry().getLicenseKey())
+    assertThat(inMemoryConfiguration.getDiagnosticsRegistry().getLicenseKey())
         .isEqualToComparingFieldByField(new LicenseKeyDataImpl(null, null, null, null, null, "my company;unlimited"));
-
-    // force clean up
-    inMemoryConfiguration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP);
-  }
-
-  @Test
-  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.persistence"}, level = "DEBUG")
-  public void shouldNotLogDefaultTelemetryValue() {
-    // given
-    Boolean telemetryInitializedValue = null;
-    inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
-    inMemoryConfiguration
-        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
-
-    // when
-    inMemoryConfiguration.buildProcessEngine();
-
-    // then
-    assertThat(loggingRule.getFilteredLog("Creating the telemetry property in database with the value: " + telemetryInitializedValue).size()).isZero();
-  }
-
-  @Test
-  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.persistence"}, level = "DEBUG")
-  public void shouldLogTelemetryValue() {
-    // given
-    Boolean telemetryInitializedValue = null;
-    inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
-    inMemoryConfiguration
-    .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
-    .setInitializeTelemetry(true);
-
-    // when
-    inMemoryConfiguration.buildProcessEngine();
-
-    // then
-    assertThat(loggingRule.getFilteredLog("Creating the telemetry property in database with the value: " + telemetryInitializedValue).size()).isZero();
-  }
-
-  @Test
-  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.persistence"}, level = "DEBUG")
-  public void shouldLogTelemetryPersistenceLog() {
-    // given
-    boolean telemetryInitialized = true;
-    inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
-    inMemoryConfiguration
-        .setInitializeTelemetry(telemetryInitialized)
-        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
-
-    // when
-    inMemoryConfiguration.buildProcessEngine();
-
-    // then
-    assertThat(loggingRule.getFilteredLog("No telemetry property found in the database").size()).isOne();
-    assertThat(loggingRule.getFilteredLog("Creating the telemetry property in database with the value: " + telemetryInitialized).size()).isOne();
-  }
-
-  @Test
-  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "INFO")
-  public void shouldThrowAnException() {
-    // given
-    wireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig().port(8085));
-    wireMockServer.start();
-    inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
-    inMemoryConfiguration
-        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
-        .setInitializeTelemetry(true)
-        .setTelemetryRequestRetries(0)
-        .setTelemetryRequestTimeout(1)
-        .setTelemetryEndpoint(TELEMETRY_ENDPOINT);
-    inMemoryConfiguration.buildProcessEngine();
-    wireMockServer.stubFor(post(urlEqualTo("/pings"))
-        .willReturn(aResponse().withStatus(202)));
-
-    // when
-    inMemoryConfiguration.getTelemetryReporter().reportNow();
-
-    // then
-    assertThat(loggingRule
-        .getFilteredLog("Could not send telemetry data. Reason: "
-            + "ConnectorRequestException with message 'HTCL-02007 Unable to execute HTTP request'")
-        .size())
-        .isOne();
   }
 
 }

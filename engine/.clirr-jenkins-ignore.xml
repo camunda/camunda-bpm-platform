@@ -101,4 +101,20 @@
     <className>org/camunda/bpm/engine/ProcessEngineConfiguration</className>
     <method>**Jpa**</method>
   </difference>
+
+  <!-- 6001: removed field -->
+  <!-- removed feature: sending telemetry-->
+  <difference>
+    <differenceType>6001</differenceType>
+    <className>org/camunda/bpm/engine/ProcessEngineConfiguration</className>
+    <field>telemetryRegistry</field>
+  </difference>
+  <!-- 7002: removed method -->
+  <!-- removed feature: sending telemetry -->
+  <difference>>
+    <differenceType>7002</differenceType>
+    <className>org/camunda/bpm/engine/ProcessEngineConfiguration</className>
+    <method>**Telemetry**</method>
+  </difference>
+
 </differences>

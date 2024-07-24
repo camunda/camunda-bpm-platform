@@ -27,11 +27,11 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.diagnostics.CommandCounter;
+import org.camunda.bpm.engine.impl.diagnostics.DiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.metrics.Meter;
-import org.camunda.bpm.engine.impl.telemetry.CommandCounter;
-import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -65,31 +65,27 @@ public class TelemetryDynamicDataTest {
     clearMetrics();
   }
 
-
   @After
   public void tearDown() {
     clearMetrics();
-    managementService.toggleTelemetry(false);
 
     if (processEngineInMem != null) {
-      ((ProcessEngineConfigurationImpl) processEngineInMem.getProcessEngineConfiguration()).getManagementService()
-          .toggleTelemetry(false);
       ProcessEngines.unregister(processEngineInMem);
       processEngineInMem.close();
     }
   }
 
   public void clearMetrics() {
-    configuration.getTelemetryRegistry().clear();
+    configuration.getDiagnosticsRegistry().clear();
     clearMetrics(configuration.getMetricsRegistry().getDbMeters());
-    clearMetrics(configuration.getMetricsRegistry().getTelemetryMeters());
+    clearMetrics(configuration.getMetricsRegistry().getDiagnosticsMeters());
+    managementService.deleteMetrics(null);
   }
 
   protected void clearMetrics(Map<String, Meter> meters) {
     for (Meter meter : meters.values()) {
       meter.getAndClear();
     }
-    managementService.deleteMetrics(null);
   }
 
   @Test
@@ -97,17 +93,19 @@ public class TelemetryDynamicDataTest {
     // when
     processEngineInMem =  new StandaloneInMemProcessEngineConfiguration()
         .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
-        .setInitializeTelemetry(true)
         .buildProcessEngine();
 
     // then
-    TelemetryRegistry telemetryRegistry = processEngineInMem.getProcessEngineConfiguration().getTelemetryRegistry();
+    DiagnosticsRegistry telemetryRegistry = ((ProcessEngineConfigurationImpl) processEngineInMem.getProcessEngineConfiguration()).getDiagnosticsRegistry();
     Map<String, CommandCounter> entries = telemetryRegistry.getCommands();
     // note: There are more commands executed during engine start, but the
     // telemetry registry (including the command counts) is reset when telemetry is activated
     // during engine startup
     assertThat(entries.keySet()).containsExactlyInAnyOrder(
-        "IsTelemetryEnabledCmd",
+        "GetTableMetaDataCmd",
+        "HistoryCleanupCmd",
+        "SchemaOperationsProcessEngineBuild",
+        "HistoryLevelSetupCommand",
         "BootstrapEngineCommand",
         "GetLicenseKeyCmd");
     for (String commandName : entries.keySet()) {
@@ -119,9 +117,8 @@ public class TelemetryDynamicDataTest {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void shouldCountAfterCleaning() {
     // given
-    managementService.toggleTelemetry(true);
     clearCommandCounts();
-    Map<String, CommandCounter> entries = configuration.getTelemetryRegistry().getCommands();
+    Map<String, CommandCounter> entries = configuration.getDiagnosticsRegistry().getCommands();
 
     // when
     String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
@@ -131,20 +128,19 @@ public class TelemetryDynamicDataTest {
 
     // then
     assertThat(entries.size()).isEqualTo(4);
-    String [] expectedExcutedCommands = {"StartProcessInstanceCmd",
+    String [] expectedExecutedCommands = {"StartProcessInstanceCmd",
                                          "SetExecutionVariablesCmd",
                                          "TaskQueryImpl",
                                          "CompleteTaskCmd"};
-    assertThat(entries.keySet()).contains(expectedExcutedCommands);
-    for (String commandName : expectedExcutedCommands) {
+    assertThat(entries.keySet()).contains(expectedExecutedCommands);
+    for (String commandName : expectedExecutedCommands) {
       assertThat(entries.get(commandName).get()).isEqualTo(1);
     }
   }
 
   @Test
   public void shouldCollectInnerClasses() {
-    // given
-    managementService.toggleTelemetry(true);
+    // given default configuration
 
     // when
     configuration.getCommandExecutorTxRequired().execute(new InnerClassCmd());
@@ -152,16 +148,15 @@ public class TelemetryDynamicDataTest {
 
     // then
     // the class is properly formatted
-    Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
-    String [] expectedExcutedCommands = {"TelemetryDynamicDataTest_InnerClassCmd"};
-    assertThat(commands.keySet()).contains(expectedExcutedCommands);
+    Map<String, CommandCounter> commands = configuration.getDiagnosticsRegistry().getCommands();
+    String [] expectedExecutedCommands = {"TelemetryDynamicDataTest_InnerClassCmd"};
+    assertThat(commands.keySet()).contains(expectedExecutedCommands);
     assertThat(commands.get("TelemetryDynamicDataTest_InnerClassCmd").get()).isEqualTo(2L);
   }
 
   @Test
   public void shouldNotCollectAnonymousClasses() {
-    // given
-    managementService.toggleTelemetry(true);
+    // given default configuration
 
     // when
     // execute anonymous class
@@ -184,14 +179,13 @@ public class TelemetryDynamicDataTest {
 
     // then
     // the class is not collected
-    Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
-    assertThat(commands.keySet()).containsExactly("TelemetryConfigureCmd");
+    Map<String, CommandCounter> commands = configuration.getDiagnosticsRegistry().getCommands();
+    assertThat(commands.keySet()).containsExactlyInAnyOrder("DeleteMetricsCmd");
   }
 
   @Test
   public void shouldNotCollectLambdas() {
-    // given
-    managementService.toggleTelemetry(true);
+    // given default configuration
 
     // when
     // execute command as lambda
@@ -202,12 +196,12 @@ public class TelemetryDynamicDataTest {
 
     // then
     // the class is not collected
-    Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
-    assertThat(commands.keySet()).containsExactly("TelemetryConfigureCmd");
+    Map<String, CommandCounter> commands = configuration.getDiagnosticsRegistry().getCommands();
+    assertThat(commands.keySet()).containsExactlyInAnyOrder("DeleteMetricsCmd");
   }
 
   protected void clearCommandCounts() {
-    configuration.getTelemetryRegistry().clearCommandCounts();
+    configuration.getDiagnosticsRegistry().clearCommandCounts();
   }
 
   protected static class InnerClassCmd implements Command<Void> {

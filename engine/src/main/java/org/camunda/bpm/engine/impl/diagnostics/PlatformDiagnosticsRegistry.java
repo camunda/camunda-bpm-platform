@@ -14,17 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.container.impl.ejb.deployment;
+package org.camunda.bpm.engine.impl.diagnostics;
 
-import org.camunda.bpm.container.impl.deployment.PlatformXmlStartProcessEnginesStep;
-import org.camunda.bpm.container.impl.deployment.StartProcessEngineStep;
-import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
+import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 
-public class EjbPlatformXmlStartProcessEnginesStep extends PlatformXmlStartProcessEnginesStep {
+public class PlatformDiagnosticsRegistry {
 
-  @Override
-  protected StartProcessEngineStep createStartProcessEngineStep(ProcessEngineXml parsedProcessEngine) {
-    return new EjbStartProcessEngineStep(parsedProcessEngine);
+  protected static ApplicationServerImpl applicationServer;
+
+  public static synchronized ApplicationServerImpl getApplicationServer() {
+    return applicationServer;
   }
 
+  public static synchronized void setApplicationServer(String applicationServerVersion) {
+    if (applicationServer == null) {
+      applicationServer = new ApplicationServerImpl(applicationServerVersion);
+    }
+  }
+
+  public static synchronized void clear() {
+    applicationServer = null;
+  }
 }

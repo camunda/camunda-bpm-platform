@@ -4,8 +4,9 @@
   <@lib.endpointInfo
       id = "configureTelemetry"
       tag = "Telemetry"
+      deprecated = true
       summary = "Configure Telemetry"
-      desc = "Configures whether Camunda receives data collection of the process engine setup and usage." />
+      desc = "Deprecated: The sending telemetry feature is removed. Please remove the endpoint usages as they are no longer needed." />
 
   "parameters" : [],
 

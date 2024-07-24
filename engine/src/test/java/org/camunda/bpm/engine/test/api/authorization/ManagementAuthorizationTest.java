@@ -49,6 +49,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   protected static final String DUMMY_VALUE = "aPropertyValue";
   protected static final String DUMMY_METRIC = "dummyMetric";
 
+  @Override
   @After
   public void tearDown() {
     super.tearDown();
@@ -485,52 +486,11 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   // configure telemetry /////////////////////////////////////
 
   @Test
-  public void shouldNotToggleTelemetryEnabledWithoutAuthorization() {
+  public void shouldNotThrowExceptionWhenToggleTelemetry() {
     // given
-
-    assertThatThrownBy(() -> {
-      // when
-      managementService.toggleTelemetry(false);
-    })
-    // then
-        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.SET));
-  }
-
-  @Test
-  public void shouldToggleTelemetryEnabledAsCamundaAdmin() {
-    // given
-    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
-    managementService.toggleTelemetry(true);
 
     // when
-    managementService.toggleTelemetry(false);
-
-    // then
-    assertThat(managementService.isTelemetryEnabled()).isFalse();
-  }
-
-  @Test
-  public void shouldToggleTelemetryEnabledWithPermission() {
-    // given
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ, SystemPermissions.SET);
     managementService.toggleTelemetry(true);
-
-    // when
-    managementService.toggleTelemetry(false);
-
-    // then
-    assertThat(managementService.isTelemetryEnabled()).isFalse();
-  }
-
-  @Test
-  public void shouldToggleTelemetryEnabledWithAdminAndPermission() {
-    // given
-    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ, SystemPermissions.SET);
-    managementService.toggleTelemetry(true);
-
-    // when
-    managementService.toggleTelemetry(false);
 
     // then
     assertThat(managementService.isTelemetryEnabled()).isFalse();

@@ -20,7 +20,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
+import org.camunda.bpm.engine.impl.diagnostics.CamundaIntegration;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -31,6 +31,7 @@ public class CamundaIntegrationDeterminator implements InitializingBean {
   @Autowired
   protected ProcessEngine processEngine;
 
+  @Override
   public void afterPropertiesSet() throws Exception {
     ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
 

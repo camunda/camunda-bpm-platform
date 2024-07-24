@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
+import org.camunda.bpm.engine.impl.diagnostics.CamundaIntegration;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.run.CamundaBpmRun;
 import org.junit.Test;

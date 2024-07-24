@@ -2,8 +2,6 @@ camunda.bpm:
   admin-user:
     id: demo
     password: demo
-    generic-properties.properties:
-      telemetry-reporter-activate: false
   run.example.enabled: true 
 
 spring.datasource:

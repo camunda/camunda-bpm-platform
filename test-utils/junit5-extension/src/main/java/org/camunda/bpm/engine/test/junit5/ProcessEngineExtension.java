@@ -41,7 +41,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.telemetry.PlatformTelemetryRegistry;
+import org.camunda.bpm.engine.impl.diagnostics.PlatformDiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.test.Deployment;
@@ -218,7 +218,7 @@ public class ProcessEngineExtension implements TestWatcher,
 
    TestHelper.resetIdGenerator(processEngineConfiguration);
    ClockUtil.reset();
-   PlatformTelemetryRegistry.clear();
+   PlatformDiagnosticsRegistry.clear();
 
    // finally clear database and fail test if database is dirty
    if (ensureCleanAfterTest) {

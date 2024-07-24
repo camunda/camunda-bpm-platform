@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.impl.util;
 
 /**
  * Holds process engine version and edition (enterprise or community)
- * Used in retrieving the process engine details when sending telemetry data
+ * Used in retrieving the process engine details for diagnostics data
  */
 public class ProcessEngineDetails {
 

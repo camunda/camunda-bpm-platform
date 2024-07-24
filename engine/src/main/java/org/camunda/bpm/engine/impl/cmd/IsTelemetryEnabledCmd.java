@@ -17,32 +17,20 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
-import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 
+/**
+ * @deprecated Always returns <code>false</code>
+ * The sending telemetry data feature is removed.
+ * Please remove any usages of the command.
+ */
+@Deprecated
 public class IsTelemetryEnabledCmd implements Command<Boolean> {
 
-  protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
 
+  @Override
   public Boolean execute(CommandContext commandContext) {
-
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkCamundaAdminOrPermission(CommandChecker::checkReadTelemetryCollectionStatusData);
-
-    PropertyEntity telemetryProperty = commandContext.getPropertyManager().findPropertyById("camunda.telemetry.enabled");
-    if (telemetryProperty != null) {
-      if (telemetryProperty.getValue().toLowerCase().equals("null")) {
-        return null;
-      } else {
-        return Boolean.parseBoolean(telemetryProperty.getValue());
-      }
-    } else {
-      LOG.databaseTelemetryPropertyMissingInfo();
-      return null;
-    }
+    return false;
   }
 }

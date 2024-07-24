@@ -57,7 +57,6 @@ import org.camunda.bpm.engine.test.concurrency.ConcurrentHistoryCleanupTest;
 import org.camunda.bpm.engine.test.concurrency.ConcurrentHistoryLevelTest;
 import org.camunda.bpm.engine.test.concurrency.ConcurrentInstallationIdInitializationTest;
 import org.camunda.bpm.engine.test.concurrency.ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest;
-import org.camunda.bpm.engine.test.concurrency.ConcurrentTelemetryConfigurationTest;
 import org.camunda.bpm.engine.test.jobexecutor.ControllableJobExecutor;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -104,7 +103,6 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
     historyService = engineRule.getHistoryService();
 
     TestHelper.deleteInstallationId(processEngineConfiguration);
-    TestHelper.deleteTelemetryProperty(processEngineConfiguration);
     TestHelper.deleteHistoryLevel(processEngineConfiguration);
   }
 
@@ -186,62 +184,6 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
     assertThat(deployCommand1.getTries()).isEqualTo(1);
     // while the second deploy command failed with an OLE, and was retried
     assertThat(deployCommand2.getTries()).isEqualTo(2);
-  }
-
-  /**
-   * See {@link ConcurrentTelemetryConfigurationTest}
-   * for the test case without retries, and with an exclusive lock.
-   */
-  @Test
-  public void shouldEnableTelemetryWithoutExclusiveLock() throws InvocationTargetException,
-      NoSuchMethodException,
-      InstantiationException,
-      IllegalAccessException {
-
-    // given
-    // two concurrent commands to create a new telemetry property
-    ControllableProcessEngineBootstrapCommand telemetrySetupCommand1 =
-        new ControllableProcessEngineBootstrapCommand(ControllableUpdateTelemetrySetupCommand.class);
-    ControllableProcessEngineBootstrapCommand telemetrySetupCommand2 =
-        new ControllableProcessEngineBootstrapCommand(ControllableUpdateTelemetrySetupCommand.class);
-
-    ConcurrencyTestHelper.ThreadControl thread1 = executeControllableCommand(telemetrySetupCommand1);
-    thread1.reportInterrupts();
-    thread1.waitForSync();
-
-    ConcurrencyTestHelper.ThreadControl thread2 = executeControllableCommand(telemetrySetupCommand2);
-    thread2.reportInterrupts();
-    thread2.waitForSync();
-
-    // the first command initializes the property
-    thread1.makeContinue();
-    thread1.waitForSync();
-
-    // the second command initializes the property
-    thread2.makeContinue();
-    thread2.waitForSync();
-
-    // the first commands flushes its result
-    thread1.waitUntilDone();
-
-    // when
-    // the second command attempts to flush its result
-    // fails, and retries
-    thread2.waitUntilDone(true);
-
-    // then
-    // the first command shouldn't fail at all
-    assertNull(thread1.getException());
-    // the second command should fail with an OLE, but it should be
-    // caught by the CrdbTransactionRetryInterceptor
-    assertNull(thread2.getException());
-    // the telemetry property is successfully set
-    assertThat(managementService.isTelemetryEnabled()).isFalse();
-
-    // the first command was only executed once
-    assertThat(telemetrySetupCommand1.getTries()).isOne();
-    // but the second failed with an OLE, and was retried
-    assertThat(telemetrySetupCommand2.getTries()).isEqualTo(2);
   }
 
   /**
@@ -468,6 +410,7 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
       this.tries = 0;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
 
       monitor.sync();  // thread will block here until makeContinue() is called from main thread
@@ -530,8 +473,7 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
           ProcessEngineConfiguration
               .createProcessEngineConfigurationFromResource("camunda.cfg.xml"))
           .setCommandRetries(COMMAND_RETRIES)
-          .setProcessEngineName(PROCESS_ENGINE_NAME)
-          .setInitializeTelemetry(false);
+          .setProcessEngineName(PROCESS_ENGINE_NAME);
       processEngineConfiguration.setProcessEngineBootstrapCommand(bootstrapCommand);
 
       processEngineConfiguration.buildProcessEngine();
@@ -611,25 +553,6 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
     }
   }
 
-  protected static class ControllableUpdateTelemetrySetupCommand extends ControllableBootstrapEngineCommand {
-
-    public ControllableUpdateTelemetrySetupCommand(ThreadControl threadControl) {
-      super(threadControl);
-    }
-
-    @Override
-    public void initializeTelemetryProperty(CommandContext commandContext) {
-
-      monitor.sync(); // thread will block here until makeContinue() is called from main thread
-
-      tries++;
-      super.initializeTelemetryProperty(commandContext);
-
-      monitor.sync(); // thread will block here until waitUntilDone() is called form main thread
-
-    }
-  }
-
   protected static class ControllableHistoryCleanupCommand extends ControllableCommand<Void> {
 
     protected int tries;
@@ -640,6 +563,7 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
       this.historyCleanupCmd = new HistoryCleanupCmd(true);
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
       monitor.sync();  // thread will block here until makeContinue() is called from main thread
 
@@ -675,6 +599,7 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
       this.tries = 0;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
       monitor.sync();  // thread will block here until makeContinue() is called from main thread
 

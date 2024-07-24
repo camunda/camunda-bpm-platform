@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
+import org.camunda.bpm.engine.impl.diagnostics.DiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -42,14 +42,14 @@ public class LicenseKeyTelemetryTest {
   ProcessEngine processEngine;
   ProcessEngineConfigurationImpl processEngineConfiguration;
   ManagementService managementService;
-  TelemetryRegistry telemetryRegistry;
+  DiagnosticsRegistry telemetryRegistry;
 
   @Before
   public void init() {
     processEngine = engineRule.getProcessEngine();
     processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
     managementService = processEngine.getManagementService();
-    telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
+    telemetryRegistry = processEngineConfiguration.getDiagnosticsRegistry();
   }
 
   @After
