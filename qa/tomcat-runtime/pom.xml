@@ -54,6 +54,13 @@
     </dependency>
 
     <dependency>
+      <groupId>org.jboss.weld.servlet</groupId>
+      <artifactId>weld-servlet-shaded</artifactId>
+      <version>5.1.2.Final</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.camunda.bpm.qa</groupId>
       <artifactId>camunda-qa-ensure-clean-db</artifactId>
       <version>${project.version}</version>
