@@ -1,11 +1,11 @@
-<module xmlns="urn:jboss:module:1.0" name="org.apache.httpcomponents.httpcore">
+<module xmlns="urn:jboss:module:1.0" name="org.apache.httpcomponents.core5.httpcore5">
   <resources>
-    <resource-root path="httpcore-4.4.16.jar" />
+    <resource-root path="httpcore-5.2.4.jar" />
   </resources>
 
   <dependencies>
 
-    <module name="javax.api" />
+    <module name="java.base" />
 
     <module name="commons-logging.commons-logging" />
     <module name="commons-codec.commons-codec" />
