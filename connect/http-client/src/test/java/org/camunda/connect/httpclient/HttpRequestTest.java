@@ -191,4 +191,33 @@ public class HttpRequestTest {
       assertThat(request.getConfigOptions()).isNull();
   }
 
+  @Test
+  public void setRequestConfig() {
+    HttpRequest request = connector.createRequest()
+        .configOption("throw-http-error", "TRUE")
+        .configOption("connection-timeout", "10000")
+        .configOption("socket-timeout", "30000");
+
+    assertThat(request.getConfigOptions()).hasSize(3)
+        .containsEntry("throw-http-error", "TRUE")
+        .containsEntry("connection-timeout", "10000")
+        .containsEntry("socket-timeout", "30000");
+    assertThat(request.getConfigOption("throw-http-error")).isEqualTo("TRUE");
+    assertThat(request.getConfigOption("connection-timeout")).isEqualTo("10000");
+    assertThat(request.getConfigOption("socket-timeout")).isEqualTo("30000");
+    assertThat(request.getHeader("unknown")).isNull();
+  }
+
+  @Test
+  public void shouldIgnoreRequestConfigWithNullOrEmptyNameOrValue() {
+    HttpRequest request = connector.createRequest().configOption(null, "test");
+    assertThat(request.getConfigOptions()).isNull();
+
+    request.configOption("throw-http-error", null);
+    assertThat(request.getConfigOption("throw-http-error")).isNull();
+
+    request.configOption("throw-http-error", "");
+    assertThat(request.getConfigOption("throw-http-error")).isEqualTo("");
+  }
+
 }
