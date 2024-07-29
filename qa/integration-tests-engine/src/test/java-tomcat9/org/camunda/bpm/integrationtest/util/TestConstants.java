@@ -14,24 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine;
+package org.camunda.bpm.integrationtest.util;
 
 /**
- * Exception that is thrown when an optimistic locking error occurs in
- * CockroachDB, caused by concurrent access to the same data entries by
- * multiple transactions. CockroachDB optimistic locking errors can't be
- * handled in application code, so the transaction must be rolled back
- * and the involved commands retried.
+ * @author Thorben Lindhauer
+ *
  */
-public class CrdbTransactionRetryException extends OptimisticLockingException {
+public class TestConstants {
 
-  private static final long serialVersionUID = 1L;
+  public final static String APP_NAME = "";
+  public final static String PROCESS_ENGINE_SERVICE_JNDI_NAME = "java:comp/env/ProcessEngineService";
+  public final static String PROCESS_APPLICATION_SERVICE_JNDI_NAME = "java:comp/env/ProcessApplicationService";
 
-  public CrdbTransactionRetryException(String message) {
-    super(message);
+  public static String getAppName() {
+    return APP_NAME;
   }
 
-  public CrdbTransactionRetryException(String message, Throwable throwable) {
-    super(message, throwable);
+  public String getEngineService() {
+    return PROCESS_ENGINE_SERVICE_JNDI_NAME;
   }
+
+  public String getProcessApplicationService() {
+    return PROCESS_APPLICATION_SERVICE_JNDI_NAME;
+  }
+
 }

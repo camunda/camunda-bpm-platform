@@ -75,7 +75,6 @@ public abstract class AbstractFoxPlatformIntegrationTest {
 
     return archive;
   }
-
   public static WebArchive initWebArchiveDeployment(String name) {
     return initWebArchiveDeployment(name, "META-INF/processes.xml");
   }
@@ -83,6 +82,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   public static WebArchive initWebArchiveDeployment() {
     return initWebArchiveDeployment("test.war");
   }
+
 
 
   @Before

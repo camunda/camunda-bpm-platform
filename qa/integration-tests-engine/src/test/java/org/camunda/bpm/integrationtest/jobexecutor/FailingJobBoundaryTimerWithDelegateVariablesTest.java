@@ -20,10 +20,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.integrationtest.jobexecutor.beans.DemoDelegate;
@@ -54,28 +50,23 @@ public class FailingJobBoundaryTimerWithDelegateVariablesTest extends AbstractFo
             .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/ImmediatelyFailing.bpmn20.xml");
   }
 
-  @Inject
-  private RuntimeService runtimeService;
-  @Inject
-  private ManagementService managementService;
-
   @Test
   public void testFailingJobBoundaryTimerWithDelegateVariables() throws InterruptedException {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("ImmediatelyFailing");
 
-    List<Job> jobs = managementService.createJobQuery().list();
+    List<Job> jobs = managementService.createJobQuery().processInstanceId(pi.getProcessInstanceId()).list();
     assertEquals(1, jobs.size());
     assertEquals(3, jobs.get(0).getRetries());
 
     assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).activityId("usertask1").count());
     assertEquals(2, runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).count());
 
-    assertEquals(1, managementService.createJobQuery().executable().count());
+    assertEquals(1, managementService.createJobQuery().processInstanceId(pi.getProcessInstanceId()).executable().count());
 
     waitForJobExecutorToProcessAllJobs();
 
-    assertEquals(0, managementService.createJobQuery().executable().count()); // should be 0, because it has failed 3 times
-    assertEquals(1, managementService.createJobQuery().withException().count()); // should be 1, because job failed!
+    assertEquals(0, managementService.createJobQuery().processInstanceId(pi.getProcessInstanceId()).executable().count()); // should be 0, because it has failed 3 times
+    assertEquals(1, managementService.createJobQuery().processInstanceId(pi.getProcessInstanceId()).withException().count()); // should be 1, because job failed!
 
     assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).activityId("usertask1").count());
     assertEquals(2, runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).count());
@@ -83,7 +74,7 @@ public class FailingJobBoundaryTimerWithDelegateVariablesTest extends AbstractFo
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId()); // complete task with failed job => complete process
 
     assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).count());
-    assertEquals(0, managementService.createJobQuery().count()); // should be 0, because process is finished.
+    assertEquals(0, managementService.createJobQuery().processInstanceId(pi.getProcessInstanceId()).count()); // should be 0, because process is finished.
   }
 
 }

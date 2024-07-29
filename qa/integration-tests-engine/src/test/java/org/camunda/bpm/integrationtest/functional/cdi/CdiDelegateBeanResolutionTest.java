@@ -30,7 +30,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-
 /**
  * <p>Deploys two different applications, a process archive and a cleint application.</p>
  *
@@ -61,7 +60,7 @@ public class CdiDelegateBeanResolutionTest extends AbstractFoxPlatformIntegratio
             .addClass(AbstractFoxPlatformIntegrationTest.class)
             .addAsLibraries(DeploymentHelper.getEngineCdi());
 
-     TestContainer.addContainerSpecificResources(webArchive);
+     TestContainer.addContainerSpecificResourcesEmbedCdiLib(webArchive);
 
      return webArchive;
   }

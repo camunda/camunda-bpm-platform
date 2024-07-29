@@ -65,16 +65,6 @@ public class ExceptionUtilTest {
   }
 
   @Test
-  public void checkCrdbTransactionRetryException() {
-    assertThat(ExceptionUtil.checkCrdbTransactionRetryException(mock(SQLException.class))).isFalse();
-
-    SQLException retry = mock(SQLException.class);
-    doReturn("restart transaction").when(retry).getMessage();
-    doReturn(40001).when(retry).getErrorCode();
-    assertThat(ExceptionUtil.checkCrdbTransactionRetryException(retry)).isTrue();
-  }
-
-  @Test
   public void checkDeadlockException() {
     assertThat(ExceptionUtil.checkDeadlockException(mock(SQLException.class))).isFalse();
 

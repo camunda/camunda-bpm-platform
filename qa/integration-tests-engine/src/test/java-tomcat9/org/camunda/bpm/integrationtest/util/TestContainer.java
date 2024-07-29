@@ -18,36 +18,55 @@ package org.camunda.bpm.integrationtest.util;
 
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
-
-
 /**
+ * Tomcat test container.
  *
- * @author christian.lipphardt
+ * @author Daniel Meyer
  */
 public class TestContainer {
 
+  /**
+   * In some scenarios, Tomcat 10 and Weld 5 have issues when the Weld library is embedded into the WAR.
+   * To solve these issues, Weld is added to the Tomcat server libs folder.
+   */
   public static void addContainerSpecificResourcesEmbedCdiLib(WebArchive webArchive) {
     addContainerSpecificResources(webArchive);
   }
 
-  public static void addContainerSpecificResources(WebArchive archive) {
-    addContainerSpecificResourcesWithoutWeld(archive);
+  public static void addContainerSpecificResources(WebArchive webArchive) {
+    webArchive
+        .addAsManifestResource("context.xml")
+        .addClass(TestProcessApplication.class)
+        .addAsWebInfResource("web.xml")
+        .addAsLibraries(DeploymentHelper.getWeld());
   }
 
   public static void addContainerSpecificResourcesWithoutWeld(WebArchive webArchive) {
-    webArchive.addClass(TestProcessApplication.class);
+    webArchive
+      .addAsManifestResource("context.xml")
+      .addClass(TestProcessApplication.class)
+      .addAsWebInfResource("web-without-weld.xml", "web.xml");
   }
 
+  /**
+   * In some scenarios, Tomcat 10 and Weld 5 have issues when the Weld library is embedded into the WAR.
+   * To solve these issues, Weld is added to the Tomcat server libs folder.
+   */
   public static void addContainerSpecificResourcesForNonPaEmbedCdiLib(WebArchive webArchive) {
     addContainerSpecificResourcesForNonPa(webArchive);
   }
 
   public static void addContainerSpecificResourcesForNonPa(WebArchive webArchive) {
-    addContainerSpecificResourcesForNonPaWithoutWeld(webArchive);
+    webArchive
+        .addAsManifestResource("context.xml")
+        .addAsWebInfResource("web.xml")
+        .addAsLibraries(DeploymentHelper.getWeld());
   }
 
   public static void addContainerSpecificResourcesForNonPaWithoutWeld(WebArchive webArchive) {
-    webArchive.addAsManifestResource("jboss-deployment-structure.xml");
+    webArchive
+      .addAsManifestResource("context.xml")
+      .addAsWebInfResource("web-without-weld.xml", "web.xml");
   }
 
   public static void addContainerSpecificProcessEngineConfigurationClass(WebArchive deployment) {
@@ -55,15 +74,15 @@ public class TestContainer {
   }
 
   public static void addSpinJacksonJsonDataFormat(WebArchive webArchive) {
-    webArchive.addAsManifestResource("jboss-deployment-structure-spin-json.xml", "jboss-deployment-structure.xml");
+    webArchive.addAsLibraries(DeploymentHelper.getSpinJacksonJsonDataFormatForServer("tomcat"));
   }
 
   public static void addJodaTimeJacksonModule(WebArchive webArchive) {
-    webArchive.addAsLibraries(DeploymentHelper.getJodaTimeModuleForServer("jboss"));
+    webArchive.addAsLibraries(DeploymentHelper.getJodaTimeModuleForServer("tomcat"));
   }
 
   public static void addCommonLoggingDependency(WebArchive webArchive) {
-    webArchive.addAsManifestResource("jboss-deployment-structure-with-commons-logging.xml", "jboss-deployment-structure.xml");
+    // nothing to do
   }
 
 }
