@@ -18,14 +18,13 @@ package org.camunda.bpm.engine.rest.dto.history;
 
 import static java.lang.Boolean.TRUE;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
@@ -35,8 +34,6 @@ import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 /**
@@ -56,7 +53,7 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
-    VALID_SORT_BY_VALUES = new ArrayList<String>();
+    VALID_SORT_BY_VALUES = new ArrayList<>();
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_VARIABLE_NAME);
     VALID_SORT_BY_VALUES.add(SORT_BY_VARIABLE_TYPE);
@@ -74,6 +71,7 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
   protected String caseExecutionId;
   protected String variableInstanceId;
   protected String[] variableTypeIn;
+  protected String variableNameLike;
   protected String taskId;
   protected Boolean formFields;
   protected Boolean variableUpdates;
@@ -127,6 +125,11 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
   public void setVariableTypeIn(String[] variableTypeIn) {
     this.variableTypeIn = variableTypeIn;
   }
+
+   @CamundaQueryParam(value="variableNameLike", converter = StringArrayConverter.class)
+   public void setVariablenameLike(String variableNameLike) {
+     this.variableNameLike = variableNameLike;
+   }
 
   @CamundaQueryParam(value = "taskId")
   public void setTaskId(String taskId) {
@@ -235,6 +238,9 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     }
     if (variableTypeIn != null && variableTypeIn.length > 0) {
       query.variableTypeIn(variableTypeIn);
+    }
+    if(variableNameLike != null) {
+      query.variableNameLike(variableNameLike);
     }
     if (taskId != null) {
       query.taskId(taskId);

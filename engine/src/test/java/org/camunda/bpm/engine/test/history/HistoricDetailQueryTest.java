@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -28,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -230,7 +230,7 @@ public class HistoricDetailQueryTest {
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void testQueryByVariableTypeIn() {
     // given
-    Map<String, Object> variables1 = new HashMap<String, Object>();
+    Map<String, Object> variables1 = new HashMap<>();
     variables1.put("stringVar", "test");
     variables1.put("boolVar", true);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
@@ -257,7 +257,7 @@ public class HistoricDetailQueryTest {
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void testQueryByVariableTypeInWithCapitalLetter() {
     // given
-    Map<String, Object> variables1 = new HashMap<String, Object>();
+    Map<String, Object> variables1 = new HashMap<>();
     variables1.put("stringVar", "test");
     variables1.put("boolVar", true);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
@@ -284,7 +284,7 @@ public class HistoricDetailQueryTest {
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void testQueryByVariableTypeInWithSeveralTypes() {
     // given
-    Map<String, Object> variables1 = new HashMap<String, Object>();
+    Map<String, Object> variables1 = new HashMap<>();
     variables1.put("stringVar", "test");
     variables1.put("boolVar", true);
     variables1.put("intVar", 5);
@@ -300,7 +300,7 @@ public class HistoricDetailQueryTest {
     // then
     assertEquals(3, query.list().size());
     assertEquals(3, query.count());
-    Set<String> allowedVariableTypes = new HashSet<String>();
+    Set<String> allowedVariableTypes = new HashSet<>();
     allowedVariableTypes.add("boolean");
     allowedVariableTypes.add("integer");
     allowedVariableTypes.add("object");
@@ -318,7 +318,7 @@ public class HistoricDetailQueryTest {
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void testQueryByInvalidVariableTypeIn() {
     // given
-    Map<String, Object> variables1 = new HashMap<String, Object>();
+    Map<String, Object> variables1 = new HashMap<>();
     variables1.put("stringVar", "test");
     variables1.put("boolVar", true);
     variables1.put("intVar", 5);
@@ -351,9 +351,187 @@ public class HistoricDetailQueryTest {
 
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableNameLike() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("FooBarBaz", "variableValue");
+    variables.put("bazBarFoo", "anotherVariableValue");
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().variableNameLike("FooBar%").list();
+
+    // then
+    assertThat(historicDetails).hasSize(1);
+    assertThat(historicDetails.get(0)).isInstanceOf(HistoricVariableUpdate.class);
+    HistoricVariableUpdate historicDetail = (HistoricVariableUpdate) historicDetails.get(0);
+    assertThat(historicDetail.getVariableName()).isEqualTo("FooBarBaz");
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableNameLikeTwoWildcards() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("FooBarBaz", "variableValue");
+    variables.put("FooBaz", "anotherVariableValue");
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().variableNameLike("%Bar%").list();
+
+    // then
+    assertThat(historicDetails).hasSize(1);
+    assertThat(historicDetails.get(0)).isInstanceOf(HistoricVariableUpdate.class);
+    HistoricVariableUpdate historicDetail = (HistoricVariableUpdate) historicDetails.get(0);
+    assertThat(historicDetail.getVariableName()).isEqualTo("FooBarBaz");
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableNameLikePrefixWildcard() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("FooBarBaz", "variableValue");
+    variables.put("FooBar", "anotherVariableValue");
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().variableNameLike("%Bar").list();
+
+    // then
+    assertThat(historicDetails).hasSize(1);
+    assertThat(historicDetails.get(0)).isInstanceOf(HistoricVariableUpdate.class);
+    HistoricVariableUpdate historicDetail = (HistoricVariableUpdate) historicDetails.get(0);
+    assertThat(historicDetail.getVariableName()).isEqualTo("FooBar");
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableNameLikeInfixWildcard() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("FooBarBaz", "variableValue");
+    variables.put("FooBar", "anotherVariableValue");
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().variableNameLike("Foo%Baz").list();
+
+    // then
+    assertThat(historicDetails).hasSize(1);
+    assertThat(historicDetails.get(0)).isInstanceOf(HistoricVariableUpdate.class);
+    HistoricVariableUpdate historicDetail = (HistoricVariableUpdate) historicDetails.get(0);
+    assertThat(historicDetail.getVariableName()).isEqualTo("FooBarBaz");
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableNameLikeIgnoreCase() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("FooBarBaz", "variableValue");
+    variables.put("BarBaz", "anotherVariableValue");
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().variableNameLike("foo%").list();
+
+    // then
+    assertThat(historicDetails).hasSize(1);
+    assertThat(historicDetails.get(0)).isInstanceOf(HistoricVariableUpdate.class);
+    HistoricVariableUpdate historicDetail = (HistoricVariableUpdate) historicDetails.get(0);
+    assertThat(historicDetail.getVariableName()).isEqualTo("FooBarBaz");
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableNameLikeEqualsNoWildcard() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("FooBarBaz", "variableValue");
+    variables.put("BarBaz", "anotherVariableValue");
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().variableNameLike("BarBaz").list();
+
+    // then
+    assertThat(historicDetails).hasSize(1);
+    assertThat(historicDetails.get(0)).isInstanceOf(HistoricVariableUpdate.class);
+    HistoricVariableUpdate historicDetail = (HistoricVariableUpdate) historicDetails.get(0);
+    assertThat(historicDetail.getVariableName()).isEqualTo("BarBaz");
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableNameLikeEqualsWildcards() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("BarFooBaz", "variableValue");
+    variables.put("BarBaz", "anotherVariableValue");
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().variableNameLike("%BarBaz%").list();
+
+    // then
+    assertThat(historicDetails).hasSize(1);
+    assertThat(historicDetails.get(0)).isInstanceOf(HistoricVariableUpdate.class);
+    HistoricVariableUpdate historicDetail = (HistoricVariableUpdate) historicDetails.get(0);
+    assertThat(historicDetail.getVariableName()).isEqualTo("BarBaz");
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableNameLikeTwoMatches() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("FooBarBaz", "variableValue");
+    variables.put("BarBazFoo", "anotherVariableValue");
+    variables.put("FooBaz", "anotherVariableValue");
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().variableNameLike("%Bar%").list();
+
+    // then
+    assertThat(historicDetails).hasSize(2);
+    assertThat(historicDetails.get(0)).isInstanceOf(HistoricVariableUpdate.class);
+    assertThat(historicDetails.get(1)).isInstanceOf(HistoricVariableUpdate.class);
+    assertThat(historicDetails).extracting("variableName").containsOnly("FooBarBaz", "BarBazFoo");
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableNameLikeTwoProcessInstances() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("FooBarBaz", "variableValue");
+    variables.put("BarBazFoo", "anotherVariableValue");
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().variableNameLike("FooBar%").list();
+
+    // then
+    assertThat(historicDetails).hasSize(2);
+    assertThat(historicDetails.get(0)).isInstanceOf(HistoricVariableUpdate.class);
+    assertThat(historicDetails.get(1)).isInstanceOf(HistoricVariableUpdate.class);
+    assertThat(historicDetails)
+      .extracting("variableName", "processInstanceId")
+      .containsExactlyInAnyOrder(
+          tuple("FooBarBaz", processInstance1.getId()),
+          tuple("FooBarBaz", processInstance2.getId())
+      );
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testQueryBySingleProcessInstanceId() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("stringVar", "test");
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
 
@@ -372,7 +550,7 @@ public class HistoricDetailQueryTest {
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testQueryBySeveralProcessInstanceIds() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("stringVar", "test");
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
@@ -385,7 +563,7 @@ public class HistoricDetailQueryTest {
         .processInstanceIdIn(processInstance.getProcessInstanceId(), processInstance2.getProcessInstanceId());
 
     // then
-    Set<String> expectedProcessInstanceIds = new HashSet<String>();
+    Set<String> expectedProcessInstanceIds = new HashSet<>();
     expectedProcessInstanceIds.add(processInstance.getId());
     expectedProcessInstanceIds.add(processInstance2.getId());
     assertEquals(2, query.count());
@@ -397,7 +575,7 @@ public class HistoricDetailQueryTest {
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testQueryByNonExistingProcessInstanceId() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("stringVar", "test");
     runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
 
@@ -414,7 +592,7 @@ public class HistoricDetailQueryTest {
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void testQueryByInvalidProcessInstanceIds() {
     // given
-    Map<String, Object> variables1 = new HashMap<String, Object>();
+    Map<String, Object> variables1 = new HashMap<>();
     variables1.put("stringVar", "test");
     runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables1);
 
@@ -451,7 +629,7 @@ public class HistoricDetailQueryTest {
     Calendar hourFromNow = Calendar.getInstance();
     hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("stringVar", "test");
     runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
 
@@ -477,7 +655,7 @@ public class HistoricDetailQueryTest {
     Calendar hourFromNow = Calendar.getInstance();
     hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("stringVar", "test");
     runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
 
@@ -502,7 +680,7 @@ public class HistoricDetailQueryTest {
     Calendar hourFromNow = Calendar.getInstance();
     hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("stringVar", "test");
     runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
 
@@ -521,7 +699,7 @@ public class HistoricDetailQueryTest {
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void testQueryByInvalidOccurredBeforeDate() {
     // given
-    Map<String, Object> variables1 = new HashMap<String, Object>();
+    Map<String, Object> variables1 = new HashMap<>();
     variables1.put("stringVar", "test");
     runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables1);
 
@@ -542,7 +720,7 @@ public class HistoricDetailQueryTest {
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void testQueryByInvalidOccurredAfterDate() {
     // given
-    Map<String, Object> variables1 = new HashMap<String, Object>();
+    Map<String, Object> variables1 = new HashMap<>();
     variables1.put("stringVar", "test");
     runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables1);
 
