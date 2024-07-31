@@ -1,48 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions id="definitions" 
-  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
-  targetNamespace="Examples">
-	
-	<process id="compensateProcess" isExecutable="true">
-
-		<startEvent id="start" />
-		
-		<sequenceFlow sourceRef="start"	targetRef="fork" />
-		
-		<parallelGateway id="fork" />
-
-		<sequenceFlow sourceRef="fork" targetRef="bookHotel" />
-		<sequenceFlow sourceRef="fork" targetRef="bookFlight" />
-		
-			<serviceTask id="bookHotel" camunda:expression="${true}" />
-				
-			<boundaryEvent id="compensateBookHotelEvt" name="Boundary event" attachedToRef="bookHotel">
-				<compensateEventDefinition />
-			</boundaryEvent>		
-			
-			<userTask id="undoBookHotel" isForCompensation="true" />
-			
-			<serviceTask id="bookFlight" camunda:expression="${true}" />	
-			
-			<boundaryEvent id="compensateBookFlightEvt" name="Boundary event" attachedToRef="bookFlight">
-				<compensateEventDefinition  />
-			</boundaryEvent>		
-			
-			<userTask id="undoBookFlight" isForCompensation="true" />	
-			
-			<parallelGateway id="join" />
-
-		<sequenceFlow sourceRef="bookHotel" targetRef="join" />
-		<sequenceFlow sourceRef="bookFlight" targetRef="join" />
-		<sequenceFlow sourceRef="join" targetRef="end" />		
-		
-		<endEvent id="end">
-			<compensateEventDefinition activityRef="bookHotel" />
-		</endEvent>
-		
-		<association associationDirection="One" sourceRef="compensateBookHotelEvt" targetRef="undoBookHotel" />
-		<association associationDirection="One" sourceRef="compensateBookFlightEvt" targetRef="undoBookFlight" />
-	</process>
-
-</definitions>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_0x9f08k" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.12.0">
+	<bpmn:process id="bookingProcess" name="Booking Process" isExecutable="true">
+		<bpmn:startEvent id="startEvent">
+			<bpmn:outgoing>Flow_0g59efg</bpmn:outgoing>
+		</bpmn:startEvent>
+		<bpmn:userTask id="bookFlight" name="Book Flight">
+<!--			<bpmn:extensionElements>
+				<camunda:inputOutput>
+					<camunda:inputParameter name="Description">Forward details</camunda:inputParameter>
+				</camunda:inputOutput>
+			</bpmn:extensionElements>-->
+			<bpmn:incoming>Flow_0g59efg</bpmn:incoming>
+			<bpmn:outgoing>Flow_0aoao32</bpmn:outgoing>
+		</bpmn:userTask>
+		<bpmn:userTask id="cancelFlight" name="Cancel Flight" isForCompensation="true" />
+		<bpmn:boundaryEvent id="compensateCatchBookFlight" name="" attachedToRef="bookFlight">
+			<bpmn:compensateEventDefinition id="CompensateEventDefinition_0dvp08n" />
+		</bpmn:boundaryEvent>
+		<bpmn:sequenceFlow id="Flow_0g59efg" sourceRef="startEvent" targetRef="bookFlight" />
+		<bpmn:userTask id="bookCar" name="Book Car">
+			<bpmn:incoming>Flow_0wb6b9o</bpmn:incoming>
+			<bpmn:outgoing>Flow_0noqsum</bpmn:outgoing>
+		</bpmn:userTask>
+		<bpmn:userTask id="cancelCar" name="Cancel Car" isForCompensation="true" />
+		<bpmn:boundaryEvent id="compensateCatchBookCar" name="" attachedToRef="bookCar">
+			<bpmn:compensateEventDefinition id="CompensateEventDefinition_1o1sen5" />
+		</bpmn:boundaryEvent>
+		<bpmn:userTask id="bookHotel" name="Book Hotel">
+			<bpmn:incoming>Flow_0aoao32</bpmn:incoming>
+			<bpmn:outgoing>Flow_0wb6b9o</bpmn:outgoing>
+		</bpmn:userTask>
+		<bpmn:userTask id="cancelHotel" name="Cancel Hotel" isForCompensation="true" />
+		<bpmn:boundaryEvent id="compensateCatchBookHotel" name="" attachedToRef="bookHotel">
+			<bpmn:compensateEventDefinition id="CompensateEventDefinition_0ds1pcl" />
+		</bpmn:boundaryEvent>
+		<bpmn:sequenceFlow id="Flow_0aoao32" sourceRef="bookFlight" targetRef="bookHotel" />
+		<bpmn:sequenceFlow id="Flow_0wb6b9o" sourceRef="bookHotel" targetRef="bookCar" />
+		<bpmn:sequenceFlow id="Flow_0noqsum" sourceRef="bookCar" targetRef="payBooking" />
+		<bpmn:endEvent id="endEvent">
+			<bpmn:incoming>Flow_1inwse4</bpmn:incoming>
+		</bpmn:endEvent>
+		<bpmn:sequenceFlow id="Flow_1inwse4" sourceRef="payBooking" targetRef="endEvent" />
+		<bpmn:boundaryEvent id="errorEvent" attachedToRef="payBooking">
+			<bpmn:outgoing>Flow_1cvaope</bpmn:outgoing>
+			<bpmn:errorEventDefinition id="ErrorEventDefinition_07t7ol9" />
+		</bpmn:boundaryEvent>
+		<bpmn:sequenceFlow id="Flow_1cvaope" sourceRef="errorEvent" targetRef="compensationThrowEndEvent" />
+		<bpmn:endEvent id="compensationThrowEndEvent">
+			<bpmn:incoming>Flow_1cvaope</bpmn:incoming>
+			<bpmn:compensateEventDefinition id="CompensateEventDefinition_1ou7hzd" />
+		</bpmn:endEvent>
+		<bpmn:userTask id="payBooking" name="Pay Booking">
+			<bpmn:incoming>Flow_0noqsum</bpmn:incoming>
+			<bpmn:outgoing>Flow_1inwse4</bpmn:outgoing>
+		</bpmn:userTask>
+		<bpmn:association id="Association_06t6jaw" sourceRef="compensateCatchBookFlight" targetRef="cancelFlight" />
+		<bpmn:association id="Association_1g3b11v" sourceRef="compensateCatchBookCar" targetRef="cancelCar" />
+		<bpmn:association id="Association_0zpw7zc" associationDirection="One" sourceRef="compensateCatchBookHotel" targetRef="cancelHotel" />
+	</bpmn:process>
+</bpmn:definitions>

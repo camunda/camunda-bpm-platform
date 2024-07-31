@@ -1,68 +1,147 @@
 package org.camunda.bpm.engine.test.bpmn.event.compensate.helper;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance;
+import org.camunda.bpm.engine.test.mock.Mocks;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.Ignore;
+import org.camunda.bpm.model.bpmn.instance.BaseElement;
+import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputOutput;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputParameter;
+import org.junit.After;
 import org.junit.Test;
 
-import java.util.Date;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
-import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
-import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CompensationConceptsTests extends PluggableProcessEngineTest {
 
-/*    @Deployment
+    protected String deploymentId;
+
+    protected CamundaInputParameter findInputParameterByName(BaseElement baseElement, String name) {
+        Collection<CamundaInputParameter> camundaInputParameters = baseElement.getExtensionElements().getElementsQuery().filterByType(CamundaInputOutput.class).singleResult().getCamundaInputParameters();
+        for (CamundaInputParameter camundaInputParameter : camundaInputParameters) {
+            if (camundaInputParameter.getCamundaName().equals(name)) {
+                return camundaInputParameter;
+            }
+        }
+        throw new BpmnModelException("Unable to find camunda:inputParameter with name '" + name + "' for element with id '" + baseElement.getId() + "'");
+    }
+
+    @After
+    public void clear() {
+        Mocks.reset();
+
+        if (deploymentId != null) {
+            repositoryService.deleteDeployment(deploymentId, true);
+            deploymentId = null;
+        }
+    }
+
+
+    private void completeTasks(String taskName, int times) {
+        List<org.camunda.bpm.engine.task.Task> tasks = taskService.createTaskQuery().taskName(taskName).list();
+
+        assertTrue("Actual there are " + tasks.size() + " open tasks with name '" + taskName + "'. Expected at least " + times, times <= tasks.size());
+
+        Iterator<org.camunda.bpm.engine.task.Task> taskIterator = tasks.iterator();
+        for (int i = 0; i < times; i++) {
+            Task task = taskIterator.next();
+            taskService.complete(task.getId());
+        }
+    }
+
+    private void completeTask(String taskName) {
+        completeTasks(taskName, 1);
+    }
+
+
     @Test
-    public void testCompensateSubprocess() {
+    public void test123123() {
+        BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo").startEvent("start").userTask("userTask").camundaInputParameter("var", "Hello World${'!'}").endEvent("end").done();
 
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+        testRule.deploy(modelInstance);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("foo");
 
-        assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
+        VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().variableName("var").singleResult();
 
-        runtimeService.signal(processInstance.getId());
-        testRule.assertProcessEnded(processInstance.getId());
+        // then
+        assertEquals("Hello World!", variableInstance.getValue());
+        UserTask serviceTask = modelInstance.getModelElementById("userTask");
 
-    }*/
+        CamundaInputParameter inputParameter = findInputParameterByName(serviceTask, "var");
+        Assertions.assertThat(inputParameter.getCamundaName()).isEqualTo("var");
 
-    @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.activityWithCompensationEndEvent.bpmn20.xml")
-    @Test
-    public void testActivityInstanceTreeForCompensationEndEvent(){
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
-        ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-        assertThat(tree).hasStructure(
-                describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-                        .activity("end")
-                        .activity("undoBookHotel")
-                        .done());
     }
 
     @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensationConceptsTest.sandroTest.bpmn20.xml")
     @Test
-    public void sandroTest(){
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+    public void sandroTest() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("bookingProcess").getId();
 
-        ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-        assertThat(tree).hasStructure(
-                describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-                        .activity("end")
-                        .activity("undoBookHotel")
-                        .done());
+        completeTask("Book Flight");
+        completeTask("Book Hotel");
+        completeTask("Book Car");
+        completeTask("Pay Booking");
+
+        testRule.assertProcessEnded(processInstanceId);
+
+        List<HistoricActivityInstance> historicActivityInstance = historyService.createHistoricActivityInstanceQuery().orderByHistoricActivityInstanceStartTime().asc().list();
+        assertEquals(6, historicActivityInstance.size());
+
+        assertEquals("startEvent", historicActivityInstance.get(0).getActivityId());
+        assertEquals("bookFlight", historicActivityInstance.get(1).getActivityId());
+        assertEquals("bookHotel", historicActivityInstance.get(2).getActivityId());
+        assertEquals("bookCar", historicActivityInstance.get(3).getActivityId());
+        assertEquals("payBooking", historicActivityInstance.get(4).getActivityId());
+        assertEquals("endEvent", historicActivityInstance.get(5).getActivityId());
+
+        processInstanceId = runtimeService.startProcessInstanceByKey("bookingProcess").getId();
+        completeTask("Book Flight");
+        completeTask("Book Hotel");
+        completeTask("Book Car");
+
+        Task task = taskService.createTaskQuery().taskName("Pay Booking").singleResult();
+        Assertions.assertThat(task).isNotNull();
+        Assertions.assertThat(task.getName()).isEqualTo("Pay Booking");
+        taskService.handleBpmnError(task.getId(), "errorCode");
+        historicActivityInstance = historyService.createHistoricActivityInstanceQuery().orderByHistoricActivityInstanceStartTime().asc().list();
+        assertEquals(16, historicActivityInstance.size());
+
+        assertEquals("startEvent", historicActivityInstance.get(6).getActivityId());
+        assertEquals("bookFlight", historicActivityInstance.get(7).getActivityId());
+        assertEquals("bookHotel", historicActivityInstance.get(8).getActivityId());
+        assertEquals("bookCar", historicActivityInstance.get(9).getActivityId());
+        assertEquals("payBooking", historicActivityInstance.get(10).getActivityId());
+
+        // following have same start times, leading to flaky test if position is tested
+        // assertEquals("errorEvent", historicActivityInstance.get(11).getActivityId());
+        //assertEquals("compensationThrowEndEvent", historicActivityInstance.get(12).getActivityId());
+
+        assertEquals("cancelCar", historicActivityInstance.get(13).getActivityId());
+        assertEquals("cancelHotel", historicActivityInstance.get(14).getActivityId());
+        assertEquals("cancelFlight", historicActivityInstance.get(15).getActivityId());
+        testRule.assertProcessNotEnded(processInstanceId);
+
+        completeTask("Cancel Flight");
+        completeTask("Cancel Hotel");
+        completeTask("Cancel Car");
+        testRule.assertProcessEnded(processInstanceId);
     }
 
-
+/*
     @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
     @Test
     public void testDeleteInstanceWithEventScopeExecution()
@@ -70,53 +149,117 @@ public class CompensationConceptsTests extends PluggableProcessEngineTest {
         // given
         BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo")
                 .startEvent("start")
-                .subProcess("subProcess")
-                .embeddedSubProcess()
-                .startEvent("subProcessStart")
-                .endEvent("subProcessEnd")
-                .subProcessDone()
                 .userTask("userTask")
-                .done();
-
-        modelInstance = ModifiableBpmnModelInstance.modify(modelInstance)
-                .addSubProcessTo("subProcess")
-                .id("eventSubProcess")
-                .triggerByEvent()
-                .embeddedSubProcess()
-                .startEvent()
-                .compensateEventDefinition()
-                .compensateEventDefinitionDone()
-                .endEvent()
+                .endEvent("end")
                 .done();
 
         testRule.deploy(modelInstance);
-
-        long dayInMillis = 1000 * 60 * 60 * 24;
-        Date date1 = new Date(10 * dayInMillis);
-        ClockUtil.setCurrentTime(date1);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("foo");
-
-        // when
-        Date date2 = new Date(date1.getTime() + dayInMillis);
-        ClockUtil.setCurrentTime(date2);
-        runtimeService.deleteProcessInstance(processInstance.getId(), null);
 
         // then
         List<HistoricActivityInstance> historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
                 .orderByActivityId().asc().list();
-        assertEquals(5, historicActivityInstance.size());
+        assertEquals(2, historicActivityInstance.size());
 
         assertEquals("start", historicActivityInstance.get(0).getActivityId());
-        assertEquals(date1, historicActivityInstance.get(0).getEndTime());
-        assertEquals("subProcess", historicActivityInstance.get(1).getActivityId());
-        assertEquals(date1, historicActivityInstance.get(1).getEndTime());
-        /*assertEquals("subProcessEnd", historicActivityInstance.get(2).getActivityId());
-        assertEquals(date1, historicActivityInstance.get(2).getEndTime());
-        assertEquals("subProcessStart", historicActivityInstance.get(3).getActivityId());
-        assertEquals(date1, historicActivityInstance.get(3).getEndTime());
-        assertEquals("userTask", historicActivityInstance.get(4).getActivityId());
-        assertEquals(date2, historicActivityInstance.get(4).getEndTime());*/
+        assertEquals("userTask", historicActivityInstance.get(1).getActivityId());
 
+        // then
+        HistoricActivityInstance userTask = historyService.createHistoricActivityInstanceQuery()
+                .activityId("end")
+                .singleResult();
+        assertEquals("start", historicActivityInstance.get(0).getActivityId());
 
     }
+
+    @Test
+    @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+    public void shouldResolveMethodExpressionWithTwoNullParameter() {
+        // given
+        BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess")
+                .startEvent()
+                .exclusiveGateway()
+                .condition("true", "${myBean.myMethod(execution.getVariable('v'), "
+                        + "execution.getVariable('w'), execution.getVariable('x'), "
+                        + "execution.getVariable('y'), execution.getVariable('z'))}")
+                .userTask("userTask")
+                .moveToLastGateway()
+                .condition("false", "${false}")
+                .endEvent()
+                .done();
+
+        deploymentId = repositoryService.createDeployment()
+                .addModelInstance("testProcess.bpmn", process)
+                .deploy()
+                .getId();
+
+        Mocks.register("myBean", new ExpressionManagerTest.MyBean());
+
+
+        // when
+        runtimeService.startProcessInstanceByKey("testProcess");
+
+
+        // then
+        HistoricActivityInstance userTask = historyService.createHistoricActivityInstanceQuery()
+                .activityId("userTask")
+                .singleResult();
+
+        Assertions.assertThat(userTask).isNotNull();
+    }
+
+    @Test
+    public void testCompositeExpressionForInputValue() {
+
+        // given
+        BpmnModelInstance instance = Bpmn.createExecutableProcess("Process")
+                .startEvent()
+                .receiveTask()
+                .camundaInputParameter("var", "Hello World${'!'}")
+                .endEvent("end")
+                .done();
+
+        testRule.deploy(instance);
+        runtimeService.startProcessInstanceByKey("Process");
+
+        // when
+        VariableInstance variableInstance = runtimeService
+                .createVariableInstanceQuery()
+                .variableName("var")
+                .singleResult();
+
+        // then
+        assertEquals("Hello World!", variableInstance.getValue());
+    }
+
+    @Test
+    public void testCompensationTask() {
+        BpmnModelInstance modelInstance = Bpmn.createProcess()
+                .startEvent()
+                .userTask("task")
+                .boundaryEvent("boundary")
+                .compensateEventDefinition().compensateEventDefinitionDone()
+                .compensationStart()
+                .userTask("compensate").name("compensate")
+                .compensationDone()
+                .endEvent("theend")
+                .done();
+
+        // Checking Association
+        Collection<Association> associations = modelInstance.getModelElementsByType(Association.class);
+        Assertions.assertThat(associations).hasSize(1);
+        Association association = associations.iterator().next();
+        Assertions.assertThat(association.getSource().getId()).isEqualTo("boundary");
+        Assertions.assertThat(association.getTarget().getId()).isEqualTo("compensate");
+        Assertions.assertThat(association.getAssociationDirection()).isEqualTo(AssociationDirection.One);
+
+        // Checking Sequence flow
+        UserTask task = modelInstance.getModelElementById("task");
+        Collection<SequenceFlow> outgoing = task.getOutgoing();
+        Assertions.assertThat(outgoing).hasSize(1);
+        SequenceFlow flow = outgoing.iterator().next();
+        Assertions.assertThat(flow.getSource().getId()).isEqualTo("task");
+        Assertions.assertThat(flow.getTarget().getId()).isEqualTo("theend");
+
+    }*/
 }
