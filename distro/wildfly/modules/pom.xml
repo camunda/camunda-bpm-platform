@@ -251,7 +251,7 @@
                 </copy>
 
                 <!-- copy groovy dependencies to single dir -->
-                <delete dir="target/modules/org/codehaus/groovy" />
+                <delete dir="target/modules/org/apache/groovy" />
                 <copy todir="target/modules" flatten="false">
                   <fileset refid="maven.project.dependencies" />
                   <mapper>
