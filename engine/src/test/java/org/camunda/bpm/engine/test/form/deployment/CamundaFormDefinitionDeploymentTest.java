@@ -221,12 +221,10 @@ public class CamundaFormDefinitionDeploymentTest {
     String formContent1 = "{\"id\"=\"myForm\",\"type\": \"default\",\"components\":[{\"key\": \"button3\",\"label\": \"Button\",\"type\": \"button\"}]}";
     String formContent2 = "{\"id\"=\"myForm\",\"type\": \"default\",\"components\": []}";
 
-    createDeploymentBuilder(true).tenantId("tenant1").addInputStream(fileName, writeTempFormFile(fileName, formContent1, tempFolder))
-        .deploy();
+    createDeploymentBuilder(true).tenantId("tenant1").addInputStream(fileName, writeTempFormFile(fileName, formContent1, tempFolder)).deploy();
 
     // when deploy changed file
-    createDeploymentBuilder(true).tenantId("tenant1").addInputStream(fileName, writeTempFormFile(fileName, formContent2, tempFolder))
-        .deploy();
+    createDeploymentBuilder(true).tenantId("tenant1").addInputStream(fileName, writeTempFormFile(fileName, formContent2, tempFolder)).deploy();
 
     // then
     List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
@@ -235,8 +233,7 @@ public class CamundaFormDefinitionDeploymentTest {
     List<CamundaFormDefinition> formDefinitions = findAllCamundaFormDefinitionEntities(processEngineConfiguration);
     assertThat(formDefinitions).extracting("version").containsExactlyInAnyOrder(1, 2);
     assertThat(formDefinitions).extracting("resourceName").containsExactly(fileName, fileName);
-    assertThat(formDefinitions).extracting("deploymentId")
-        .containsExactlyInAnyOrder(deployments.stream().map(Deployment::getId).toArray());
+    assertThat(formDefinitions).extracting("deploymentId").containsExactlyInAnyOrder(deployments.stream().map(Deployment::getId).toArray());
 
   }
 
