@@ -41,6 +41,8 @@ public class SignalEventReceivedBuilderImpl implements SignalEventReceivedBuilde
 
   protected VariableMap variables = null;
 
+  protected String businessKey = null;
+
   public SignalEventReceivedBuilderImpl(CommandExecutor commandExecutor, String signalName) {
     this.commandExecutor = commandExecutor;
     this.signalName = signalName;
@@ -85,6 +87,12 @@ public class SignalEventReceivedBuilderImpl implements SignalEventReceivedBuilde
   }
 
   @Override
+  public SignalEventReceivedBuilder businessKey(String businessKey) {
+    this.businessKey = businessKey;
+    return this;
+  }
+
+  @Override
   public void send() {
     if (executionId != null && isTenantIdSet) {
       throw LOG.exceptionDeliverSignalToSingleExecutionWithTenantId();
@@ -112,6 +120,10 @@ public class SignalEventReceivedBuilderImpl implements SignalEventReceivedBuilde
 
   public VariableMap getVariables() {
     return variables;
+  }
+
+  public String getBusinessKey() {
+    return businessKey;
   }
 
 }
