@@ -32,6 +32,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.impl.telemetry.dto.MetricImpl;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.telemetry.ApplicationServer;
@@ -190,7 +191,7 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
 
   @Test
   public void shouldGetTelemetryData() throws JsonProcessingException {
-    when(managementServiceMock.getTelemetryData()).thenReturn(MockProvider.EXAMPLE_TELEMETRY_DATA);
+    when(managementServiceMock.getTelemetryData(null, null, null)).thenReturn(MockProvider.EXAMPLE_TELEMETRY_DATA);
 
     given()
     .then()
@@ -225,7 +226,7 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
     .when()
       .get(TELEMETRY_DATA_URL);
 
-    verify(managementServiceMock).getTelemetryData();
+    verify(managementServiceMock).getTelemetryData(null, null, null);
   }
 
   @Test
@@ -248,13 +249,16 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
     when(internals.getCommands()).thenReturn(new HashMap<>());
     when(internals.getDatabase()).thenReturn(mock(Database.class));
     when(internals.getJdk()).thenReturn(mock(Jdk.class));
-    when(internals.getMetrics()).thenReturn(new HashMap<>());
+    when(internals.getMetrics()).thenReturn(new HashMap<>() {{
+      put("process-instances", new MetricImpl(1));
+    }});
     when(internals.getWebapps()).thenReturn(new HashSet<>());
     // license key may be null and is therefore not mocked
 
-    when(managementServiceMock.getTelemetryData()).thenReturn(telemetryData);
+    when(managementServiceMock.getTelemetryData("process-instances", null, null)).thenReturn(telemetryData);
 
     given()
+    .queryParam("metricsFilter", "process-instances")
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -263,10 +267,11 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
         .body("product.name", equalTo(MockProvider.EXAMPLE_TELEMETRY_PRODUCT_NAME))
         .body("product.version", equalTo(MockProvider.EXAMPLE_TELEMETRY_PRODUCT_VERSION))
         .body("product.edition", equalTo(MockProvider.EXAMPLE_TELEMETRY_PRODUCT_EDITION))
+        .body("product.internals.metrics.size()", equalTo(1))
     .when()
       .get(TELEMETRY_DATA_URL);
 
-    verify(managementServiceMock).getTelemetryData();
+    verify(managementServiceMock).getTelemetryData("process-instances", null, null);
   }
 
 }

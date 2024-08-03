@@ -1305,6 +1305,16 @@ public interface ManagementService {
   void deleteMetrics(Date timestamp);
 
   /**
+   * Fetches metric count from persistence storage
+   *
+   *
+   * @param metricsName name of metrics
+   * @param startDate start date of date range
+   * @param endDate end date of date range
+   */
+  Number getMetricsSum(String metricsName, Date startDate, Date endDate);
+
+  /**
    * Deletes all metrics events which are older than the specified timestamp
    * and reported by the given reporter. If a parameter is null, all metric events
    * are matched in that regard.
@@ -1450,6 +1460,6 @@ public interface ManagementService {
    *
    * @see <a href="https://docs.camunda.org/manual/latest/introduction/telemetry/#collected-data">Camunda Documentation: Telemetry</a>
    */
-  TelemetryData getTelemetryData();
+  TelemetryData getTelemetryData(String metricFilter, Date startDate, Date endDate);
 
 }

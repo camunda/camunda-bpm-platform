@@ -363,7 +363,7 @@ public class TelemetryReporterTest {
     configuration.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
 
     // setup
-    TelemetryDataImpl initialTelemetryData = (TelemetryDataImpl) configuration.getManagementService().getTelemetryData();
+    TelemetryDataImpl initialTelemetryData = (TelemetryDataImpl) configuration.getManagementService().getTelemetryData(null, null, null);
     TelemetryDataImpl expectedData = simpleData(b -> {
       b.installation(initialTelemetryData.getInstallation());
 
@@ -1134,7 +1134,7 @@ public class TelemetryReporterTest {
     //then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .withHeader("Content-Type",  equalTo("application/json")));
-    assertThat(managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate())
+    assertThat(managementService.getTelemetryData(null, null, null).getProduct().getInternals().getDataCollectionStartDate())
       .isAfter(telemetryDataTimeFrameBeforeReported);
   }
 

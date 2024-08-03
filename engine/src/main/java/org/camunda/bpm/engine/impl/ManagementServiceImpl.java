@@ -17,11 +17,7 @@
 package org.camunda.bpm.engine.impl;
 
 import java.sql.Connection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
@@ -81,22 +77,15 @@ import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionState
 import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
+import org.camunda.bpm.engine.impl.metrics.util.MetricsUtil;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
-import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
-import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
-import org.camunda.bpm.engine.management.JobDefinitionQuery;
-import org.camunda.bpm.engine.management.MetricsQuery;
-import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
-import org.camunda.bpm.engine.management.SchemaLogQuery;
-import org.camunda.bpm.engine.management.SetJobRetriesByJobsAsyncBuilder;
-import org.camunda.bpm.engine.management.SetJobRetriesByProcessAsyncBuilder;
-import org.camunda.bpm.engine.management.TableMetaData;
-import org.camunda.bpm.engine.management.TablePageQuery;
-import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateSelectBuilder;
-import org.camunda.bpm.engine.management.UpdateJobSuspensionStateSelectBuilder;
+import org.camunda.bpm.engine.impl.telemetry.dto.MetricImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
+import org.camunda.bpm.engine.management.*;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.telemetry.Metric;
 import org.camunda.bpm.engine.telemetry.TelemetryData;
 
 
@@ -518,6 +507,21 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     commandExecutor.execute(new DeleteMetricsCmd(timestamp, null));
   }
 
+  public Number getMetricsSum(String metricsName, Date startDate, Date endDate) {
+    if (Metrics.UNIQUE_TASK_WORKERS.equals(metricsName) || Metrics.TASK_USERS.equals(metricsName)) {
+      return getUniqueTaskWorkerCount(startDate, endDate);
+    } else {
+      MetricsQuery query = createMetricsQuery().name(metricsName);
+      if (startDate != null) {
+        query.startDate(startDate);
+      }
+      if (endDate != null) {
+        query.endDate(endDate);
+      }
+      return query.sum();
+    }
+  }
+
   public void deleteMetrics(Date timestamp, String reporter) {
     commandExecutor.execute(new DeleteMetricsCmd(timestamp, reporter));
 
@@ -582,8 +586,21 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   }
 
   @Override
-  public TelemetryData getTelemetryData() {
-    return commandExecutor.execute(new GetTelemetryDataCmd());
+  public TelemetryData getTelemetryData(String metricFilter, Date startDate, Date endDate) {
+    TelemetryDataImpl telemetryData = commandExecutor.execute(new GetTelemetryDataCmd(metricFilter));
+    if (startDate != null || endDate != null) {
+      Map<String, Metric> metrics = new HashMap<>();
+      Set<String> metricsNeedToReturn = MetricsUtil.METRICS_TO_REPORT;
+      if (metricFilter != null)
+        metricsNeedToReturn = Collections.singleton(metricFilter);
+
+      for (String metric : metricsNeedToReturn) {
+        String metricPublicName = MetricsUtil.resolvePublicName(metric);
+        metrics.put(metricPublicName, new MetricImpl((long) getMetricsSum(metricPublicName, startDate, endDate)));
+      }
+      telemetryData.getProduct().getInternals().setMetrics(metrics);
+    }
+    return telemetryData;
   }
 
   /**

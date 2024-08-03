@@ -5,9 +5,53 @@
       id = "getTelemetryData"
       tag = "Telemetry"
       summary = "Fetch Telemetry Data"
-      desc = "Fetches Telemetry Data." />
+      desc = "Fetches metrics count based on the start and end date" />
 
-  "parameters" : [],
+    "parameters" : [
+
+      <@lib.parameter
+        name = "metricsFilter"
+        location = "query"
+        type = "string"
+        required = false
+        enumValues = ["activity-instance-start",
+        "activity-instance-end",
+        "decision-instances",
+        "flow-node-instances",
+        "job-acquisition-attempt",
+        "job-acquired-success",
+        "job-acquired-failure",
+        "job-execution-rejected",
+        "job-successful",
+        "job-failed",
+        "job-locked-exclusive",
+        "executed-decision-elements",
+        "history-cleanup-removed-process-instances",
+        "history-cleanup-removed-case-instances",
+        "history-cleanup-removed-decision-instances",
+        "history-cleanup-removed-batch-operations",
+        "history-cleanup-removed-task-metrics",
+        "unique-task-workers",
+        "process-instances",
+        "task-users"]
+        desc = "The filter of metric." />
+
+      <@lib.parameter
+        name = "startDate"
+        location = "query"
+        type = "string"
+        format = "date-time"
+        desc = "The start date (inclusive)."/>
+
+    <@lib.parameter
+      name = "endDate"
+      location = "query"
+      type = "string"
+      format = "date-time"
+      last = true
+      desc = "The end date (exclusive)."/>
+
+    ],
 
   "responses" : {
 
