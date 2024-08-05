@@ -44,6 +44,9 @@
 
     <property name="enforceHistoryTimeToLive" value="false" />
 
+    <property name="transactionIsolationLevel" value="serializable" />
+<!--    <property name="transactionIsolationLevel"><null/></property>&ndash;&gt;-->
+
   </bean>
 
   <!--<bean id="uuidGenerator" class="org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator" />-->

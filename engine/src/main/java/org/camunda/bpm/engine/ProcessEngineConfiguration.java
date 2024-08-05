@@ -252,6 +252,7 @@ public abstract class ProcessEngineConfiguration {
   protected boolean transactionsExternallyManaged = false;
   /** the number of seconds the jdbc driver will wait for a response from the database */
   protected Integer jdbcStatementTimeout;
+  protected String transactionIsolationLevel = "readCommitted";
   protected boolean jdbcBatchProcessing = true;
 
   protected int defaultNumberOfRetries = JobEntity.DEFAULT_RETRIES;
@@ -565,6 +566,14 @@ public abstract class ProcessEngineConfiguration {
   public ProcessEngineConfiguration setDatabaseVendor(String databaseVendor) {
     this.databaseVendor = databaseVendor;
     return this;
+  }
+
+  public String getTransactionIsolationLevel() {
+    return transactionIsolationLevel;
+  }
+
+  public void setTransactionIsolationLevel(String transactionIsolationLevel) {
+    this.transactionIsolationLevel = transactionIsolationLevel;
   }
 
   public String getDatabaseVersion() {
