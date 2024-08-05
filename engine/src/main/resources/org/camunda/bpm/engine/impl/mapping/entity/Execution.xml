@@ -155,8 +155,9 @@
     <result property="cachedEntityState" column="CACHED_ENT_STATE_" jdbcType="INTEGER"/>
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
   </resultMap>
-  
+
   <resultMap type="org.camunda.bpm.engine.impl.util.ImmutablePair" id="deploymentIdMapping">
     <id property="left" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
     <id property="right" column="ID_" jdbcType="VARCHAR" />
