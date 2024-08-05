@@ -195,7 +195,7 @@
     inner join ${prefix}ACT_RE_PROCDEF PD on RES.PROC_DEF_ID_ = PD.ID_
 
     <if test="performAuthorizationCheck">
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClauseUnion" />
       AUTH ON (
        (AUTH.RESOURCE_TYPE_ = 8 
         AND (AUTH.RESOURCE_ID_ ${authJoinStart} RES.PROC_INST_ID_ ${authJoinSeparator} '*' ${authJoinEnd})   
@@ -205,7 +205,7 @@
         AND (AUTH.RESOURCE_ID_ ${authJoinStart} RES.PROC_DEF_KEY_ ${authJoinSeparator} '*' ${authJoinEnd}) 
         AND ${bitand1}AUTH.PERMS_${bitand2}512${bitand3} = 512) 
       )
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClauseUnion" />
       AUTH1 ON (
          (AUTH1.RESOURCE_TYPE_ = 8 
           AND (AUTH1.RESOURCE_ID_ ${authJoin1Start} RES.PROC_INST_ID_ ${authJoin1Separator} '*' ${authJoin1End})
