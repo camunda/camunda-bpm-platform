@@ -19,6 +19,7 @@ package org.camunda.bpm.spring.boot.starter;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.spring.boot.starter.actuator.JobExecutorHealthIndicator;
+import org.camunda.bpm.spring.boot.starter.actuator.MicrometerMetrics;
 import org.camunda.bpm.spring.boot.starter.actuator.ProcessEngineHealthIndicator;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -46,5 +47,11 @@ public class CamundaBpmActuatorConfiguration {
   @ConditionalOnMissingBean(name = "processEngineHealthIndicator")
   public HealthIndicator processEngineHealthIndicator(ProcessEngine processEngine) {
     return new ProcessEngineHealthIndicator(processEngine);
+  }
+
+  @Bean
+  @ConditionalOnBean(name = "processEngineConfigurationImpl")
+  public MicrometerMetrics micrometerMetrics(){
+    return new MicrometerMetrics();
   }
 }
