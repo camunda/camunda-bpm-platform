@@ -419,6 +419,14 @@
       <if test="suspensionState != null">
         and RES.SUSPENSION_STATE_ = #{suspensionState.stateCode}
       </if>
+      <if test="executing">
+        AND
+        RES.SUSPENSION_STATE_ = 1
+        AND
+        RES.LOCK_EXP_TIME_ IS NOT NULL
+        AND
+        RES.LOCK_EXP_TIME_  > #{now, jdbcType=TIMESTAMP}
+      </if>
       <if test="isTenantIdSet">
         <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
           and ( RES.TENANT_ID_ in
