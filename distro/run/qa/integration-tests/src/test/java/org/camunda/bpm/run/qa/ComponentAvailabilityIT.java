@@ -60,7 +60,8 @@ public class ComponentAvailabilityIT {
       { new String[]{"--webapps"}, false, true, false, false },
       { new String[]{"--swaggerui"}, false, false, true, false },
       { new String[]{"--rest", "--webapps", "--swaggerui"}, true, true, true, false },
-      { new String[]{"--rest", "--webapps", "--swaggerui", "--example"}, true, true, true, true }
+      { new String[]{"--rest", "--webapps", "--swaggerui", "--example"}, true, true, true, true },
+      { new String[]{"--rest", "--webapps", "--swaggerui", "--example", "--oauth2"}, true, true, true, true }
     });
   }
 
