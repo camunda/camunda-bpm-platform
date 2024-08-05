@@ -415,7 +415,7 @@
                 </local-cache>
             </cache-container>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:io:3.0">
+        <subsystem xmlns="urn:jboss:domain:io:4.0">
             <worker name="default"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jaxrs:3.0"/>
@@ -490,7 +490,7 @@
             <remote-naming/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
-        <subsystem xmlns="urn:jboss:domain:remoting:6.0">
+        <subsystem xmlns="urn:jboss:domain:remoting:7.0">
             <http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-sasl-authentication"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
