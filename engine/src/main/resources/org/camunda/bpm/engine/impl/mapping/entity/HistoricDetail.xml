@@ -485,6 +485,10 @@
         </foreach>
       </if>
 
+      <if test="variableNameLike != null">
+        and UPPER(RES.NAME_) like UPPER(#{variableNameLike}) ESCAPE ${escapeChar}
+      </if>
+
       <!-- processInstanceIds -->
       <if test="processInstanceIds != null &amp;&amp; processInstanceIds.length > 0">
         and RES.PROC_INST_ID_ in
