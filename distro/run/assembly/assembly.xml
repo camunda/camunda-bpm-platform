@@ -131,6 +131,10 @@
       <directory>../modules/swaggerui/target/dependency/</directory>
       <outputDirectory>internal/swaggerui/</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>../modules/oauth2/target/dependency/</directory>
+      <outputDirectory>internal/oauth2/</outputDirectory>
+    </fileSet>
     <!-- create empty resource folder -->
     <fileSet>
       <directory>resources/dummyResource</directory>
