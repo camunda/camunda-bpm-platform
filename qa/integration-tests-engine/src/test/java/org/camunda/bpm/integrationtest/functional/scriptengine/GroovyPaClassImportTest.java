@@ -47,7 +47,7 @@ public class GroovyPaClassImportTest extends AbstractFoxPlatformIntegrationTest 
     + "<jboss-deployment-structure>"
     + "  <deployment>"
     + "    <dependencies>"
-    + "      <module name=\"org.codehaus.groovy.groovy-all\" services=\"import\" />"
+    + "      <module name=\"org.apache.groovy.groovy-all\" services=\"import\" />"
     + "    </dependencies>"
     + "  </deployment>"
     + "</jboss-deployment-structure>";
