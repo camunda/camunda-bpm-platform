@@ -146,6 +146,8 @@ import org.mockito.Mockito;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TaskRestServiceInteractionTest extends
     AbstractRestServiceTest {
@@ -214,6 +216,7 @@ public class TaskRestServiceInteractionTest extends
     mockQuery = mock(TaskQuery.class);
     when(mockQuery.initializeFormKeys()).thenReturn(mockQuery);
     when(mockQuery.taskId(any())).thenReturn(mockQuery);
+    when(mockQuery.withCommentAttachmentInfo()).thenReturn(mockQuery);
     when(mockQuery.singleResult()).thenReturn(mockTask);
     when(taskServiceMock.createTaskQuery()).thenReturn(mockQuery);
 
@@ -314,6 +317,36 @@ public class TaskRestServiceInteractionTest extends
       .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
       .body("lastUpdated", equalTo(MockProvider.EXAMPLE_TASK_LAST_UPDATED))
       .body("taskState", equalTo(MockProvider.EXAMPLE_HISTORIC_TASK_STATE))
+      .when().get(SINGLE_TASK_URL);
+  }
+  @Test
+  public void testGetSingleTaskWithQueryParam() {
+    given().pathParam("id", EXAMPLE_TASK_ID)
+      .queryParam("withCommentAttachmentInfo", true)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("id", equalTo(EXAMPLE_TASK_ID))
+      .body("name", equalTo(MockProvider.EXAMPLE_TASK_NAME))
+      .body("assignee", equalTo(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME))
+      .body("created", equalTo(MockProvider.EXAMPLE_TASK_CREATE_TIME))
+      .body("due", equalTo(MockProvider.EXAMPLE_TASK_DUE_DATE))
+      .body("delegationState", equalTo(MockProvider.EXAMPLE_TASK_DELEGATION_STATE.toString()))
+      .body("description", equalTo(MockProvider.EXAMPLE_TASK_DESCRIPTION))
+      .body("executionId", equalTo(MockProvider.EXAMPLE_TASK_EXECUTION_ID))
+      .body("owner", equalTo(MockProvider.EXAMPLE_TASK_OWNER))
+      .body("parentTaskId", equalTo(MockProvider.EXAMPLE_TASK_PARENT_TASK_ID))
+      .body("priority", equalTo(MockProvider.EXAMPLE_TASK_PRIORITY))
+      .body("processDefinitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+      .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .body("taskDefinitionKey", equalTo(MockProvider.EXAMPLE_TASK_DEFINITION_KEY))
+      .body("suspended", equalTo(MockProvider.EXAMPLE_TASK_SUSPENSION_STATE))
+      .body("caseExecutionId", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_ID))
+      .body("caseInstanceId", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID))
+      .body("caseDefinitionId", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_ID))
+      .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
+      .body("lastUpdated", equalTo(MockProvider.EXAMPLE_TASK_LAST_UPDATED))
+      .body("attachment", equalTo(MockProvider.EXAMPLE_TASK_ATTACHMENT_STATE))
+      .body("comment", equalTo(MockProvider.EXAMPLE_TASK_COMMENT_STATE))
       .when().get(SINGLE_TASK_URL);
   }
 
