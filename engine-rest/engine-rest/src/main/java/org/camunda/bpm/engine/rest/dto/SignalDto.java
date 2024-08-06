@@ -27,6 +27,7 @@ public class SignalDto {
   private Map<String, VariableValueDto> variables;
   private String tenantId;
   private boolean withoutTenantId;
+  private String businessKey;
 
   public String getName() {
     return name;
@@ -66,5 +67,13 @@ public class SignalDto {
 
   public void setWithoutTenantId(boolean withoutTenantId) {
     this.withoutTenantId = withoutTenantId;
+  }
+
+  public String getBusinessKey() {
+    return businessKey;
+  }
+
+  public void setBusinessKey(String businessKey) {
+    this.businessKey = businessKey;
   }
 }

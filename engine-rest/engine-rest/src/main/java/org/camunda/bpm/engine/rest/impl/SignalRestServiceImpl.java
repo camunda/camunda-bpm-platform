@@ -81,6 +81,11 @@ public class SignalRestServiceImpl extends AbstractRestProcessEngineAware implem
       signalEvent.withoutTenantId();
     }
 
+    String businessKey = dto.getBusinessKey();
+    if (businessKey != null) {
+      signalEvent.businessKey(businessKey);
+    }
+
     return signalEvent;
   }
 }

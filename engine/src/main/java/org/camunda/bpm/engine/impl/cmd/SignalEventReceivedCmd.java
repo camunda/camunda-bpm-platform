@@ -37,8 +37,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
 /**
@@ -175,7 +175,8 @@ public class SignalEventReceivedCmd implements Command<Void> {
       if (processDefinition != null) {
 
         ActivityImpl signalStartEvent = processDefinition.findActivity(signalStartEventSubscription.getActivityId());
-        PvmProcessInstance processInstance = processDefinition.createProcessInstanceForInitial(signalStartEvent);
+        PvmExecutionImpl processInstance = (PvmExecutionImpl) processDefinition.createProcessInstanceForInitial(signalStartEvent);
+        processInstance.setProcessBusinessKey(builder.getBusinessKey());
         processInstance.start(builder.getVariables());
       }
     }

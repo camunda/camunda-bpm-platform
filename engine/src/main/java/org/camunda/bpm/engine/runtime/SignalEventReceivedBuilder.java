@@ -69,6 +69,15 @@ public interface SignalEventReceivedBuilder {
   SignalEventReceivedBuilder withoutTenantId();
 
   /**
+   * Add the given business key to the triggered executions if the receiver is signal start event.
+   *
+   * @param businessKey
+   *          the business key added to process instance if it is received by signal start event.
+   * @return the builder
+   */
+  SignalEventReceivedBuilder businessKey(String businessKey);
+
+  /**
    * <p>
    * Delivers the signal to waiting executions and process definitions. The notification and instantiation happen
    * synchronously.

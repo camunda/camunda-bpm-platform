@@ -69,6 +69,7 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
     when(signalBuilderMock.executionId(anyString())).thenReturn(signalBuilderMock);
     when(signalBuilderMock.tenantId(anyString())).thenReturn(signalBuilderMock);
     when(signalBuilderMock.withoutTenantId()).thenReturn(signalBuilderMock);
+    when(signalBuilderMock.businessKey(anyString())).thenReturn(signalBuilderMock);
   }
 
   @Test
