@@ -31,7 +31,6 @@ Contents:
 
         webapps: http://localhost:8080/
         rest: http://localhost:8080/engine-rest/
-        swaggerui: http://localhost:8080/swaggerui/
 
   internal/
         This directory contains the Java application and optional components

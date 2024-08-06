@@ -46,28 +46,25 @@ public class ComponentAvailabilityIT {
   @Parameter(2)
   public boolean webappsAvailable;
   @Parameter(3)
-  public boolean swaggerUIAvailable;
-  @Parameter(4)
   public boolean exampleAvailable;
 
-  @Parameters(name = "Test instance: {index}. Rest: {1}, Webapps: {2}, SwaggerUI: {3}, Example: {4}")
+  @Parameters(name = "Test instance: {index}. Rest: {1}, Webapps: {2}, Example: {3}")
   public static Collection<Object[]> commands() {
     return Arrays.asList(new Object[][] {
-      { new String[0], true, true, true, true },
-      { new String[]{"--rest"}, true, false, false, false },
-      { new String[]{"--rest", "--webapps"}, true, true, false, false },
-      { new String[]{"--rest", "--example"}, true, false, false, true },
-      { new String[]{"--webapps"}, false, true, false, false },
-      { new String[]{"--swaggerui"}, false, false, true, false },
-      { new String[]{"--rest", "--webapps", "--swaggerui"}, true, true, true, false },
-      { new String[]{"--rest", "--webapps", "--swaggerui", "--example"}, true, true, true, true }
+      { new String[0], true, true, true },
+      { new String[]{"--rest"}, true, false, false },
+      { new String[]{"--rest", "--webapps"}, true, true, false },
+      { new String[]{"--rest", "--example"}, true, false, true },
+      { new String[]{"--webapps"}, false, true, false },
+      { new String[]{"--rest", "--webapps"}, true, true, false },
+      { new String[]{"--rest", "--webapps", "--example"}, true, true, true }
     });
   }
 
   private static SpringBootManagedContainer container;
 
   @BeforeParam
-  public static void runStartScript(String[] commands, boolean restAvailable, boolean webappsAvailable, boolean swaggerUIAvailable, boolean exampleAvailable) {
+  public static void runStartScript(String[] commands, boolean restAvailable, boolean webappsAvailable, boolean exampleAvailable) {
     container = new SpringBootManagedContainer(commands);
     try {
       container.start();
@@ -109,19 +106,6 @@ public class ComponentAvailabilityIT {
       response.then()
         .statusCode(200)
         .body("html.head.title", equalTo("Camunda Welcome"));
-    } else {
-      response.then()
-        .statusCode(404);
-    }
-  }
-
-  @Test
-  public void shouldFindSwaggerUI() {
-    Response response = when().get(container.getBaseUrl() + "/swaggerui");
-    if (swaggerUIAvailable) {
-      response.then()
-        .statusCode(200)
-        .body("html.head.title", equalTo("Camunda Platform REST API"));
     } else {
       response.then()
         .statusCode(404);

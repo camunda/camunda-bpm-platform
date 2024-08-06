@@ -72,7 +72,7 @@
       </exclusions>
     </dependency>
 
-    <!-- spring-webmvc is not a direct requirement of run-core, but is required by modules/swaggerui and modules/webapps.
+    <!-- spring-webmvc is not a direct requirement of run-core, but is required by modules/webapps.
       To avoid having it on the classpath twice, it is included here and becomes part of the uberjar.-->
     <dependency>
       <groupId>org.springframework</groupId>
