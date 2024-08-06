@@ -924,6 +924,26 @@
       </build>
     </profile>
 
+    <profile>
+      <id>oracle-23</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <!-- In case of an unknown server name, Oracle 23ai doesn't return 
+                a 08 class SQL State hence the test would fail. -->
+                <excludes combine.children="append">
+                  <exclude>**/*ConnectionPersistenceExceptionTest.java</exclude>
+                </excludes>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
     <!-- test profiles -->
     <profile>
      <id>testBpmn</id>
