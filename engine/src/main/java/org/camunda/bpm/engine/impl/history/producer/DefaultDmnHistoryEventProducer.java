@@ -101,8 +101,14 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     HistoricDecisionEvaluationEvent event = newDecisionEvaluationEvent(evaluationEvent);
 
     HistoricDecisionInstanceEntity rootDecisionEvent = supplier.createHistoricDecisionInstance(evaluationEvent.getDecisionResult(), null);
+    /**
+     * Setting the generated decisionInstanceId to the root event
+     * Generating custom decisionInstanceId to persist the history event and return the id in the response
+     */
+    if(isNotBlank(evaluationEvent.getDecisionInstanceId())) {
+      rootDecisionEvent.setId(evaluationEvent.getDecisionInstanceId());
+    }
     event.setRootHistoricDecisionInstance(rootDecisionEvent);
-
     List<HistoricDecisionInstanceEntity> requiredDecisionEvents = new ArrayList<HistoricDecisionInstanceEntity>();
     for (DmnDecisionLogicEvaluationEvent requiredDecisionResult : evaluationEvent.getRequiredDecisionResults()) {
       HistoricDecisionInstanceEntity requiredDecisionEvent = supplier.createHistoricDecisionInstance(requiredDecisionResult, rootDecisionEvent);
@@ -422,6 +428,10 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
   protected HistoricProcessInstanceEventEntity getHistoricRootProcessInstance(String rootProcessInstanceId) {
     return Context.getCommandContext().getDbEntityManager()
       .selectById(HistoricProcessInstanceEventEntity.class, rootProcessInstanceId);
+  }
+
+  public boolean isNotBlank(String value) {
+    return value != null && !value.isEmpty();
   }
 
 }

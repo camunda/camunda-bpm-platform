@@ -36,6 +36,11 @@ public class DmnDecisionResultImpl implements DmnDecisionResult {
 
   protected final List<DmnDecisionResultEntries> ruleResults;
 
+  /**
+   * GIT Issue: https://github.com/camunda/camunda-bpm-platform/issues/2749
+   */
+  protected String dmnDecisionInstanceId;
+
   public DmnDecisionResultImpl(List<DmnDecisionResultEntries> ruleResults) {
     this.ruleResults = ruleResults;
   }
@@ -222,6 +227,16 @@ public class DmnDecisionResultImpl implements DmnDecisionResult {
   @Override
   public String toString() {
     return ruleResults.toString();
+  }
+
+  @Override
+  public String getDmnDecisionInstanceId() {
+    return dmnDecisionInstanceId;
+  }
+
+  @Override
+  public void setDmnDecisionInstanceId(String dmnDecisionInstanceId) {
+    this.dmnDecisionInstanceId = dmnDecisionInstanceId;
   }
 
   protected List<DmnDecisionResultEntries> asUnmodifiableList() {

@@ -49,6 +49,11 @@ public class MockDecisionResultBuilder {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * GIT Issue: https://github.com/camunda/camunda-bpm-platform/issues/2749
+     */
+    private String dmnDecisionInstanceId;
+
     @Override
     public DmnDecisionResultEntries getFirstResult() {
       throw new UnsupportedOperationException();
@@ -77,6 +82,16 @@ public class MockDecisionResultBuilder {
     @Override
     public <T extends TypedValue> T getSingleEntryTyped() {
       throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getDmnDecisionInstanceId() {
+      return this.dmnDecisionInstanceId;
+    }
+
+    @Override
+    public void setDmnDecisionInstanceId(String dmnDecisionInstanceId) {
+        this.dmnDecisionInstanceId = dmnDecisionInstanceId;
     }
 
   }

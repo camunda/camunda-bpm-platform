@@ -112,7 +112,7 @@ public class DefaultDmnEngine implements DmnEngine {
     if (decision instanceof DmnDecisionImpl && decision.isDecisionTable()) {
       DefaultDmnDecisionContext decisionContext = new DefaultDmnDecisionContext(dmnEngineConfiguration);
 
-      DmnDecisionResult decisionResult = decisionContext.evaluateDecision(decision, variableContext);
+      DmnDecisionResult decisionResult = decisionContext.evaluateDecision(decision, variableContext, null);
       return DmnDecisionTableResultImpl.wrap(decisionResult);
     }
     else {
@@ -155,16 +155,16 @@ public class DefaultDmnEngine implements DmnEngine {
   public DmnDecisionResult evaluateDecision(DmnDecision decision, Map<String, Object> variables) {
     ensureNotNull("decision", decision);
     ensureNotNull("variables", variables);
-    return evaluateDecision(decision, Variables.fromMap(variables).asVariableContext());
+    return evaluateDecision(decision, Variables.fromMap(variables).asVariableContext(), null);
   }
 
-  public DmnDecisionResult evaluateDecision(DmnDecision decision, VariableContext variableContext) {
+  public DmnDecisionResult evaluateDecision(DmnDecision decision, VariableContext variableContext, String decisionInsanceId) {
     ensureNotNull("decision", decision);
     ensureNotNull("variableContext", variableContext);
 
     if (decision instanceof DmnDecisionImpl) {
       DefaultDmnDecisionContext decisionContext = new DefaultDmnDecisionContext(dmnEngineConfiguration);
-      return decisionContext.evaluateDecision(decision, variableContext);
+      return decisionContext.evaluateDecision(decision, variableContext, decisionInsanceId);
     }
     else {
       throw LOG.decisionTypeNotSupported(decision);
@@ -181,7 +181,7 @@ public class DefaultDmnEngine implements DmnEngine {
     List<DmnDecision> decisions = parseDecisions(inputStream);
     for (DmnDecision decision : decisions) {
       if (decisionKey.equals(decision.getKey())) {
-        return evaluateDecision(decision, variableContext);
+        return evaluateDecision(decision, variableContext, null);
       }
     }
     throw LOG.unableToFindDecisionWithKey(decisionKey);
@@ -197,7 +197,7 @@ public class DefaultDmnEngine implements DmnEngine {
     List<DmnDecision> decisions = parseDecisions(dmnModelInstance);
     for (DmnDecision decision : decisions) {
       if (decisionKey.equals(decision.getKey())) {
-        return evaluateDecision(decision, variableContext);
+        return evaluateDecision(decision, variableContext, null);
       }
     }
     throw LOG.unableToFindDecisionWithKey(decisionKey);
