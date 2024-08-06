@@ -406,7 +406,7 @@
         <bind name="JOIN_TYPE" value="'left join'" />
       </if>
 
-      <if test="query != null &amp;&amp; (query.withIncidents || query.withRootIncidents || query.incidentStatus != null || query.incidentMessage != null || query.incidentMessageLike != null || query.incidentType != null)">
+      <if test="query != null &amp;&amp; (query.withIncidents || query.withRootIncidents || query.incidentStatus != null || query.incidentMessage != null || query.incidentMessageLike != null || query.incidentType != null || query.incidentId != null)">
         <bind name="INC_JOIN" value="true" />
       </if>
 
@@ -550,6 +550,11 @@
             <if test="query.incidentType != null">
               ${queryType} INC.INCIDENT_TYPE_ = #{query.incidentType}
             </if>
+
+            <if test="query.incidentId != null">
+              ${queryType} INC.ID_ = #{query.incidentId}
+            </if>
+
             <if test="query.incidentMessage != null">
               ${queryType} INC.INCIDENT_MSG_ = #{query.incidentMessage}
             </if>

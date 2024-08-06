@@ -127,6 +127,15 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
    */
   HistoricProcessInstanceQuery withRootIncidents();
 
+
+  /**
+   * Only select historic process instances which are associated with the given incident id.
+   * 
+   * @return HistoricProcessInstanceQuery
+   */
+  HistoricProcessInstanceQuery incidentId(String incidentId);
+
+
   /**
    * Only select historic process instances with incident status either 'open' or 'resolved'.
    * To get all process instances with incidents, use {@link HistoricProcessInstanceQuery#withIncidents()}.

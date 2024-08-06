@@ -123,6 +123,11 @@
     "desc": "Only include process instances which have a root incident. Value may only be `true`, as `false` is the default behavior."
   },
 
+  "incidentId": {
+    "type": "string",
+    "desc": "Filter by incident id."
+  },
+
   "incidentType": {
     "type": "string",
     "desc": "Filter by the incident type. See the [User Guide](${docsUrl}/user-guide/process-engine/incidents/#incident-types) for a list of incident types."
