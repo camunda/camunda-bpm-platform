@@ -17,11 +17,14 @@
 package org.camunda.bpm.engine.rest.sub.runtime;
 
 import java.util.List;
-
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-
 import org.camunda.bpm.engine.rest.dto.task.CommentDto;
 
 public interface ProcessInstanceCommentResource {
@@ -30,4 +33,15 @@ public interface ProcessInstanceCommentResource {
   @Produces(MediaType.APPLICATION_JSON)
   List<CommentDto> getComments();
 
+  @DELETE
+  @Path("/{commentId}")
+  @Produces(MediaType.APPLICATION_JSON)
+  void deleteComment(@PathParam("commentId") String commentId);
+
+  @PUT
+  @Consumes(MediaType.APPLICATION_JSON)
+  void updateComment(CommentDto comment);
+
+  @DELETE
+  void deleteComments();
 }

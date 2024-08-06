@@ -185,6 +185,7 @@ create table ACT_HI_COMMENT (
     FULL_MSG_ longvarbinary,
     TENANT_ID_ varchar(64),
     REMOVAL_TIME_ timestamp,
+    REV_ integer,
     primary key (ID_)
 );
 

@@ -185,6 +185,7 @@ create table ACT_HI_COMMENT (
     FULL_MSG_ LONGBLOB,
     TENANT_ID_ varchar(64),
     REMOVAL_TIME_ datetime,
+    REV_ integer,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

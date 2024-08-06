@@ -19,11 +19,14 @@ package org.camunda.bpm.engine.rest.sub.runtime.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import javax.ws.rs.core.Response.Status;
-
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
@@ -57,6 +60,70 @@ public class ProcessInstanceCommentResourceImpl implements ProcessInstanceCommen
     }
 
     return comments;
+  }
+
+  /**
+   * Deletes a comment by a given commentId
+   */
+  @Override
+  public void deleteComment(String commentId) {
+    ensureHistoryEnabled(Status.FORBIDDEN);
+    ensureProcessInstanceExists(Status.NOT_FOUND);
+
+    TaskService taskService = engine.getTaskService();
+    try {
+      taskService.deleteProcessInstanceComment(processInstanceId, commentId);
+    } catch (NotValidException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND,
+          "Deletion is not possible. No comment exists for processInstanceId '" + processInstanceId
+              + "' and comment id '" + commentId + "'.");
+    }
+  }
+
+  /**
+   * Updates message for a given processInstance ID and commentId
+   */
+  public void updateComment(CommentDto comment) {
+    ensureHistoryEnabled(Status.FORBIDDEN);
+    ensureProcessInstanceExists(Status.NOT_FOUND);
+
+    TaskService taskService = engine.getTaskService();
+    try {
+      taskService.updateProcessInstanceComment(processInstanceId, comment.getId(), comment.getMessage());
+    } catch (NotValidException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND,
+          "Update is not possible. No comment exists for process instance id '" + processInstanceId
+              + "' and comment id '" + comment.getId() + "'.");
+    } catch (AuthorizationException e) {
+      throw e;
+    } catch (NullValueException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Not enough parameters submitted");
+    }
+  }
+
+  /**
+   * Deletes all comments by a given processInstanceId
+   */
+  @Override
+  public void deleteComments() {
+    ensureHistoryEnabled(Status.FORBIDDEN);
+    ensureProcessInstanceExists(Status.NOT_FOUND);
+    TaskService taskService = engine.getTaskService();
+
+    try {
+      taskService.deleteProcessInstanceComments(processInstanceId);
+    } catch (NotValidException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND,
+          "Deletion of comments not possible for processInstance id '" + processInstanceId + "'.");
+    }
+  }
+
+  private void ensureHistoryEnabled(Status status) {
+    if (!isHistoryEnabled()) {
+      throw new InvalidRequestException(status, "History is not enabled");
+    }
   }
 
   private boolean isHistoryEnabled() {

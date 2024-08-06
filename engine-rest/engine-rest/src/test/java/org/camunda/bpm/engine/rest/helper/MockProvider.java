@@ -204,6 +204,11 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TASK_COMMENT_TIME = withTimezone("2014-04-24T14:10:44");
   public static final String EXAMPLE_TASK_COMMENT_ROOT_PROCESS_INSTANCE_ID = "aRootProcInstId";
 
+  //process instance comment
+  public static final String EXAMPLE_PROCESS_INSTANCE_COMMENT_ID = "aProcessInstanceCommentId";
+  public static final String EXAMPLE_PROCESS_INSTANCE_COMMENT_FULL_MESSAGE = "aProcessInstanceCommentFullMessage";
+
+
   // task attachment
   public static final String EXAMPLE_TASK_ATTACHMENT_ID = "aTaskAttachmentId";
   public static final String EXAMPLE_TASK_ATTACHMENT_NAME = "aTaskAttachmentName";
