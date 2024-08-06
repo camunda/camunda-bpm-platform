@@ -19,7 +19,7 @@
     <!-- database driver versions -->
     <version.h2>2.1.214</version.h2>
     <version.h2-v1>1.4.200</version.h2-v1><!-- used for instance migration qa -->
-    <version.oracle>19.3.0.0</version.oracle>
+    <version.oracle>23.5.0.24.07</version.oracle>
     <version.mariadb>1.7.6</version.mariadb>
     <version.mariadb-v1>1.1.8</version.mariadb-v1>
     <version.mysql>8.3.0</version.mysql>
@@ -44,8 +44,8 @@
         <version>${version.h2}</version>
       </dependency>
       <dependency>
-        <groupId>com.oracle.ojdbc</groupId>
-        <artifactId>ojdbc8</artifactId>
+        <groupId>com.oracle.database.jdbc</groupId>
+        <artifactId>ojdbc11</artifactId>
         <version>${version.oracle}</version>
       </dependency>
       <dependency>
