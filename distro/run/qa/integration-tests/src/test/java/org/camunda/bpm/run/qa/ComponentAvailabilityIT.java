@@ -45,7 +45,7 @@ public class ComponentAvailabilityIT {
   public boolean restAvailable;
   @Parameter(2)
   public boolean webappsAvailable;
-  @Parameter(4)
+  @Parameter(3)
   public boolean exampleAvailable;
 
   @Parameters(name = "Test instance: {index}. Rest: {1}, Webapps: {2}, Example: {3}")
