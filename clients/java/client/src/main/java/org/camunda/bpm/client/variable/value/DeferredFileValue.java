@@ -17,6 +17,7 @@
 package org.camunda.bpm.client.variable.value;
 
 import org.camunda.bpm.engine.variable.value.FileValue;
+import org.camunda.bpm.engine.variable.value.builder.Executionaware;
 
 /**
  * File value is not available unless it is loaded actively
@@ -26,8 +27,7 @@ import org.camunda.bpm.engine.variable.value.FileValue;
  *
  * @author Tassilo Weidner
  */
-public interface DeferredFileValue extends FileValue {
-
+public interface DeferredFileValue extends FileValue, Executionaware {
   /**
    * Indicates whether the file value has been loaded
    *

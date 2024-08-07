@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.camunda.bpm.engine.variable.value.builder.Executionaware;
 
 /**
  * @author Tassilo Weidner
@@ -274,6 +275,10 @@ public class ExternalTaskImpl implements ExternalTask {
 
     receivedVariableMap.forEach((variableName, variableValue) -> {
       TypedValue typedValue = getVariableTyped(variableName, deserializeObjectValues);
+      if(typedValue instanceof Executionaware) {
+        Executionaware executionaware = (Executionaware) typedValue;
+        executionaware.setExecutionId(this.executionId);
+      }
       variables.putValueTyped(variableName, typedValue);
     });
 
@@ -295,6 +300,10 @@ public class ExternalTaskImpl implements ExternalTask {
     VariableValue variableValue = receivedVariableMap.get(variableName);
     if (variableValue != null) {
       typedValue = variableValue.getTypedValue(deserializeObjectValues);
+      if(typedValue instanceof Executionaware) {
+        Executionaware executionaware = (Executionaware) typedValue;
+        executionaware.setExecutionId(this.executionId);
+      }
     }
 
     return (T) typedValue;
