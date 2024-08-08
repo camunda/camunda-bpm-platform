@@ -258,6 +258,9 @@ public class ExternalTaskImpl implements ExternalTask {
 
     VariableValue variableValue = receivedVariableMap.get(variableName);
     if (variableValue != null) {
+      if(variableValue.getTypedValue() instanceof Executionaware) {
+        ((Executionaware) variableValue.getTypedValue()).setExecutionId(executionId);
+      }
       value = (T) variableValue.getValue();
     }
 
