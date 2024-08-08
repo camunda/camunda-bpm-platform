@@ -14,29 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.variable.value;
+package org.camunda.bpm.engine.variable.value.builder;
 
-import org.camunda.bpm.engine.variable.value.FileValue;
-import org.camunda.bpm.engine.variable.value.builder.Executionaware;
-
-/**
- * File value is not available unless it is loaded actively
- *
- * Initially {@link #getValue()} returns {@code null}. Once {@link #load()} has been called
- * {@link #getValue()} holds the respective file value.
- *
- * @author Tassilo Weidner
- */
-public interface DeferredFileValue extends FileValue, Executionaware {
-  /**
-   * Indicates whether the file value has been loaded
-   *
-   * @return
-   * <ul>
-   *   <li> {@code true} if file value has been loaded
-   *   <li> {@code false} if file value has not been loaded
-   * </ul>
-   */
-  boolean isLoaded();
-
+public interface Executionaware {
+  public String getExecutionId();
+  public void setExecutionId(String executionId);
 }

@@ -52,11 +52,10 @@ public class EngineClient {
   public static final String FAILURE_RESOURCE_PATH = ID_RESOURCE_PATH + "/failure";
   public static final String BPMN_ERROR_RESOURCE_PATH = ID_RESOURCE_PATH + "/bpmnError";
   public static final String NAME_PATH_PARAM = "{name}";
-  public static final String EXECUTION_RESOURCE_PATH = "/execution";
-  public static final String EXECUTION_ID_RESOURCE_PATH = EXECUTION_RESOURCE_PATH + "/" + ID_PATH_PARAM;
-  public static final String GET_LOCAL_VARIABLE =  EXECUTION_ID_RESOURCE_PATH + "/localVariables/" + NAME_PATH_PARAM;
-  public static final String GET_LOCAL_BINARY_VARIABLE =  GET_LOCAL_VARIABLE + "/data";
-
+  public static final String PROCESS_INSTANCE_RESOURCE_PATH = "/process-instance";
+  public static final String PROCESS_INSTANCE_ID_RESOURCE_PATH = PROCESS_INSTANCE_RESOURCE_PATH + "/" + ID_PATH_PARAM;
+  public static final String GET_BINARY_VARIABLE =
+      PROCESS_INSTANCE_ID_RESOURCE_PATH + "/variables/" + NAME_PATH_PARAM + "/data";
   protected String baseUrl;
   protected String workerId;
   protected int maxTasks;
@@ -146,9 +145,9 @@ public class EngineClient {
     String resourceUrl = baseUrl + resourcePath;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
-
+// /process-instance/{id}/variables/{name}/data
   public byte[] getLocalBinaryVariable(String variableName, String processInstanceId)  {
-    String resourcePath = baseUrl + GET_LOCAL_BINARY_VARIABLE
+    String resourcePath = baseUrl + GET_BINARY_VARIABLE
             .replace(ID_PATH_PARAM, processInstanceId)
             .replace(NAME_PATH_PARAM, variableName);
 

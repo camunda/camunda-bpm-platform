@@ -39,6 +39,7 @@ public class DeferredFileValueImpl extends FileValueImpl implements DeferredFile
   protected String variableName;
   protected String processInstanceId;
   protected EngineClient engineClient;
+  protected String executionId = null;
 
   public DeferredFileValueImpl(String filename, EngineClient engineClient) {
     super(PrimitiveValueType.FILE, filename);
@@ -47,7 +48,7 @@ public class DeferredFileValueImpl extends FileValueImpl implements DeferredFile
 
   protected void load() {
     try {
-      byte[] bytes = engineClient.getLocalBinaryVariable(variableName, processInstanceId);
+      byte[] bytes = engineClient.getLocalBinaryVariable(variableName, executionId);
       setValue(bytes);
 
       this.isLoaded = true;
@@ -82,6 +83,16 @@ public class DeferredFileValueImpl extends FileValueImpl implements DeferredFile
   @Override
   public String toString() {
     return "DeferredFileValueImpl [mimeType=" + mimeType + ", filename=" + filename + ", type=" + type + ", isTransient=" + isTransient + ", isLoaded=" + isLoaded + "]";
+  }
+
+  @Override
+  public void setExecutionId(String executionId){
+    this.executionId = executionId;
+  };
+
+  @Override
+  public String getExecutionId() {
+    return executionId;
   }
 
 }
