@@ -24,6 +24,17 @@ pipeline {
     string(name: 'EE_DOWNSTREAM', defaultValue: 'cambpm-ee-main-pr/' + cambpmDefaultBranch(), description: 'The name of the EE branch/PR to run the EE pipeline on, e.g. cambpm-ee-main/PR-333')
   }
   stages {
+    stage('Engine Rest UNIT tests') {
+      steps {
+        script {
+          // see the .ci/config/matrices.yaml for the stage generation values
+          // see .ci/config/stage-types.yaml for the stage configurations
+          parallel(cambpmGetMatrixStages('engine-rest', failedStageTypes, { stageInfo ->
+            return cambpmWithLabels(stageInfo.allowedLabels)
+          }))
+        }
+      }
+    }
     stage('UNIT DB tests') {
       steps {
         script {
