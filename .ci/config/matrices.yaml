@@ -6,10 +6,21 @@
 engine-webapp-unit:
 # engine-webapp-unit.databases should include all supported database versions
   databases:
-  - 'sqlserver_2017'
-  - 'sqlserver_2019'
+  - 'postgresql_132'
+  - 'postgresql_142'
+  - 'postgresql_150'
+  - 'postgresql_160'
+  - 'aws_aurora_postgresql_13'
+  - 'aws_aurora_postgresql_14'
+  - 'aws_aurora_postgresql_15'
+  - 'mariadb_106'
+  - 'mysql_80'
   - 'oracle_19'
   - 'oracle_23'
+  - 'db2_115'
+  - 'sqlserver_2017'
+  - 'sqlserver_2019'
+  - 'sqlserver_2022'
   stages:
   - 'db-unit'
 engine-rest:
