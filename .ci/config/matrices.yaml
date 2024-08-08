@@ -6,6 +6,8 @@
 engine-webapp-unit:
 # engine-webapp-unit.databases should include all supported database versions
   databases:
+  - 'sqlserver_2017'
+  - 'sqlserver_2019'
   - 'oracle_19'
   - 'oracle_23'
   stages:
