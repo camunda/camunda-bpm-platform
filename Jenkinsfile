@@ -43,7 +43,7 @@ pipeline {
           parallel(cambpmGetMatrixStages('engine-webapp-unit', failedStageTypes, { stageInfo ->
             List allowedStageLabels = stageInfo.allowedLabels
             String dbLabel = stageInfo.nodeType
-            println "Running stage: ${stageInfo.stageName} on labels: ${stageLabels}"
+            println "Running stage: ${dbLabel}"
             return cambpmWithLabels(allowedStageLabels, cambpmGetDbType(dbLabel))
           }))
         }
