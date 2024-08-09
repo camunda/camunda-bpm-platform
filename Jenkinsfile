@@ -43,7 +43,6 @@ pipeline {
           parallel(cambpmGetMatrixStages('engine-webapp-unit', failedStageTypes, { stageInfo ->
             List allowedStageLabels = stageInfo.allowedLabels
             String dbLabel = stageInfo.nodeType
-            println "Running stage: ${stageInfo.stageName} on labels: ${stageLabels}"
             return cambpmWithLabels(allowedStageLabels, cambpmGetDbType(dbLabel))
           }))
         }
@@ -51,22 +50,15 @@ pipeline {
     }
    }
   post {
-    always {
+    changed {
       script {
-        if (failedStageTypes.size() > 0) {
-          currentBuild.result = "UNSTABLE"
+        if (!agentDisconnected()){
+          cambpmSendEmailNotification()
         }
       }
-      cambpmSetBuildResult()
     }
-    failure {
-      slackSend(color: "danger", message: "Build failed: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
-    }
-    success {
-      slackSend(color: "good", message: "Build succeeded: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
-    }
-    unstable {
-      slackSend(color: "warning", message: "Build unstable: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+    always {
+      cambpmWithSpanAttributes()
     }
   }
 }
