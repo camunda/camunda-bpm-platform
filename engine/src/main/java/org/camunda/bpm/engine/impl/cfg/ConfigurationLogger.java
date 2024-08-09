@@ -137,4 +137,19 @@ public class ConfigurationLogger extends ProcessEngineLogger {
         + "* Set a default historyTimeToLive as a global process engine configuration\n"
         + "* (Not recommended) Deactivate the enforceTTL config to disable this check"));
   }
+
+  public void logNullIsolationLevel(String defaultIsolationLevel) {
+    logInfo("019",
+        "Property transactionIsolationLevel has a null or empty value and the global database configuration is different from '{}'."
+            + "This may produce deadlocks or other unexpected behaviors.",
+          defaultIsolationLevel);
+  }
+
+  public void logNonOptimalIsolationLevel(String propertyValue, String defaultIsolationLevel) {
+    logWarn("020",
+        "Property transactionIsolationLevel has value '{}' which is different from '{}'. "
+            + "This may produce deadlocks or other unexpected behaviors.",
+        propertyValue,
+        defaultIsolationLevel);
+  }
 }

@@ -191,6 +191,11 @@ public abstract class ProcessEngineConfiguration {
   public static final String AUTHORIZATION_CHECK_REVOKE_NEVER = "never";
 
   /**
+   * The default transaction isolation level when no property is configured
+   */
+  public static final String TRANSACTION_ISOLATION_LEVEL_DEFAULT = "readCommitted";
+
+  /**
    * This mode only checks for {@link Authorization#AUTH_TYPE_REVOKE revoke} authorizations if at least
    * one revoke authorization currently exits for the current user or one of the groups the user is a member
    * of. To achieve this it is checked once per command whether potentially applicable revoke authorizations
@@ -252,6 +257,7 @@ public abstract class ProcessEngineConfiguration {
   protected boolean transactionsExternallyManaged = false;
   /** the number of seconds the jdbc driver will wait for a response from the database */
   protected Integer jdbcStatementTimeout;
+  protected String transactionIsolationLevel = TRANSACTION_ISOLATION_LEVEL_DEFAULT;
   protected boolean jdbcBatchProcessing = true;
 
   protected int defaultNumberOfRetries = JobEntity.DEFAULT_RETRIES;
@@ -565,6 +571,14 @@ public abstract class ProcessEngineConfiguration {
   public ProcessEngineConfiguration setDatabaseVendor(String databaseVendor) {
     this.databaseVendor = databaseVendor;
     return this;
+  }
+
+  public String getTransactionIsolationLevel() {
+    return transactionIsolationLevel;
+  }
+
+  public void setTransactionIsolationLevel(String transactionIsolationLevel) {
+    this.transactionIsolationLevel = transactionIsolationLevel;
   }
 
   public String getDatabaseVersion() {

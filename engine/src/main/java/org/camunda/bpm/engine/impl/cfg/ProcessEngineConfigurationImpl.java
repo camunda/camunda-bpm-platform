@@ -26,8 +26,6 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -47,6 +45,7 @@ import javax.script.ScriptEngineManager;
 import javax.sql.DataSource;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
+import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ExecutorType;
@@ -130,7 +129,6 @@ import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantCommandChecker;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
 import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneTransactionContextFactory;
-import org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd;
 import org.camunda.bpm.engine.impl.cmmn.CaseServiceImpl;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
@@ -395,7 +393,7 @@ import org.camunda.connect.spi.ConnectorRequest;
  */
 public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfiguration {
 
-  protected final static ConfigurationLogger LOG = ConfigurationLogger.CONFIG_LOGGER;
+  protected static ConfigurationLogger LOG = ConfigurationLogger.CONFIG_LOGGER;
 
   public static final String DB_SCHEMA_UPDATE_CREATE = "create";
   public static final String DB_SCHEMA_UPDATE_DROP_CREATE = "drop-create";
@@ -416,6 +414,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected static final Map<Object, Object> DEFAULT_BEANS_MAP = new HashMap<>();
 
   protected static final String PRODUCT_NAME = "Camunda BPM Runtime";
+  protected static final Map<String, Integer> TRANSACTION_ISOLATION_LEVEL_MAPPING = Map.of(
+      "readCommitted", Connection.TRANSACTION_READ_COMMITTED,
+      "readUncommitted", Connection.TRANSACTION_READ_UNCOMMITTED,
+      "repeatableRead", Connection.TRANSACTION_REPEATABLE_READ, 
+      "serializable", Connection.TRANSACTION_SERIALIZABLE);
 
   public static SqlSessionFactory cachedSqlSessionFactory;
 
@@ -439,7 +442,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   // Command executor and interceptor stack
   /**
-   * the configurable list which will be {@link #initInterceptorChain(java.util.List) processed} to build the {@link #commandExecutorTxRequired}
+   * the configurable list which will be {@link #initInterceptorChain(List) processed} to build the {@link #commandExecutorTxRequired}
    */
   protected List<CommandInterceptor> customPreCommandInterceptorsTxRequired;
   protected List<CommandInterceptor> customPostCommandInterceptorsTxRequired;
@@ -749,7 +752,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected DmnHistoryEventProducer dmnHistoryEventProducer;
 
   /**
-   * As an instance of {@link org.camunda.bpm.engine.impl.history.handler.CompositeHistoryEventHandler}
+   * As an instance of {@link CompositeHistoryEventHandler}
    * it contains all the provided history event handlers that process history events.
    */
   protected HistoryEventHandler historyEventHandler;
@@ -1261,7 +1264,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     //validate number of threads
     if (historyCleanupDegreeOfParallelism < 1 || historyCleanupDegreeOfParallelism > MAX_THREADS_NUMBER) {
       throw LOG.invalidPropertyValue("historyCleanupDegreeOfParallelism", String.valueOf(historyCleanupDegreeOfParallelism),
-        String.format("value for number of threads for history cleanup should be between 1 and %s", HistoryCleanupCmd.MAX_THREADS_NUMBER));
+        String.format("value for number of threads for history cleanup should be between 1 and %s", MAX_THREADS_NUMBER));
     }
 
     if (historyCleanupBatchWindowStartTime != null) {
@@ -1708,9 +1711,49 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         ((PooledDataSource) dataSource).forceCloseAll();
       }
     }
+    configureDefaultIsolationLevel();
 
     if (databaseType == null) {
       initDatabaseType();
+    }
+  }
+
+  protected void configureDefaultIsolationLevel() {
+    if (transactionIsolationLevel == null || transactionIsolationLevel.isBlank()) {
+        int currentIsolationLevel = getCurrentTransactionIsolationLevel();
+        if (currentIsolationLevel != Connection.TRANSACTION_READ_COMMITTED) {
+          LOG.logNullIsolationLevel(TRANSACTION_ISOLATION_LEVEL_DEFAULT);
+        }
+    } else if (!TRANSACTION_ISOLATION_LEVEL_MAPPING.containsKey(transactionIsolationLevel)) {
+      throw LOG.invalidPropertyValue("transactionIsolationLevel", transactionIsolationLevel);
+    } else {
+        final int isolationLevel = TRANSACTION_ISOLATION_LEVEL_MAPPING.get(transactionIsolationLevel);
+        if (isolationLevel != Connection.TRANSACTION_READ_COMMITTED) {
+          LOG.logNonOptimalIsolationLevel(transactionIsolationLevel, TRANSACTION_ISOLATION_LEVEL_DEFAULT);
+        }
+      setDefaultTransactionIsolationLevel(isolationLevel);
+    }
+  }
+
+  protected Integer getCurrentTransactionIsolationLevel() {
+    try (Connection connection = dataSource.getConnection()) {
+      return connection.getTransactionIsolation();
+    } catch (SQLException e) {
+      throw LOG.databaseConnectionAccessException(e);
+    }
+  }
+
+  protected void setDefaultTransactionIsolationLevel(int isolationLevel) {
+    if (dataSource instanceof PooledDataSource) {
+      ((PooledDataSource) dataSource).setDefaultTransactionIsolationLevel(isolationLevel);
+    } else if (dataSource instanceof UnpooledDataSource){
+      ((UnpooledDataSource) dataSource).setDefaultTransactionIsolationLevel(isolationLevel);
+    } else {
+      try (Connection connection = dataSource.getConnection()) {
+        connection.setTransactionIsolation(isolationLevel);
+      } catch (SQLException e) {
+        throw LOG.databaseConnectionAccessException(e);
+      }
     }
   }
 
