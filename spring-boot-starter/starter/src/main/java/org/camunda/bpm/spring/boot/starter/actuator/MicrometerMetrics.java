@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.management.MetricIntervalValue;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+
 public class MicrometerMetrics {
 
     @Autowired
@@ -19,6 +21,9 @@ public class MicrometerMetrics {
 
     @Autowired
     ProcessEngine processEngine;
+
+    @Value("${management.health.camunda.interval:900}")
+    private long interval;
 
     @PostConstruct
     public void init() {
@@ -39,6 +44,6 @@ public class MicrometerMetrics {
                 }
                 metricsMap.put(metric.getName(), metric.getValue());
             });
-        }, 0, 5, TimeUnit.SECONDS);
+        }, 0, interval, TimeUnit.SECONDS);
     }
 }
