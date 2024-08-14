@@ -214,6 +214,29 @@ public class CamundaFormDefinitionDeploymentTest {
 
   }
 
+  @Test
+  public void shouldUpdateVersionForChangedFormResourceWithTenant() throws IOException {
+    // given
+    String fileName = "myForm.form";
+    String formContent1 = "{\"id\"=\"myForm\",\"type\": \"default\",\"components\":[{\"key\": \"button3\",\"label\": \"Button\",\"type\": \"button\"}]}";
+    String formContent2 = "{\"id\"=\"myForm\",\"type\": \"default\",\"components\": []}";
+
+    createDeploymentBuilder(true).tenantId("tenant1").addInputStream(fileName, writeTempFormFile(fileName, formContent1, tempFolder)).deploy();
+
+    // when deploy changed file
+    createDeploymentBuilder(true).tenantId("tenant1").addInputStream(fileName, writeTempFormFile(fileName, formContent2, tempFolder)).deploy();
+
+    // then
+    List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
+    assertThat(deployments).hasSize(2);
+    assertThat(deployments).extracting("tenantId").containsExactly("tenant1", "tenant1");
+    List<CamundaFormDefinition> formDefinitions = findAllCamundaFormDefinitionEntities(processEngineConfiguration);
+    assertThat(formDefinitions).extracting("version").containsExactlyInAnyOrder(1, 2);
+    assertThat(formDefinitions).extracting("resourceName").containsExactly(fileName, fileName);
+    assertThat(formDefinitions).extracting("deploymentId").containsExactlyInAnyOrder(deployments.stream().map(Deployment::getId).toArray());
+
+  }
+
   private DeploymentBuilder createDeploymentBuilder(boolean filterDuplicates) {
     DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().name(getClass().getSimpleName());
     if (filterDuplicates) {

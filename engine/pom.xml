@@ -166,6 +166,16 @@
       <artifactId>jboss-javaee-web-6.0</artifactId>
       <type>pom</type>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jboss.spec.javax.xml.bind</groupId>
+          <artifactId>jboss-jaxb-api_2.2_spec</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jboss.spec.javax.servlet.jsp</groupId>
+          <artifactId>jboss-jsp-api_2.2_spec</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -307,7 +317,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-jsr223</artifactId>
       <scope>test</scope>
     </dependency>
@@ -715,22 +725,6 @@
               <excludes combine.children="append">
                 <exclude>**/CompetingMessageCorrelationTest.java</exclude>
               </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>cockroachdb</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <failIfNoTests>false</failIfNoTests>
-              <trimStackTrace>false</trimStackTrace>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>

@@ -24,7 +24,7 @@
     <dependencies>
       <!-- override the Spring Boot Groovy version with the Camunda Groovy version -->
       <dependency>
-        <groupId>org.codehaus.groovy</groupId>
+        <groupId>org.apache.groovy</groupId>
         <artifactId>groovy-bom</artifactId>
         <version>${version.groovy}</version>
         <scope>import</scope>
@@ -40,20 +40,6 @@
       <artifactId>camunda-bpm-run-modules-rest</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
-      <exclusions>
-        <!-- do not add transitive dependencies to generated dependency list -->
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm.run</groupId>
-      <artifactId>camunda-bpm-run-modules-swaggerui</artifactId>
-      <version>${project.version}</version>
-      <type>jar</type>
       <exclusions>
         <!-- do not add transitive dependencies to generated dependency list -->
         <exclusion>
@@ -103,20 +89,28 @@
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-jsr223</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-json</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-xml</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-templates</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-dateutil</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-datetime</artifactId>
     </dependency>
 
   </dependencies>

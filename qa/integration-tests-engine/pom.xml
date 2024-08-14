@@ -248,7 +248,7 @@
 
     <!-- required for TestWarDeploymentWithProcessEnginePlugin -->
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-jsr223</artifactId>
       <scope>test</scope>
     </dependency>
@@ -554,7 +554,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-tomcat</source>
+                    <source>src/test/java-tomcat9</source>
                   </sources>
                 </configuration>
               </execution>

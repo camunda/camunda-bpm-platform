@@ -87,7 +87,6 @@
       <modules>
         <module>modules</module>
         <module>modules/rest</module>
-        <module>modules/swaggerui</module>
         <module>modules/example</module>
         <module>core</module>
         <module>assembly</module>
