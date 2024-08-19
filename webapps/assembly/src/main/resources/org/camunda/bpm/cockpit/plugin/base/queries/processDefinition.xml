@@ -69,7 +69,7 @@
               select
                     PROCDEF.KEY_
                   , PROCDEF.TENANT_ID_
-                  , max(PROCDEF.version_)         as LATEST_VERSION_
+                  , max(PROCDEF.VERSION_)         as LATEST_VERSION_
                   , ${dbSpecificIfNullFunction}(sum(INSTANCE.INSTANCE_COUNT_), 0) as INSTANCE_COUNT_
                   , ${dbSpecificIfNullFunction}(sum(INC.INCIDENT_COUNT_), 0)      as INCIDENT_COUNT_
               <!-- Join process definitions with data about running instances and failed jobs -->
@@ -119,8 +119,8 @@
               group by PROCDEF.KEY_, PROCDEF.TENANT_ID_
             ) GROUPED
               <!-- join on key, tenantId and latest version -->
-              on GROUPED.key_ = RES.key_ and GROUPED.latest_version_ = RES.version_ and
-              (GROUPED.tenant_id_ = RES.tenant_id_ or (GROUPED.tenant_id_ is null and RES.tenant_id_ is null))
+              on GROUPED.KEY_ = RES.KEY_ and GROUPED.LATEST_VERSION_ = RES.VERSION_ and
+              (GROUPED.TENANT_ID_ = RES.TENANT_ID_ or (GROUPED.TENANT_ID_ is null and RES.TENANT_ID_ is null))
     ) RES
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
