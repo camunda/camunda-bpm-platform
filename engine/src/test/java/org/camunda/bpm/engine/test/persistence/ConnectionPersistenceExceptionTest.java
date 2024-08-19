@@ -38,8 +38,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-// This test is excluded on Oracle 23ai since the SQL State changed.
-@RequiredDatabase(excludes = { DbSqlSessionFactory.H2 })
+// This test is excluded on Oracle since the SQL State changed with the new version of the JDBC driver.
+@RequiredDatabase(excludes = { DbSqlSessionFactory.H2, DbSqlSessionFactory.ORACLE })
 public class ConnectionPersistenceExceptionTest {
 
   @Rule
