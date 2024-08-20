@@ -183,7 +183,7 @@
                         <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
                     </data-stores>
                 </timer-service>
-                <remote cluster="ejb" connectors="http-remoting-connector" thread-pool-name="default">
+                <remote connectors="http-remoting-connector" thread-pool-name="default">
                     <channel-creation-options>
                         <option name="MAX_OUTBOUND_MESSAGES" value="1234" type="remoting"/>
                     </channel-creation-options>
@@ -356,7 +356,7 @@
                     </local-cache>
                 </cache-container>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:io:4.0">
+            <subsystem xmlns="urn:jboss:domain:io:4.0" default-worker="default">
                 <worker name="default"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jaxrs:3.0"/>
@@ -617,7 +617,7 @@
                         <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
                     </data-stores>
                 </timer-service>
-                <remote cluster="ejb" connectors="http-remoting-connector" thread-pool-name="default">
+                <remote connectors="http-remoting-connector" thread-pool-name="default">
                     <channel-creation-options>
                         <option name="MAX_OUTBOUND_MESSAGES" value="1234" type="remoting"/>
                     </channel-creation-options>
@@ -807,7 +807,7 @@
                     </replicated-cache>
                 </cache-container>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:io:4.0">
+            <subsystem xmlns="urn:jboss:domain:io:4.0" default-worker="default">
                 <worker name="default"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jaxrs:3.0"/>
@@ -1087,7 +1087,7 @@
                         <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
                     </data-stores>
                 </timer-service>
-                <remote cluster="ejb" connectors="http-remoting-connector" thread-pool-name="default">
+                <remote connectors="http-remoting-connector" thread-pool-name="default">
                     <channel-creation-options>
                         <option name="MAX_OUTBOUND_MESSAGES" value="1234" type="remoting"/>
                     </channel-creation-options>
@@ -1266,7 +1266,7 @@
                     </local-cache>
                 </cache-container>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:io:4.0">
+            <subsystem xmlns="urn:jboss:domain:io:4.0" default-worker="default">
                 <worker name="default"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jaxrs:3.0"/>
@@ -1522,7 +1522,7 @@
                         <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
                     </data-stores>
                 </timer-service>
-                <remote cluster="ejb" connectors="http-remoting-connector" thread-pool-name="default">
+                <remote connectors="http-remoting-connector" thread-pool-name="default">
                     <channel-creation-options>
                         <option name="MAX_OUTBOUND_MESSAGES" value="1234" type="remoting"/>
                     </channel-creation-options>
@@ -1718,7 +1718,7 @@
                     </replicated-cache>
                 </cache-container>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:io:4.0">
+            <subsystem xmlns="urn:jboss:domain:io:4.0" default-worker="default">
                 <worker name="default"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jaxrs:3.0"/>
@@ -1944,7 +1944,7 @@
                     <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"/>
                 </formatter>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:io:4.0">
+            <subsystem xmlns="urn:jboss:domain:io:4.0" default-worker="default">
                 <worker name="default"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:undertow:14.0" default-virtual-host="default-host" default-servlet-container="default" default-server="default-server" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}">
@@ -2305,6 +2305,7 @@
                 <extension module="org.wildfly.extension.microprofile.lra-participant"/>
                 <extension module="org.wildfly.extension.microprofile.lra-coordinator"/>
                 <extension module="org.wildfly.extension.microprofile.telemetry"/>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly24.0">
@@ -2317,6 +2318,7 @@
                 <extension module="org.wildfly.extension.microprofile.lra-participant"/>
                 <extension module="org.wildfly.extension.microprofile.lra-coordinator"/>
                 <extension module="org.wildfly.extension.microprofile.telemetry"/>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly25.0">
@@ -2327,6 +2329,7 @@
                 <extension module="org.wildfly.extension.microprofile.lra-participant"/>
                 <extension module="org.wildfly.extension.microprofile.lra-coordinator"/>
                 <extension module="org.wildfly.extension.microprofile.telemetry"/>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly26.0">
@@ -2337,6 +2340,7 @@
                 <extension module="org.wildfly.extension.microprofile.lra-participant"/>
                 <extension module="org.wildfly.extension.microprofile.lra-coordinator"/>
                 <extension module="org.wildfly.extension.microprofile.telemetry"/>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly27.0">
@@ -2346,6 +2350,31 @@
                 <extension module="org.wildfly.extension.microprofile.lra-participant"/>
                 <extension module="org.wildfly.extension.microprofile.lra-coordinator"/>
                 <extension module="org.wildfly.extension.microprofile.telemetry"/>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly28.0">
+            <host-release id="WildFly28.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly29.0">
+            <host-release id="WildFly29.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly30.0">
+            <host-release id="WildFly30.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly31.0">
+            <host-release id="WildFly31.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
             </excluded-extensions>
         </host-exclude>
     </host-excludes>
