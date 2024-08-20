@@ -208,6 +208,11 @@
         name = "candidateGroup"
         type = "string"
         desc = "Only include tasks that are offered to the given group." />
+
+    <@lib.property
+    name = "candidateGroupLike"
+    type = "string"
+    desc = "Only include tasks that are offered to groups that have the parameter value as a substring." />
   
     <@lib.property
         name = "candidateGroupExpression"
