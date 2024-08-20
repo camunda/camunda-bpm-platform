@@ -36,6 +36,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -614,6 +615,70 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   }
 
   @Test
+  public void testQueryByIncludeAssignedTasksWithoutMissingCandidateUserOrGroup() {
+    // We expect no exceptions when the there is at least 1 candidate user or group present
+    try {
+      taskService.createTaskQuery().taskCandidateUser("user").includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a taskCandidateUser is present");
+    }
+
+    try {
+      taskService.createTaskQuery().taskCandidateGroupLike("%group%").includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a candidateGroupLike is present");
+    }
+
+    try {
+      taskService.createTaskQuery().taskCandidateGroupIn(List.of("group")).includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a taskCandidateGroupIn is present");
+    }
+
+    try {
+      taskService.createTaskQuery().withCandidateGroups().includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a withCandidateGroups is present");
+    }
+
+    try {
+      taskService.createTaskQuery().withoutCandidateGroups().includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a withoutCandidateGroups is present");
+    }
+
+    try {
+      taskService.createTaskQuery().withCandidateUsers().includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a withCandidateUsers is present");
+    }
+
+    try {
+      taskService.createTaskQuery().withoutCandidateUsers().includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a withoutCandidateUsers is present");
+    }
+
+    try {
+      taskService.createTaskQuery().taskCandidateUserExpression("expression").includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a taskCandidateUserExpression is present");
+    }
+
+    try {
+      taskService.createTaskQuery().taskCandidateGroupExpression("expression").includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a taskCandidateGroupExpression is present");
+    }
+
+    try {
+      taskService.createTaskQuery().taskCandidateGroupInExpression("expression").includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a taskCandidateGroupInExpression is present");
+    }
+  }
+
+  @Test
   public void testQueryByCandidateGroup() {
     // management group is candidate for 3 tasks, one of them is already assigned
     TaskQuery query = taskService.createTaskQuery().taskCandidateGroup("management");
@@ -651,6 +716,58 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     query = taskService.createTaskQuery().taskCandidateGroup("sales").includeAssignedTasks();
     assertEquals(0, query.count());
     assertEquals(0, query.list().size());
+  }
+
+  @Test
+  public void testQueryByCandidateGroupLike() {
+    // management group is candidate for 3 tasks, one of them is already assigned
+    TaskQuery query = taskService.createTaskQuery().taskCandidateGroupLike("management");
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
+    assertThrows(ProcessEngineException.class, query::singleResult);
+
+    // test with "shortened" group name for like query
+    query = taskService.createTaskQuery().taskCandidateGroupLike("mana%");
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
+    assertThrows(ProcessEngineException.class, query::singleResult);
+
+    // test with "shortened" group name for like query (different part)
+    query = taskService.createTaskQuery().taskCandidateGroupLike("%ment");
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
+    assertThrows(ProcessEngineException.class, query::singleResult);
+
+    // test management candidates group with assigned tasks included
+    query = taskService.createTaskQuery().taskCandidateGroupLike("management").includeAssignedTasks();
+    assertEquals(3, query.count());
+    assertEquals(3, query.list().size());
+    assertThrows(ProcessEngineException.class, query::singleResult);
+
+    // test with "shortened" group name for like query (assigned tasks included)
+    query = taskService.createTaskQuery().taskCandidateGroupLike("mana%").includeAssignedTasks();
+    assertEquals(3, query.count());
+    assertEquals(3, query.list().size());
+    assertThrows(ProcessEngineException.class, query::singleResult);
+
+    // test with "shortened" group name for like query (different part, assigned tasks included)
+    query = taskService.createTaskQuery().taskCandidateGroupLike("%ment").includeAssignedTasks();
+    assertEquals(3, query.count());
+    assertEquals(3, query.list().size());
+    assertThrows(ProcessEngineException.class, query::singleResult);
+
+    // test query that matches tasks with the "management" the "accountancy" candidate groups
+    // accountancy group is candidate for 3 tasks, one of them is already assigned
+    query = taskService.createTaskQuery().taskCandidateGroupLike("%an%");
+    assertEquals(4, query.count());
+    assertEquals(4, query.list().size());
+    assertThrows(ProcessEngineException.class, query::singleResult);
+
+    // test query that matches tasks with the "management" the "accountancy" candidate groups (assigned tasks included)
+    query = taskService.createTaskQuery().taskCandidateGroupLike("%an%").includeAssignedTasks();
+    assertEquals(5, query.count());
+    assertEquals(5, query.list().size());
+    assertThrows(ProcessEngineException.class, query::singleResult);
   }
 
   @Test

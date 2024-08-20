@@ -508,6 +508,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("assignee", "anAssignee");
     parameters.put("assigneeLike", "anAssigneeLike");
     parameters.put("candidateGroup", "aCandidateGroup");
+    parameters.put("candidateGroupLike", "aCandidateGroupLike");
     parameters.put("candidateUser", "aCandidate");
     parameters.put("includeAssignedTasks", "false");
     parameters.put("taskId", "aTaskId");
@@ -566,6 +567,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).taskAssignee(stringQueryParameters.get("assignee"));
     verify(mockQuery).taskAssigneeLike(stringQueryParameters.get("assigneeLike"));
     verify(mockQuery).taskCandidateGroup(stringQueryParameters.get("candidateGroup"));
+    verify(mockQuery).taskCandidateGroupLike(stringQueryParameters.get("candidateGroupLike"));
     verify(mockQuery).taskCandidateUser(stringQueryParameters.get("candidateUser"));
     verify(mockQuery).taskDefinitionKey(stringQueryParameters.get("taskDefinitionKey"));
     verify(mockQuery).taskDefinitionKeyLike(stringQueryParameters.get("taskDefinitionKeyLike"));
