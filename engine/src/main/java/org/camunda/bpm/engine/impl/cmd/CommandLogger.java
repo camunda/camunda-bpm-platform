@@ -356,4 +356,9 @@ public class CommandLogger extends ProcessEngineLogger {
         "The number of job retries must be a non-negative Integer, but '{}' has been provided.", retries));
   }
 
+  public ProcessEngineException exceptionWhileRetrievingDiagnosticsDataRegistryNull() {
+    return new ProcessEngineException(
+        exceptionMessage("055", "Error while retrieving diagnostics data. Diagnostics registry was not initialized."));
+  }
+
 }

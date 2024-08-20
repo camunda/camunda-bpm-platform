@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.rest.util;
 import static org.camunda.bpm.engine.rest.util.EngineUtil.getProcessEngineProvider;
 
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
-import org.camunda.bpm.engine.impl.telemetry.PlatformTelemetryRegistry;
+import org.camunda.bpm.engine.impl.diagnostics.PlatformDiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 
@@ -28,8 +28,8 @@ public class WebApplicationUtil {
   public static void setApplicationServer(String serverInfo) {
     if (serverInfo != null && !serverInfo.isEmpty() ) {
       // set the application server info globally for all engines in the container
-      if (PlatformTelemetryRegistry.getApplicationServer() == null) {
-        PlatformTelemetryRegistry.setApplicationServer(serverInfo);
+      if (PlatformDiagnosticsRegistry.getApplicationServer() == null) {
+        PlatformDiagnosticsRegistry.setApplicationServer(serverInfo);
       }
     }
   }
@@ -40,7 +40,7 @@ public class WebApplicationUtil {
       for (String engineName : processEngineProvider.getProcessEngineNames()) {
         if (engineName != null) {
           ManagementServiceImpl managementService = (ManagementServiceImpl) processEngineProvider.getProcessEngine(engineName).getManagementService();
-          managementService.setLicenseKeyForTelemetry(licenseKeyData);
+          managementService.setLicenseKeyForDiagnostics(licenseKeyData);
         }
       }
     }

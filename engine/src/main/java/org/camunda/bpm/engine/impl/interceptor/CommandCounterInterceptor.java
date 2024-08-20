@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.impl.interceptor;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
+import org.camunda.bpm.engine.impl.diagnostics.DiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.util.ClassNameUtil;
 
 public class CommandCounterInterceptor extends CommandInterceptor {
@@ -33,13 +33,13 @@ public class CommandCounterInterceptor extends CommandInterceptor {
     try {
       return next.execute(command);
     } finally {
-      TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
-      if (telemetryRegistry != null) {
+      DiagnosticsRegistry diagnosticsRegistry = processEngineConfiguration.getDiagnosticsRegistry();
+      if (diagnosticsRegistry != null) {
         String className = ClassNameUtil.getClassNameWithoutPackage(command);
         // anonymous class/lambda implementations of the Command interface are excluded
         if (!command.getClass().isAnonymousClass() && !className.contains("$$Lambda")) {
           className = parseLocalClassName(className);
-          telemetryRegistry.markOccurrence(className);
+          diagnosticsRegistry.markOccurrence(className);
         }
       }
     }

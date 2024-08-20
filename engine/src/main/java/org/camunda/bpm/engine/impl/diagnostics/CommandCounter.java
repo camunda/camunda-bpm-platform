@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.telemetry;
+package org.camunda.bpm.engine.impl.diagnostics;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -42,14 +42,6 @@ public class CommandCounter {
 
   public void mark(long times) {
     count.addAndGet(times);
-  }
-
-  public long getAndClear() {
-    return count.getAndSet(0);
-  }
-
-  public long get(boolean clear) {
-    return clear ? getAndClear() : get();
   }
 
   public long get() {
