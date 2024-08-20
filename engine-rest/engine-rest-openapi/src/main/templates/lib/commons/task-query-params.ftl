@@ -200,6 +200,11 @@
       type = "string"
       desc = "Only include tasks that are offered to the given group." />
 
+  <@lib.parameter name = "candidateGroupLike"
+  location = "query"
+  type = "string"
+  desc = "Only include tasks that are offered to groups that have the parameter value as a substring." />
+
   <@lib.parameter name = "candidateGroupExpression"
       location = "query"
       type = "string"
