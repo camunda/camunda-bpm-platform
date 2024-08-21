@@ -56,12 +56,10 @@ public class Slf4jClassloadingTest extends AbstractFoxPlatformIntegrationTest {
 
     // verify that a SLF4J backend is used which is not the NOP logger
     
-    System.out.println(loggerFactory.getClass().getCanonicalName());
     assertFalse("Should not use NOPLoggerFactory", loggerFactory instanceof NOPLoggerFactory);
 
     // should either use slf4j-jdk14 or slf4j-jboss-logmanager
     String loggerFactoryClassName = loggerFactory.getClass().getCanonicalName();
-    System.out.println(loggerFactoryClassName);
     assertTrue("Should use slf4j-jdk14 or slf4j-jboss-logmanager",
         JDK14_LOGGER_FACTORY.equals(loggerFactoryClassName) || JBOSS_SLF4J_LOGGER_FACTORY.equals(loggerFactoryClassName));
   }
