@@ -55,7 +55,6 @@ public class Slf4jClassloadingTest extends AbstractFoxPlatformIntegrationTest {
     ILoggerFactory loggerFactory = LoggerFactory.getILoggerFactory();
 
     // verify that a SLF4J backend is used which is not the NOP logger
-    
     assertFalse("Should not use NOPLoggerFactory", loggerFactory instanceof NOPLoggerFactory);
 
     // should either use slf4j-jdk14 or slf4j-jboss-logmanager
