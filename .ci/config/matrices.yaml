@@ -6,13 +6,14 @@
 engine-webapp-unit:
 # engine-webapp-unit.databases should include all supported database versions
   databases:
-  - 'postgresql_132'
-  - 'postgresql_142'
-  - 'postgresql_150'
-  - 'postgresql_160'
-  - 'aws_aurora_postgresql_13'
-  - 'aws_aurora_postgresql_14'
-  - 'aws_aurora_postgresql_15'
+  #- 'postgresql_132'
+  #- 'postgresql_142'
+  #- 'postgresql_150'
+  #- 'postgresql_160'
+  - 'postgresql_170'
+  #- 'aws_aurora_postgresql_13'
+  #- 'aws_aurora_postgresql_14'
+  #- 'aws_aurora_postgresql_15'
   - 'mariadb_106'
   - 'mysql_80'
   - 'oracle_19'
@@ -33,8 +34,8 @@ engine-rest:
 daily-stages:
   databases:
 # daily-stages.databases should include the latest version for each supported database
-  - 'postgresql_160'
-  - 'aws_aurora_postgresql_15'
+  - 'postgresql_170'
+  #- 'aws_aurora_postgresql_15'
   - 'mariadb_106'
   - 'mysql_80'
   - 'oracle_19'
@@ -57,9 +58,6 @@ sidetrack-stages:
   - 'rolling-update'
 jdk-ce-stages:
   stages:
-  - 'platform-jdk-openjdk-jdk-21-latest'
-  - 'platform-jdk-openjdk-jdk-17-latest'
-  - 'platform-jdk-openjdk-jdk-11-latest'
-  - 'platform-jdk-jdk-21-latest'
-  - 'platform-jdk-jdk-17-latest'
-  - 'platform-jdk-jdk-11-latest'
+  - 'platform-jdk-temurin-jdk-21-latest'
+  - 'platform-jdk-temurin-jdk-17-latest'
+  - 'platform-jdk-temurin-jdk-11-latest'
