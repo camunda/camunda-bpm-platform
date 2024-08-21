@@ -44,7 +44,8 @@
     <version.jakarta.xml.bind-api>4.0.2</version.jakarta.xml.bind-api>
     <version.httpclient>4.5.14</version.httpclient>
 
-    <version.slf4j>2.0.13</version.slf4j>
+    <!-- Tomcat 9 comes with slf4j-api 1.7 -->
+    <version.slf4j>1.7.36</version.slf4j>
     <!-- logback >= 1.4.0 discontinuous support for Javax EE -->
     <version.logback>1.3.14</version.logback>
     <version.junit>4.13.1</version.junit>
