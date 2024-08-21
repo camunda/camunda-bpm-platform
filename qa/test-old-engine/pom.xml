@@ -410,6 +410,8 @@
 
                 <exclude>**/ManagementServiceTableCountTest.java</exclude>
 
+                <!-- Can be removed in Camunda 7.23-->
+                <exclude>**/ConcurrentTelemetryConfigurationTest.java</exclude>
               </excludes>
               <testFailureIgnore>false</testFailureIgnore>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
