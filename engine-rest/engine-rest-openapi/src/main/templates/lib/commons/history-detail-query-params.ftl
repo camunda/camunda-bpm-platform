@@ -59,6 +59,10 @@
              [here](${docsUrl}/user-guide/process-engine/variables/#supported-variable-values).
              **Note:** All non-primitive variables are associated with the type `serializable`."
   },
+  "variableNameLike": {
+    "type": "string",
+    "desc": "Filter by variable name like. Example usage: `variableNameLike(%camunda%)`. The query will match the names of variables in a case-insensitive way."
+  },
   "tenantIdIn": {
     "type": "array",
     "itemType": "string",
