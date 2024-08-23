@@ -84,6 +84,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   private Boolean rootProcessInstances;
   private Boolean leafProcessInstances;
   private Boolean isProcessDefinitionWithoutTenantId;
+  private Boolean withVariablesInReturn;
 
   protected Boolean variableNamesIgnoreCase;
   protected Boolean variableValuesIgnoreCase;
@@ -365,6 +366,15 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   @CamundaQueryParam(value = "processDefinitionWithoutTenantId", converter = BooleanConverter.class)
   public void setProcessDefinitionWithoutTenantId(Boolean isProcessDefinitionWithoutTenantId) {
     this.isProcessDefinitionWithoutTenantId = isProcessDefinitionWithoutTenantId;
+  }
+
+  public Boolean isWithVariablesInReturn() {
+    return withVariablesInReturn;
+  }
+
+  @CamundaQueryParam(value = "withVariablesInReturn", converter = BooleanConverter.class)
+  public void setWithVariablesInReturn(Boolean withVariablesInReturn) {
+    this.withVariablesInReturn = withVariablesInReturn;
   }
 
   @Override
