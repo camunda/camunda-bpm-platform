@@ -175,6 +175,13 @@
       desc = "Match all variable names in this query case-insensitively.
               If set to true variableName and variablename are treated as equal."/>
 
+  <@lib.parameter name = "withVariablesInReturn"
+      location = "query"
+      type = "boolean"
+      defaultValue = 'false'
+      desc = "Indicates if the variables associated with the process instance should be returned.
+              Value may only be true, as false is the default behavior."/>
+
   <@lib.parameter name = "variableValuesIgnoreCase"
       location = "query"
       type = "boolean"
