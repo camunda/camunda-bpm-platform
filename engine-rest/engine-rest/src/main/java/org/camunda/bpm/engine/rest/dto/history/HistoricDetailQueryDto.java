@@ -16,15 +16,7 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
-import static java.lang.Boolean.TRUE;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
@@ -35,6 +27,15 @@ import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import static java.lang.Boolean.TRUE;
 
 /**
  * @author Roman Smirnov
@@ -121,13 +122,13 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     this.variableInstanceId = variableInstanceId;
   }
 
-   @CamundaQueryParam(value="variableTypeIn", converter = StringArrayConverter.class)
+  @CamundaQueryParam(value="variableTypeIn", converter = StringArrayConverter.class)
   public void setVariableTypeIn(String[] variableTypeIn) {
     this.variableTypeIn = variableTypeIn;
   }
 
-   @CamundaQueryParam(value="variableNameLike", converter = StringArrayConverter.class)
-   public void setVariablenameLike(String variableNameLike) {
+  @CamundaQueryParam(value="variableNameLike")
+  public void setVariableNameLike(String variableNameLike) {
      this.variableNameLike = variableNameLike;
    }
 
