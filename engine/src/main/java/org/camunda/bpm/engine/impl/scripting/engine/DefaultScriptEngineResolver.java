@@ -37,10 +37,12 @@ public class DefaultScriptEngineResolver implements ScriptEngineResolver {
     this.scriptEngineManager = scriptEngineManager;
   }
 
+  @Override
   public void addScriptEngineFactory(ScriptEngineFactory scriptEngineFactory) {
     scriptEngineManager.registerEngineName(scriptEngineFactory.getEngineName(), scriptEngineFactory);
   }
 
+  @Override
   public ScriptEngineManager getScriptEngineManager() {
     return scriptEngineManager;
   }
@@ -51,6 +53,7 @@ public class DefaultScriptEngineResolver implements ScriptEngineResolver {
    * @param language the language (such as 'groovy' for the script engine)
    * @return the cached engine or null if no script engine can be created for the given language
    */
+  @Override
   public ScriptEngine getScriptEngine(String language, boolean resolveFromCache) {
 
     ScriptEngine scriptEngine = null;
@@ -141,6 +144,8 @@ public class DefaultScriptEngineResolver implements ScriptEngineResolver {
   protected void configureGraalJsScriptEngine(ScriptEngine scriptEngine) {
     ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
     if (config != null) {
+      // skip warning: implementation does not support runtime compilation
+      scriptEngine.getContext().setAttribute("polyglot.engine.WarnInterpreterOnly", false, ScriptContext.ENGINE_SCOPE);
       if (config.isConfigureScriptEngineHostAccess()) {
         // make sure Graal JS can provide access to the host and can lookup classes
         scriptEngine.getContext().setAttribute("polyglot.js.allowHostAccess", true, ScriptContext.ENGINE_SCOPE);
