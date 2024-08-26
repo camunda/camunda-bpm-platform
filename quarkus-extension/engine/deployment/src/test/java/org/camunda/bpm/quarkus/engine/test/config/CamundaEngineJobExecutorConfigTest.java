@@ -44,8 +44,8 @@ public class CamundaEngineJobExecutorConfigTest {
     // given a custom application.properties file
 
     // then
-    assertThat(config.jobExecutor.threadPool.maxPoolSize).isEqualTo(12);
-    assertThat(config.jobExecutor.threadPool.queueSize).isEqualTo(5);
+    assertThat(config.jobExecutor().threadPool().maxPoolSize()).isEqualTo(12);
+    assertThat(config.jobExecutor().threadPool().queueSize()).isEqualTo(5);
   }
 
   @Test
@@ -53,13 +53,13 @@ public class CamundaEngineJobExecutorConfigTest {
     // given a custom application.properties file
 
     // then
-    assertThat(config.jobExecutor.genericConfig.get("max-jobs-per-acquisition")).isEqualTo("5");
-    assertThat(config.jobExecutor.genericConfig.get("lock-time-in-millis")).isEqualTo("500000");
-    assertThat(config.jobExecutor.genericConfig.get("wait-time-in-millis")).isEqualTo("7000");
-    assertThat(config.jobExecutor.genericConfig.get("max-wait")).isEqualTo("65000");
-    assertThat(config.jobExecutor.genericConfig.get("backoff-time-in-millis")).isEqualTo("5");
-    assertThat(config.jobExecutor.genericConfig.get("max-backoff")).isEqualTo("5");
-    assertThat(config.jobExecutor.genericConfig.get("backoff-decrease-threshold")).isEqualTo("120");
-    assertThat(config.jobExecutor.genericConfig.get("wait-increase-factor")).isEqualTo("3");
+    assertThat(config.jobExecutor().genericConfig().get("max-jobs-per-acquisition")).isEqualTo("5");
+    assertThat(config.jobExecutor().genericConfig().get("lock-time-in-millis")).isEqualTo("500000");
+    assertThat(config.jobExecutor().genericConfig().get("wait-time-in-millis")).isEqualTo("7000");
+    assertThat(config.jobExecutor().genericConfig().get("max-wait")).isEqualTo("65000");
+    assertThat(config.jobExecutor().genericConfig().get("backoff-time-in-millis")).isEqualTo("5");
+    assertThat(config.jobExecutor().genericConfig().get("max-backoff")).isEqualTo("5");
+    assertThat(config.jobExecutor().genericConfig().get("backoff-decrease-threshold")).isEqualTo("120");
+    assertThat(config.jobExecutor().genericConfig().get("wait-increase-factor")).isEqualTo("3");
   }
 }
