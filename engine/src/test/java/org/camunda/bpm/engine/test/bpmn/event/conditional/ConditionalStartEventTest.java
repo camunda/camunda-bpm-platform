@@ -488,6 +488,7 @@ public class ConditionalStartEventTest {
 
     List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processDefinitionKey(TRUE_CONDITION_PROCESS).list();
     assertEquals(1, processInstances.size());
+    System.out.println(processInstances.get(0).getProcessDefinitionKey());
 
     assertEquals(processInstances.get(0).getId(), conditionInstances.get(0).getId());
   }

@@ -45,6 +45,7 @@ public class StartProcessInstanceCmd implements Command<ProcessInstanceWithVaria
     this.instantiationBuilder = instantiationBuilder;
   }
 
+  @Override
   public ProcessInstanceWithVariables execute(CommandContext commandContext) {
 
     ProcessDefinitionEntity processDefinition = new GetDeployedProcessDefinitionCmd(instantiationBuilder, false).execute(commandContext);
@@ -61,7 +62,7 @@ public class StartProcessInstanceCmd implements Command<ProcessInstanceWithVaria
       processInstance.setTenantId(instantiationBuilder.getTenantId());
     }
 
-    processInstance.setProcessDefinitionKey(processDefinition.getKey());
+//    processInstance.setProcessDefinitionKey(processDefinition.getKey());
 
     final ExecutionVariableSnapshotObserver variablesListener = new ExecutionVariableSnapshotObserver(processInstance);
 

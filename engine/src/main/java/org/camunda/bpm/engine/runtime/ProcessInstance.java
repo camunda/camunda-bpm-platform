@@ -33,11 +33,6 @@ public interface ProcessInstance extends Execution {
   String getProcessDefinitionId();
 
   /**
-   * The key of the process definition of the process instance.
-   */
-  String getProcessDefinitionKey();
-
-  /**
    * The business key of this process instance.
    */
   String getBusinessKey();
