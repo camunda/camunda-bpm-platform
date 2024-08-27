@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -37,6 +38,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
@@ -525,6 +527,26 @@ public class HistoricDetailQueryTest {
           tuple("FooBarBaz", processInstance1.getId()),
           tuple("FooBarBaz", processInstance2.getId())
       );
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableNameLikeNull() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("FooBarBaz", "variableValue");
+    variables.put("FooBaz", "anotherVariableValue");
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery();
+
+    // then
+    assertThatThrownBy(() -> {
+      query.variableNameLike(null);
+    })
+        .isInstanceOf(NullValueException.class)
+        .hasMessageContaining("Variable name like is null");
   }
 
   @Test
