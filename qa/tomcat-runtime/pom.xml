@@ -138,5 +138,17 @@
         </plugins>
       </build>
     </profile>
+
+    <profile>
+      <id>engine-integration-jakarta</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.jboss.weld.servlet</groupId>
+          <artifactId>weld-servlet-shaded</artifactId>
+          <version>5.1.2.Final</version>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+    </profile>
   </profiles>
 </project>

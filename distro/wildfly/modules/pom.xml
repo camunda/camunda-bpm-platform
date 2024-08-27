@@ -83,24 +83,32 @@
 
     <!-- script engine dependencies -->
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-jsr223</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-json</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-xml</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-templates</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-dateutil</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-datetime</artifactId>
     </dependency>
 
     <dependency>
@@ -243,13 +251,13 @@
                 </copy>
 
                 <!-- copy groovy dependencies to single dir -->
-                <delete dir="target/modules/org/codehaus/groovy" />
+                <delete dir="target/modules/org/apache/groovy" />
                 <copy todir="target/modules" flatten="false">
                   <fileset refid="maven.project.dependencies" />
                   <mapper>
                     <chainedmapper>
                       <regexpmapper from="^(.*)/([^/]+)/([^/]+)/([^/]*)$$" to="\1/groovy-all/main/\4" handledirsep="yes" />
-                      <regexpmapper from="^(org.codehaus.groovy.*/.*.jar)$$" to="\1" handledirsep="yes" />
+                      <regexpmapper from="^(org.apache.groovy.*/.*.jar)$$" to="\1" handledirsep="yes" />
                     </chainedmapper>
                   </mapper>
                 </copy>

@@ -155,11 +155,6 @@ public class ControllableJobExecutor extends JobExecutor {
 
       return acquiredJobs;
     }
-    
-    @Override
-    public boolean isRetryable() {
-      return wrappedCommand.isRetryable();
-    }
 
     protected void rethrowOptimisticLockingException(CommandContext commandContext) {
       commandContext.getDbEntityManager().registerOptimisticLockingListener(new OptimisticLockingListener() {

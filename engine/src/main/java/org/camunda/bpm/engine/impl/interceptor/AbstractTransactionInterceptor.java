@@ -72,14 +72,7 @@ public abstract class AbstractTransactionInterceptor extends CommandInterceptor 
   }
 
   protected void handleRollbackException(Exception rollbackException) {
-    // When CockroachDB is used, a CRDB concurrency error may occur on transaction commit.
-    // To ensure that these errors are still detected as OLEs, we must catch them and wrap
-    // them in a CrdbTransactionRetryException
-    if (DbSqlSession.isCrdbConcurrencyConflictOnCommit(rollbackException, processEngineConfiguration)) {
-      throw ProcessEngineLogger.PERSISTENCE_LOGGER.crdbTransactionRetryExceptionOnCommit(rollbackException);
-    } else {
-      throw new TransactionException("Unable to commit transaction", rollbackException);
-    }
+    throw new TransactionException("Unable to commit transaction", rollbackException);
   }
 
   protected abstract void doResume(Object oldTx);

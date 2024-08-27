@@ -19,10 +19,10 @@ package org.camunda.bpm.engine.impl.cmd;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.diagnostics.DiagnosticsCollector;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
-import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 
 public class GetTelemetryDataCmd implements Command<TelemetryDataImpl> {
 
@@ -30,15 +30,15 @@ public class GetTelemetryDataCmd implements Command<TelemetryDataImpl> {
 
   @Override
   public TelemetryDataImpl execute(CommandContext commandContext) {
-    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkReadTelemetryData);
+    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkReadDiagnosticsData);
 
     configuration = commandContext.getProcessEngineConfiguration();
 
-    TelemetryReporter telemetryReporter = configuration.getTelemetryReporter();
-    if (telemetryReporter != null) {
-      return telemetryReporter.getTelemetrySendingTask().updateAndSendData(false, false);
+    DiagnosticsCollector diagnosticsCollector = configuration.getDiagnosticsCollector();
+    if (diagnosticsCollector != null) {
+      return diagnosticsCollector.updateAndFetchData();
     } else {
-      throw ProcessEngineLogger.TELEMETRY_LOGGER.exceptionWhileRetrievingTelemetryDataRegistryNull();
+      throw ProcessEngineLogger.CMD_LOGGER.exceptionWhileRetrievingDiagnosticsDataRegistryNull();
     }
   }
 

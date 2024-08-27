@@ -70,15 +70,9 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     assertEquals(0, processEngine.getHistoryService().createHistoricJobLogQuery().list().size());
   }
 
-  /**
-   * On CockroachDB, exclusive message correlation is not supported since a concurrent transaction obtaining
-   * a pessimistic lock provided with a `SELECT FOR UPDATE` will not see the changed data until it commits.
-   *
-   * @throws InterruptedException
-   */
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
   @Test
-  @RequiredDatabase(excludes = { DbSqlSessionFactory.H2, DbSqlSessionFactory.CRDB })
+  @RequiredDatabase(excludes = DbSqlSessionFactory.H2)
   public void testConcurrentExclusiveCorrelation() throws InterruptedException {
     InvocationLogListener.reset();
 
@@ -170,13 +164,8 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     assertTrue(thread2.getException() instanceof OptimisticLockingException);
   }
 
-  /**
-   * On CockroachDB, exclusive message correlation is not supported since a concurrent transaction obtaining
-   * a pessimistic lock provided with a `SELECT FOR UPDATE` will not see the changed data until it commits.
-   */
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
   @Test
-  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
   public void testConcurrentExclusiveCorrelationToDifferentExecutions() throws InterruptedException {
     InvocationLogListener.reset();
 
@@ -273,14 +262,6 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("afterMessageUserTask").count());
   }
 
-  /** On CockroachDB, the test will cause a hanging thread:
-   * 1. TX1 will perform a SELECT FOR UPDATE which behaves as a CRDB Write Intent
-   * 2. TX2 will attempt to SELECT the same ACT_RU_EVENT_SUBSCR row and will block in CRDB
-   *
-   * To make the test work on CRDB, TX1 needs to commit before TX2 executes the ACT_RU_EVENT_SUBSCR select,
-   * which orders the transactions and makes the test redundant.
-   */
-  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
   @Test
   public void testConcurrentMixedCorrelation() {

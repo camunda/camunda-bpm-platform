@@ -19,7 +19,7 @@ package org.camunda.bpm.container.impl.jboss.config;
 import java.util.Set;
 import org.camunda.bpm.engine.impl.cfg.JakartaTransactionProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
-import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
+import org.camunda.bpm.engine.impl.diagnostics.CamundaIntegration;
 
 /**
  *

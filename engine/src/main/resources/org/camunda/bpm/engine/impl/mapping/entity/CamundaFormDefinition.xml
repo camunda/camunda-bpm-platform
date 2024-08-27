@@ -123,7 +123,7 @@
           and VERSION_ = (
               select max(VERSION_) 
               from ${prefix}ACT_RE_CAMFORMDEF 
-              where KEY_ = #{key} and TENANT_ID_ = #{tenantId})
+              where KEY_ = #{camundaFormDefinitionKey} and TENANT_ID_ = #{tenantId})
   </select>
 
   <select id="selectCamundaFormDefinitionByKeyVersionWithoutTenantId" parameterType="map" resultMap="camundaFormDefinitionResultMap">

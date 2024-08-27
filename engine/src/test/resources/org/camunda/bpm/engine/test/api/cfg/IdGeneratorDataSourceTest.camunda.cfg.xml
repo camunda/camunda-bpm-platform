@@ -20,7 +20,6 @@
     
     <!-- job executor configurations -->
     <property name="jobExecutorActivate" value="false" />
-    <property name="telemetryReporterActivate" value="false" />
     
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />

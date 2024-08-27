@@ -20,13 +20,6 @@
       <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
     </dependencySet>
     <dependencySet>
-      <outputDirectory>internal/swaggerui/</outputDirectory>
-      <includes>
-        <include>org.camunda.bpm.run:camunda-bpm-run-modules-swaggerui</include>
-      </includes>
-      <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
-    </dependencySet>
-    <dependencySet>
       <outputDirectory>internal/example/</outputDirectory>
       <includes>
         <include>org.camunda.bpm.run:camunda-bpm-run-modules-example-invoice</include>
@@ -44,11 +37,13 @@
       <outputDirectory>configuration/userlib/</outputDirectory>
       <includes>
         <include>com.h2database:h2</include>
-        <include>org.codehaus.groovy:groovy:jar:*</include>
-        <include>org.codehaus.groovy:groovy-jsr223:jar:*</include>
-        <include>org.codehaus.groovy:groovy-json:jar:*</include>
-        <include>org.codehaus.groovy:groovy-xml:jar:*</include>
-        <include>org.codehaus.groovy:groovy-templates:jar:*</include>
+        <include>org.apache.groovy:groovy:jar:*</include>
+        <include>org.apache.groovy:groovy-jsr223:jar:*</include>
+        <include>org.apache.groovy:groovy-json:jar:*</include>
+        <include>org.apache.groovy:groovy-xml:jar:*</include>
+        <include>org.apache.groovy:groovy-templates:jar:*</include>
+        <include>org.apache.groovy:groovy-dateutil:jar:*</include>
+        <include>org.apache.groovy:groovy-datetime:jar:*</include>
       </includes>
     </dependencySet>
   </dependencySets>
@@ -126,10 +121,6 @@
     <fileSet>
       <directory>../modules/rest/target/dependency/</directory>
       <outputDirectory>internal/rest/</outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>../modules/swaggerui/target/dependency/</directory>
-      <outputDirectory>internal/swaggerui/</outputDirectory>
     </fileSet>
     <!-- create empty resource folder -->
     <fileSet>

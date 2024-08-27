@@ -31,11 +31,21 @@ public interface TelemetryRestService {
 
   String PATH = "/telemetry";
 
+  /**
+   * @deprecated The sending telemetry feature is removed.
+   * Please remove the endpoint usages as they are no longer needed.
+   */
+  @Deprecated
   @POST
   @Path("/configuration")
   @Consumes(MediaType.APPLICATION_JSON)
   void configureTelemetry(TelemetryConfigurationDto dto);
 
+  /**
+   * @deprecated The sending telemetry feature is removed.
+   * Please remove the endpoint usages as they are no longer needed.
+   */
+  @Deprecated
   @GET
   @Path("/configuration")
   @Produces(MediaType.APPLICATION_JSON)

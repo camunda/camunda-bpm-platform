@@ -183,7 +183,7 @@
                         <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
                     </data-stores>
                 </timer-service>
-                <remote cluster="ejb" connectors="http-remoting-connector" thread-pool-name="default">
+                <remote connectors="http-remoting-connector" thread-pool-name="default">
                     <channel-creation-options>
                         <option name="MAX_OUTBOUND_MESSAGES" value="1234" type="remoting"/>
                     </channel-creation-options>
@@ -202,7 +202,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:18.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:community:18.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -356,7 +356,7 @@
                     </local-cache>
                 </cache-container>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:io:3.0">
+            <subsystem xmlns="urn:jboss:domain:io:4.0" default-worker="default">
                 <worker name="default"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jaxrs:3.0"/>
@@ -399,7 +399,7 @@
                 <remote-naming/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:remoting:6.0">
+            <subsystem xmlns="urn:jboss:domain:remoting:7.0">
                 <http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-sasl-authentication"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
@@ -510,7 +510,7 @@
                 </logger>
                 <logger category="com.networknt.schema">
                     <level name="WARN"/>
-                </logger>                         
+                </logger>
                 <logger category="io.jaegertracing.Configuration">
                     <level name="WARN"/>
                 </logger>
@@ -567,7 +567,7 @@
                 <infinispan-timer-management name="persistent" cache-container="ejb" cache="persistent" max-active-timers="10000"/>
                 <infinispan-timer-management name="transient" cache-container="ejb" cache="transient" max-active-timers="10000"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:distributable-web:3.0" default-session-management="default" default-single-sign-on-management="default">
+            <subsystem xmlns="urn:jboss:domain:distributable-web:4.0" default-session-management="default" default-single-sign-on-management="default">
                 <infinispan-session-management name="default" cache-container="web" granularity="SESSION">
                     <primary-owner-affinity/>
                 </infinispan-session-management>
@@ -617,7 +617,7 @@
                         <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
                     </data-stores>
                 </timer-service>
-                <remote cluster="ejb" connectors="http-remoting-connector" thread-pool-name="default">
+                <remote connectors="http-remoting-connector" thread-pool-name="default">
                     <channel-creation-options>
                         <option name="MAX_OUTBOUND_MESSAGES" value="1234" type="remoting"/>
                     </channel-creation-options>
@@ -636,7 +636,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:18.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:community:18.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -807,7 +807,7 @@
                     </replicated-cache>
                 </cache-container>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:io:3.0">
+            <subsystem xmlns="urn:jboss:domain:io:4.0" default-worker="default">
                 <worker name="default"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jaxrs:3.0"/>
@@ -896,7 +896,7 @@
                 <remote-naming/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:remoting:6.0">
+            <subsystem xmlns="urn:jboss:domain:remoting:7.0">
                 <http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-sasl-authentication"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
@@ -976,7 +976,7 @@
                 </logger>
                 <logger category="com.networknt.schema">
                     <level name="WARN"/>
-                </logger>                                                        
+                </logger>
                 <logger category="io.jaegertracing.Configuration">
                     <level name="WARN"/>
                 </logger>
@@ -1087,7 +1087,7 @@
                         <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
                     </data-stores>
                 </timer-service>
-                <remote cluster="ejb" connectors="http-remoting-connector" thread-pool-name="default">
+                <remote connectors="http-remoting-connector" thread-pool-name="default">
                     <channel-creation-options>
                         <option name="MAX_OUTBOUND_MESSAGES" value="1234" type="remoting"/>
                     </channel-creation-options>
@@ -1107,7 +1107,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:18.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:community:18.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -1266,7 +1266,7 @@
                     </local-cache>
                 </cache-container>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:io:3.0">
+            <subsystem xmlns="urn:jboss:domain:io:4.0" default-worker="default">
                 <worker name="default"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jaxrs:3.0"/>
@@ -1339,7 +1339,7 @@
                 <remote-naming/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:remoting:6.0">
+            <subsystem xmlns="urn:jboss:domain:remoting:7.0">
                 <http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-sasl-authentication"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
@@ -1411,7 +1411,7 @@
                 </logger>
                 <logger category="com.networknt.schema">
                     <level name="WARN"/>
-                </logger>                         
+                </logger>
                 <logger category="io.jaegertracing.Configuration">
                     <level name="WARN"/>
                 </logger>
@@ -1522,7 +1522,7 @@
                         <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
                     </data-stores>
                 </timer-service>
-                <remote cluster="ejb" connectors="http-remoting-connector" thread-pool-name="default">
+                <remote connectors="http-remoting-connector" thread-pool-name="default">
                     <channel-creation-options>
                         <option name="MAX_OUTBOUND_MESSAGES" value="1234" type="remoting"/>
                     </channel-creation-options>
@@ -1542,7 +1542,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:18.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:community:18.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -1718,7 +1718,7 @@
                     </replicated-cache>
                 </cache-container>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:io:3.0">
+            <subsystem xmlns="urn:jboss:domain:io:4.0" default-worker="default">
                 <worker name="default"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jaxrs:3.0"/>
@@ -1841,7 +1841,7 @@
                 <remote-naming/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:remoting:6.0">
+            <subsystem xmlns="urn:jboss:domain:remoting:7.0">
                 <http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-sasl-authentication"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
@@ -1921,7 +1921,7 @@
                 </logger>
                 <logger category="com.networknt.schema">
                     <level name="WARN"/>
-                </logger>                                                        
+                </logger>
                 <logger category="io.jaegertracing.Configuration">
                     <level name="WARN"/>
                 </logger>
@@ -1944,7 +1944,7 @@
                     <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"/>
                 </formatter>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:io:3.0">
+            <subsystem xmlns="urn:jboss:domain:io:4.0" default-worker="default">
                 <worker name="default"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:undertow:14.0" default-virtual-host="default-host" default-servlet-container="default" default-server="default-server" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}">
@@ -2305,6 +2305,7 @@
                 <extension module="org.wildfly.extension.microprofile.lra-participant"/>
                 <extension module="org.wildfly.extension.microprofile.lra-coordinator"/>
                 <extension module="org.wildfly.extension.microprofile.telemetry"/>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly24.0">
@@ -2317,6 +2318,7 @@
                 <extension module="org.wildfly.extension.microprofile.lra-participant"/>
                 <extension module="org.wildfly.extension.microprofile.lra-coordinator"/>
                 <extension module="org.wildfly.extension.microprofile.telemetry"/>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly25.0">
@@ -2327,6 +2329,7 @@
                 <extension module="org.wildfly.extension.microprofile.lra-participant"/>
                 <extension module="org.wildfly.extension.microprofile.lra-coordinator"/>
                 <extension module="org.wildfly.extension.microprofile.telemetry"/>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly26.0">
@@ -2337,6 +2340,7 @@
                 <extension module="org.wildfly.extension.microprofile.lra-participant"/>
                 <extension module="org.wildfly.extension.microprofile.lra-coordinator"/>
                 <extension module="org.wildfly.extension.microprofile.telemetry"/>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly27.0">
@@ -2346,6 +2350,31 @@
                 <extension module="org.wildfly.extension.microprofile.lra-participant"/>
                 <extension module="org.wildfly.extension.microprofile.lra-coordinator"/>
                 <extension module="org.wildfly.extension.microprofile.telemetry"/>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly28.0">
+            <host-release id="WildFly28.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly29.0">
+            <host-release id="WildFly29.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly30.0">
+            <host-release id="WildFly30.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly31.0">
+            <host-release id="WildFly31.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.mvc-krazo"/>
             </excluded-extensions>
         </host-exclude>
     </host-excludes>

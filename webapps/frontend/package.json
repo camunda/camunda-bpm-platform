@@ -57,8 +57,8 @@
     "moment": "2.30.1",
     "mousetrap": "1.6.5",
     "q": "1.5.1",
-    "requirejs": "2.3.6",
-    "requirejs-angular-define": "https://github.com/camunda/requirejs-angular-define.git#aaa450a66e4d1a0588819804e1098c541bed585d",
+    "requirejs": "2.3.7",
+    "requirejs-angular-define": "github:camunda/requirejs-angular-define#20f44d0a7b29d70e240defbfa843decce2bc4550",
     "superagent": "8.1.2"
   },
   "devDependencies": {

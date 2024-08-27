@@ -105,18 +105,6 @@
     </dependency>
 
     <dependency>
-      <groupId>com.github.tomakehurst</groupId>
-      <artifactId>wiremock-jre8-standalone</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- required for wiremock-jre8-standalone - see CAM-14755 -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-jdk14</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>jakarta.annotation</groupId>
       <artifactId>jakarta.annotation-api</artifactId>
       <scope>provided</scope>
@@ -292,7 +280,7 @@
 
     <!-- required for TestWarDeploymentWithProcessEnginePlugin -->
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-jsr223</artifactId>
       <scope>test</scope>
     </dependency>
@@ -713,20 +701,8 @@
                 <!-- TODO Please delete the following exclusions after the Tomcat 10 issue with Arquillian -->
                 <!-- See Relevant issue: https://github.com/camunda/camunda-bpm-platform/issues/4434 -->
                 <exclude>**/CallActivityContextSwitchTest.java</exclude>
-                <exclude>**/TestMultipleClasspathRoots.java</exclude>
-                <exclude>**/TestResourceName.java</exclude>
-                <exclude>**/TestWarDeploymentDeployChangedOnlyWithJarAsLib.java</exclude>
-                <exclude>**/TestWarDeploymentWithDiagram.java</exclude>
-                <exclude>**/TestWarDeploymentWithoutDiagram.java</exclude>
-                <exclude>**/TestWarDeploymentWithoutProcessDefinitions.java</exclude>
-                <exclude>**/TestWarDeploymentWithoutProcessesXml.java</exclude>
                 <exclude>**/CdiBeanCallActivityResolutionTest.java</exclude>
-                <exclude>**/CdiBeanCaseTaskResolutionTest.java</exclude>
-                <exclude>**/CallActivityContextSwitchTest.java</exclude>
-                <exclude>**/FailingJobBoundaryTimerWithDelegateVariablesTest.java</exclude>
-                <exclude>**/SignalEventCatchBoundaryWithVariablesTest.java</exclude>
-                <exclude>**/TimerRecalculationTest.java</exclude>
-                <exclude>**/CdiProcessApplicationEventSupportTest.java</exclude>
+
                 <!-- TODO and weld-servlet-shaded is resolved with integration-tests-engine-jakarta -->
 
               </excludes>

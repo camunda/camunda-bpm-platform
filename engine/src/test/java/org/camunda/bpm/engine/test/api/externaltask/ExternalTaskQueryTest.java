@@ -265,14 +265,8 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTest {
     assertEquals(processInstances.get(0).getId(), task.getProcessInstanceId());
   }
 
-  /**
-   * Excluded on CRDB since the problem does not occur on it. The test execution also times out
-   * during test cleanup, on DELETE-ing the deployments, due the the slowness of the SQL statements on CRDB.
-   * See CAM-12239 for the performance issue.
-   */
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   @Test
-  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
   public void testQueryByLargeListOfProcessInstanceIdIn() {
     // given
     List<String> processInstances = new ArrayList<>();

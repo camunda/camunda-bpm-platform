@@ -90,6 +90,20 @@
       </build>
     </profile>
 
+     <profile>
+      <id>oracle-23</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>true</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>   
+
     <profile>
       <id>old-engine</id>
 
@@ -176,7 +190,7 @@
         </dependency>
 
         <dependency>
-          <groupId>org.codehaus.groovy</groupId>
+          <groupId>org.apache.groovy</groupId>
           <artifactId>groovy-jsr223</artifactId>
         </dependency>
 
@@ -410,6 +424,9 @@
 
                 <exclude>**/ManagementServiceTableCountTest.java</exclude>
 
+                <!-- The test is not relevant in `old-engine` setup since the feature has been removed -->
+                <!-- See https://github.com/camunda/camunda-bpm-platform/pull/4544#discussion_r1728748399 -->
+                <exclude>**/ConcurrentTelemetryConfigurationTest.java</exclude>
               </excludes>
               <testFailureIgnore>false</testFailureIgnore>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>

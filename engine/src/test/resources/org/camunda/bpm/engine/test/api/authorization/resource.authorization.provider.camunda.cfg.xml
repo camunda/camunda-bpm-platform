@@ -33,9 +33,6 @@
     <property name="resourceAuthorizationProvider" ref="myResourceAuthorizationProvider" />
     <property name="enforceHistoryTimeToLive" value="false" />
 
-    <!-- telemetry configuration -->
-    <property name="telemetryReporterActivate" value="false"/>
-
   </bean>
 
   <bean id="myResourceAuthorizationProvider" class="org.camunda.bpm.engine.test.api.authorization.MyResourceAuthorizationProvider" />

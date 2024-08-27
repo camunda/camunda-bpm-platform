@@ -72,16 +72,6 @@ public class ProductionConfigurationIT {
   }
 
   @Test
-  public void shouldNotProvideSwaggerUIInProductionConfiguration() {
-    // when
-    Response engineResponse = when().get(container.getBaseUrl() + "/swaggerui");
-
-    // then
-    engineResponse.then()
-      .statusCode(Status.NOT_FOUND.getStatusCode());
-  }
-
-  @Test
   public void shouldNotProvideExampleInProductionConfiguration() {
     // when
     Response response = when().get(container.getBaseUrl() + "/engine-rest/engine/production/process-definition");

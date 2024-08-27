@@ -127,7 +127,7 @@
   <!-- HISTORIC CASE ACTIVITY INSTANCE SELECT -->
 
   <select id="selectHistoricCaseActivityInstance" resultMap="historicCaseActivityInstanceResultMap">
-    select * from ${prefix}ACT_HI_CASEACTINST where Id_ = #{id}
+    select * from ${prefix}ACT_HI_CASEACTINST where ID_ = #{id}
   </select>
 
   <select id="selectHistoricCaseActivityInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricCaseActivityInstanceQueryImpl" resultMap="historicCaseActivityInstanceResultMap">
