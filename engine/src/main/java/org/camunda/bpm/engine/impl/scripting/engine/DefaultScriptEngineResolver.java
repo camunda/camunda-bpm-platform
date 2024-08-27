@@ -145,7 +145,6 @@ public class DefaultScriptEngineResolver implements ScriptEngineResolver {
     ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
     if (config != null) {
       // skip warning: implementation does not support runtime compilation
-      scriptEngine.getContext().setAttribute("polyglot.engine.WarnInterpreterOnly", false, ScriptContext.ENGINE_SCOPE);
       if (config.isConfigureScriptEngineHostAccess()) {
         // make sure Graal JS can provide access to the host and can lookup classes
         scriptEngine.getContext().setAttribute("polyglot.js.allowHostAccess", true, ScriptContext.ENGINE_SCOPE);
@@ -160,6 +159,7 @@ public class DefaultScriptEngineResolver implements ScriptEngineResolver {
         scriptEngine.getContext().setAttribute("polyglot.js.nashorn-compat", true, ScriptContext.ENGINE_SCOPE);
       }
     }
+    scriptEngine.getContext().setAttribute("polyglot.engine.WarnInterpreterOnly", false, ScriptContext.ENGINE_SCOPE);
   }
 
 }
