@@ -25,10 +25,15 @@ import io.quarkus.arc.runtime.BeanContainer;
 import io.quarkus.runtime.RuntimeValue;
 import io.quarkus.runtime.ShutdownContext;
 import io.quarkus.runtime.annotations.Recorder;
+import io.smallrye.config.ConfigMappingInterface;
 import io.smallrye.context.SmallRyeManagedExecutor;
 import jakarta.enterprise.inject.spi.BeanManager;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -38,6 +43,7 @@ import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.quarkus.engine.extension.CamundaEngineConfig;
+import org.camunda.bpm.quarkus.engine.extension.CamundaJobExecutorConfig;
 import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
 import org.camunda.bpm.quarkus.engine.extension.event.CamundaEngineStartupEvent;
 import org.eclipse.microprofile.context.ManagedExecutor;
@@ -57,6 +63,8 @@ public class CamundaEngineRecorder {
 
     QuarkusProcessEngineConfiguration configuration = getBeanFromContainer(QuarkusProcessEngineConfiguration.class,
         beanContainer);
+
+    filterOutDeclaredProperties(config);
 
     // apply properties from config before any other configuration.
     PropertyHelper.applyProperties(configuration, config.genericConfig(), PropertyHelper.KEBAB_CASE);
@@ -79,6 +87,32 @@ public class CamundaEngineRecorder {
     configureCdiEventBridge(configuration);
 
     return new RuntimeValue<>(configuration);
+  }
+
+  /**
+   * This workaround is the result of migrating config classes from the legacy @ConfigRoot behaviour to the new
+   * @ConfigMapping behaviour. Now, the genericConfig property maps need to either be named, which entails renaming
+   * all existing properties, or it contains all properties including the ones specifically declared in the class
+   * (like datasource), resulting in duplicates and unexpected behaviours.
+   * @param config the root configuration
+   */
+  protected static void filterOutDeclaredProperties(CamundaEngineConfig config) {
+    removeDeclaredPropertiesFromMap(config.genericConfig(), CamundaEngineConfig.class);
+    removeDeclaredPropertiesFromMap(config.jobExecutor().genericConfig(), CamundaJobExecutorConfig.class);
+  }
+
+  protected static void removeDeclaredPropertiesFromMap(Map<String, String> properties, Class<?> clazz) {
+    ConfigMappingInterface configurationInterface = ConfigMappingInterface.getConfigurationInterface(clazz);
+    Set<String> knownProperties = Arrays.stream(configurationInterface.getProperties())
+        .map(property -> property.getPropertyName(configurationInterface.getNamingStrategy()))
+        .filter(property -> !property.isBlank())
+        .collect(Collectors.toSet());
+
+    properties.keySet().removeIf(name -> knownProperties.contains(extractPropertyParent(name)));
+  }
+
+  protected static String extractPropertyParent(String property) {
+    return property != null ? property.split("\\.")[0] : "";
   }
 
   protected void configureCdiEventBridge(QuarkusProcessEngineConfiguration configuration) {

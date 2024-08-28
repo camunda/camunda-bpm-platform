@@ -19,6 +19,7 @@ package org.camunda.bpm.quarkus.engine.extension;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
 import io.smallrye.config.ConfigMapping;
+import io.smallrye.config.WithParentName;
 import java.util.Map;
 import java.util.Optional;
 
@@ -30,6 +31,7 @@ public interface CamundaEngineConfig {
    * The Camunda ProcessEngineConfiguration properties. For more details,
    * @see <a href="https://docs.camunda.org/manual/latest/reference/deployment-descriptors/tags/process-engine/#configuration-properties">Process Engine Configuration Properties</a>.
    */
+  @WithParentName
   Map<String, String> genericConfig();
 
   /**
