@@ -149,7 +149,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   }
 
   @Override
-  public TaskResource getTask(String id, Optional<Boolean> withCommentAttachmentInfo) {
+  public TaskResource getTask(String id, boolean withCommentAttachmentInfo) {
     return new TaskResourceImpl(getProcessEngine(), id, relativeRootResourcePath, getObjectMapper(), withCommentAttachmentInfo);
   }
 

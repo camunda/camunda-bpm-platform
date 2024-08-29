@@ -37,7 +37,7 @@ public interface TaskRestService {
   public static final String PATH = "/task";
 
   @Path("/{id}")
-  TaskResource getTask(@PathParam("id") String id, @QueryParam("withCommentAttachmentInfo") Optional<Boolean> withCommentAttachmentInfo);
+  TaskResource getTask(@PathParam("id") String id, @QueryParam("withCommentAttachmentInfo") boolean withCommentAttachmentInfo);
 
   @GET
   @Produces({MediaType.APPLICATION_JSON, Hal.APPLICATION_HAL_JSON})

@@ -176,7 +176,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   // or query /////////////////////////////
   protected List<TaskQueryImpl> queries = new ArrayList<>(Arrays.asList(this));
   protected boolean isOrQueryActive = false;
-  protected boolean withCommentAttachmentInfo = false;
+  protected boolean withCommentAttachmentInfo;
 
   public TaskQueryImpl() {
   }

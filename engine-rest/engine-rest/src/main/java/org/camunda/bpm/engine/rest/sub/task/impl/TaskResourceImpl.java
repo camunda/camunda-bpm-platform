@@ -73,9 +73,9 @@ public class TaskResourceImpl implements TaskResource {
   protected String taskId;
   protected String rootResourcePath;
   protected ObjectMapper objectMapper;
-  protected Optional<Boolean> withCommentAttachmentInfo;
+  protected boolean withCommentAttachmentInfo;
 
-  public TaskResourceImpl(ProcessEngine engine, String taskId, String rootResourcePath, ObjectMapper objectMapper, Optional<Boolean> withCommentAttachmentInfo) {
+  public TaskResourceImpl(ProcessEngine engine, String taskId, String rootResourcePath, ObjectMapper objectMapper, boolean withCommentAttachmentInfo) {
     this.engine = engine;
     this.taskId = taskId;
     this.rootResourcePath = rootResourcePath;
@@ -193,7 +193,7 @@ public class TaskResourceImpl implements TaskResource {
     if (task == null) {
       throw new InvalidRequestException(Status.NOT_FOUND, "No matching task with id " + taskId);
     }
-    if (withCommentAttachmentInfo.isPresent() && Boolean.TRUE.equals(withCommentAttachmentInfo.get())) {
+    if (withCommentAttachmentInfo) {
       return TaskWithAttachmentAndCommentDto.fromEntity(task);
     }
     else {
@@ -434,8 +434,8 @@ public class TaskResourceImpl implements TaskResource {
     }
   }
 
-  protected Task getTaskById(String id, Optional<Boolean> withCommentAttachmentInfo) {
-    if (withCommentAttachmentInfo.isPresent() && Boolean.TRUE.equals(withCommentAttachmentInfo.get())) {
+  protected Task getTaskById(String id, boolean withCommentAttachmentInfo) {
+    if (withCommentAttachmentInfo) {
       return engine.getTaskService().createTaskQuery().taskId(id).withCommentAttachmentInfo().initializeFormKeys().singleResult();
     }
     else{
