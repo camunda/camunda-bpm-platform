@@ -18,15 +18,13 @@ package my.own.custom.spring.boot.project;
 
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
-@SpringBootConfiguration
-@EnableAutoConfiguration
+@SpringBootApplication
 public class SampleApplication {
 
   public static void main(String... args) {

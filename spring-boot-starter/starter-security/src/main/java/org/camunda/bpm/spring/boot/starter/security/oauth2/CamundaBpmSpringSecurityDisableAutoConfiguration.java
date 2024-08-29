@@ -14,26 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package my.own.custom.spring.boot.project;
+package org.camunda.bpm.spring.boot.starter.security.oauth2;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.camunda.bpm.spring.boot.starter.security.oauth2.impl.ClientsNotConfiguredCondition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
-@SpringBootConfiguration
-@EnableAutoConfiguration
-public class SamplePermitAllApplication {
+@Conditional(ClientsNotConfiguredCondition.class)
+public class CamundaBpmSpringSecurityDisableAutoConfiguration {
 
-  public static void main(String... args) {
-    SpringApplication.run(SamplePermitAllApplication.class, args);
-  }
-  
+  private static final Logger logger = LoggerFactory.getLogger(CamundaBpmSpringSecurityDisableAutoConfiguration.class);
+
   @Bean
   public SecurityFilterChain filterChainPermitAll(HttpSecurity http) throws Exception {
+    logger.info("Disabling Camunda Spring Security oauth2 integration");
+
     http.authorizeHttpRequests(customizer -> customizer.anyRequest().permitAll())
         .cors(AbstractHttpConfigurer::disable)
         .csrf(AbstractHttpConfigurer::disable);
