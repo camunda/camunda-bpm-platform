@@ -83,7 +83,7 @@ IF [%~1]==[--webapps] (
 IF [%~1]==[--oauth2] (
   SET optionalComponentChosen=true
   SET classPath=%OAUTH2_PATH%,%classPath%
-  ECHO OAuth2 enabled
+  ECHO Spring Security OAuth2 enabled
 )
 
 IF [%~1]==[--rest] (

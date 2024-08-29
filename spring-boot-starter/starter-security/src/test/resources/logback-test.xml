@@ -4,5 +4,5 @@
   <logger name="org.springframework" level="info"/>
   <logger name="org.hibernate" level="info"/>
   <logger name="org.camunda" level="info"/>
-  <logger name="org.camunda.bpm.engine.persistence" level="warn" />
+  <logger name="org.camunda.bpm.engine.persistence" level="info" />
 </configuration>
