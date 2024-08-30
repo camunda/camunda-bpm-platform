@@ -76,9 +76,8 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   @Override
   public List<ProcessInstanceDto> queryProcessInstances(
-      ProcessInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
-   ProcessEngine engine = getProcessEngine();
-    RuntimeService runtimeService = engine.getRuntimeService(); 
+    ProcessInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
+    ProcessEngine engine = getProcessEngine();
     queryDto.setObjectMapper(getObjectMapper());
     ProcessInstanceQuery query = queryDto.toQuery(engine);
 
@@ -86,14 +85,14 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
     List<ProcessInstanceDto> instanceResults = new ArrayList<>();
     for (ProcessInstance instance : matchingInstances) {
-    	
-       if (null!= queryDto.isWithVariablesInReturn() && queryDto.isWithVariablesInReturn()){
-         VariableMap variableMap = (VariableMap) runtimeService.getVariables(instance.getProcessInstanceId());
-	     Map<String, VariableValueDto> variableValueDtoMap=  VariableValueDto.fromMap(variableMap);
-	     ProcessInstanceWithVariablesDto resultInstanceWithVariable = new ProcessInstanceWithVariablesDto(instance);
-	     resultInstanceWithVariable.setVariables(variableValueDtoMap);
-	     instanceResults.add(resultInstanceWithVariable);	
-       }
+      if (null!= queryDto.isWithVariablesInReturn() && queryDto.isWithVariablesInReturn()){
+        RuntimeService runtimeService = engine.getRuntimeService();       
+        VariableMap variableMap = (VariableMap) runtimeService.getVariables(instance.getProcessInstanceId());
+	Map<String, VariableValueDto> variableValueDtoMap=  VariableValueDto.fromMap(variableMap);
+	ProcessInstanceWithVariablesDto resultInstanceWithVariable = new ProcessInstanceWithVariablesDto(instance);
+	resultInstanceWithVariable.setVariables(variableValueDtoMap);
+	instanceResults.add(resultInstanceWithVariable);	
+      }
       else {
          ProcessInstanceDto resultInstance = ProcessInstanceDto.fromProcessInstance(instance);
          instanceResults.add(resultInstance);
