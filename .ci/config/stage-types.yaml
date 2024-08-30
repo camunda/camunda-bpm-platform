@@ -150,7 +150,7 @@ platform-jdk-openjdk-jdk-11-latest:
   directory: '.'
   command: 'install source:jar source:test-jar
     -pl ''!spring-boot-starter,!spring-boot-starter/starter,!spring-boot-starter/starter-client/spring,!spring-boot-starter/starter-client/spring-boot,
-          !spring-boot-starter/starter-qa,!spring-boot-starter/starter-rest,!spring-boot-starter/starter-test,!spring-boot-starter/starter-webapp,
+          !spring-boot-starter/starter-qa,!spring-boot-starter/starter-rest,!spring-boot-starter/starter-test,!spring-boot-starter/starter-webapp,!spring-boot-starter/starter-security,
           !spring-boot-starter/starter-webapp-core,
           !spring-boot-starter/starter-qa/integration-test-liquibase,!spring-boot-starter/starter-qa/integration-test-plugins,
           !spring-boot-starter/starter-qa/integration-test-plugins/spin,!spring-boot-starter/starter-qa/integration-test-plugins/spin/spin-dataformat-all,
@@ -187,7 +187,7 @@ platform-jdk-jdk-11-latest:
   directory: '.'
   command: 'install source:jar source:test-jar
     -pl ''!spring-boot-starter,!spring-boot-starter/starter,!spring-boot-starter/starter-client/spring,!spring-boot-starter/starter-client/spring-boot,
-          !spring-boot-starter/starter-qa,!spring-boot-starter/starter-rest,!spring-boot-starter/starter-test,!spring-boot-starter/starter-webapp,
+          !spring-boot-starter/starter-qa,!spring-boot-starter/starter-rest,!spring-boot-starter/starter-test,!spring-boot-starter/starter-webapp,!spring-boot-starter/starter-security,
           !spring-boot-starter/starter-webapp-core,
           !spring-boot-starter/starter-qa/integration-test-liquibase,!spring-boot-starter/starter-qa/integration-test-plugins,
           !spring-boot-starter/starter-qa/integration-test-plugins/spin,!spring-boot-starter/starter-qa/integration-test-plugins/spin/spin-dataformat-all,
