@@ -31,9 +31,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.util.JsonUtil;
-
-import static org.camunda.bpm.engine.impl.RestartProcessInstancesBatchConfigurationJsonConverter.PROCESS_DEFINITION_ID;
 
 /**
  *

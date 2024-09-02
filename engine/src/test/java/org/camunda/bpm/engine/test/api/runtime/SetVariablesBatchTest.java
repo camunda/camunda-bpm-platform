@@ -685,6 +685,7 @@ public class SetVariablesBatchTest {
     rule.executeSeedJobs(batch);
 
     // then
+    //Making sure that processInstanceId is set in execution jobs #4205
     List<Job> executionJobs = rule.getExecutionJobs(batch);
     assertThat(executionJobs)
         .extracting("processInstanceId")
