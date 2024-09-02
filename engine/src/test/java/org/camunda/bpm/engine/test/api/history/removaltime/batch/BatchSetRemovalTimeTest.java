@@ -421,7 +421,7 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
-  public void shouldCreateProcessInstanceRelatedBatchJobsForSingleInvocations() {
+  public void testRemovalTimeProcess_shouldCreateProcessInstanceRelatedBatchJobsForSingleInvocations() {
     // given
     testRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(1);
 
