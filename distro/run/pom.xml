@@ -87,6 +87,7 @@
       <modules>
         <module>modules</module>
         <module>modules/rest</module>
+        <module>modules/oauth2</module>
         <module>modules/example</module>
         <module>core</module>
         <module>assembly</module>
@@ -100,7 +101,6 @@
       </activation>
       <modules>
         <module>modules/webapps</module>
-        <module>modules/oauth2</module>
         <module>distro</module>
         <module>qa</module>
       </modules>
