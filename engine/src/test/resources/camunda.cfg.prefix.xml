@@ -40,6 +40,7 @@
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 
     <property name="databaseTablePrefix" value="SCHEMA1." />
+    <property name="transactionIsolationLevel" value="serializable" />
 
     <property name="enforceHistoryTimeToLive" value="false" />
 
