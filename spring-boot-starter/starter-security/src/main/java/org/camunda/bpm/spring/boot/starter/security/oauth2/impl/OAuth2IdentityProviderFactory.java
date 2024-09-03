@@ -16,14 +16,14 @@
  */
 package org.camunda.bpm.spring.boot.starter.security.oauth2.impl;
 
-import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
+import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 
 public class OAuth2IdentityProviderFactory implements SessionFactory {
   @Override
   public Class<?> getSessionType() {
-    return ReadOnlyIdentityProvider.class;
+    return WritableIdentityProvider.class;
   }
 
   @Override
