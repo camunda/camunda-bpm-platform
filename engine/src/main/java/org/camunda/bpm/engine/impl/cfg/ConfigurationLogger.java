@@ -137,4 +137,9 @@ public class ConfigurationLogger extends ProcessEngineLogger {
         + "* Set a default historyTimeToLive as a global process engine configuration\n"
         + "* (Not recommended) Deactivate the enforceTTL config to disable this check"));
   }
+
+  @Override
+  protected void logError(String id, String messageTemplate, Object... parameters) {
+    super.logError(id, messageTemplate, parameters);
+  }
 }

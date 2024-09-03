@@ -15,7 +15,8 @@
     <wildfly.container.adapter.groupId>org.wildfly.arquillian</wildfly.container.adapter.groupId>
     <wildfly.container.adapter.version>2.2.0.Final</wildfly.container.adapter.version>
 
-    <redirect.test.output>true</redirect.test.output>
+    <!-- Print directly to job logs-->
+    <redirect.test.output>false</redirect.test.output>
   </properties>
 
   <!-- import shrinkwrap and arquillian bom for artifact versions,

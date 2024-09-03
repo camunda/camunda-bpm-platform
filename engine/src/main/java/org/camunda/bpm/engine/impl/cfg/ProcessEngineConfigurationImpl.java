@@ -23,12 +23,15 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,6 +43,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.stream.Collectors;
 import javax.naming.InitialContext;
 import javax.script.ScriptEngineManager;
 import javax.sql.DataSource;
@@ -1679,11 +1683,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         // ACT-233: connection pool of Ibatis is not properely initialized if this is not called!
         ((PooledDataSource) dataSource).forceCloseAll();
       }
+
+      logDataSourceMetadata();
     }
 
     if (databaseType == null) {
       initDatabaseType();
     }
+  }
+
+  private void logDataSourceMetadata() {
+    Class<?> clazz = dataSource.getClass();
+    String canonicalName = clazz.getCanonicalName();
+    List<String> declaredFields = Arrays.stream(clazz.getDeclaredFields()).map(Field::toString).collect(Collectors.toList());
+    List<String> declaredMethods = Arrays.stream(clazz.getDeclaredMethods()).map(Method::toString).collect(Collectors.toList());
+    LOG.logError("999", "Datasource metadata: " + "\n\nClass name: {}" + "\n\nDeclared fields: {}" + "\n\nDeclared methods: {}", canonicalName, declaredFields, declaredMethods);
   }
 
   protected static Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
