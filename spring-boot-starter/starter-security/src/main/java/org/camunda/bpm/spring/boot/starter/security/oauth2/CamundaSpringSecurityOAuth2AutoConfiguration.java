@@ -67,7 +67,7 @@ public class CamundaSpringSecurityOAuth2AutoConfiguration {
         ProcessEngineAuthenticationFilter.AUTHENTICATION_PROVIDER_PARAM, OAuth2AuthenticationProvider.class.getName()));
     // make sure the filter is registered after the Spring Security Filter Chain
     filterRegistration.setOrder(SecurityProperties.DEFAULT_FILTER_ORDER + 1);
-    filterRegistration.addUrlPatterns(webappPath + "/app/*");
+    filterRegistration.addUrlPatterns(webappPath + "/app/*", webappPath + "/api/*");
     filterRegistration.setDispatcherTypes(DispatcherType.REQUEST);
     return filterRegistration;
   }
@@ -82,10 +82,8 @@ public class CamundaSpringSecurityOAuth2AutoConfiguration {
             .anyRequest().permitAll()
         )
         .oauth2Login(Customizer.withDefaults())
-        .oauth2Login(Customizer.withDefaults())
         .oidcLogout(Customizer.withDefaults())
         .oauth2Client(Customizer.withDefaults())
-        .cors(AbstractHttpConfigurer::disable)
         .csrf(AbstractHttpConfigurer::disable);
 
     return http.build();
