@@ -24,19 +24,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = SampleApplication.class, webEnvironment = RANDOM_PORT)
+@SpringBootTest(classes = SampleApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CamundaBpmSampleApplicationTest {
 
   private String baseUrl;
@@ -53,10 +48,15 @@ public class CamundaBpmSampleApplicationTest {
   }
 
   @Test
+  public void webappApiIsAvailableAndAuthorized() {
+    ResponseEntity<String> entity = testRestTemplate.getForEntity(baseUrl + "/camunda/api/engine/engine/default/user", String.class);
+    assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+  }
+
+  @Test
   public void restApiIsAvailable() {
     ResponseEntity<String> entity = testRestTemplate.getForEntity(baseUrl + "/engine-rest/engine/", String.class);
-    // default Spring Security filter chain config redirects to /login
-    assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.FOUND);
-    assertThat(entity.getHeaders()).contains(entry(HttpHeaders.LOCATION, List.of(baseUrl + "/login")));
+    assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(entity.getBody()).isEqualTo("[{\"name\":\"default\"}]");
   }
 }

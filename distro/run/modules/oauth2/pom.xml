@@ -11,7 +11,7 @@
 
   <artifactId>camunda-bpm-run-modules-oauth2</artifactId>
   <name>Camunda Platform - Run - Module Spring Security</name>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   
   <properties>
     <!-- generate a bom of compile time dependencies for the license book.
