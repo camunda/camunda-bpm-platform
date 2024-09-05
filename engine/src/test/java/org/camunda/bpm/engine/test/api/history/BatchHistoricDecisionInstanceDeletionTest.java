@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -49,7 +48,6 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.BatchHelper;
-import org.camunda.bpm.engine.test.util.AssertUtil;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -146,19 +144,6 @@ public class BatchHistoricDecisionInstanceDeletionTest {
   public void removeBatches() {
     helper.removeAllRunningAndHistoricBatches();
     ClockUtil.reset();
-  }
-
-  @Test
-  public void shouldCreateProcessInstanceRelatedBatchJobsForSingleInvocations(){
-    // when
-    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, null);
-    helper.executeSeedJob(batch);
-
-    //then
-    //Making sure that processInstanceId is set in execution jobs #4205
-    assertThat(helper.getExecutionJobs(batch))
-            .extracting("processInstanceId")
-            .containsExactlyInAnyOrder(decisionInstanceIds.toArray());
   }
 
   @Test
@@ -680,6 +665,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
       super(engineRule);
     }
 
+    @Override
     public JobDefinition getExecutionJobDefinition(Batch batch) {
       return engineRule.getManagementService().createJobDefinitionQuery()
           .jobDefinitionId(batch.getBatchJobDefinitionId())

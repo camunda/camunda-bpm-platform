@@ -231,6 +231,7 @@ public abstract class JobEntity extends AcquirableJobEntity
     persistentState.put("exceptionMessage", exceptionMessage);
     persistentState.put("suspensionState", suspensionState);
     persistentState.put("processDefinitionId", processDefinitionId);
+//    persistentState.put("processInstanceId", processInstanceId);
     persistentState.put("jobDefinitionId", jobDefinitionId);
     persistentState.put("deploymentId", deploymentId);
     persistentState.put("jobHandlerConfiguration", jobHandlerConfiguration);

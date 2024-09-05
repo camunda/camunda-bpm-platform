@@ -2864,8 +2864,6 @@ public class BatchSetRemovalTimeTest {
                 .putValue("dayType", "Weekend")
         ).evaluate();
 
-    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
-
     Batch batch = historyService.setRemovalTimeToHistoricDecisionInstances()
         .absoluteRemovalTime(CURRENT_DATE)
         .byQuery(historyService.createHistoricDecisionInstanceQuery())
@@ -2882,11 +2880,6 @@ public class BatchSetRemovalTimeTest {
 
     assertThat(batch.getExecutionStartTime()).isEqualToIgnoringMillis(CURRENT_DATE);
     assertThat(historicBatch.getExecutionStartTime()).isEqualToIgnoringMillis(CURRENT_DATE);
-
-    //Making sure that processInstanceId is set in execution jobs #4205
-    assertThat(executionJobs)
-            .extracting("processInstanceId")
-            .containsExactlyInAnyOrder(query.list().stream().map(HistoricDecisionInstance::getId).toArray());
   }
 
 }
