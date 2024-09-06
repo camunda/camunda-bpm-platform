@@ -108,6 +108,7 @@ public class CamundaSpringSecurityOAuth2AutoConfiguration {
         .oauth2Login(Customizer.withDefaults())
         .oidcLogout(Customizer.withDefaults())
         .oauth2Client(Customizer.withDefaults())
+        .cors(AbstractHttpConfigurer::disable)
         .csrf(AbstractHttpConfigurer::disable);
 
     return http.build();

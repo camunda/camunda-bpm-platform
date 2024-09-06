@@ -17,9 +17,9 @@
 package org.camunda.bpm.spring.boot.starter.security.oauth2.impl;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.spring.SpringProcessEnginePlugin;
+import org.camunda.bpm.spring.boot.starter.util.SpringBootProcessEnginePlugin;
 
-public class OAuth2IdentityProviderPlugin extends SpringProcessEnginePlugin {
+public class OAuth2IdentityProviderPlugin extends SpringBootProcessEnginePlugin {
 
   @Override
   public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
