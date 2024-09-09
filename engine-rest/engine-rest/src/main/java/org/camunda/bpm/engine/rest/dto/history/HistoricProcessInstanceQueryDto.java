@@ -87,7 +87,6 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private Boolean unfinished;
   private Boolean withIncidents;
   private Boolean withRootIncidents;
-  private String incidentId;
   private String incidentType;
   private String incidentStatus;
   private String incidentMessage;
@@ -115,6 +114,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private Boolean completed;
   private Boolean externallyTerminated;
   private Boolean internallyTerminated;
+  private List<String> incidentIds;
 
   private List<VariableQueryParameterDto> variables;
 
@@ -218,11 +218,6 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     this.withRootIncidents = withRootIncidents;
   }
 
-  @CamundaQueryParam(value = "incidentId")
-  public void setIncidentId(String incidentId) {
-    this.incidentId = incidentId;
-  }
-
   @CamundaQueryParam(value = "incidentStatus")
   public void setIncidentStatus(String status) {
     this.incidentStatus = status;
@@ -310,6 +305,12 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   @CamundaQueryParam(value = "incidentType")
   public void setIncidentType(String incidentType) {
     this.incidentType = incidentType;
+  }
+
+
+  @CamundaQueryParam(value = "incidentIdIn", converter = StringListConverter.class)
+  public void setIncidentIdIn(List<String> incidentIds) {
+    this.incidentIds = incidentIds;
   }
 
   @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
@@ -449,9 +450,6 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     if (withRootIncidents != null && withRootIncidents) {
       query.withRootIncidents();
     }
-    if (incidentId != null) {
-      query.incidentId(incidentId);
-    }
     if (incidentStatus != null) {
       query.incidentStatus(incidentStatus);
     }
@@ -499,6 +497,10 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     }
     if (TRUE.equals(withoutTenantId)) {
       query.withoutTenantId();
+    }
+
+    if (incidentIds != null && !incidentIds.isEmpty()) {
+      query.incidentIdIn(incidentIds.toArray(new String[0]));
     }
     if(TRUE.equals(variableNamesIgnoreCase)) {
       query.matchVariableNamesIgnoreCase();

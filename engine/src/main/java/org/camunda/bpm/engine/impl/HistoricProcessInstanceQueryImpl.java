@@ -94,6 +94,9 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String[] activeActivityIds;
   protected String state;
 
+  protected String[] incidentIds;
+
+
   protected String caseInstanceId;
 
   protected List<HistoricProcessInstanceQueryImpl> queries = new ArrayList<>(Collections.singletonList(this));
@@ -178,11 +181,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public HistoricProcessInstanceQuery withRootIncidents() {
     this.withRootIncidents = true;
-    return this;
-  }
-
-  public HistoricProcessInstanceQuery incidentId(String incidentId) {
-    this.incidentId = incidentId;
     return this;
   }
 
@@ -285,6 +283,12 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public HistoricProcessInstanceQuery caseInstanceId(String caseInstanceId) {
     this.caseInstanceId = caseInstanceId;
+    return this;
+  }
+
+  public HistoricProcessInstanceQuery incidentIdIn(String... incidentIds) {
+    ensureNotNull("incidentIds", (Object[]) incidentIds);
+    this.incidentIds = incidentIds;
     return this;
   }
 
@@ -589,10 +593,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     return caseInstanceId;
   }
 
-  public String getIncidentId() {
-    return incidentId;
-  }
-
   public String getIncidentType() {
     return incidentType;
   }
@@ -739,6 +739,11 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public String[] getTenantIds() {
     return tenantIds;
   }
+
+  public String[] getIncidentIds() {
+    return incidentIds;
+  }
+
 
   @Override
   public HistoricProcessInstanceQuery executedActivityAfter(Date date) {
