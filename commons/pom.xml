@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.commons</groupId>
     <artifactId>camunda-commons-bom</artifactId>
-    <version>7.22.0-SNAPSHOT</version>
+    <version>7.22.0-alpha5</version>
     <relativePath>bom</relativePath>
   </parent>
 
@@ -134,7 +134,7 @@
     <url>https://github.com/camunda/camunda-bpm-platform</url>
     <connection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>7.22.0-alpha5</tag>
   </scm>
 
 </project>
