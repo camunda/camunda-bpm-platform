@@ -94,7 +94,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String state;
   protected String[] incidentIds;
 
-
   protected String caseInstanceId;
 
   protected List<HistoricProcessInstanceQueryImpl> queries = new ArrayList<>(Collections.singletonList(this));
@@ -741,7 +740,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public String[] getIncidentIds() {
     return incidentIds;
   }
-
 
   @Override
   public HistoricProcessInstanceQuery executedActivityAfter(Date date) {

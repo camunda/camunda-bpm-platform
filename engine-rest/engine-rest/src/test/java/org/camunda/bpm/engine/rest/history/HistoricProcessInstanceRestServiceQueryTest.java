@@ -2327,7 +2327,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
         .when()
         .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).incidentIdIn("1", "2"); // TODO
+    verify(mockedQuery).incidentIdIn("1", "2");
   }
 
   @Test

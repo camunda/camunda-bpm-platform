@@ -1999,7 +1999,6 @@ public class HistoricProcessInstanceTest {
     runtimeService.startProcessInstanceByKey("failingProcess");
     List<String> queriedProcessInstances = Arrays.asList(processInstance.getId(), processInstance2.getId());
 
-
     testHelper.executeAvailableJobs();
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(queriedProcessInstances.get(0)).singleResult();
     Incident incident2 = runtimeService.createIncidentQuery().processInstanceId(queriedProcessInstances.get(1)).singleResult();
