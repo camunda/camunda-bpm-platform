@@ -401,6 +401,7 @@ public class MessageStartEventTest extends PluggableProcessEngineTest {
             .setVariableLocal("var", "value")
             .correlateWithResult().getProcessInstance();
 
+    System.out.println(processInstance.getProcessDefinitionKey());
     // then
     // ensure the variable is available
     String processInstanceValue = (String) runtimeService.getVariableLocal(processInstance.getId(), "var");
