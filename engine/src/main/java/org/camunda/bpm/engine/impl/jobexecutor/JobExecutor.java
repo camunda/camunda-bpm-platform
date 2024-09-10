@@ -173,7 +173,7 @@ public abstract class JobExecutor {
   }
 
   public void logRejectedExecution(ProcessEngineImpl engine, int numJobs) {
-    if(engine != null){
+    if (engine != null) {
       LOG.rejectedJobExecutions(engine.getName(), numJobs);
       if (engine.getProcessEngineConfiguration().isMetricsEnabled()) {
         engine.getProcessEngineConfiguration()
@@ -183,18 +183,22 @@ public abstract class JobExecutor {
     }
   }
 
-  public void logJobExecutionInfo(ProcessEngineImpl engine, int executionQueueSize, int executionQueueCapacity, int maxExecutionThreads, int activeExecutionThreads) {
-    if(engine != null){
-      LOG.numJobsInQueue(engine.getName(), executionQueueSize, executionQueueCapacity);
+  public void logJobExecutionInfo(ProcessEngineImpl engine,
+                                  int executionQueueSize,
+                                  int executionQueueCapacity,
+                                  int maxExecutionThreads,
+                                  int activeExecutionThreads) {
+    if (engine != null) {
       LOG.currentJobExecutions(engine.getName(), activeExecutionThreads);
+      LOG.numJobsInQueue(engine.getName(), executionQueueSize, executionQueueCapacity);
       try {
         LOG.availableJobExecutionThreads(engine.getName(),
-                Math.subtractExact(maxExecutionThreads, activeExecutionThreads));
-      } catch (ArithmeticException arithmeticException){
+            Math.subtractExact(maxExecutionThreads, activeExecutionThreads));
+      } catch (ArithmeticException arithmeticException) {
         //arithmetic exception occurred while computing remaining available thread count for logging.
         LOG.availableThreadsCalculationError();
       }
-      }
+    }
   }
 
   public int calculateTotalQueueCapacity(int availableItems, int remainingCapacity) {
