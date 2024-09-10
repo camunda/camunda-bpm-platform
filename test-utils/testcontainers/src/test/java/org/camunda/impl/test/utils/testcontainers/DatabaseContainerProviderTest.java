@@ -60,8 +60,6 @@ public class DatabaseContainerProviderTest {
       // The username and password need to be explicitly declared.
       { "jdbc:tc:cammysql:5.7://localhost:3306/process-engine?user=camunda&password=camunda", "SELECT version();", "5.7" },
       { "jdbc:tc:cammysql:8.0://localhost:3306/process-engine?user=camunda&password=camunda", "SELECT version();", "8.0" },
-      // The current Camunda CockroachDB images are compatible with Testcontainers.
-      { "jdbc:tc:camcockroachdb:20.1.13://localhost/process-engine?user=camunda&password=camunda", "SELECT version();", "20.1.3" },
       // The current Camunda SqlServer 2017/2019 images are compatible with Testcontainers.
       { "jdbc:tc:camsqlserver:2017:///process-engine", "SELECT @@VERSION", "2017" },
       { "jdbc:tc:camsqlserver:2019:///process-engine", "SELECT @@VERSION", "2019" },

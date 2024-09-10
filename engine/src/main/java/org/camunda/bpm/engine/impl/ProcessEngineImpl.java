@@ -35,7 +35,6 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.SimpleIpBasedProvider;
@@ -43,7 +42,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
-import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.CompositeCondition;
 
 /**
@@ -153,12 +151,6 @@ public class ProcessEngineImpl implements ProcessEngine {
       // if an OLE occurred during the process engine bootstrap, we suppress it
       // since all the data has already been persisted by a previous process engine bootstrap
       LOG.historyCleanupJobReconfigurationFailure(ole);
-      String databaseType = this.getProcessEngineConfiguration().getDatabaseType();
-      if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
-        // on CRDB, we want to re-throw the OLE to the caller
-        // when the CRDB Command retries are exausted
-        throw ole;
-      }
     }
   }
 
@@ -169,11 +161,6 @@ public class ProcessEngineImpl implements ProcessEngine {
 
     if(processEngineConfiguration.isMetricsEnabled()) {
       processEngineConfiguration.getDbMetricsReporter().stop();
-    }
-
-    TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
-    if (telemetryReporter != null) {
-      telemetryReporter.stop();
     }
 
     if ((jobExecutor != null)) {

@@ -1419,23 +1419,19 @@ public interface ManagementService {
   SchemaLogQuery createSchemaLogQuery();
 
   /**
-   * Enable/disable sending telemetry data to Camunda
-   *
-   * @throws AuthorizationException
-   *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
+   * @deprecated The sending telemetry feature is removed.
+   * Please remove the method references as they are no longer needed.
    */
+  @Deprecated
   void toggleTelemetry(boolean enabled);
 
   /**
-   * Checks how sending telemetry data to Camunda is configured
-   * @return
-   *   <ul>
-   *     <li><code>null</code> if the configuration is not defined so far,
-   *     treated as <code>false</code> and no data is sent,</li>
-   *     <li><code>true</code> if the telemetry sending is enabled, and</li>
-   *     <li><code>false</code> if the telemetry is disabled explicitly.</li>
-   *   </ul>
+   * @deprecated The sending telemetry feature is removed.
+   * Please remove the method references as they are no longer needed.
+   * @return always <code>false</code>
+   *
    */
+  @Deprecated
   Boolean isTelemetryEnabled();
 
   /**
@@ -1445,8 +1441,6 @@ public interface ManagementService {
    * page in the Camunda docs.
    *
    * The engine collects information about multiple aspects of the installation.
-   * If telemetry is enabled this information is sent to Camunda. If telemetry
-   * is disabled, the engine still collects this information.
    *
    * @see <a href="https://docs.camunda.org/manual/latest/introduction/telemetry/#collected-data">Camunda Documentation: Telemetry</a>
    */

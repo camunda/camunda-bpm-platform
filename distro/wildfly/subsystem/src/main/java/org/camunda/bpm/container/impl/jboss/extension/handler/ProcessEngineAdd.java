@@ -48,6 +48,10 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
 
   public static final ProcessEngineAdd INSTANCE = new ProcessEngineAdd();
 
+  protected ProcessEngineAdd() {
+    super(SubsystemAttributeDefinitons.PROCESS_ENGINE_ATTRIBUTES);
+  }
+
   @Override
   protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model) throws OperationFailedException {
 
@@ -63,7 +67,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
     MscManagedProcessEngineController service = new MscManagedProcessEngineController(processEngineConfiguration);
     ServiceName serviceName = ServiceNames.forManagedProcessEngine(processEngineConfiguration.getEngineName());
 
-    ServiceBuilder<?> serviceBuilder = context.getCapabilityServiceTarget().addService(serviceName);
+    ServiceBuilder<?> serviceBuilder = context.getServiceTarget().addService(serviceName);
 
     service.initializeServiceBuilder(processEngineConfiguration, serviceBuilder, serviceName, processEngineConfiguration.getJobExecutorAcquisitionName());
 
@@ -82,6 +86,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
         getPlugins(SubsystemAttributeDefinitons.PLUGINS.resolveModelAttribute(context, model))
     );
   }
+
 
   protected List<ProcessEnginePluginXml> getPlugins(ModelNode plugins) {
     List<ProcessEnginePluginXml> pluginConfigurations =  new ArrayList<>();

@@ -20,6 +20,15 @@ var moment = require('camunda-commons-ui/vendor/moment'),
   angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = function(ngModule, appRoot, appName) {
+  ngModule.factory('sanitizeMissingTranslationKey', [
+    '$translateSanitization',
+    function($sanitize) {
+      return function(translationKey) {
+        return $sanitize.sanitize(translationKey, 'text', 'escape');
+      };
+    }
+  ]);
+
   ngModule.factory('localeLoader', [
     '$q',
     '$http',
@@ -101,6 +110,9 @@ module.exports = function(ngModule, appRoot, appName) {
     '$translateProvider',
     'configurationProvider',
     function($translateProvider, configurationProvider) {
+      $translateProvider.useMissingTranslationHandler(
+        'sanitizeMissingTranslationKey'
+      );
       var avail = configurationProvider.getAvailableLocales();
       var fallback = configurationProvider.getFallbackLocale();
 

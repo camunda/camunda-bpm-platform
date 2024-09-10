@@ -41,9 +41,6 @@ insert into ACT_GE_PROPERTY
 values ('startup.lock', '0', 1);
 
 insert into ACT_GE_PROPERTY
-values ('telemetry.lock', '0', 1);
-
-insert into ACT_GE_PROPERTY
 values ('installationId.lock', '0', 1);
 
 create table ACT_GE_BYTEARRAY (
@@ -204,6 +201,7 @@ create table ACT_RU_TASK (
     FOLLOW_UP_DATE_ timestamp,
     SUSPENSION_STATE_ integer,
     TENANT_ID_ varchar(64),
+    TASK_STATE_ varchar(64),
     primary key (ID_)
 );
 

@@ -84,18 +84,6 @@
     </dependency>
 
     <dependency>
-      <groupId>com.github.tomakehurst</groupId>
-      <artifactId>wiremock-jre8-standalone</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- required for wiremock-jre8-standalone - see CAM-14755 -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-jdk14</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.jboss.spec</groupId>
       <artifactId>jboss-javaee-6.0</artifactId>
       <type>pom</type>
@@ -175,11 +163,13 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -210,6 +200,7 @@
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- explicit Spring dependencies for applications
@@ -245,7 +236,7 @@
 
     <!-- required for TestWarDeploymentWithProcessEnginePlugin -->
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-jsr223</artifactId>
       <scope>test</scope>
     </dependency>
@@ -494,7 +485,7 @@
     </profile>
 
     <profile>
-      <id>tomcat</id>
+      <id>tomcat9</id>
       <dependencyManagement>
         <dependencies>
           <!-- import internal dependencies before JBoss to preserve internal versions, e.g. for JUnit -->
@@ -518,7 +509,7 @@
         <dependency>
           <!-- make sure this comes after runtime in the reactor build -->
           <groupId>org.camunda.bpm.qa</groupId>
-          <artifactId>camunda-qa-tomcat-runtime</artifactId>
+          <artifactId>camunda-qa-tomcat9-runtime</artifactId>
           <version>${project.version}</version>
           <scope>provided</scope>
           <type>pom</type>
@@ -551,7 +542,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-tomcat</source>
+                    <source>src/test/java-tomcat9</source>
                   </sources>
                 </configuration>
               </execution>

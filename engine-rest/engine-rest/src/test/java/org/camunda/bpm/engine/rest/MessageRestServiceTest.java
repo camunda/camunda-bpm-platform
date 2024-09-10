@@ -1261,6 +1261,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     String content = response.asString();
     assertTrue(!content.isEmpty());
     checkVariablesInResult(content, 0);
+    checkExecutionResult(content, 0);
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
     verify(messageCorrelationBuilderMock).correlateWithResultAndVariables(false);

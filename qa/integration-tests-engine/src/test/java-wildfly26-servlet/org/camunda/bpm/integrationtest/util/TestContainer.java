@@ -26,12 +26,20 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
  */
 public class TestContainer {
 
+  public static void addContainerSpecificResourcesEmbedCdiLib(WebArchive webArchive) {
+    addContainerSpecificResources(webArchive);
+  }
+
   public static void addContainerSpecificResources(WebArchive archive) {
     addContainerSpecificResourcesWithoutWeld(archive);
   }
 
   public static void addContainerSpecificResourcesWithoutWeld(WebArchive webArchive) {
     webArchive.addClass(TestProcessApplication.class);
+  }
+
+  public static void addContainerSpecificResourcesForNonPaEmbedCdiLib(WebArchive webArchive) {
+    addContainerSpecificResourcesForNonPa(webArchive);
   }
 
   public static void addContainerSpecificResourcesForNonPa(WebArchive webArchive) {

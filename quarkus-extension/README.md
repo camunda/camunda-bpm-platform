@@ -29,7 +29,6 @@ can look like the following:
 quarkus.camunda.cmmn-enabled=false
 quarkus.camunda.dmn-enabled=false
 quarkus.camunda.history=none
-quarkus.camunda.initialize-telemetry=false
 
 # job executor configuration
 quarkus.camunda.job-executor.thread-pool.max-pool-size=12

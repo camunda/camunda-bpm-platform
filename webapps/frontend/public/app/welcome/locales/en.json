@@ -182,6 +182,10 @@
     "TOGGLE_NAVIGATION": "Toggle navigation",
     "UPDATE": "Update",
     "USERNAME": "Username",
-    "USERNAME_FOR_AUTHENTICATION": "Username for authentication: {{username}}"
+    "USERNAME_FOR_AUTHENTICATION": "Username for authentication: {{username}}",
+    "SEARCH_LESS_THAN": "<",
+    "SEARCH_LESS_THAN_EQUALS": "<=",
+    "SEARCH_GREATER_THAN": ">",
+    "SEARCH_GREATER_THAN_EQUALS": ">="
   }
 }

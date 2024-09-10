@@ -172,6 +172,7 @@ public class TaskServiceTest {
     assertEquals(dueDate, task.getDueDate());
     assertEquals(0, task.getPriority());
     assertEquals("taskcaseinstanceid", task.getCaseInstanceId());
+    assertEquals("Created", task.getTaskState());
 
     if (processEngineConfiguration.getHistoryLevel().getId()>= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       HistoricTaskInstance historicTaskInstance = historyService
@@ -205,6 +206,7 @@ public class TaskServiceTest {
     assertEquals(dueDate, task.getDueDate());
     assertEquals(1, task.getPriority());
     assertEquals("updatetaskcaseinstanceid", task.getCaseInstanceId());
+    assertEquals("Updated", task.getTaskState());
 
     if (processEngineConfiguration.getHistoryLevel().getId()>= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       HistoricTaskInstance historicTaskInstance = historyService

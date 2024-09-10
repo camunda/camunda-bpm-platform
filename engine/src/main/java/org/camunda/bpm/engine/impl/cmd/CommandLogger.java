@@ -302,12 +302,6 @@ public class CommandLogger extends ProcessEngineLogger {
         variableName));
   }
 
-  public void crdbTransactionRetryAttempt(Throwable cause) {
-    logDebug("045",
-      "A CockroachDB transaction retry attempt will be made. Reason: {}",
-      cause.getMessage());
-  }
-
   public void debugNotAllowedToResolveCalledProcess(String calledProcessId, String callingProcessId, String callActivityId, Throwable cause) {
     logDebug("046",
       "Resolving a called process definition {} for {} in {} was not possible. Reason: {}",
@@ -360,6 +354,11 @@ public class CommandLogger extends ProcessEngineLogger {
     return new ProcessEngineException(exceptionMessage(
         "054",
         "The number of job retries must be a non-negative Integer, but '{}' has been provided.", retries));
+  }
+
+  public ProcessEngineException exceptionWhileRetrievingDiagnosticsDataRegistryNull() {
+    return new ProcessEngineException(
+        exceptionMessage("055", "Error while retrieving diagnostics data. Diagnostics registry was not initialized."));
   }
 
 }

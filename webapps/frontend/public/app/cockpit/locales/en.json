@@ -1758,6 +1758,7 @@
     "PLGN_SETA_CONF_PROCESS_DEFINITION_NAME": "Process Definition Name",
     "PLGN_SETA_CONF_PROCESS_INSTANCE_ID": "Process Instance ID",
     "PLGN_SETA_CONF_PROCESS_VARIABLE": "Process Variable",
+    "PLGN_SETA_CONF_ROOT_PROCESS_INSTANCE_ID": "Root Process Instance ID",
     "PLGN_SETA_CONF_TASK_ASSIGNEE": "Task Assignee",
     "PLGN_SETA_CONF_TASK_DEFINITION_KEY": "Task Definition Key",
     "PLGN_SETA_CONF_TASK_DELETE_REASON": "Task Delete Reason",
@@ -2554,6 +2555,10 @@
     "VARIABLE_UPLOAD_PROGRESS": "Upload progress: {{progress}}%",
     "VARIABLE_UPLOAD_SELECT_FILE": "Select a file containing the binary content for the variable",
     "VARIABLE_UPLOAD_UPLOAD": "Upload",
-    "WITHOUT_DUE_DATE": "Without Due Date"
+    "WITHOUT_DUE_DATE": "Without Due Date",
+    "SEARCH_LESS_THAN": "<",
+    "SEARCH_LESS_THAN_EQUALS": "<=",
+    "SEARCH_GREATER_THAN": ">",
+    "SEARCH_GREATER_THAN_EQUALS": ">="
   }
 }

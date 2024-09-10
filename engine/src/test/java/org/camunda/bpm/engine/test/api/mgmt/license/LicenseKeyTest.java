@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Map;
 
-import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -56,10 +55,14 @@ public class LicenseKeyTest {
     processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
     managementService = processEngine.getManagementService();
     identityService = processEngine.getIdentityService();
+
+    // clean up license before starting the tests
+    managementService.deleteLicenseKey();
   }
 
   @After
   public void tearDown() {
+    // clean up license after finishing the tests
     managementService.deleteLicenseKey();
   }
 

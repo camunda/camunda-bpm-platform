@@ -27,7 +27,7 @@ pipeline {
     stage('ASSEMBLY') {
       when {
         expression {
-          env.BRANCH_NAME == cambpmDefaultBranch() || (changeRequest() && !pullRequest.labels.contains('ci:no-build'))
+          env.BRANCH_NAME == cambpmDefaultBranch() || (env.CHANGE_ID != null && !pullRequest.labels.contains('ci:no-build'))
         }
       }
       environment {
@@ -39,6 +39,10 @@ pipeline {
           agentLabel: 'h2_perf32',
           suppressErrors: false,
           runSteps: {
+            skipTests = ""
+            if (env.CHANGE_ID != null && pullRequest.labels.contains('ci:skipTests')) {
+               skipTests = "-DskipTests "
+            }
             withVault([vaultSecrets: [
                 [
                     path        : 'secret/products/cambpm/ci/xlts.dev',
@@ -47,7 +51,7 @@ pipeline {
                         [envVar: 'XLTS_AUTH_TOKEN', vaultKey: 'authToken']]
                 ]]]) {
               cambpmRunMaven('.',
-                  'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true ',
+                  'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true '+ skipTests,
                   withCatch: false,
                   withNpm: true,
                   // we use JDK 17 to build the artifacts, as it is required for supporting Spring Boot 3
@@ -63,8 +67,12 @@ pipeline {
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war',
-                                  '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
-                                  '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json')
+                                  '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war')
+            if (env.CHANGE_ID != null && pullRequest.labels.contains('ci:distro')) {
+              cambpmArchiveArtifacts(
+                     '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-*.zip',
+                     '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-*.tar.gz')
+            }
 
             cambpmStash("platform-stash-runtime",
                         ".m2/org/camunda/**/*-SNAPSHOT/**",
@@ -224,10 +232,29 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'postgresql_142',
               runSteps: {
-                cambpmRunMaven('qa/', 'clean install -Ptomcat,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
+                cambpmRunMaven('qa/', 'clean install -Ptomcat9,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
               },
               postFailure: {
                 cambpmPublishTestResult()
+              }
+            ])
+          }
+        }
+        stage('engine-IT-tomcat-10-postgresql-142') {
+          when {
+            expression {
+              cambpmWithLabels('all-as', 'tomcat')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'postgresql_142',
+              runSteps: {
+                cambpmRunMaven('qa/', 'clean install -Ptomcat,postgresql,engine-integration-jakarta', runtimeStash: true, archiveStash: true, jdkVersion: 'jdk-17-latest')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+                cambpmArchiveArtifacts('qa/tomcat-runtime/target/**/standalone/log/**')
               }
             ])
           }
@@ -330,11 +357,31 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'chrome_112',
               runSteps: {
+                cambpmRunMaven('qa/', 'clean install -Ptomcat9,h2,webapps-integration', runtimeStash: true, archiveStash: true)
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+                cambpmArchiveArtifacts('qa/integration-tests-webapps/shared-engine/target/selenium-screenshots/*')
+              }
+            ])
+          }
+        }
+        stage('webapp-IT-tomcat-10-h2') {
+          when {
+            expression {
+              cambpmWithLabels('webapp-integration', 'h2')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'chrome_112',
+              runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Ptomcat,h2,webapps-integration', runtimeStash: true, archiveStash: true)
               },
               postFailure: {
                 cambpmPublishTestResult()
                 cambpmArchiveArtifacts('qa/integration-tests-webapps/shared-engine/target/selenium-screenshots/*')
+                cambpmArchiveArtifacts('qa/integration-tests-webapps/shared-engine/target/*')
               }
             ])
           }

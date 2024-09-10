@@ -16,9 +16,11 @@ engine-webapp-unit:
   - 'mariadb_106'
   - 'mysql_80'
   - 'oracle_19'
+  - 'oracle_23'
   - 'db2_115'
   - 'sqlserver_2017'
   - 'sqlserver_2019'
+  - 'sqlserver_2022'
   stages:
   - 'db-unit'
 engine-rest:
@@ -37,8 +39,9 @@ daily-stages:
   - 'mariadb_106'
   - 'mysql_80'
   - 'oracle_19'
+  - 'oracle_23'
   - 'db2_115'
-  - 'sqlserver_2019'
+  - 'sqlserver_2022'
   stages:
   - 'sql-scripts'
   - 'instance-migration'

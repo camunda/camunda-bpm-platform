@@ -26,7 +26,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +36,6 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -48,7 +46,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.TableMetaData;
@@ -74,16 +71,12 @@ import org.junit.Test;
  */
 public class ManagementServiceTest extends PluggableProcessEngineTest {
 
-  protected boolean tearDownTelemetry;
   protected boolean tearDownEnsureJobDueDateNotNull;
 
   protected final Date TEST_DUE_DATE = new Date(1675752840000L);
 
   @After
   public void tearDown() {
-    if (tearDownTelemetry) {
-      managementService.toggleTelemetry(false);
-    }
     if(tearDownEnsureJobDueDateNotNull) {
       processEngineConfiguration.setEnsureJobDueDateNotNull(false);
     }
@@ -927,15 +920,6 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
     assertThat(tableMetaData.getColumnTypes().get(createTimeIndex)).isIn("TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME", "DATETIME2");
   }
 
-  private void assertOneOf(String[] possibleValues, String currentValue) {
-    for (String value : possibleValues) {
-      if (currentValue.equals(value)) {
-        return;
-      }
-    }
-    fail("Value '" + currentValue + "' should be one of: " + Arrays.deepToString(possibleValues));
-  }
-
   @Test
   public void testGetTablePage() {
     String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
@@ -987,38 +971,19 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
   }
 
   @Test
-  public void testFetchTelemetryConfiguration() {
+  public void shouldAlwaysReturnFalseWhenFetchingIsTelemetryEnabled() {
     // given default configuration
-    boolean expectedTelemetryValue = Boolean.parseBoolean(getTelemetryProperty(processEngineConfiguration).getValue());
-
-    // when
-    boolean actualTelemetryValue = managementService.isTelemetryEnabled();
 
     // then
-    assertThat(actualTelemetryValue).isEqualTo(expectedTelemetryValue);
+    assertThat(managementService.isTelemetryEnabled()).isFalse();
   }
 
   @Test
-  public void testTelemetryEnabled() {
+  public void shouldReturnFalseWhenToggleTelemetry() {
     // given default configuration
-    tearDownTelemetry = true;
 
     // when
     managementService.toggleTelemetry(true);
-
-    // then
-    assertThat(managementService.isTelemetryEnabled()).isTrue();
-  }
-
-  @Test
-  public void testTelemetryDisabled() {
-    // given
-    tearDownTelemetry = true;
-
-    managementService.toggleTelemetry(true);
-
-    // when
-    managementService.toggleTelemetry(false);
 
     // then
     assertThat(managementService.isTelemetryEnabled()).isFalse();
@@ -1048,13 +1013,4 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
     return taskIds;
   }
 
-
-  protected PropertyEntity getTelemetryProperty(ProcessEngineConfigurationImpl configuration) {
-      return configuration.getCommandExecutorTxRequired()
-        .execute(new Command<PropertyEntity>() {
-          public PropertyEntity execute(CommandContext commandContext) {
-            return commandContext.getPropertyManager().findPropertyById("camunda.telemetry.enabled");
-          }
-        });
-  }
 }

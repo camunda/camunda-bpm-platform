@@ -17,12 +17,12 @@
 package org.camunda.bpm.engine.rest.dto.externaltask;
 
 import static java.lang.Boolean.TRUE;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.FetchAndLockBuilder;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.rest.dto.SortingDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 /**
  * @author Thorben Lindhauer
@@ -293,7 +294,6 @@ public class FetchExternalTasksDto {
    * and applies them.
    * <p>
    * To achieve that, maps are used internally to map fields and orders to the corresponding builder method.
-   * It works with case-insensitive orders (e.g will work with "asc", "ASC").
    */
   static class SortMapper {
 
@@ -318,21 +318,23 @@ public class FetchExternalTasksDto {
      * Applies the sorting field mappings to the builder and returns it.
      */
     protected FetchAndLockBuilder getBuilderWithSortConfigs() {
-      sorting.forEach(dto -> {
-        fieldMappingKey(dto).ifPresent(key -> FIELD_MAPPINGS.get(key).accept(builder));
-        orderMappingKey(dto).ifPresent(key -> ORDER_MAPPINGS.get(key).accept(builder));
-      });
+      for (SortingDto dto : sorting) {
+        String sortBy = dto.getSortBy();
+        configureFieldOrBadRequest(sortBy, "sortBy", FIELD_MAPPINGS);
 
+        String sortOrder = dto.getSortOrder();
+        if (sortOrder != null) {
+          configureFieldOrBadRequest(sortOrder, "sortOrder", ORDER_MAPPINGS);
+        }
+      }
       return builder;
     }
 
-    protected Optional<String> fieldMappingKey(SortingDto dto) {
-      return Optional.ofNullable(dto.getSortBy());
-    }
-
-    protected Optional<String> orderMappingKey(SortingDto dto) {
-      return Optional.ofNullable(dto.getSortOrder());
+    protected void configureFieldOrBadRequest(String key, String parameterName, Map<String, Consumer<FetchAndLockBuilder>> fieldMappings) {
+      if (!fieldMappings.containsKey(key)) {
+        throw new InvalidRequestException(BAD_REQUEST, "Cannot set query " + parameterName + " parameter to value " + key);
+      }
+      fieldMappings.get(key).accept(builder);
     }
   }
-
 }

@@ -21,10 +21,11 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 
 import java.io.ByteArrayInputStream;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
-
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ExternalTaskService;
@@ -94,7 +95,7 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
 
   protected final Date REMOVAL_TIME = testRule.REMOVAL_TIME;
 
-  protected final Date CREATE_TIME = new Date(1363608000000L);
+  protected final Date CREATE_TIME = new GregorianCalendar(2013, Calendar.MARCH, 18, 13, 0, 0).getTime();
 
   protected RuntimeService runtimeService;
   protected DecisionService decisionService;

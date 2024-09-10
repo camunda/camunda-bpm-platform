@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://camunda.org/example"
+           xmlns:ex="http://camunda.org/test-example"
+           targetNamespace="http://camunda.org/example"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+  <xs:import namespace="http://camunda.org/test-example" schemaLocation="validation_schema_extension.xsd" />
+
+  <xs:element name="customers">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="customer" minOccurs="1" maxOccurs="3" />
+        <xs:element name="order-details" type="ex:order-details" />
+      </xs:sequence>
+      <xs:attribute name="dueUntil" type="xs:long" />
+      <xs:attribute name="order" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="customer">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="contractStartDate" type="xs:integer" />
+        <xs:element name="name" type="xs:string" />
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

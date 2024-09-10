@@ -36,7 +36,6 @@ import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CaseControlRuleImpl;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -415,18 +414,6 @@ public class ProcessEngineTestRule extends TestWatcher {
     return processEngineRule.getProcessEngineConfiguration()
         .getDbSqlSessionFactory()
         .getDatabaseType();
-  }
-
-  /**
-   * This methods is used to determine if the currently used database
-   * allows for OptimisticLockingExceptions to be ignored, or handled,
-   * without a transaction rollback and retry. Otherwise, it is false.
-   *
-   * Currently, the method only returns false when CockroachDB is used
-   * since this database implements its own OLE mechanism.
-   */
-  public boolean isOptimisticLockingExceptionSuppressible() {
-    return !DbSqlSessionFactory.CRDB.equals(getDatabaseType());
   }
 
   public void deleteAllAuthorizations() {

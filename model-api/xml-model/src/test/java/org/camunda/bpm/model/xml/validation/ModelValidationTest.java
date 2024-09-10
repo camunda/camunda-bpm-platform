@@ -20,13 +20,9 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.camunda.bpm.model.xml.ModelInstance;
-import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import org.camunda.bpm.model.xml.impl.validation.ModelValidationResultsImpl;
 import org.camunda.bpm.model.xml.testmodel.TestModelParser;
 import org.camunda.bpm.model.xml.testmodel.instance.Bird;
 import org.junit.Before;
@@ -34,7 +30,6 @@ import org.junit.Test;
 
 /**
  * @author Daniel Meyer
- *
  */
 public class ModelValidationTest {
 
@@ -51,9 +46,7 @@ public class ModelValidationTest {
 
   @Test
   public void shouldValidateWithEmptyList() {
-    List<ModelElementValidator<?>> validators = new ArrayList<ModelElementValidator<?>>();
-
-    ValidationResults results = modelInstance.validate(validators);
+    ValidationResults results = modelInstance.validate(List.of());
 
     assertThat(results).isNotNull();
     assertThat(results.hasErrors()).isFalse();
@@ -61,9 +54,7 @@ public class ModelValidationTest {
 
   @Test
   public void shouldCollectWarnings() {
-    List<ModelElementValidator<?>> validators = new ArrayList<ModelElementValidator<?>>();
-
-    validators.add(new IsAdultWarner());
+    List<ModelElementValidator<?>> validators = List.of(new IsAdultWarner());
 
     ValidationResults results = modelInstance.validate(validators);
 
@@ -75,9 +66,7 @@ public class ModelValidationTest {
 
   @Test
   public void shouldCollectErrors() {
-    List<ModelElementValidator<?>> validators = new ArrayList<ModelElementValidator<?>>();
-
-    validators.add(new IllegalBirdValidator("tweety"));
+    List<ModelElementValidator<?>> validators = List.of(new IllegalBirdValidator("tweety"));
 
     ValidationResults results = modelInstance.validate(validators);
 
@@ -89,9 +78,7 @@ public class ModelValidationTest {
 
   @Test
   public void shouldWriteResults() {
-    List<ModelElementValidator<?>> validators = new ArrayList<ModelElementValidator<?>>();
-
-    validators.add(new IllegalBirdValidator("tweety"));
+    List<ModelElementValidator<?>> validators = List.of(new IllegalBirdValidator("tweety"));
 
     ValidationResults results = modelInstance.validate(validators);
 
@@ -102,35 +89,82 @@ public class ModelValidationTest {
   }
 
   @Test
-  public void shouldReturnResults() {
-    List<ModelElementValidator<?>> validators = new ArrayList<ModelElementValidator<?>>();
+  public void shouldWriteResultsUntilMaxSize() {
+    // Given
+    int maxSize = 120;
 
-    validators.add(new IllegalBirdValidator("tweety"));
-    validators.add(new IsAdultWarner());
+    // adds 7 elements with warnings of size 30, and an element prefix of size 8
+    // total size for 1 warning = 38
+    List<ModelElementValidator<?>> validators = List.of(new IsAdultWarner());
+
+    var results = modelInstance.validate(validators);
+    var stringWriter = new StringWriter();
+
+    // When
+    results.write(stringWriter, new TestResultFormatter(), maxSize);
+
+    // it has enough size to print 3 warnings, but it will only print 2,
+    // because it needs to accommodate the suffix too in the max size.
+    assertThat(stringWriter.toString())
+        .describedAs("2 lines for 2 element names, 2 line for 2 warnings and one for the suffix")
+        .hasLineCount(5)
+        .describedAs(
+            "shall contain only one error/warning and mention the count of the missing ones")
+        .endsWith(String.format(TestResultFormatter.OMITTED_RESULTS_SUFFIX_FORMAT, 5));
+  }
+
+  @Test
+  public void shouldCombineDifferentValidationResults() {
+    // Given
+    int maxSize = 120;
+
+    // has 7 warnings
+    var results1 = modelInstance.validate(List.of(new IsAdultWarner()));
+    // has 1 error
+    var results2 = modelInstance.validate(List.of(new IllegalBirdValidator("tweety")));
+    var stringWriter = new StringWriter();
+
+    // When
+    var results = new ModelValidationResultsImpl(results1, results2);
+    results.write(stringWriter, new TestResultFormatter(), maxSize);
+
+    // it has enough size to print 3 warnings, but it will only print 2,
+    // because it needs to accommodate the suffix too in the max size.
+    assertThat(stringWriter.toString())
+        .describedAs("2 lines for 2 element names, 2 line for 2 warnings and one for the suffix")
+        .hasLineCount(5)
+        .describedAs(
+            "shall contain only one error/warning and mention the count of the missing ones")
+        .endsWith(String.format(TestResultFormatter.OMITTED_RESULTS_SUFFIX_FORMAT, 6));
+  }
+
+  @Test
+  public void shouldReturnResults() {
+    List<ModelElementValidator<?>> validators =
+        List.of(new IllegalBirdValidator("tweety"), new IsAdultWarner());
 
     ValidationResults results = modelInstance.validate(validators);
 
     assertThat(results.getErrorCount()).isEqualTo(1);
     assertThat(results.getWarinigCount()).isEqualTo(7);
 
-    Map<ModelElementInstance, List<ValidationResult>> resultsByElement = results.getResults();
+    var resultsByElement = results.getResults();
     assertThat(resultsByElement.size()).isEqualTo(7);
 
-    for (Entry<ModelElementInstance, List<ValidationResult>> resultEntry : resultsByElement.entrySet()) {
+    for (var resultEntry : resultsByElement.entrySet()) {
       Bird element = (Bird) resultEntry.getKey();
       List<ValidationResult> validationResults = resultEntry.getValue();
       assertThat(element).isNotNull();
       assertThat(validationResults).isNotNull();
 
-      if(element.getId().equals("tweety")) {
+      if (element.getId().equals("tweety")) {
         assertThat(validationResults.size()).isEqualTo(2);
         ValidationResult error = validationResults.remove(0);
         assertThat(error.getType()).isEqualTo(ValidationResultType.ERROR);
         assertThat(error.getCode()).isEqualTo(20);
         assertThat(error.getMessage()).isEqualTo("Bird tweety is illegal");
         assertThat(error.getElement()).isEqualTo(element);
-      }
-      else {
+      } else {
         assertThat(validationResults.size()).isEqualTo(1);
       }
 

@@ -14,7 +14,6 @@
   </parent>
 
   <properties>
-    <version.httpclient>5.3</version.httpclient>
     <engine.runtime>${project.build.directory}/camunda-tomcat</engine.runtime>
     <tomcat.runtime>${engine.runtime}/server/apache-tomcat-${version.tomcat}</tomcat.runtime>
     <http.port>${tomcat.connector.http.port}</http.port>
@@ -54,17 +53,19 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-typed-values</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.httpcomponents.client5</groupId>
       <artifactId>httpclient5</artifactId>
-      <version>${version.httpclient}</version>
+      <version>${version.httpclient5}</version>
     </dependency>
 
     <dependency>
@@ -107,6 +108,7 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-all</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -134,7 +136,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest</artifactId>
+      <artifactId>camunda-engine-rest-jakarta</artifactId>
       <scope>test</scope>
       <type>war</type>
       <classifier>tomcat</classifier>
@@ -259,7 +261,7 @@
           <!-- Container configuration -->
           <container>
             <type>installed</type>
-            <containerId>tomcat9x</containerId>
+            <containerId>tomcat10x</containerId>
             <append>false</append>
             <home>${tomcat.runtime}</home>
             <timeout>${cargo.timeout}</timeout>
@@ -285,7 +287,7 @@
           <deployables>
             <deployable>
               <groupId>org.camunda.bpm</groupId>
-              <artifactId>camunda-engine-rest</artifactId>
+              <artifactId>camunda-engine-rest-jakarta</artifactId>
               <type>war</type>
               <classifier>tomcat</classifier>
               <pingURL>
