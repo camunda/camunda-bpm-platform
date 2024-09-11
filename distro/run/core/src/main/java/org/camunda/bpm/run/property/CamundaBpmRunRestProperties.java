@@ -17,6 +17,7 @@
 package org.camunda.bpm.run.property;
 
 public class CamundaBpmRunRestProperties {
+
   public static final String PREFIX = CamundaBpmRunProperties.PREFIX + ".rest";
 
   protected boolean disableWadl;
