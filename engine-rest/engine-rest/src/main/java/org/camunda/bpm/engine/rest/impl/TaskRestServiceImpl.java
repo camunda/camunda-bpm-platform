@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.rest.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
@@ -71,21 +70,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   public List<TaskDto> getJsonTasks(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     // get list of tasks
     TaskQueryDto queryDto = new TaskQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
-    queryDto.setObjectMapper(getObjectMapper());
-
-    ProcessEngine engine = getProcessEngine();
-    TaskQuery query = queryDto.toQuery(engine);
-
-    List<Task> matchingTasks = executeTaskQuery(firstResult, maxResults, query);
-
-    List<TaskDto> result;
-    if (Boolean.TRUE.equals(queryDto.getWithCommentAttachmentInfo())) {
-      result = matchingTasks.stream().map(TaskWithAttachmentAndCommentDto::fromEntity).collect(Collectors.toList());
-    }
-    else {
-      result = matchingTasks.stream().map(TaskDto::fromEntity).collect(Collectors.toList());
-    }
-    return result;
+    return queryTasks(queryDto, firstResult, maxResults);
   }
 
   public HalTaskList getHalTasks(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
