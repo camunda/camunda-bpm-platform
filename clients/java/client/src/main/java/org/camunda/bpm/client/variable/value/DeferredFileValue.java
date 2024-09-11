@@ -39,4 +39,8 @@ public interface DeferredFileValue extends FileValue {
    */
   boolean isLoaded();
 
+  void setExecutionId(String executionId);
+
+  String getExecutionId();
+
 }
