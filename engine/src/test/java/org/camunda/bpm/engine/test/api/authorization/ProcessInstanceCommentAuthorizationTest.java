@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
-import static org.camunda.bpm.engine.authorization.Resources.TASK;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
@@ -34,7 +34,7 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   @Test
-  public void testDeleteProcessInstanceCommentWithoutAuthorization() {
+  public void testDeleteProcessInstanceTaskCommentWithoutAuthorization() {
     // given
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
     createTask(TASK_ID);
@@ -47,7 +47,7 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to delete a task.");
     } catch (AuthorizationException e) {
       // then
-      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_WORK' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
+      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'UPDATE'",
           e.getMessage());
     }
 
@@ -57,12 +57,12 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   @Test
-  public void testDeleteProcessInstanceComment() {
+  public void testDeleteProcessInstanceTaskComment() {
     // given
     createTask(TASK_ID);
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
     Comment createdComment = taskService.createComment(TASK_ID, processInstanceId, "aComment");
-    createGrantAuthorization(TASK, TASK_ID, userId, UPDATE);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
     // when
     taskService.deleteProcessInstanceComment(processInstanceId, createdComment.getId());
@@ -77,7 +77,7 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   @Test
-  public void testDeleteProcessInstanceCommentsWithoutAuthorization() {
+  public void testDeleteProcessInstanceTaskCommentsWithoutAuthorization() {
     // given
     createTask(TASK_ID);
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -89,7 +89,7 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to delete a comment.");
     } catch (AuthorizationException e) {
       // then
-      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_WORK' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
+      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'UPDATE'",
           e.getMessage());
     }
 
@@ -99,14 +99,14 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   @Test
-  public void testDeleteProcessInstanceComments() {
+  public void testDeleteProcessInstanceTaskComments() {
     // given
     createTask(TASK_ID);
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
     taskService.createComment(TASK_ID, processInstanceId, "aCommentOne");
     taskService.createComment(TASK_ID, processInstanceId, "aCommentTwo");
 
-    createGrantAuthorization(TASK, TASK_ID, userId, UPDATE);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
     // when
     taskService.deleteProcessInstanceComments(processInstanceId);
@@ -121,7 +121,7 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   @Test
-  public void testUpdateProcessInstanceCommentWithoutAuthorization() {
+  public void testUpdateProcessInstanceTaskCommentWithoutAuthorization() {
     // given
     createTask(TASK_ID);
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -133,7 +133,7 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to delete a task.");
     } catch (AuthorizationException e) {
       // then
-      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_WORK' permission on resource 'myTask' of type 'Task' or 'UPDATE' permission on resource 'myTask' of type 'Task'",
+      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'UPDATE'",
           e.getMessage());
     }
 
@@ -142,7 +142,7 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   @Test
-  public void testUpdateProcessInstanceComment() {
+  public void testUpdateProcessInstanceTaskComment() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -151,7 +151,7 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
     String commentMessage = "OriginalCommentMessage";
     String updatedMessage = "UpdatedCommentMessage";
     Comment comment = taskService.createComment(taskId, processInstanceId, commentMessage);
-    createGrantAuthorization(TASK, TASK_ID, userId, UPDATE);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
     // when
     taskService.updateProcessInstanceComment(processInstanceId, comment.getId(), updatedMessage);
@@ -163,6 +163,115 @@ public class ProcessInstanceCommentAuthorizationTest extends AuthorizationTest {
 
     // triggers a db clean up
     deleteTask(taskId, true);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @Test
+  public void testDeleteProcessInstanceCommentWithoutAuthorization() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
+
+    Comment createdComment = createComment(null, processInstanceId, "aComment");
+
+    try {
+      // when
+      taskService.deleteProcessInstanceComment(processInstanceId, createdComment.getId());
+      fail("Exception expected: It should not be possible to delete a task.");
+    } catch (AuthorizationException e) {
+      // then
+      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'UPDATE'",
+          e.getMessage());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @Test
+  public void testDeleteProcessInstanceComment() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
+    Comment createdComment = taskService.createComment(null, processInstanceId, "aComment");
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+
+    // when
+    taskService.deleteProcessInstanceComment(processInstanceId, createdComment.getId());
+
+    // then
+    List<Comment> deletedCommentLst = taskService.getProcessInstanceComments(processInstanceId);
+    assertEquals("The comments list should be empty", Collections.emptyList(), deletedCommentLst);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @Test
+  public void testDeleteProcessInstanceCommentsWithoutAuthorization() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
+    createComment(null, processInstanceId, "aComment");
+
+    try {
+      // when
+      taskService.deleteProcessInstanceComments(processInstanceId);
+      fail("Exception expected: It should not be possible to delete a comment.");
+    } catch (AuthorizationException e) {
+      // then
+      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'UPDATE'",
+          e.getMessage());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @Test
+  public void testDeleteProcessInstanceComments() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
+    taskService.createComment(null, processInstanceId, "aCommentOne");
+    taskService.createComment(null, processInstanceId, "aCommentTwo");
+
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+
+    // when
+    taskService.deleteProcessInstanceComments(processInstanceId);
+
+    // then
+    List<Comment> comments = taskService.getProcessInstanceComments(processInstanceId);
+    assertEquals("The comments list should be empty", Collections.emptyList(), comments);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @Test
+  public void testUpdateProcessInstanceCommentWithoutAuthorization() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
+    Comment createdComment = createComment(null, processInstanceId, "originalComment");
+
+    try {
+      // when
+      taskService.updateProcessInstanceComment(processInstanceId, createdComment.getId(), "updateMessage");
+      fail("Exception expected: It should not be possible to delete a task.");
+    } catch (AuthorizationException e) {
+      // then
+      testRule.assertTextPresent("The user with id 'test' does not have one of the following permissions: 'UPDATE'",
+          e.getMessage());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @Test
+  public void testUpdateProcessInstanceComment() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
+
+    String commentMessage = "OriginalCommentMessage";
+    String updatedMessage = "UpdatedCommentMessage";
+    Comment comment = taskService.createComment(null, processInstanceId, commentMessage);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+
+    // when
+    taskService.updateProcessInstanceComment(processInstanceId, comment.getId(), updatedMessage);
+
+    // then
+    List<Comment> comments = taskService.getProcessInstanceComments(processInstanceId);
+    assertFalse("The comments list should not be empty", comments.isEmpty());
+    assertEquals(updatedMessage, comments.get(0).getFullMessage());
   }
 
 }

@@ -19,7 +19,9 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.camunda.bpm.engine.impl.db.DbEntity;
@@ -58,7 +60,9 @@ public class CommentEntity implements Comment, Event, HasDbRevision, DbEntity, H
   protected int revision;
 
   public Object getPersistentState() {
-    return CommentEntity.class;
+    Map<String, Object> persistentState = new HashMap<>();
+    persistentState.put("message", message);
+    return persistentState;
   }
 
   public byte[] getFullMessageBytes() {

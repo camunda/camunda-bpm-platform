@@ -306,13 +306,13 @@ public class TaskServiceTest {
   }
 
   @Test
-  public void testDeleteTaskComment() {
+  public void testDeleteTaskCommentWithoutProcessInstance() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
     String taskId = task.getId();
 
     //create a task comment
-    Comment comment = taskService.createComment(taskId, "pid", "aMessage");
+    Comment comment = taskService.createComment(taskId, null, "aMessage");
     String commentId = comment.getId();
 
     //delete a comment
@@ -324,6 +324,25 @@ public class TaskServiceTest {
 
     // Finally, delete task
     taskService.deleteTask(taskId, true);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
+  public void testDeleteTaskCommentWithProcessInstance() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    String taskId = task.getId();
+
+    //create a task comment
+    Comment comment = taskService.createComment(taskId, processInstance.getId(), "aMessage");
+    String commentId = comment.getId();
+
+    //delete a comment
+    taskService.deleteTaskComment(taskId, commentId);
+
+    //make sure the comment is not there.
+    Comment shouldBeDeleted = taskService.getTaskComment(taskId, commentId);
+    assertNull(shouldBeDeleted);
   }
 
   @Test
@@ -366,7 +385,7 @@ public class TaskServiceTest {
     String taskId = task.getId();
 
     //create a task comment
-    Comment comment = taskService.createComment(taskId, "pid", "aMessage");
+    Comment comment = taskService.createComment(taskId, null, "aMessage");
 
     //delete a comment
     taskService.deleteTaskComments(taskId);
@@ -377,6 +396,24 @@ public class TaskServiceTest {
 
     // Finally, delete task
     taskService.deleteTask(taskId, true);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
+  public void testDeleteProcessInstanceTaskComments() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    String taskId = task.getId();
+
+    //create a task comment
+    Comment comment = taskService.createComment(taskId, processInstance.getId(), "aMessage");
+
+    //delete a comment
+    taskService.deleteTaskComments(taskId);
+
+    //make sure the comment is not there.
+    Comment shouldBeDeleted = taskService.getTaskComment(taskId, comment.getId());
+    assertNull(shouldBeDeleted);
   }
 
   @Test
@@ -466,6 +503,24 @@ public class TaskServiceTest {
     taskService.deleteTask(taskId, true);
   }
 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
+  public void testUpdateProcessTaskComment() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    String taskId = task.getId();
+
+    Comment comment = taskService.createComment(taskId, processInstance.getId(), "originalMessage");
+    String updatedMessage = "updatedMessage";
+
+    taskService.updateTaskComment(taskId, comment.getId(), updatedMessage);
+
+    Comment actual = taskService.getTaskComment(taskId, comment.getId());
+
+    assertThat(actual).isNotNull();
+    assertEquals(updatedMessage, actual.getFullMessage());
+  }
+
   @Test
   public void testDeleteProcessInstanceCommentNullTaskIdAndCommentId() {
     try {
@@ -487,12 +542,10 @@ public class TaskServiceTest {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
-  public void testDeleteProcessInstanceComment() {
-    Task task = taskService.newTask();
-    taskService.saveTask(task);
-    String taskId = task.getId();
-
+  public void testDeleteTaskProcessInstanceComment() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    String taskId = task.getId();
     String processInstanceId = processInstance.getId();
 
     //create a task comment
@@ -504,9 +557,23 @@ public class TaskServiceTest {
     //make sure the comment is not there.
     List<Comment> shouldBeDeletedLst = taskService.getProcessInstanceComments(processInstanceId);
     assertThat(shouldBeDeletedLst).isEmpty();
+  }
 
-    // Finally, delete task
-    taskService.deleteTask(taskId, true);
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
+  public void testDeleteProcessInstanceComment() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String processInstanceId = processInstance.getId();
+
+    //create a task comment
+    Comment comment = taskService.createComment(null, processInstanceId, "aMessage");
+
+    //delete a comment
+    taskService.deleteProcessInstanceComment(processInstanceId, comment.getId());
+
+    //make sure the comment is not there.
+    List<Comment> shouldBeDeletedLst = taskService.getProcessInstanceComments(processInstanceId);
+    assertThat(shouldBeDeletedLst).isEmpty();
   }
 
   @Test
@@ -541,12 +608,28 @@ public class TaskServiceTest {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
-  public void testDeleteProcessInstanceComments() {
-    Task task = taskService.newTask();
-    taskService.saveTask(task);
-    String taskId = task.getId();
-
+  public void testDeleteProcessInstanceCommentsWithoutTaskComments() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String processInstanceId = processInstance.getId();
+
+    //create a task comment
+    taskService.createComment(null, processInstanceId, "messageOne");
+    taskService.createComment(null, processInstanceId, "messageTwo");
+
+    //delete a comment
+    taskService.deleteProcessInstanceComments(processInstanceId);
+
+    //make sure the comment is not there.
+    List<Comment> shouldBeDeletedLst = taskService.getProcessInstanceComments(processInstanceId);
+    assertThat(shouldBeDeletedLst).isEmpty();
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
+  public void testDeleteProcessInstanceCommentsWithTask() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    String taskId = task.getId();
     String processInstanceId = processInstance.getId();
 
     //create a task comment
@@ -559,9 +642,6 @@ public class TaskServiceTest {
     //make sure the comment is not there.
     List<Comment> shouldBeDeletedLst = taskService.getProcessInstanceComments(processInstanceId);
     assertThat(shouldBeDeletedLst).isEmpty();
-
-    // Finally, delete task
-    taskService.deleteTask(taskId, true);
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
@@ -579,49 +659,46 @@ public class TaskServiceTest {
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testUpdateProcessInstanceCommentNullProcessInstanceId() {
-    Task task = taskService.newTask();
-    taskService.saveTask(task);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    Comment comment = taskService.createComment(task.getId(), processInstance.getId(), "originalMessage");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    String taskId = task.getId();
+
+    Comment comment = taskService.createComment(taskId, processInstance.getId(), "originalMessage");
 
     try {
       taskService.updateProcessInstanceComment(null, comment.getId(), "updatedMessage");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       testRule.assertTextPresent("Both process instance and task ids are null", ae.getMessage());
-    } finally {
-      taskService.deleteTask(task.getId(), true);
     }
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testUpdateProcessInstanceCommentNullMessage() {
-    Task task = taskService.newTask();
-    taskService.saveTask(task);
-    String taskId = task.getId();
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    Comment comment = taskService.createComment(taskId, processInstance.getId(), "originalMessage");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    String taskId = task.getId();
+    String processInstanceId = processInstance.getId();
+
+    Comment comment = taskService.createComment(taskId, processInstanceId, "originalMessage");
 
     try {
-      taskService.updateProcessInstanceComment(processInstance.getId(), comment.getId(), null);
+      taskService.updateProcessInstanceComment(processInstanceId, comment.getId(), null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       testRule.assertTextPresent("message is null", ae.getMessage());
-    } finally {
-      taskService.deleteTask(task.getId(), true);
     }
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testUpdateProcessInstanceCommentNotExistingCommentId() {
-    Task task = taskService.newTask();
-    taskService.saveTask(task);
-    String taskId = task.getId();
-
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    String taskId = task.getId();
     String processInstanceId = processInstance.getId();
+
     taskService.createComment(taskId, processInstanceId, "originalMessage");
 
     String nonExistingCommentId = "notExistingCommentId";
@@ -632,19 +709,15 @@ public class TaskServiceTest {
       testRule.assertTextPresent(
           "No comment exists with commentId: " + nonExistingCommentId + " and processInstanceId: " + processInstanceId,
           ae.getMessage());
-    } finally {
-      taskService.deleteTask(taskId, true);
     }
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
-  public void testUpdateProcessInstanceComment() {
-    Task task = taskService.newTask();
-    taskService.saveTask(task);
-    String taskId = task.getId();
-
+  public void testUpdateProcessInstanceCommentWithTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    String taskId = task.getId();
     String processInstanceId = processInstance.getId();
 
     Comment comment = taskService.createComment(taskId, processInstanceId, "originalMessage");
@@ -659,9 +732,26 @@ public class TaskServiceTest {
 
     Comment actual = updateCommentLst.get(0);
     assertEquals(updatedMessage, actual.getFullMessage());
+  }
 
-    // Finally, delete task
-    taskService.deleteTask(taskId, true);
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
+  public void testUpdateProcessInstanceCommentWithoutTask() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String processInstanceId = processInstance.getId();
+
+    Comment comment = taskService.createComment(null, processInstanceId, "originalMessage");
+    String updatedMessage = "updatedMessage";
+
+    taskService.updateProcessInstanceComment(processInstanceId, comment.getId(), updatedMessage);
+
+    List<Comment> updateCommentLst = taskService.getProcessInstanceComments(processInstanceId);
+
+    assertThat(updateCommentLst).isNotEmpty();
+    assertThat(updateCommentLst).hasSize(1);
+
+    Comment actual = updateCommentLst.get(0);
+    assertEquals(updatedMessage, actual.getFullMessage());
   }
 
   @Test

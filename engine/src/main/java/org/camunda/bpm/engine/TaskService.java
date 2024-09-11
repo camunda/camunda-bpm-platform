@@ -1114,6 +1114,7 @@ public interface TaskService {
    * @param commentId id of a comment that is intended to be deleted
    * @throws NotFoundException       if no task with the given id exists
    * @throws BadUserRequestException if task id or error code were null or empty
+   * @throws BadUserRequestException when given both task and comment ids are null
    * @throws ProcessEngineException  when task and comment don't exist with the given taskId and commentId
    * @throws AuthorizationException  If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_WORK} permissions on {@link Resources#TASK}
    *                                 or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_WORK} permissions on {@link Resources#PROCESS_DEFINITION}
@@ -1177,12 +1178,12 @@ public interface TaskService {
    * @param processInstanceId id of a process instance of a comment that is intended to be updated
    * @param commentId         id of a comment that is intended to be updated
    * @param message           new message that needs to be updated
-   * @throws NotFoundException      if no process instance with the given processInstanceId id exists
-   * @throws NotFoundException      if no comment found to be updated for a given comment id
-   * @throws ProcessEngineException when given process instance id and comment id are passed as null
-   * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_WORK} permissions on {@link Resources#TASK}
-   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_WORK} permissions on {@link Resources#PROCESS_DEFINITION}
-   *                                (if the task is part of a running process instance).
+   * @throws NotFoundException       if no process instance with the given processInstanceId id exists
+   * @throws NotFoundException       if no comment found to be updated for a given comment id
+   * @throws BadUserRequestException when given both process instance id and comment id are passed as null
+   * @throws AuthorizationException  If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_WORK} permissions on {@link Resources#TASK}
+   *                                 or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_WORK} permissions on {@link Resources#PROCESS_DEFINITION}
+   *                                 (if the task is part of a running process instance).
    */
   void updateProcessInstanceComment(String processInstanceId, String commentId, String message);
 

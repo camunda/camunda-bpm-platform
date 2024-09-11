@@ -151,20 +151,4 @@ public class CommentManager extends AbstractHistoricManager {
       .deletePreserveOrder(CommentEntity.class, "deleteCommentsByRemovalTime",
         new ListQueryParameterObject(parameters, 0, batchSize));
   }
-
-  public void updateCommentMessage(CommentEntity entity) {
-    checkHistoryEnabled();
-    Map<String, Object> parameters = new HashMap<>();
-    parameters.put("message", entity.getMessage());
-    parameters.put("fullMessageBytes", entity.getFullMessageBytes());
-    parameters.put("time", entity.getTime());
-    parameters.put("action", entity.getAction());
-    parameters.put("id", entity.getId());
-    parameters.put("userId", entity.getUserId());
-    parameters.put("revision", entity.getRevision());
-    parameters.put("revisionNext", entity.getRevisionNext());
-
-    getDbEntityManager().update(CommentEntity.class, "updateComment", parameters);
-  }
-
 }

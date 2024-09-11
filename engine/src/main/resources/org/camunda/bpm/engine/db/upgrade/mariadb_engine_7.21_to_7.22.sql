@@ -23,10 +23,9 @@ alter table ACT_RU_TASK add column TASK_STATE_ varchar(64);
 alter table ACT_HI_TASKINST add column TASK_STATE_ varchar(64);
 
 alter table ACT_HI_COMMENT
-    add column REV_ integer;
+    add column REV_ int;
 
 --Set revision number to already existing comments
 --   if any for backward compatibility
 update ACT_HI_COMMENT
-set REV_ = 1
-where REV_ is null; 
+set REV_ = 1;

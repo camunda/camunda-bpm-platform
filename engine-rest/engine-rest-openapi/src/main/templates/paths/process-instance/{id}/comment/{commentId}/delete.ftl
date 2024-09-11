@@ -14,7 +14,7 @@
         location = "path"
         type = "string"
         required = true
-        desc = "The id of the processInstance." />
+        desc = "The id of the process instance." />
 
     <@lib.parameter
         name = "commentId"
@@ -31,6 +31,13 @@
     <@lib.response
         code = "204"
         desc = "Request successful." />
+
+    <@lib.response
+        code = "400"
+        dto = "ExceptionDto"
+        last = true
+        desc = "Returned if a given process instance id or comment id is invalid.
+                See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response format."/>
 
     <@lib.response
         code = "401"

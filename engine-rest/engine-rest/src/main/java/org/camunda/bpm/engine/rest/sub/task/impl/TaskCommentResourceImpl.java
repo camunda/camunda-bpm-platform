@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -86,10 +85,10 @@ public class TaskCommentResourceImpl implements TaskCommentResource {
     TaskService taskService = engine.getTaskService();
     try {
       taskService.deleteTaskComment(taskId, commentId);
-    } catch (NotValidException e) {
-      throw new InvalidRequestException(Status.NOT_FOUND,
-          "Deletion is not possible. No comment exists for task id '" + taskId + "' and comment id '" + commentId
-              + "'.");
+    } catch (AuthorizationException e) {
+      throw e;
+    } catch (NullValueException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
   }
 
@@ -99,16 +98,10 @@ public class TaskCommentResourceImpl implements TaskCommentResource {
 
     try {
       engine.getTaskService().updateTaskComment(taskId, comment.getId(), comment.getMessage());
-    } catch (NotValidException e) {
-      throw new InvalidRequestException(Status.NOT_FOUND,
-          "Update is not possible. No comment exists for task id '" + taskId + "' and comment id '" + comment.getId()
-              + "'.");
     } catch (AuthorizationException e) {
       throw e;
     } catch (NullValueException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
-    } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Not enough parameters submitted");
     }
   }
 
@@ -119,9 +112,10 @@ public class TaskCommentResourceImpl implements TaskCommentResource {
 
     try {
       taskService.deleteTaskComments(taskId);
-    } catch (NotValidException e) {
-      throw new InvalidRequestException(Status.NOT_FOUND,
-          "Deletion of comments not possible for task id '" + taskId + "'.");
+    } catch (AuthorizationException e) {
+      throw e;
+    } catch (NullValueException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
   }
 

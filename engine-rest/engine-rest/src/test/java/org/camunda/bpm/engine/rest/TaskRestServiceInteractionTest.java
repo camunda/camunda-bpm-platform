@@ -3751,6 +3751,7 @@ public class TaskRestServiceInteractionTest extends
         .statusCode(Status.NO_CONTENT.getStatusCode())
         .when()
         .delete(SINGLE_TASK_SINGLE_COMMENT_URL);
+    verify(taskServiceMock).deleteTaskComment(EXAMPLE_TASK_ID, EXAMPLE_TASK_COMMENT_ID  );
   }
 
   @Test
@@ -3855,6 +3856,7 @@ public class TaskRestServiceInteractionTest extends
         .statusCode(Status.NO_CONTENT.getStatusCode())
         .when()
         .delete(SINGLE_TASK_COMMENTS_URL);
+    verify(taskServiceMock).deleteTaskComments(EXAMPLE_TASK_ID);
   }
 
   @Test

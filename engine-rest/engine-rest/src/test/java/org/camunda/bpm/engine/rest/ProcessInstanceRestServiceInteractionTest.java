@@ -874,6 +874,8 @@ public class ProcessInstanceRestServiceInteractionTest extends AbstractRestServi
         .statusCode(Status.NO_CONTENT.getStatusCode())
         .when()
         .delete(SINGLE_PROCESS_INSTANCE_SINGLE_COMMENT_URL);
+
+    verify(taskServiceMock).deleteProcessInstanceComment(EXAMPLE_PROCESS_INSTANCE_ID, EXAMPLE_PROCESS_INSTANCE_COMMENT_ID);
   }
 
   @Test
@@ -986,6 +988,8 @@ public class ProcessInstanceRestServiceInteractionTest extends AbstractRestServi
         .statusCode(Status.NO_CONTENT.getStatusCode())
         .when()
         .delete(PROCESS_INSTANCE_COMMENTS_URL);
+
+    verify(taskServiceMock).deleteProcessInstanceComments(EXAMPLE_PROCESS_INSTANCE_ID);
   }
 
   @Test

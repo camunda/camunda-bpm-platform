@@ -41,10 +41,8 @@
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
-        desc = "Returned if some of the query parameters are invalid, for example if
-                    the value of `commentId` parameter is supplied as null. See the
-                    [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
-                    for the error response format." />
+        desc = "Returned if a given process instance id or comment id is invalid.
+                See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response format."/>
 
     <@lib.response
         code = "401"

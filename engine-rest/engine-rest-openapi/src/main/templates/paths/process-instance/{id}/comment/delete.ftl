@@ -4,7 +4,7 @@
         id = "deleteProcessInstanceComments"
         tag = "Process Instance Comment"
         summary = "Delete ProcessInstance Comments"
-        desc = "Deletes all comments of a processIntance by processInstance id." />
+        desc = "Deletes all comments of a process instance by id." />
 
   "parameters": [
 
@@ -22,6 +22,13 @@
     <@lib.response
         code = "204"
         desc = "Request successful." />
+
+    <@lib.response
+        code = "400"
+        dto = "ExceptionDto"
+        last = true
+        desc = "Returned if a given process instance id is invalid.
+                See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response format."/>
 
     <@lib.response
         code = "401"

@@ -39,6 +39,13 @@
         desc = "Request successful."  />
 
     <@lib.response
+        code = "400"
+        dto = "ExceptionDto"
+        last = true
+        desc = "Returned if a given task id or comment id is invalid.
+                See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response format."/>
+
+    <@lib.response
         code = "401"
         dto = "ExceptionDto"
         desc = "The authenticated user is unauthorized to update this resource. See the

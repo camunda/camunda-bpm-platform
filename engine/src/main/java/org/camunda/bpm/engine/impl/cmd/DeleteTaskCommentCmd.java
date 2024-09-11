@@ -20,7 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.List;
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -52,7 +52,7 @@ public class DeleteTaskCommentCmd implements Command<Object>, Serializable {
 
   public Object execute(CommandContext commandContext) {
     if (commentId == null && taskId == null) {
-      throw new ProcessEngineException("Both task and comment ids are null");
+      throw new BadUserRequestException("Both task and comment ids are null");
     }
 
     ensureNotNull("taskId", taskId);
@@ -70,8 +70,8 @@ public class DeleteTaskCommentCmd implements Command<Object>, Serializable {
       task = commandContext.getTaskManager().findTaskById(taskId);
       ensureNotNull("No task exists with taskId: " + taskId, "task", task);
       List<Comment> comments = commandContext.getCommentManager().findCommentsByTaskId(taskId);
+      checkTaskWork(task, commandContext);
       if (!comments.isEmpty()) {
-        checkTaskWork(task, commandContext);
         commandContext.getCommentManager().deleteCommentsByTaskId(taskId);
       }
     }
@@ -79,15 +79,11 @@ public class DeleteTaskCommentCmd implements Command<Object>, Serializable {
     if (task != null) {
       commandContext.getOperationLogManager()
           .logCommentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_COMMENT, task,
-              getCommentPropertyChange(comment != null ? comment.getMessage() : null));
+              new PropertyChange("comment", null, null));
       task.triggerUpdateEvent();
     }
 
     return null;
-  }
-
-  private PropertyChange getCommentPropertyChange(String message) {
-    return new PropertyChange("comment", null, message);
   }
 
   private TaskEntity getTask(CommentEntity comment, CommandContext commandContext) {
