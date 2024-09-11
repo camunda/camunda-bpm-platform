@@ -29,7 +29,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
-import java.util.Optional;
 
 @Produces(MediaType.APPLICATION_JSON)
 public interface TaskRestService {

@@ -23,7 +23,7 @@
 
     <@lib.response
         code = "200"
-        dto = "TaskDto"
+        dto = "TaskWithAttachmentAndCommentDto"
         desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "GET /task/anId Response",

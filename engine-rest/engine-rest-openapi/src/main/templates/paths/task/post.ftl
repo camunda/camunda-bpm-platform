@@ -87,7 +87,7 @@
 
     <@lib.response
         code = "200"
-        dto = "TaskDto"
+        dto = "TaskWithAttachmentAndCommentDto"
         array = true
         desc = "Request successful."
         examples = ['"example-1": {
