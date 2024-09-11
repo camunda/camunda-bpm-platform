@@ -20,8 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.camunda.bpm.container.impl.jmx.services.JmxManagedThreadPool;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.Command;
