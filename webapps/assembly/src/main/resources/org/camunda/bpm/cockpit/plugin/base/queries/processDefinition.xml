@@ -45,12 +45,129 @@
     ${limitAfter}
   </select>
 
+  <select id="selectPDStatistics_mssql" resultMap="processDefinitionStatisticsMap"
+          parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessDefinitionStatisticsQueryDto">
+    ${limitBefore}
+    select ${distinct} RES.*
+    ${limitBetween}
+    <include refid="selectPDStatisticsByQueryCriteriaSql_withHashJoinHint"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
   <select id="selectPDStatisticsCount" resultType="long"
           parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessDefinitionStatisticsQueryDto">
     ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectPDStatisticsByQueryCriteriaSql"/>
     ${countDistinctAfterEnd}
   </select>
+
+  <select id="selectPDStatisticsCount_mssql" resultType="long"
+          parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessDefinitionStatisticsQueryDto">
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
+    <include refid="selectPDStatisticsByQueryCriteriaSql_withHashJoinHint"/>
+    ${countDistinctAfterEnd}
+  </select>
+
+  <sql id="selectPDStatisticsByQueryCriteriaSql_withHashJoinHint">
+    from (
+    select ${distinct}
+    RES.ID_
+    , RES.KEY_
+    , RES.NAME_
+    , RES.VERSION_
+    , RES.TENANT_ID_
+    , RES.SUSPENSION_STATE_
+    , GROUPED.INSTANCE_COUNT_
+    , GROUPED.INCIDENT_COUNT_
+    from ${prefix}ACT_RE_PROCDEF RES
+    inner join
+    (
+    select
+    PROCDEF.KEY_
+    , PROCDEF.TENANT_ID_
+    , max(PROCDEF.VERSION_)         as LATEST_VERSION_
+    , ${dbSpecificIfNullFunction}(sum(INSTANCE.INSTANCE_COUNT_), 0) as INSTANCE_COUNT_
+    , ${dbSpecificIfNullFunction}(sum(INC.INCIDENT_COUNT_), 0)      as INCIDENT_COUNT_
+    <!-- Join process definitions with data about running instances and failed jobs -->
+    from ${prefix}ACT_RE_PROCDEF PROCDEF
+
+    <!-- instances -->
+    left outer join
+    <!-- Count and group all process instances (executions that have ID_ = PROC_INST_ID_) by process definition -->
+    (
+    select
+    E.PROC_DEF_ID_
+    , count(E.PROC_INST_ID_) as INSTANCE_COUNT_
+    from
+    ${prefix}ACT_RU_EXECUTION E
+
+    where
+    E.PARENT_ID_ IS NULL
+    <bind name="columnPrefix" value="'E.'"/>
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
+    group by
+    E.PROC_DEF_ID_
+    ) INSTANCE
+    on
+    PROCDEF.ID_ = INSTANCE.PROC_DEF_ID_
+
+    <!-- incidents -->
+    left outer hash join
+    <!-- Sum all incidents grouped by process definition and incident type-->
+    (
+    select
+    I.PROC_DEF_ID_
+    , I.INCIDENT_TYPE_
+    , count(I.ID_) as INCIDENT_COUNT_
+    from
+    ${prefix}ACT_RU_INCIDENT I
+
+    <where>
+      <bind name="columnPrefix" value="'I.'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
+    </where>
+    group by
+    I.PROC_DEF_ID_, I.INCIDENT_TYPE_
+    ) INC
+    on
+    PROCDEF.ID_ = INC.PROC_DEF_ID_
+
+    group by PROCDEF.KEY_, PROCDEF.TENANT_ID_
+    ) GROUPED
+    <!-- join on key, tenantId and latest version -->
+    on GROUPED.KEY_ = RES.KEY_ and GROUPED.LATEST_VERSION_ = RES.VERSION_ and
+    (GROUPED.TENANT_ID_ = RES.TENANT_ID_ or (GROUPED.TENANT_ID_ is null and RES.TENANT_ID_ is null))
+    ) RES
+
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+      AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart} RES.ID_ ${authJoinSeparator} RES.KEY_ ${authJoinSeparator} '*' ${authJoinEnd})
+    </if>
+
+    <where>
+      <!-- key -->
+      <if test="key != null">
+        RES.KEY_ = #{key}
+      </if>
+      <!-- keyLike -->
+      <if test="keyLike != null">
+        and UPPER(RES.KEY_) like UPPER(#{keyLike}) ESCAPE ${escapeChar}
+      </if>
+
+      <!-- name -->
+      <if test="name != null">
+        and RES.NAME_ = #{name}
+      </if>
+      <!-- nameLike -->
+      <if test="nameLike != null">
+        and UPPER(RES.NAME_) like UPPER(#{nameLike}) ESCAPE ${escapeChar}
+      </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+    </where>
+  </sql>
 
   <sql id="selectPDStatisticsByQueryCriteriaSql">
     from (
