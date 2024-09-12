@@ -83,6 +83,8 @@ public class HistoricProcessInstanceStateTest {
     ProcessDefinition processDefinition = processEngineTestRule.deployAndGetDefinition(instance);
     processEngineRule.getRuntimeService().startProcessInstanceById(processDefinition.getId());
     HistoricProcessInstance entity = getHistoricProcessInstanceWithAssertion(processDefinition);
+
+    assertThat(entity.getRestartedProcessInstanceId()).isNull();
     assertThat(entity.getState()).isEqualTo(HistoricProcessInstance.STATE_COMPLETED);
   }
 
