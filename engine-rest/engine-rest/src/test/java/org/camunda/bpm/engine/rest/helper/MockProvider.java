@@ -2183,6 +2183,7 @@ public abstract class MockProvider {
     when(mock.getCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID);
     when(mock.getTenantId()).thenReturn(tenantId);
     when(mock.getState()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_STATE);
+    when(mock.getRestartedProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
 
     return mock;
   }
