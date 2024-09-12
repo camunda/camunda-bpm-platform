@@ -59,10 +59,10 @@ public class CamundaEngineRecorder {
         beanContainer);
 
     // apply properties from config before any other configuration.
-    PropertyHelper.applyProperties(configuration, config.genericConfig, PropertyHelper.KEBAB_CASE);
+    PropertyHelper.applyProperties(configuration, config.genericConfig(), PropertyHelper.KEBAB_CASE);
 
     if (configuration.getDataSource() == null) {
-      String datasource = config.datasource.orElse(DEFAULT_DATASOURCE_NAME);
+      String datasource = config.datasource().orElse(DEFAULT_DATASOURCE_NAME);
       configuration.setDataSource(DataSources.fromName(datasource));
     }
 
@@ -138,8 +138,8 @@ public class CamundaEngineRecorder {
   protected void configureJobExecutor(ProcessEngineConfigurationImpl configuration,
                                       CamundaEngineConfig config) {
 
-    int maxPoolSize = config.jobExecutor.threadPool.maxPoolSize;
-    int queueSize = config.jobExecutor.threadPool.queueSize;
+    int maxPoolSize = config.jobExecutor().threadPool().maxPoolSize();
+    int queueSize = config.jobExecutor().threadPool().queueSize();
 
     // create a non-bean ManagedExecutor instance. This instance
     // uses it's own Executor/thread pool.
@@ -152,7 +152,7 @@ public class CamundaEngineRecorder {
 
     // apply job executor configuration properties
     PropertyHelper
-        .applyProperties(quarkusJobExecutor, config.jobExecutor.genericConfig, PropertyHelper.KEBAB_CASE);
+        .applyProperties(quarkusJobExecutor, config.jobExecutor().genericConfig(), PropertyHelper.KEBAB_CASE);
 
     configuration.setJobExecutor(quarkusJobExecutor);
   }

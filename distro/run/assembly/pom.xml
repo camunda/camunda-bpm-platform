@@ -49,6 +49,21 @@
       </exclusions>
     </dependency>
 
+    <!-- make sure this runs after the oauth2 module -->
+    <dependency>
+      <groupId>org.camunda.bpm.run</groupId>
+      <artifactId>camunda-bpm-run-modules-oauth2</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <exclusions>
+        <!-- we don't need any transitive dependencies -->
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
     <dependency>
       <groupId>org.camunda.bpm.run</groupId>
       <artifactId>camunda-bpm-run-modules-example-invoice</artifactId>

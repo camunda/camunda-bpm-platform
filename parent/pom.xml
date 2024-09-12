@@ -18,17 +18,17 @@
   </description>
 
   <properties>
-    <version.quarkus>3.8.5</version.quarkus>
+    <version.quarkus>3.14.2</version.quarkus>
     <version.spring.framework>5.3.36</version.spring.framework>
     <version.spring.framework6>6.1.8</version.spring.framework6>
-    <version.spring-boot>3.3.1</version.spring-boot>
+    <version.spring-boot>3.3.3</version.spring-boot>
     <version.resteasy>3.15.6.Final</version.resteasy>
     <version.jersey2>2.34</version.jersey2>
     <!-- use minimum version of resteasy and jersey -->
     <version.jaxrs.api>2.0.1.Final</version.jaxrs.api>
     <version.groovy>4.0.22</version.groovy>
-    <version.graal.js>21.3.11</version.graal.js>
-    <version.icu.icu4j>71.1</version.icu.icu4j>
+    <version.graal.js>21.1.0</version.graal.js>
+    <version.icu.icu4j>68.2</version.icu.icu4j>
     <!-- json-smart and accessors-smart are runtime dependencies of json-path -->
     <version.json-path>2.9.0</version.json-path>
     <version.json-smart>2.5.0</version.json-smart>
@@ -43,6 +43,7 @@
     <version.xml.jaxb-impl4>4.0.5</version.xml.jaxb-impl4>
     <version.jakarta.xml.bind-api>4.0.2</version.jakarta.xml.bind-api>
     <version.httpclient>4.5.14</version.httpclient>
+    <version.httpclient5>5.3</version.httpclient5>
 
     <version.slf4j>1.7.26</version.slf4j>
     <version.logback>1.2.11</version.logback>
@@ -56,8 +57,8 @@
     <version.bouncycastle>1.47</version.bouncycastle>
 
     <!-- application servers -->
-    <version.wildfly>31.0.0.Final</version.wildfly>
-    <version.wildfly.core>23.0.1.Final</version.wildfly.core>
+    <version.wildfly>33.0.1.Final</version.wildfly>
+    <version.wildfly.core>25.0.1.Final</version.wildfly.core>
 
     <version.wildfly26>26.0.1.Final</version.wildfly26>
     <version.wildfly26.core>18.0.4.Final</version.wildfly26.core>

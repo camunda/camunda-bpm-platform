@@ -17,7 +17,7 @@
   <properties>
 
     <!-- database driver versions -->
-    <version.h2>2.1.214</version.h2>
+    <version.h2>2.3.232</version.h2>
     <version.h2-v1>1.4.200</version.h2-v1><!-- used for instance migration qa -->
     <version.oracle>23.5.0.24.07</version.oracle>
     <version.mariadb>1.7.6</version.mariadb>
