@@ -48,6 +48,7 @@ import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderCaseInstanceContext;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderHistoricDecisionInstanceContext;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderProcessInstanceContext;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -246,6 +247,46 @@ public class RestartProcessInstanceAsyncTest {
     restartedProcessInstance = restartedProcessInstances.get(1);
     restartedTask = engineRule.getTaskService().createTaskQuery().processInstanceId(restartedProcessInstance.getId()).active().singleResult();
     Assert.assertEquals(task2.getTaskDefinitionKey(), restartedTask.getTaskDefinitionKey());
+  }
+
+  @Test
+  public void shouldAssignRestartProcessInstanceIdOnlyToRestartedProcessInstances() {
+    // given process instances 1 and 2
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+
+    var processInstance1 = runtimeService.startProcessInstanceByKey("Process");
+    var processInstance2 = runtimeService.startProcessInstanceByKey("Process");
+
+    runtimeService.deleteProcessInstance(processInstance1.getId(), "test");
+    runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
+
+    // when process instance 1 is restarted
+    Batch batch = runtimeService.restartProcessInstances(processDefinition.getId())
+            .startBeforeActivity("userTask1")
+            .processInstanceIds(processInstance1.getId())
+            .executeAsync();
+
+    helper.completeSeedJobs(batch);
+
+    helper.getExecutionJobs(batch).forEach(j -> assertEquals(processDefinition.getDeploymentId(), j.getDeploymentId()));
+    helper.completeExecutionJobs(batch);
+    helper.completeMonitorJobs(batch);
+
+    // then the restartedProcessInstanceId should be populated only for the restarted process instance 1
+    var restartedProcessInstance = runtimeService.createProcessInstanceQuery()
+            .active()
+            .singleResult();
+
+    var historicProcessInstance1 = (HistoricProcessInstanceEntity) historyService.createHistoricProcessInstanceQuery()
+            .processInstanceId(restartedProcessInstance.getId())
+            .singleResult();
+
+    var historicProcessInstance2 = (HistoricProcessInstanceEntity) historyService.createHistoricProcessInstanceQuery()
+            .processInstanceId(processInstance2.getId())
+            .singleResult();
+
+    assertThat(historicProcessInstance1.getRestartedProcessInstanceId()).isEqualTo(processInstance1.getId());
+    assertThat(historicProcessInstance2.getRestartedProcessInstanceId()).isNull();
   }
 
   @Test
