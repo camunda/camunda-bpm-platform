@@ -61,7 +61,7 @@ public class CamundaBpmRunConfiguration {
   }
 
   @Bean
-  public static CamundaDeploymentConfiguration camundaDeploymentConfiguration(
+  public CamundaBpmRunDeploymentConfiguration camundaDeploymentConfiguration(
       @Value("${camunda.deploymentDir:#{null}}") String deploymentDir
   ) {
     return new CamundaBpmRunDeploymentConfiguration(deploymentDir);
