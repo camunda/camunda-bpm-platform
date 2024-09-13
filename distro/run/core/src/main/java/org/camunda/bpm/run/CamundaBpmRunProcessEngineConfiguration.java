@@ -28,7 +28,6 @@ import org.camunda.bpm.run.utils.CamundaBpmRunProcessEnginePluginHelper;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +37,12 @@ public class CamundaBpmRunProcessEngineConfiguration extends SpringProcessEngine
   @Inject
   private Environment env;
 
-  public CamundaBpmRunProcessEngineConfiguration(CamundaBpmRunProperties runProperties, List<ProcessEnginePlugin> processEnginePlugins) {
+  private final String normalisedDeploymentDir;
+
+  public CamundaBpmRunProcessEngineConfiguration(CamundaBpmRunProperties runProperties,
+                                                 String normalisedDeploymentDir,
+                                                 List<ProcessEnginePlugin> processEnginePlugins) {
+    this.normalisedDeploymentDir = normalisedDeploymentDir;
     setDeployChangedOnly(true);
     configureProcessEnginePlugins(processEnginePlugins, runProperties);
   }
@@ -48,12 +52,8 @@ public class CamundaBpmRunProcessEngineConfiguration extends SpringProcessEngine
     // only path relative to the root deployment directory as identifier to
     // prevent re-deployments when the path changes (e.g. distro is moved)
     try {
-      String deploymentDir = env.getProperty("camunda.deploymentDir");
-      if(File.separator.equals("\\")) {
-        deploymentDir = deploymentDir.replace("\\", "/");
-      }
       String resourceAbsolutePath = resource.getURI().toString();
-      int startIndex = resourceAbsolutePath.indexOf(deploymentDir) + deploymentDir.length();
+      int startIndex = resourceAbsolutePath.indexOf(normalisedDeploymentDir) + normalisedDeploymentDir.length();
       return resourceAbsolutePath.substring(startIndex);
     } catch (IOException e) {
       throw new ProcessEngineException("Failed to locate resource " + resource.getFilename(), e);

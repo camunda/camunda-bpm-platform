@@ -53,8 +53,11 @@ public class CamundaBpmRunConfiguration {
 
   @Bean
   public ProcessEngineConfigurationImpl processEngineConfigurationImpl(List<ProcessEnginePlugin> processEnginePlugins,
-                                                                       CamundaBpmRunProperties properties) {
-    return new CamundaBpmRunProcessEngineConfiguration(properties, processEnginePlugins);
+                                                                       CamundaBpmRunProperties properties,
+                                                                       CamundaBpmRunDeploymentConfiguration deploymentConfig
+  ) {
+    var normalizedDeploymentDir = deploymentConfig.getNormalizedDeploymentDir();
+    return new CamundaBpmRunProcessEngineConfiguration(properties, normalizedDeploymentDir, processEnginePlugins);
   }
 
   @Bean

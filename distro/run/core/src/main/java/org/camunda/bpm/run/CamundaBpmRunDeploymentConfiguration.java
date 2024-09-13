@@ -53,7 +53,7 @@ public class CamundaBpmRunDeploymentConfiguration extends DefaultDeploymentConfi
     return Collections.emptySet();
   }
 
-  protected String getEffectiveDeploymentDir() {
+  protected String getNormalizedDeploymentDir() {
     String result = deploymentDir;
 
     if(File.separator.equals("\\")) {
