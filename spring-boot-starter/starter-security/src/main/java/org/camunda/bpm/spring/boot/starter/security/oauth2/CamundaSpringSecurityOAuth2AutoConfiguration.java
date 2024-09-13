@@ -45,9 +45,12 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
+import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import java.util.Map;
 
@@ -98,9 +101,17 @@ public class CamundaSpringSecurityOAuth2AutoConfiguration {
     return new OAuth2GrantedAuthoritiesMapper(oAuth2Properties);
   }
 
+  protected LogoutSuccessHandler oidcLogoutSuccessHandler(ClientRegistrationRepository clientRegistrationRepository) {
+    var oidcLogoutSuccessHandler = new OidcClientInitiatedLogoutSuccessHandler(clientRegistrationRepository);
+    // Redirected after the logout has been performed at the provider
+    oidcLogoutSuccessHandler.setPostLogoutRedirectUri(oAuth2Properties.getSsoLogout().getPostLogoutRedirectUri());
+    return oidcLogoutSuccessHandler;
+  }
+
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http, OAuth2AuthorizedClientManager clientManager)
-      throws Exception {
+  public SecurityFilterChain filterChain(HttpSecurity http,
+                                         ClientRegistrationRepository clientRegistrationRepository,
+                                         OAuth2AuthorizedClientManager clientManager) throws Exception {
     logger.info("Enabling Camunda Spring Security oauth2 integration");
 
     var validateTokenFilter = new AuthorizeTokenFilter(clientManager);
@@ -113,12 +124,21 @@ public class CamundaSpringSecurityOAuth2AutoConfiguration {
         )
         .addFilterAfter(validateTokenFilter, OAuth2AuthorizationRequestRedirectFilter.class)
         .anonymous(AbstractHttpConfigurer::disable)
+        .oidcLogout(c -> c.backChannel(Customizer.withDefaults()))
         .oauth2Login(Customizer.withDefaults())
-        .oidcLogout(Customizer.withDefaults())
+        .logout(c -> c
+            //.logoutUrl("")
+            .clearAuthentication(true)
+            .invalidateHttpSession(true)
+        )
         .oauth2Client(Customizer.withDefaults())
         .cors(AbstractHttpConfigurer::disable)
         .csrf(AbstractHttpConfigurer::disable);
     // @formatter:on
+
+    if (oAuth2Properties.getSsoLogout().isEnabled()) {
+      http.logout(c -> c.logoutSuccessHandler(oidcLogoutSuccessHandler(clientRegistrationRepository)));
+    }
 
     return http.build();
   }
