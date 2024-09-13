@@ -16,14 +16,12 @@
  */
 package org.camunda.bpm.run.test.config.rest;
 
-import org.camunda.bpm.run.property.CamundaBpmRunRestProperties;
 import org.camunda.bpm.run.test.AbstractRestTest;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class WadlUnsetTest extends AbstractRestTest {
 

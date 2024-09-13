@@ -25,8 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
-import static org.assertj.core.api.Assertions.*;
-
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestPropertySource(properties = { CamundaBpmRunRestProperties.PREFIX + ".disable-wadl=true" })
 public class WadlDisabledTest extends AbstractRestTest {
