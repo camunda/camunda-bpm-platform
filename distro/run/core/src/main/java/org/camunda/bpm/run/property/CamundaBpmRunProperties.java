@@ -45,6 +45,9 @@ public class CamundaBpmRunProperties {
   @NestedConfigurationProperty
   protected CamundaBpmRunRestProperties rest = new CamundaBpmRunRestProperties();
 
+  @NestedConfigurationProperty
+  protected CamundaBpmRunDeployChangedOnlyProperties deployChangedOnly = new CamundaBpmRunDeployChangedOnlyProperties();
+
   protected CamundaBpmRunAdministratorAuthorizationProperties adminAuth
       = new CamundaBpmRunAdministratorAuthorizationProperties();
 
@@ -96,6 +99,15 @@ public class CamundaBpmRunProperties {
     this.rest = rest;
   }
 
+  public CamundaBpmRunDeployChangedOnlyProperties getDeployChangedOnly() {
+    return deployChangedOnly;
+  }
+
+  public void setDeployChangedOnly(CamundaBpmRunDeployChangedOnlyProperties deployChangedOnly) {
+    this.deployChangedOnly = deployChangedOnly;
+  }
+
+
   @Override
   public String toString() {
     return "CamundaBpmRunProperties [" +
@@ -105,6 +117,7 @@ public class CamundaBpmRunProperties {
         ", adminAuth=" + adminAuth +
         ", plugins=" + processEnginePlugins +
         ", rest=" + rest +
+        ", deployChangedOnly=" + deployChangedOnly +
         "]";
   }
 }

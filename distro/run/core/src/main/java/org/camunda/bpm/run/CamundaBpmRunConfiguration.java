@@ -53,10 +53,11 @@ public class CamundaBpmRunConfiguration {
   @Bean
   public ProcessEngineConfigurationImpl processEngineConfigurationImpl(List<ProcessEnginePlugin> processEnginePlugins,
                                                                        CamundaBpmRunProperties properties,
-                                                                       CamundaBpmRunDeploymentConfiguration deploymentConfig
-  ) {
+                                                                       CamundaBpmRunDeploymentConfiguration deploymentConfig,
+                                                                       @Value("${camunda.bpm.run.deploy-changed-only.enabled:true}") boolean deployChangedOnly) {
     var normalizedDeploymentDir = deploymentConfig.getNormalizedDeploymentDir();
-    return new CamundaBpmRunProcessEngineConfiguration(properties, normalizedDeploymentDir, processEnginePlugins);
+    return new CamundaBpmRunProcessEngineConfiguration(properties, normalizedDeploymentDir, deployChangedOnly,
+        processEnginePlugins);
   }
 
   @Bean

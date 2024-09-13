@@ -36,9 +36,10 @@ public class CamundaBpmRunProcessEngineConfiguration extends SpringProcessEngine
 
   public CamundaBpmRunProcessEngineConfiguration(CamundaBpmRunProperties runProperties,
                                                  String normalisedDeploymentDir,
+                                                 boolean deployChangedOnly,
                                                  List<ProcessEnginePlugin> processEnginePlugins) {
     this.normalisedDeploymentDir = normalisedDeploymentDir;
-    setDeployChangedOnly(true);
+    setDeployChangedOnly(deployChangedOnly);
     configureProcessEnginePlugins(processEnginePlugins, runProperties);
   }
 
