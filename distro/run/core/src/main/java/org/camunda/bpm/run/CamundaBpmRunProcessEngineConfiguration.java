@@ -17,23 +17,30 @@
 package org.camunda.bpm.run;
 
 import jakarta.inject.Inject;
-import java.io.File;
-import java.io.IOException;
-import java.util.Set;
-
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CompositeProcessEnginePlugin;
+import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.diagnostics.CamundaIntegration;
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
+import org.camunda.bpm.run.property.CamundaBpmRunProcessEnginePluginProperty;
+import org.camunda.bpm.run.property.CamundaBpmRunProperties;
+import org.camunda.bpm.run.utils.CamundaBpmRunProcessEnginePluginHelper;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 public class CamundaBpmRunProcessEngineConfiguration extends SpringProcessEngineConfiguration {
 
   @Inject
   private Environment env;
 
-  public CamundaBpmRunProcessEngineConfiguration() {
+  public CamundaBpmRunProcessEngineConfiguration(CamundaBpmRunProperties runProperties, List<ProcessEnginePlugin> processEnginePlugins) {
     setDeployChangedOnly(true);
+    configureProcessEnginePlugins(processEnginePlugins, runProperties);
   }
 
   @Override
@@ -58,5 +65,13 @@ public class CamundaBpmRunProcessEngineConfiguration extends SpringProcessEngine
     super.initTelemetryData();
     Set<String> camundaIntegration = telemetryData.getProduct().getInternals().getCamundaIntegration();
     camundaIntegration.add(CamundaIntegration.CAMUNDA_BPM_RUN);
+  }
+
+  protected void configureProcessEnginePlugins(List<ProcessEnginePlugin> processEnginePlugins, CamundaBpmRunProperties runProperties) {
+    // register process engine plugins defined in yaml
+    List<CamundaBpmRunProcessEnginePluginProperty> yamlPluginsInfo = runProperties.getProcessEnginePlugins();
+    CamundaBpmRunProcessEnginePluginHelper.registerYamlPlugins(processEnginePlugins, yamlPluginsInfo);
+
+    this.processEnginePlugins.add(new CompositeProcessEnginePlugin(processEnginePlugins));
   }
 }

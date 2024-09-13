@@ -61,15 +61,9 @@ public class CamundaBpmRunConfiguration {
   }
 
   @Bean
-  public ProcessEngineConfigurationImpl processEngineConfigurationImpl(List<ProcessEnginePlugin> processEnginePlugins) {
-    final SpringProcessEngineConfiguration configuration = new CamundaBpmRunProcessEngineConfiguration();
-
-    // register process engine plugins defined in yaml
-    List<CamundaBpmRunProcessEnginePluginProperty> yamlPluginsInfo = camundaBpmRunProperties.getProcessEnginePlugins();
-    CamundaBpmRunProcessEnginePluginHelper.registerYamlPlugins(processEnginePlugins, yamlPluginsInfo);
-
-    configuration.getProcessEnginePlugins().add(new CompositeProcessEnginePlugin(processEnginePlugins));
-    return configuration;
+  public ProcessEngineConfigurationImpl processEngineConfigurationImpl(List<ProcessEnginePlugin> processEnginePlugins,
+                                                                       CamundaBpmRunProperties camundaBpmRunProperties) {
+    return new CamundaBpmRunProcessEngineConfiguration(camundaBpmRunProperties, processEnginePlugins);
   }
 
   @Bean
