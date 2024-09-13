@@ -37,6 +37,7 @@ import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
+import org.camunda.bpm.client.UrlResolver;
 import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.backoff.ExponentialBackoffStrategy;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
@@ -94,6 +95,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   protected boolean isAutoFetchingEnabled;
   protected BackoffStrategy backoffStrategy;
   protected boolean isBackoffStrategyDisabled;
+  protected UrlResolver urlResolver;
 
   public ExternalTaskClientBuilderImpl() {
     // default values
@@ -108,10 +110,15 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     this.httpClientBuilder = HttpClients.custom().useSystemProperties();
   }
 
-  public ExternalTaskClientBuilder baseUrl(String baseUrl) {
-    this.baseUrl = baseUrl;
-    return this;
-  }
+    public ExternalTaskClientBuilder baseUrl(String baseUrl) {
+        this.urlResolver = new PermanentUrlResolver(baseUrl);
+        return this;
+    }
+
+    public ExternalTaskClientBuilder urlResolver(UrlResolver urlResolver) {
+        this.urlResolver = urlResolver;
+        return this;
+    }
 
   public ExternalTaskClientBuilder workerId(String workerId) {
     this.workerId = workerId;
@@ -209,7 +216,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
       throw LOG.lockDurationIsNotGreaterThanZeroException(lockDuration);
     }
 
-    if (baseUrl == null || baseUrl.isEmpty()) {
+    if (urlResolver == null) {
       throw LOG.baseUrlNullException();
     }
 
@@ -227,9 +234,11 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     return new ExternalTaskClientImpl(topicSubscriptionManager);
   }
 
-  protected void initBaseUrl() {
-    baseUrl = sanitizeUrl(baseUrl);
-  }
+    protected void initBaseUrl() {
+        if (this.urlResolver instanceof PermanentUrlResolver) {
+            ((PermanentUrlResolver) this.urlResolver).setBaseUrl(sanitizeUrl(this.urlResolver.getBaseUrl()));
+        }
+    }
 
   protected String sanitizeUrl(String url) {
     url = url.trim();
@@ -304,9 +313,9 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     httpClientBuilder.addRequestInterceptorLast(requestInterceptorHandler);
     RequestExecutor requestExecutor = new RequestExecutor(httpClientBuilder.build(), objectMapper);
 
-    engineClient = new EngineClient(workerId, maxTasks, asyncResponseTimeout, baseUrl, requestExecutor,
-        usePriority, orderingConfig);
-  }
+        engineClient = new EngineClient(workerId, maxTasks, asyncResponseTimeout, urlResolver , requestExecutor,
+                usePriority, orderingConfig);
+    }
 
   protected void initTopicSubscriptionManager() {
     topicSubscriptionManager = new TopicSubscriptionManager(engineClient, typedValues, lockDuration);
@@ -389,7 +398,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   }
 
   public String getBaseUrl() {
-    return baseUrl;
+      return urlResolver.getBaseUrl();
   }
 
   protected String getWorkerId() {
