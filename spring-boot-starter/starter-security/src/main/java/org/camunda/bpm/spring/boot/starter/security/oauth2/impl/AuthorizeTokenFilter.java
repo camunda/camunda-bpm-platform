@@ -88,7 +88,7 @@ public class AuthorizeTokenFilter extends OncePerRequestFilter {
     try {
       var res = clientManager.authorize(authRequest);
       if (res != null) {
-        logger.debug("Authorize successful, access token: {}", res.getAccessToken());
+        logger.debug("Authorize successful, access token expiry: {}", res.getAccessToken().getExpiresAt());
       }
     } catch (OAuth2AuthorizationException e) {
       logger.warn("Authorize failed: {}", e.getMessage());
