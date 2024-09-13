@@ -42,6 +42,9 @@ public class CamundaBpmRunProperties {
   @NestedConfigurationProperty
   protected List<CamundaBpmRunProcessEnginePluginProperty> processEnginePlugins = new ArrayList<>();
 
+  @NestedConfigurationProperty
+  protected CamundaBpmRunRestProperties rest = new CamundaBpmRunRestProperties();
+
   protected CamundaBpmRunAdministratorAuthorizationProperties adminAuth
       = new CamundaBpmRunAdministratorAuthorizationProperties();
 
@@ -85,6 +88,14 @@ public class CamundaBpmRunProperties {
     this.processEnginePlugins = processEnginePlugins;
   }
 
+  public CamundaBpmRunRestProperties getRest() {
+    return rest;
+  }
+
+  public void setRest(CamundaBpmRunRestProperties rest) {
+    this.rest = rest;
+  }
+
   @Override
   public String toString() {
     return "CamundaBpmRunProperties [" +
@@ -93,6 +104,7 @@ public class CamundaBpmRunProperties {
         ", ldap=" + ldap +
         ", adminAuth=" + adminAuth +
         ", plugins=" + processEnginePlugins +
+        ", rest=" + rest +
         "]";
   }
 }
