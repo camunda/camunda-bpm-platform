@@ -33,6 +33,7 @@ import org.camunda.bpm.run.utils.CamundaBpmRunProcessEnginePluginHelper;
 import org.camunda.bpm.spring.boot.starter.CamundaBpmAutoConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.CamundaDeploymentConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -72,8 +73,10 @@ public class CamundaBpmRunConfiguration {
   }
 
   @Bean
-  public static CamundaDeploymentConfiguration camundaDeploymentConfiguration() {
-    return new CamundaBpmRunDeploymentConfiguration();
+  public static CamundaDeploymentConfiguration camundaDeploymentConfiguration(
+      @Value("${camunda.deploymentDir:#{null}}") String deploymentDir
+  ) {
+    return new CamundaBpmRunDeploymentConfiguration(deploymentDir);
   }
 
 }
