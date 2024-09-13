@@ -24,7 +24,6 @@ import org.camunda.bpm.run.property.CamundaBpmRunAdministratorAuthorizationPrope
 import org.camunda.bpm.run.property.CamundaBpmRunLdapProperties;
 import org.camunda.bpm.run.property.CamundaBpmRunProperties;
 import org.camunda.bpm.spring.boot.starter.CamundaBpmAutoConfiguration;
-import org.camunda.bpm.spring.boot.starter.configuration.CamundaDeploymentConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

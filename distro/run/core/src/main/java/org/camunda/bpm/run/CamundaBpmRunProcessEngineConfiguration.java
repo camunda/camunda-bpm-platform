@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.run;
 
-import jakarta.inject.Inject;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.CompositeProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
@@ -25,7 +24,6 @@ import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.camunda.bpm.run.property.CamundaBpmRunProcessEnginePluginProperty;
 import org.camunda.bpm.run.property.CamundaBpmRunProperties;
 import org.camunda.bpm.run.utils.CamundaBpmRunProcessEnginePluginHelper;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
@@ -33,9 +31,6 @@ import java.util.List;
 import java.util.Set;
 
 public class CamundaBpmRunProcessEngineConfiguration extends SpringProcessEngineConfiguration {
-
-  @Inject
-  private Environment env;
 
   private final String normalisedDeploymentDir;
 
