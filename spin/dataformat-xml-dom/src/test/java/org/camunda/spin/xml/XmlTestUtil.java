@@ -24,13 +24,23 @@ public class XmlTestUtil {
    * @return same as input string without the timezone offset
    */
   public static String removeTimeZone(String input) {
-    int indexOfTimezone = input.indexOf("T00:00:00");
-    if (indexOfTimezone != -1) {
-      int indexOfClosingBracket = input.indexOf("<", indexOfTimezone);
-      if (indexOfClosingBracket != -1) {
-        input = input.substring(0, indexOfTimezone) + input.substring(indexOfClosingBracket);
-      }
+    if (input == null) {
+      return null;
     }
-    return input;
+
+    final String TIMEZONE = "T00:00:00";
+    final String CLOSING_BRACKET = "<";
+
+    int indexOfTimezone = input.indexOf(TIMEZONE);
+    if (indexOfTimezone == -1) {
+      return input;
+    }
+
+    int indexOfClosingBracket = input.indexOf(CLOSING_BRACKET, indexOfTimezone);
+    if (indexOfClosingBracket == -1) {
+      return input;
+    }
+
+    return input.substring(0, indexOfTimezone) + input.substring(indexOfClosingBracket);
   }
 }
