@@ -16,28 +16,32 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.util.ChangeVariablesDelegate;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
+import org.hamcrest.MatcherAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -115,8 +119,8 @@ public class JobEntityTest {
     Job messageJob = managementService.createJobQuery().singleResult();
 
     // then
-    assertThat(messageJob.getCreateTime(), is(CREATE_DATE));
-    assertThat(messageJob.getClass().getSimpleName(), is("MessageEntity"));
+    MatcherAssert.assertThat(messageJob.getCreateTime(), is(CREATE_DATE));
+    MatcherAssert.assertThat(messageJob.getClass().getSimpleName(), is("MessageEntity"));
 
     // cleanup
     jobIds.add(messageJob.getId());
@@ -138,8 +142,8 @@ public class JobEntityTest {
     Job timerJob = managementService.createJobQuery().singleResult();
 
     // then
-    assertThat(timerJob.getCreateTime(), is(CREATE_DATE));
-    assertThat(timerJob.getClass().getSimpleName(), is("TimerEntity"));
+    MatcherAssert.assertThat(timerJob.getCreateTime(), is(CREATE_DATE));
+    MatcherAssert.assertThat(timerJob.getClass().getSimpleName(), is("TimerEntity"));
 
     // cleanup
     jobIds.add(timerJob.getId());
@@ -154,8 +158,8 @@ public class JobEntityTest {
     Job everLivingJob = managementService.createJobQuery().singleResult();
 
     // then
-    assertThat(everLivingJob.getCreateTime(), is(CREATE_DATE));
-    assertThat(everLivingJob.getClass().getSimpleName(), is("EverLivingJobEntity"));
+    MatcherAssert.assertThat(everLivingJob.getCreateTime(), is(CREATE_DATE));
+    MatcherAssert.assertThat(everLivingJob.getClass().getSimpleName(), is("EverLivingJobEntity"));
 
     // cleanup
     jobIds.add(everLivingJob.getId());
@@ -186,7 +190,7 @@ public class JobEntityTest {
 
     // then
     job = (JobEntity) managementService.createJobQuery().jobId(job.getId()).singleResult();
-    assertThat(job.getFailedActivityId(), is("theTask"));
+    MatcherAssert.assertThat(job.getFailedActivityId(), is("theTask"));
   }
 
   @Test
@@ -216,7 +220,7 @@ public class JobEntityTest {
 
     // then
     job = (JobEntity) managementService.createJobQuery().jobId(job.getId()).singleResult();
-    assertThat(job.getFailedActivityId(), is("theTask"));
+    MatcherAssert.assertThat(job.getFailedActivityId(), is("theTask"));
   }
 
   @Test
@@ -248,7 +252,28 @@ public class JobEntityTest {
 
     // then
     job = (JobEntity) managementService.createJobQuery().jobId(job.getId()).singleResult();
-    assertThat(job.getFailedActivityId(), is("theTask3"));
+    MatcherAssert.assertThat(job.getFailedActivityId(), is("theTask3"));
+  }
+
+  @Test
+  public void should(){
+    // given
+    testRule.deploy(Bpmn.createExecutableProcess("process")
+        .camundaHistoryTimeToLive(180)
+        .startEvent()
+        .userTask()
+        .endEvent()
+        .done());
+    ProcessInstance process1 = runtimeService.startProcessInstanceByKey("process");
+    ProcessInstance process2 = runtimeService.startProcessInstanceByKey("process");
+
+    // when
+    Batch batch = runtimeService.setVariablesAsync(Arrays.asList(process1.getId(), process2.getId()),
+        Variables.createVariables().putValue("foo", "bar"));
+
+    // then
+    JobEntity job = (JobEntity) managementService.createJobQuery().singleResult();
+    assertThat(job.getBatchId()).isEqualTo(batch.getId());
   }
 
   // helper ////////////////////////////////////////////////////////////////////////////////////////////////////////////

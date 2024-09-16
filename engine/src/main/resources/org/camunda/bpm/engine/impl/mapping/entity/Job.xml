@@ -137,6 +137,7 @@
     <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
     <result property="lastFailureLogId" column="LAST_FAILURE_LOG_ID_" jdbcType="VARCHAR" />
+    <result property="batchId" column="BATCH_ID_" jdbcType="VARCHAR" />
     <discriminator javaType="string" column="TYPE_">
       <case value="message" resultMap="messageResultMap"/>
       <case value="timer" resultMap="timerResultMap"/>
