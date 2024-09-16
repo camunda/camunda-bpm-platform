@@ -81,11 +81,6 @@ public class DeferredFileValueImpl extends FileValueImpl implements DeferredFile
   }
 
   @Override
-  public String toString() {
-    return "DeferredFileValueImpl [mimeType=" + mimeType + ", filename=" + filename + ", type=" + type + ", isTransient=" + isTransient + ", isLoaded=" + isLoaded + "]";
-  }
-
-  @Override
   public void setExecutionId(String executionId){
     this.executionId = executionId;
   };
@@ -93,6 +88,12 @@ public class DeferredFileValueImpl extends FileValueImpl implements DeferredFile
   @Override
   public String getExecutionId() {
     return executionId;
+  }
+
+  @Override
+  public String toString() {
+    return "DeferredFileValueImpl [mimeType=" + mimeType + ", filename=" + filename + ", type=" + type + ", "
+        + "isTransient=" + isTransient + ", isLoaded=" + isLoaded + ", processInstanceId" + processInstanceId + ", executionId" + executionId + "]";
   }
 
 }
