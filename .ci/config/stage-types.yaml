@@ -139,8 +139,7 @@ platform-jdk-temurin-jdk-17-latest:
   jdkVersion: 'jdk-17-latest'
   podSpec:
     cpu: 4
-    image: 'maven:3.8.5-eclipse-temurin-17'
-    stageId: 'jdk-17-latest'
+    image: 'maven:3.9.7-eclipse-temurin-17'
 platform-jdk-temurin-jdk-21-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -Pdistro,distro-ce,distro-wildfly'
@@ -151,7 +150,6 @@ platform-jdk-temurin-jdk-21-latest:
   podSpec:
     cpu: 4
     image: 'maven:3.9.7-eclipse-temurin-21'
-    stageId: 'jdk-21-latest'
 platform-jdk-temurin-jdk-11-latest:
   directory: '.'
   command: 'install source:jar source:test-jar
@@ -174,5 +172,5 @@ platform-jdk-temurin-jdk-11-latest:
   jdkVersion: 'jdk-11-latest'
   podSpec:
     cpu: 4
-    image: 'maven:3.8.5-eclipse-temurin-11'
-    stageId: 'jdk-11-latest'
+    image: 'maven:3.9.7-eclipse-temurin-11'
+

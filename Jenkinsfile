@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library@52-declarative-pod-specs']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
 
 def failedStageTypes = []
 
@@ -38,7 +38,7 @@ pipeline {
         cambpmConditionalRetry([
           podSpec: [
             cpu: 32,
-            image: 'maven:3.8.5-eclipse-temurin-17'
+            image: 'maven:3.9.7-eclipse-temurin-17'
             ],
           suppressErrors: false,
           runSteps: {
