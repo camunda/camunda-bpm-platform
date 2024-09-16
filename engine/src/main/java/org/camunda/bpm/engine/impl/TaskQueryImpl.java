@@ -44,6 +44,7 @@ import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 
 /**
  * @author Joram Barrez
@@ -175,6 +176,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   // or query /////////////////////////////
   protected List<TaskQueryImpl> queries = new ArrayList<>(Arrays.asList(this));
   protected boolean isOrQueryActive = false;
+  protected boolean withCommentAttachmentInfo;
 
   public TaskQueryImpl() {
   }
@@ -1088,6 +1090,12 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       || CompareUtil.elementIsNotContainedInArray(processInstanceBusinessKey, processInstanceBusinessKeys);
   }
 
+  @Override
+  public TaskQuery withCommentAttachmentInfo() {
+    this.withCommentAttachmentInfo = true;
+    return this;
+  }
+
   public List<String> getCandidateGroups() {
     if (cachedCandidateGroups != null) {
       return cachedCandidateGroups;
@@ -1438,6 +1446,13 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       for (Task task : taskList) {
         // initialize the form keys of the tasks
         ((TaskEntity) task).initializeFormKey();
+      }
+    }
+
+    if (withCommentAttachmentInfo && !Context.getProcessEngineConfiguration().getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+      for (Task task : taskList) {
+        // verify attachment and comments exists for the task
+        ((TaskEntity) task).initializeAttachmentAndComments();
       }
     }
 
