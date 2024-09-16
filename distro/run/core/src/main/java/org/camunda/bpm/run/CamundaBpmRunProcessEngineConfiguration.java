@@ -32,13 +32,14 @@ import java.util.Set;
 
 public class CamundaBpmRunProcessEngineConfiguration extends SpringProcessEngineConfiguration {
 
-  private final String normalisedDeploymentDir;
+  private final String normalizedDeploymentDir;
 
   public CamundaBpmRunProcessEngineConfiguration(CamundaBpmRunProperties runProperties,
-                                                 String normalisedDeploymentDir,
+                                                 String normalizedDeploymentDir,
                                                  boolean deployChangedOnly,
                                                  List<ProcessEnginePlugin> processEnginePlugins) {
-    this.normalisedDeploymentDir = normalisedDeploymentDir;
+    this.normalizedDeploymentDir = normalizedDeploymentDir;
+
     setDeployChangedOnly(deployChangedOnly);
     configureProcessEnginePlugins(processEnginePlugins, runProperties);
   }
@@ -49,7 +50,7 @@ public class CamundaBpmRunProcessEngineConfiguration extends SpringProcessEngine
     // prevent re-deployments when the path changes (e.g. distro is moved)
     try {
       String resourceAbsolutePath = resource.getURI().toString();
-      int startIndex = resourceAbsolutePath.indexOf(normalisedDeploymentDir) + normalisedDeploymentDir.length();
+      int startIndex = resourceAbsolutePath.indexOf(normalizedDeploymentDir) + normalizedDeploymentDir.length();
       return resourceAbsolutePath.substring(startIndex);
     } catch (IOException e) {
       throw new ProcessEngineException("Failed to locate resource " + resource.getFilename(), e);
