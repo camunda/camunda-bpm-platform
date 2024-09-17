@@ -30,9 +30,11 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
+import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.Clock;
 
 /**
  * Authorize or re-authorize (if required) oauth2 client using {@link OAuth2AuthorizedClientManager}.
@@ -54,6 +56,7 @@ public class AuthorizeTokenFilter extends OncePerRequestFilter {
 
   private static final Logger logger = LoggerFactory.getLogger(AuthorizeTokenFilter.class);
   private final OAuth2AuthorizedClientManager clientManager;
+  private final Clock clock = Clock.systemUTC();
 
   public AuthorizeTokenFilter(OAuth2AuthorizedClientManager clientManager) {
     this.clientManager = clientManager;
@@ -72,9 +75,21 @@ public class AuthorizeTokenFilter extends OncePerRequestFilter {
     filterChain.doFilter(request, response);
   }
 
-  private void authorizeToken(OAuth2AuthenticationToken token,
-                              HttpServletRequest request,
-                              HttpServletResponse response) {
+  protected boolean hasTokenExpired(OAuth2Token token) {
+    return token.getExpiresAt() == null || this.clock.instant().isAfter(token.getExpiresAt());
+  }
+
+  protected void clearContext(HttpServletRequest request) {
+    SecurityContextHolder.clearContext();
+    try {
+      request.getSession().invalidate();
+    } catch (Exception ignored) {
+    }
+  }
+
+  protected void authorizeToken(OAuth2AuthenticationToken token,
+                                HttpServletRequest request,
+                                HttpServletResponse response) {
     // @formatter:off
     var authRequest = OAuth2AuthorizeRequest
         .withClientRegistrationId(token.getAuthorizedClientRegistrationId())
@@ -87,17 +102,15 @@ public class AuthorizeTokenFilter extends OncePerRequestFilter {
 
     try {
       var res = clientManager.authorize(authRequest);
-      if (res != null) {
+      if (res == null || hasTokenExpired(res.getAccessToken())) {
+        logger.warn("Authorize failed: could not re-authorize expired access token");
+        clearContext(request);
+      } else {
         logger.debug("Authorize successful, access token expiry: {}", res.getAccessToken().getExpiresAt());
       }
     } catch (OAuth2AuthorizationException e) {
       logger.warn("Authorize failed: {}", e.getMessage());
-      // clear security context
-      SecurityContextHolder.clearContext();
-      try {
-        request.getSession().invalidate();
-      } catch (Exception ignored) {
-      }
+      clearContext(request);
     }
   }
 }
