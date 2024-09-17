@@ -39,4 +39,20 @@ public interface DeferredFileValue extends FileValue {
    */
   boolean isLoaded();
 
+  /**
+   * Sets the executionId, which defines the scope of the DeferredFileValue.
+   * This identifier ensures that the correct scope is applied when loading the file value.
+   *
+   * @param executionId defines the scope of the DeferredFileValue
+   */
+  void setExecutionId(String executionId);
+
+  /**
+   * Returns the executionId, which specifies the scope of the DeferredFileValue.
+   * This identifier ensures that the correct scope is applied when loading the file value.
+   *
+   * @return the executionId which defines the scope of the DeferredFileValue
+   */
+  String getExecutionId();
+
 }
