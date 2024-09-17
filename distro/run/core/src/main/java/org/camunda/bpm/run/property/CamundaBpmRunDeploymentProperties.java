@@ -14,24 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.run.test.config.deploy;
+package org.camunda.bpm.run.property;
 
-import org.camunda.bpm.run.CamundaBpmRunProcessEngineConfiguration;
-import org.camunda.bpm.run.test.AbstractRestTest;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.TestPropertySource;
+public class CamundaBpmRunDeploymentProperties {
 
-import static org.assertj.core.api.Assertions.assertThat;
+  public static final String PREFIX = CamundaBpmRunProperties.PREFIX + ".rest";
 
-@TestPropertySource(properties = { "camunda.bpm.run.deployment.deploy-changed-only=false" })
-public class DeployChangedOnlyDisabledTest extends AbstractRestTest {
+  protected boolean deployChangedOnly;
 
-  @Autowired
-  private CamundaBpmRunProcessEngineConfiguration engineConfig;
+  public boolean isDeployChangedOnly() {
+    return deployChangedOnly;
+  }
 
-  @Test
-  public void shouldEnableDeployChangedOnlyOnCamundaRunProperty() {
-    assertThat(engineConfig.isDeployChangedOnly()).isEqualTo(false);
+  public void setDeployChangedOnly(boolean deployChangedOnly) {
+    this.deployChangedOnly = deployChangedOnly;
+  }
+
+  @Override
+  public String toString() {
+    return "CamundaBpmRunDeploymentProperties[" + "deployChangedOnly=" + deployChangedOnly + ']';
   }
 }

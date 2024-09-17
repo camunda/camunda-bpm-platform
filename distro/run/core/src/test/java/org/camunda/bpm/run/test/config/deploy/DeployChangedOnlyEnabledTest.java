@@ -24,7 +24,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@TestPropertySource(properties = { "camunda.bpm.run.deploy-changed-only=true" })
+@TestPropertySource(properties = { "camunda.bpm.run.deployment.deploy-changed-only=true" })
 public class DeployChangedOnlyEnabledTest extends AbstractRestTest {
 
   @Autowired
