@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.util.ChangeVariablesDelegate;
+import org.camunda.bpm.engine.test.util.BatchRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
@@ -55,9 +56,10 @@ public class JobEntityTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected BatchRule batchRule = new BatchRule(engineRule, testRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(batchRule);
 
   protected List<String> jobIds = new ArrayList<>();
 
@@ -256,7 +258,7 @@ public class JobEntityTest {
   }
 
   @Test
-  public void should(){
+  public void should() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess("process")
         .camundaHistoryTimeToLive(180)
@@ -270,6 +272,7 @@ public class JobEntityTest {
     // when
     Batch batch = runtimeService.setVariablesAsync(Arrays.asList(process1.getId(), process2.getId()),
         Variables.createVariables().putValue("foo", "bar"));
+    batchRule.manageBatchId(batch.getId());
 
     // then
     JobEntity job = (JobEntity) managementService.createJobQuery().singleResult();
