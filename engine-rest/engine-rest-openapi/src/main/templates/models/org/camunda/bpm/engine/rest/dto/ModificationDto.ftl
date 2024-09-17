@@ -38,6 +38,13 @@
     />
 
     <@lib.property
+        name = "historicProcessInstanceQuery"
+        type = "ref"
+        dto = "HistoricProcessInstanceQueryDto"
+        desc = "A historic process instance query."
+    />
+
+    <@lib.property
         name = "instructions"
         type = "array"
         dto = "MultipleProcessInstanceModificationInstructionDto"
