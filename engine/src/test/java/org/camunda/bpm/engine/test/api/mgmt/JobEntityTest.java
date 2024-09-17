@@ -258,7 +258,7 @@ public class JobEntityTest {
   }
 
   @Test
-  public void should() {
+  public void shouldSetBatchId() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess("process")
         .camundaHistoryTimeToLive(180)
@@ -272,7 +272,7 @@ public class JobEntityTest {
     // when
     Batch batch = runtimeService.setVariablesAsync(Arrays.asList(process1.getId(), process2.getId()),
         Variables.createVariables().putValue("foo", "bar"));
-    batchRule.manageBatchId(batch.getId());
+    batchRule.manageBatch(batch.getId());
 
     // then
     JobEntity job = (JobEntity) managementService.createJobQuery().singleResult();

@@ -21,3 +21,6 @@ values ('1100', CURRENT_TIMESTAMP, '7.22.0');
 alter table ACT_RU_TASK add column TASK_STATE_ varchar(64);
 
 alter table ACT_HI_TASKINST add column TASK_STATE_ varchar(64);
+
+alter table ACT_RU_JOB add column BATCH_ID_ varchar(64),
+alter table ACT_HI_JOB_LOG add column BATCH_ID_ varchar(64),

@@ -130,6 +130,7 @@ create table ACT_RU_JOB (
     TENANT_ID_ varchar(64),
     CREATE_TIME_ timestamp,
     LAST_FAILURE_LOG_ID_ varchar(64),
+    BATCH_ID_ varchar(64),
     primary key (ID_)
 );
 

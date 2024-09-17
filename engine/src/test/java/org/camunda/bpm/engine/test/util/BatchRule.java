@@ -120,7 +120,7 @@ public class BatchRule extends TestWatcher {
         .list();
   }
 
-  public void manageBatchId(String batchId) {
+  public void manageBatch(String batchId) {
     batchIds.add(batchId);
   }
 
