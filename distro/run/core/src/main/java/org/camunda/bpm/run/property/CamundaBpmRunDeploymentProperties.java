@@ -18,7 +18,7 @@ package org.camunda.bpm.run.property;
 
 public class CamundaBpmRunDeploymentProperties {
 
-  public static final String PREFIX = CamundaBpmRunProperties.PREFIX + ".rest";
+  public static final String PREFIX = CamundaBpmRunProperties.PREFIX + ".deployment";
 
   protected boolean deployChangedOnly;
 
