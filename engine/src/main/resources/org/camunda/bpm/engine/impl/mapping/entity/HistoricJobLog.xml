@@ -48,7 +48,8 @@
             TENANT_ID_,
             HOSTNAME_,
             SEQUENCE_COUNTER_,
-            REMOVAL_TIME_
+            REMOVAL_TIME_,
+            BATCH_ID_
           )
     values (#{id, jdbcType=VARCHAR},
             #{timestamp, jdbcType=TIMESTAMP},
@@ -73,7 +74,8 @@
             #{tenantId, jdbcType=VARCHAR},
             #{hostname, jdbcType=VARCHAR},
             #{sequenceCounter, jdbcType=BIGINT},
-            #{removalTime, jdbcType=TIMESTAMP}
+            #{removalTime, jdbcType=TIMESTAMP},
+            #{batchId, jdbcType=VARCHAR}
     )
   </insert>
 
@@ -366,6 +368,7 @@
     <result property="hostname" column="HOSTNAME_" jdbcType="VARCHAR" />
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
     <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="batchId" column="BATCH_ID_" jdbcType="VARCHAR"/>
   </resultMap>
 
   <sql id="selectExceptionByteArrayIds">
