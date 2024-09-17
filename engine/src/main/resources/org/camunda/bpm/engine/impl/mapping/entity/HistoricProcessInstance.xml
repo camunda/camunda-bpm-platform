@@ -402,6 +402,7 @@
 
     <bind name="INC_JOIN" value="false" />
     <bind name="HAI_JOIN" value="false" />
+     <bind name="RU_JOB_JOIN" value="false" />
     <bind name="JOIN_TYPE" value="'inner join'" />
 
     <foreach collection="queries" item="query">
@@ -413,8 +414,12 @@
         <bind name="INC_JOIN" value="true" />
       </if>
 
-      <if test="query != null &amp;&amp; (query.executedActivityIds != null and query.executedActivityIds.length > 0) || (query.activeActivityIds != null and query.activeActivityIds.length > 0)">
+      <if test="query != null &amp;&amp; (query.executedActivityIds != null and query.executedActivityIds.length > 0) || (query.activeActivityIds != null and query.activeActivityIds.length > 0) || (query.activityIds != null and query.activityIds.length > 0)">
         <bind name="HAI_JOIN" value="true" />
+      </if>
+
+    <if test="query != null &amp;&amp; (query.activityIds != null and query.activityIds.length > 0)">
+        <bind name="RU_JOB_JOIN" value="true" />
       </if>
     </foreach>
 
@@ -424,6 +429,11 @@
     <if test="HAI_JOIN">
       LEFT JOIN ${prefix}ACT_HI_ACTINST HAI
       ON HAI.PROC_INST_ID_ = SELF.ID_
+    </if>
+
+    <if test="RU_JOB_JOIN">
+      LEFT JOIN ${prefix}ACT_RU_JOB RU_JOB
+      ON RU_JOB.PROCESS_INSTANCE_ID_ = SELF.PROC_INST_ID_
     </if>
     
     <!-- actual value conditions are checked in the WHERE part; 
@@ -632,6 +642,21 @@
                 </if>
               </where>
               )
+            </if>
+
+            <if test="query.activityIds != null and query.activityIds.length > 0">
+              ${queryType} (
+                  (
+                  HAI.END_TIME_ IS NULL
+                  AND HAI.ACT_ID_ IN
+                  <foreach item="activityId" index="index" collection="query.activityIds" open="(" separator="," close=")">
+                    #{activityId}
+                  </foreach>
+                  ) OR RU_JOB.FAILED_ACT_ID_ IN
+                  <foreach item="activityId" index="index" collection="query.activityIds" open="(" separator="," close=")">
+                    #{activityId}
+                  </foreach>
+                )
             </if>
 
             <if test="query.executedActivityIds != null and query.executedActivityIds.length > 0">

@@ -1549,6 +1549,62 @@ public class HistoricProcessInstanceTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testHistoricProcInstQueryWithActivityIdsWithoutError() {
+    // given
+    deployment(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
+
+    // assume
+    HistoricActivityInstance historicActivityInstance = historyService
+        .createHistoricActivityInstanceQuery()
+        .activityId("userTask1")
+        .singleResult();
+    assertNotNull(historicActivityInstance);
+
+    // when
+    List<HistoricProcessInstance> result = historyService
+        .createHistoricProcessInstanceQuery()
+        .activityIdIn(historicActivityInstance.getActivityId())
+        .list();
+
+    // then
+    assertNotNull(result);
+    assertEquals(1, result.size());
+    assertEquals(result.get(0).getId(), processInstance.getId());
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testHistoricProcessInstanceQueryWithIncidents.bpmn"})
+  public void testHistoricProcInstQueryWithActivityIdsWithError() {
+    // given
+    runtimeService.startProcessInstanceByKey("Process_1");
+    testHelper.executeAvailableJobs();
+
+    runtimeService.startProcessInstanceByKey("Process_1");
+
+    // assume
+    assertEquals(2, historyService.createHistoricProcessInstanceQuery().count());
+    assertEquals(2, historyService.createHistoricProcessInstanceQuery().list().size());
+
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().withIncidents().count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().withIncidents().list().size());
+    HistoricProcessInstance failingInstance =  historyService.createHistoricProcessInstanceQuery().withIncidents().singleResult();
+
+    // when
+    List<HistoricProcessInstance> result = historyService
+        .createHistoricProcessInstanceQuery()
+        .activityIdIn("ServiceTask_3")
+        .list();
+
+    // then
+    assertNotNull(result);
+    assertEquals(1, result.size());
+    assertEquals(result.get(0).getId(), failingInstance.getId());
+  }
+
+  @Test
   public void testHistoricProcInstQueryWithActiveActivityIdsNull() {
     try {
       historyService.createHistoricProcessInstanceQuery()
