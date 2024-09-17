@@ -39,7 +39,7 @@ import java.time.Clock;
 /**
  * Authorize or re-authorize (if required) oauth2 client using {@link OAuth2AuthorizedClientManager}.
  * <ul>
- *   <li>If the access token is valida, then does nothing.
+ *   <li>If the access token is valid, then does nothing.
  *   <li>If the access token is expired, then refreshes it.
  *   <li>If authorize failed, then clears the {@link org.springframework.security.core.context.SecurityContext} and {@link jakarta.servlet.http.HttpSession}.
  * </ul>
