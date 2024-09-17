@@ -35,7 +35,6 @@ create table ACT_HI_PROCINST (
     DELETE_REASON_ NVARCHAR2(2000),
     TENANT_ID_ NVARCHAR2(64),
     STATE_ NVARCHAR2(255),
-    BATCH_ID_ NVARCHAR2(64),
     primary key (ID_),
     unique (PROC_INST_ID_)
 );
@@ -288,6 +287,7 @@ create table ACT_HI_JOB_LOG (
     TENANT_ID_ NVARCHAR2(64),
     HOSTNAME_ NVARCHAR2(255),
     REMOVAL_TIME_ TIMESTAMP(6),
+    BATCH_ID_ NVARCHAR2(64),
     primary key (ID_)
 );
 
