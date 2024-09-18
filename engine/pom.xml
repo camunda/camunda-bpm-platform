@@ -774,7 +774,6 @@
         <dependency>
           <groupId>org.camunda.spin</groupId>
           <artifactId>camunda-spin-dataformat-all</artifactId>
-          <version>${project.version}</version>
         </dependency>
         <dependency>
           <groupId>org.camunda.bpm</groupId>
