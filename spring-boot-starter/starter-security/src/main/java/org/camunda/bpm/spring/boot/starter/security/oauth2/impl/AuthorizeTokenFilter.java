@@ -21,6 +21,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -34,7 +35,7 @@ import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.time.Clock;
+import java.util.Date;
 
 /**
  * Authorize or re-authorize (if required) oauth2 client using {@link OAuth2AuthorizedClientManager}.
@@ -56,7 +57,6 @@ public class AuthorizeTokenFilter extends OncePerRequestFilter {
 
   private static final Logger logger = LoggerFactory.getLogger(AuthorizeTokenFilter.class);
   private final OAuth2AuthorizedClientManager clientManager;
-  private final Clock clock = Clock.systemUTC();
 
   public AuthorizeTokenFilter(OAuth2AuthorizedClientManager clientManager) {
     this.clientManager = clientManager;
@@ -76,7 +76,7 @@ public class AuthorizeTokenFilter extends OncePerRequestFilter {
   }
 
   protected boolean hasTokenExpired(OAuth2Token token) {
-    return token.getExpiresAt() == null || this.clock.instant().isAfter(token.getExpiresAt());
+    return token.getExpiresAt() == null || ClockUtil.now().after(Date.from(token.getExpiresAt()));
   }
 
   protected void clearContext(HttpServletRequest request) {
