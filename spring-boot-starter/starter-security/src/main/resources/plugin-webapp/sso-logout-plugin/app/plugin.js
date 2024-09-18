@@ -36,7 +36,7 @@ const observer = new MutationObserver(() => {
 });
 observer.observe(document, { attributes: false, childList: true, characterData: false, subtree: true });
 
-// forward user from login page to dashboard
-if (window.location.hash.includes("login")) {
+// on page load forward user from login page to dashboard
+if (window.location.hash === '#/login') {
   window.location.hash = "";
 }
