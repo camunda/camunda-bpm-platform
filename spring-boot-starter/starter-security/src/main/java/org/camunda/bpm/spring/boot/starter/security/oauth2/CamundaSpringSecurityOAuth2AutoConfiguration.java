@@ -127,7 +127,6 @@ public class CamundaSpringSecurityOAuth2AutoConfiguration {
         .oidcLogout(c -> c.backChannel(Customizer.withDefaults()))
         .oauth2Login(Customizer.withDefaults())
         .logout(c -> c
-            //.logoutUrl("")
             .clearAuthentication(true)
             .invalidateHttpSession(true)
         )
