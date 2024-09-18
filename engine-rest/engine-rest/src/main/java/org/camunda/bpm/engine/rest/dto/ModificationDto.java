@@ -105,4 +105,8 @@ public class ModificationDto {
   public HistoricProcessInstanceQueryDto getHistoricProcessInstanceQuery() {
     return historicProcessInstanceQuery;
   }
+
+  public void setHistoricProcessInstanceQuery(HistoricProcessInstanceQueryDto historicProcessInstanceQuery) {
+    this.historicProcessInstanceQuery = historicProcessInstanceQuery;
+  }
 }
