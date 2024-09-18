@@ -93,7 +93,10 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel : 'centos-stable',
+              podSpec: [
+                cpu: 4,
+                image: 'maven:3.9.7-eclipse-temurin-11'
+              ],
               runSteps   : {
                 cambpmRunMaven('./engine-rest',
                   "package -Dmaven.test.skip -pl '!engine-rest,!assembly'",
