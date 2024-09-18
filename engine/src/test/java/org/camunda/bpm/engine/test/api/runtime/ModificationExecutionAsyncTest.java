@@ -35,12 +35,14 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -86,6 +88,7 @@ public class ModificationExecutionAsyncTest {
 
   protected ProcessEngineConfigurationImpl configuration;
   protected RuntimeService runtimeService;
+  protected HistoryService historyService;
 
   protected BpmnModelInstance instance;
 
@@ -110,6 +113,7 @@ public class ModificationExecutionAsyncTest {
   @Before
   public void initServices() {
     runtimeService = rule.getRuntimeService();
+    historyService = rule.getHistoryService();
   }
 
   @Before
@@ -239,6 +243,17 @@ public class ModificationExecutionAsyncTest {
 
     try {
       runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceQuery(null).executeAsync();
+      fail("Should not succeed");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage()).contains("Process instance ids is empty");
+    }
+  }
+
+  @Test
+  public void testNullHistoricProcessInstanceQueryAsync() {
+
+    try {
+      runtimeService.createModification("processDefinitionId").startAfterActivity("user1").historicProcessInstanceQuery(null).executeAsync();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage()).contains("Process instance ids is empty");
@@ -863,6 +878,27 @@ public class ModificationExecutionAsyncTest {
   }
 
   @Test
+  public void testBatchCreationWithHistoricProcessInstanceQuery() {
+    int processInstanceCount = 15;
+    DeploymentWithDefinitions deployment = testRule.deploy(instance);
+    ProcessDefinition processDefinition = deployment.getDeployedProcessDefinitions().get(0);
+    helper.startInstances("process1", 15);
+
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery().processDefinitionId(processDefinition.getId());
+    assertEquals(processInstanceCount, historicProcessInstanceQuery.count());
+
+    // when
+    Batch batch = runtimeService
+        .createModification(processDefinition.getId())
+        .startAfterActivity("user1")
+        .historicProcessInstanceQuery(historicProcessInstanceQuery)
+        .executeAsync();
+
+    // then a batch is created
+    assertBatchCreated(batch, processInstanceCount);
+  }
+
+  @Test
   public void testBatchCreationWithOverlappingProcessInstanceIdsAndQuery() {
     int processInstanceCount = 15;
     DeploymentWithDefinitions deployment = testRule.deploy(instance);
@@ -879,6 +915,52 @@ public class ModificationExecutionAsyncTest {
       .processInstanceIds(processInstanceIds)
       .processInstanceQuery(processInstanceQuery)
       .executeAsync();
+
+    // then a batch is created
+    assertBatchCreated(batch, processInstanceCount);
+  }
+
+  @Test
+  public void testBatchCreationWithOverlappingProcessInstanceIdsAndHistoricQuery() {
+    int processInstanceCount = 15;
+    DeploymentWithDefinitions deployment = testRule.deploy(instance);
+    ProcessDefinition processDefinition = deployment.getDeployedProcessDefinitions().get(0);
+    List<String> processInstanceIds = helper.startInstances("process1", 15);
+
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId());
+    assertEquals(processInstanceCount, processInstanceQuery.count());
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery().processDefinitionId(processDefinition.getId());
+    assertEquals(processInstanceCount, historicProcessInstanceQuery.count());
+
+    // when
+    Batch batch = runtimeService
+        .createModification(processDefinition.getId())
+        .startTransition("seq")
+        .processInstanceIds(processInstanceIds)
+        .historicProcessInstanceQuery(historicProcessInstanceQuery)
+        .executeAsync();
+
+    // then a batch is created
+    assertBatchCreated(batch, processInstanceCount);
+  }
+
+  @Test
+  public void testBatchCreationWithOverlappingHistoricQueryAndQuery() {
+    int processInstanceCount = 15;
+    DeploymentWithDefinitions deployment = testRule.deploy(instance);
+    ProcessDefinition processDefinition = deployment.getDeployedProcessDefinitions().get(0);
+    List<String> processInstanceIds = helper.startInstances("process1", 15);
+
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery().processDefinitionId(processDefinition.getId());
+    assertEquals(processInstanceCount, historicProcessInstanceQuery.count());
+
+    // when
+    Batch batch = runtimeService
+        .createModification(processDefinition.getId())
+        .startTransition("seq")
+        .processInstanceIds(processInstanceIds)
+        .historicProcessInstanceQuery(historicProcessInstanceQuery)
+        .executeAsync();
 
     // then a batch is created
     assertBatchCreated(batch, processInstanceCount);
