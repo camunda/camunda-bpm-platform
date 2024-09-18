@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
@@ -57,6 +58,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateEvent;
@@ -857,6 +859,61 @@ public class ModificationExecutionAsyncTest {
   }
 
   @Test
+  public void testBatchExecutionFailureWithHistoricQueryThatMatchesDeletedInstance() {
+    DeploymentWithDefinitions deployment = testRule.deploy(instance);
+    ProcessDefinition processDefinition = deployment.getDeployedProcessDefinitions().get(0);
+
+    List<String> startedInstances = helper.startInstances("process1", 3);
+    RuntimeService runtimeService = rule.getRuntimeService();
+
+    String deletedProcessInstanceId = startedInstances.get(0);
+
+    runtimeService.deleteProcessInstance(deletedProcessInstanceId, "test");
+
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery().processDefinitionId(processDefinition.getId());
+
+    Batch batch = runtimeService
+        .createModification(processDefinition.getId())
+        .startAfterActivity("user1")
+        .historicProcessInstanceQuery(historicProcessInstanceQuery)
+        .executeAsync();
+
+    helper.completeSeedJobs(batch);
+
+    // when
+    helper.executeJobs(batch);
+
+    // then the remaining process instance was modified
+    for (String processInstanceId : startedInstances) {
+      if (processInstanceId.equals(deletedProcessInstanceId)) {
+        ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
+        assertNull(updatedTree);
+        continue;
+      }
+
+      ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
+      assertNotNull(updatedTree);
+      assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
+
+      assertThat(updatedTree).hasStructure(
+          describeActivityInstanceTree(
+              processDefinition.getId())
+              .activity("user1")
+              .activity("user2")
+              .done());
+    }
+
+    // and one batch job failed and has 2 retries left
+    List<Job> modificationJobs = helper.getExecutionJobs(batch);
+    assertEquals(1, modificationJobs.size());
+
+    Job failedJob = modificationJobs.get(0);
+    assertEquals(2, failedJob.getRetries());
+    assertThat(failedJob.getExceptionMessage()).startsWith("ENGINE-13036");
+    assertThat(failedJob.getExceptionMessage()).contains("Process instance '" + deletedProcessInstanceId + "' cannot be modified");
+  }
+
+  @Test
   public void testBatchCreationWithProcessInstanceQuery() {
     int processInstanceCount = 15;
     DeploymentWithDefinitions deployment = testRule.deploy(instance);
@@ -897,6 +954,121 @@ public class ModificationExecutionAsyncTest {
     // then a batch is created
     assertBatchCreated(batch, processInstanceCount);
   }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.syncAfterOneTaskProcess.bpmn20.xml" })
+  public void testBatchCreationFailureWithFinishedInstanceId() {
+    // given
+    List<String> startedInstances = helper.startInstances("oneTaskProcess", 3);
+
+    TaskService taskService = rule.getTaskService();
+    Task task = taskService.createTaskQuery().processInstanceId(startedInstances.get(0)).singleResult();
+    String processDefinitionId = task.getProcessDefinitionId();
+    String completedProcessInstanceId = task.getProcessInstanceId();
+    assertNotNull(task);
+    taskService.complete(task.getId());
+
+    // then
+    Batch batch = runtimeService
+        .createModification(processDefinitionId)
+        .startAfterActivity("theStart")
+        .processInstanceIds(startedInstances)
+        .executeAsync();
+
+    helper.completeSeedJobs(batch);
+
+    // when
+    helper.executeJobs(batch);
+
+    //     then the remaining process instance was modified
+    for (String processInstanceId : startedInstances) {
+      if (processInstanceId.equals(completedProcessInstanceId)) {
+        ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
+        assertNull(updatedTree);
+        continue;
+      }
+
+      ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
+      assertNotNull(updatedTree);
+      assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
+
+      assertThat(updatedTree).hasStructure(
+          describeActivityInstanceTree(
+              processDefinitionId)
+              .activity("theTask")
+              .activity("theTask")
+              .done());
+    }
+
+    //    and one batch job failed and has 2 retries left
+    List<Job> modificationJobs = helper.getExecutionJobs(batch);
+    assertEquals(1, modificationJobs.size());
+
+    Job failedJob = modificationJobs.get(0);
+    assertEquals(2, failedJob.getRetries());
+    assertThat(failedJob.getExceptionMessage()).startsWith("ENGINE-13036");
+    assertThat(failedJob.getExceptionMessage()).contains("Process instance '" + completedProcessInstanceId + "' cannot be modified");
+  }
+
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.syncAfterOneTaskProcess.bpmn20.xml" })
+  public void testBatchCreationFailureWithHistoricQueryThatMatchesFinishedInstance() {
+    // given
+    List<String> startedInstances = helper.startInstances("oneTaskProcess", 3);
+
+    TaskService taskService = rule.getTaskService();
+    Task task = taskService.createTaskQuery().processInstanceId(startedInstances.get(0)).singleResult();
+    String processDefinitionId = task.getProcessDefinitionId();
+    String completedProcessInstanceId = task.getProcessInstanceId();
+    assertNotNull(task);
+    taskService.complete(task.getId());
+
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery().processDefinitionId(processDefinitionId);
+    assertEquals(3, historicProcessInstanceQuery.count());
+
+    // then
+    Batch batch = runtimeService
+        .createModification(processDefinitionId)
+        .startAfterActivity("theStart")
+        .historicProcessInstanceQuery(historicProcessInstanceQuery)
+        .executeAsync();
+
+    helper.completeSeedJobs(batch);
+
+    // when
+    helper.executeJobs(batch);
+
+    //     then the remaining process instance was modified
+    for (String processInstanceId : startedInstances) {
+      if (processInstanceId.equals(completedProcessInstanceId)) {
+        ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
+        assertNull(updatedTree);
+        continue;
+      }
+
+      ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
+      assertNotNull(updatedTree);
+      assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
+
+      assertThat(updatedTree).hasStructure(
+          describeActivityInstanceTree(
+              processDefinitionId)
+              .activity("theTask")
+              .activity("theTask")
+              .done());
+    }
+
+    // and one batch job failed and has 2 retries left
+    List<Job> modificationJobs = helper.getExecutionJobs(batch);
+    assertEquals(1, modificationJobs.size());
+
+    Job failedJob = modificationJobs.get(0);
+    assertEquals(2, failedJob.getRetries());
+    assertThat(failedJob.getExceptionMessage()).startsWith("ENGINE-13036");
+    assertThat(failedJob.getExceptionMessage()).contains("Process instance '" + completedProcessInstanceId + "' cannot be modified");
+  }
+
 
   @Test
   public void testBatchCreationWithOverlappingProcessInstanceIdsAndQuery() {
