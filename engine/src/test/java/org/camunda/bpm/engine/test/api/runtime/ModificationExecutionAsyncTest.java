@@ -1169,10 +1169,11 @@ public class ModificationExecutionAsyncTest {
 
   @Test
   public void testBatchCreationWithOverlappingHistoricQueryAndQuery() {
+    // given
     int processInstanceCount = 15;
     DeploymentWithDefinitions deployment = testRule.deploy(instance);
     ProcessDefinition processDefinition = deployment.getDeployedProcessDefinitions().get(0);
-    List<String> processInstanceIds = helper.startInstances("process1", 15);
+    helper.startInstances("process1", processInstanceCount);
 
     ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId());
     assertEquals(processInstanceCount, processInstanceQuery.count());
