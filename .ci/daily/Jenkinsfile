@@ -155,7 +155,10 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel: 'h2_perf32',
+              podSpec: [
+                cpu: 32,
+                image: 'maven:3.9.7-eclipse-temurin-17'
+              ],
               runSteps: {
                 cambpmRunMaven('.',
                   "deploy source:jar source:test-jar javadoc:javadoc -Dskip-zip-frontend-sources=true -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -B",
@@ -186,7 +189,10 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel: 'h2_perf32',
+              podSpec: [
+                cpu: 32,
+                image: 'maven:3.9.7-eclipse-temurin-17'
+              ],
               runSteps: {
                 cambpmRunMaven('.',
                   "install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -B",
