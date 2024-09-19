@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.Date;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
+import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -81,6 +82,9 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
     if (context instanceof BatchEntity) {
       BatchEntity batch = ((BatchEntity) context);
       job.setBatchId(batch.getId());
+    } else if(context instanceof BatchJobContext) {
+      BatchJobContext batchJobContext = (BatchJobContext) context;
+      job.setBatchId(batchJobContext.getBatch().getId());
     }
 
     if(jobDefinitionId != null) {

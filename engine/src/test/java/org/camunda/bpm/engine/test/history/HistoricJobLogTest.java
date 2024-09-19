@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.fail;
 
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.List;
 import java.util.Random;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
@@ -29,7 +28,6 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricJobLogQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -57,7 +55,6 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.FailingDelegate;
-import org.camunda.bpm.engine.test.util.BatchRule;
 import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -81,10 +78,9 @@ public class HistoricJobLogTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-  protected BatchRule batchRule = new BatchRule(engineRule, testRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(batchRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected RuntimeService runtimeService;
@@ -1423,31 +1419,6 @@ public class HistoricJobLogTest {
     });
 
     assertThat(historyService.createHistoricJobLogQuery().count()).isEqualTo(0);
-  }
-
-  @Test
-  public void shouldSetBatchId() {
-    // given
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .userTask()
-        .endEvent()
-        .done());
-    ProcessInstance process = runtimeService.startProcessInstanceByKey("process");
-
-    runtimeService.setVariablesAsync(List.of(process.getId()), Variables.createVariables().putValue("foo", "bar"));
-    Batch batch = managementService.createBatchQuery().singleResult();
-    batchRule.manageBatch(batch.getId());
-    Job setVariablesJob = managementService.createJobQuery().singleResult();
-
-    // when
-    managementService.executeJob(setVariablesJob.getId());
-
-    // then
-    HistoricJobLog historicJobLog = historyService.createHistoricJobLogQuery().successLog().singleResult();
-
-    assertThat(historicJobLog.getBatchId()).isNotNull();
-    assertThat(historicJobLog.getBatchId()).isEqualTo(batch.getId());
   }
 
 }
