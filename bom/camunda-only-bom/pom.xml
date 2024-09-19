@@ -232,6 +232,8 @@
         <groupId>org.camunda.connect</groupId>
         <artifactId>camunda-connect-bom</artifactId>
         <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
 
       <!-- dmn engine dependencies
