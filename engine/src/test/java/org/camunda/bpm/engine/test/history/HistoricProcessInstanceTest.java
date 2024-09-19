@@ -1696,6 +1696,43 @@ public class HistoricProcessInstanceTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/failingProcessCreateOneIncident.bpmn20.xml"})
+  public void shouldQueryProcessInstancesWithIncidentIdIn() {
+    // GIVEN
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("failingProcess");
+    runtimeService.startProcessInstanceByKey("failingProcess");
+    List<String> queriedProcessInstances = Arrays.asList(processInstance.getId(), processInstance2.getId());
+
+    testHelper.executeAvailableJobs();
+    Incident incident = runtimeService.createIncidentQuery().processInstanceId(queriedProcessInstances.get(0)).singleResult();
+    Incident incident2 = runtimeService.createIncidentQuery().processInstanceId(queriedProcessInstances.get(1)).singleResult();
+
+    // WHEN
+    List<HistoricProcessInstance> processInstanceList =
+        historyService.createHistoricProcessInstanceQuery().incidentIdIn(incident.getId(), incident2.getId()).list();
+
+    // THEN
+    assertEquals(2, processInstanceList.size());
+    assertThat(queriedProcessInstances)
+        .containsExactlyInAnyOrderElementsOf(
+            processInstanceList.stream()
+                .map(HistoricProcessInstance::getId)
+                .collect(Collectors.toList()));
+  }
+
+  @Test
+  public void testHistoricProcessInstanceQueryWithNullIncidentIdIn() {
+    try {
+      historyService.createHistoricProcessInstanceQuery().incidentIdIn(null).list();
+      fail("incidentMessage with null value is not allowed");
+    } catch( NullValueException nex ) {
+      // expected
+    }
+  }
+
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneAsyncTaskProcess.bpmn20.xml"})
   public void testShouldStoreHistoricProcessInstanceVariableOnAsyncBefore() {
     // given definition with asyncBefore startEvent
@@ -1988,32 +2025,6 @@ public class HistoricProcessInstanceTest {
     assertThat(processInstances)
         .extracting("processInstanceId")
         .containsExactlyInAnyOrder(processInstanceIdOne, processInstanceIdTwo);
-  }
-
-  @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/failingProcessCreateOneIncident.bpmn20.xml"})
-  public void shouldQueryByVariableValue_13() {
-    // GIVEN
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("failingProcess");
-    runtimeService.startProcessInstanceByKey("failingProcess");
-    List<String> queriedProcessInstances = Arrays.asList(processInstance.getId(), processInstance2.getId());
-
-    testHelper.executeAvailableJobs();
-    Incident incident = runtimeService.createIncidentQuery().processInstanceId(queriedProcessInstances.get(0)).singleResult();
-    Incident incident2 = runtimeService.createIncidentQuery().processInstanceId(queriedProcessInstances.get(1)).singleResult();
-
-    // WHEN
-    List<HistoricProcessInstance> processInstanceList =
-        historyService.createHistoricProcessInstanceQuery().incidentIdIn(incident.getId(), incident2.getId()).list();
-
-    // THEN
-    assertEquals(2, processInstanceList.size());
-    assertThat(queriedProcessInstances)
-        .containsExactlyInAnyOrderElementsOf(
-            processInstanceList.stream()
-                .map(HistoricProcessInstance::getId)
-                .collect(Collectors.toList()));
   }
 
   protected void deployment(String... resources) {
