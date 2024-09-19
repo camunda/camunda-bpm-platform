@@ -602,4 +602,21 @@ public class BatchOperationJobIdTest {
         .singleResult();
     assertThat(batchExecutionJobLog.getBatchId()).isEqualTo(batch.getId());
   }
+
+  @Test
+  public void shouldNotSetBatchIdOnJobOrJobLog_nonBatchJob() {
+    // given
+    testRule.deploy(getTimerProcess());
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    Job timerJob = managementService.createJobQuery().singleResult();
+
+    // when
+    managementService.executeJob(timerJob.getId());
+
+    // then
+    List<HistoricJobLog> historicJobLogs = historyService.createHistoricJobLogQuery().list();
+    assertThat(historicJobLogs).hasSize(2);
+    assertThat(historicJobLogs).extracting("batchId").containsOnlyNulls();
+  }
 }
