@@ -344,7 +344,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   }
 
   @CamundaQueryParam(value = "activityIdIn", converter = StringListConverter.class)
-  public void setactivityIdIn(List<String> activityIdIn) {
+  public void setActivityIdIn(List<String> activityIdIn) {
     this.activityIdIn = activityIdIn;
   }
 
