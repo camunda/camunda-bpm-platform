@@ -1830,6 +1830,43 @@ public class HistoricProcessInstanceTest {
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testHistoricProcInstQueryWithActivityIdsWhenDeletedCompetedInstancesExist() {
+    // given
+    String USER_TASK_1 = "userTask1";
+    String USER_TASK_2 = "userTask2";
+    deployment(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("Process");
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertEquals(2, tasks.size());
+    taskService.complete(tasks.get(0).getId());
+
+    ProcessInstance completedProcessInstance = runtimeService.startProcessInstanceByKey("Process");
+    Task task = taskService.createTaskQuery().processInstanceId(completedProcessInstance.getId()).singleResult();
+    taskService.complete(task.getId());
+    task = taskService.createTaskQuery().processInstanceId(completedProcessInstance.getId()).singleResult();
+    taskService.complete(task.getId());
+
+
+    ProcessInstance deletedProcessInstance = runtimeService.startProcessInstanceByKey("Process");
+    runtimeService.deleteProcessInstance(deletedProcessInstance.getId(), "Testing");
+
+    // when
+    List<HistoricProcessInstance> result = historyService
+        .createHistoricProcessInstanceQuery()
+        .activityIdIn(USER_TASK_1, USER_TASK_2)
+        .list();
+
+    // then
+    assertNotNull(result);
+    assertEquals(2, result.size());
+    assertThat(result.stream().map(HistoricProcessInstance::getId).collect(Collectors.toList()))
+        .containsExactlyInAnyOrder(processInstance.getId(), processInstance2.getId());
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testHistoricProcessInstanceQueryActivityIdInWithIncident.bpmn"})
   public void testHistoricProcInstQueryWithActivityIdsWithFailingActivity() {
     // given
