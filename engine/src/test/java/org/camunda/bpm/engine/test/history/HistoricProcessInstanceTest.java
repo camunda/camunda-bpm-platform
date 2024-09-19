@@ -1757,13 +1757,36 @@ public class HistoricProcessInstanceTest {
   }
 
   @Test
-  public void testHistoricProcessInstanceQueryWithNullIncidentIdIn() {
+  public void shouldFailWhenQueryWithNullIncidentIdIn() {
     try {
       historyService.createHistoricProcessInstanceQuery().incidentIdIn(null).list();
       fail("incidentMessage with null value is not allowed");
     } catch( NullValueException nex ) {
       // expected
     }
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/failingSubProcessCreateOneIncident.bpmn20.xml"})
+  public void shouldQueryByIncidentIdInSubProcess() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingSubProcess");
+
+    testHelper.executeAvailableJobs();
+
+    List<Incident> incidentList = runtimeService.createIncidentQuery().list();
+    assertEquals(1, incidentList.size());
+
+    Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
+
+    // when
+    HistoricProcessInstance historicPI =
+        historyService.createHistoricProcessInstanceQuery().incidentIdIn(incident.getId()).singleResult();
+
+    // then
+    assertThat(historicPI).isNotNull();
+    assertThat(historicPI.getId()).isEqualTo(processInstance.getId());
   }
 
   @Test
