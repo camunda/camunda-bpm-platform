@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.diagnostics.CamundaIntegration;
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.camunda.bpm.run.property.CamundaBpmRunProcessEnginePluginProperty;
-import org.camunda.bpm.run.property.CamundaBpmRunProperties;
 import org.camunda.bpm.run.utils.CamundaBpmRunProcessEnginePluginHelper;
 import org.springframework.core.io.Resource;
 
@@ -34,14 +33,14 @@ public class CamundaBpmRunProcessEngineConfiguration extends SpringProcessEngine
 
   private final String normalizedDeploymentDir;
 
-  public CamundaBpmRunProcessEngineConfiguration(CamundaBpmRunProperties runProperties,
-                                                 String normalizedDeploymentDir,
+  public CamundaBpmRunProcessEngineConfiguration(String normalizedDeploymentDir,
                                                  boolean deployChangedOnly,
-                                                 List<ProcessEnginePlugin> processEnginePlugins) {
+                                                 List<ProcessEnginePlugin> processEnginePluginsFromContext,
+                                                 List<CamundaBpmRunProcessEnginePluginProperty> processEnginePluginsFromYaml) {
     this.normalizedDeploymentDir = normalizedDeploymentDir;
 
     setDeployChangedOnly(deployChangedOnly);
-    configureProcessEnginePlugins(processEnginePlugins, runProperties);
+    configureProcessEnginePlugins(processEnginePluginsFromContext, processEnginePluginsFromYaml);
   }
 
   @Override
@@ -64,11 +63,11 @@ public class CamundaBpmRunProcessEngineConfiguration extends SpringProcessEngine
     camundaIntegration.add(CamundaIntegration.CAMUNDA_BPM_RUN);
   }
 
-  protected void configureProcessEnginePlugins(List<ProcessEnginePlugin> processEnginePlugins, CamundaBpmRunProperties runProperties) {
+  protected void configureProcessEnginePlugins(List<ProcessEnginePlugin> processEnginePluginsFromContext,
+                                               List<CamundaBpmRunProcessEnginePluginProperty> processEnginePluginsFromYaml) {
     // register process engine plugins defined in yaml
-    List<CamundaBpmRunProcessEnginePluginProperty> yamlPluginsInfo = runProperties.getProcessEnginePlugins();
-    CamundaBpmRunProcessEnginePluginHelper.registerYamlPlugins(processEnginePlugins, yamlPluginsInfo);
+    CamundaBpmRunProcessEnginePluginHelper.registerYamlPlugins(processEnginePluginsFromContext, processEnginePluginsFromYaml);
 
-    this.processEnginePlugins.add(new CompositeProcessEnginePlugin(processEnginePlugins));
+    this.processEnginePlugins.add(new CompositeProcessEnginePlugin(processEnginePluginsFromContext));
   }
 }

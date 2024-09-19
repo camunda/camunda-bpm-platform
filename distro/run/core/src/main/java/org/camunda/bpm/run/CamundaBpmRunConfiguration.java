@@ -51,22 +51,19 @@ public class CamundaBpmRunConfiguration {
   }
 
   @Bean
-  public ProcessEngineConfigurationImpl processEngineConfigurationImpl(
-      List<ProcessEnginePlugin> processEnginePlugins,
-      CamundaBpmRunProperties properties,
-      CamundaBpmRunDeploymentConfiguration deploymentConfig,
-      @Value("${camunda.bpm.run.deployment.deploy-changed-only:true}") boolean deployChangedOnly)
-  {
-    var normalizedDeploymentDir = deploymentConfig.getNormalizedDeploymentDir();
+  public ProcessEngineConfigurationImpl processEngineConfigurationImpl(List<ProcessEnginePlugin> processEnginePluginsFromContext,
+                                                                       CamundaBpmRunProperties properties,
+                                                                       CamundaBpmRunDeploymentConfiguration deploymentConfig) {
+    String normalizedDeploymentDir = deploymentConfig.getNormalizedDeploymentDir();
+    boolean deployChangedOnly = properties.getDeployment().isDeployChangedOnly();
+    var processEnginePluginsFromYaml = properties.getProcessEnginePlugins();
 
-    return new CamundaBpmRunProcessEngineConfiguration(properties, normalizedDeploymentDir, deployChangedOnly,
-        processEnginePlugins);
+    return new CamundaBpmRunProcessEngineConfiguration(normalizedDeploymentDir, deployChangedOnly,
+        processEnginePluginsFromContext, processEnginePluginsFromYaml);
   }
 
   @Bean
-  public CamundaBpmRunDeploymentConfiguration camundaDeploymentConfiguration(
-      @Value("${camunda.deploymentDir:#{null}}") String deploymentDir
-  ) {
+  public CamundaBpmRunDeploymentConfiguration camundaDeploymentConfiguration(@Value("${camunda.deploymentDir:#{null}}") String deploymentDir) {
     return new CamundaBpmRunDeploymentConfiguration(deploymentDir);
   }
 

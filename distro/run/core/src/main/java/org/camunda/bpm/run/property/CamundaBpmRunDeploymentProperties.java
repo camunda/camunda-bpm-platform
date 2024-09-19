@@ -20,7 +20,7 @@ public class CamundaBpmRunDeploymentProperties {
 
   public static final String PREFIX = CamundaBpmRunProperties.PREFIX + ".deployment";
 
-  protected boolean deployChangedOnly;
+  protected boolean deployChangedOnly = true;
 
   public boolean isDeployChangedOnly() {
     return deployChangedOnly;

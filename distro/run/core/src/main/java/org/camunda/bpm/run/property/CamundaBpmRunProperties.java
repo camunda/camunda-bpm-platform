@@ -16,14 +16,12 @@
  */
 package org.camunda.bpm.run.property;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @ConfigurationProperties(CamundaBpmRunProperties.PREFIX)
 public class CamundaBpmRunProperties {
@@ -45,6 +43,7 @@ public class CamundaBpmRunProperties {
   @NestedConfigurationProperty
   protected CamundaBpmRunRestProperties rest = new CamundaBpmRunRestProperties();
 
+  @NestedConfigurationProperty
   protected CamundaBpmRunDeploymentProperties deployment = new CamundaBpmRunDeploymentProperties();
 
   protected CamundaBpmRunAdministratorAuthorizationProperties adminAuth
