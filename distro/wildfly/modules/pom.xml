@@ -70,13 +70,11 @@
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-http-client</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-soap-http-client</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <!-- script engine dependencies -->
