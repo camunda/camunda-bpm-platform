@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.spring.boot.starter.security.oauth2;
 
+import jakarta.annotation.Nullable;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
 import org.camunda.bpm.engine.rest.security.auth.ProcessEngineAuthenticationFilter;
@@ -27,6 +28,7 @@ import org.camunda.bpm.spring.boot.starter.security.oauth2.impl.AuthorizeTokenFi
 import org.camunda.bpm.spring.boot.starter.security.oauth2.impl.OAuth2AuthenticationProvider;
 import org.camunda.bpm.spring.boot.starter.security.oauth2.impl.OAuth2GrantedAuthoritiesMapper;
 import org.camunda.bpm.spring.boot.starter.security.oauth2.impl.OAuth2IdentityProviderPlugin;
+import org.camunda.bpm.spring.boot.starter.security.oauth2.impl.SsoLogoutSuccessHandler;
 import org.camunda.bpm.webapp.impl.security.auth.ContainerBasedAuthenticationFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +48,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -85,7 +88,7 @@ public class CamundaSpringSecurityOAuth2AutoConfiguration {
   }
 
   @Bean
-  @ConditionalOnProperty(name = "identity-provider.enabled", prefix = OAuth2Properties.PREFIX)
+  @ConditionalOnProperty(name = "identity-provider.enabled", havingValue = "true", prefix = OAuth2Properties.PREFIX)
   public OAuth2IdentityProviderPlugin identityProviderPlugin() {
     logger.debug("Registering OAuth2IdentityProviderPlugin");
     return new OAuth2IdentityProviderPlugin();
@@ -99,11 +102,24 @@ public class CamundaSpringSecurityOAuth2AutoConfiguration {
   }
 
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http, OAuth2AuthorizedClientManager clientManager)
-      throws Exception {
-    logger.info("Enabling Camunda Spring Security oauth2 integration");
+  @ConditionalOnProperty(name = "sso-logout.enabled", havingValue = "true", prefix = OAuth2Properties.PREFIX)
+  protected SsoLogoutSuccessHandler ssoLogoutSuccessHandler(ClientRegistrationRepository clientRegistrationRepository) {
+    logger.debug("Registering SsoLogoutSuccessHandler");
+    return new SsoLogoutSuccessHandler(clientRegistrationRepository, oAuth2Properties);
+  }
 
-    var validateTokenFilter = new AuthorizeTokenFilter(clientManager);
+  @Bean
+  protected AuthorizeTokenFilter authorizeTokenFilter(OAuth2AuthorizedClientManager clientManager) {
+    logger.debug("Registering AuthorizeTokenFilter");
+    return new AuthorizeTokenFilter(clientManager);
+  }
+
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http,
+                                         AuthorizeTokenFilter authorizeTokenFilter,
+                                         @Nullable SsoLogoutSuccessHandler ssoLogoutSuccessHandler) throws Exception {
+
+    logger.info("Enabling Camunda Spring Security oauth2 integration");
 
     // @formatter:off
     http.authorizeHttpRequests(c -> c
@@ -111,14 +127,22 @@ public class CamundaSpringSecurityOAuth2AutoConfiguration {
             .requestMatchers(webappPath + "/api/**").authenticated()
             .anyRequest().permitAll()
         )
-        .addFilterAfter(validateTokenFilter, OAuth2AuthorizationRequestRedirectFilter.class)
+        .addFilterAfter(authorizeTokenFilter, OAuth2AuthorizationRequestRedirectFilter.class)
         .anonymous(AbstractHttpConfigurer::disable)
+        .oidcLogout(c -> c.backChannel(Customizer.withDefaults()))
         .oauth2Login(Customizer.withDefaults())
-        .oidcLogout(Customizer.withDefaults())
+        .logout(c -> c
+            .clearAuthentication(true)
+            .invalidateHttpSession(true)
+        )
         .oauth2Client(Customizer.withDefaults())
         .cors(AbstractHttpConfigurer::disable)
         .csrf(AbstractHttpConfigurer::disable);
     // @formatter:on
+
+    if (oAuth2Properties.getSsoLogout().isEnabled()) {
+      http.logout(c -> c.logoutSuccessHandler(ssoLogoutSuccessHandler));
+    }
 
     return http.build();
   }
