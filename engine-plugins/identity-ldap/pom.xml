@@ -21,7 +21,6 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <!-- LDAP Libraries to start test server -->
