@@ -1723,6 +1723,40 @@ public class HistoricProcessInstanceTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/failingProcessAfterUserTaskCreateOneIncident.bpmn20.xml"})
+  public void shouldOnlyQueryProcessInstancesWithIncidentIdIn() {
+    // GIVEN
+    ProcessInstance processWithIncident1 = runtimeService.startProcessInstanceByKey("failingProcess");
+    ProcessInstance processWithIncident2 = runtimeService.startProcessInstanceByKey("failingProcess");
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertEquals(2, tasks.size());
+    taskService.complete(tasks.get(0).getId());
+    taskService.complete(tasks.get(1).getId());
+
+    ProcessInstance processWithoutIncident = runtimeService.startProcessInstanceByKey("failingProcess");
+
+    List<String> queriedProcessInstances = Arrays.asList(processWithIncident1.getId(), processWithIncident2.getId());
+
+    testHelper.executeAvailableJobs();
+    Incident incident = runtimeService.createIncidentQuery().processInstanceId(queriedProcessInstances.get(0)).singleResult();
+    Incident incident2 = runtimeService.createIncidentQuery().processInstanceId(queriedProcessInstances.get(1)).singleResult();
+
+    // WHEN
+    List<HistoricProcessInstance> processInstanceList =
+        historyService.createHistoricProcessInstanceQuery().incidentIdIn(incident.getId(), incident2.getId()).list();
+
+    // THEN
+    assertEquals(2, processInstanceList.size());
+    assertThat(queriedProcessInstances)
+        .containsExactlyInAnyOrderElementsOf(
+            processInstanceList.stream()
+                .map(HistoricProcessInstance::getId)
+                .collect(Collectors.toList()));
+  }
+
+  @Test
   public void testHistoricProcessInstanceQueryWithNullIncidentIdIn() {
     try {
       historyService.createHistoricProcessInstanceQuery().incidentIdIn(null).list();
