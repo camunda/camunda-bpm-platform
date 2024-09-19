@@ -45,7 +45,7 @@ public class OAuth2Properties {
     private boolean enabled = false;
 
     /**
-     * Enable SSO Logout. Default {@code {baseUrl}}.
+     * URI the user is redirected after SSO logout from the provider. Default {@code {baseUrl}}.
      */
     private String postLogoutRedirectUri = "{baseUrl}";
 
