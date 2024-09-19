@@ -88,10 +88,11 @@ pipeline {
           }
         }
         stage('stage-restapi-docs') {
-          when {
+          /*when {
             branch cambpmDefaultBranch();
-          }
+          }*/
           steps {
+            sh "apt-get update && apt-get install openssh-client -y"
             cambpmConditionalRetry([
               podSpec: [
                 cpu: 4,
