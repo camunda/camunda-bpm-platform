@@ -919,6 +919,7 @@ public class HistoricProcessInstanceQueryOrTest {
 
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void shouldReturnHistoricProcInstWithVarValue1OrVarValue21() {
     // given
     Map<String, Object> vars = new HashMap<String, Object>();
@@ -971,6 +972,7 @@ public class HistoricProcessInstanceQueryOrTest {
 
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void shouldReturnHistoricProcInstWithVarValue1OrVarValue23() {
     // given
     Map<String, Object> vars = new HashMap<String, Object>();
