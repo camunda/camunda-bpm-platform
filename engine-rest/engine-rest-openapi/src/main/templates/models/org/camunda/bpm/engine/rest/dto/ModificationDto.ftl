@@ -41,7 +41,8 @@
         name = "historicProcessInstanceQuery"
         type = "ref"
         dto = "HistoricProcessInstanceQueryDto"
-        desc = "A historic process instance query."
+        desc = "A historic process instance query. . It is advised to include the `unfinished` filter in the
+                historic process instance query as finished instances cause failures for the modification.""
     />
 
     <@lib.property

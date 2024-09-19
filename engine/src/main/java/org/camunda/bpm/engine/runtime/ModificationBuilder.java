@@ -120,6 +120,7 @@ public interface ModificationBuilder extends InstantiationBuilder<ModificationBu
 
   /**
    * @param historicProcessInstanceQuery a query which selects the process instances to modify.
+   *   It is advised to include the `unfinished` filter in the historicProcessInstanceQuery as finished instances cause failures for the modification.
    *   Query results are restricted to process instances for which the user has {@link Permissions#READ_HISTORY} permission.
    */
   ModificationBuilder historicProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery);
