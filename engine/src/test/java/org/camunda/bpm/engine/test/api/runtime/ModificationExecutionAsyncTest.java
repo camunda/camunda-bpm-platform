@@ -914,6 +914,59 @@ public class ModificationExecutionAsyncTest {
   }
 
   @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.syncAfterOneTaskProcess.bpmn20.xml" })
+  public void testBatchExecutionWithHistoricQueryUnfinished() {
+    // given
+    List<String> startedInstances = helper.startInstances("oneTaskProcess", 3);
+
+    TaskService taskService = rule.getTaskService();
+    Task task = taskService.createTaskQuery().processInstanceId(startedInstances.get(0)).singleResult();
+    String processDefinitionId = task.getProcessDefinitionId();
+    String completedProcessInstanceId = task.getProcessInstanceId();
+    assertNotNull(task);
+    taskService.complete(task.getId());
+
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery().unfinished().processDefinitionId(processDefinitionId);
+    assertEquals(3, historicProcessInstanceQuery.count());
+
+    // then
+    Batch batch = runtimeService
+        .createModification(processDefinitionId)
+        .startAfterActivity("theStart")
+        .historicProcessInstanceQuery(historicProcessInstanceQuery)
+        .executeAsync();
+
+    helper.completeSeedJobs(batch);
+
+    // when
+    helper.executeJobs(batch);
+
+    //     then the remaining process instance was modified
+    for (String processInstanceId : startedInstances) {
+      if (processInstanceId.equals(completedProcessInstanceId)) {
+        ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
+        assertNull(updatedTree);
+        continue;
+      }
+
+      ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
+      assertNotNull(updatedTree);
+      assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
+
+      assertThat(updatedTree).hasStructure(
+          describeActivityInstanceTree(
+              processDefinitionId)
+              .activity("theTask")
+              .activity("theTask")
+              .done());
+    }
+
+    // and one batch job failed and has 2 retries left
+    List<Job> modificationJobs = helper.getExecutionJobs(batch);
+    assertEquals(0, modificationJobs.size());
+  }
+
+  @Test
   public void testBatchCreationWithProcessInstanceQuery() {
     int processInstanceCount = 15;
     DeploymentWithDefinitions deployment = testRule.deploy(instance);
@@ -957,7 +1010,7 @@ public class ModificationExecutionAsyncTest {
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.syncAfterOneTaskProcess.bpmn20.xml" })
-  public void testBatchCreationFailureWithFinishedInstanceId() {
+  public void testBatchExecutionFailureWithFinishedInstanceId() {
     // given
     List<String> startedInstances = helper.startInstances("oneTaskProcess", 3);
 
@@ -1013,7 +1066,7 @@ public class ModificationExecutionAsyncTest {
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.syncAfterOneTaskProcess.bpmn20.xml" })
-  public void testBatchCreationFailureWithHistoricQueryThatMatchesFinishedInstance() {
+  public void testBatchExecutionFailureWithHistoricQueryThatMatchesFinishedInstance() {
     // given
     List<String> startedInstances = helper.startInstances("oneTaskProcess", 3);
 

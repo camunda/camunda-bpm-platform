@@ -158,6 +158,23 @@ public class ModificationExecutionSyncTest {
   }
 
   @Test
+  public void createSimpleModificationPlanWithHistoricQueryUnfinished() {
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    List<String> instances = helper.startInstances("process1", 2);
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+    historicProcessInstanceQuery.processDefinitionId(processDefinition.getId()).unfinished();
+
+    runtimeService.deleteProcessInstance(instances.get(0), "test");
+
+    runtimeService.createModification(processDefinition.getId()).startBeforeActivity("user2")
+        .cancelAllForActivity("user1").historicProcessInstanceQuery(historicProcessInstanceQuery).execute();
+
+    List<String> activeActivityIds = runtimeService.getActiveActivityIds(instances.get(1));
+    assertEquals(1, activeActivityIds.size());
+    assertEquals(activeActivityIds.iterator().next(), "user2");
+  }
+
+  @Test
   public void createModificationWithNullProcessInstanceIdsList() {
 
     try {
