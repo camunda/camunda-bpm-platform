@@ -180,20 +180,16 @@ platform-jdk-jdk-17-latest:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'jdk-17-latest'
-  podSpec:
-    cpu: 4
-    image: 'maven:3.9.7-eclipse-temurin-17'
-platform-jdk-temurin-jdk-21-latest:
+  withNpm: true
+platform-jdk-jdk-21-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -Pdistro,distro-ce,distro-wildfly -Dskip.frontend.build=true'
   stash:
     runtimeStash: true
-  withNpm: true
+  nodeLabel: 'h2'
   jdkVersion: 'jdk-21-latest'
-  podSpec:
-    cpu: 4
-    image: 'maven:3.9.7-eclipse-temurin-21'
-platform-jdk-temurin-jdk-11-latest:
+  withNpm: true
+platform-jdk-jdk-11-latest:
   directory: '.'
   command: 'install source:jar source:test-jar
     -pl ''!spring-boot-starter,!spring-boot-starter/starter,!spring-boot-starter/starter-client/spring,!spring-boot-starter/starter-client/spring-boot,
@@ -212,9 +208,7 @@ platform-jdk-temurin-jdk-11-latest:
     -Dskip.frontend.build=true'
   stash:
     runtimeStash: true
-  withNpm: true
+  nodeLabel: 'h2'
   jdkVersion: 'jdk-11-latest'
-  podSpec:
-    cpu: 4
-    image: 'maven:3.9.7-eclipse-temurin-11'
+  withNpm: true
 
