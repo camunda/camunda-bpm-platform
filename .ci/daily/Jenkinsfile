@@ -93,8 +93,12 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel : 'centos-stable',
+              podSpec: [
+                cpu: 4,
+                image: 'alpine:3.20'
+              ],
               runSteps   : {
+                sh "apk -U add openjdk17-jdk maven rsync openssh libstdc++ libgcc bash"
                 cambpmRunMaven('./engine-rest',
                   "package -Dmaven.test.skip -pl '!engine-rest,!assembly'",
                   withNpm: true,
@@ -152,7 +156,10 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel: 'h2_perf32',
+              podSpec: [
+                cpu: 32,
+                image: 'maven:3.9.7-eclipse-temurin-17'
+              ],
               runSteps: {
                 cambpmRunMaven('.',
                   "deploy source:jar source:test-jar javadoc:javadoc -Dskip-zip-frontend-sources=true -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -B",
@@ -183,7 +190,10 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel: 'h2_perf32',
+              podSpec: [
+                cpu: 32,
+                image: 'maven:3.9.7-eclipse-temurin-17'
+              ],
               runSteps: {
                 cambpmRunMaven('.',
                   "install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -B",
