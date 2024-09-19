@@ -46,6 +46,7 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
 import org.camunda.bpm.client.util.RecordingInvocationHandler;
 import org.camunda.bpm.client.util.RecordingInvocationHandler.RecordedInvocation;
+import org.camunda.bpm.client.variable.impl.value.DeferredFileValueImpl;
 import org.camunda.bpm.client.variable.value.DeferredFileValue;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.FileValue;
@@ -183,7 +184,9 @@ public class FileSerializationIT {
   @Test
   public void shouldGetTyped_Deferred() {
     // given
-    engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_FILE, VARIABLE_VALUE_FILE);
+    ProcessInstanceDto processInstanceDto = engineRule.startProcessInstance(processDefinition.getId(),
+        VARIABLE_NAME_FILE,
+        VARIABLE_VALUE_FILE);
 
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
       .handler(handler)
@@ -201,6 +204,10 @@ public class FileSerializationIT {
     assertThat(typedValue.isLoaded()).isFalse();
     assertThat(typedValue.getEncoding()).isNull();
     assertThat(typedValue.getMimeType()).isNull();
+
+    DeferredFileValueImpl typedValueImpl = (DeferredFileValueImpl) typedValue;
+    assertThat(typedValueImpl.getProcessInstanceId()).isEqualTo(processInstanceDto.getId());
+    assertThat(typedValueImpl.getExecutionId()).isEqualTo(task.getExecutionId());
   }
 
   @Test
