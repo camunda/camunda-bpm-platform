@@ -220,6 +220,8 @@
         <groupId>org.camunda.commons</groupId>
         <artifactId>camunda-commons-bom</artifactId>
         <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
       <dependency>
         <groupId>org.camunda.template-engines</groupId>
