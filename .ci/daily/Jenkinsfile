@@ -147,12 +147,12 @@ pipeline {
           }
         }
         stage('platform-DISTRO-maven-central') {
-          when {
+          /*when {
             expression {
               // trigger stage only on the master branch
               env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
             }
-          }
+          }*/
           steps {
             cambpmConditionalRetry([
               podSpec: [
@@ -181,12 +181,12 @@ pipeline {
           }
         }
         stage('platform-public-nexus') {
-          when {
+          /*when {
             expression {
               // trigger stage only on the master branch
               env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
             }
-          }
+          }*/
           steps {
             cambpmConditionalRetry([
               podSpec: [
