@@ -927,7 +927,7 @@ public class ModificationExecutionAsyncTest {
     taskService.complete(task.getId());
 
     HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery().unfinished().processDefinitionId(processDefinitionId);
-    assertEquals(3, historicProcessInstanceQuery.count());
+    assertEquals(2, historicProcessInstanceQuery.count());
 
     // then
     Batch batch = runtimeService
@@ -1152,8 +1152,6 @@ public class ModificationExecutionAsyncTest {
     ProcessDefinition processDefinition = deployment.getDeployedProcessDefinitions().get(0);
     List<String> processInstanceIds = helper.startInstances("process1", 15);
 
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId());
-    assertEquals(processInstanceCount, processInstanceQuery.count());
     HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery().processDefinitionId(processDefinition.getId());
     assertEquals(processInstanceCount, historicProcessInstanceQuery.count());
 
@@ -1176,6 +1174,8 @@ public class ModificationExecutionAsyncTest {
     ProcessDefinition processDefinition = deployment.getDeployedProcessDefinitions().get(0);
     List<String> processInstanceIds = helper.startInstances("process1", 15);
 
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId());
+    assertEquals(processInstanceCount, processInstanceQuery.count());
     HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery().processDefinitionId(processDefinition.getId());
     assertEquals(processInstanceCount, historicProcessInstanceQuery.count());
 
@@ -1183,7 +1183,7 @@ public class ModificationExecutionAsyncTest {
     Batch batch = runtimeService
         .createModification(processDefinition.getId())
         .startTransition("seq")
-        .processInstanceIds(processInstanceIds)
+        .processInstanceQuery(processInstanceQuery)
         .historicProcessInstanceQuery(historicProcessInstanceQuery)
         .executeAsync();
 
