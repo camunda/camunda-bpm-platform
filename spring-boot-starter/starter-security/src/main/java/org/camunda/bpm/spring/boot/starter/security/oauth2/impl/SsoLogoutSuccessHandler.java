@@ -20,6 +20,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.camunda.bpm.spring.boot.starter.security.oauth2.OAuth2Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -31,6 +33,8 @@ import java.io.IOException;
  */
 public class SsoLogoutSuccessHandler extends OidcClientInitiatedLogoutSuccessHandler {
 
+  private static final Logger logger = LoggerFactory.getLogger(SsoLogoutSuccessHandler.class);
+
   public SsoLogoutSuccessHandler(ClientRegistrationRepository clientRegistrationRepository,
                                  OAuth2Properties oAuth2Properties) {
     super(clientRegistrationRepository);
@@ -40,7 +44,7 @@ public class SsoLogoutSuccessHandler extends OidcClientInitiatedLogoutSuccessHan
   @Override
   public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
       throws IOException, ServletException {
-    logger.debug("Initiating SSO logout with provider.");
+    logger.debug("Initiating SSO logout for '{}'", authentication.getName());
     super.onLogoutSuccess(request, response, authentication);
   }
 }
