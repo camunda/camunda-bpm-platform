@@ -29,13 +29,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -59,6 +62,7 @@ public class ModificationExecutionSyncTest {
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testRule);
 
   protected RuntimeService runtimeService;
+  protected HistoryService historyService;
   protected BpmnModelInstance instance;
 
   @Before
@@ -76,6 +80,7 @@ public class ModificationExecutionSyncTest {
   @Before
   public void initServices() {
     runtimeService = rule.getRuntimeService();
+    historyService = rule.getHistoryService();
   }
 
   @After
@@ -95,6 +100,78 @@ public class ModificationExecutionSyncTest {
       assertEquals(1, activeActivityIds.size());
       assertEquals(activeActivityIds.iterator().next(), "user2");
     }
+  }
+
+  @Test
+  public void createSimpleModificationPlanWithHistoricQuery() {
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    List<String> instances = helper.startInstances("process1", 2);
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+    historicProcessInstanceQuery.processDefinitionId(processDefinition.getId());
+
+    runtimeService.createModification(processDefinition.getId()).startBeforeActivity("user2")
+        .cancelAllForActivity("user1").historicProcessInstanceQuery(historicProcessInstanceQuery).execute();
+
+    for (String instanceId : instances) {
+      List<String> activeActivityIds = runtimeService.getActiveActivityIds(instanceId);
+      assertEquals(1, activeActivityIds.size());
+      assertEquals(activeActivityIds.iterator().next(), "user2");
+    }
+  }
+
+  @Test
+  public void createSimpleModificationPlanWithIdenticalRuntimeAndHistoryQuery() {
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    List<String> instances = helper.startInstances("process1", 2);
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+    historicProcessInstanceQuery.processDefinitionId(processDefinition.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery();
+    processInstanceQuery.processDefinitionId(processDefinition.getId());
+
+    runtimeService.createModification(processDefinition.getId()).startBeforeActivity("user2")
+        .cancelAllForActivity("user1").historicProcessInstanceQuery(historicProcessInstanceQuery).processInstanceQuery(processInstanceQuery).execute();
+
+    for (String instanceId : instances) {
+      List<String> activeActivityIds = runtimeService.getActiveActivityIds(instanceId);
+      assertEquals(1, activeActivityIds.size());
+      assertEquals(activeActivityIds.iterator().next(), "user2");
+    }
+  }
+
+  @Test
+  public void createSimpleModificationPlanWithComplementaryRuntimeAndHistoryQueries() {
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    List<String> instances = helper.startInstances("process1", 2);
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+    historicProcessInstanceQuery.processInstanceId(instances.get(0));
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery();
+    processInstanceQuery.processInstanceId(instances.get(1));
+
+    runtimeService.createModification(processDefinition.getId()).startBeforeActivity("user2")
+        .cancelAllForActivity("user1").historicProcessInstanceQuery(historicProcessInstanceQuery).processInstanceQuery(processInstanceQuery).execute();
+
+    for (String instanceId : instances) {
+      List<String> activeActivityIds = runtimeService.getActiveActivityIds(instanceId);
+      assertEquals(1, activeActivityIds.size());
+      assertEquals(activeActivityIds.iterator().next(), "user2");
+    }
+  }
+
+  @Test
+  public void createSimpleModificationPlanWithHistoricQueryUnfinished() {
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    List<String> instances = helper.startInstances("process1", 2);
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+    historicProcessInstanceQuery.processDefinitionId(processDefinition.getId()).unfinished();
+
+    runtimeService.deleteProcessInstance(instances.get(0), "test");
+
+    runtimeService.createModification(processDefinition.getId()).startBeforeActivity("user2")
+        .cancelAllForActivity("user1").historicProcessInstanceQuery(historicProcessInstanceQuery).execute();
+
+    List<String> activeActivityIds = runtimeService.getActiveActivityIds(instances.get(1));
+    assertEquals(1, activeActivityIds.size());
+    assertEquals(activeActivityIds.iterator().next(), "user2");
   }
 
   @Test
@@ -168,6 +245,16 @@ public class ModificationExecutionSyncTest {
   public void testNullProcessInstanceQuery() {
     try {
       runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceQuery(null).execute();
+      fail("Should not succeed");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage()).contains("Process instance ids is empty");
+    }
+  }
+
+  @Test
+  public void testNullHistoricProcessInstanceQuery() {
+    try {
+      runtimeService.createModification("processDefinitionId").startAfterActivity("user1").historicProcessInstanceQuery(null).execute();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage()).contains("Process instance ids is empty");

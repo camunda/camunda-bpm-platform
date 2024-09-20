@@ -19,6 +19,8 @@ package org.camunda.bpm.engine.rest.dto;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.modification.ProcessInstanceModificationInstructionDto;
 import org.camunda.bpm.engine.runtime.ModificationBuilder;
@@ -30,6 +32,7 @@ public class ModificationDto {
   protected List<ProcessInstanceModificationInstructionDto> instructions;
   protected List<String> processInstanceIds;
   protected ProcessInstanceQueryDto processInstanceQuery;
+  protected HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
   protected String processDefinitionId;
   protected boolean skipIoMappings;
   protected boolean skipCustomListeners;
@@ -99,4 +102,11 @@ public class ModificationDto {
     this.annotation = annotation;
   }
 
+  public HistoricProcessInstanceQueryDto getHistoricProcessInstanceQuery() {
+    return historicProcessInstanceQuery;
+  }
+
+  public void setHistoricProcessInstanceQuery(HistoricProcessInstanceQueryDto historicProcessInstanceQuery) {
+    this.historicProcessInstanceQuery = historicProcessInstanceQuery;
+  }
 }
