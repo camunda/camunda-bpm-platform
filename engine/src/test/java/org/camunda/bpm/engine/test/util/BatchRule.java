@@ -19,7 +19,9 @@ package org.camunda.bpm.engine.test.util;
 import static org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl.DEFAULT_INVOCATIONS_PER_BATCH_JOB;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -29,6 +31,10 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
 public class BatchRule extends TestWatcher {
+
+  public static final String SEED_JOB = "seed-job";
+  public static final String MONITOR_JOB = "monitor-job";
+  public static final String EXECUTION_JOBS = "execution-job";
 
   protected ProcessEngineRule engineRule;
   protected ProcessEngineTestRule engineTestRule;
@@ -68,40 +74,55 @@ public class BatchRule extends TestWatcher {
     }
   }
 
-  public void syncExec(Batch batch) {
-    syncExec(batch, true);
+  public Map<String, List<Job>> syncExec(Batch batch) {
+    return syncExec(batch, true);
   }
 
-  public void syncExec(Batch batch, boolean isClear) {
+  public Map<String, List<Job>> syncExec(Batch batch, boolean isClear) {
+    Map<String, List<Job>> processedJobs = new HashMap<>();
+    List<Job> processedSeedJobs = new ArrayList<>();
     if (isClear) {
       batchIds.add(batch.getId());
     }
 
-    executeSeedJobs(batch);
+    processedSeedJobs.addAll(executeSeedJobs(batch));
+    processedJobs.put(SEED_JOB, processedSeedJobs);
 
+    List<Job> processedExecutionJobs = new ArrayList<>();
     List<Job> jobs = getExecutionJobs(batch);
     while (!jobs.isEmpty()) {
       for (Job job : jobs) {
         engineRule.getManagementService().executeJob(job.getId());
+        processedExecutionJobs.add(job);
       }
       jobs = getExecutionJobs(batch);
     }
+    processedJobs.put(EXECUTION_JOBS, processedExecutionJobs);
 
-    engineRule.getManagementService().executeJob(
-        getJobForDefinition(batch.getMonitorJobDefinitionId()).getId());
+    List<Job> processedMonitorJobs = new ArrayList<>();
+    Job monitorJob = getJobForDefinition(batch.getMonitorJobDefinitionId());
+    engineRule.getManagementService().executeJob(monitorJob.getId());
+    processedMonitorJobs.add(monitorJob);
+    processedJobs.put(MONITOR_JOB, processedMonitorJobs);
+    
+    return processedJobs;
   }
 
-  public void executeSeedJobs(Batch batch) {
-    executeSeedJobs(batch, false);
+  public List<Job> executeSeedJobs(Batch batch) {
+    return executeSeedJobs(batch, false);
   }
 
-  public void executeSeedJobs(Batch batch, boolean cleanUp) {
+  public List<Job> executeSeedJobs(Batch batch, boolean cleanUp) {
+    List<Job> processedJobs = new ArrayList<>();
     if (cleanUp) {
       batchIds.add(batch.getId());
     }
     while (getSeedJob(batch) != null) {
-      engineRule.getManagementService().executeJob(getSeedJob(batch).getId());
+      Job seedJob = getSeedJob(batch);
+      engineRule.getManagementService().executeJob(seedJob.getId());
+      processedJobs.add(seedJob);
     }
+    return processedJobs;
   }
 
   public Job getSeedJob(Batch batch) {
