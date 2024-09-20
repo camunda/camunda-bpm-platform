@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl.dmn.entity.repository;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NotValidException;
@@ -193,18 +194,24 @@ public class DecisionRequirementsDefinitionQueryImpl extends AbstractQuery<Decis
 
   @Override
   public long executeCount(CommandContext commandContext) {
-    checkQueryOk();
-    return commandContext
-      .getDecisionRequirementsDefinitionManager()
-      .findDecisionRequirementsDefinitionCountByQueryCriteria(this);
+    if (commandContext.getProcessEngineConfiguration().isDmnEnabled()) {
+      checkQueryOk();
+      return commandContext
+              .getDecisionRequirementsDefinitionManager()
+              .findDecisionRequirementsDefinitionCountByQueryCriteria(this);
+    }
+    return 0;
   }
 
   @Override
   public List<DecisionRequirementsDefinition> executeList(CommandContext commandContext, Page page) {
-    checkQueryOk();
-    return commandContext
-      .getDecisionRequirementsDefinitionManager()
-      .findDecisionRequirementsDefinitionsByQueryCriteria(this, page);
+    if (commandContext.getProcessEngineConfiguration().isDmnEnabled()) {
+      checkQueryOk();
+      return commandContext
+              .getDecisionRequirementsDefinitionManager()
+              .findDecisionRequirementsDefinitionsByQueryCriteria(this, page);
+    }
+    return Collections.emptyList();
   }
 
   @Override

@@ -33,8 +33,10 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByPri
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByProcessInstanceId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySortingAndCount;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -55,6 +57,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.filter.Filter;
@@ -72,6 +75,7 @@ import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -611,6 +615,70 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   }
 
   @Test
+  public void testQueryByIncludeAssignedTasksWithoutMissingCandidateUserOrGroup() {
+    // We expect no exceptions when the there is at least 1 candidate user or group present
+    try {
+      taskService.createTaskQuery().taskCandidateUser("user").includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a taskCandidateUser is present");
+    }
+
+    try {
+      taskService.createTaskQuery().taskCandidateGroupLike("%group%").includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a candidateGroupLike is present");
+    }
+
+    try {
+      taskService.createTaskQuery().taskCandidateGroupIn(List.of("group")).includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a taskCandidateGroupIn is present");
+    }
+
+    try {
+      taskService.createTaskQuery().withCandidateGroups().includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a withCandidateGroups is present");
+    }
+
+    try {
+      taskService.createTaskQuery().withoutCandidateGroups().includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a withoutCandidateGroups is present");
+    }
+
+    try {
+      taskService.createTaskQuery().withCandidateUsers().includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a withCandidateUsers is present");
+    }
+
+    try {
+      taskService.createTaskQuery().withoutCandidateUsers().includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a withoutCandidateUsers is present");
+    }
+
+    try {
+      taskService.createTaskQuery().taskCandidateUserExpression("expression").includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a taskCandidateUserExpression is present");
+    }
+
+    try {
+      taskService.createTaskQuery().taskCandidateGroupExpression("expression").includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a taskCandidateGroupExpression is present");
+    }
+
+    try {
+      taskService.createTaskQuery().taskCandidateGroupInExpression("expression").includeAssignedTasks();
+    } catch (ProcessEngineException e) {
+      fail("We expect no exceptions when a taskCandidateGroupInExpression is present");
+    }
+  }
+
+  @Test
   public void testQueryByCandidateGroup() {
     // management group is candidate for 3 tasks, one of them is already assigned
     TaskQuery query = taskService.createTaskQuery().taskCandidateGroup("management");
@@ -648,6 +716,58 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     query = taskService.createTaskQuery().taskCandidateGroup("sales").includeAssignedTasks();
     assertEquals(0, query.count());
     assertEquals(0, query.list().size());
+  }
+
+  @Test
+  public void testQueryByCandidateGroupLike() {
+    // management group is candidate for 3 tasks, one of them is already assigned
+    TaskQuery query = taskService.createTaskQuery().taskCandidateGroupLike("management");
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
+    assertThrows(ProcessEngineException.class, query::singleResult);
+
+    // test with "shortened" group name for like query
+    query = taskService.createTaskQuery().taskCandidateGroupLike("mana%");
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
+    assertThrows(ProcessEngineException.class, query::singleResult);
+
+    // test with "shortened" group name for like query (different part)
+    query = taskService.createTaskQuery().taskCandidateGroupLike("%ment");
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
+    assertThrows(ProcessEngineException.class, query::singleResult);
+
+    // test management candidates group with assigned tasks included
+    query = taskService.createTaskQuery().taskCandidateGroupLike("management").includeAssignedTasks();
+    assertEquals(3, query.count());
+    assertEquals(3, query.list().size());
+    assertThrows(ProcessEngineException.class, query::singleResult);
+
+    // test with "shortened" group name for like query (assigned tasks included)
+    query = taskService.createTaskQuery().taskCandidateGroupLike("mana%").includeAssignedTasks();
+    assertEquals(3, query.count());
+    assertEquals(3, query.list().size());
+    assertThrows(ProcessEngineException.class, query::singleResult);
+
+    // test with "shortened" group name for like query (different part, assigned tasks included)
+    query = taskService.createTaskQuery().taskCandidateGroupLike("%ment").includeAssignedTasks();
+    assertEquals(3, query.count());
+    assertEquals(3, query.list().size());
+    assertThrows(ProcessEngineException.class, query::singleResult);
+
+    // test query that matches tasks with the "management" the "accountancy" candidate groups
+    // accountancy group is candidate for 3 tasks, one of them is already assigned
+    query = taskService.createTaskQuery().taskCandidateGroupLike("%an%");
+    assertEquals(4, query.count());
+    assertEquals(4, query.list().size());
+    assertThrows(ProcessEngineException.class, query::singleResult);
+
+    // test query that matches tasks with the "management" the "accountancy" candidate groups (assigned tasks included)
+    query = taskService.createTaskQuery().taskCandidateGroupLike("%an%").includeAssignedTasks();
+    assertEquals(5, query.count());
+    assertEquals(5, query.list().size());
+    assertThrows(ProcessEngineException.class, query::singleResult);
   }
 
   @Test
@@ -5602,7 +5722,39 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     assertThat(taskResult.getLastUpdated()).isAfter(beforeSave);
     assertThat(taskResult.getLastUpdated()).isAfter(taskResult.getCreateTime());
   }
-
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void shouldNotFindAttachmentAndCommentInfoWithoutQueryParam() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    task.setAssignee("myself");
+    // when
+    taskService.createComment(task.getId(), processInstance.getId(), "testComment");
+    taskService.createAttachment("foo", task.getId(), processInstance.getId(), "testAttachment", "testDesc", "http://camunda.org");
+    // then
+    Task taskResult = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertThat(taskResult).isNotNull();
+    assertFalse(taskResult.hasComment());
+    assertFalse(taskResult.hasAttachment());
+  }
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void shouldFindAttachmentAndCommentInfoWithQueryParam() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    // when
+    taskService.createComment(task.getId(), processInstance.getId(), "testComment");
+    taskService.createAttachment("foo", task.getId(), processInstance.getId(), "testAttachment",  "testDesc", "http://camunda.org");
+    // then
+    Task taskResult = taskService.createTaskQuery().processInstanceId(processInstance.getId()).withCommentAttachmentInfo().singleResult();
+    assertThat(taskResult).isNotNull();
+    assertTrue(taskResult.hasComment());
+    assertTrue(taskResult.hasAttachment());
+  }
   // ---------------------- HELPER ------------------------------
 
   // make sure that time passes between two fast operations

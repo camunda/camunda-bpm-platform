@@ -55,7 +55,8 @@
       CASE_INST_ID_,
       DELETE_REASON_,
       TENANT_ID_,
-      STATE_
+      STATE_,
+      RESTARTED_PROC_INST_ID_
     ) values (
       #{id ,jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
@@ -75,7 +76,8 @@
       #{caseInstanceId, jdbcType=VARCHAR},
       #{deleteReason, jdbcType=VARCHAR},
       #{tenantId, jdbcType=VARCHAR},
-      #{state, jdbcType=VARCHAR}
+      #{state, jdbcType=VARCHAR},
+      #{restartedProcessInstanceId, jdbcType=VARCHAR}
     )
   </insert>
 
@@ -313,6 +315,7 @@
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
     <result property="state" column="STATE_" jdbcType="VARCHAR"/>
+    <result property="restartedProcessInstanceId" column="RESTARTED_PROC_INST_ID_" jdbcType="VARCHAR"/>
   </resultMap>
   
   <resultMap type="org.camunda.bpm.engine.impl.util.ImmutablePair" id="deploymentIdMapping">
@@ -406,7 +409,7 @@
         <bind name="JOIN_TYPE" value="'left join'" />
       </if>
 
-      <if test="query != null &amp;&amp; (query.withIncidents || query.withRootIncidents || query.incidentStatus != null || query.incidentMessage != null || query.incidentMessageLike != null || query.incidentType != null)">
+      <if test="query != null &amp;&amp; (query.withIncidents || query.withRootIncidents || query.incidentStatus != null || query.incidentMessage != null || query.incidentMessageLike != null || query.incidentType != null || (incidentIds != null &amp;&amp; incidentIds.length > 0))">
         <bind name="INC_JOIN" value="true" />
       </if>
 
@@ -550,6 +553,14 @@
             <if test="query.incidentType != null">
               ${queryType} INC.INCIDENT_TYPE_ = #{query.incidentType}
             </if>
+
+            <if test="query.incidentIds != null &amp;&amp; query.incidentIds.length > 0">
+              ${queryType} INC.ID_ IN
+              <foreach item="incidentId" index="index" collection="query.incidentIds" open="(" separator="," close=")">
+                  #{incidentId}
+              </foreach>
+            </if>
+
             <if test="query.incidentMessage != null">
               ${queryType} INC.INCIDENT_MSG_ = #{query.incidentMessage}
             </if>

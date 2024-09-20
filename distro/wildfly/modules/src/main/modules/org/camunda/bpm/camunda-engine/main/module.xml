@@ -24,7 +24,7 @@
     <module name="com.fasterxml.uuid.java-uuid-generator"/>
     <module name="org.joda.time" slot="2.1" />
 
-    <module name="org.codehaus.groovy.groovy-all" services="import"/>
+    <module name="org.apache.groovy.groovy-all" services="import"/>
     <module name="org.graalvm.js.js-scriptengine" services="import"/>
     <module name="org.graalvm.js.js" services="import"/>
     <module name="org.graalvm.regex.regex" services="import"/>
@@ -41,7 +41,6 @@
     <module name="org.camunda.commons.camunda-commons-logging" />
     <module name="org.camunda.commons.camunda-commons-utils" />
     <module name="org.camunda.commons.camunda-commons-typed-values" export="true" />
-    <module name="org.camunda.connect.camunda-connect-core" />
     <module name="org.camunda.template-engines.camunda-template-engines-freemarker" services="import" />
     <module name="org.camunda.spin.camunda-spin-core" services="import"/>
 

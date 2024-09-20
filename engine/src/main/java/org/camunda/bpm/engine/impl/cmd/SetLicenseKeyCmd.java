@@ -58,13 +58,13 @@ public class SetLicenseKeyCmd extends LicenseCmd implements Command<Object> {
     // cleanup legacy property
     commandContext.runWithoutAuthorization(new DeletePropertyCmd(LICENSE_KEY_PROPERTY_NAME));
 
-    // add raw license to telemetry data if not there already
+    // add raw license to diagnostics data if not there already
     ManagementServiceImpl managementService = (ManagementServiceImpl) commandContext.getProcessEngineConfiguration().getManagementService();
-    LicenseKeyDataImpl currentLicenseData = managementService.getLicenseKeyFromTelemetry();
+    LicenseKeyDataImpl currentLicenseData = managementService.getLicenseKeyFromDiagnostics();
     // only report license body without signature
     LicenseKeyDataImpl licenseKeyData = LicenseKeyDataImpl.fromRawString(licenseKey);
     if (currentLicenseData == null || !licenseKeyData.getRaw().equals(currentLicenseData.getRaw())) {
-      managementService.setLicenseKeyForTelemetry(licenseKeyData);
+      managementService.setLicenseKeyForDiagnostics(licenseKeyData);
     }
 
     return null;

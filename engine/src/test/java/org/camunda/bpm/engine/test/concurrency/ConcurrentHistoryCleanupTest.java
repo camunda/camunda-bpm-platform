@@ -94,11 +94,7 @@ public class ConcurrentHistoryCleanupTest extends ConcurrencyTestCase {
     assertEquals(1, historyCleanupJobs.size());
 
     assertNull(thread1.getException());
-    if (testRule.isOptimisticLockingExceptionSuppressible()) {
-      assertNull(thread2.getException());
-    } else {
-      assertThat(thread2.getException()).isInstanceOf(OptimisticLockingException.class);
-    }
+    assertNull(thread2.getException());
 
   }
 

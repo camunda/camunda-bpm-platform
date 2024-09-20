@@ -181,6 +181,11 @@
       </dependency>
       <dependency>
         <groupId>org.camunda.bpm.springboot</groupId>
+        <artifactId>camunda-bpm-spring-boot-starter-security</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.springboot</groupId>
         <artifactId>camunda-bpm-spring-boot-starter-webapp-ee</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -208,35 +213,15 @@
         <groupId>org.camunda.spin</groupId>
         <artifactId>camunda-spin-bom</artifactId>
         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.camunda.spin</groupId>
-        <artifactId>camunda-spin-dataformat-all</artifactId>
-        <version>${project.version}</version>
-        <!-- Excluding dependencies that are shaded in camunda-spin-dataformat-all -->
-        <exclusions>
-          <exclusion>
-            <groupId>org.camunda.spin</groupId>
-            <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.camunda.spin</groupId>
-            <artifactId>camunda-spin-dataformat-xml-dom</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-          </exclusion>
-        </exclusions>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
       <dependency>
         <groupId>org.camunda.commons</groupId>
         <artifactId>camunda-commons-bom</artifactId>
         <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
       <dependency>
         <groupId>org.camunda.template-engines</groupId>
@@ -247,6 +232,8 @@
         <groupId>org.camunda.connect</groupId>
         <artifactId>camunda-connect-bom</artifactId>
         <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
 
       <!-- dmn engine dependencies

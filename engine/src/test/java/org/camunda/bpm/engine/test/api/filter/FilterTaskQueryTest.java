@@ -185,6 +185,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     query.taskUnassigned();
     query.taskAssigned();
     query.taskDelegationState(testDelegationState);
+    query.taskCandidateGroupLike(testString);
     query.taskCandidateGroupIn(testCandidateGroups);
     query.taskCandidateGroupInExpression(testString);
     query.withCandidateGroups();
@@ -290,6 +291,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     assertTrue(query.isUnassigned());
     assertTrue(query.isAssigned());
     assertEquals(testDelegationState, query.getDelegationState());
+    assertEquals(testString, query.getCandidateGroupLike());
     assertEquals(testCandidateGroups, query.getCandidateGroups());
     assertTrue(query.isWithCandidateGroups());
     assertTrue(query.isWithoutCandidateGroups());
@@ -658,6 +660,21 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
   }
 
   @Test
+  public void testTaskQueryCandidateGroupLike() {
+    // given
+    TaskQueryImpl query = new TaskQueryImpl();
+    query.taskCandidateGroupLike(testGroup.getId());
+
+    saveQuery(query);
+
+    // when
+    query = filter.getQuery();
+
+    // then
+    assertEquals(testGroup.getId(), query.getCandidateGroupLike());
+  }
+
+  @Test
   public void testTaskQueryCandidateUserIncludeAssignedTasks() {
     TaskQueryImpl query = new TaskQueryImpl();
     query.taskCandidateUser(testUser.getId());
@@ -706,6 +723,23 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     query = filterService.getFilter(filter.getId()).getQuery();
 
     assertEquals(testString, query.getExpressions().get("taskCandidateGroup"));
+    assertTrue(query.isIncludeAssignedTasks());
+  }
+
+  @Test
+  public void testTaskQueryCandidateGroupLikeIncludeAssignedTasks() {
+    // given
+    TaskQueryImpl query = new TaskQueryImpl();
+    query.taskCandidateGroupLike(testGroup.getId());
+    query.includeAssignedTasks();
+
+    saveQuery(query);
+
+    // when
+    query = filter.getQuery();
+
+    // then
+    assertEquals(testGroup.getId(), query.getCandidateGroupLike());
     assertTrue(query.isIncludeAssignedTasks());
   }
 
@@ -821,6 +855,56 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     assertEquals(1, origQueryTasks.size());
     assertEquals(1, selfExtendQueryTasks.size());
     assertEquals(0, extendingQueryTasks.size());
+  }
+
+  @Test
+  public void testExtendingEmptyTaskQueryWithCandidateGroupLike() {
+    // given 3 test tasks created during setup
+    TaskQuery query = taskService.createTaskQuery();
+    saveQuery(query);
+    List<Task> tasks = filterService.list(filter.getId());
+    assertEquals(3, tasks.size());
+
+    // when extending the query with a "candidate group like"
+    TaskQuery extendingQuery = taskService.createTaskQuery();
+    extendingQuery.taskCandidateGroupLike("%count%");
+
+    // then there is 1 unassigned task with the candidate group "accounting"
+    tasks = filterService.list(filter.getId(), extendingQuery);
+    assertEquals(1, tasks.size());
+  }
+
+  @Test
+  public void testExtendingCandidateGroupLikeTaskQueryWithEmpty() {
+    // given 3 existing tasks but only 1 unassigned task that matches the initial filter
+    TaskQuery query = taskService.createTaskQuery().taskCandidateGroupLike("%count%");
+    saveQuery(query);
+    List<Task> tasks = filterService.list(filter.getId());
+    assertEquals(1, tasks.size());
+
+    // when extending the query with an empty query
+    TaskQuery extendingQuery = taskService.createTaskQuery();
+
+    // then the empty query should be ignored in favor of the existing value for "candidate group like"
+    tasks = filterService.list(filter.getId(), extendingQuery);
+    assertEquals(1, tasks.size());
+  }
+
+  @Test
+  public void testExtendingCandidateGroupLikeTaskQueryWithCandidateGroupLike() {
+    // given 3 existing tasks but zero match the initial filter
+    TaskQuery query = taskService.createTaskQuery().taskCandidateGroupLike("HR");
+    saveQuery(query);
+    List<Task> tasks = filterService.list(filter.getId());
+    assertTrue(tasks.isEmpty());
+
+    // when extending the query with a "candidate groups like" query
+    TaskQuery extendingQuery = taskService.createTaskQuery();
+    extendingQuery.taskCandidateGroupLike("acc%");
+
+    // then the query should be return result of task matching the new filter
+    tasks = filterService.list(filter.getId(), extendingQuery);
+    assertEquals(1, tasks.size());
   }
 
   @Test

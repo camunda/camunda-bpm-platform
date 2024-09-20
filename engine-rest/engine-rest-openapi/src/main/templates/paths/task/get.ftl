@@ -34,11 +34,11 @@
 
     <@lib.response
         code = "200"
-        dto = "TaskDto"
+        dto = "TaskWithAttachmentAndCommentDto"
         array = true
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "Status 200 response",
+                       "summary": "Status 200 response 1",
                        "description": "Response for GET `/task?assignee=anAssignee&delegationState=RESOLVED&maxPriority=50`",
                        "value": [
                          {
@@ -70,6 +70,43 @@
                            },
                            "tenantId": "aTenantId",
                            "taskState": "aTaskState"
+                         }
+                       ]
+                     }',
+        '"example-2": {
+                       "summary": "Status 200 response 2",
+                       "description": "Response for GET `/task?assignee=anAssignee&withCommentAttachmentInfo=true`",
+                       "value": [
+                         {
+                           "id":"anId",
+                           "name":"aName",
+                           "assignee":"anAssignee",
+                           "created":"2013-01-23T13:42:42.657+0200",
+                           "due":"2013-01-23T13:49:42.323+0200",
+                           "followUp:":"2013-01-23T13:44:42.987+0200",
+                           "lastUpdated:":"2013-01-23T13:44:42.987+0200",
+                           "delegationState":"RESOLVED",
+                           "description":"aDescription",
+                           "executionId":"anExecution",
+                           "owner":"anOwner",
+                           "parentTaskId":"aParentId",
+                           "priority":42,
+                           "processDefinitionId":"aProcDefId",
+                           "processInstanceId":"aProcInstId",
+                           "caseDefinitionId":"aCaseDefId",
+                           "caseInstanceId":"aCaseInstId",
+                           "caseExecutionId":"aCaseExecution",
+                           "taskDefinitionKey":"aTaskDefinitionKey",
+                           "suspended": false,
+                           "formKey":"aFormKey",
+                           "camundaFormRef":{
+                             "key": "aCamundaFormKey",
+                             "binding": "version",
+                             "version": 2
+                           },
+                           "tenantId": "aTenantId",
+                           "attachment":false,
+                           "comment":false
                          }
                        ]
                      }'] />

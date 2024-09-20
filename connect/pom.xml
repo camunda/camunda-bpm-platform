@@ -2,12 +2,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.camunda.connect</groupId>
-    <artifactId>camunda-connect-bom</artifactId>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-parent</artifactId>
+    <relativePath>../parent</relativePath>
     <version>7.22.0-SNAPSHOT</version>
-    <relativePath>bom</relativePath>
   </parent>
 
+  <groupId>org.camunda.connect</groupId>
   <artifactId>camunda-connect-root</artifactId>
   <name>Camunda Platform - connect - root</name>
   <inceptionYear>2014</inceptionYear>
@@ -34,14 +35,6 @@
 
   <dependencyManagement>
     <dependencies>
-
-      <dependency>
-        <groupId>org.camunda.commons</groupId>
-        <artifactId>camunda-commons-bom</artifactId>
-        <version>${project.version}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
 
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>

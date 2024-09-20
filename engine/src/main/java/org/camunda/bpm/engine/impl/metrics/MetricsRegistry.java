@@ -26,7 +26,7 @@ import java.util.Map;
 public class MetricsRegistry {
 
   protected Map<String, Meter> dbMeters = new HashMap<>();
-  protected Map<String, Meter> telemetryMeters = new HashMap<>();
+  protected Map<String, Meter> diagnosticsMeters = new HashMap<>();
 
   public Meter getDbMeterByName(String name) {
     return dbMeters.get(name);
@@ -36,12 +36,12 @@ public class MetricsRegistry {
     return dbMeters;
   }
 
-  public Map<String, Meter> getTelemetryMeters() {
-    return telemetryMeters;
+  public Map<String, Meter> getDiagnosticsMeters() {
+    return diagnosticsMeters;
   }
 
-  public void clearTelemetryMetrics() {
-    telemetryMeters.values().forEach(Meter::getAndClear);
+  public void clearDiagnosticsMetrics() {
+    diagnosticsMeters.values().forEach(Meter::getAndClear);
   }
 
   public void markOccurrence(String name) {
@@ -50,11 +50,11 @@ public class MetricsRegistry {
 
   public void markOccurrence(String name, long times) {
     markOccurrence(dbMeters, name, times);
-    markOccurrence(telemetryMeters, name, times);
+    markOccurrence(diagnosticsMeters, name, times);
   }
 
-  public void markTelemetryOccurrence(String name, long times) {
-    markOccurrence(telemetryMeters, name, times);
+  public void markDiagnosticsOccurrence(String name, long times) {
+    markOccurrence(diagnosticsMeters, name, times);
   }
 
   protected void markOccurrence(Map<String, Meter> meters, String name, long times) {
@@ -66,14 +66,14 @@ public class MetricsRegistry {
   }
 
   /**
-   * Creates a meter for both database and telemetry collection.
+   * Creates a meter for both database and diagnostics collection.
    */
   public void createMeter(String name) {
     Meter dbMeter = new Meter(name);
     dbMeters.put(name, dbMeter);
 
-    Meter telemetryMeter = new Meter(name);
-    telemetryMeters.put(name, telemetryMeter);
+    Meter diagnosticsMeter = new Meter(name);
+    diagnosticsMeters.put(name, diagnosticsMeter);
   }
 
   /**

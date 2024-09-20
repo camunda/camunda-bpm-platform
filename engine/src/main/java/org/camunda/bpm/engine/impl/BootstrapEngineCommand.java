@@ -32,8 +32,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
-import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
-import org.camunda.bpm.engine.impl.util.TelemetryUtil;
 
 /**
  * @author Nikola Koevski
@@ -42,7 +40,6 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
 
   private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
-  protected static final String TELEMETRY_PROPERTY_NAME = "camunda.telemetry.enabled";
   protected static final String INSTALLATION_PROPERTY_NAME = "camunda.installation.id";
 
   @Override
@@ -57,10 +54,8 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
       createHistoryCleanupJob(commandContext);
     }
 
-    initializeTelemetryProperty(commandContext);
     // installationId needs to be updated in the telemetry data
     updateTelemetryData(commandContext);
-    startTelemetryReporter(commandContext);
 
     return null;
   }
@@ -103,61 +98,6 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
   protected boolean isHistoryCleanupEnabled(CommandContext commandContext) {
     return commandContext.getProcessEngineConfiguration()
         .isHistoryCleanupEnabled();
-  }
-
-  public void initializeTelemetryProperty(CommandContext commandContext) {
-    try {
-
-      checkTelemetryLockExists(commandContext);
-
-      acquireExclusiveTelemetryLock(commandContext);
-      PropertyEntity databaseTelemetryProperty = databaseTelemetryConfiguration(commandContext);
-
-      ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-      if (databaseTelemetryProperty == null) {
-        LOG.noTelemetryPropertyFound();
-        createTelemetryProperty(commandContext);
-      }
-
-      // reset collected dynamic data
-      if ((databaseTelemetryProperty == null && processEngineConfiguration.isInitializeTelemetry())
-          || (databaseTelemetryProperty != null && Boolean.parseBoolean(databaseTelemetryProperty.getValue()))) {
-        TelemetryUtil.toggleLocalTelemetry(true,
-            processEngineConfiguration.getTelemetryRegistry(),
-            processEngineConfiguration.getMetricsRegistry());
-      }
-
-    } catch (Exception e) {
-      LOG.errorConfiguringTelemetryProperty(e);
-    }
-  }
-
-  protected void checkTelemetryLockExists(CommandContext commandContext) {
-    PropertyEntity telemetryLockProperty = commandContext.getPropertyManager().findPropertyById("telemetry.lock");
-    if (telemetryLockProperty == null) {
-      LOG.noTelemetryLockPropertyFound();
-    }
-  }
-
-  protected PropertyEntity databaseTelemetryConfiguration(CommandContext commandContext) {
-    try {
-      return commandContext.getPropertyManager().findPropertyById(TELEMETRY_PROPERTY_NAME);
-    } catch (Exception e) {
-      LOG.errorFetchingTelemetryPropertyInDatabase(e);
-      return null;
-    }
-  }
-
-  protected void createTelemetryProperty(CommandContext commandContext) {
-    Boolean telemetryEnabled = commandContext.getProcessEngineConfiguration().isInitializeTelemetry();
-    PropertyEntity property = null;
-    if (telemetryEnabled != null) {
-      property = new PropertyEntity(TELEMETRY_PROPERTY_NAME, Boolean.toString(telemetryEnabled));
-    } else {
-      property = new PropertyEntity(TELEMETRY_PROPERTY_NAME, "null");
-    }
-    commandContext.getPropertyManager().insert(property);
-    LOG.creatingTelemetryPropertyInDatabase(telemetryEnabled);
   }
 
   public void initializeInstallationId(CommandContext commandContext) {
@@ -219,59 +159,14 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     String licenseKey = managementService.getLicenseKey();
     if (licenseKey != null) {
       LicenseKeyDataImpl licenseKeyData = LicenseKeyDataImpl.fromRawString(licenseKey);
-      managementService.setLicenseKeyForTelemetry(licenseKeyData);
+      managementService.setLicenseKeyForDiagnostics(licenseKeyData);
       telemetryData.getProduct().getInternals().setLicenseKey(licenseKeyData);
     }
-  }
-
-  protected void startTelemetryReporter(CommandContext commandContext) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-
-    TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
-    boolean telemetryReporterActivate = processEngineConfiguration.isTelemetryReporterActivate();
-
-    // Start telemetry if the reporter is generally activated via the engine configuration.
-    // Note that there are two conditions for telemetry to be sent: The reporter runs and
-    // telemetry is enabled via API. If the latter is not the case, the reporter will do nothing.
-    // However, it is important that it is always running so that it will detect if telemetry
-    // was enabled by another engine in the cluster.
-    if (telemetryReporter != null && telemetryReporterActivate) {
-      try {
-        telemetryReporter.start();
-      } catch (Exception e) {
-        ProcessEngineLogger.TELEMETRY_LOGGER.schedulingTaskFailsOnEngineStart(e);
-      }
-    }
-  }
-
-  protected void acquireExclusiveTelemetryLock(CommandContext commandContext) {
-    PropertyManager propertyManager = commandContext.getPropertyManager();
-    //exclusive lock
-    propertyManager.acquireExclusiveLockForTelemetry();
   }
 
   protected void acquireExclusiveInstallationIdLock(CommandContext commandContext) {
     PropertyManager propertyManager = commandContext.getPropertyManager();
     //exclusive lock
     propertyManager.acquireExclusiveLockForInstallationId();
-  }
-
-  /**
-   * When CockroachDB is used, this command may be retried multiple times until
-   * it is successful, or the retries are exhausted. CockroachDB uses a stricter,
-   * SERIALIZABLE transaction isolation which ensures a serialized manner
-   * of transaction execution. A concurrent transaction that attempts to modify
-   * the same data as another transaction is required to abort, rollback and retry.
-   * This also makes our use-case of pessimistic locks redundant since we only use
-   * them as synchronization barriers, and not to lock actual data which would
-   * protect it from concurrent modifications.
-   *
-   * The BootstrapEngine command only executes internal code, so we are certain that
-   * a retry of a failed engine bootstrap will not impact user data, and may be
-   * performed multiple times.
-   */
-  @Override
-  public boolean isRetryable() {
-    return true;
   }
 }

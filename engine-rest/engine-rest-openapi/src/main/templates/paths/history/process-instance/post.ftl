@@ -78,7 +78,8 @@
                                     "superCaseInstanceId":null,
                                     "caseInstanceId":null,
                                     "tenantId":null,
-                                    "state":"ACTIVE"
+                                    "state":"ACTIVE",
+                                    "restartedProcessInstanceId":"2bef365d-3406-11ef-bd73-0a0027000003"
                                   }
                                 ]
                      }'] />

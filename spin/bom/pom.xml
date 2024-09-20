@@ -1,21 +1,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <!-- HEADS-UP: Do not use camunda-parent as parent,
+  it would introduce a cyclic dependency to this bom -->
   <parent>
     <groupId>org.camunda.bpm</groupId>
-    <artifactId>camunda-parent</artifactId>
-    <relativePath>../../parent</relativePath>
+    <artifactId>camunda-root</artifactId>
     <version>7.22.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <groupId>org.camunda.spin</groupId>
   <artifactId>camunda-spin-bom</artifactId>
   <name>camunda spin - bom</name>
+  <version>7.22.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-
-  <properties>
-    <plugin.version.javadoc>3.3.1</plugin.version.javadoc>
-  </properties>
 
   <dependencyManagement>
     <dependencies>
@@ -37,6 +36,25 @@
         <groupId>org.camunda.spin</groupId>
         <artifactId>camunda-spin-dataformat-all</artifactId>
         <version>${project.version}</version>
+        <!-- Excluding dependencies that are shaded in camunda-spin-dataformat-all -->
+        <exclusions>
+          <exclusion>
+            <groupId>org.camunda.spin</groupId>
+            <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.camunda.spin</groupId>
+            <artifactId>camunda-spin-dataformat-xml-dom</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
@@ -58,22 +76,6 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>${plugin.version.javadoc}</version>
-          <configuration combine.children="append">
-            <doclint>none</doclint>
-            <detectJavaApiLink>false</detectJavaApiLink>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
 
   <scm>
     <url>https://github.com/camunda/camunda-bpm-platform</url>

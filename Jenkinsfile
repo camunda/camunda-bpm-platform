@@ -36,9 +36,13 @@ pipeline {
       }
       steps {
         cambpmConditionalRetry([
-          agentLabel: 'h2_perf32',
+          podSpec: [
+            cpu: 32,
+            image: 'maven:3.9.7-eclipse-temurin-17'
+            ],
           suppressErrors: false,
           runSteps: {
+            sh(label: 'GIT: Mark current directory as safe', script: "git config --global --add safe.directory \$PWD")
             skipTests = ""
             if (env.CHANGE_ID != null && pullRequest.labels.contains('ci:skipTests')) {
                skipTests = "-DskipTests "
@@ -67,8 +71,7 @@ pipeline {
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war',
-                                  '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
-                                  '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json')
+                                  '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war')
             if (env.CHANGE_ID != null && pullRequest.labels.contains('ci:distro')) {
               cambpmArchiveArtifacts(
                      '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-*.zip',
@@ -233,10 +236,29 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'postgresql_142',
               runSteps: {
-                cambpmRunMaven('qa/', 'clean install -Ptomcat,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
+                cambpmRunMaven('qa/', 'clean install -Ptomcat9,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
               },
               postFailure: {
                 cambpmPublishTestResult()
+              }
+            ])
+          }
+        }
+        stage('engine-IT-tomcat-10-postgresql-142') {
+          when {
+            expression {
+              cambpmWithLabels('all-as', 'tomcat')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'postgresql_142',
+              runSteps: {
+                cambpmRunMaven('qa/', 'clean install -Ptomcat,postgresql,engine-integration-jakarta', runtimeStash: true, archiveStash: true, jdkVersion: 'jdk-17-latest')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+                cambpmArchiveArtifacts('qa/tomcat-runtime/target/**/standalone/log/**')
               }
             ])
           }
@@ -339,11 +361,31 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'chrome_112',
               runSteps: {
+                cambpmRunMaven('qa/', 'clean install -Ptomcat9,h2,webapps-integration', runtimeStash: true, archiveStash: true)
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+                cambpmArchiveArtifacts('qa/integration-tests-webapps/shared-engine/target/selenium-screenshots/*')
+              }
+            ])
+          }
+        }
+        stage('webapp-IT-tomcat-10-h2') {
+          when {
+            expression {
+              cambpmWithLabels('webapp-integration', 'h2')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'chrome_112',
+              runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Ptomcat,h2,webapps-integration', runtimeStash: true, archiveStash: true)
               },
               postFailure: {
                 cambpmPublishTestResult()
                 cambpmArchiveArtifacts('qa/integration-tests-webapps/shared-engine/target/selenium-screenshots/*')
+                cambpmArchiveArtifacts('qa/integration-tests-webapps/shared-engine/target/*')
               }
             ])
           }

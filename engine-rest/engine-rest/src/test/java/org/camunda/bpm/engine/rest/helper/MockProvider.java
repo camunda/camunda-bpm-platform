@@ -198,6 +198,10 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TASK_DEFINITION_KEY = "aTaskDefinitionKey";
   public static final boolean EXAMPLE_TASK_SUSPENSION_STATE = false;
 
+  public static final boolean EXAMPLE_TASK_ATTACHMENT_STATE = false;
+
+  public static final boolean EXAMPLE_TASK_COMMENT_STATE = false;
+
   // task comment
   public static final String EXAMPLE_TASK_COMMENT_ID = "aTaskCommentId";
   public static final String EXAMPLE_TASK_COMMENT_FULL_MESSAGE = "aTaskCommentFullMessage";
@@ -1019,7 +1023,6 @@ public abstract class MockProvider {
   public static final InternalsImpl EXAMPLE_TELEMETRY_INTERNALS = new InternalsImpl(EXAMPLE_TELEMETRY_DATABASE,
       EXAMPLE_TELEMETRY_SERVER, EXAMPLE_TELEMETRY_LICENSE, EXAMPLE_TELEMETRY_JDK);
   static {
-    EXAMPLE_TELEMETRY_INTERNALS.setTelemetryEnabled(false);
     EXAMPLE_TELEMETRY_INTERNALS.setCamundaIntegration(
         Stream.of("spring-boot-starter", "camunda-bpm-run").collect(Collectors.toCollection(HashSet::new)));
     EXAMPLE_TELEMETRY_INTERNALS
@@ -1063,7 +1066,11 @@ public abstract class MockProvider {
       .caseExecutionId(EXAMPLE_CASE_EXECUTION_ID)
       .formKey(EXAMPLE_FORM_KEY)
       .camundaFormRef(EXAMPLE_FORM_KEY, EXAMPLE_FORM_REF_BINDING, EXAMPLE_FORM_REF_VERSION)
-      .tenantId(EXAMPLE_TENANT_ID).taskState(EXAMPLE_HISTORIC_TASK_STATE);
+      .tenantId(EXAMPLE_TENANT_ID)
+      .taskState(EXAMPLE_HISTORIC_TASK_STATE)
+      .tenantId(EXAMPLE_TENANT_ID)
+      .hasAttachment(EXAMPLE_TASK_ATTACHMENT_STATE)
+      .hasComment(EXAMPLE_TASK_COMMENT_STATE);
   }
 
   public static List<Task> createMockTasks() {
@@ -2189,6 +2196,7 @@ public abstract class MockProvider {
     when(mock.getCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID);
     when(mock.getTenantId()).thenReturn(tenantId);
     when(mock.getState()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_STATE);
+    when(mock.getRestartedProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
 
     return mock;
   }

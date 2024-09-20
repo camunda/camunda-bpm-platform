@@ -45,6 +45,7 @@
     <tomcat.server.port>48005</tomcat.server.port>
 
     <tomcat.runtime.location>../tomcat-runtime/target/server/apache-tomcat-${version.tomcat}</tomcat.runtime.location>
+    <tomcat9.runtime.location>../tomcat9-runtime/target/server/apache-tomcat-${version.tomcat9}</tomcat9.runtime.location>
 
   </properties>
 
@@ -75,6 +76,7 @@
         <module>wildfly-runtime</module>
         <module>wildfly26-runtime</module>
         <module>tomcat-runtime</module>
+        <module>tomcat9-runtime</module>
         <module>integration-tests-webapps</module>
         <module>integration-tests-engine</module>
         <module>test-db-util</module>
@@ -121,6 +123,13 @@
       <id>wildfly26-domain</id>
       <modules>
         <module>wildfly26-runtime</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>tomcat9</id>
+      <modules>
+        <module>tomcat9-runtime</module>
       </modules>
     </profile>
 

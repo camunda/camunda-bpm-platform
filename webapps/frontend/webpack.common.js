@@ -103,6 +103,11 @@ module.exports = (_env, argv = {}) => {
         'preact-markup': path.resolve(
           __dirname,
           'node_modules/preact-markup/dist/preact-markup.umd.js'
+        ),
+        // prevent `flatpickr` being tree shaken (transitive dependency of form-js)
+        flatpickr: path.resolve(
+          __dirname,
+          'node_modules/flatpickr/dist/flatpickr.js'
         )
       }
     },

@@ -26,6 +26,8 @@ import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.junit.After;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author Roman Smirnov
  *
@@ -53,6 +55,12 @@ public class DmnDisabledTest {
     processEngineImpl.getProcessEngineConfiguration()
       .getCommandExecutorSchemaOperations()
       .execute(new SchemaOperationsProcessEngineBuild());
+
+    assertEquals(0, processEngineImpl.getRepositoryService().createDecisionDefinitionQuery().count());
+    assertEquals(0, processEngineImpl.getRepositoryService().createDecisionDefinitionQuery().list().size());
+    assertEquals(0, processEngineImpl.getRepositoryService().createDecisionRequirementsDefinitionQuery().count());
+    assertEquals(0, processEngineImpl.getRepositoryService().createDecisionRequirementsDefinitionQuery().list().size());
+
   }
 
   // allows to return a process engine configuration which doesn't create a schema when it's build.

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneTransactionContextFactory;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandCounterInterceptor;
@@ -58,11 +57,6 @@ public abstract class AbstractTransactionProcessEngineConfiguration extends Proc
   @Override
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequired() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
-    // CRDB interceptor is added before the JtaTransactionInterceptor,
-    // so that a Java EE managed TX may be rolled back before retrying.
-    if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
-      defaultCommandInterceptorsTxRequired.add(getCrdbRetryInterceptor());
-    }
     if (!isDisableExceptionCode()) {
       defaultCommandInterceptorsTxRequired.add(getExceptionCodeInterceptor());
     }
@@ -77,11 +71,6 @@ public abstract class AbstractTransactionProcessEngineConfiguration extends Proc
   @Override
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequiresNew() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequiresNew = new ArrayList<CommandInterceptor>();
-    // CRDB interceptor is added before the JtaTransactionInterceptor,
-    // so that a Java EE managed TX may be rolled back before retrying.
-    if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
-      defaultCommandInterceptorsTxRequiresNew.add(getCrdbRetryInterceptor());
-    }
     if (!isDisableExceptionCode()) {
       defaultCommandInterceptorsTxRequiresNew.add(getExceptionCodeInterceptor());
     }

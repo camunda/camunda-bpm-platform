@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.test.errorcode;
 
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
-import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -36,7 +35,6 @@ import java.util.concurrent.CountDownLatch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.CRDB;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.DB2;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.H2;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MARIADB_MYSQL;
@@ -117,11 +115,6 @@ public class DeadlockTest {
       provokeDeadlock();
       assertThat(sqlException.getSQLState()).isEqualTo(POSTGRES.getSqlState());
       assertThat(sqlException.getErrorCode()).isEqualTo(POSTGRES.getErrorCode());
-      break;
-    case DbSqlSessionFactory.CRDB:
-      provokeDeadlock();
-      assertThat(sqlException.getSQLState()).isEqualTo(CRDB.getSqlState());
-      assertThat(sqlException.getErrorCode()).isEqualTo(CRDB.getErrorCode());
       break;
     case DbSqlSessionFactory.H2:
       provokeDeadlock();

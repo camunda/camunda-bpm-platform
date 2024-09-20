@@ -16,42 +16,36 @@
  */
 package org.camunda.bpm.quarkus.engine.extension;
 
+import io.smallrye.config.WithDefault;
 import java.util.Map;
 
-import io.quarkus.runtime.annotations.ConfigGroup;
-import io.quarkus.runtime.annotations.ConfigItem;
-
-@ConfigGroup
-public class CamundaJobExecutorConfig {
+public interface CamundaJobExecutorConfig {
 
   /**
    * The Camunda JobExecutor configuration properties. For more details,
    * @see <a href="https://docs.camunda.org/manual/latest/reference/deployment-descriptors/tags/job-executor/#job-acquisition-configuration-properties">Job-Acquisition Configuration Properties</a>
    */
-  @ConfigItem(name = ConfigItem.PARENT)
-  public Map<String, String> genericConfig;
+  Map<String, String> genericConfig();
 
   /**
    * The Camunda JobExecutor thread pool config. This thread pool is responsible for running
    * Camunda jobs.
    */
-  @ConfigItem
-  public ThreadPoolConfig threadPool;
+  ThreadPoolConfig threadPool();
 
-  @ConfigGroup
-  public static class ThreadPoolConfig {
+  interface ThreadPoolConfig {
     /**
      * Sets the maximum number of threads that can be present in the Quarkus-managed
      * thread pool for the Camunda JobExecutor. The default value is 10.
      */
-    @ConfigItem(defaultValue = "10")
-    public int maxPoolSize;
+    @WithDefault("10")
+    int maxPoolSize();
 
     /**
      * Sets the size of the Quarkus-managed JobExecutor queue. The default value is 3.
      */
-    @ConfigItem(defaultValue = "3")
-    public int queueSize;
+    @WithDefault("3")
+    int queueSize();
 
   }
 }

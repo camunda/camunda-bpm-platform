@@ -2,12 +2,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.camunda.commons</groupId>
-    <artifactId>camunda-commons-bom</artifactId>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-parent</artifactId>
+    <relativePath>../parent</relativePath>
     <version>7.22.0-SNAPSHOT</version>
-    <relativePath>bom</relativePath>
   </parent>
 
+  <groupId>org.camunda.commons</groupId>
   <artifactId>camunda-commons-root</artifactId>
   <name>camunda Commons - Root Pom</name>
   <inceptionYear>2014</inceptionYear>
