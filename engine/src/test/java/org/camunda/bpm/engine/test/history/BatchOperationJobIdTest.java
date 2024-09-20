@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.batch.BatchMonitorJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -230,7 +229,7 @@ public class BatchOperationJobIdTest {
         .startEvent()
         .endEvent()
         .done());
-    ProcessInstance process = runtimeService.startProcessInstanceByKey("process");
+    runtimeService.startProcessInstanceByKey("process");
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
         .processDefinitionKey("process");
@@ -392,7 +391,7 @@ public class BatchOperationJobIdTest {
   public void shouldSetBatchIdOnJobAndJobLog_SetJobRetries() {
     // given
     testRule.deploy(getTimerProcess());
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    runtimeService.startProcessInstanceByKey("process");
 
     Job timerJob = managementService.createJobQuery().singleResult();
 
@@ -428,7 +427,7 @@ public class BatchOperationJobIdTest {
   public void shouldNotSetBatchIdOnJobOrJobLog_nonBatchJob() {
     // given
     testRule.deploy(getTimerProcess());
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    runtimeService.startProcessInstanceByKey("process");
 
     Job timerJob = managementService.createJobQuery().singleResult();
 
@@ -443,22 +442,10 @@ public class BatchOperationJobIdTest {
 
   // HELPER
 
-  private JobEntity getSeedJob(Batch batch) {
-    return (JobEntity) managementService.createJobQuery().jobDefinitionId(batch.getSeedJobDefinitionId()).singleResult();
-  }
-
-  private JobEntity getMonitorJob(Batch batch) {
-    return (JobEntity) managementService.createJobQuery().jobDefinitionId(batch.getMonitorJobDefinitionId()).singleResult();
-  }
-
-  private List<JobEntity> getExecutionJobs(Batch batch) {
-    return (List<JobEntity>)(List<?>) managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list();
-  }
-
   private void assertProcessedJobs(Batch batch, Map<String, List<Job>> processedJobs) {
-    assertThat(processedJobs.get(batchRule.SEED_JOB)).extracting("batchId").containsOnly(batch.getId());
-    assertThat(processedJobs.get(batchRule.EXECUTION_JOBS)).extracting("batchId").containsOnly(batch.getId());
-    assertThat(processedJobs.get(batchRule.MONITOR_JOB)).extracting("batchId").containsOnly(batch.getId());
+    assertThat(processedJobs.get(BatchRule.SEED_JOB)).extracting("batchId").containsOnly(batch.getId());
+    assertThat(processedJobs.get(BatchRule.EXECUTION_JOBS)).extracting("batchId").containsOnly(batch.getId());
+    assertThat(processedJobs.get(BatchRule.MONITOR_JOB)).extracting("batchId").containsOnly(batch.getId());
   }
 
   private void assertHistoricJobLogs(Batch batch, String expectedBatchType) {
