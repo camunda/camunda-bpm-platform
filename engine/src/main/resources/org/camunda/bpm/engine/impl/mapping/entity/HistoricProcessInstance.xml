@@ -409,7 +409,7 @@
         <bind name="JOIN_TYPE" value="'left join'" />
       </if>
 
-      <if test="query != null &amp;&amp; (query.withIncidents || query.withRootIncidents || query.incidentStatus != null || query.incidentMessage != null || query.incidentMessageLike != null || query.incidentType != null)">
+      <if test="query != null &amp;&amp; (query.withIncidents || query.withRootIncidents || query.incidentStatus != null || query.incidentMessage != null || query.incidentMessageLike != null || query.incidentType != null || (incidentIds != null &amp;&amp; incidentIds.length > 0))">
         <bind name="INC_JOIN" value="true" />
       </if>
 
@@ -553,6 +553,14 @@
             <if test="query.incidentType != null">
               ${queryType} INC.INCIDENT_TYPE_ = #{query.incidentType}
             </if>
+
+            <if test="query.incidentIds != null &amp;&amp; query.incidentIds.length > 0">
+              ${queryType} INC.ID_ IN
+              <foreach item="incidentId" index="index" collection="query.incidentIds" open="(" separator="," close=")">
+                  #{incidentId}
+              </foreach>
+            </if>
+
             <if test="query.incidentMessage != null">
               ${queryType} INC.INCIDENT_MSG_ = #{query.incidentMessage}
             </if>
