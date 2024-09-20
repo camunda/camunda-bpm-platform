@@ -16,35 +16,22 @@
  */
 package org.camunda.bpm.run.property;
 
-import java.util.Collections;
-import java.util.Map;
+public class CamundaBpmRunDeploymentProperties {
 
-public class CamundaBpmRunProcessEnginePluginProperty {
+  public static final String PREFIX = CamundaBpmRunProperties.PREFIX + ".deployment";
 
-  protected String pluginClass;
-  protected Map<String, Object> pluginParameters = Collections.EMPTY_MAP;
+  protected boolean deployChangedOnly = true;
 
-  public String getPluginClass() {
-    return pluginClass;
+  public boolean isDeployChangedOnly() {
+    return deployChangedOnly;
   }
 
-  public void setPluginClass(String pluginClass) {
-    this.pluginClass = pluginClass;
-  }
-
-  public Map<String, Object> getPluginParameters() {
-    return pluginParameters;
-  }
-
-  public void setPluginParameters(Map<String, Object> pluginParameters) {
-    this.pluginParameters = pluginParameters;
+  public void setDeployChangedOnly(boolean deployChangedOnly) {
+    this.deployChangedOnly = deployChangedOnly;
   }
 
   @Override
   public String toString() {
-    return "CamundaBpmRunProcessEnginePluginProperty [pluginClass=" + pluginClass +
-        ", pluginParameters=" + pluginParameters +
-        "]";
+    return "CamundaBpmRunDeploymentProperties[" + "deployChangedOnly=" + deployChangedOnly + ']';
   }
-
 }

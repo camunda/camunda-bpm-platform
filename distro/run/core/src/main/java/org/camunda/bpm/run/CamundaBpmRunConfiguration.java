@@ -16,64 +16,55 @@
  */
 package org.camunda.bpm.run;
 
-import java.util.List;
-import java.util.Map;
-
-import org.camunda.bpm.engine.impl.cfg.CompositeProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.plugin.AdministratorAuthorizationPlugin;
-import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin;
 import org.camunda.bpm.run.property.CamundaBpmRunAdministratorAuthorizationProperties;
 import org.camunda.bpm.run.property.CamundaBpmRunLdapProperties;
-import org.camunda.bpm.run.property.CamundaBpmRunProcessEnginePluginProperty;
 import org.camunda.bpm.run.property.CamundaBpmRunProperties;
-import org.camunda.bpm.run.utils.CamundaBpmRunProcessEnginePluginHelper;
 import org.camunda.bpm.spring.boot.starter.CamundaBpmAutoConfiguration;
-import org.camunda.bpm.spring.boot.starter.configuration.CamundaDeploymentConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 @EnableConfigurationProperties(CamundaBpmRunProperties.class)
 @Configuration
 @AutoConfigureAfter({ CamundaBpmAutoConfiguration.class })
 public class CamundaBpmRunConfiguration {
 
-  @Autowired
-  CamundaBpmRunProperties camundaBpmRunProperties;
-
   @Bean
   @ConditionalOnProperty(name = "enabled", havingValue = "true", prefix = CamundaBpmRunLdapProperties.PREFIX)
-  public LdapIdentityProviderPlugin ldapIdentityProviderPlugin() {
-    return camundaBpmRunProperties.getLdap();
+  public LdapIdentityProviderPlugin ldapIdentityProviderPlugin(CamundaBpmRunProperties properties) {
+    return properties.getLdap();
   }
 
   @Bean
   @ConditionalOnProperty(name = "enabled", havingValue = "true", prefix = CamundaBpmRunAdministratorAuthorizationProperties.PREFIX)
-  public AdministratorAuthorizationPlugin administratorAuthorizationPlugin() {
-    return camundaBpmRunProperties.getAdminAuth();
+  public AdministratorAuthorizationPlugin administratorAuthorizationPlugin(CamundaBpmRunProperties properties) {
+    return properties.getAdminAuth();
   }
 
   @Bean
-  public ProcessEngineConfigurationImpl processEngineConfigurationImpl(List<ProcessEnginePlugin> processEnginePlugins) {
-    final SpringProcessEngineConfiguration configuration = new CamundaBpmRunProcessEngineConfiguration();
+  public ProcessEngineConfigurationImpl processEngineConfigurationImpl(List<ProcessEnginePlugin> processEnginePluginsFromContext,
+                                                                       CamundaBpmRunProperties properties,
+                                                                       CamundaBpmRunDeploymentConfiguration deploymentConfig) {
+    String normalizedDeploymentDir = deploymentConfig.getNormalizedDeploymentDir();
+    boolean deployChangedOnly = properties.getDeployment().isDeployChangedOnly();
+    var processEnginePluginsFromYaml = properties.getProcessEnginePlugins();
 
-    // register process engine plugins defined in yaml
-    List<CamundaBpmRunProcessEnginePluginProperty> yamlPluginsInfo = camundaBpmRunProperties.getProcessEnginePlugins();
-    CamundaBpmRunProcessEnginePluginHelper.registerYamlPlugins(processEnginePlugins, yamlPluginsInfo);
-
-    configuration.getProcessEnginePlugins().add(new CompositeProcessEnginePlugin(processEnginePlugins));
-    return configuration;
+    return new CamundaBpmRunProcessEngineConfiguration(normalizedDeploymentDir, deployChangedOnly,
+        processEnginePluginsFromContext, processEnginePluginsFromYaml);
   }
 
   @Bean
-  public static CamundaDeploymentConfiguration camundaDeploymentConfiguration() {
-    return new CamundaBpmRunDeploymentConfiguration();
+  public CamundaBpmRunDeploymentConfiguration camundaDeploymentConfiguration(@Value("${camunda.deploymentDir:#{null}}") String deploymentDir) {
+    return new CamundaBpmRunDeploymentConfiguration(deploymentDir);
   }
 
 }
