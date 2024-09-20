@@ -88,7 +88,7 @@ public class CamundaSpringSecurityOAuth2AutoConfiguration {
   }
 
   @Bean
-  @ConditionalOnProperty(name = "identity-provider.enabled", havingValue = "true", prefix = OAuth2Properties.PREFIX)
+  @ConditionalOnProperty(name = "identity-provider.enabled", havingValue = "true", prefix = OAuth2Properties.PREFIX, matchIfMissing = true)
   public OAuth2IdentityProviderPlugin identityProviderPlugin() {
     logger.debug("Registering OAuth2IdentityProviderPlugin");
     return new OAuth2IdentityProviderPlugin();
