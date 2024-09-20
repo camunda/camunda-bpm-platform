@@ -244,8 +244,8 @@ public class FileSerializationIT {
     assertThat(typedValue.getEncoding()).isNull();
     assertThat(typedValue.getMimeType()).isNull();
 
-    DeferredFileValueImpl typedValueImpl = (DeferredFileValueImpl) typedValue;
-    assertThat(typedValueImpl.getExecutionId()).isEqualTo(task.getExecutionId());
+    InputStream value = typedValue.getValue();
+    assertThat(IoUtil.inputStreamAsString(value)).isEqualTo(new String(VARIABLE_VALUE_FILE_VALUE));
   }
 
   @Test
