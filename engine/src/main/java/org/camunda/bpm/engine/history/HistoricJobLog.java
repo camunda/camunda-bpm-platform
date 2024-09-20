@@ -177,7 +177,7 @@ public interface HistoricJobLog {
   Date getRemovalTime();
 
   /**
-   * Returns the ID of the batch associated with the job or null if no batch is associated with the job.
+   * Returns the ID of the batch associated with the job or {@code null} if no batch is associated with the job.
    * @return the ID of the batch associated with the job
    */
   String getBatchId();

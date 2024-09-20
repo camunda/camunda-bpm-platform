@@ -82,7 +82,7 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
     if (context instanceof BatchEntity) {
       BatchEntity batch = ((BatchEntity) context);
       job.setBatchId(batch.getId());
-    } else if(context instanceof BatchJobContext) {
+    } else if (context instanceof BatchJobContext) {
       BatchJobContext batchJobContext = (BatchJobContext) context;
       job.setBatchId(batchJobContext.getBatch().getId());
     }
