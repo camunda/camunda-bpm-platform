@@ -288,6 +288,7 @@ create table ACT_HI_JOB_LOG (
     TENANT_ID_ varchar(64),
     HOSTNAME_ varchar(255),
     REMOVAL_TIME_ datetime,
+    BATCH_ID_ varchar(64),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
