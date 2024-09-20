@@ -140,7 +140,17 @@
                 The name of the host of the Process Engine where the
                 job of this historic job log entry was executed."
     />
-    
+
+    <@lib.property
+        name = "batchId"
+        type = "string"
+        desc = "The ID of the batch associated with this job. `null` if no batch is associated with this job. The
+            following jobs are associated with batches:
+            * Seed Jobs
+            * Monitor Jobs
+            * Batch Execution Jobs"
+    />
+
     <@lib.property
         name = "creationLog"
         type = "boolean"

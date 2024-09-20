@@ -49,7 +49,8 @@
                            "suspended": false,
                            "priority": 10,
                            "tenantId": null,
-                           "createTime": "2018-05-05T17:00:00+0200"
+                           "createTime": "2018-05-05T17:00:00+0200",
+                           "batchId": "aBatchId"
                          },
                          {
                            "id": "anotherJobId",
@@ -65,7 +66,8 @@
                            "suspended": true,
                            "priority": 8,
                            "tenantId": null,
-                           "createTime": "2018-05-05T17:00:00+0200"
+                           "createTime": "2018-05-05T17:00:00+0200",
+                           "batchId": null
                          }
                        ]
                      }']
