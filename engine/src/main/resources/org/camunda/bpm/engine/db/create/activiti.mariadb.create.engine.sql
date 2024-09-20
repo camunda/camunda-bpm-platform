@@ -130,6 +130,7 @@ create table ACT_RU_JOB (
     TENANT_ID_ varchar(64),
     CREATE_TIME_ datetime(3),
     LAST_FAILURE_LOG_ID_ varchar(64),
+    BATCH_ID_ varchar(64),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

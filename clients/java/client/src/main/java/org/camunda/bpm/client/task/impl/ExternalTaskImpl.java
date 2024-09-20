@@ -25,7 +25,6 @@ import java.util.Map;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.variable.impl.TypedValueField;
 import org.camunda.bpm.client.variable.impl.VariableValue;
-import org.camunda.bpm.client.variable.value.DeferredFileValue;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -258,10 +257,6 @@ public class ExternalTaskImpl implements ExternalTask {
 
     VariableValue variableValue = receivedVariableMap.get(variableName);
     if (variableValue != null) {
-      if(variableValue.getTypedValue() instanceof DeferredFileValue) {
-        DeferredFileValue deferredFileValue = (DeferredFileValue) variableValue.getTypedValue();
-        deferredFileValue.setExecutionId(this.executionId);
-      }
       value = (T) variableValue.getValue();
     }
 
@@ -300,10 +295,6 @@ public class ExternalTaskImpl implements ExternalTask {
     VariableValue variableValue = receivedVariableMap.get(variableName);
     if (variableValue != null) {
       typedValue = variableValue.getTypedValue(deserializeObjectValues);
-      if(typedValue instanceof DeferredFileValue) {
-        DeferredFileValue deferredFileValue = (DeferredFileValue) typedValue;
-        deferredFileValue.setExecutionId(this.executionId);
-      }
     }
 
     return (T) typedValue;

@@ -117,6 +117,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
       .jobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID)
       .tenantId(MockProvider.EXAMPLE_TENANT_ID)
       .createTime(DateTimeUtil.parseDate(MockProvider.EXAMPLE_JOB_CREATE_TIME))
+      .batchId(MockProvider.EXAMPLE_BATCH_ID)
       .build();
 
     when(mockQuery.singleResult()).thenReturn(mockedJob);
@@ -294,6 +295,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("jobDefinitionId", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_ID))
       .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
       .body("createTime", equalTo(MockProvider.EXAMPLE_JOB_CREATE_TIME))
+      .body("batchId", equalTo(MockProvider.EXAMPLE_BATCH_ID))
     .when()
       .get(SINGLE_JOB_RESOURCE_URL);
 

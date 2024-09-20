@@ -91,6 +91,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected boolean isTenantIdSet;
   protected String[] executedActivityIds;
   protected String[] activeActivityIds;
+  protected String[] activityIds;
   protected String state;
   protected String[] incidentIds;
 
@@ -478,6 +479,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     return activeActivityIds;
   }
 
+  public String[] getActivityIds() {
+    return activityIds;
+  }
+
   public String getBusinessKey() {
     return businessKey;
   }
@@ -778,6 +783,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     ensureNotNull(BadUserRequestException.class, "activity ids", (Object[]) ids);
     ensureNotContainsNull(BadUserRequestException.class, "activity ids", Arrays.asList(ids));
     this.activeActivityIds = ids;
+    return this;
+  }
+
+  @Override
+  public HistoricProcessInstanceQuery activityIdIn(String... ids) {
+    ensureNotNull(BadUserRequestException.class, "activity ids", (Object[]) ids);
+    ensureNotContainsNull(BadUserRequestException.class, "activity ids", Arrays.asList(ids));
+    this.activityIds = ids;
     return this;
   }
 

@@ -50,6 +50,7 @@ public class HistoricJobLogDto {
   protected String tenantId;
   protected String hostname;
   protected String rootProcessInstanceId;
+  protected String batchId;
 
   protected boolean creationLog;
   protected boolean failureLog;
@@ -140,6 +141,10 @@ public class HistoricJobLogDto {
     return rootProcessInstanceId;
   }
 
+  public String getBatchId() {
+    return batchId;
+  }
+
   public boolean isCreationLog() {
     return creationLog;
   }
@@ -183,6 +188,7 @@ public class HistoricJobLogDto {
     result.tenantId = historicJobLog.getTenantId();
     result.hostname = historicJobLog.getHostname();
     result.rootProcessInstanceId = historicJobLog.getRootProcessInstanceId();
+    result.batchId = historicJobLog.getBatchId();
 
     result.creationLog = historicJobLog.isCreationLog();
     result.failureLog = historicJobLog.isFailureLog();
