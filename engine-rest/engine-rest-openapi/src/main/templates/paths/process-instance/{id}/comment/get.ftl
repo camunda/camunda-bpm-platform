@@ -3,7 +3,7 @@
 
   <@lib.endpointInfo
       id = "getProcessInstanceComments"
-      tag = "Process Instance"
+      tag = "Process Instance comment"
       summary = "Get Process Instance Comments"
       desc = "Gets the comments for a process instance by id." />
 
