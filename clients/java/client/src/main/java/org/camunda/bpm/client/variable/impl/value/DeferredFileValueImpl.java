@@ -37,9 +37,8 @@ public class DeferredFileValueImpl extends FileValueImpl implements DeferredFile
   protected boolean isLoaded = false;
 
   protected String variableName;
-  protected String processInstanceId;
+  protected String executionId;
   protected EngineClient engineClient;
-  protected String executionId = null;
 
   public DeferredFileValueImpl(String filename, EngineClient engineClient) {
     super(PrimitiveValueType.FILE, filename);

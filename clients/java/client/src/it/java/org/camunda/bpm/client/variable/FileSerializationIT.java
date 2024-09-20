@@ -214,18 +214,18 @@ public class FileSerializationIT {
     // given
     ProcessDefinitionDto processDefinitionDto = engineRule.deploy(
         Bpmn.createExecutableProcess("process")
-            .startEvent("startEvent")
-            .serviceTask("serviceTaskFoo")
-            .camundaExternalTask(EXTERNAL_TASK_TOPIC_FOO)
+        .startEvent("startEvent")
+        .serviceTask("serviceTaskFoo")
+          .camundaExternalTask(EXTERNAL_TASK_TOPIC_FOO)
             // create the local file variable with the same content but different name
-            .camundaInputParameter(LOCAL_VARIABLE_NAME_FILE, "${execution.getVariableTyped('fileVariable')}")
-            .serviceTask("serviceTaskBar")
-            .camundaExternalTask(EXTERNAL_TASK_TOPIC_BAR)
-            .endEvent("endEvent")
-            .done()
+          .camundaInputParameter(LOCAL_VARIABLE_NAME_FILE, "${execution.getVariableTyped('fileVariable')}")
+        .serviceTask("serviceTaskBar")
+          .camundaExternalTask(EXTERNAL_TASK_TOPIC_BAR)
+        .endEvent("endEvent")
+        .done()
     ).get(0);
 
-    ProcessInstanceDto processInstanceDto = engineRule.startProcessInstance(processDefinitionDto.getId(), VARIABLE_NAME_FILE, VARIABLE_VALUE_FILE);
+    engineRule.startProcessInstance(processDefinitionDto.getId(), VARIABLE_NAME_FILE, VARIABLE_VALUE_FILE);
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
