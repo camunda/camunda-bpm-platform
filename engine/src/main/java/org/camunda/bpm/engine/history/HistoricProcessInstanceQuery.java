@@ -442,8 +442,6 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
 
   /**
    * Only select historic process instances that have active activities or failing activities with given ids.
-   * Activities that follow an asyncAfter activity or themselves are asyncBefore or boundary activities are not
-   * considered active until the scheduler picked them up for execution.
    */
   HistoricProcessInstanceQuery activityIdIn(String... ids);
 
