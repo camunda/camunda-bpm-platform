@@ -240,8 +240,10 @@
   "activityIdIn": {
     "type": "array",
     "itemType": "string",
-    "desc": "Restrict to instances that have an active activity or failing activity with one of given ids.  It works
-             similarly to the activityIdIn filter in the runtime query. ${listTypeDescription}"
+    "desc": "Restrict to instances that have an active activity or failing activity with one of given ids. It works
+             similarly to the activityIdIn filter in the runtime query. Difference is activities that follow
+             an asyncAfter activity or themselves are asyncBefore or boundary activities are not considered active until
+             the scheduler picked them up for execution. ${listTypeDescription}"
   },
 
   "executedActivityIdIn": {
