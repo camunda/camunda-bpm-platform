@@ -69,7 +69,7 @@ public class TypedValues {
 
   @SuppressWarnings("rawtypes")
   public Map<String, VariableValue> wrapVariables(ExternalTask externalTask, Map<String, TypedValueField> variables) {
-    String processInstanceId = externalTask.getProcessInstanceId();
+    String executionId = externalTask.getExecutionId();
 
     Map<String, VariableValue> result = new HashMap<>();
 
@@ -80,7 +80,7 @@ public class TypedValues {
         typeName = Character.toLowerCase(typeName.charAt(0)) + typeName.substring(1);
         variableValue.setType(typeName);
 
-        VariableValue value = new VariableValue(processInstanceId, variableName, variableValue, serializers);
+        VariableValue value = new VariableValue(executionId, variableName, variableValue, serializers);
         result.put(variableName, value);
       });
     }
