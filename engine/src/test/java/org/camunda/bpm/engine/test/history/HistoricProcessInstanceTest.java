@@ -60,6 +60,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -70,9 +71,11 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.api.mgmt.FailingDelegate;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.CallActivityModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.CompensationModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
+import org.camunda.bpm.engine.test.api.runtime.util.ChangeVariablesDelegate;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
@@ -2079,6 +2082,44 @@ public class HistoricProcessInstanceTest {
         .map(HistoricProcessInstance::getId)
         .collect(Collectors.toList()))
         .containsExactlyInAnyOrderElementsOf(Arrays.asList(processInstance.getId(), processInstance2.getId()));
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void shouldQueryByActivityIdWhereIncidentOccurred() {
+    // given
+    testHelper.deploy(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .serviceTask("theTask")
+        .camundaAsyncBefore()
+        .camundaClass(ChangeVariablesDelegate.class)
+      .serviceTask("theTask2").camundaClass(ChangeVariablesDelegate.class)
+      .serviceTask("theTask3").camundaClass(FailingDelegate.class)
+      .endEvent()
+      .done());
+
+    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", true));
+    JobEntity job = (JobEntity) managementService.createJobQuery().singleResult();
+
+    // when: incident is raised
+    for(int i = 0; i<3; i++) {
+      try {
+        managementService.executeJob(job.getId());
+        fail("Exception expected");
+      } catch (Exception e) {
+        // exception expected
+      }
+    }
+
+    // then
+    HistoricProcessInstance theTask = historyService.createHistoricProcessInstanceQuery()
+        .activityIdIn("theTask")
+        .singleResult();
+    assertThat(theTask).isNotNull();
+    HistoricProcessInstance theTask3 = historyService.createHistoricProcessInstanceQuery()
+        .activityIdIn("theTask3")
+        .singleResult();
+    assertThat(theTask3).isNull();
   }
 
   @Test
