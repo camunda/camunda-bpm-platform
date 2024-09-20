@@ -240,7 +240,7 @@
   "activityIdIn": {
     "type": "array",
     "itemType": "string",
-    "desc": "Restrict to instances that have an active activity or failing activity with one of the given ids. ${listTypeDescription}"
+    "desc": "Restrict to instances with an active activity with one of the given ids. This filter behaves differently as `activeActivityIdIn` since it also yields results when filtering for activities with an incident. ${listTypeDescription}"
   },
 
   "executedActivityIdIn": {
