@@ -206,7 +206,6 @@ public class FileSerializationIT {
     assertThat(typedValue.getMimeType()).isNull();
 
     DeferredFileValueImpl typedValueImpl = (DeferredFileValueImpl) typedValue;
-    assertThat(typedValueImpl.getProcessInstanceId()).isEqualTo(processInstanceDto.getId());
     assertThat(typedValueImpl.getExecutionId()).isEqualTo(task.getExecutionId());
   }
 
@@ -246,7 +245,6 @@ public class FileSerializationIT {
     assertThat(typedValue.getMimeType()).isNull();
 
     DeferredFileValueImpl typedValueImpl = (DeferredFileValueImpl) typedValue;
-    assertThat(typedValueImpl.getProcessInstanceId()).isEqualTo(processInstanceDto.getId());
     assertThat(typedValueImpl.getExecutionId()).isEqualTo(task.getExecutionId());
   }
 

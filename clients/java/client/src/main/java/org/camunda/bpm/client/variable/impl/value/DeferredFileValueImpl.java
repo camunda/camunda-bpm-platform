@@ -72,14 +72,6 @@ public class DeferredFileValueImpl extends FileValueImpl implements DeferredFile
     return super.getValue();
   }
 
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
-
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
-
   public void setVariableName(String variableName) {
     this.variableName = variableName;
   }
