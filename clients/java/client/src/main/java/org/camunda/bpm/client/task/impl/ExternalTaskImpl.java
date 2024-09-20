@@ -259,10 +259,6 @@ public class ExternalTaskImpl implements ExternalTask {
 
     VariableValue variableValue = receivedVariableMap.get(variableName);
     if (variableValue != null) {
-      if(variableValue.getTypedValue() instanceof DeferredFileValueImpl) {
-        DeferredFileValueImpl deferredFileValue = (DeferredFileValueImpl) variableValue.getTypedValue();
-        deferredFileValue.setExecutionId(this.executionId);
-      }
       value = (T) variableValue.getValue();
     }
 
@@ -301,10 +297,6 @@ public class ExternalTaskImpl implements ExternalTask {
     VariableValue variableValue = receivedVariableMap.get(variableName);
     if (variableValue != null) {
       typedValue = variableValue.getTypedValue(deserializeObjectValues);
-      if(typedValue instanceof DeferredFileValueImpl) {
-        DeferredFileValueImpl deferredFileValue = (DeferredFileValueImpl) typedValue;
-        deferredFileValue.setExecutionId(this.executionId);
-      }
     }
 
     return (T) typedValue;
