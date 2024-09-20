@@ -55,7 +55,6 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
-      <version>${project.version}</version>
       <optional>true</optional>
     </dependency>
 
@@ -121,7 +120,6 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-testing</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

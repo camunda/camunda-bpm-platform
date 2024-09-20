@@ -116,7 +116,6 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -194,7 +193,6 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-testing</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
 

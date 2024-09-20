@@ -134,7 +134,6 @@
         <dependency>
           <groupId>org.camunda.spin</groupId>
           <artifactId>camunda-spin-core</artifactId>
-          <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -145,13 +144,11 @@
         <dependency>
           <groupId>org.camunda.spin</groupId>
           <artifactId>camunda-spin-dataformat-all</artifactId>
-          <version>${project.version}</version>
         </dependency>
 
         <dependency>
           <groupId>org.camunda.connect</groupId>
           <artifactId>camunda-connect-core</artifactId>
-          <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -172,7 +169,6 @@
               <artifactId>camunda-connect-soap-http-client</artifactId>
             </exclusion>
           </exclusions>
-          <version>${project.version}</version>
         </dependency>
 
         <dependency>

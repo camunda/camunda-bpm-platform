@@ -89,13 +89,11 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-typed-values</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -246,7 +244,6 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-testing</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -774,7 +771,6 @@
         <dependency>
           <groupId>org.camunda.spin</groupId>
           <artifactId>camunda-spin-dataformat-all</artifactId>
-          <version>${project.version}</version>
         </dependency>
         <dependency>
           <groupId>org.camunda.bpm</groupId>
@@ -783,7 +779,6 @@
         <dependency>
           <groupId>org.camunda.connect</groupId>
           <artifactId>camunda-connect-connectors-all</artifactId>
-          <version>${project.version}</version>
           <exclusions>
             <exclusion>
               <groupId>org.camunda.connect</groupId>

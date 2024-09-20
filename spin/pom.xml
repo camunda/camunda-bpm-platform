@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- camunda BPM parent release pom -->
   <parent>
-    <groupId>org.camunda.spin</groupId>
-    <artifactId>camunda-spin-bom</artifactId>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-parent</artifactId>
+    <relativePath>../parent</relativePath>
     <version>7.22.0-SNAPSHOT</version>
-    <relativePath>bom</relativePath>
   </parent>
 
+  <groupId>org.camunda.spin</groupId>
   <artifactId>camunda-spin-root</artifactId>
   <name>camunda Spin - root</name>
   <inceptionYear>2014</inceptionYear>
@@ -27,6 +27,7 @@
     <powermock.version>2.0.9</powermock.version>
     <mockito.version>3.3.3</mockito.version>
     <spin.version.old>1.23.0</spin.version.old>
+    <plugin.version.javadoc>3.3.1</plugin.version.javadoc>
 
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
     <additionalparam>-Xdoclint:none</additionalparam>
@@ -40,14 +41,6 @@
         <version>${project.version}</version>
         <scope>import</scope>
         <type>pom</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.commons</groupId>
-        <artifactId>camunda-commons-bom</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
       </dependency>
 
       <dependency>
@@ -130,6 +123,15 @@
   <build>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${plugin.version.javadoc}</version>
+          <configuration combine.children="append">
+            <doclint>none</doclint>
+            <detectJavaApiLink>false</detectJavaApiLink>
+          </configuration>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
