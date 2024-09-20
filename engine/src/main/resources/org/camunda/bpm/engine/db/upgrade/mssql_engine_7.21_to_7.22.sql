@@ -22,6 +22,9 @@ alter table ACT_RU_TASK add TASK_STATE_ nvarchar(64);
 
 alter table ACT_HI_TASKINST add TASK_STATE_ nvarchar(64);
 
+alter table ACT_HI_PROCINST add RESTARTED_PROC_INST_ID_ nvarchar(64);
+create index ACT_IDX_HI_PRO_RST_PRO_INST_ID on ACT_HI_PROCINST(RESTARTED_PROC_INST_ID_);
+
 alter table ACT_HI_COMMENT
     add column REV_ integer;
 
