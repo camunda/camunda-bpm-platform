@@ -100,16 +100,17 @@ public class AuthorizeTokenFilter extends OncePerRequestFilter {
         }).build();
     // @formatter:on
 
+    var name = token.getName();
     try {
       var res = clientManager.authorize(authRequest);
       if (res == null || hasTokenExpired(res.getAccessToken())) {
-        logger.warn("Authorize failed: could not re-authorize expired access token");
+        logger.warn("Authorize failed for '{}': could not re-authorize expired access token", name);
         clearContext(request);
       } else {
-        logger.debug("Authorize successful, access token expiry: {}", res.getAccessToken().getExpiresAt());
+        logger.debug("Authorize successful for '{}', access token expiry: {}", name, res.getAccessToken().getExpiresAt());
       }
     } catch (OAuth2AuthorizationException e) {
-      logger.warn("Authorize failed: {}", e.getMessage());
+      logger.warn("Authorize failed for '{}': {}", name, e.getMessage());
       clearContext(request);
     }
   }
