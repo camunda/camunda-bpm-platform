@@ -51,7 +51,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
-public class BatchOperationJobIdTest {
+public class JobEntityAndJobLogBatchIdTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
