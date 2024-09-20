@@ -237,6 +237,12 @@
     "desc": "Only include historic process instances which belong to no tenant. Value may only be `true`, as `false` is the default behavior."
   },
 
+  "activityIdIn": {
+    "type": "array",
+    "itemType": "string",
+    "desc": "Restrict to instances with an active activity with one of the given ids. This filter behaves differently as `activeActivityIdIn` since it also yields results when filtering for activities with an incident. ${listTypeDescription}"
+  },
+
   "executedActivityIdIn": {
     "type": "array",
     "itemType": "string",
