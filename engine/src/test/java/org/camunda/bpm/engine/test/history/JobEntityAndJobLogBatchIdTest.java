@@ -17,15 +17,19 @@
 package org.camunda.bpm.engine.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.Map;
+
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricJobLog;
@@ -37,6 +41,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.history.removaltime.batch.helper.BatchSetRemovalTimeRule;
@@ -167,6 +172,27 @@ public class JobEntityAndJobLogBatchIdTest {
     // then
     assertProcessedJobs(batch, processedJobs);
     assertHistoricJobLogs(batch, Batch.TYPE_SET_VARIABLES);
+  }
+
+  @Test
+  public void shouldFail_SetVariables() {
+    // given
+    testRule.deploy(getUserTaskProcess());
+    String id = runtimeService.startProcessInstanceByKey("process").getId();
+
+    Batch batch = runtimeService.setVariablesAsync(List.of(id), Variables.createVariables().putValue("foo", "bar"));
+
+    // finish process
+    Task task = engineRule.getTaskService().createTaskQuery().processInstanceId(id).singleResult();
+    engineRule.getTaskService().complete(task.getId());
+
+
+    assertThatThrownBy(() -> {
+      // when
+      batchRule.syncExec(batch);
+    })
+        // then
+        .isInstanceOf(NullValueException.class);
   }
 
   @Test
@@ -403,6 +429,27 @@ public class JobEntityAndJobLogBatchIdTest {
     // then
     assertProcessedJobs(batch, processedJobs);
     assertHistoricJobLogs(batch, Batch.TYPE_SET_JOB_RETRIES);
+  }
+
+  @Test
+  public void shouldFail_SetJobRetries() {
+    // given
+    String deploymentId = testRule.deploy(getTimerProcess()).getId();
+    runtimeService.startProcessInstanceByKey("process");
+
+    Job timerJob = managementService.createJobQuery().singleResult();
+
+    Batch batch = managementService.setJobRetriesAsync(List.of(timerJob.getId()), 5);
+
+    // remove the deployment, job is deleted
+    engineRule.getRepositoryService().deleteDeployment(deploymentId, true);
+
+    assertThatThrownBy(() -> {
+      // when
+      batchRule.syncExec(batch);
+    })
+        // then
+        .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
