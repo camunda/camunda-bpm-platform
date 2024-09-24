@@ -68,7 +68,7 @@ public class JobExecutionLoggingTest {
     processEngineConfiguration.setJobExecutor(testJobExecutor);
     testJobExecutor.registerProcessEngine(processEngineConfiguration.getProcessEngine());
 
-    // Given ten jobs
+    // Given five jobs
     for (int i = 0; i < 5; i++) {
       runtimeService.startProcessInstanceByKey("simpleAsyncDelayProcess");
     }

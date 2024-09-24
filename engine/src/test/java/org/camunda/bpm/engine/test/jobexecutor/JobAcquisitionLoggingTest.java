@@ -55,17 +55,17 @@ public class JobAcquisitionLoggingTest {
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml" })
   public void shouldLogJobsAttemptingToAcquire() {
-    // given five jobs
+    // Given three jobs
     for (int i = 0; i < 3; i++) {
       runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
     }
 
-    // when executing the jobs
+    // When executing the jobs
     processEngineConfiguration.getJobExecutor().start();
     testRule.waitForJobExecutorToProcessAllJobs();
     processEngineConfiguration.getJobExecutor().shutdown();
 
-    // look for log where it states that "acquiring [set value of MaxJobPerAcquisition] jobs"
+    // Look for log where it states that "acquiring [set value of MaxJobPerAcquisition] jobs"
     List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog(
         "Attempting to acquire " + processEngineConfiguration.getJobExecutor().getMaxJobsPerAcquisition()
             + " jobs for the process engine '" + processEngineConfiguration.getProcessEngineName() + "'");
@@ -77,7 +77,7 @@ public class JobAcquisitionLoggingTest {
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml" })
   public void shouldLogFailedAcquisitionLocks() {
-    // given five jobs
+    // Given three jobs
     for (int i = 0; i < 3; i++) {
       runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
     }
@@ -87,13 +87,13 @@ public class JobAcquisitionLoggingTest {
     testRule.waitForJobExecutorToProcessAllJobs();
     processEngineConfiguration.getJobExecutor().shutdown();
 
-    //look for acquisition lock failures in logs. The logs should appear irrelevant of lock failure count of zero or
+    // Look for acquisition lock failures in logs. The logs should appear irrelevant of lock failure count of zero or
     // more.
     List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog(
         "Jobs failed to Lock during Acquisition of jobs for the process engine '"
             + processEngineConfiguration.getProcessEngineName() + "' : ");
 
-    // then observe the log appearing minimum 1 time, considering minimum 1 acquisition cycle
+    // Then observe the log appearing minimum 1 time, considering minimum 1 acquisition cycle
     assertThat(filteredLogList.size()).isGreaterThanOrEqualTo(1);
   }
 }
