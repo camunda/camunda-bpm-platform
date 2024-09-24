@@ -1409,7 +1409,6 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstance(variableInstanceId);
 
     // then
-    //verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
     verifyHistoricVariableOperationAssertsWithTaskId(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
     verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
@@ -1428,7 +1427,6 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstance(variableInstanceId);
 
     // then
-    //verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
     verifyHistoricVariableOperationAssertsWithTaskId(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
     verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
