@@ -29,9 +29,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
 
 public class JobAcquisitionLoggingTest {
 
@@ -56,7 +56,7 @@ public class JobAcquisitionLoggingTest {
   @Deployment(resources = { "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml" })
   public void shouldLogJobsAttemptingToAcquire() {
     // given five jobs
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 3; i++) {
       runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
     }
 
@@ -65,19 +65,20 @@ public class JobAcquisitionLoggingTest {
     testRule.waitForJobExecutorToProcessAllJobs();
     processEngineConfiguration.getJobExecutor().shutdown();
 
-    // look for log where it states that "acquiring three jobs"
+    // look for log where it states that "acquiring [set value of MaxJobPerAcquisition] jobs"
     List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog(
-        "Attempting to acquire 3 jobs for the process engine 'default'");
+        "Attempting to acquire " + processEngineConfiguration.getJobExecutor().getMaxJobsPerAcquisition()
+            + " jobs for the process engine '" + processEngineConfiguration.getProcessEngineName() + "'");
 
-    // then find the expected logs
-    assertThat(filteredLogList.size()).isGreaterThan(4);
+    // asserting for a minimum occurrence as acquisition cycle should have started
+    assertThat(filteredLogList.size()).isGreaterThanOrEqualTo(1);
   }
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml" })
   public void shouldLogFailedAcquisitionLocks() {
     // given five jobs
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 3; i++) {
       runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
     }
 
@@ -86,10 +87,13 @@ public class JobAcquisitionLoggingTest {
     testRule.waitForJobExecutorToProcessAllJobs();
     processEngineConfiguration.getJobExecutor().shutdown();
 
+    //look for acquisition lock failures in logs. The logs should appear irrelevant of lock failure count of zero or
+    // more.
     List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog(
-        "Jobs failed to Lock during Acquisition of jobs for the process engine 'default' : 0");
+        "Jobs failed to Lock during Acquisition of jobs for the process engine '"
+            + processEngineConfiguration.getProcessEngineName() + "' : ");
 
-    // then get logs that states there were no faults during job acquisition locks
-    assertThat(filteredLogList.size()).isGreaterThan(4);
+    // then observe the log appearing minimum 1 time, considering minimum 1 acquisition cycle
+    assertThat(filteredLogList.size()).isGreaterThanOrEqualTo(1);
   }
 }

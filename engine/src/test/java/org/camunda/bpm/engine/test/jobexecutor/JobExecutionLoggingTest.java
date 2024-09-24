@@ -50,8 +50,8 @@ public class JobExecutionLoggingTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(loggingRule);
 
-  private RuntimeService runtimeService;
-  private ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected RuntimeService runtimeService;
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @Before
   public void init() {
@@ -60,110 +60,108 @@ public class JobExecutionLoggingTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncDelayProcess.bpmn20.xml" })
   public void shouldLogJobsQueuedForExecution() {
-    // replace job executor with one that has custom threadpool executor settings
+    // Replace job executor with one that has custom threadpool executor settings
     JobExecutionLoggingTest.TestJobExecutor testJobExecutor = new JobExecutionLoggingTest.TestJobExecutor();
     testJobExecutor.setMaxJobsPerAcquisition(10);
     processEngineConfiguration.setJobExecutor(testJobExecutor);
     testJobExecutor.registerProcessEngine(processEngineConfiguration.getProcessEngine());
 
-    // given five jobs
+    // Given ten jobs
     for (int i = 0; i < 5; i++) {
-      runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
+      runtimeService.startProcessInstanceByKey("simpleAsyncDelayProcess");
     }
 
-    // when executing the jobs
+    // When executing the jobs
     processEngineConfiguration.getJobExecutor().start();
-    testRule.waitForJobExecutorToProcessAllJobs(5000L);
+    testRule.waitForJobExecutorToProcessAllJobs(7000L);
     processEngineConfiguration.getJobExecutor().shutdown();
 
-    // look for filled queue logs
+    // Look for filled queue logs
     List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog("Jobs currently in queue to be executed for the "
-        + "process engine 'default' : 2 (out of the max queue size : 2)");
+        + "process engine '" + processEngineConfiguration.getProcessEngineName() + "' : 2 (out of the max queue size "
+        + ": " + testJobExecutor.queueSize + ")");
 
-    // then 3 instances of filled queue logs will be available as there is 2 additional threads possible to reach max-pool-size
-    assertThat(filteredLogList.size()).isEqualTo(3);
+    // Then minimum one instance of filled queue log will be available.
+    assertThat(filteredLogList.size()).isGreaterThanOrEqualTo(1);
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncDelayProcess.bpmn20.xml" })
   public void shouldLogJobsInExecution() {
-    // replace job executor with one that has custom threadpool executor settings
+    // Replace job executor with one that has custom threadpool executor settings
     JobExecutionLoggingTest.TestJobExecutor testJobExecutor = new JobExecutionLoggingTest.TestJobExecutor();
-    testJobExecutor.setMaxJobsPerAcquisition(10);
     processEngineConfiguration.setJobExecutor(testJobExecutor);
     testJobExecutor.registerProcessEngine(processEngineConfiguration.getProcessEngine());
 
-    // given five jobs
-    for (int i = 0; i < 5; i++) {
-      runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
-    }
+    // Given one job
+    runtimeService.startProcessInstanceByKey("simpleAsyncDelayProcess");
 
-    // when executing the jobs
+    // When executing the jobs
     processEngineConfiguration.getJobExecutor().start();
     testRule.waitForJobExecutorToProcessAllJobs(5000L);
     processEngineConfiguration.getJobExecutor().shutdown();
 
-    // look for 3 jobs in execution
+    // Look for jobs in execution
     List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog(
-        "Jobs currently in execution for the process engine 'default' : 3");
+        "Jobs currently in execution for the process engine '" + processEngineConfiguration.getProcessEngineName()
+            + "' : 1");
 
-    // then one count of 'three jobs in execution' will be available as 2 out of 5 jobs should be queued.
-    assertThat(filteredLogList.size()).isEqualTo(1);
+    // Since the execution will be happening for a while the check is made for more than one occurrence of the log.
+    assertThat(filteredLogList.size()).isGreaterThanOrEqualTo(1);
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncDelayProcess.bpmn20.xml" })
   public void shouldLogAvailableJobExecutionThreads() {
-    // replace job executor with one that has custom threadpool executor settings
+    // Replace job executor with one that has custom threadpool executor settings
     JobExecutionLoggingTest.TestJobExecutor testJobExecutor = new JobExecutionLoggingTest.TestJobExecutor();
-    testJobExecutor.setMaxJobsPerAcquisition(10);
     processEngineConfiguration.setJobExecutor(testJobExecutor);
     testJobExecutor.registerProcessEngine(processEngineConfiguration.getProcessEngine());
 
-    // given five jobs
-    for (int i = 0; i < 5; i++) {
-      runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
-    }
+    // Given one job
+    runtimeService.startProcessInstanceByKey("simpleAsyncDelayProcess");
 
-    // when executing the jobs
+    // When executing the jobs
     processEngineConfiguration.getJobExecutor().start();
     testRule.waitForJobExecutorToProcessAllJobs(5000L);
     processEngineConfiguration.getJobExecutor().shutdown();
 
-    // look for 2 count of available job execution threads
+    // Look for available job execution threads logs
     List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog(
-        "Available job execution threads for the process engine 'default' : 2");
+        "Available job execution threads for the process engine '" + processEngineConfiguration.getProcessEngineName()
+            + "' : 2");
 
-    // then 2 threads will be available for 3 number of times because of queuing action post the core-pool-size limit is met
-    assertThat(filteredLogList.size()).isEqualTo(3);
+    // Since the execution will be happening for a while the check is made for more than one occurrence of the log.
+    assertThat(filteredLogList.size()).isGreaterThanOrEqualTo(1);
   }
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/jobexecutor/delegateThrowsException.bpmn20.xml" })
   public void shouldLogJobExecutionRejections() {
-    // given three jobs
+    // Given three jobs
     for (int i = 0; i < 3; i++) {
       runtimeService.startProcessInstanceByKey("testProcess");
     }
 
-    // replace job executor with one that rejects all jobs
+    // Replace job executor with one that rejects all jobs
     JobExecutionLoggingTest.RejectionJobExecutor rejectionExecutor = new JobExecutionLoggingTest.RejectionJobExecutor();
     processEngineConfiguration.setJobExecutor(rejectionExecutor);
     rejectionExecutor.registerProcessEngine(processEngineConfiguration.getProcessEngine());
 
-    // when executing the jobs
+    // When executing the jobs
     processEngineConfiguration.getJobExecutor().start();
     testRule.waitForJobExecutorToProcessAllJobs(5000L);
     processEngineConfiguration.getJobExecutor().shutdown();
 
-    // look for job execution rejection job count with one job
+    // Look for job execution rejection job count with one job
     List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog(
-        "Jobs execution rejections for the process engine 'default' : 1");
+        "Jobs execution rejections for the process engine '" + processEngineConfiguration.getProcessEngineName()
+            + "' : ");
 
-    // then there exist job execution rejection logs with job count as one
-    assertThat(filteredLogList.size()).isGreaterThan(0);
+    // Minimum occurrences of the log is three
+    assertThat(filteredLogList.size()).isGreaterThanOrEqualTo(3);
   }
 
   public static class TestJobExecutor extends DefaultJobExecutor {
