@@ -65,6 +65,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -422,6 +423,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   protected HistoryEvent createHistoricVariableEvent(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope, HistoryEventType eventType) {
     String scopeActivityInstanceId = null;
     String sourceActivityInstanceId = null;
+    String taskId = null;
 
     if(variableInstance.getExecutionId() != null) {
       ExecutionEntity scopeExecution = Context.getCommandContext()
@@ -449,6 +451,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     } else if (sourceVariableScope instanceof TaskEntity) {
       sourceExecution = ((TaskEntity) sourceVariableScope).getExecution();
       if (sourceExecution != null) {
+        List<TaskEntity> taskEntityList = sourceExecution.getTasks();
+        if(taskEntityList!=null && taskEntityList.size()>0)
+          taskId = taskEntityList.get(0).getId();
+
         sourceActivityInstanceId = sourceExecution.getActivityInstanceId();
       }
       else {
@@ -475,6 +481,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     // set source activity instance id
     evt.setActivityInstanceId(sourceActivityInstanceId);
+    if(taskId!=null && evt.getTaskId()==null)
+      evt.setTaskId(taskId);
 
     // mark initial variables on process start
     if (sourceExecution != null && sourceExecution.isProcessInstanceStarting()
@@ -727,6 +735,15 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     if(task != null) {
       evt.setTaskId(task.getId());
       evt.setTaskAssignee(task.getAssignee());
+
+      List <HistoricVariableInstanceEntity> cachedHistoricVariableInstances = Context.getCommandContext().getDbEntityManager().getCachedEntitiesByType(HistoricVariableInstanceEntity.class);
+      for (HistoricVariableInstanceEntity historicVariableInstance : cachedHistoricVariableInstances) {
+        if(executionEntity.getActivityInstanceId()!=null && historicVariableInstance.getActivityInstanceId()!=null) {
+          if (historicVariableInstance.getActivityInstanceId().equals(executionEntity.getActivityInstanceId())) {
+            historicVariableInstance.setTaskId(task.getId());
+          }
+        }
+      }
     }
 
     return evt;
