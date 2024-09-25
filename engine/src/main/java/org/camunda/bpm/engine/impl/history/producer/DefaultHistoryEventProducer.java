@@ -452,8 +452,9 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       sourceExecution = ((TaskEntity) sourceVariableScope).getExecution();
       if (sourceExecution != null) {
         List<TaskEntity> taskEntityList = sourceExecution.getTasks();
-        if(taskEntityList!=null && taskEntityList.size()>0)
+        if(taskEntityList!=null && !taskEntityList.isEmpty()){
           taskId = taskEntityList.get(0).getId();
+        }
 
         sourceActivityInstanceId = sourceExecution.getActivityInstanceId();
       }
@@ -481,8 +482,11 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     // set source activity instance id
     evt.setActivityInstanceId(sourceActivityInstanceId);
-    if(taskId!=null && evt.getTaskId()==null)
+
+    // set task id
+    if(taskId!=null && evt.getTaskId()==null) {
       evt.setTaskId(taskId);
+    }
 
     // mark initial variables on process start
     if (sourceExecution != null && sourceExecution.isProcessInstanceStarting()
