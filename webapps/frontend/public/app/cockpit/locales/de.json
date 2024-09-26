@@ -2555,6 +2555,10 @@
     "VARIABLE_UPLOAD_PROGRESS": "Fortschritt: {{progress}}%",
     "VARIABLE_UPLOAD_SELECT_FILE": "Wähle die Datei, die den binären Inhalt für die Variable beinhaltet",
     "VARIABLE_UPLOAD_UPLOAD": "Hochladen",
-    "WITHOUT_DUE_DATE": "Ohne Fälligkeitsdatum"
+    "WITHOUT_DUE_DATE": "Ohne Fälligkeitsdatum",
+    "SEARCH_LESS_THAN": "<",
+    "SEARCH_LESS_THAN_EQUALS": "<=",
+    "SEARCH_GREATER_THAN": ">",
+    "SEARCH_GREATER_THAN_EQUALS": ">="
   }
 }
