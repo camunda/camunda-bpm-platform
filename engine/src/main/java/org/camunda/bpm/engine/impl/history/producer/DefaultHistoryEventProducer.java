@@ -25,7 +25,6 @@ import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -741,9 +740,11 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       evt.setTaskAssignee(task.getAssignee());
 
       List <HistoricVariableInstanceEntity> cachedHistoricVariableInstances = Context.getCommandContext().getDbEntityManager().getCachedEntitiesByType(HistoricVariableInstanceEntity.class);
+      String executionActivityInstanceId = executionEntity.getActivityInstanceId();
       for (HistoricVariableInstanceEntity historicVariableInstance : cachedHistoricVariableInstances) {
-        if(executionEntity.getActivityInstanceId()!=null && historicVariableInstance.getActivityInstanceId()!=null) {
-          if (historicVariableInstance.getActivityInstanceId().equals(executionEntity.getActivityInstanceId())) {
+        String historicActivityInstanceId = historicVariableInstance.getActivityInstanceId();
+        if(executionActivityInstanceId!=null && historicActivityInstanceId!=null) {
+          if (historicActivityInstanceId.equals(executionActivityInstanceId)) {
             historicVariableInstance.setTaskId(task.getId());
           }
         }
