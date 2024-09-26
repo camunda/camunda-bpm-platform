@@ -6,11 +6,9 @@
 engine-webapp-unit:
 # engine-webapp-unit.databases should include all supported database versions
   databases:
-  - 'postgresql_132'
   - 'postgresql_142'
   - 'postgresql_150'
   - 'postgresql_160'
-  - 'aws_aurora_postgresql_13'
   - 'aws_aurora_postgresql_14'
   - 'aws_aurora_postgresql_15'
   - 'mariadb_106'
