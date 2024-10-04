@@ -28,6 +28,7 @@ public class ProcessInstanceDto extends LinkableDto {
   private boolean ended;
   private boolean suspended;
   private String tenantId;
+  private String definitionKey;
 
   public ProcessInstanceDto() {
   }
@@ -35,6 +36,7 @@ public class ProcessInstanceDto extends LinkableDto {
   public ProcessInstanceDto(ProcessInstance instance) {
     this.id = instance.getId();
     this.definitionId = instance.getProcessDefinitionId();
+    this.definitionKey = instance.getProcessDefinitionKey();
     this.businessKey = instance.getBusinessKey();
     this.caseInstanceId = instance.getCaseInstanceId();
     this.ended = instance.isEnded();
@@ -48,6 +50,10 @@ public class ProcessInstanceDto extends LinkableDto {
 
   public String getDefinitionId() {
     return definitionId;
+  }
+
+  public String getDefinitionKey() {
+    return definitionKey;
   }
 
   public String getBusinessKey() {

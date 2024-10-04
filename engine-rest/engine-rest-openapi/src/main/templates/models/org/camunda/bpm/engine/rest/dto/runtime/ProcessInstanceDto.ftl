@@ -13,6 +13,11 @@
         desc = "The id of the process definition that this process instance belongs to." />
 
     <@lib.property
+        name = "definitionKey"
+        type = "string"
+        desc = "The key of the process definition that this process instance belongs to." />
+
+    <@lib.property
         name = "businessKey"
         type = "string"
         desc = "The business key of the process instance." />
