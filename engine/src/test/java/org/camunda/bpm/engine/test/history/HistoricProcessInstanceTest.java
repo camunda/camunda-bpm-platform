@@ -2330,6 +2330,27 @@ public class HistoricProcessInstanceTest {
                 .collect(Collectors.toList()));
   }
 
+  @Test(expected = ProcessEngineException.class)
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/failingProcessCreateOneIncident.bpmn20.xml"})
+  public void failsOnProcessDefinitionIdOrIncidentIdIn() {
+    // Given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
+    testHelper.executeAvailableJobs();
+
+    Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
+
+    // When
+    historyService.createHistoricProcessInstanceQuery()
+        .or()
+        .incidentIdIn(incident.getId())
+        .processDefinitionId(processInstance.getProcessDefinitionId())
+        .endOr()
+        .list();
+
+    // Then
+  }
+
   @Test
   public void shouldFailWhenQueryWithNullIncidentIdIn() {
     try {
