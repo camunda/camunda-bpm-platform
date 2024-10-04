@@ -53,7 +53,7 @@ public class ProcessInstanceDto extends LinkableDto {
   }
 
   public String getDefinitionKey() {
-	  return definitionKey;
+    return definitionKey;
   }
 
   public String getBusinessKey() {
