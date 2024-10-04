@@ -25,6 +25,7 @@ import static org.mockito.Mockito.mock;
 
 import java.io.InputStream;
 import java.util.Map;
+import java.util.UUID;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionLogic;
@@ -775,6 +776,20 @@ public class DmnEngineApiTest extends DmnEngineTest {
     assertThat((String) results.getSingleEntry())
       .isNotNull()
       .isEqualTo(EXPECTED_OUTPUT_VALUE);
+  }
+
+  @Test
+  @DecisionResource(resource = ONE_RULE_DMN)
+  public void shouldEvaluateDecisionWithDecisionInstanceId() {
+    String decisionInstanceId = UUID.randomUUID().toString();
+    DmnDecisionResult results = dmnEngine.evaluateDecision(decision, createVariables().putValue("input", INPUT_VALUE).asVariableContext(), decisionInstanceId);
+
+    assertThat((String) results.getSingleEntry())
+      .isNotNull()
+      .isEqualTo(EXPECTED_OUTPUT_VALUE);
+    assertThat(results.getDmnDecisionInstanceId())
+      .isNotNull()
+      .isEqualTo(decisionInstanceId);
   }
 
   @Test
