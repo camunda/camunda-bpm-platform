@@ -250,7 +250,7 @@
       <if test="query.isOrQueryActive">
         <bind name="JOIN_TYPE" value="'left join'" />
       </if>
-      <if test="query != null &amp;&amp; (query.candidateUser != null || query.candidateGroups != null || query.involvedUser != null || query.withCandidateGroups || query.withCandidateUsers)">
+      <if test="query != null &amp;&amp; (query.candidateUser != null || query.candidateGroups != null  || query.candidateGroupLike != null || query.involvedUser != null || query.withCandidateGroups || query.withCandidateUsers)">
         <bind name="I_JOIN" value="true" />
       </if>
       <!-- the process definition table is joined if
@@ -577,14 +577,14 @@
             <if test="query.isWithoutTenantId">
               ${queryType} RES.TENANT_ID_ is null
             </if>
-            <if test="query.candidateUser != null || query.candidateGroups != null || query.withCandidateGroups || query.withCandidateUsers">
+            <if test="query.candidateUser != null || query.candidateGroups != null || query.candidateGroupLike != null || query.withCandidateGroups || query.withCandidateUsers">
               ${queryType}
               <trim prefixOverrides="and" prefix="(" suffix=")">
                 <if test="!query.includeAssignedTasks">
                   and RES.ASSIGNEE_ is null
                 </if>
                 and I.TYPE_ = 'candidate'
-                <if test="query.candidateUser != null || query.candidateGroups != null">
+                <if test="query.candidateUser != null || query.candidateGroups != null || query.candidateGroupLike != null">
                   and
                   (
                   <if test="query.candidateUser != null">
@@ -599,6 +599,14 @@
                              open="(" separator="," close=")">
                       #{group}
                     </foreach>
+                  </if>
+                  <!-- If we need to add the candidateGroupsLike statement and there have been previous statements
+                   in the candidates block, then we need to add an "or" first -->
+                  <if test="query.candidateGroupLike != null &amp;&amp; (query.candidateUser != null || (query.candidateGroups != null &amp;&amp; query.candidateGroups.size &gt; 0))">
+                    or
+                  </if>
+                  <if test="query.candidateGroupLike != null">
+                    I.GROUP_ID_ LIKE #{candidateGroupLike}
                   </if>
                   )
                 </if>

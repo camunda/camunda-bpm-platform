@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-root</artifactId>
-    <version>7.22.0-SNAPSHOT</version>
+    <version>7.23.0-SNAPSHOT</version>
     <relativePath>../</relativePath>
   </parent>
 
@@ -18,7 +18,7 @@
   </description>
 
   <properties>
-    <version.quarkus>3.14.2</version.quarkus>
+    <version.quarkus>3.15.0</version.quarkus>
     <version.spring.framework>5.3.36</version.spring.framework>
     <version.spring.framework6>6.1.8</version.spring.framework6>
     <version.spring-boot>3.3.3</version.spring-boot>
@@ -63,7 +63,7 @@
     <version.wildfly26.core>18.0.4.Final</version.wildfly26.core>
 
     <version.tomcat9>9.0.90</version.tomcat9>
-    <version.tomcat>10.1.25</version.tomcat>
+    <version.tomcat>10.1.30</version.tomcat>
 
     <version.arquillian>1.1.10.Final</version.arquillian>
     <version.shrinkwrap.resolvers>2.2.2</version.shrinkwrap.resolvers>
@@ -74,8 +74,8 @@
     <version.jakarta-ee-spec>10.0.0</version.jakarta-ee-spec>
 
     <version.eirslett.frontend.maven.plugin>1.12.1</version.eirslett.frontend.maven.plugin>
-    <version.nodejs>17.9.1</version.nodejs>
-    <version.npm>8.11.0</version.npm>
+    <version.nodejs>20.14.0</version.nodejs>
+    <version.npm>10.7.0</version.npm>
 
     <!-- OSGi bundles properties -->
     <camunda.artifact />

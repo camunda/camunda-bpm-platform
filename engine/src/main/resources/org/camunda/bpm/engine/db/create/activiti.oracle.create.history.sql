@@ -288,6 +288,7 @@ create table ACT_HI_JOB_LOG (
     TENANT_ID_ NVARCHAR2(64),
     HOSTNAME_ NVARCHAR2(255),
     REMOVAL_TIME_ TIMESTAMP(6),
+    BATCH_ID_ NVARCHAR2(64),
     primary key (ID_)
 );
 

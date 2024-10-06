@@ -131,6 +131,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String[] assigneeNotIn;
   private String candidateGroup;
   private String candidateGroupExpression;
+  private String candidateGroupLike;
   private String candidateUser;
   private String candidateUserExpression;
   private Boolean includeAssignedTasks;
@@ -345,6 +346,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam("candidateGroupExpression")
   public void setCandidateGroupExpression(String candidateGroupExpression) {
     this.candidateGroupExpression = candidateGroupExpression;
+  }
+
+  @CamundaQueryParam("candidateGroupLike")
+  public void setCandidateGroupLike(String candidateGroupLike) {
+    this.candidateGroupLike = candidateGroupLike;
   }
 
   @CamundaQueryParam(value = "withCandidateGroups", converter = BooleanConverter.class)
@@ -821,6 +827,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return candidateGroupExpression;
   }
 
+  public String getCandidateGroupLike() {
+    return candidateGroupLike;
+  }
+
   public String getCandidateUser() {
     return candidateUser;
   }
@@ -1168,6 +1178,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     if (candidateGroupExpression != null) {
       query.taskCandidateGroupExpression(candidateGroupExpression);
+    }
+    if (candidateGroupLike != null) {
+      query.taskCandidateGroupLike(candidateGroupLike);
     }
     if (withCandidateGroups != null && withCandidateGroups) {
       query.withCandidateGroups();
@@ -1570,6 +1583,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
     dto.candidateUser = taskQuery.getCandidateUser();
     dto.candidateGroup = taskQuery.getCandidateGroup();
+    dto.candidateGroupLike = taskQuery.getCandidateGroupLike();
     dto.candidateGroups = taskQuery.getCandidateGroupsInternal();
     dto.includeAssignedTasks = taskQuery.isIncludeAssignedTasksInternal();
     dto.withCandidateGroups = taskQuery.isWithCandidateGroups();

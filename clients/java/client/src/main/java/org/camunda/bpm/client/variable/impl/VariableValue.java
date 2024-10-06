@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class VariableValue<T extends TypedValue> {
 
-  protected String processInstanceId;
+  protected String executionId;
   protected String variableName;
   protected TypedValueField typedValueField;
   protected ValueMappers mappers;
@@ -30,8 +30,8 @@ public class VariableValue<T extends TypedValue> {
   protected ValueMapper<T> serializer;
   protected T cachedValue;
 
-  public VariableValue(String processInstanceId, String variableName, TypedValueField typedValueField, ValueMappers mappers) {
-    this.processInstanceId = processInstanceId;
+  public VariableValue(String executionId, String variableName, TypedValueField typedValueField, ValueMappers mappers) {
+    this.executionId = executionId;
     this.variableName = variableName;
     this.typedValueField = typedValueField;
     this.mappers = mappers;
@@ -63,7 +63,7 @@ public class VariableValue<T extends TypedValue> {
 
       if (cachedValue instanceof DeferredFileValueImpl) {
         DeferredFileValueImpl fileValue = (DeferredFileValueImpl) cachedValue;
-        fileValue.setProcessInstanceId(processInstanceId);
+        fileValue.setExecutionId(executionId);
         fileValue.setVariableName(variableName);
       }
     }
@@ -83,7 +83,7 @@ public class VariableValue<T extends TypedValue> {
   public String toString() {
     return "VariableValue ["
         + "cachedValue=" + cachedValue + ", "
-        + "processInstanceId=" + processInstanceId + ", "
+        + "executionId=" + executionId + ", "
         + "variableName=" + variableName + ", "
         + "typedValueField=" + typedValueField + "]";
   }

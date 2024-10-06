@@ -8,7 +8,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-engine-rest-root</artifactId>
     <relativePath>../</relativePath>
-    <version>7.22.0-SNAPSHOT</version>
+    <version>7.23.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -86,7 +86,6 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -218,7 +217,6 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-testing</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
 

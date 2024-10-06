@@ -1868,7 +1868,8 @@ public abstract class MockProvider {
       .priority(EXAMPLE_JOB_PRIORITY)
       .jobDefinitionId(EXAMPLE_JOB_DEFINITION_ID)
       .createTime(DateTimeUtil.parseDate(EXAMPLE_JOB_CREATE_TIME))
-      .failedActivityId(EXAMPLE_JOB_FAILED_ACTIVITY_ID);
+      .failedActivityId(EXAMPLE_JOB_FAILED_ACTIVITY_ID)
+      .batchId(EXAMPLE_BATCH_ID);
   }
 
   public static List<Job> createMockJobs() {
@@ -2985,6 +2986,7 @@ public abstract class MockProvider {
     when(mock.getTenantId()).thenReturn(tenantId);
     when(mock.getRootProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_ROOT_PROC_INST_ID);
     when(mock.getHostname()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_HOSTNAME);
+    when(mock.getBatchId()).thenReturn(EXAMPLE_BATCH_ID);
 
     when(mock.isCreationLog()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_IS_CREATION_LOG);
     when(mock.isFailureLog()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_IS_FAILURE_LOG);
