@@ -19,8 +19,8 @@
 
   <properties>
     <version.quarkus>3.15.0</version.quarkus>
-    <version.spring.framework>5.3.36</version.spring.framework>
-    <version.spring.framework6>6.1.8</version.spring.framework6>
+    <version.spring.framework>5.3.39</version.spring.framework>
+    <version.spring.framework6>6.1.13</version.spring.framework6>
     <version.spring-boot>3.3.3</version.spring-boot>
     <version.resteasy>3.15.6.Final</version.resteasy>
     <version.jersey2>2.34</version.jersey2>
