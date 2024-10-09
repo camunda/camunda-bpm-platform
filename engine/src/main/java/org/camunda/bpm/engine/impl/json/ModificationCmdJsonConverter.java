@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.json;
 
+import org.camunda.bpm.engine.impl.cmd.AbstractInstantiationCmd;
 import org.camunda.bpm.engine.impl.cmd.AbstractProcessInstanceModificationCommand;
 import org.camunda.bpm.engine.impl.cmd.ActivityAfterInstantiationCmd;
 import org.camunda.bpm.engine.impl.cmd.ActivityBeforeInstantiationCmd;
@@ -38,6 +39,7 @@ public class ModificationCmdJsonConverter extends JsonObjectConverter<AbstractPr
   public static final String CANCEL_ACTIVITY_INSTANCES = "cancelActivityInstances";
   public static final String PROCESS_INSTANCE = "processInstances";
   public static final String CANCEL_TRANSITION_INSTANCES = "cancelTransitionInstances";
+  public static final String ANCESTOR_ACTIVITY_INSTANCE_ID = "ancestorActivityInstanceId";
 
   @Override
   public JsonObject toJsonObject(AbstractProcessInstanceModificationCommand command) {
@@ -45,6 +47,7 @@ public class ModificationCmdJsonConverter extends JsonObjectConverter<AbstractPr
 
     if (command instanceof ActivityAfterInstantiationCmd) {
       JsonUtil.addField(json, START_AFTER, ((ActivityAfterInstantiationCmd) command).getTargetElementId());
+      JsonUtil.addField(json, ANCESTOR_ACTIVITY_INSTANCE_ID, ((ActivityAfterInstantiationCmd) command).getAncestorActivityInstanceId());
     }
     else if (command instanceof ActivityBeforeInstantiationCmd) {
       JsonUtil.addField(json, START_BEFORE, ((ActivityBeforeInstantiationCmd) command).getTargetElementId());
@@ -78,6 +81,7 @@ public class ModificationCmdJsonConverter extends JsonObjectConverter<AbstractPr
     }
     else if (json.has(START_AFTER)) {
       cmd = new ActivityAfterInstantiationCmd(JsonUtil.getString(json, START_AFTER));
+      ((AbstractInstantiationCmd) cmd).setAncestorActivityInstanceId(JsonUtil.getString(json, ANCESTOR_ACTIVITY_INSTANCE_ID, null));
     }
     else if (json.has(START_TRANSITION)) {
       cmd = new TransitionInstantiationCmd(JsonUtil.getString(json, START_TRANSITION));
