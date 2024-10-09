@@ -52,8 +52,6 @@ public class ExceptionHandlerHelper {
     Response.Status responseStatus = getStatus(throwable);
     ExceptionDto exceptionDto = fromException(throwable);
 
-    provideExceptionCode(throwable, exceptionDto);
-
     return Response
         .status(responseStatus)
         .entity(exceptionDto)
@@ -85,17 +83,21 @@ public class ExceptionHandlerHelper {
   }
 
   public ExceptionDto fromException(Throwable e) {
+    ExceptionDto exceptionDto;
     if (e instanceof MigratingProcessInstanceValidationException) {
-      return MigratingProcessInstanceValidationExceptionDto.from((MigratingProcessInstanceValidationException)e);
+      exceptionDto = MigratingProcessInstanceValidationExceptionDto.from((MigratingProcessInstanceValidationException)e);
     } else if (e instanceof MigrationPlanValidationException) {
-      return MigrationPlanValidationExceptionDto.from((MigrationPlanValidationException)e);
+      exceptionDto = MigrationPlanValidationExceptionDto.from((MigrationPlanValidationException)e);
     } else if (e instanceof AuthorizationException) {
-      return AuthorizationExceptionDto.fromException((AuthorizationException)e);
+      exceptionDto = AuthorizationExceptionDto.fromException((AuthorizationException)e);
     } else if (e instanceof ParseException){
-      return ParseExceptionDto.fromException((ParseException) e);
+      exceptionDto = ParseExceptionDto.fromException((ParseException) e);
     } else {
-      return ExceptionDto.fromException(e);
+      exceptionDto = ExceptionDto.fromException(e);
     }
+    provideExceptionCode(e, exceptionDto);
+
+    return exceptionDto;
   }
 
   public Response.Status getStatus(Throwable exception) {
