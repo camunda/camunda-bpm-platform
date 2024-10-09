@@ -12,7 +12,7 @@
   <name>Camunda Platform - QA - test new schema with old engine</name>
 
   <properties>
-    <camunda.old.engine.version>7.21.0</camunda.old.engine.version>
+    <camunda.old.engine.version>7.22.0</camunda.old.engine.version>
   </properties>
 
   <build>
@@ -90,20 +90,6 @@
       </build>
     </profile>
 
-     <profile>
-      <id>oracle-23</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <skipTests>true</skipTests>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>   
-
     <profile>
       <id>old-engine</id>
 
@@ -113,7 +99,7 @@
             <groupId>org.camunda.bpm</groupId>
             <artifactId>camunda-bom</artifactId>
             <!-- Cannot use variables due to bug in Maven Release Plugin -->
-            <version>7.21.0</version>
+            <version>7.22.0</version>
             <scope>import</scope>
             <type>pom</type>
           </dependency>
@@ -426,6 +412,9 @@
                 <!-- The test is not relevant in `old-engine` setup since the feature has been removed -->
                 <!-- See https://github.com/camunda/camunda-bpm-platform/pull/4544#discussion_r1728748399 -->
                 <exclude>**/ConcurrentTelemetryConfigurationTest.java</exclude>
+
+                <!-- The test is not relevant in `old-engine` setup and lacks necessary resource files -->
+                <exclude>**DatabaseNamingConsistencyTest.java</exclude>
               </excludes>
               <testFailureIgnore>false</testFailureIgnore>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>

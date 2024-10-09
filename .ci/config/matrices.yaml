@@ -36,7 +36,6 @@ daily-stages:
   - 'aws_aurora_postgresql_15'
   - 'mariadb_106'
   - 'mysql_80'
-  - 'oracle_19'
   - 'oracle_23'
   - 'db2_115'
   - 'sqlserver_2022'
