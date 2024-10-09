@@ -130,9 +130,9 @@ public class BpmnExceptionHandler {
       if (origException == null) {
 
         if (Context.getCommandContext().getProcessEngineConfiguration().isEnableExceptionsAfterUnhandledBpmnError()) {
-          throw LOG.missingBoundaryCatchEventError(execution.getActivity().getId(), errorCode);
+          throw LOG.missingBoundaryCatchEventError(execution.getActivity().getId(), errorCode, errorMessage);
         } else {
-          LOG.missingBoundaryCatchEvent(execution.getActivity().getId(), errorCode);
+          LOG.missingBoundaryCatchEvent(execution.getActivity().getId(), errorCode, errorMessage);
           execution.end(true);
         }
       } else {
