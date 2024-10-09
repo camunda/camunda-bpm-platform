@@ -289,7 +289,7 @@ public class TaskListenerErrorThrowTest extends AbstractTaskListenerTest {
     } catch (ProcessEngineException e) {
       // then
       assertTrue(e.getMessage().contains("There was an exception while invoking the TaskListener"));
-      assertTrue(e.getMessage().contains("Execution with id 'mainTask' throws an error event with errorCode '208', but no error handler was defined."));
+      assertTrue(e.getMessage().contains("Execution with id 'mainTask' throws an error event with errorCode '208' and errorMessage 'business error 208', but no error handler was defined."));
     }
 
     // then

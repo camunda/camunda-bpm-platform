@@ -29,13 +29,14 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 public class BpmnBehaviorLogger extends ProcessEngineLogger {
 
 
-  public void missingBoundaryCatchEvent(String executionId, String errorCode) {
+  public void missingBoundaryCatchEvent(String executionId, String errorCode, String errorMessage) {
     logInfo(
       "001",
-      "Execution with id '{}' throws an error event with errorCode '{}', but no catching boundary event was defined. " +
+      "Execution with id '{}' throws an error event with errorCode '{}' and errorMessage '{}', but no catching boundary event was defined. " +
         "Execution is ended (none end event semantics).",
       executionId,
-      errorCode
+      errorCode,
+      errorMessage
     );
   }
 
@@ -262,13 +263,14 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
       exceptionMessage("041", "Class '{}' doesn't implement '{}'.", className, delegateVarMapping));
   }
 
-  public ProcessEngineException missingBoundaryCatchEventError(String executionId, String errorCode) {
+  public ProcessEngineException missingBoundaryCatchEventError(String executionId, String errorCode, String errorMessage) {
     return new ProcessEngineException(
       exceptionMessage(
         "042",
-        "Execution with id '{}' throws an error event with errorCode '{}', but no error handler was defined. ",
+        "Execution with id '{}' throws an error event with errorCode '{}' and errorMessage '{}', but no error handler was defined. ",
         executionId,
-        errorCode));
+        errorCode,
+        errorMessage));
   }
 
 
