@@ -104,7 +104,11 @@ public class ProcessesXmlParse extends DeploymentMetadataParse {
         processArchive.setProcessEngineName(childElement.getText());
 
       } else if(PROCESS.equals(childElement.getTagName()) || RESOURCE.equals(childElement.getTagName())) {
-        processResourceNames.add(childElement.getText());
+        String resource = childElement.getText();
+        if (resource != null) {
+          resource = resource.trim();
+        }
+        processResourceNames.add(resource);
 
       } else if(PROPERTIES.equals(childElement.getTagName())) {
         parseProperties(childElement, properties);
