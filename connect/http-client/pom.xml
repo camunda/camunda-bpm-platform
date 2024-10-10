@@ -19,15 +19,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-    </dependency>
-    <!-- commons-codec is a transitive dependency of httpclient;
-      we override its version here in order to update the default commons-codec
-      version which has known vulnerabilities, see https://jira.camunda.com/browse/CAM-12774 -->
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
     </dependency>
 
     <dependency>
