@@ -17,22 +17,18 @@
     <!-- job executor configurations -->
     <property name="jobExecutorActivate" value="false" />
 
-    <!-- enabled authorization -->
-    <property name="authorizationEnabled" value="true" />
-
     <!-- mail server configurations -->
     <property name="mailServerPort" value="${mail.server.port}" />
     <property name="history" value="full" />
 
-    <!-- disable metrics -->
-    <property name="metricsEnabled" value="false" />
+    <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
+    <property name="taskMetricsEnabled" value="false" />
 
-    <property name="jdbcBatchProcessing" value="false"/>
+    <property name="defaultSerializationFormat" value="application/json"/>
 
-    <property name="generalResourceWhitelistPattern" value=".+"/>
+    <property name="jdbcBatchProcessing" value="${jdbcBatchProcessing}"/>
 
-    <property name="enforceHistoryTimeToLive" value="false" />
   </bean>
 
 </beans>

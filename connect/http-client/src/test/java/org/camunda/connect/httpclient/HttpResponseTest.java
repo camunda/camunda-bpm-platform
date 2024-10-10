@@ -94,7 +94,7 @@ public class HttpResponseTest {
   @Test
   public void testSuccessfulResponseCode() {
     // given
-    testResponse.statusCode(200);
+    testResponse.code(200);
     // when
     HttpResponse response = getResponse();
     // then
@@ -104,7 +104,7 @@ public class HttpResponseTest {
   @Test
   public void testResponseErrorCodeForMalformedRequest() {
     // given
-    testResponse.statusCode(400);
+    testResponse.code(400);
     // when
     HttpResponse response = getResponse();
     // then
@@ -114,7 +114,7 @@ public class HttpResponseTest {
   @Test
   public void testResponseErrorCodeForServerError() {
     // given
-    testResponse.statusCode(500);
+    testResponse.code(500);
     // when
     HttpResponse response = getResponse();
     // then
@@ -124,7 +124,7 @@ public class HttpResponseTest {
   @Test
   public void testServerErrorResponseWithConfigOptionSet() {
     // given
-    testResponse.statusCode(500);
+    testResponse.code(500);
     try {
       // when
       connector.createRequest().configOption("throw-http-error", "TRUE").url("http://camunda.com").get().execute();
@@ -138,7 +138,7 @@ public class HttpResponseTest {
   @Test
   public void testMalformedRequestWithConfigOptionSet() {
     // given
-    testResponse.statusCode(400);
+    testResponse.code(400);
     try {
       // when
       connector.createRequest().configOption("throw-http-error", "TRUE").url("http://camunda.com").get().execute();
@@ -152,7 +152,7 @@ public class HttpResponseTest {
   @Test
   public void testSuccessResponseWithConfigOptionSet() {
     // given
-    testResponse.statusCode(200);
+    testResponse.code(200);
     // when
     connector.createRequest().configOption("throw-http-error", "TRUE").url("http://camunda.com").get().execute();
     // then
@@ -163,7 +163,7 @@ public class HttpResponseTest {
   @Test
   public void testMalformedRequestWithConfigOptionSetToFalse() {
     // given
-    testResponse.statusCode(400);
+    testResponse.code(400);
     // when
     connector.createRequest().configOption("throw-http-error", "FALSE").url("http://camunda.com").get().execute();
     // then
