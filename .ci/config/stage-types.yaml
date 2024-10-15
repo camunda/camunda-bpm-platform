@@ -23,7 +23,7 @@ db-unit:
   directory: '.'
   command: 'clean package -pl "engine,webapps/assembly,webapps/assembly-jakarta" -Dskip.frontend.build=true -P'
   stash:
-    runtimeStash: true
+    runtimeStash: false
   labels:
   - 'all-db'
   - 'db2'
@@ -32,7 +32,9 @@ db-unit:
   - 'mariadb'
   - 'sqlserver'
   - 'postgresql'
-  jdkVersion: 'openjdk-jdk-11-latest'
+  podSpec:
+    cpu: 4
+    image: 'maven:3.8.5-eclipse-temurin-11'
 sql-scripts:
   directory: 'distro/sql-script'
   command: 'install -Pcheck-sql,'
