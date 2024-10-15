@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.api.dmn;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assert.assertNotNull;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
@@ -191,7 +192,7 @@ public class DecisionServiceTest {
         .evaluateDecisionById(decisionDefinition.getId())
         .variables(createVariables())
         .evaluate();
-
+    assertNotNull("The value of decisionInstanceId should not be null", decisionResult.getDmnDecisionInstanceId());
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
 

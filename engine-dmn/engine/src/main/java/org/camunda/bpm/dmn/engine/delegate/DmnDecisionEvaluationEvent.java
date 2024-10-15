@@ -42,4 +42,9 @@ public interface DmnDecisionEvaluationEvent {
    * @return the number of executed decision elements during the evaluation
    */
   long getExecutedDecisionElements();
+
+  /**
+   * @return the decisionInstanceId generated part of DMN evaluation
+   */
+  String getDecisionInstanceId();
 }
