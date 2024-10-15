@@ -71,6 +71,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   protected String failedActivityId;
   protected boolean noRetriesLeft;
   protected SuspensionState suspensionState;
+  protected boolean executing;
 
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
@@ -257,6 +258,11 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     return this;
   }
 
+  public JobQuery executing() {
+    executing = true;
+    return this;
+  }
+
   @Override
   protected boolean hasExcludingConditions() {
     return super.hasExcludingConditions()
@@ -401,6 +407,9 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   }
   public String getExceptionMessage() {
     return exceptionMessage;
+  }
+  public boolean getExecuting() {
+    return executing;
   }
 
 }
