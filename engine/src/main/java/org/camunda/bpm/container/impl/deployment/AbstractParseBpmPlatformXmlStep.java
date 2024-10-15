@@ -215,6 +215,18 @@ public abstract class AbstractParseBpmPlatformXmlStep extends DeploymentOperatio
     return fileLocation;
   }
 
+  public URL testMethod(String url) throws MalformedURLException {
+    Pattern pattern = Pattern.compile("^(/|[A-z]://?|A-Za-z]:\\\\).*[/|\\\\]bpm-platform\\.xml$");
+    Matcher fileMatcher = pattern.matcher(url);
+    if (fileMatcher.matches()) {
+      File location = new File(url);
+      if (location.isAbsolute() && location.exists()) {
+        return location.toURI().toURL();
+      }
+    }
+    return null;
+  }
+
   public abstract URL getBpmPlatformXmlStream(DeploymentOperation operationContext);
 
 }
