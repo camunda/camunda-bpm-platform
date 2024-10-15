@@ -48,6 +48,7 @@ import org.camunda.bpm.engine.rest.dto.runtime.SetJobRetriesByProcessDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.CorrelationMessageAsyncDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.DeleteProcessInstancesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.SetVariablesAsyncDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceWithVariablesDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
@@ -75,7 +76,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   @Override
   public List<ProcessInstanceDto> queryProcessInstances(
-      ProcessInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
+    ProcessInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
     ProcessEngine engine = getProcessEngine();
     queryDto.setObjectMapper(getObjectMapper());
     ProcessInstanceQuery query = queryDto.toQuery(engine);
@@ -84,8 +85,18 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
     List<ProcessInstanceDto> instanceResults = new ArrayList<>();
     for (ProcessInstance instance : matchingInstances) {
-      ProcessInstanceDto resultInstance = ProcessInstanceDto.fromProcessInstance(instance);
-      instanceResults.add(resultInstance);
+      if (null!= queryDto.isWithVariablesInReturn() && queryDto.isWithVariablesInReturn()){
+        RuntimeService runtimeService = engine.getRuntimeService();       
+        VariableMap variableMap = (VariableMap) runtimeService.getVariables(instance.getProcessInstanceId());
+	Map<String, VariableValueDto> variableValueDtoMap=  VariableValueDto.fromMap(variableMap);
+	ProcessInstanceWithVariablesDto resultInstanceWithVariable = new ProcessInstanceWithVariablesDto(instance);
+	resultInstanceWithVariable.setVariables(variableValueDtoMap);
+	instanceResults.add(resultInstanceWithVariable);	
+      }
+      else {
+         ProcessInstanceDto resultInstance = ProcessInstanceDto.fromProcessInstance(instance);
+         instanceResults.add(resultInstance);
+      }
     }
     return instanceResults;
   }
