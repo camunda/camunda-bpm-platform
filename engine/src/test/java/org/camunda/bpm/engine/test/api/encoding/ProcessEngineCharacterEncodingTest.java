@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.task.Comment;
@@ -90,6 +89,10 @@ public class ProcessEngineCharacterEncodingTest {
     return task;
   }
 
+  protected Comment createNewComment(String taskId, String message) {
+    return taskService.createComment(taskId, null, message);
+  }
+
   @Test
   public void shouldPreserveArabicTaskCommentMessageWithCharset() {
     // given
@@ -118,4 +121,37 @@ public class ProcessEngineCharacterEncodingTest {
     assertThat(taskComments.get(0).getFullMessage()).isEqualTo(message);
   }
 
+  @Test
+  public void shouldPreserveArabicTaskUpdateCommentMessageWithCharset() {
+    // given
+    String taskId = newTask().getId();
+    Comment comment = createNewComment(taskId, "OriginalMessage");
+
+    // when
+    String updatedMessage = "این نمونه است";
+    taskService.updateTaskComment(taskId, comment.getId(), updatedMessage);
+
+    Comment updatedComment = taskService.getTaskComment(taskId, comment.getId());
+
+    // then
+    assertThat(updatedComment).isNotNull();
+    assertThat(updatedComment.getFullMessage()).isEqualTo(updatedMessage);
+  }
+
+  @Test
+  public void shouldPreserveLatinTaskUpdateCommentMessageWithCharset() {
+    // given
+    String taskId = newTask().getId();
+    Comment comment = createNewComment(taskId, "OriginalMessage");
+
+    // when
+    String updatedMessage = "This is an example";
+    taskService.updateTaskComment(taskId, comment.getId(), updatedMessage);
+
+    Comment updatedComment = taskService.getTaskComment(taskId, comment.getId());
+
+    // then
+    assertThat(updatedComment).isNotNull();
+    assertThat(updatedComment.getFullMessage()).isEqualTo(updatedMessage);
+  }
 }
