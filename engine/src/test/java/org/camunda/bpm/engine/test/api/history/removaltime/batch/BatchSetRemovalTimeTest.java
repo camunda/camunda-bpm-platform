@@ -421,6 +421,34 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  public void testRemovalTimeProcess_shouldCreateProcessInstanceRelatedBatchJobsForSingleInvocations() {
+    // given
+    testRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(1);
+
+    String processInstanceIdOne = testRule.process().userTask().deploy().start();
+    String processInstanceIdTwo = testRule.process().userTask().deploy().start();
+
+    // when
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+    Batch batch = historyService.setRemovalTimeToHistoricProcessInstances()
+            .absoluteRemovalTime(REMOVAL_TIME)
+            .byQuery(query)
+            .executeAsync();
+
+    testRule.executeSeedJobs(batch);
+
+    // then
+    //Making sure that processInstanceId is set in execution jobs #4205
+    List<Job> executionJobs = testRule.getExecutionJobs(batch);
+    assertThat(executionJobs)
+            .extracting("processInstanceId")
+            .containsExactlyInAnyOrder(processInstanceIdOne, processInstanceIdTwo);
+
+    // clear
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
   public void shouldSetRemovalTime_SingleInvocationPerBatchJob() {
     // given
     testRule.getProcessEngineConfiguration()
@@ -2835,6 +2863,9 @@ public class BatchSetRemovalTimeTest {
                 .putValue("temperature", 32)
                 .putValue("dayType", "Weekend")
         ).evaluate();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+
     Batch batch = historyService.setRemovalTimeToHistoricDecisionInstances()
         .absoluteRemovalTime(CURRENT_DATE)
         .byQuery(historyService.createHistoricDecisionInstanceQuery())
@@ -2851,6 +2882,11 @@ public class BatchSetRemovalTimeTest {
 
     assertThat(batch.getExecutionStartTime()).isEqualToIgnoringMillis(CURRENT_DATE);
     assertThat(historicBatch.getExecutionStartTime()).isEqualToIgnoringMillis(CURRENT_DATE);
+
+    //Making sure that processInstanceId is set in execution jobs #4205
+    assertThat(executionJobs)
+            .extracting("processInstanceId")
+            .containsExactlyInAnyOrder(query.list().stream().map(HistoricDecisionInstance::getId).toArray());
   }
 
 }
