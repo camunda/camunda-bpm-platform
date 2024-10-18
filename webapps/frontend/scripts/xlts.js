@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-const scope = 'xlts.dev';
+const scope = 'neverendingsupport';
 
 const {execSync} = require('child_process');
 
@@ -33,18 +33,24 @@ const exec = (cmd, successMsg) => {
   }).toString();
 };
 
+const dependencyVersion = (npmPackage, xltsVersion) => {
+  let versionPostfix = npmPackage.split('-')[1] || '';
+  versionPostfix = versionPostfix ? '-' + versionPostfix : '';
+  return `${npmPackage}@npm:@${scope}/angularjs@${xltsVersion}${versionPostfix}`;
+};
+
 const registryConfigured = exec(`npm get @${scope}:registry`) !== 'undefined\n';
 
 const {XLTS_REGISTRY, XLTS_AUTH_TOKEN} = process.env;
 
 if (!registryConfigured && XLTS_REGISTRY && XLTS_AUTH_TOKEN) {
   exec(
-    `npm set @${scope}:registry https://${XLTS_REGISTRY}/`,
+    `npm set @${scope}:registry https://${XLTS_REGISTRY}`,
     'XLTS.dev registry configured.'
   );
 
   exec(
-    `npm set //${XLTS_REGISTRY}/:_authToken ${XLTS_AUTH_TOKEN}`,
+    `npm set //${XLTS_REGISTRY}:_authToken ${XLTS_AUTH_TOKEN}`,
     'XLTS.dev auth token configured.'
   );
 }
@@ -54,12 +60,9 @@ if (
   process.argv[2] === 'install'
 ) {
   const {xltsVersion, dependencies} = require('../package.json').xlts;
-
   const getNpmPackages = dependencies =>
     dependencies
-      .map(
-        npmPackage => `${npmPackage}@npm:@${scope}/${npmPackage}@${xltsVersion}`
-      )
+      .map(npmPackage => dependencyVersion(npmPackage, xltsVersion))
       .join(' ');
 
   exec(`npm i --save-exact ${getNpmPackages(dependencies)}`);
