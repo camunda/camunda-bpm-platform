@@ -100,17 +100,25 @@
     "webpack-merge": "5.10.0"
   },
   "xlts": {
-    "xltsVersion": "1.9.7",
-    "dependencies": [
-      "angular",
-      "angular-animate",
-      "angular-cookies",
-      "angular-loader",
-      "angular-resource",
-      "angular-route",
-      "angular-sanitize",
-      "angular-touch",
-      "angular-mocks"
-    ]
+    "angular": {
+      "xltsVersion": "1.9.7",
+      "dependencies": [
+        "angular",
+        "angular-animate",
+        "angular-cookies",
+        "angular-loader",
+        "angular-resource",
+        "angular-route",
+        "angular-sanitize",
+        "angular-touch",
+        "angular-mocks"
+      ]
+    },
+    "bootstrap": {
+      "xltsVersion": "3.4.5",
+      "dependencies": [
+        "bootstrap"
+      ]
+    }
   }
 }
