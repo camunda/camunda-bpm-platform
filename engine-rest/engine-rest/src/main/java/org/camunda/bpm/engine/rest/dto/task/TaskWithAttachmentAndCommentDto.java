@@ -56,5 +56,9 @@ public class TaskWithAttachmentAndCommentDto extends TaskWithVariablesDto {
     result.hasComment = task.hasComment();
     return result;
   }
-  
+
+  public static TaskDto fromEntity(Task task) {
+    return fromEntity(task, null);
+  }
+
 }
