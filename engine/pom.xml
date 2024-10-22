@@ -418,7 +418,7 @@
         <configuration>
           <failIfNoTests>false</failIfNoTests>
           <trimStackTrace>false</trimStackTrace>
-          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          <redirectTestOutputToFile>false</redirectTestOutputToFile>
           <includes>
            <include>%regex[.*(${test.includes}).*Test.*.class]</include>
           </includes>
@@ -657,7 +657,7 @@
             <configuration>
               <failIfNoTests>false</failIfNoTests>
               <trimStackTrace>false</trimStackTrace>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>false</redirectTestOutputToFile>
               <reuseForks>true</reuseForks>
               <systemPropertyVariables>
                 <jdbcUrl>jdbc:h2:mem:camunda_${surefire.forkNumber};DB_CLOSE_DELAY=1000</jdbcUrl>
@@ -677,7 +677,7 @@
             <configuration>
               <failIfNoTests>false</failIfNoTests>
               <trimStackTrace>false</trimStackTrace>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>false</redirectTestOutputToFile>
               <excludes combine.children="append">
                 <exclude>**/CompetingMessageCorrelationTest.java</exclude>
               </excludes>
@@ -696,7 +696,7 @@
             <configuration>
               <failIfNoTests>false</failIfNoTests>
               <trimStackTrace>false</trimStackTrace>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>false</redirectTestOutputToFile>
               <excludes combine.children="append">
                 <exclude>**/CompetingMessageCorrelationTest.java</exclude>
               </excludes>

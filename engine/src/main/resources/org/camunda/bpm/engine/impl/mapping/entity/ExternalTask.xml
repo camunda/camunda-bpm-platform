@@ -290,6 +290,125 @@
     ${limitAfter}
   </select>
 
+  <select id="selectExternalTasksForTopics_mssql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="externalTaskResultMap">
+    <bind name="orderingProperties" value="parameter.orderingProperties" />
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+
+    <bind name="performAuthorizationCheck" value="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null" />
+
+    ${limitBefore}
+    select
+    <!-- Distinct can only be omitted when there are no joins with a 1:n relationship.
+      Currently this is only the case for the authorization joins. When you add a join
+      in this statement in the future, check if distinct can be omitted or not -->
+    <if test="!parameter.usesPostgres || performAuthorizationCheck">
+      ${distinct}
+    </if>
+    RES.*
+    ${limitBetween}
+    from (
+    select RES.*, PI.BUSINESS_KEY_, PD.VERSION_TAG_
+    from ${prefix}ACT_RU_EXT_TASK RES
+
+    left join ${prefix}ACT_RU_EXECUTION PI on RES.PROC_INST_ID_ = PI.ID_
+    inner join ${prefix}ACT_RE_PROCDEF PD on RES.PROC_DEF_ID_ = PD.ID_
+
+    <if test="performAuthorizationCheck">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause_mssql" />
+      AUTH ON (
+      (AUTH.RESOURCE_TYPE_ = 8
+      AND (AUTH.RESOURCE_ID_ ${authJoinStart} RES.PROC_INST_ID_ ${authJoinSeparator} '*' ${authJoinEnd})
+      AND ${bitand1}AUTH.PERMS_${bitand2}2${bitand3} = 2)
+      OR
+      (AUTH.RESOURCE_TYPE_ = 6
+      AND (AUTH.RESOURCE_ID_ ${authJoinStart} RES.PROC_DEF_KEY_ ${authJoinSeparator} '*' ${authJoinEnd})
+      AND ${bitand1}AUTH.PERMS_${bitand2}512${bitand3} = 512)
+      )
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause_mssql" />
+      AUTH1 ON (
+      (AUTH1.RESOURCE_TYPE_ = 8
+      AND (AUTH1.RESOURCE_ID_ ${authJoin1Start} RES.PROC_INST_ID_ ${authJoin1Separator} '*' ${authJoin1End})
+      AND ${bitand1}AUTH1.PERMS_${bitand2}4${bitand3} = 4)
+      OR
+      (AUTH1.RESOURCE_TYPE_ = 6
+      AND (AUTH1.RESOURCE_ID_ ${authJoin1Start} RES.PROC_DEF_KEY_ ${authJoin1Separator} '*' ${authJoin1End})
+      AND ${bitand1}AUTH1.PERMS_${bitand2}1024${bitand3} = 1024)
+      )
+    </if>
+    <where>
+      (RES.LOCK_EXP_TIME_ is null or RES.LOCK_EXP_TIME_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
+      and (RES.SUSPENSION_STATE_ is null or RES.SUSPENSION_STATE_ = 1)
+      and (RES.RETRIES_ is null or RES.RETRIES_ > 0)
+      <if test="parameter != null &amp;&amp; parameter.topics.size > 0">
+        and
+        <foreach collection="parameter.topics" open="(" close=")" separator="or" item="topicFilters">
+          RES.TOPIC_NAME_ = #{topicFilters.topicName}
+          <if test="topicFilters.businessKey">
+            and PI.BUSINESS_KEY_ = #{topicFilters.businessKey}
+          </if>
+          <if test="topicFilters.processDefinitionId != null">
+            and RES.PROC_DEF_ID_ = #{topicFilters.processDefinitionId}
+          </if>
+          <if test="topicFilters.processDefinitionIds != null &amp;&amp; topicFilters.processDefinitionIds.length > 0">
+            and RES.PROC_DEF_ID_ in
+            <foreach item="item" index="index" collection="topicFilters.processDefinitionIds"
+                     open="(" separator="," close=")">
+              #{item}
+            </foreach>
+          </if>
+          <if test="topicFilters.processDefinitionKey != null">
+            and RES.PROC_DEF_KEY_ = #{topicFilters.processDefinitionKey}
+          </if>
+          <if test="topicFilters.processDefinitionKeys != null &amp;&amp; topicFilters.processDefinitionKeys.length > 0">
+            and RES.PROC_DEF_KEY_ in
+            <foreach item="item" index="index" collection="topicFilters.processDefinitionKeys"
+                     open="(" separator="," close=")">
+              #{item}
+            </foreach>
+          </if>
+          <if test="topicFilters.isTenantIdSet">
+            <if test="topicFilters.tenantIds == null" >
+              and RES.TENANT_ID_ is null
+            </if>
+            <if test="topicFilters.tenantIds != null &amp;&amp; topicFilters.tenantIds.length > 0">
+              and RES.TENANT_ID_ in
+              <foreach item="tenantId" index="index" collection="topicFilters.tenantIds"
+                       open="(" separator="," close=")">
+                #{tenantId}
+              </foreach>
+            </if>
+          </if>
+          <if test="topicFilters.filterVariables.size > 0">
+            and RES.PROC_INST_ID_ in (
+            select VAR.EXECUTION_ID_
+            from ${prefix}ACT_RU_VARIABLE VAR
+            WHERE
+            <bind name="varPrefix" value="'VAR.'"/>
+            <bind name="varTypeField" value="'TYPE_'"/>
+            <foreach collection="topicFilters.filterVariables" open="(" close=")" separator="or" item="variable">
+              ${varPrefix}NAME_ = #{variable.name}
+              and
+              <bind name="queryVariableValue" value="variable" />
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions" />
+            </foreach>
+            )
+          </if>
+          <if test="topicFilters.processDefinitionVersionTag != null">
+            and (PD.VERSION_TAG_ like #{topicFilters.processDefinitionVersionTag})
+          </if>
+        </foreach>
+
+      </if>
+    </where>
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+    ) RES
+    <if test="parameter.applyOrdering">
+      ${orderBy}
+    </if>
+    ${limitAfter}
+  </select>
+
   <select id="selectTopicNamesByQuery" parameterType="org.camunda.bpm.engine.impl.ExternalTaskQueryImpl" resultType="string">
     select distinct RES.TOPIC_NAME_
     <include refid="selectExternalTaskByQueryCriteriaSql"/>

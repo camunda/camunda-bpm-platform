@@ -810,6 +810,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(MSSQL, "updateDecisionInputByteArraysByDecisionInstanceId", "updateDecisionInputByteArraysByDecisionInstanceId_mssql");
     addDatabaseSpecificStatement(MSSQL, "updateDecisionOutputByteArraysByDecisionInstanceId", "updateDecisionOutputByteArraysByDecisionInstanceId_mssql");
     addDatabaseSpecificStatement(MSSQL, "updateByteArraysByBatchId", "updateByteArraysByBatchId_mssql");
+    addDatabaseSpecificStatement(MSSQL, "selectExternalTasksForTopics", "selectExternalTasksForTopics_mssql");
 
     constants = new HashMap<>();
     constants.put("constant.event", "'event'");
