@@ -50,12 +50,12 @@ const {XLTS_REGISTRY, XLTS_AUTH_TOKEN} = process.env;
 if (!registryConfigured && XLTS_REGISTRY && XLTS_AUTH_TOKEN) {
   exec(
     `npm set @${scope}:registry https://${XLTS_REGISTRY}`,
-    'XLTS.dev registry configured.'
+    'XLTS registry configured.'
   );
 
   exec(
     `npm set //${XLTS_REGISTRY}:_authToken ${XLTS_AUTH_TOKEN}`,
-    'XLTS.dev auth token configured.'
+    'XLTS auth token configured.'
   );
 }
 
