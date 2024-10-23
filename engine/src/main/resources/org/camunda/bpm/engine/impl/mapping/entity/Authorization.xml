@@ -844,16 +844,8 @@
     <bind name="atomicChecks" value="authCheck.permissionChecks.atomicChecks" />
     <bind name="disjunctive" value="authCheck.permissionChecks.disjunctive" />
     <bind name="useLeftJoin" value="authCheck.useLeftJoin" />
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClauseWithBinding" />
-  </sql>
-
-  <sql id="authCheckJoinWithoutOnClause_mssql">
-    <bind name="authGroupIds" value="authCheck.authGroupIds" />
-    <bind name="atomicChecks" value="authCheck.permissionChecks.atomicChecks" />
-    <bind name="disjunctive" value="authCheck.permissionChecks.disjunctive" />
-    <bind name="useLeftJoin" value="authCheck.useLeftJoin" />
-    <include
-      refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClauseWithBinding_mssql" />
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClauseWithBinding${authCheckMethodSuffix}" />
+    <!-- The suffix above is added to handle mssql differently (with UNION instead of OR for groups) -->
   </sql>
 
   <sql id="authCheckJoinWithoutOnClauseWithBinding">
