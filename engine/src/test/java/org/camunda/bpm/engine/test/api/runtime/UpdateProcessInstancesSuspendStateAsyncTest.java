@@ -194,9 +194,20 @@ public class UpdateProcessInstancesSuspendStateAsyncTest {
     // when
     Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId())).suspendAsync();
     helper.completeSeedJobs(suspendprocess);
+
+    //Making sure that processInstanceId is set in execution jobs #4205
+    assertThat(helper.getExecutionJobs(suspendprocess))
+            .extracting("processInstanceId")
+            .containsExactlyInAnyOrder(processInstance1.getId(), processInstance2.getId());
+
     helper.executeJobs(suspendprocess);
     Batch activateprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId())).activateAsync();
     helper.completeSeedJobs(activateprocess);
+
+    //Making sure that processInstanceId is set in execution jobs #4205
+    assertThat(helper.getExecutionJobs(activateprocess))
+            .extracting("processInstanceId")
+            .containsExactlyInAnyOrder(processInstance1.getId(), processInstance2.getId());
     helper.executeJobs(activateprocess);
 
 

@@ -169,6 +169,11 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
       ByteArrayEntity configurationEntity = saveConfiguration(byteArrayManager, jobConfiguration);
 
       JobEntity job = createBatchJob(batch, configurationEntity);
+
+      if (jobConfiguration.getIds() != null && jobConfiguration.getIds().size() == 1) {
+        job.setProcessInstanceId(jobConfiguration.getIds().get(0));
+      }
+
       job.setDeploymentId(deploymentId);
       postProcessJob(configuration, job, jobConfiguration);
       jobManager.insertAndHintJobExecutor(job);
