@@ -21,6 +21,7 @@ const template = require('./execution-metrics.html?raw');
 const moment = require('moment');
 const angular = require('angular');
 const Chart = require('chart.js');
+const {sortedMockMonthly, TU2, TU1} = require('./execution-metrics-mocks');
 
 const debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
   .debouncePromiseFactory;
@@ -235,17 +236,22 @@ const Controller = [
       return Object.values(metricsGroupMap).sort((a, b) => b.label - a.label);
     };
 
-    const getMonthlyMetrics = (metrics, startDate, endDate) => {
+    const getMonthlyMetrics = (metricsData, startDate, endDate) => {
       return new Promise((resolve, reject) => {
         PluginMetricsResource.getAggregated({
           subscriptionStartDate: $scope.startDate,
           groupBy: 'month',
-          metrics: Array.from(metrics).toString(),
+          metrics: Array.from(metricsData).toString(),
           startDate,
           endDate
         }).$promise.then(
           monthlyMetrics => {
-            prepareTableData(monthlyMetrics, fmtMonth, monthlyMetricUsageMap);
+            let mockResponse = metricsData.includes(metrics.TU)
+              ? !endDate
+                ? TU1
+                : TU2
+              : sortedMockMonthly;
+            prepareTableData(mockResponse, fmtMonth, monthlyMetricUsageMap);
             resolve();
           },
           err => reject(err)
@@ -282,7 +288,8 @@ const Controller = [
       // prefill last 12 months for monthly table
       monthlyMetricUsageMap = {};
       let month = $scope.activeMonth.clone();
-      for (let i = 0; i < 12; i++) {
+      // initialize to 24 to cover all edge cases
+      for (let i = 0; i < 24; i++) {
         // create label
         const label = createGroupLabel(month.year(), month.month() + 1);
         monthlyMetricUsageMap[label] = {
@@ -345,7 +352,9 @@ const Controller = [
             }
           }
 
+          // only keep last 12 records
           $scope.monthlyMetrics = angular.copy(monthlyMetricsArray);
+          $scope.monthlyMetrics = $scope.monthlyMetrics.slice(0, 12);
           updateMonthlyChart(monthlyMetricsArray.reverse());
           $scope.loadingStateMonthly = 'LOADED';
           $scope.$apply();
@@ -392,6 +401,7 @@ const Controller = [
     };
 
     const getApiError = err => {
+      console.error(err);
       let msg;
       if (err.data?.type) {
         msg = err.data.type;
