@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.camunda.bpm.container.ExecutorService;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
+import org.camunda.bpm.container.impl.jmx.services.JmxManagedThreadPool;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 
@@ -32,6 +33,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
  */
 public class RuntimeContainerJobExecutor extends JobExecutor {
 
+  @Override
   protected void startExecutingJobs() {
 
     final RuntimeContainerDelegate runtimeContainerDelegate = getRuntimeContainerDelegate();
@@ -43,10 +45,12 @@ public class RuntimeContainerJobExecutor extends JobExecutor {
 
   }
 
+  @Override
   protected void stopExecutingJobs() {
     // nothing to do
   }
 
+  @Override
   public void executeJobs(List<String> jobIds, ProcessEngineImpl processEngine) {
 
     final RuntimeContainerDelegate runtimeContainerDelegate = getRuntimeContainerDelegate();
@@ -59,6 +63,17 @@ public class RuntimeContainerJobExecutor extends JobExecutor {
 
       logRejectedExecution(processEngine, jobIds.size());
       rejectedJobsHandler.jobsRejected(jobIds, processEngine, this);
+    }
+
+    if (executorService instanceof JmxManagedThreadPool) {
+      int totalQueueCapacity = calculateTotalQueueCapacity(((JmxManagedThreadPool) executorService).getQueueCount(),
+          ((JmxManagedThreadPool) executorService).getQueueAddlCapacity());
+
+      logJobExecutionInfo(processEngine,
+          ((JmxManagedThreadPool) executorService).getQueueCount(),
+          totalQueueCapacity,
+          ((JmxManagedThreadPool) executorService).getMaximumPoolSize(),
+          ((JmxManagedThreadPool) executorService).getActiveCount());
     }
   }
 
