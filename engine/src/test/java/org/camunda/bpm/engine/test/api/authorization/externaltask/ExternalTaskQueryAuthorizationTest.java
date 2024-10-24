@@ -17,13 +17,17 @@
 package org.camunda.bpm.engine.test.api.authorization.externaltask;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
+import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
+import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +38,8 @@ import org.junit.Test;
  */
 public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
 
+  protected static final String WORKER_ID = "aWorkerId";
+  protected static final String EXTERNAL_TASK_TOPIC = "externalTaskTopic";
   protected String deploymentId;
   protected String instance1Id;
   protected String instance2Id;
@@ -134,5 +140,51 @@ public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 1);
+  }
+
+  @Test
+  public void shouldFetchAndLockWhenUserAuthorized() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, ALL);
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(EXTERNAL_TASK_TOPIC, 10)
+        .execute();
+
+    // then
+    assertEquals(1, externalTasks.size());
+  }
+
+  @Test
+  public void shouldFetchAndLockWhenGroupAuthorized() {
+    // given
+    createGrantAuthorizationGroup(PROCESS_DEFINITION, ANY, groupId, ALL);
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(EXTERNAL_TASK_TOPIC, 10)
+        .execute();
+
+    // then
+    assertEquals(1, externalTasks.size());
+  }
+
+  @Test
+  public void shouldNotFetchAndLockWhenUnauthorized() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
+    createGrantAuthorizationGroup(PROCESS_DEFINITION, ANY, groupId, READ_INSTANCE);
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(EXTERNAL_TASK_TOPIC, 10)
+        .execute();
+
+    // then
+    assertEquals(0, externalTasks.size());
   }
 }

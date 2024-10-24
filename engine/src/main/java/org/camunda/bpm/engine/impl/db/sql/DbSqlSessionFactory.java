@@ -106,6 +106,8 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final Map<String, String> databaseSpecificAuth1JoinSeparator = new HashMap<>();
 
   public static final Map<String, String> databaseSpecificExtractTimeUnitFromDate = new HashMap<>();
+  public static final Map<String, String> databaseSpecificAuthCheckMethodSuffix = new HashMap<>();
+
 
   /*
    * On SQL server, the overall maximum number of parameters in a prepared statement
@@ -729,6 +731,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificAuthJoinStart.put(MSSQL, defaultAuthOnStart);
     databaseSpecificAuthJoinEnd.put(MSSQL, defaultAuthOnEnd);
     databaseSpecificAuthJoinSeparator.put(MSSQL, defaultAuthOnSeparator);
+    databaseSpecificAuthCheckMethodSuffix.put(MSSQL, "_mssql");
 
     databaseSpecificAuth1JoinStart.put(MSSQL, defaultAuthOnStart);
     databaseSpecificAuth1JoinEnd.put(MSSQL, defaultAuthOnEnd);
