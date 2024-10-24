@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.dmn.EvaluateDecisionDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionDefinitionDto;
+import org.camunda.bpm.engine.rest.dto.repository.DecisionEvaluationDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.DecisionDefinitionResource;
@@ -160,6 +161,40 @@ public class DecisionDefinitionResourceImpl implements DecisionDefinitionResourc
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
     }
     catch (DmnEngineException e) {
+      String errorMessage = String.format("Cannot evaluate decision %s: %s", decisionDefinitionId, e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
+    }
+  }
+
+  public DecisionEvaluationDto evaluateDecisionWithId(UriInfo context, EvaluateDecisionDto parameters) {
+    DecisionService decisionService = engine.getDecisionService();
+
+    Map<String, Object> variables = VariableValueDto.toMap(parameters.getVariables(), engine, objectMapper);
+
+    try {
+      DmnDecisionResult decisionResult = decisionService
+              .evaluateDecisionById(decisionDefinitionId)
+              .variables(variables)
+              .evaluate();
+      List<Map<String, VariableValueDto>> result = createDecisionResultDto(decisionResult);
+      DecisionEvaluationDto response = new DecisionEvaluationDto();
+      response.setResult(result);
+      response.setDecisionInstanceId(decisionResult.getDmnDecisionInstanceId());
+      return response;
+
+    }
+    catch (AuthorizationException e) {
+      throw e;
+    }
+    catch (NotFoundException e) {
+      String errorMessage = String.format("Cannot evaluate decision %s: %s", decisionDefinitionId, e.getMessage());
+      throw new InvalidRequestException(Status.NOT_FOUND, e, errorMessage);
+    }
+    catch (NotValidException e) {
+      String errorMessage = String.format("Cannot evaluate decision %s: %s", decisionDefinitionId, e.getMessage());
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, errorMessage);
+    }
+    catch (ProcessEngineException|DmnEngineException e) {
       String errorMessage = String.format("Cannot evaluate decision %s: %s", decisionDefinitionId, e.getMessage());
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
     }
