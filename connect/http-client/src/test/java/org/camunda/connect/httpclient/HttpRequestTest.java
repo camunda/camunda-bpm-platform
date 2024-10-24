@@ -21,14 +21,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpOptions;
-import org.apache.http.client.methods.HttpPatch;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpTrace;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.classic.methods.HttpOptions;
+import org.apache.hc.client5.http.classic.methods.HttpPatch;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.classic.methods.HttpTrace;
 import org.camunda.connect.Connectors;
 import org.junit.Before;
 import org.junit.Test;
@@ -148,7 +148,7 @@ public class HttpRequestTest {
 
     request.setRequestParameter("hello", "world");
 
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("foo", "bar");
     params.put("number", 42);
     request.setRequestParameters(params);
@@ -166,13 +166,13 @@ public class HttpRequestTest {
     HttpRequest request = connector.createRequest()
         .configOption("object-field", value)
         .configOption("int-field", 15)
-        .configOption("long-field", 15l)
+        .configOption("long-field", 15L)
         .configOption("boolean-field", true)
         .configOption("string-field", "string-value");
 
     assertThat(request.getConfigOption("object-field")).isEqualTo(value);
     assertThat(request.getConfigOption("int-field")).isEqualTo(15);
-    assertThat(request.getConfigOption("long-field")).isEqualTo(15l);
+    assertThat(request.getConfigOption("long-field")).isEqualTo(15L);
     assertThat(request.getConfigOption("boolean-field")).isEqualTo(true);
     assertThat(request.getConfigOption("string-field")).isEqualTo("string-value");
   }
