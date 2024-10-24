@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-const scope = 'xlts.dev';
+const scope = 'neverendingsupport';
 
 const {execSync} = require('child_process');
 
@@ -33,19 +33,29 @@ const exec = (cmd, successMsg) => {
   }).toString();
 };
 
+const getDependencyVersion = (nameSpace, npmPackage, xltsVersion) => {
+  if (nameSpace !== 'angular') {
+    return `${npmPackage}@npm:@${scope}/${npmPackage}@${xltsVersion}`;
+  }
+
+  let versionPostfix = npmPackage.split('-')[1] || '';
+  versionPostfix = versionPostfix ? '-' + versionPostfix : '';
+  return `${npmPackage}@npm:@${scope}/angularjs@${xltsVersion}${versionPostfix}`;
+};
+
 const registryConfigured = exec(`npm get @${scope}:registry`) !== 'undefined\n';
 
 const {XLTS_REGISTRY, XLTS_AUTH_TOKEN} = process.env;
 
 if (!registryConfigured && XLTS_REGISTRY && XLTS_AUTH_TOKEN) {
   exec(
-    `npm set @${scope}:registry https://${XLTS_REGISTRY}/`,
-    'XLTS.dev registry configured.'
+    `npm set @${scope}:registry https://${XLTS_REGISTRY}`,
+    'XLTS registry configured.'
   );
 
   exec(
-    `npm set //${XLTS_REGISTRY}/:_authToken ${XLTS_AUTH_TOKEN}`,
-    'XLTS.dev auth token configured.'
+    `npm set //${XLTS_REGISTRY}:_authToken ${XLTS_AUTH_TOKEN}`,
+    'XLTS auth token configured.'
   );
 }
 
@@ -53,16 +63,19 @@ if (
   (registryConfigured || (XLTS_REGISTRY && XLTS_AUTH_TOKEN)) &&
   process.argv[2] === 'install'
 ) {
-  const {xltsVersion, dependencies} = require('../package.json').xlts;
+  const xlts = require('../package.json').xlts;
 
-  const getNpmPackages = dependencies =>
-    dependencies
-      .map(
-        npmPackage => `${npmPackage}@npm:@${scope}/${npmPackage}@${xltsVersion}`
-      )
-      .join(' ');
+  const npmPackages = Object.entries(xlts)
+    .map(([nameSpace, settings]) =>
+      settings.dependencies
+        .map(npmPackage =>
+          getDependencyVersion(nameSpace, npmPackage, settings.xltsVersion)
+        )
+        .join(' ')
+    )
+    .join(' ');
 
-  exec(`npm i --save-exact ${getNpmPackages(dependencies)}`);
+  exec(`npm i --save-exact ${npmPackages}`);
 } else {
   console.log('XLTS installation skipped.'); // eslint-disable-line
 }
