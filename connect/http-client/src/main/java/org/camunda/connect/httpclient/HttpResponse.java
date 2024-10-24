@@ -22,9 +22,9 @@ import org.camunda.connect.spi.CloseableConnectorResponse;
 
 public interface HttpResponse extends CloseableConnectorResponse {
 
-  static final String PARAM_NAME_STATUS_CODE = "statusCode";
-  static final String PARAM_NAME_RESPONSE = "response";
-  static final String PARAM_NAME_RESPONSE_HEADERS = "headers";
+  String PARAM_NAME_STATUS_CODE = "statusCode";
+  String PARAM_NAME_RESPONSE = "response";
+  String PARAM_NAME_RESPONSE_HEADERS = "headers";
 
   /**
    * @return the HTTP status code of the response
