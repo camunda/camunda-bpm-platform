@@ -60,7 +60,7 @@
         name = "interval"
         location = "query"
         type = "integer"
-        format = "int32"
+        format = "int64"
         defaultValue = "900"
         desc = "The interval for which the metrics should be aggregated. Time unit is seconds.
                 Default: The interval is set to 15 minutes (900 seconds)." />
