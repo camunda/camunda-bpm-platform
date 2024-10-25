@@ -34,7 +34,9 @@ db-unit:
   - 'postgresql'
   podSpec:
     cpu: 4
-    image: 'maven:3.8.5-eclipse-temurin-11'
+    labels:
+      - 'maven'
+      - 'postgresql'
 sql-scripts:
   directory: 'distro/sql-script'
   command: 'install -Pcheck-sql,'
