@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.externaltask;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
@@ -25,11 +26,12 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
-import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
+import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -43,6 +45,9 @@ public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
   protected String deploymentId;
   protected String instance1Id;
   protected String instance2Id;
+
+  @Rule
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
 
   @Override
   @Before
@@ -154,7 +159,8 @@ public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
         .execute();
 
     // then
-    assertEquals(1, externalTasks.size());
+    assertThat(externalTasks).hasSize(1);
+    assertThat(externalTasks).extracting(LockedExternalTask::getTopicName).first().isEqualTo(EXTERNAL_TASK_TOPIC);
   }
 
   @Test
@@ -169,7 +175,8 @@ public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
         .execute();
 
     // then
-    assertEquals(1, externalTasks.size());
+    assertThat(externalTasks).hasSize(1);
+    assertThat(externalTasks).extracting(LockedExternalTask::getTopicName).first().isEqualTo(EXTERNAL_TASK_TOPIC);
   }
 
   @Test
@@ -185,6 +192,6 @@ public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
         .execute();
 
     // then
-    assertEquals(0, externalTasks.size());
+    assertThat(externalTasks).isEmpty();
   }
 }
