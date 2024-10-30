@@ -8,7 +8,7 @@ engine-webapp-unit:
   databases:
   #- 'postgresql_142'
   #- 'postgresql_150'
-  #- 'postgresql_160'
+  - 'postgresql_160'
   - 'postgresql_170'
   #- 'aws_aurora_postgresql_14'
   #- 'aws_aurora_postgresql_15'
