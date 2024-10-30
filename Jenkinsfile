@@ -38,7 +38,7 @@ pipeline {
         cambpmConditionalRetry([
           podSpec: [
             cpu: 32,
-            image: 'maven:3.9.7-eclipse-temurin-17'
+            containers: ['maven-3.9_jdk-temurin-17']
             ],
           suppressErrors: false,
           runSteps: {

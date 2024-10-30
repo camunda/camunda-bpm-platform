@@ -35,7 +35,7 @@ db-unit:
   podSpec:
     cpu: 4
     containers:
-      - 'maven:3.8.5-eclipse-temurin-11'
+      - 'maven-3.8_jdk-temurin-11'
       - 'postgres-17'
 sql-scripts:
   directory: 'distro/sql-script'
@@ -143,7 +143,8 @@ platform-jdk-temurin-jdk-17-latest:
   jdkVersion: 'jdk-17-latest'
   podSpec:
     cpu: 4
-    image: 'maven:3.9.7-eclipse-temurin-17'
+    containers:
+      - 'maven-3.9_jdk-temurin-17'
 platform-jdk-temurin-jdk-21-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -Pdistro,distro-ce,distro-wildfly'
@@ -153,7 +154,8 @@ platform-jdk-temurin-jdk-21-latest:
   jdkVersion: 'jdk-21-latest'
   podSpec:
     cpu: 4
-    image: 'maven:3.9.7-eclipse-temurin-21'
+    containers:
+      - 'maven-3.9_jdk-temurin-21'
 platform-jdk-temurin-jdk-11-latest:
   directory: '.'
   command: 'install source:jar source:test-jar
@@ -176,7 +178,8 @@ platform-jdk-temurin-jdk-11-latest:
   jdkVersion: 'jdk-11-latest'
   podSpec:
     cpu: 4
-    image: 'maven:3.9.7-eclipse-temurin-11'
+    containers:
+      - 'maven-3.9_jdk-temurin-11'
 platform-jdk-jdk-17-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -Pdistro,distro-ce,distro-wildfly -Dskip.frontend.build=true'
