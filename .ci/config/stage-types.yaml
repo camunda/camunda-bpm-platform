@@ -67,6 +67,9 @@ old-engine:
   - 'mariadb'
   - 'sqlserver'
   - 'postgresql'
+  podSpec:
+    cpu: 4
+    images: ['maven:3.8.5-eclipse-temurin-11', 'postgres:17.0']
 rolling-update:
   directory: 'qa/test-db-rolling-update'
   command: 'verify -Prolling-update,'
