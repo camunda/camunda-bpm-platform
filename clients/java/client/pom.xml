@@ -18,11 +18,11 @@
     <tomcat.runtime>${engine.runtime}/server/apache-tomcat-${version.tomcat}</tomcat.runtime>
     <http.port>${tomcat.connector.http.port}</http.port>
 
-    <tomcat.connector.http.port>48080</tomcat.connector.http.port>
-    <tomcat.connector.http.redirectPort>48443</tomcat.connector.http.redirectPort>
-    <tomcat.connector.ajp.port>48009</tomcat.connector.ajp.port>
-    <tomcat.connector.ajp.redirectPort>48443</tomcat.connector.ajp.redirectPort>
-    <tomcat.server.port>48005</tomcat.server.port>
+    <tomcat.connector.http.port>50080</tomcat.connector.http.port>
+    <tomcat.connector.http.redirectPort>50443</tomcat.connector.http.redirectPort>
+    <tomcat.connector.ajp.port>50009</tomcat.connector.ajp.port>
+    <tomcat.connector.ajp.redirectPort>50443</tomcat.connector.ajp.redirectPort>
+    <tomcat.server.port>50005</tomcat.server.port>
 
     <cargo.timeout>240000</cargo.timeout>
     <cargo.deploy.timeout>60000</cargo.deploy.timeout>
