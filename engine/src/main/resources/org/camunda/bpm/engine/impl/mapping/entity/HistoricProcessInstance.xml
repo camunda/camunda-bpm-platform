@@ -416,7 +416,7 @@
         <bind name="INC_JOIN" value="true" />
       </if>
 
-      <if test="query != null &amp;&amp; (query.executedActivityIds != null and query.executedActivityIds.length > 0) || (query.activeActivityIds != null and query.activeActivityIds.length > 0) || (query.activityIds != null and query.activityIds.length > 0)">
+      <if test="query != null &amp;&amp; (query.executedActivityIds != null and query.executedActivityIds.length > 0) || (query.activeActivityIds != null and query.activeActivityIds.length > 0)">
         <bind name="HAI_JOIN" value="true" />
       </if>
 
