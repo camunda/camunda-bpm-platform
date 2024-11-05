@@ -36,11 +36,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -66,16 +64,15 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.camunda.bpm.engine.test.api.mgmt.FailingDelegate;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.CallActivityModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.CompensationModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.util.ChangeVariablesDelegate;
+import org.camunda.bpm.engine.test.jobexecutor.FailingDelegate;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
@@ -93,25 +90,25 @@ import org.junit.rules.RuleChain;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class HistoricProcessInstanceTest {
 
-  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-  public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
-
   public static final BpmnModelInstance FORK_JOIN_SUB_PROCESS_MODEL = ProcessModels.newModel()
-      .startEvent()
-      .subProcess("subProcess")
-      .embeddedSubProcess()
+    .startEvent()
+    .subProcess("subProcess")
+    .embeddedSubProcess()
       .startEvent()
       .parallelGateway("fork")
-      .userTask("userTask1")
-      .name("completeMe")
+        .userTask("userTask1")
+        .name("completeMe")
       .parallelGateway("join")
       .endEvent()
       .moveToNode("fork")
-      .userTask("userTask2")
+        .userTask("userTask2")
       .connectTo("join")
-      .subProcessDone()
-      .endEvent()
-      .done();
+    .subProcessDone()
+    .endEvent()
+    .done();
+
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain chain = RuleChain.outerRule(engineRule).around(testHelper);
@@ -1573,18 +1570,19 @@ public class HistoricProcessInstanceTest {
   }
 
   @Test
-  public void testQueryByNullActivityId() {
+  public void shouldFailWhenQueryByNullActivityId() {
     try {
-      historyService.createHistoricProcessInstanceQuery().activeActivityIdIn((String[]) null).list();
+      historyService.createHistoricProcessInstanceQuery()
+          .activityIdIn((String) null);
       fail("exception expected");
     }
     catch (BadUserRequestException e) {
-      assertThat(e.getMessage()).contains("activity ids is null");
+      assertThat(e.getMessage()).contains("activity ids contains null value");
     }
   }
 
   @Test
-  public void testQueryByNullActivityIds() {
+  public void shouldFailWhenQueryByNullActivityIds() {
     try {
       historyService.createHistoricProcessInstanceQuery()
           .activityIdIn((String[]) null);
@@ -1596,51 +1594,53 @@ public class HistoricProcessInstanceTest {
   }
 
   @Test
-  public void testQueryByUnknownActivityId() {
+  public void shouldReturnEmptyWhenQueryByUnknownActivityId() {
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
         .activityIdIn("unknown");
 
-    assertEquals(0, query.count());
-    assertEquals(0, query.list().size());
+    assertThat(query.list()).isEmpty();
   }
 
   @Test
-  public void testQueryByLeafActivityId() {
+  public void shouldQueryByLeafActivityId() {
     // given
     ProcessDefinition oneTaskDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     ProcessDefinition gatewaySubProcessDefinition = testHelper.deployAndGetDefinition(FORK_JOIN_SUB_PROCESS_MODEL);
 
     // when
-    ProcessInstance oneTaskInstance1 = runtimeService.startProcessInstanceById(oneTaskDefinition.getId());
-    ProcessInstance oneTaskInstance2 = runtimeService.startProcessInstanceById(oneTaskDefinition.getId());
-    ProcessInstance gatewaySubProcessInstance1 = runtimeService.startProcessInstanceById(gatewaySubProcessDefinition.getId());
-    ProcessInstance gatewaySubProcessInstance2 = runtimeService.startProcessInstanceById(gatewaySubProcessDefinition.getId());
+    String oneTaskPiOne = runtimeService.startProcessInstanceById(oneTaskDefinition.getId()).getId();
+    String oneTaskPiTwo = runtimeService.startProcessInstanceById(oneTaskDefinition.getId()).getId();
+    String gatewaySubProcessPiOne = runtimeService.startProcessInstanceById(gatewaySubProcessDefinition.getId()).getId();
+    String gatewaySubProcessPiTwo = runtimeService.startProcessInstanceById(gatewaySubProcessDefinition.getId()).getId();
 
     Task task = engineRule.getTaskService().createTaskQuery()
-        .processInstanceId(gatewaySubProcessInstance2.getId())
+        .processInstanceId(gatewaySubProcessPiTwo)
         .taskName("completeMe")
         .singleResult();
     engineRule.getTaskService().complete(task.getId());
 
     // then
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().activityIdIn("userTask");
-    assertReturnedProcessInstances(query, oneTaskInstance1, oneTaskInstance2);
+    assertThat(query.list()).extracting("id").containsExactlyInAnyOrder(oneTaskPiOne, oneTaskPiTwo);
 
     query = historyService.createHistoricProcessInstanceQuery().activityIdIn("userTask1", "userTask2");
-    assertReturnedProcessInstances(query, gatewaySubProcessInstance1, gatewaySubProcessInstance2);
+    assertThat(query.list()).extracting("id")
+        .containsExactlyInAnyOrder(gatewaySubProcessPiOne, gatewaySubProcessPiTwo);
 
     query = historyService.createHistoricProcessInstanceQuery().activityIdIn("userTask", "userTask1");
-    assertReturnedProcessInstances(query, oneTaskInstance1, oneTaskInstance2, gatewaySubProcessInstance1);
+    assertThat(query.list()).extracting("id")
+        .containsExactlyInAnyOrder(oneTaskPiOne, oneTaskPiTwo, gatewaySubProcessPiOne);
 
     query = historyService.createHistoricProcessInstanceQuery().activityIdIn("userTask", "userTask1", "userTask2");
-    assertReturnedProcessInstances(query, oneTaskInstance1, oneTaskInstance2, gatewaySubProcessInstance1, gatewaySubProcessInstance2);
+    assertThat(query.list()).extracting("id")
+        .containsExactlyInAnyOrder(oneTaskPiOne, oneTaskPiTwo, gatewaySubProcessPiOne, gatewaySubProcessPiTwo);
 
     query = historyService.createHistoricProcessInstanceQuery().activityIdIn("join");
-    assertReturnedProcessInstances(query, gatewaySubProcessInstance2);
+    assertThat(query.list()).extracting("id").containsExactlyInAnyOrder(gatewaySubProcessPiTwo);
   }
 
   @Test
-  public void testQueryByNonLeafActivityId() {
+  public void shouldReturnEmptyWhenQueryByNonLeafActivityId() {
     // given
     ProcessDefinition processDefinition = testHelper.deployAndGetDefinition(FORK_JOIN_SUB_PROCESS_MODEL);
 
@@ -1648,123 +1648,95 @@ public class HistoricProcessInstanceTest {
     runtimeService.startProcessInstanceById(processDefinition.getId());
 
     // then
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().activityIdIn("subProcess", "fork");
-
-    assertEquals(0, query.count());
-    assertEquals(0, query.list().size());
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
+        .activityIdIn("subProcess", "fork");
+    assertThat(query.list()).isEmpty();
   }
 
   @Test
-  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-  public void testQueryByAsyncBeforeActivityId() {
-    // For a historic instance when AsyncBefore is used the historic activity is only created when the execution is scheduled
-    // For process instances that have a token just before a AsyncBefore activity
-    //  In the runtimeInstanceQuery activityIdIn filter returns instances that are not scheduled yet
-    //  In historicInstanceQuery activityIdIn filter does not return instances that are not scheduled yet
-
+  public void shouldQueryByAsyncBeforeActivityId() {
     // given
     ProcessDefinition testProcess = testHelper.deployAndGetDefinition(ProcessModels.newModel()
-        .startEvent("start").camundaAsyncBefore()
-        .subProcess("subProcess").camundaAsyncBefore()
-        .embeddedSubProcess()
+      .startEvent("start").camundaAsyncBefore()
+      .subProcess("subProcess").camundaAsyncBefore()
+      .embeddedSubProcess()
         .startEvent()
         .serviceTask("task").camundaAsyncBefore().camundaExpression("${true}")
         .endEvent()
-        .subProcessDone()
-        .endEvent("end").camundaAsyncBefore()
-        .done()
+      .subProcessDone()
+      .endEvent("end").camundaAsyncBefore()
+      .done()
     );
 
     // when
-    ProcessInstance instanceBeforeStart = runtimeService.startProcessInstanceById(testProcess.getId());
-    ProcessInstance instanceBeforeSubProcess = runtimeService.startProcessInstanceById(testProcess.getId());
+    String instanceBeforeStart = runtimeService.startProcessInstanceById(testProcess.getId()).getId();
+    String instanceBeforeSubProcess = runtimeService.startProcessInstanceById(testProcess.getId()).getId();
     executeJobForProcessInstance(instanceBeforeSubProcess);
-    ProcessInstance instanceBeforeTask = runtimeService.startProcessInstanceById(testProcess.getId());
+    String instanceBeforeTask = runtimeService.startProcessInstanceById(testProcess.getId()).getId();
     executeJobForProcessInstance(instanceBeforeTask);
     executeJobForProcessInstance(instanceBeforeTask);
-    ProcessInstance instanceBeforeEnd = runtimeService.startProcessInstanceById(testProcess.getId());
+    String instanceBeforeEnd = runtimeService.startProcessInstanceById(testProcess.getId()).getId();
     executeJobForProcessInstance(instanceBeforeEnd);
     executeJobForProcessInstance(instanceBeforeEnd);
     executeJobForProcessInstance(instanceBeforeEnd);
 
     // then
-    HistoricProcessInstanceQuery historicQuery = historyService.createHistoricProcessInstanceQuery().activityIdIn("start");
-    assertNull(historicQuery.singleResult());
-    ProcessInstanceQuery runtimeQuery = runtimeService.createProcessInstanceQuery().activityIdIn("start");
-    assertEquals(instanceBeforeStart.getId(), runtimeQuery.singleResult().getProcessInstanceId());
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().activityIdIn("start");
+    assertThat(query.singleResult()).extracting("id").containsExactlyInAnyOrder(instanceBeforeStart);
 
-    historicQuery = historyService.createHistoricProcessInstanceQuery().activityIdIn("subProcess");
-    assertReturnedProcessInstances(historicQuery, instanceBeforeTask);
-    runtimeQuery = runtimeService.createProcessInstanceQuery().activityIdIn("subProcess");
-    assertEquals(instanceBeforeSubProcess.getId(), runtimeQuery.singleResult().getProcessInstanceId());
+    query = historyService.createHistoricProcessInstanceQuery().activityIdIn("subProcess");
+    assertThat(query.singleResult()).extracting("id").containsExactlyInAnyOrder(instanceBeforeSubProcess);
 
-    historicQuery = historyService.createHistoricProcessInstanceQuery().activityIdIn("task");
-    assertNull(historicQuery.singleResult());
-    runtimeQuery = runtimeService.createProcessInstanceQuery().activityIdIn("task");
-    assertEquals(instanceBeforeTask.getId(), runtimeQuery.singleResult().getProcessInstanceId());
+    query = historyService.createHistoricProcessInstanceQuery().activityIdIn("task");
+    assertThat(query.singleResult()).extracting("id").containsExactlyInAnyOrder(instanceBeforeTask);
 
-    historicQuery = historyService.createHistoricProcessInstanceQuery().activityIdIn("end");
-    assertNull(historicQuery.singleResult());
-    runtimeQuery = runtimeService.createProcessInstanceQuery().activityIdIn("end");
-    assertEquals(instanceBeforeEnd.getId(), runtimeQuery.singleResult().getProcessInstanceId());
+    query = historyService.createHistoricProcessInstanceQuery().activityIdIn("end");
+    assertThat(query.singleResult()).extracting("id").containsExactlyInAnyOrder(instanceBeforeEnd);
   }
 
   @Test
-  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-  public void testQueryByAsyncAfterActivityId() {
-    // For a historic activity the end time is set after it is executed => the activity is not considered active anymore,
-    //    this is not changed if AsyncAfter is used
-    //    if the task is a subprocess end time will only be set after the subprocess is terminated
-    // For the runtime query the execution is still visible if AsyncAfter is used (I assume we delete the execution when scheduling next activity)
-
+  public void shouldQueryByAsyncAfterActivityId() {
     // given
     ProcessDefinition testProcess = testHelper.deployAndGetDefinition(ProcessModels.newModel()
-        .startEvent("start").camundaAsyncAfter()
-        .subProcess("subProcess").camundaAsyncAfter()
-        .embeddedSubProcess()
+      .startEvent("start").camundaAsyncAfter()
+      .subProcess("subProcess").camundaAsyncAfter()
+      .embeddedSubProcess()
         .startEvent()
         .serviceTask("task").camundaAsyncAfter().camundaExpression("${true}")
         .endEvent()
-        .subProcessDone()
-        .endEvent("end").camundaAsyncAfter()
-        .done()
+      .subProcessDone()
+      .endEvent("end").camundaAsyncAfter()
+      .done()
     );
 
     // when
-    ProcessInstance instanceAfterStart = runtimeService.startProcessInstanceById(testProcess.getId());
-    ProcessInstance instanceAfterTask = runtimeService.startProcessInstanceById(testProcess.getId());
+    String instanceAfterStart = runtimeService.startProcessInstanceById(testProcess.getId()).getId();
+    String instanceAfterTask = runtimeService.startProcessInstanceById(testProcess.getId()).getId();
     executeJobForProcessInstance(instanceAfterTask);
-    ProcessInstance instanceAfterSubProcess = runtimeService.startProcessInstanceById(testProcess.getId());
+    String instanceAfterSubProcess = runtimeService.startProcessInstanceById(testProcess.getId()).getId();
     executeJobForProcessInstance(instanceAfterSubProcess);
     executeJobForProcessInstance(instanceAfterSubProcess);
-    ProcessInstance instanceAfterEnd = runtimeService.startProcessInstanceById(testProcess.getId());
+    String instanceAfterEnd = runtimeService.startProcessInstanceById(testProcess.getId()).getId();
     executeJobForProcessInstance(instanceAfterEnd);
     executeJobForProcessInstance(instanceAfterEnd);
     executeJobForProcessInstance(instanceAfterEnd);
 
-    HistoricProcessInstanceQuery historicQuery = historyService.createHistoricProcessInstanceQuery().activityIdIn("start");
-    assertNull(historicQuery.singleResult());
-    ProcessInstanceQuery runtimeQuery = runtimeService.createProcessInstanceQuery().activityIdIn("start");
-    assertEquals(instanceAfterStart.getId(), runtimeQuery.singleResult().getProcessInstanceId());
+    // then
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().activityIdIn("start");
+    assertThat(query.singleResult()).extracting("id").containsExactlyInAnyOrder(instanceAfterStart);
 
-    historicQuery = historyService.createHistoricProcessInstanceQuery().activityIdIn("task");
-    assertNull(historicQuery.singleResult());
-    runtimeQuery = runtimeService.createProcessInstanceQuery().activityIdIn("task");
-    assertEquals(instanceAfterTask.getId(), runtimeQuery.singleResult().getProcessInstanceId());
+    query = historyService.createHistoricProcessInstanceQuery().activityIdIn("task");
+    assertThat(query.singleResult()).extracting("id").containsExactlyInAnyOrder(instanceAfterTask);
 
-    historicQuery = historyService.createHistoricProcessInstanceQuery().activityIdIn("subProcess");
-    assertReturnedProcessInstances(historicQuery, instanceAfterTask);
-    runtimeQuery = runtimeService.createProcessInstanceQuery().activityIdIn("subProcess");
-    assertEquals(instanceAfterSubProcess.getId(), runtimeQuery.singleResult().getProcessInstanceId());
+    query = historyService.createHistoricProcessInstanceQuery().activityIdIn("subProcess");
+    assertThat(query.singleResult()).extracting("id").containsExactlyInAnyOrder(instanceAfterSubProcess);
 
-    historicQuery = historyService.createHistoricProcessInstanceQuery().activityIdIn("end");
-    assertNull(historicQuery.singleResult());
-    runtimeQuery = runtimeService.createProcessInstanceQuery().activityIdIn("end");
-    assertEquals(instanceAfterEnd.getId(), runtimeQuery.singleResult().getProcessInstanceId());
+    query = historyService.createHistoricProcessInstanceQuery().activityIdIn("end");
+    assertThat(query.singleResult()).extracting("id").containsExactlyInAnyOrder(instanceAfterEnd);
   }
 
   @Test
-  public void testQueryByActivityIdBeforeCompensation() {
+  public void shouldReturnEmptyWhenQueryByActivityIdBeforeCompensation() {
     // given
     ProcessDefinition testProcess = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
 
@@ -1773,17 +1745,12 @@ public class HistoricProcessInstanceTest {
     testHelper.completeTask("userTask1");
 
     // then
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().activityIdIn("subProcess");
-
-    assertEquals(0, query.count());
-    assertEquals(0, query.list().size());  }
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().activityIdIn("subProcess");
+    assertThat(query.list()).isEmpty();
+  }
 
   @Test
-  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-  public void testQueryByActivityIdDuringCompensation() {
-    // After completing user task we are expecting "subProcess", "compensationEvent", "compensationHandler" to have an activity
-    // Based on historic data only "compensationEvent", "compensationHandler" have active events
-
+  public void shouldQueryByActivityIdDuringCompensation() {
     // given
     ProcessDefinition testProcess = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
 
@@ -1793,25 +1760,19 @@ public class HistoricProcessInstanceTest {
     testHelper.completeTask("userTask2");
 
     // then
-    HistoricProcessInstanceQuery historicQuery = historyService.createHistoricProcessInstanceQuery().activityIdIn("subProcess");
-    assertNull(historicQuery.singleResult());
-    ProcessInstanceQuery runtimeQuery = runtimeService.createProcessInstanceQuery().activityIdIn("subProcess");
-    assertEquals(processInstance.getId(), runtimeQuery.singleResult().getProcessInstanceId());
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().activityIdIn("subProcess");
+    assertThat(query.singleResult()).extracting("id").containsExactlyInAnyOrder(processInstance.getId());
 
-    historicQuery = historyService.createHistoricProcessInstanceQuery().activityIdIn("compensationEvent");
-    assertReturnedProcessInstances(historicQuery, processInstance);
-    runtimeQuery = runtimeService.createProcessInstanceQuery().activityIdIn("compensationEvent");
-    assertEquals(processInstance.getId(), runtimeQuery.singleResult().getProcessInstanceId());
+    query = historyService.createHistoricProcessInstanceQuery().activityIdIn("compensationEvent");
+    assertThat(query.singleResult()).extracting("id").containsExactlyInAnyOrder(processInstance.getId());
 
-    historicQuery = historyService.createHistoricProcessInstanceQuery().activityIdIn("compensationHandler");
-    assertReturnedProcessInstances(historicQuery, processInstance);
-    runtimeQuery = runtimeService.createProcessInstanceQuery().activityIdIn("compensationEvent");
-    assertEquals(processInstance.getId(), runtimeQuery.singleResult().getProcessInstanceId());
+    query = historyService.createHistoricProcessInstanceQuery().activityIdIn("compensationHandler");
+    assertThat(query.singleResult()).extracting("id").containsExactlyInAnyOrder(processInstance.getId());
   }
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-  public void testHistoricProcInstQueryWithActivityIdsWithOneId() {
+  public void shouldQueryWithActivityIdsWithOneId() {
     // given
     String USER_TASK_1 = "userTask1";
     deployment(ProcessModels.TWO_TASKS_PROCESS);
@@ -1819,7 +1780,7 @@ public class HistoricProcessInstanceTest {
     runtimeService.startProcessInstanceByKey("Process");
 
     List<Task> tasks = taskService.createTaskQuery().list();
-    assertEquals(2, tasks.size());
+    assertThat(tasks).hasSize(2);
     taskService.complete(tasks.get(0).getId());
 
     // when
@@ -1829,14 +1790,13 @@ public class HistoricProcessInstanceTest {
         .list();
 
     // then
-    assertNotNull(result);
-    assertEquals(1, result.size());
-    assertEquals(result.get(0).getId(), tasks.get(1).getProcessInstanceId());
+    assertThat(result).extracting("id")
+        .containsExactlyInAnyOrder(tasks.get(1).getProcessInstanceId());
   }
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-  public void testHistoricProcInstQueryWithActivityIdsWithMultipleIds() {
+  public void shouldQueryWithActivityIdsWithMultipleIds() {
     // given
     String USER_TASK_1 = "userTask1";
     String USER_TASK_2 = "userTask2";
@@ -1845,7 +1805,7 @@ public class HistoricProcessInstanceTest {
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("Process");
 
     List<Task> tasks = taskService.createTaskQuery().list();
-    assertEquals(2, tasks.size());
+    assertThat(tasks).hasSize(2);
     taskService.complete(tasks.get(0).getId());
 
     // when
@@ -1855,15 +1815,13 @@ public class HistoricProcessInstanceTest {
         .list();
 
     // then
-    assertNotNull(result);
-    assertEquals(2, result.size());
-    assertThat(result.stream().map(HistoricProcessInstance::getId).collect(Collectors.toList()))
-        .containsExactlyInAnyOrder(processInstance.getId(),processInstance2.getId());
+    assertThat(result).extracting("id")
+        .containsExactlyInAnyOrder(processInstance.getId(), processInstance2.getId());
   }
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-  public void testHistoricProcInstQueryWithActivityIdsWhenDeletedCompetedInstancesExist() {
+  public void shouldQueryWithActivityIdsWhenDeletedCompetedInstancesExist() {
     // given
     String USER_TASK_1 = "userTask1";
     String USER_TASK_2 = "userTask2";
@@ -1872,7 +1830,7 @@ public class HistoricProcessInstanceTest {
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("Process");
 
     List<Task> tasks = taskService.createTaskQuery().list();
-    assertEquals(2, tasks.size());
+    assertThat(tasks).hasSize(2);
     taskService.complete(tasks.get(0).getId());
 
     ProcessInstance completedProcessInstance = runtimeService.startProcessInstanceByKey("Process");
@@ -1892,21 +1850,19 @@ public class HistoricProcessInstanceTest {
         .list();
 
     // then
-    assertNotNull(result);
-    assertEquals(2, result.size());
-    assertThat(result.stream().map(HistoricProcessInstance::getId).collect(Collectors.toList()))
+    assertThat(result).extracting("id")
         .containsExactlyInAnyOrder(processInstance.getId(), processInstance2.getId());
   }
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testHistoricProcessInstanceQueryActivityIdInWithIncident.bpmn"})
-  public void testHistoricProcInstQueryWithActivityIdsWithFailingActivity() {
+  public void shouldQueryQueryWithActivityIdsWithFailingActivity() {
     // given
-    runtimeService.startProcessInstanceByKey("failingProcess");
+    String piOne = runtimeService.startProcessInstanceByKey("failingProcess").getId();
     testHelper.executeAvailableJobs();
 
-    runtimeService.startProcessInstanceByKey("failingProcess");
+    String piTwo = runtimeService.startProcessInstanceByKey("failingProcess").getId();
 
     // assume
     assertEquals(2, historyService.createHistoricProcessInstanceQuery().count());
@@ -1914,7 +1870,6 @@ public class HistoricProcessInstanceTest {
 
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().withIncidents().count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().withIncidents().list().size());
-    HistoricProcessInstance failingInstance =  historyService.createHistoricProcessInstanceQuery().withIncidents().singleResult();
 
     // when
     List<HistoricProcessInstance> result = historyService
@@ -1923,17 +1878,15 @@ public class HistoricProcessInstanceTest {
         .list();
 
     // then
-    assertNotNull(result);
-    assertEquals(1, result.size());
-    assertEquals(result.get(0).getId(), failingInstance.getId());
+    assertThat(result).extracting("id").containsExactlyInAnyOrder(piOne, piTwo);
   }
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/failingSubProcessCreateOneIncident.bpmn20.xml"})
-  public void shouldQueryByActivityIdInWithActivityIdOfFailingSubprocess() {
+  public void shouldNotRetrieveInstanceWhenQueryByActivityIdInWithFailingSubprocess() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingSubProcess");
+    runtimeService.startProcessInstanceByKey("failingSubProcess");
 
     testHelper.executeAvailableJobs();
 
@@ -1942,14 +1895,13 @@ public class HistoricProcessInstanceTest {
         historyService.createHistoricProcessInstanceQuery().activityIdIn("subProcess").singleResult();
 
     // then
-    assertThat(historicPI).isNotNull();
-    assertThat(historicPI.getId()).isEqualTo(processInstance.getId());
+    assertThat(historicPI).isNull();
   }
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/failingSubProcessCreateOneIncident.bpmn20.xml"})
-  public void shouldQueryByActivityIdInWithActivityIdOfFailingSubServiceTask() {
+  public void shouldQueryByActivityIdInWithFailingSubServiceTask() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingSubProcess");
 
@@ -1967,7 +1919,7 @@ public class HistoricProcessInstanceTest {
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.subprocess.bpmn20.xml"})
-  public void shouldQueryByActivityIdInWithActivityIdOfSubprocess() {
+  public void shouldNotReturnInstanceWhenQueryByActivityIdInWithSubprocess() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subprocess");
 
@@ -1980,8 +1932,7 @@ public class HistoricProcessInstanceTest {
         historyService.createHistoricProcessInstanceQuery().activityIdIn("subProcess").singleResult();
 
     // then
-    assertThat(historicPI).isNotNull();
-    assertThat(historicPI.getId()).isEqualTo(processInstance.getId());
+    assertThat(historicPI).isNull();
   }
 
   @Test
@@ -1993,7 +1944,7 @@ public class HistoricProcessInstanceTest {
 
     TaskService taskService = engineRule.getTaskService();
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(task);
+    assertThat(task).isNotNull();
     taskService.complete(task.getId());
     // when
     HistoricProcessInstance historicPI =
@@ -2029,20 +1980,13 @@ public class HistoricProcessInstanceTest {
         historyService.createHistoricProcessInstanceQuery().activityIdIn("innerServiceTask", "outerTask").list();
 
     // then
-    assertThat(queryByInnerServiceActivityId.size()).isEqualTo(1);
-    assertThat(queryByInnerServiceActivityId.get(0).getId()).isEqualTo(processInstance.getId());
-
-    assertThat(queryBySubProcessActivityId.size()).isEqualTo(1);
-    assertThat(queryBySubProcessActivityId.get(0).getId()).isEqualTo(processInstance.getId());
-
-    assertThat(queryByOuterProcessActivityId.size()).isEqualTo(1);
-    assertThat(queryByOuterProcessActivityId.get(0).getId()).isEqualTo(processInstance2.getId());
-
-    assertThat(queryByOuterAndInnedActivityId.size()).isEqualTo(2);
-    assertThat(queryByOuterAndInnedActivityId.stream()
-        .map(HistoricProcessInstance::getId)
-        .collect(Collectors.toList()))
-        .containsExactlyInAnyOrderElementsOf(Arrays.asList(processInstance.getId(), processInstance2.getId()));
+    assertThat(queryByInnerServiceActivityId).extracting("id")
+        .containsExactlyInAnyOrder(processInstance.getId());
+    assertThat(queryBySubProcessActivityId).hasSize(0);
+    assertThat(queryByOuterProcessActivityId).extracting("id")
+        .containsExactlyInAnyOrder(processInstance2.getId());
+    assertThat(queryByOuterAndInnedActivityId).extracting("id")
+        .containsExactlyInAnyOrder(processInstance.getId(), processInstance2.getId());
   }
 
   @Test
@@ -2068,20 +2012,13 @@ public class HistoricProcessInstanceTest {
         historyService.createHistoricProcessInstanceQuery().activityIdIn("innerTask", "outerTask").list();
 
     // then
-    assertThat(queryByInnerServiceActivityId.size()).isEqualTo(1);
-    assertThat(queryByInnerServiceActivityId.get(0).getId()).isEqualTo(processInstance.getId());
-
-    assertThat(queryBySubProcessActivityId.size()).isEqualTo(1);
-    assertThat(queryBySubProcessActivityId.get(0).getId()).isEqualTo(processInstance.getId());
-
-    assertThat(queryByOuterProcessActivityId.size()).isEqualTo(1);
-    assertThat(queryByOuterProcessActivityId.get(0).getId()).isEqualTo(processInstance2.getId());
-
-    assertThat(queryByOuterAndInnedActivityId.size()).isEqualTo(2);
-    assertThat(queryByOuterAndInnedActivityId.stream()
-        .map(HistoricProcessInstance::getId)
-        .collect(Collectors.toList()))
-        .containsExactlyInAnyOrderElementsOf(Arrays.asList(processInstance.getId(), processInstance2.getId()));
+    assertThat(queryByInnerServiceActivityId).extracting("id")
+        .containsExactlyInAnyOrder(processInstance.getId());
+    assertThat(queryBySubProcessActivityId).hasSize(0);
+    assertThat(queryByOuterProcessActivityId).extracting("id")
+        .containsExactlyInAnyOrder(processInstance2.getId());
+    assertThat(queryByOuterAndInnedActivityId).extracting("id")
+        .containsExactlyInAnyOrder(processInstance.getId(), processInstance2.getId());
   }
 
   @Test
@@ -2679,39 +2616,8 @@ public class HistoricProcessInstanceTest {
     }
   }
 
-
-  protected void assertReturnedProcessInstances(HistoricProcessInstanceQuery query, ProcessInstance... processInstances) {
-    int expectedSize = processInstances.length;
-    assertEquals(expectedSize, query.count());
-    assertEquals(expectedSize, query.list().size());
-
-    verifyResultContainsExactly(query.list(), collectProcessInstanceIds(Arrays.asList(processInstances)));
-  }
-
-  protected void verifyResultContainsExactly(List<HistoricProcessInstance> instances, Set<String> processInstanceIds) {
-    Set<String> retrievedInstanceIds = collectHistoricProcessInstanceIds(instances);
-    assertEquals(processInstanceIds, retrievedInstanceIds);
-  }
-
-  protected Set<String> collectProcessInstanceIds(List<ProcessInstance> instances) {
-    Set<String> retrievedInstanceIds = new HashSet<>();
-    for (ProcessInstance instance : instances) {
-      retrievedInstanceIds.add(instance.getId());
-    }
-    return retrievedInstanceIds;
-  }
-
-  protected Set<String> collectHistoricProcessInstanceIds(List<HistoricProcessInstance> instances) {
-    Set<String> retrievedInstanceIds = new HashSet<>();
-    for (HistoricProcessInstance instance : instances) {
-      retrievedInstanceIds.add(instance.getId());
-    }
-    return retrievedInstanceIds;
-  }
-
-  protected void executeJobForProcessInstance(ProcessInstance processInstance) {
-    Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+  protected void executeJobForProcessInstance(String processInstanceId) {
+    Job job = managementService.createJobQuery().processInstanceId(processInstanceId).singleResult();
     managementService.executeJob(job.getId());
   }
-
 }
