@@ -45,6 +45,13 @@ public class SetExecutionVariablesCmd extends AbstractSetVariableCmd {
     super(executionId, variables, isLocal, false);
   }
 
+  public SetExecutionVariablesCmd(String executionId,
+                                  Map<String, ?> variables,
+                                  boolean isLocal,
+                                  boolean skipJavaSerializationFormatCheck, boolean failIfNotExists) {
+    super(executionId, variables, isLocal, skipJavaSerializationFormatCheck, failIfNotExists);
+  }
+
   protected ExecutionEntity getEntity() {
     ensureNotNull("executionId", entityId);
 
@@ -52,9 +59,13 @@ public class SetExecutionVariablesCmd extends AbstractSetVariableCmd {
       .getExecutionManager()
       .findExecutionById(entityId);
 
-    ensureNotNull("execution " + entityId + " doesn't exist", "execution", execution);
+    if (super.failIfNotExists) {
+      ensureNotNull("execution " + entityId + " doesn't exist", "execution", execution);
+    }
 
-    checkSetExecutionVariables(execution);
+    if(execution != null) {
+      checkSetExecutionVariables(execution);
+    }
 
     return execution;
   }

@@ -29,6 +29,7 @@ public class SetVariablesAsyncDto {
   protected ProcessInstanceQueryDto processInstanceQuery;
   protected HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
   protected Map<String, VariableValueDto> variables;
+  protected Boolean failIfNotExists;
 
   public List<String> getProcessInstanceIds() {
     return processInstanceIds;
@@ -62,4 +63,11 @@ public class SetVariablesAsyncDto {
     this.variables = variables;
   }
 
+  public boolean isFailIfNotExists() {
+    return this.failIfNotExists == null || this.failIfNotExists;
+  }
+
+  public void setFailIfNotExists(boolean failIfNotExists) {
+    this.failIfNotExists = failIfNotExists;
+  }
 }

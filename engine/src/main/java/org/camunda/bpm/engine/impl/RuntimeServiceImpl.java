@@ -482,6 +482,19 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     ));
   }
 
+  public Batch setVariablesAsyncIfExists(List<String> processInstanceIds,
+                                         ProcessInstanceQuery processInstanceQuery,
+                                         HistoricProcessInstanceQuery historicProcessInstanceQuery,
+                                         Map<String, ?> variables) {
+    return commandExecutor.execute(new SetVariablesToProcessInstancesBatchCmd(
+        processInstanceIds,
+        processInstanceQuery,
+        historicProcessInstanceQuery,
+        variables,
+        false
+    ));
+  }
+
   @Override
   public void removeVariable(String executionId, String variableName) {
     Collection<String> variableNames = new ArrayList<String>();

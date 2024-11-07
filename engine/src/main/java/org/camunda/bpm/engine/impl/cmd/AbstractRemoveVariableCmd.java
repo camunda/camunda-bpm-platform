@@ -35,6 +35,11 @@ public abstract class AbstractRemoveVariableCmd extends AbstractVariableCmd {
     this.variableNames = variableNames;
   }
 
+  public AbstractRemoveVariableCmd(String entityId, Collection<String> variableNames, boolean isLocal, boolean failIfNotExists) {
+    super(entityId, isLocal, failIfNotExists);
+    this.variableNames = variableNames;
+  }
+
   protected void executeOperation(AbstractVariableScope scope) {
     if (isLocal) {
       scope.removeVariablesLocal(variableNames);

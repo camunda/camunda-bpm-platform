@@ -259,8 +259,11 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
     Batch batch = null;
     try {
-      batch = runtimeService.setVariablesAsync(ids, runtimeQuery, historyQuery, variableMap);
-
+      if (setVariablesAsyncDto.isFailIfNotExists()) {
+        batch = runtimeService.setVariablesAsync(ids, runtimeQuery, historyQuery, variableMap);
+      } else {
+        batch = runtimeService.setVariablesAsyncIfExists(ids, runtimeQuery, historyQuery, variableMap);
+      }
     } catch (BadUserRequestException | AuthorizationException e) {
       throw e;
 

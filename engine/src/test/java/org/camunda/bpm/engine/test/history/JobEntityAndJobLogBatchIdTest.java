@@ -17,16 +17,20 @@
 package org.camunda.bpm.engine.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.Map;
+
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricJobLog;
@@ -38,6 +42,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -407,6 +412,57 @@ public class JobEntityAndJobLogBatchIdTest {
     assertProcessedJobs(batch, processedJobs);
     assertHistoricJobLogs(batch, Batch.TYPE_SET_JOB_RETRIES);
   }
+
+  @Test
+  public void setVariablesAsyncOnCompletedProcessInstanceDontFailIfNotExists() {
+    // given
+    testRule.deploy(getUserTaskProcess());
+    String id = runtimeService.startProcessInstanceByKey("process").getId();
+
+    Batch batch = runtimeService.setVariablesAsyncIfExists(List.of(id), null, null, Variables.createVariables().putValue("foo", "bar"));
+
+    // when process is completed
+    Task task = engineRule.getTaskService().createTaskQuery().processInstanceId(id).singleResult();
+    engineRule.getTaskService().complete(task.getId());
+
+    // then no exception is thrown
+    batchRule.syncExec(batch);
+  }
+
+  @Test
+  public void setVariablesAsyncOnCompletedProcessInstanceFailIfNotExists() {
+    // given
+    testRule.deploy(getUserTaskProcess());
+    String id = runtimeService.startProcessInstanceByKey("process").getId();
+
+    Batch batch = runtimeService.setVariablesAsync(List.of(id), null, null, Variables.createVariables().putValue("foo", "bar"));
+
+    // when process is completed
+    Task task = engineRule.getTaskService().createTaskQuery().processInstanceId(id).singleResult();
+    engineRule.getTaskService().complete(task.getId());
+
+    // then no exception is thrown
+    assertThatThrownBy(() -> { batchRule.syncExec(batch); })
+        .isInstanceOf(NullValueException.class);
+  }
+
+  @Test
+  public void setVariablesSync() {
+    // given
+    testRule.deploy(getUserTaskProcess());
+    String id = runtimeService.startProcessInstanceByKey("process").getId();
+
+//    Batch batch = runtimeService.setVariables(List.of(id), null, null, Variables.createVariables().putValue("foo", "bar"));
+//
+//    // when process is completed
+//    Task task = engineRule.getTaskService().createTaskQuery().processInstanceId(id).singleResult();
+//    engineRule.getTaskService().complete(task.getId());
+//
+//    // then no exception is thrown
+//    assertThatThrownBy(() -> { batchRule.syncExec(batch); })
+//        .isInstanceOf(NullValueException.class);
+  }
+
 
   @Test
   public void shouldSetBatchIdOnJobAndJobLog_UpdateProcessInstancesSuspendState() {

@@ -31,6 +31,7 @@ public class SetVariablesJsonConverter extends AbstractBatchConfigurationObjectC
 
   protected static final String IDS = "ids";
   protected static final String ID_MAPPINGS = "idMappings";
+  protected static final String FAIL_IF_NOT_EXISTS = "failIfNotExists";
 
   @Override
   public JsonObject writeConfiguration(final BatchConfiguration configuration) {
@@ -39,6 +40,7 @@ public class SetVariablesJsonConverter extends AbstractBatchConfigurationObjectC
     JsonUtil.addListField(json, IDS, configuration.getIds());
     JsonUtil.addListField(json, ID_MAPPINGS, DeploymentMappingJsonConverter.INSTANCE,
         configuration.getIdMappings());
+    JsonUtil.addField(json, FAIL_IF_NOT_EXISTS, configuration.isFailIfNotExists());
 
     return json;
   }
@@ -50,7 +52,7 @@ public class SetVariablesJsonConverter extends AbstractBatchConfigurationObjectC
     DeploymentMappings mappings = JsonUtil.asList(JsonUtil.getArray(jsonObject, ID_MAPPINGS),
         DeploymentMappingJsonConverter.INSTANCE, DeploymentMappings::new);
 
-    return new BatchConfiguration(instanceIds, mappings);
+    return new BatchConfiguration(instanceIds, mappings, JsonUtil.getBoolean(jsonObject, FAIL_IF_NOT_EXISTS));
   }
 
 }

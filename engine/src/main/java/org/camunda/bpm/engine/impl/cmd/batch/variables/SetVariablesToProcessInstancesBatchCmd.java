@@ -50,6 +50,7 @@ public class SetVariablesToProcessInstancesBatchCmd implements Command<Batch> {
   protected ProcessInstanceQuery processInstanceQuery;
   protected HistoricProcessInstanceQuery historicProcessInstanceQuery;
   protected Map<String, ?> variables;
+  protected boolean failIfNotExists = true;
 
   public SetVariablesToProcessInstancesBatchCmd(List<String> processInstanceIds,
                                                 ProcessInstanceQuery processInstanceQuery,
@@ -59,7 +60,18 @@ public class SetVariablesToProcessInstancesBatchCmd implements Command<Batch> {
     this.processInstanceQuery = processInstanceQuery;
     this.historicProcessInstanceQuery = historicProcessInstanceQuery;
     this.variables = variables;
+  }
 
+  public SetVariablesToProcessInstancesBatchCmd(List<String> processInstanceIds,
+                                                ProcessInstanceQuery processInstanceQuery,
+                                                HistoricProcessInstanceQuery historicProcessInstanceQuery,
+                                                Map<String, ?> variables,
+                                                boolean failIfNotExists) {
+    this.processInstanceIds = processInstanceIds;
+    this.processInstanceQuery = processInstanceQuery;
+    this.historicProcessInstanceQuery = historicProcessInstanceQuery;
+    this.variables = variables;
+    this.failIfNotExists = failIfNotExists;
   }
 
   @Override
@@ -108,7 +120,7 @@ public class SetVariablesToProcessInstancesBatchCmd implements Command<Batch> {
     DeploymentMappings mappings = elementConfiguration.getMappings();
     List<String> ids = elementConfiguration.getIds();
 
-    return new BatchConfiguration(ids, mappings);
+    return new BatchConfiguration(ids, mappings, failIfNotExists);
   }
 
 
