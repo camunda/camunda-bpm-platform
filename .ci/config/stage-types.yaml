@@ -34,7 +34,7 @@ db-unit:
   - 'postgresql'
   podSpec:
     cpu: 4
-    images: ['maven:3.8.5-eclipse-temurin-11', 'postgres:17.0']
+    images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
 sql-scripts:
   directory: 'distro/sql-script'
   command: 'install -Pcheck-sql,'
@@ -50,7 +50,7 @@ sql-scripts:
   - 'postgresql'
   podSpec:
     cpu: 4
-    images: ['maven:3.8.5-eclipse-temurin-11', 'postgres:17.0']
+    images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
 instance-migration:
   directory: 'qa/test-db-instance-migration'
   command: 'verify -Pinstance-migration,'
@@ -72,7 +72,7 @@ old-engine:
   - 'postgresql'
   podSpec:
     cpu: 4
-    images: ['maven:3.8.5-eclipse-temurin-11', 'postgres:17.0']
+    images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
 rolling-update:
   directory: 'qa/test-db-rolling-update'
   command: 'verify -Prolling-update,'
@@ -83,7 +83,7 @@ rolling-update:
     - 'postgresql'
   podSpec:
     cpu: 4
-    images: [ 'maven:3.8.5-eclipse-temurin-11', 'postgres:17.0' ]
+    images: [ 'maven:3.9.7-eclipse-temurin-11', 'postgres:17.0' ]
 large-data-tests:
   directory: 'qa/large-data-tests'
   command: 'verify -Plarge-data-tests,'
@@ -93,7 +93,7 @@ large-data-tests:
     - 'postgresql'
   podSpec:
     cpu: 4
-    images: [ 'maven:3.8.5-eclipse-temurin-11', 'postgres:17.0' ]
+    images: [ 'maven:3.9.7-eclipse-temurin-11', 'postgres:17.0' ]
 
 engine-rest-unit-jersey-2:
   directory: 'engine-rest/engine-rest'
