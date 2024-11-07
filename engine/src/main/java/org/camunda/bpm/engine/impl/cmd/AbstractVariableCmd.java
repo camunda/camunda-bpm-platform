@@ -36,10 +36,17 @@ public abstract class AbstractVariableCmd implements Command<Void>, Serializable
   protected String entityId;
   protected boolean isLocal;
   protected boolean preventLogUserOperation = false;
+  protected boolean failIfNotExists = true; // default to true for sync commands
 
   public AbstractVariableCmd(String entityId, boolean isLocal) {
     this.entityId = entityId;
     this.isLocal = isLocal;
+  }
+
+  public AbstractVariableCmd(String entityId, boolean isLocal, boolean failIfNotExists) {
+    this.entityId = entityId;
+    this.isLocal = isLocal;
+    this.failIfNotExists = failIfNotExists;
   }
 
   public AbstractVariableCmd disableLogUserOperation() {
@@ -52,12 +59,12 @@ public abstract class AbstractVariableCmd implements Command<Void>, Serializable
 
     AbstractVariableScope scope = getEntity();
 
-    executeOperation(scope);
-
-    onSuccess(scope);
-
-    if(!preventLogUserOperation) {
-      logVariableOperation(scope);
+    if (scope != null) {
+      executeOperation(scope);
+      onSuccess(scope);
+      if(!preventLogUserOperation) {
+        logVariableOperation(scope);
+      }
     }
 
     return null;
