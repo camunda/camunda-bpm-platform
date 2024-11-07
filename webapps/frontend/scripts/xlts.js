@@ -66,7 +66,7 @@ if (!registryConfigured && XLTS_REGISTRY && XLTS_AUTH_TOKEN) {
   );
 
   exec(
-    `npm set //${XLTS_REGISTRY}:_authToken ${XLTS_AUTH_TOKEN}`,
+    `npm set //${XLTS_REGISTRY}/:_authToken ${XLTS_AUTH_TOKEN}`,
     'XLTS auth token configured.'
   );
 }
