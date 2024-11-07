@@ -51,7 +51,7 @@ pipeline {
 
             withVault([vaultSecrets: [
                 [
-                    path        : 'secret/products/cambpm/ci/hero-dev',
+                    path        : 'secret/products/cambpm/ci/hero-devs',
                     secretValues: [
                         [envVar: 'XLTS_REGISTRY', vaultKey: 'registry'],
                         [envVar: 'XLTS_AUTH_TOKEN', vaultKey: 'authToken']]
