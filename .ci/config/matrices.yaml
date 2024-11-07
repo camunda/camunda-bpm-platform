@@ -34,9 +34,8 @@ engine-rest:
 daily-stages:
   databases:
 # daily-stages.databases should include the latest version for each supported database
-  - 'postgresql_160'
-  - 'aws_aurora_postgresql_16'
   - 'postgresql_170'
+  - 'aws_aurora_postgresql_16'
   - 'mariadb_106'
   - 'mysql_80'
   - 'oracle_23'
