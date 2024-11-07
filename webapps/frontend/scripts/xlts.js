@@ -33,14 +33,26 @@ const exec = (cmd, successMsg) => {
   }).toString();
 };
 
+// These are the last supported versions for these packages ?????
+const baseVersions = {
+  'angular-translate': '2.19.1',
+  'angular-moment': '1.3.0',
+  'angular-ui-bootstrap': '2.5.6'
+};
+
 const getDependencyVersion = (nameSpace, npmPackage, xltsVersion) => {
-  if (nameSpace !== 'angular') {
-    return `${npmPackage}@npm:@${scope}/${npmPackage}@${xltsVersion}`;
+  if (nameSpace === 'angularjs-essentials') {
+    const baseVersion = baseVersions[npmPackage];
+    return `${npmPackage}@npm:@${scope}/${nameSpace}@${baseVersion}-${npmPackage}-${xltsVersion}`;
   }
 
-  let versionPostfix = npmPackage.split('-')[1] || '';
-  versionPostfix = versionPostfix ? '-' + versionPostfix : '';
-  return `${npmPackage}@npm:@${scope}/angularjs@${xltsVersion}${versionPostfix}`;
+  if (nameSpace === 'angular') {
+    const versionPostfix =
+      npmPackage === 'angular' ? '' : '-' + npmPackage.split('-')[1];
+    return `${npmPackage}@npm:@${scope}/angularjs@${xltsVersion}${versionPostfix}`;
+  }
+
+  return `${npmPackage}@npm:@${scope}/${npmPackage}@${xltsVersion}`;
 };
 
 const registryConfigured = exec(`npm get @${scope}:registry`) !== 'undefined\n';
@@ -66,12 +78,10 @@ if (
   const xlts = require('../package.json').xlts;
 
   const npmPackages = Object.entries(xlts)
-    .map(([nameSpace, settings]) =>
-      settings.dependencies
-        .map(npmPackage =>
-          getDependencyVersion(nameSpace, npmPackage, settings.xltsVersion)
-        )
-        .join(' ')
+    .flatMap(([nameSpace, settings]) =>
+      Object.entries(settings).map(([npmPackage, version]) =>
+        getDependencyVersion(nameSpace, npmPackage, version)
+      )
     )
     .join(' ');
 
