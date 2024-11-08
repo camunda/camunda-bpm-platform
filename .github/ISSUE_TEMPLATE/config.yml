@@ -4,5 +4,5 @@ contact_links:
     url: https://forum.camunda.io/
     about: Ask questions about using Camunda Platform here.
   - name: Enterprise Support
-    url: https://docs.camunda.org/enterprise/support/
+    url: https://camunda.com/services/enterprise-support-guide/
     about: As an enterprise customer, contact our product support here.
