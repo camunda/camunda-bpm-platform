@@ -52,12 +52,12 @@ public abstract class AbstractVariableCmd implements Command<Void>, Serializable
 
     AbstractVariableScope scope = getEntity();
 
-    executeOperation(scope);
-
-    onSuccess(scope);
-
-    if(!preventLogUserOperation) {
-      logVariableOperation(scope);
+    if (scope != null) {
+      executeOperation(scope);
+      onSuccess(scope);
+      if(!preventLogUserOperation) {
+        logVariableOperation(scope);
+      }
     }
 
     return null;

@@ -17,8 +17,10 @@
 package org.camunda.bpm.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+import static org.camunda.bpm.engine.test.util.ExecutableProcessUtil.USER_TASK_PROCESS;
 import static org.camunda.bpm.engine.variable.Variables.createVariables;
 import static org.camunda.bpm.engine.variable.Variables.objectValue;
 import static org.junit.Assert.assertEquals;
@@ -110,7 +112,6 @@ import org.junit.rules.RuleChain;
 public class RuntimeServiceTest {
 
   public static final String TESTING_INSTANCE_DELETION = "testing instance deletion";
-  public static final String A_STREAM = "aStream";
 
   @ClassRule
   public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
@@ -1043,6 +1044,21 @@ public class RuntimeServiceTest {
     } catch (ProcessEngineException ae) {
       testRule.assertTextPresent("executionId is null", ae.getMessage());
     }
+  }
+
+
+  @Test
+  public void setVariablesSyncOnCompletedProcessInstance() {
+    // given completed process instance
+    testRule.deploy(USER_TASK_PROCESS);
+    String id = runtimeService.startProcessInstanceByKey("process").getId();
+    Task task = engineRule.getTaskService().createTaskQuery().processInstanceId(id).singleResult();
+    engineRule.getTaskService().complete(task.getId());
+
+    // when setting variables then exception is thrown
+    assertThatThrownBy(() -> runtimeService.setVariables(id, Variables.createVariables().putValue("foo", "bar")))
+        .isInstanceOf(NullValueException.class)
+        .hasMessage("execution " + id + " doesn't exist: execution is null");
   }
 
   private void checkHistoricVariableUpdateEntity(String variableName, String processInstanceId) {
