@@ -82,7 +82,7 @@
                      }
                    }',
       '"example-3": {
-                     "summary": "POST `/task` Request Body 2",
+                     "summary": "POST `/task` Request Body 3",
                      "description": "Logical query: assignee = \\"John Munda\\" AND (name = \\"Approve Invoice\\" OR priority = 5) AND (suspended = false OR taskDefinitionKey = \\"approveInvoice\\")",
                      "value": {
                        "assignee": "John Munda",
@@ -101,7 +101,7 @@
                      }
                    }',
       '"example-4": {
-                     "summary": "POST `/task` Request Body 2",
+                     "summary": "POST `/task` Request Body 4",
                      "description": "Logical query: assignee = \\"John Munda\\" AND (name = \\"Approve Invoice\\" OR priority = 5) AND (suspended = false OR taskDefinitionKey = \\"approveInvoice\\")",
                      "value": {
                        "assignee": "John Munda",
