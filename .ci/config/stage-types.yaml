@@ -32,7 +32,9 @@ db-unit:
   - 'mariadb'
   - 'sqlserver'
   - 'postgresql'
-  jdkVersion: 'openjdk-jdk-11-latest'
+  podSpec:
+    cpu: 4
+    images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
 sql-scripts:
   directory: 'distro/sql-script'
   command: 'install -Pcheck-sql,'
@@ -46,6 +48,9 @@ sql-scripts:
   - 'mariadb'
   - 'sqlserver'
   - 'postgresql'
+  podSpec:
+    cpu: 4
+    images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
 instance-migration:
   directory: 'qa/test-db-instance-migration'
   command: 'verify -Pinstance-migration,'
@@ -65,17 +70,27 @@ old-engine:
   - 'mariadb'
   - 'sqlserver'
   - 'postgresql'
+  podSpec:
+    cpu: 4
+    images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
 rolling-update:
   directory: 'qa/test-db-rolling-update'
   command: 'verify -Prolling-update,'
   stash:
     runtimeStash: true
     qaStash: true
+  podSpec:
+    cpu: 4
+    images: [ 'maven:3.9.7-eclipse-temurin-11', 'postgres:17.0' ]
 large-data-tests:
   directory: 'qa/large-data-tests'
   command: 'verify -Plarge-data-tests,'
   stash:
     runtimeStash: true
+  podSpec:
+    cpu: 4
+    images: [ 'maven:3.9.7-eclipse-temurin-11', 'postgres:17.0' ]
+
 engine-rest-unit-jersey-2:
   directory: 'engine-rest/engine-rest'
   command: 'clean install -Pjersey2'
@@ -139,7 +154,7 @@ platform-jdk-temurin-jdk-17-latest:
   jdkVersion: 'jdk-17-latest'
   podSpec:
     cpu: 4
-    image: 'maven:3.9.7-eclipse-temurin-17'
+    images: ['maven:3.9.7-eclipse-temurin-17']
 platform-jdk-temurin-jdk-21-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -Pdistro,distro-ce,distro-wildfly'
@@ -149,7 +164,7 @@ platform-jdk-temurin-jdk-21-latest:
   jdkVersion: 'jdk-21-latest'
   podSpec:
     cpu: 4
-    image: 'maven:3.9.7-eclipse-temurin-21'
+    images: ['maven:3.9.7-eclipse-temurin-21']
 platform-jdk-temurin-jdk-11-latest:
   directory: '.'
   command: 'install source:jar source:test-jar
@@ -172,7 +187,7 @@ platform-jdk-temurin-jdk-11-latest:
   jdkVersion: 'jdk-11-latest'
   podSpec:
     cpu: 4
-    image: 'maven:3.9.7-eclipse-temurin-11'
+    images: ['maven:3.9.7-eclipse-temurin-11']
 platform-jdk-jdk-17-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -Pdistro,distro-ce,distro-wildfly -Dskip.frontend.build=true'

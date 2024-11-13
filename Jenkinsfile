@@ -38,15 +38,17 @@ pipeline {
         cambpmConditionalRetry([
           podSpec: [
             cpu: 32,
-            image: 'maven:3.9.7-eclipse-temurin-17'
+            images: ['maven:3.9.7-eclipse-temurin-17']
             ],
           suppressErrors: false,
           runSteps: {
             sh(label: 'GIT: Mark current directory as safe', script: "git config --global --add safe.directory \$PWD")
             skipTests = ""
+
             if (env.CHANGE_ID != null && pullRequest.labels.contains('ci:skipTests')) {
                skipTests = "-DskipTests "
             }
+
             withVault([vaultSecrets: [
                 [
                     path        : 'secret/products/cambpm/ci/xlts.dev',
@@ -72,6 +74,7 @@ pipeline {
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war')
+
             if (env.CHANGE_ID != null && pullRequest.labels.contains('ci:distro')) {
               cambpmArchiveArtifacts(
                      '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-*.zip',
