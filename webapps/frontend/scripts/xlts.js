@@ -57,22 +57,22 @@ const getDependencyVersion = (nameSpace, npmPackage, xltsVersion) => {
 
 const registryConfigured = exec(`npm get @${scope}:registry`) !== 'undefined\n';
 
-const {XLTS_REGISTRY, XLTS_AUTH_TOKEN} = process.env;
+const {HERODEVS_REGISTRY, HERODEVS_AUTH_TOKEN} = process.env;
 
-if (!registryConfigured && XLTS_REGISTRY && XLTS_AUTH_TOKEN) {
+if (!registryConfigured && HERODEVS_REGISTRY && HERODEVS_AUTH_TOKEN) {
   exec(
-    `npm set @${scope}:registry https://${XLTS_REGISTRY}/`,
+    `npm set @${scope}:registry https://${HERODEVS_REGISTRY}/`,
     'XLTS registry configured.'
   );
 
   exec(
-    `npm set //${XLTS_REGISTRY}/:_authToken ${XLTS_AUTH_TOKEN}`,
+    `npm set //${HERODEVS_REGISTRY}/:_authToken ${HERODEVS_AUTH_TOKEN}`,
     'XLTS auth token configured.'
   );
 }
 
 if (
-  (registryConfigured || (XLTS_REGISTRY && XLTS_AUTH_TOKEN)) &&
+  (registryConfigured || (HERODEVS_REGISTRY && HERODEVS_AUTH_TOKEN)) &&
   process.argv[2] === 'install'
 ) {
   const xlts = require('../package.json').xlts;

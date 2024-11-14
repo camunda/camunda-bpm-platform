@@ -53,8 +53,8 @@ pipeline {
                 [
                     path        : 'secret/products/cambpm/ci/hero-devs',
                     secretValues: [
-                        [envVar: 'XLTS_REGISTRY', vaultKey: 'registry'],
-                        [envVar: 'XLTS_AUTH_TOKEN', vaultKey: 'authToken']]
+                        [envVar: 'HERODEVS_REGISTRY', vaultKey: 'registry'],
+                        [envVar: 'HERODEVS_AUTH_TOKEN', vaultKey: 'authToken']]
                 ]]]) {
               cambpmRunMaven('.',
                   'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true '+ skipTests,

@@ -120,20 +120,20 @@ The angular-moment project has been archived on Nov 30, 2021. We replaced the of
 **Heads-up:** If you build the Webapps from source code, the build includes the no longer maintained angular-moment libraries in version 1.3.0 unless you have access to the HeroDevs registry and configure it as shown below.
 
 ##### Configure the HeroDevs registry
-To enable pulling the HeroDevs extended support libraries while building the Webapps, please configure the npm registry. Add the HeroDevs npm registry by replacing the variables `${XLTS_REGISTRY}` and `${XLTS_AUTH_TOKEN}` in the following commands and execute the commands in your terminal.
+To enable pulling the HeroDevs extended support libraries while building the Webapps, please configure the npm registry. Add the HeroDevs npm registry by replacing the variables `${HERODEVS_REGISTRY}` and `${HERODEVS_AUTH_TOKEN}` in the following commands and execute the commands in your terminal.
 
 Commands to configure the HeroDevs npm registry:
 
 ```
-npm set @neverendingsupport:registry=https://${XLTS_REGISTRY}/
-npm set //${XLTS_REGISTRY}/:_authToken ${XLTS_AUTH_TOKEN}
+npm set @neverendingsupport:registry=https://${HERODEVS_REGISTRY}/
+npm set //${HERODEVS_REGISTRY}/:_authToken ${HERODEVS_AUTH_TOKEN}
 ```
 
 Alternatively, you can set the following environment variables:
 
 ```sh
-export XLTS_REGISTRY = "example.com" # Hostname without protocol (e.g., "https://"), leading or trailing slashes
-export XLTS_AUTH_TOKEN = "abc..."    # Token to authenticate against the registry
+export HERODEVS_REGISTRY = "example.com" # Hostname without protocol (e.g., "https://"), leading or trailing slashes
+export HERODEVS_AUTH_TOKEN = "abc..."    # Token to authenticate against the registry
 ```
 
 You receive the information about the registry and the auth token directly from XLTS.dev.
