@@ -347,7 +347,7 @@ const Controller = [
 
           $scope.monthlyMetrics = angular.copy(monthlyMetricsArray);
           $scope.monthlyMetrics = $scope.monthlyMetrics.slice(0, 12);
-          updateMonthlyChart(monthlyMetricsArray.reverse());
+          updateMonthlyChart($scope.monthlyMetrics.reverse());
           $scope.loadingStateMonthly = 'LOADED';
           $scope.$apply();
         })
