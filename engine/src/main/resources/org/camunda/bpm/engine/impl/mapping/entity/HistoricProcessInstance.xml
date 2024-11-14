@@ -402,7 +402,7 @@
 
     <bind name="INC_JOIN" value="false" />
     <bind name="HAI_JOIN" value="false" />
-    <bind name="INCACT_JOIN" value="false" />
+    <bind name="RU_EXE_JOIN" value="false" />
     <bind name="JOIN_TYPE" value="'inner join'" />
 
     <foreach collection="queries" item="query">
@@ -414,12 +414,12 @@
         <bind name="INC_JOIN" value="true" />
       </if>
 
-      <if test="query != null &amp;&amp; (query.executedActivityIds != null and query.executedActivityIds.length > 0) || (query.activeActivityIds != null and query.activeActivityIds.length > 0) || (query.activityIds != null and query.activityIds.length > 0)">
+      <if test="query != null &amp;&amp; (query.executedActivityIds != null and query.executedActivityIds.length > 0) || (query.activeActivityIds != null and query.activeActivityIds.length > 0)">
         <bind name="HAI_JOIN" value="true" />
       </if>
 
       <if test="query != null &amp;&amp; (query.activityIds != null and query.activityIds.length > 0)">
-        <bind name="INCACT_JOIN" value="true" />
+        <bind name="RU_EXE_JOIN" value="true" />
       </if>
     </foreach>
 
@@ -430,9 +430,8 @@
       LEFT JOIN ${prefix}ACT_HI_ACTINST HAI
       ON HAI.PROC_INST_ID_ = SELF.ID_
     </if>
-
-    <if test="INCACT_JOIN">
-      LEFT JOIN ${prefix}ACT_HI_INCIDENT INCACT on SELF.PROC_INST_ID_ = INCACT.PROC_INST_ID_
+    <if test="RU_EXE_JOIN">
+      LEFT JOIN ${prefix}ACT_RU_EXECUTION EXE on SELF.PROC_INST_ID_ = EXE.PROC_INST_ID_
     </if>
 
     <!-- actual value conditions are checked in the WHERE part;
@@ -643,19 +642,14 @@
               )
             </if>
 
-            <if test="query.activityIds != null and query.activityIds.length > 0">
-              ${queryType} (
-                  (
-                  HAI.END_TIME_ IS NULL
-                  AND HAI.ACT_ID_ IN
-                  <foreach item="activityId" index="index" collection="query.activityIds" open="(" separator="," close=")">
-                    #{activityId}
-                  </foreach>
-                  ) OR INCACT.ACTIVITY_ID_ IN
-                  <foreach item="activityId" index="index" collection="query.activityIds" open="(" separator="," close=")">
-                    #{activityId}
-                  </foreach>
-                )
+            <if test="query.activityIds != null &amp;&amp; query.activityIds.length > 0">
+              ${queryType} (EXE.IS_EVENT_SCOPE_ = ${falseConstant}
+              and EXE.ACT_ID_ in
+              <foreach item="activityId" index="index" collection="query.activityIds"
+                       open="(" separator="," close=")">
+                #{activityId}
+              </foreach>
+              )
             </if>
 
             <if test="query.executedActivityIds != null and query.executedActivityIds.length > 0">
