@@ -35,7 +35,6 @@
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
-        last = true
         desc = "Returned if a given process instance id or comment id is invalid.
                 See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response format."/>
 
