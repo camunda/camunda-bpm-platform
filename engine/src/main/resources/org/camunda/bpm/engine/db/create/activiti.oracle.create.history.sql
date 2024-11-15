@@ -186,7 +186,7 @@ create table ACT_HI_COMMENT (
     FULL_MSG_ BLOB,
     TENANT_ID_ NVARCHAR2(64),
     REMOVAL_TIME_ TIMESTAMP(6),
-    REV_ integer,
+    REV_ INTEGER,
     primary key (ID_)
 );
 
