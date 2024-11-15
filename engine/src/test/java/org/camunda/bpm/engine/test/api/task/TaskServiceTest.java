@@ -532,12 +532,12 @@ public class TaskServiceTest {
   }
 
   @Test
-  public void testDeleteProcessInstanceCommentNullTaskIdAndCommentId() {
+  public void testDeleteProcessInstanceCommentNullId() {
     try {
       taskService.deleteProcessInstanceComment(null, null);
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("Both process instance and comment ids are null", ae.getMessage());
+      fail("NullValueException expected");
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("processInstanceId is null", ae.getMessage());
     }
   }
 
@@ -559,7 +559,7 @@ public class TaskServiceTest {
     String processInstanceId = processInstance.getId();
 
     //create a task comment
-    Comment comment = taskService.createComment(taskId, processInstanceId, "aMessage");
+    Comment comment = taskService.createComment(taskId, null, "aMessage");
 
     //delete a comment
     taskService.deleteProcessInstanceComment(processInstanceId, comment.getId());
@@ -587,21 +587,21 @@ public class TaskServiceTest {
   }
 
   @Test
-  public void testDeleteProcessInstanceCommentsNullTaskId() {
+  public void testDeleteProcessInstanceCommentsNullId() {
     try {
       taskService.deleteProcessInstanceComments(null);
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("Both process instance and comment ids are null", ae.getMessage());
+      fail("NullValueException expected");
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("processInstanceId is null", ae.getMessage());
     }
   }
 
   @Test
-  public void testDeleteProcessInstanceCommentsNonExistingTaskId() {
+  public void testDeleteProcessInstanceCommentsNonExistingId() {
     try {
-      taskService.deleteProcessInstanceComments("nonExistingTaskId");
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
+      taskService.deleteProcessInstanceComments("nonExistingId");
+      fail("NullValueException expected");
+    } catch (NullValueException ae) {
       testRule.assertTextPresent("No processInstance exists with processInstanceId:", ae.getMessage());
     }
   }
@@ -643,8 +643,8 @@ public class TaskServiceTest {
     String processInstanceId = processInstance.getId();
 
     //create a task comment
-    taskService.createComment(taskId, processInstanceId, "messageOne");
-    taskService.createComment(taskId, processInstanceId, "messageTwo");
+    taskService.createComment(taskId, null, "messageOne");
+    taskService.createComment(taskId, null, "messageTwo");
 
     //delete a comment
     taskService.deleteProcessInstanceComments(processInstanceId);

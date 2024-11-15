@@ -21,7 +21,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -29,7 +28,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.CommentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.task.Comment;
 
 /**
@@ -52,46 +50,38 @@ public class DeleteProcessInstanceCommentCmd implements Command<Object>, Seriali
     this.processInstanceId = processInstanceId;
   }
 
+  @Override
   public Object execute(CommandContext commandContext) {
-    if (processInstanceId == null && commentId == null) {
-      throw new BadUserRequestException("Both process instance and comment ids are null");
-    }
-
     ensureNotNull("processInstanceId", processInstanceId);
+
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
     ensureNotNull("No processInstance exists with processInstanceId: " + processInstanceId, "processInstance",
         processInstance);
 
-    if (commentId != null && processInstanceId != null) {
+    checkUpdateProcessInstanceById(processInstanceId, commandContext);
+    if (commentId != null ) {
       CommentEntity comment = commandContext.getCommentManager()
           .findCommentByProcessInstanceIdAndCommentId(processInstanceId, commentId);
-
       if (comment != null) {
-        checkUpdateProcessInstanceById(processInstanceId, commandContext);
         commandContext.getDbEntityManager().delete(comment);
       }
-    } else {
+    } else { // delete all comments
       List<Comment> comments = commandContext.getCommentManager().findCommentsByProcessInstanceId(processInstanceId);
       if (!comments.isEmpty()) {
-        checkUpdateProcessInstanceById(processInstanceId, commandContext);
         commandContext.getCommentManager()
             .deleteCommentsByProcessInstanceIds(Collections.singletonList(processInstanceId));
       }
     }
+
     logOperation(processInstance, commandContext);
+
     return null;
   }
 
-  private void logOperation(ExecutionEntity processInstance, CommandContext commandContext) {
+  protected void logOperation(ExecutionEntity processInstance, CommandContext commandContext) {
     PropertyChange propertyChange = new PropertyChange("comment", null, null);
     commandContext.getOperationLogManager()
         .logCommentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_COMMENT, processInstance, propertyChange);
-  }
-
-  protected void checkTaskWork(TaskEntity task, CommandContext commandContext) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkTaskWork(task);
-    }
   }
 
   protected void checkUpdateProcessInstanceById(String processInstanceId, CommandContext commandContext) {

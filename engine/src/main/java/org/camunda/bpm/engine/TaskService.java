@@ -1120,20 +1120,18 @@ public interface TaskService {
   void deleteTaskComment(String taskId, String commentId);
 
   /**
-   * Deletes a comment by a given processInstanceId and comment ID
+   * Deletes a comment by a given processInstanceId and commentId
    *
    * @param processInstanceId id of a processInstance of a comment that is intended to be deleted
    * @param commentId         id of a comment that is intended to be deleted
-   * @throws NotFoundException      if no task with the given process instance id exists
-   * @throws ProcessEngineException when given process instance id and comment id are passed as null
-   * @throws AuthorizationException if the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_WORK} permissions on {@link Resources#TASK}
-   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_WORK} permissions on {@link Resources#PROCESS_DEFINITION}
-   *                                (if the task is part of a running process instance).
+   * @throws NullValueException     if processInstanceId is null or no process instance with the given id exists
+   * @throws AuthorizationException if the user hasn't any of {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *                                or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
    */
   void deleteProcessInstanceComment(String processInstanceId, String commentId);
 
   /**
-   * Deletes all comments by a given task ID
+   * Deletes all comments by a given taskId
    *
    * @param taskId id of a task of all comments that are intended to be deleted
    * @throws NullValueException     if taskId is null or no task with the given id exists
@@ -1144,14 +1142,13 @@ public interface TaskService {
   void deleteTaskComments(String taskId);
 
   /**
-   * Deletes all comments by a given processInstance ID
+   * Deletes all comments by a given processInstanceId
    *
    * @param processInstanceId id of a process instance of comments that are intended to be deleted
-   * @throws NotFoundException      when the process instance doesn't exist with a given process instance id
-   * @throws AuthorizationException if the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_WORK} permissions on {@link Resources#TASK}
-   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_WORK} permissions on {@link Resources#PROCESS_DEFINITION}
-   *                                (if the task is part of a running process instance).
-   */
+   * @throws NullValueException     if processInstanceId is null or no process instance with the given id exists
+   * @throws AuthorizationException if the user hasn't any of {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *                                or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
+  */
   void deleteProcessInstanceComments(String processInstanceId);
 
   /**
