@@ -439,6 +439,7 @@ public class TaskLastUpdatedTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     taskService.createComment(task.getId(), processInstance.getId(), "message");
+    taskService.createComment(task.getId(), null, "message2");
 
     Date beforeUpdate = getBeforeCurrentTime();
 
@@ -456,7 +457,7 @@ public class TaskLastUpdatedTest {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    Comment comment = taskService.createComment(task.getId(), processInstance.getId(), "aMessage");
+    Comment comment = taskService.createComment(task.getId(), null, "aMessage");
 
     Date beforeUpdate = getBeforeCurrentTime();
 
@@ -473,10 +474,7 @@ public class TaskLastUpdatedTest {
   public void shouldSetLastUpdatedOnProcessInstanceDeleteComment() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    Comment comment = taskService.createComment(task.getId(), processInstance.getId(), "message");
-
-    Date beforeUpdate = getBeforeCurrentTime();
+    Comment comment = taskService.createComment(null, processInstance.getId(), "message");
 
     // when
     taskService.deleteProcessInstanceComment(processInstance.getId(), comment.getId());
@@ -484,17 +482,15 @@ public class TaskLastUpdatedTest {
     // then
     Task taskResult = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     assertThat(taskResult).isNotNull();
-    assertThat(taskResult.getLastUpdated()).isAfter(beforeUpdate);
+    assertThat(taskResult.getLastUpdated()).isNull();
   }
 
   @Test
   public void shouldSetLastUpdatedOnProcessInstanceDeleteComments() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    taskService.createComment(task.getId(), processInstance.getId(), "message");
-
-    Date beforeUpdate = getBeforeCurrentTime();
+    taskService.createComment(null, processInstance.getId(), "message");
+    taskService.createComment(null, processInstance.getId(), "message2");
 
     // when
     taskService.deleteProcessInstanceComments(processInstance.getId());
@@ -502,17 +498,14 @@ public class TaskLastUpdatedTest {
     // then
     Task taskResult = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     assertThat(taskResult).isNotNull();
-    assertThat(taskResult.getLastUpdated()).isAfter(beforeUpdate);
+    assertThat(taskResult.getLastUpdated()).isNull();
   }
 
   @Test
   public void shouldSetLastUpdatedOnProcessInstanceCommentUpdate() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    Comment comment = taskService.createComment(task.getId(), processInstance.getId(), "aMessage");
-
-    Date beforeUpdate = getBeforeCurrentTime();
+    Comment comment = taskService.createComment(null, processInstance.getId(), "aMessage");
 
     // when
     taskService.updateProcessInstanceComment(processInstance.getId(), comment.getId(), "updatedMessage");
@@ -520,7 +513,7 @@ public class TaskLastUpdatedTest {
     // then
     Task taskResult = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     assertThat(taskResult).isNotNull();
-    assertThat(taskResult.getLastUpdated()).isAfter(beforeUpdate);
+    assertThat(taskResult.getLastUpdated()).isNull();
   }
 
 }
