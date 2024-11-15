@@ -1112,7 +1112,8 @@ public interface TaskService {
    *
    * @param taskId    id of a task of a comment that is intended to be deleted
    * @param commentId id of a comment that is intended to be deleted
-   * @throws NullValueException      if taskId is null or no task with the given id exists
+   * @throws BadUserRequestException if taskId is null
+   * @throws NullValueException      if no task with the given id exists
    * @throws AuthorizationException  if the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_WORK} permissions on {@link Resources#TASK}
    *                                 or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_WORK} permissions on {@link Resources#PROCESS_DEFINITION}
    *                                 (if the task is part of a running process instance).
@@ -1124,7 +1125,8 @@ public interface TaskService {
    *
    * @param processInstanceId id of a processInstance of a comment that is intended to be deleted
    * @param commentId         id of a comment that is intended to be deleted
-   * @throws NullValueException     if processInstanceId is null or no process instance with the given id exists
+   * @throws BadUserRequestException if processInstanceId is null
+   * @throws NullValueException     if no process instance with the given id exists
    * @throws AuthorizationException if the user hasn't any of {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
    *                                or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
    */
@@ -1134,7 +1136,8 @@ public interface TaskService {
    * Deletes all comments by a given taskId
    *
    * @param taskId id of a task of all comments that are intended to be deleted
-   * @throws NullValueException     if taskId is null or no task with the given id exists
+   * @throws BadUserRequestException if taskId is null
+   * @throws NullValueException      if no task with the given id exists
    * @throws AuthorizationException if the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_WORK} permissions on {@link Resources#TASK}
    *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_WORK} permissions on {@link Resources#PROCESS_DEFINITION}
    *                                (if the task is part of a running process instance).
@@ -1145,7 +1148,8 @@ public interface TaskService {
    * Deletes all comments by a given processInstanceId
    *
    * @param processInstanceId id of a process instance of comments that are intended to be deleted
-   * @throws NullValueException     if processInstanceId is null or no process instance with the given id exists
+   * @throws BadUserRequestException if processInstanceId is null
+   * @throws NullValueException     if no process instance with the given id exists
    * @throws AuthorizationException if the user hasn't any of {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
    *                                or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
   */
@@ -1157,9 +1161,7 @@ public interface TaskService {
    * @param taskId    id of a task of a comment that is intended to be updated
    * @param commentId id of a comment that is intended to be updated
    * @param message   new message that needs to be updated
-   * @throws NotFoundException      if no task with the given taskId id exists
-   * @throws NotFoundException      if no comment found to be updated for a given comment id
-   * @throws ProcessEngineException when given task id and comment id are passed as null
+   * @throws NullValueException      if no task or comment are found with the given ids
    * @throws AuthorizationException if the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_WORK} permissions on {@link Resources#TASK}
    *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_WORK} permissions on {@link Resources#PROCESS_DEFINITION}
    *                                (if the task is part of a running process instance).
@@ -1172,9 +1174,7 @@ public interface TaskService {
    * @param processInstanceId id of a process instance of a comment that is intended to be updated
    * @param commentId         id of a comment that is intended to be updated
    * @param message           new message that needs to be updated
-   * @throws NotFoundException       if no process instance with the given processInstanceId id exists
-   * @throws NotFoundException       if no comment found to be updated for a given comment id
-   * @throws BadUserRequestException when given both process instance id and comment id are passed as null
+   * @throws NullValueException      if no process instance or comment are found with the given ids
    * @throws AuthorizationException  if the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_WORK} permissions on {@link Resources#TASK}
    *                                 or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_WORK} permissions on {@link Resources#PROCESS_DEFINITION}
    *                                 (if the task is part of a running process instance).

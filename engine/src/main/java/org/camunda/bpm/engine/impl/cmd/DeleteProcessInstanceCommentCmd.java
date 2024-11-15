@@ -21,6 +21,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -52,7 +54,7 @@ public class DeleteProcessInstanceCommentCmd implements Command<Object>, Seriali
 
   @Override
   public Object execute(CommandContext commandContext) {
-    ensureNotNull("processInstanceId", processInstanceId);
+    ensureNotNull(BadUserRequestException.class, "processInstanceId", processInstanceId);
 
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
     ensureNotNull("No processInstance exists with processInstanceId: " + processInstanceId, "processInstance",

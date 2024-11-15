@@ -48,6 +48,7 @@ public class UpdateCommentCmd implements Command<Object>, Serializable {
     this.message = message;
   }
 
+  @Override
   public Object execute(CommandContext commandContext) {
     if (processInstanceId == null && taskId == null) {
       throw new BadUserRequestException("Both process instance and task ids are null");
@@ -56,9 +57,9 @@ public class UpdateCommentCmd implements Command<Object>, Serializable {
     ensureNotNull("commentId", commentId);
     ensureNotNull("message", message);
 
-    if (null == processInstanceId) {
+    CommentEntity comment = getComment(commandContext);
+    if (processInstanceId == null) {
       ensureNotNull("taskId", taskId);
-      CommentEntity comment = getComment(commandContext);
       ensureNotNull("No comment exists with commentId: " + commentId + " and taskId: " + taskId, "comment", comment);
       TaskEntity task = updateTaskComment(taskId, commandContext, comment);
       commandContext.getOperationLogManager()
@@ -66,7 +67,6 @@ public class UpdateCommentCmd implements Command<Object>, Serializable {
       task.triggerUpdateEvent();
     } else {
       ensureNotNull("processInstanceId", processInstanceId);
-      CommentEntity comment = getComment(commandContext);
       ensureNotNull("No comment exists with commentId: " + commentId + " and processInstanceId: " + processInstanceId,
           "comment", comment);
       ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
@@ -81,7 +81,7 @@ public class UpdateCommentCmd implements Command<Object>, Serializable {
     return null;
   }
 
-  private TaskEntity updateTaskComment(String taskId, CommandContext commandContext, CommentEntity comment) {
+  protected TaskEntity updateTaskComment(String taskId, CommandContext commandContext, CommentEntity comment) {
     TaskEntity task = commandContext.getTaskManager().findTaskById(taskId);
     ensureNotNull("No task exists with taskId: " + taskId, "task", task);
 
@@ -90,21 +90,21 @@ public class UpdateCommentCmd implements Command<Object>, Serializable {
     return task;
   }
 
-  private void updateProcessInstanceComment(String processInstanceId,
+  protected void updateProcessInstanceComment(String processInstanceId,
                                             CommandContext commandContext,
                                             CommentEntity comment) {
     checkUpdateProcessInstanceById(processInstanceId, commandContext);
     updateComment(commandContext, comment);
   }
 
-  private CommentEntity getComment(CommandContext commandContext) {
+  protected CommentEntity getComment(CommandContext commandContext) {
     if (taskId != null) {
       return commandContext.getCommentManager().findCommentByTaskIdAndCommentId(taskId, commentId);
     }
     return commandContext.getCommentManager().findCommentByProcessInstanceIdAndCommentId(processInstanceId, commentId);
   }
 
-  private PropertyChange getPropertyChange(CommentEntity comment) {
+  protected PropertyChange getPropertyChange(CommentEntity comment) {
     return new PropertyChange("comment", comment.getMessage(), message);
   }
 

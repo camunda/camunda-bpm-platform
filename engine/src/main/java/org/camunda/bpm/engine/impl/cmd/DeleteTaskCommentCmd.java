@@ -20,6 +20,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.List;
+
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -51,7 +53,7 @@ public class DeleteTaskCommentCmd implements Command<Object>, Serializable {
 
   @Override
   public Object execute(CommandContext commandContext) {
-    ensureNotNull("taskId", taskId);
+    ensureNotNull(BadUserRequestException.class, "taskId", taskId);
 
     TaskEntity task = commandContext.getTaskManager().findTaskById(taskId);
     ensureNotNull("No task exists with taskId: " + taskId, "task", task);
