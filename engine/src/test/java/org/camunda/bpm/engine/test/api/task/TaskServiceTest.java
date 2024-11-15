@@ -283,12 +283,22 @@ public class TaskServiceTest {
   }
 
   @Test
-  public void testDeleteTaskCommentNullTaskIdAndCommentId() {
+  public void testDeleteTaskCommentNullTaskId() {
     try {
-      taskService.deleteTaskComment(null, null);
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("Both task and comment ids are null", ae.getMessage());
+      taskService.deleteTaskComment(null, "test");
+      fail("NullValueException expected");
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
+    }
+  }
+
+  @Test
+  public void testDeleteTaskCommentNotExistingTaskId() {
+    try {
+      taskService.deleteTaskComment("notExistingId", "notExistingCommentId");
+      fail("NullValueException expected");
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("No task exists with taskId: notExistingId", ae.getMessage());
     }
   }
 
@@ -349,9 +359,9 @@ public class TaskServiceTest {
   public void testDeleteTaskCommentsNullTaskId() {
     try {
       taskService.deleteTaskComments(null);
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("Both task and comment ids are null", ae.getMessage());
+      fail("NullValueException expected");
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
     }
   }
 
@@ -359,8 +369,8 @@ public class TaskServiceTest {
   public void testDeleteTaskCommentsNonExistingTaskId() {
     try {
       taskService.deleteTaskComments("nonExistingTaskId");
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
+      fail("NullValueException expected");
+    } catch (NullValueException ae) {
       testRule.assertTextPresent("No task exists with taskId:", ae.getMessage());
     }
   }

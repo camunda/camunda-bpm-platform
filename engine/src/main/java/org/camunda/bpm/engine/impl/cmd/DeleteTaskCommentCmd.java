@@ -20,7 +20,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.List;
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -50,47 +49,32 @@ public class DeleteTaskCommentCmd implements Command<Object>, Serializable {
     this.taskId = taskId;
   }
 
+  @Override
   public Object execute(CommandContext commandContext) {
-    if (commentId == null && taskId == null) {
-      throw new BadUserRequestException("Both task and comment ids are null");
-    }
-
     ensureNotNull("taskId", taskId);
 
-    TaskEntity task = null;
-    CommentEntity comment = null;
-    if (commentId != null && taskId != null) {
-      comment = commandContext.getCommentManager().findCommentByTaskIdAndCommentId(taskId, commentId);
+    TaskEntity task = commandContext.getTaskManager().findTaskById(taskId);
+    ensureNotNull("No task exists with taskId: " + taskId, "task", task);
+    checkTaskWork(task, commandContext);
+
+    if (commentId != null) {
+      CommentEntity comment = commandContext.getCommentManager().findCommentByTaskIdAndCommentId(taskId, commentId);
       if (comment != null) {
-        task = getTask(comment, commandContext);
-        checkTaskWork(task, commandContext);
         commandContext.getDbEntityManager().delete(comment);
       }
-    } else {
-      task = commandContext.getTaskManager().findTaskById(taskId);
-      ensureNotNull("No task exists with taskId: " + taskId, "task", task);
+    } else { // delete all comments
       List<Comment> comments = commandContext.getCommentManager().findCommentsByTaskId(taskId);
-      checkTaskWork(task, commandContext);
       if (!comments.isEmpty()) {
         commandContext.getCommentManager().deleteCommentsByTaskId(taskId);
       }
     }
 
-    if (task != null) {
-      commandContext.getOperationLogManager()
-          .logCommentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_COMMENT, task,
-              new PropertyChange("comment", null, null));
-      task.triggerUpdateEvent();
-    }
+    commandContext.getOperationLogManager()
+        .logCommentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_COMMENT, task,
+            new PropertyChange("comment", null, null));
+    task.triggerUpdateEvent();
 
     return null;
-  }
-
-  private TaskEntity getTask(CommentEntity comment, CommandContext commandContext) {
-    String taskId = comment.getTaskId();
-    TaskEntity task = commandContext.getTaskManager().findTaskById(taskId);
-    ensureNotNull("Task not found for taskId: " + taskId + " CommentId: " + commentId, "comment", comment);
-    return task;
   }
 
   protected void checkTaskWork(TaskEntity task, CommandContext commandContext) {
