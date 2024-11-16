@@ -26,30 +26,18 @@
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
-        desc = "Returned if a given task id is invalid.
+        desc = "Returned if a given task id is invalid. Orhe history of the engine is disabled.
                 See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response format."/>
 
     <@lib.response
-        code = "401"
-        dto = "ExceptionDto"
+        code = "404"
+        dto = "AuthorizationExceptionDto"
+        last = true
         desc = "The authenticated user is unauthorized to delete this resource. See the
                         [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
                         for the error response format."
     />
 
-    <@lib.response
-        code = "403"
-        dto = "AuthorizationExceptionDto"
-        desc = "The history of the engine is disabled. See the [Introduction](/reference/rest/overview/#error-handling)
-                        for the error response format." />
-
-    <@lib.response
-        code = "500"
-        dto = "ExceptionDto"
-        last = true
-        desc = "Comments of a task could not be deleted successfully.
-                                See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
-                                for the error response format." />
     }
   }
 </#macro>
