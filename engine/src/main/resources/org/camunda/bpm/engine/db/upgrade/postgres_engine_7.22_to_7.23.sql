@@ -21,7 +21,7 @@ values ('1200', CURRENT_TIMESTAMP, '7.23.0');
 alter table ACT_HI_COMMENT
     add column REV_ integer;
 
---Set revision number to already existing comments
+-- Set revision number to already existing comments
 --   if any for backward compatibility
 update ACT_HI_COMMENT
 set REV_ = 1
