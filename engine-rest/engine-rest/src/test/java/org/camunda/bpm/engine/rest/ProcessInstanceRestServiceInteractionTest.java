@@ -67,7 +67,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
@@ -896,7 +895,7 @@ public class ProcessInstanceRestServiceInteractionTest extends AbstractRestServi
   @Test
   public void testDeleteInstanceCommentForNonExistingCommentId() {
     mockHistoryFull();
-    doThrow(new NotValidException()).when(taskServiceMock)
+    doThrow(new NullValueException()).when(taskServiceMock)
         .deleteProcessInstanceComment(EXAMPLE_PROCESS_INSTANCE_ID, NON_EXISTING_ID);
 
     given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
@@ -946,7 +945,7 @@ public class ProcessInstanceRestServiceInteractionTest extends AbstractRestServi
   }
 
   @Test
-  public void testDeleteInstanceCommentForNonExistingTaskWithHistoryDisabled() {
+  public void testDeleteInstanceCommentForNonExistingWithHistoryDisabled() {
     mockHistoryDisabled();
 
     given().pathParam("id", NON_EXISTING_ID)
@@ -1004,7 +1003,7 @@ public class ProcessInstanceRestServiceInteractionTest extends AbstractRestServi
   }
 
   @Test
-  public void testDeleteProcessInstanceCommentsForNonExistingTask() {
+  public void testDeleteProcessInstanceCommentsForNonExisting() {
     mockHistoryFull();
     historicProcessInstanceQueryMock = mock(HistoricProcessInstanceQuery.class);
     when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(historicProcessInstanceQueryMock);
@@ -1023,7 +1022,7 @@ public class ProcessInstanceRestServiceInteractionTest extends AbstractRestServi
   }
 
   @Test
-  public void testDeleteProcessInstanceCommentsForNonExistingTaskWithHistoryDisabled() {
+  public void testDeleteProcessInstanceCommentsForNonExistingWithHistoryDisabled() {
     mockHistoryDisabled();
 
     given().pathParam("id", NON_EXISTING_ID)

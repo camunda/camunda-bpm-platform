@@ -147,8 +147,6 @@ import org.mockito.Mockito;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TaskRestServiceInteractionTest extends
     AbstractRestServiceTest {
@@ -3787,7 +3785,7 @@ public class TaskRestServiceInteractionTest extends
         .statusCode(Status.NO_CONTENT.getStatusCode())
         .when()
         .delete(SINGLE_TASK_SINGLE_COMMENT_URL);
-    verify(taskServiceMock).deleteTaskComment(EXAMPLE_TASK_ID, EXAMPLE_TASK_COMMENT_ID  );
+    verify(taskServiceMock).deleteTaskComment(EXAMPLE_TASK_ID, EXAMPLE_TASK_COMMENT_ID);
   }
 
   @Test
@@ -3807,7 +3805,7 @@ public class TaskRestServiceInteractionTest extends
 
   @Test
   public void testDeleteTaskCommentForNonExistingCommentId() {
-    doThrow(new NotValidException()).when(taskServiceMock).deleteTaskComment(EXAMPLE_TASK_ID, NON_EXISTING_ID);
+    doThrow(new NullValueException()).when(taskServiceMock).deleteTaskComment(EXAMPLE_TASK_ID, NON_EXISTING_ID);
 
     given().pathParam("id", EXAMPLE_TASK_ID)
         .pathParam("commentId", NON_EXISTING_ID)
@@ -4066,7 +4064,6 @@ public class TaskRestServiceInteractionTest extends
         .contentType(ContentType.JSON)
         .when()
         .put(SINGLE_TASK_COMMENTS_URL);
-
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })

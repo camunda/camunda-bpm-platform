@@ -43,6 +43,7 @@ public class ProcessInstanceCommentResourceImpl implements ProcessInstanceCommen
     this.processInstanceId = processInstanceId;
   }
 
+  @Override
   public List<CommentDto> getComments() {
     if (!isHistoryEnabled()) {
       return Collections.emptyList();
@@ -79,8 +80,9 @@ public class ProcessInstanceCommentResourceImpl implements ProcessInstanceCommen
   }
 
   /**
-   * Updates message for a given processInstance ID and commentId
+   * Updates message for a given processInstanceId and commentId
    */
+  @Override
   public void updateComment(CommentDto comment) {
     ensureHistoryEnabled(Status.FORBIDDEN);
     ensureProcessInstanceExists(Status.NOT_FOUND);
