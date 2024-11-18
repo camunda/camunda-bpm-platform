@@ -67,7 +67,7 @@ public class HttpsConfigurationEnabledTest extends AbstractRestTest {
 
     // then
     exceptionRule.expect(ResourceAccessException.class);
-    exceptionRule.expectMessage("Connection refused");
+    exceptionRule.expectMessage("I/O error on GET request for \"http://localhost:8080/engine-rest/task\":");
 
     // then
     ResponseEntity<String> response = testRestTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(null), String.class);
