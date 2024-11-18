@@ -21,21 +21,26 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.commons.testing.ProcessEngineLoggingRule;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
 public class BpmnBehaviorLoggerTest extends PluggableProcessEngineTest {
+  @After
+  public void tearDown() {
+    processEngineConfiguration.setEnableExceptionsAfterUnhandledBpmnError(false);
+  }
 
   @Rule
   public ProcessEngineLoggingRule processEngineLoggingRule = new ProcessEngineLoggingRule().watch(
       "org.camunda.bpm.engine.bpmn.behavior", Level.INFO);
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/behavior/UnhandledBpmnError.bpmn20.xml" })
-  public void testUnhandledBpmnErrorThrowException() {
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/behavior/BpmnBehaviorLoggerTest.UnhandledBpmnError.bpmn20.xml" })
+  public void shouldIncludeBpmnErrorMessageInUnhandledBpmnError() {
     // given
     processEngineConfiguration.setEnableExceptionsAfterUnhandledBpmnError(true);
     try {
@@ -43,19 +48,20 @@ public class BpmnBehaviorLoggerTest extends PluggableProcessEngineTest {
       runtimeService.startProcessInstanceByKey("testProcess");
     } catch (ProcessEngineException e) {
       // then
-      assertTrue(e.getMessage()
-          .contains(
-              "Execution with id 'serviceTask' throws an error event with errorCode 'errorCode' and errorMessage 'ouch!', but no error handler was defined"));
+      assertThat(e.getMessage()).contains(
+          "Execution with id 'serviceTask' throws an error event with errorCode 'errorCode' and errorMessage 'ouch!', but no error handler was defined");
     }
-    // cleanup
-    processEngineConfiguration.setEnableExceptionsAfterUnhandledBpmnError(false);
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/behavior/UnhandledBpmnError.bpmn20.xml" })
-  public void testUnhandledBpmnErrorLogException() {
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/behavior/BpmnBehaviorLoggerTest.UnhandledBpmnError.bpmn20.xml" })
+  public void shouldLogBpmnErrorMessageInUnhandledBpmnErrorWithoutException() {
+    // given
     String logMessage = "Execution with id 'serviceTask' throws an error event with errorCode 'errorCode' and errorMessage 'ouch!'";
+    // when
     runtimeService.startProcessInstanceByKey("testProcess");
+    // then
     assertThat(processEngineLoggingRule.getFilteredLog(logMessage)).hasSize(1);
   }
 }
