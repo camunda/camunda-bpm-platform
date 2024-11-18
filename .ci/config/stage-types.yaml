@@ -57,6 +57,9 @@ instance-migration:
   stash:
     runtimeStash: true
     qaStash: true
+  podSpec:
+    cpu: 4
+    images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
 old-engine:
   directory: 'qa'
   command: 'verify -Pold-engine,'
