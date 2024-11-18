@@ -28,6 +28,7 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class BpmnBehaviorLoggerTest extends PluggableProcessEngineTest {
+
   @After
   public void tearDown() {
     processEngineConfiguration.setEnableExceptionsAfterUnhandledBpmnError(false);
