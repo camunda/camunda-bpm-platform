@@ -19,10 +19,5 @@ insert into ACT_GE_SCHEMA_LOG
 values ('1200', CURRENT_TIMESTAMP, '7.23.0');
 
 alter table ACT_HI_COMMENT
-    add column REV_ integer;
-
--- Set revision number to already existing comments
---   if any for backward compatibility
-update ACT_HI_COMMENT
-set REV_ = 1
-where REV_ is null;
+    add column REV_ integer not null
+    default 1;
