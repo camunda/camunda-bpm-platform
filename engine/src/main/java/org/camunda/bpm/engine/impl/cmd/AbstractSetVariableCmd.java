@@ -45,6 +45,17 @@ public abstract class AbstractSetVariableCmd extends AbstractVariableCmd {
     this.skipJavaSerializationFormatCheck = skipJavaSerializationFormatCheck;
   }
 
+  public AbstractSetVariableCmd(String entityId,
+                                Map<String, ? extends Object> variables,
+                                boolean isLocal,
+                                boolean skipJavaSerializationFormatCheck,
+                                boolean failIfNotExists) {
+    super(entityId, isLocal, failIfNotExists);
+    this.variables = variables;
+    this.skipJavaSerializationFormatCheck = skipJavaSerializationFormatCheck;
+  }
+
+
   protected void executeOperation(AbstractVariableScope scope) {
     if (isLocal) {
       scope.setVariablesLocal(variables, skipJavaSerializationFormatCheck);

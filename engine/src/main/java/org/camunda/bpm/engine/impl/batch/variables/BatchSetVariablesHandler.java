@@ -51,7 +51,7 @@ public class BatchSetVariablesHandler extends AbstractBatchJobHandler<BatchConfi
 
     for (String processInstanceId : processInstanceIds) {
       commandContext.executeWithOperationLogPrevented(
-          new SetExecutionVariablesCmd(processInstanceId, variables, false, true));
+          new SetExecutionVariablesCmd(processInstanceId, variables, false, true, batchConfiguration.isFailIfNotExists()));
     }
   }
 
@@ -63,7 +63,7 @@ public class BatchSetVariablesHandler extends AbstractBatchJobHandler<BatchConfi
   @Override
   protected BatchConfiguration createJobConfiguration(BatchConfiguration configuration,
                                                       List<String> processIdsForJob) {
-    return new BatchConfiguration(processIdsForJob);
+    return new BatchConfiguration(processIdsForJob, configuration.isFailIfNotExists());
   }
 
   @Override

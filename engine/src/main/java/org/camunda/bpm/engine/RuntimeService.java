@@ -1595,6 +1595,11 @@ public interface RuntimeService {
    */
   Batch setVariablesAsync(HistoricProcessInstanceQuery historicProcessInstanceQuery, Map<String, ?> variables);
 
+  Batch setVariablesAsyncIfExists(List<String> processInstanceIds,
+                                  ProcessInstanceQuery processInstanceQuery,
+                                  HistoricProcessInstanceQuery historicProcessInstanceQuery,
+                                  Map<String, ?> variables);
+
   /**
    * Removes a variable for an execution.
    *
