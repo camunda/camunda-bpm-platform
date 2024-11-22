@@ -34,6 +34,7 @@ import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.config.RequestConfig.Builder;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
@@ -71,13 +72,10 @@ public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R e
 
   @Override
   public R execute(Q request) {
-    BasicClassicHttpRequest httpRequest = createHttpRequest(request);
-
     R invocationResult;
-    HttpRequestBase httpRequest = createHttpRequest(request);
+    BasicClassicHttpRequest httpRequest = createHttpRequest(request);
     HttpRequestInvocation invocation = new HttpRequestInvocation(httpRequest, request, requestInterceptors, httpClient);
     try {
-      return createResponse((ClassicHttpResponse) invocation.proceed());
       invocationResult = createResponse((CloseableHttpResponse) invocation.proceed());
     } catch (Exception e) {
       throw LOG.unableToExecuteRequest(e);
