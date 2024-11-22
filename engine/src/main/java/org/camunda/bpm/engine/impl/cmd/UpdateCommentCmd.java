@@ -58,12 +58,13 @@ public class UpdateCommentCmd implements Command<Object>, Serializable {
     ensureNotNull("message", message);
 
     CommentEntity comment = getComment(commandContext);
+    String oldMessage = comment.getMessage();
     if (processInstanceId == null) {
       ensureNotNull("taskId", taskId);
       ensureNotNull("No comment exists with commentId: " + commentId + " and taskId: " + taskId, "comment", comment);
       TaskEntity task = updateTaskComment(taskId, commandContext, comment);
       commandContext.getOperationLogManager()
-          .logCommentOperation(UserOperationLogEntry.OPERATION_TYPE_UPDATE_COMMENT, task, getPropertyChange(comment));
+          .logCommentOperation(UserOperationLogEntry.OPERATION_TYPE_UPDATE_COMMENT, task, getPropertyChange(oldMessage));
       task.triggerUpdateEvent();
     } else {
       ensureNotNull("processInstanceId", processInstanceId);
@@ -75,7 +76,7 @@ public class UpdateCommentCmd implements Command<Object>, Serializable {
       updateProcessInstanceComment(processInstanceId, commandContext, comment);
       commandContext.getOperationLogManager()
           .logCommentOperation(UserOperationLogEntry.OPERATION_TYPE_UPDATE_COMMENT, processInstance,
-              getPropertyChange(comment));
+              getPropertyChange(oldMessage));
     }
 
     return null;
@@ -104,8 +105,8 @@ public class UpdateCommentCmd implements Command<Object>, Serializable {
     return commandContext.getCommentManager().findCommentByProcessInstanceIdAndCommentId(processInstanceId, commentId);
   }
 
-  protected PropertyChange getPropertyChange(CommentEntity comment) {
-    return new PropertyChange("comment", comment.getMessage(), message);
+  protected PropertyChange getPropertyChange(String oldMessage) {
+    return new PropertyChange("comment", oldMessage, message);
   }
 
   protected void checkTaskWork(TaskEntity task, CommandContext commandContext) {
