@@ -28,6 +28,7 @@
         code = "200"
         mediaType= "text/plain"
         desc = "Request successful."
+        contentDesc = "Returns the stacktrace of the exception for the historic job with the given ID."
         examples = ['"example-1": {
                        "summary": "response",
                        "description": "GET `history/job-log/someId/stacktrace`
