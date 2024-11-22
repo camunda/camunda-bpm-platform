@@ -22,6 +22,7 @@ import static org.camunda.spin.Spin.XML;
 import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_VALIDATION_XML;
 import static org.camunda.spin.xml.XmlTestConstants.createExampleOrder;
 
+import org.camunda.spin.xml.XmlTestUtil;
 import org.camunda.spin.xml.mapping.NonXmlRootElementType;
 import org.camunda.spin.xml.mapping.Order;
 import org.junit.Test;
@@ -32,8 +33,11 @@ public class XmlDomMapJavaToXmlTest {
   public void shouldMapJavaToXml() {
     Order order = createExampleOrder();
     String orderAsString = XML(order).toString();
-
-    assertThat(orderAsString).isXmlEqualTo(EXAMPLE_VALIDATION_XML);
+    //In EXAMPLE_VALIDATION_XML, expected date is hardcoded in CET timezone, ignoring it so that it passes when ran in
+    //different timezone
+    String exampleValidationXmlWoTimezone = XmlTestUtil.removeTimeZone(EXAMPLE_VALIDATION_XML);
+    orderAsString = XmlTestUtil.removeTimeZone(orderAsString);
+    assertThat(orderAsString).isXmlEqualTo(exampleValidationXmlWoTimezone);
   }
 
   @Test
