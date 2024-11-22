@@ -22,6 +22,7 @@ import static org.camunda.spin.xml.XmlTestConstants.createExampleOrder;
 
 import org.camunda.spin.impl.test.Script;
 import org.camunda.spin.impl.test.ScriptTest;
+import org.camunda.spin.xml.XmlTestUtil;
 import org.camunda.spin.xml.mapping.Order;
 import org.junit.Test;
 
@@ -36,7 +37,11 @@ public abstract class XmlDomMapJavaToXmlScriptTest extends ScriptTest{
     script.execute();
     String xml = script.getVariable("xml");
 
-    assertThat(xml).isXmlEqualTo(EXAMPLE_VALIDATION_XML);
+    //In EXAMPLE_VALIDATION_XML, expected date is hardcoded in CET timezone, ignoring it so that it passes when ran in
+    //different timezone
+    String exampleValidationXmlWoTimezone = XmlTestUtil.removeTimeZone(EXAMPLE_VALIDATION_XML);
+    xml = XmlTestUtil.removeTimeZone(xml);
+    assertThat(xml).isXmlEqualTo(exampleValidationXmlWoTimezone);
   }
 
   @Test(expected = IllegalArgumentException.class)
