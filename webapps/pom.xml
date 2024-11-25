@@ -173,7 +173,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>Install HeroDevs XLTS dependencies</id>
+            <id>Install XLTS.dev dependencies</id>
             <goals>
               <goal>npm</goal>
             </goals>
