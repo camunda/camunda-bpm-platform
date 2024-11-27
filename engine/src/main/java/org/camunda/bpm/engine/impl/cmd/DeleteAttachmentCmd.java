@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -49,16 +50,16 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
 
   public Object execute(CommandContext commandContext) {
     AttachmentEntity attachment = null;
-    if (taskId != null) {
+    if (StringUtils.isNotBlank(taskId)) {
       attachment = (AttachmentEntity) commandContext
           .getAttachmentManager()
           .findAttachmentByTaskIdAndAttachmentId(taskId, attachmentId);
-      ensureNotNull("No attachment exist for task id '" + taskId + " and attachmentId '" + attachmentId + "'.", "attachment", attachment);
+      ensureNotNull("No attachment exists for task id '" + taskId + " and attachmentId '" + attachmentId + "'.", "attachment", attachment);
     } else {
       attachment = commandContext
           .getDbEntityManager()
           .selectById(AttachmentEntity.class, attachmentId);
-      ensureNotNull("No attachment exist with attachmentId '" + attachmentId + "'.", "attachment", attachment);
+      ensureNotNull("No attachment exists with attachmentId '" + attachmentId + "'.", "attachment", attachment);
     }
 
     commandContext
@@ -71,17 +72,19 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
         .deleteByteArrayById(attachment.getContentId());
     }
 
-    if (attachment.getTaskId()!=null) {
+    if (StringUtils.isNotBlank(attachment.getTaskId())) {
       TaskEntity task = commandContext
           .getTaskManager()
           .findTaskById(attachment.getTaskId());
 
-      PropertyChange propertyChange = new PropertyChange("name", null, attachment.getName());
+      if (task != null) {
+        PropertyChange propertyChange = new PropertyChange("name", null, attachment.getName());
 
-      commandContext.getOperationLogManager()
-          .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT, task, propertyChange);
+        commandContext.getOperationLogManager()
+            .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT, task, propertyChange);
 
-      task.triggerUpdateEvent();
+        task.triggerUpdateEvent();
+      }
     }
 
     return null;
