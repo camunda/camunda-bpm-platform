@@ -255,6 +255,7 @@
 <#macro response code desc
         flatType=""
         dto=""
+        contentDesc=""
         array=false
         additionalProperties=false
         mediaType="application/json"
@@ -270,6 +271,7 @@
                 array = array
                 additionalProperties = additionalProperties
                 mediaType = mediaType
+                contentDesc = contentDesc
                 binary = binary
                 examples = examples />
           },
@@ -296,6 +298,7 @@
                   array = type["array"]
                   additionalProperties = type["additionalProperties"]
                   mediaType = type["mediaType"]
+                  contentDesc = type["contentDesc"]
                   binary = type["binary"]
                   examples = type["examples"] /><#sep>,
             </#list>
@@ -314,6 +317,7 @@
         array=false
         additionalProperties=false
         mediaType="application/json"
+        contentDesc=""
         binary = false
         examples=[] >
            <#if mediaType == "application/xhtml+xml" | (mediaType == "application/json" & !array & flatType == "string") | binary>
@@ -326,6 +330,11 @@
            <#else>
              "${mediaType}": {
                "schema": {
+
+               <#if mediaType == "text/plain" && contentDesc?has_content>
+                   "type" : "string",
+                   "description" : "${contentDesc}"
+               </#if>
 
                  <#if array>
                    "type" : "array",
