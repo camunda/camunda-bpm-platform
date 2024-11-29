@@ -28,6 +28,7 @@
         code = "200"
         mediaType= "text/plain"
         desc = "Request successful."
+        contentDesc = "Returns the error details of the historic external task log with the given ID."
         examples = ['"example-1": {
                        "summary": "GET `history/external-task-log/someId/error-details`",
                        "description": "GET `history/external-task-log/someId/error-details`",

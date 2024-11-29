@@ -2,7 +2,7 @@ REST API - OpenAPI documentation generation
 ========
 
 This project generates a single openapi.json containing the OpeanAPI documentation of the Engine Rest API.
-Aligned with OpeanAPI specification version [3.0.2](https://github.com/OAI/OpenAPI-Specification/blob/3.0.2/versions/3.0.2.md).
+Aligned with OpenAPI specification version [3.0.2](https://github.com/OAI/OpenAPI-Specification/blob/3.0.2/versions/3.0.2.md).
 
 # Table of Contents
 1. [Build and phases](#build-and-phases)
