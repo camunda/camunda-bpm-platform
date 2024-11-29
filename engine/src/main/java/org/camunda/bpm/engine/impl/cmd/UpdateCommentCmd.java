@@ -58,7 +58,7 @@ public class UpdateCommentCmd implements Command<Object>, Serializable {
     ensureNotNull("message", message);
 
     CommentEntity comment = getComment(commandContext);
-    String oldMessage = comment.getMessage();
+    String oldMessage = comment != null ? comment.getMessage() : "";
     if (processInstanceId == null) {
       ensureNotNull("taskId", taskId);
       ensureNotNull("No comment exists with commentId: " + commentId + " and taskId: " + taskId, "comment", comment);
