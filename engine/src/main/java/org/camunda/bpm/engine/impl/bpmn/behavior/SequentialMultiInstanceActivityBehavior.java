@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -35,19 +36,19 @@ public class SequentialMultiInstanceActivityBehavior extends MultiInstanceActivi
 
   @Override
   protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {
-
+    Collection<?> collection = evaluateCollection(execution);
     prepareScope(execution, nrOfInstances);
     setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, 1);
 
     ActivityImpl innerActivity = getInnerActivity(execution.getActivity());
-    performInstance(execution, innerActivity, 0);
+    performInstance(execution, innerActivity, 0, collection);
   }
 
   public void complete(ActivityExecution scopeExecution) {
     int loopCounter = getLoopVariable(scopeExecution, LOOP_COUNTER) + 1;
     int nrOfInstances = getLoopVariable(scopeExecution, NUMBER_OF_INSTANCES);
     int nrOfCompletedInstances = getLoopVariable(scopeExecution, NUMBER_OF_COMPLETED_INSTANCES) + 1;
-
+    Collection<?> collection = evaluateCollection(scopeExecution);
     setLoopVariable(scopeExecution, NUMBER_OF_COMPLETED_INSTANCES, nrOfCompletedInstances);
 
     if (loopCounter == nrOfInstances || completionConditionSatisfied(scopeExecution)) {
@@ -55,7 +56,7 @@ public class SequentialMultiInstanceActivityBehavior extends MultiInstanceActivi
     }
     else {
       PvmActivity innerActivity = getInnerActivity(scopeExecution.getActivity());
-      performInstance(scopeExecution, innerActivity, loopCounter);
+      performInstance(scopeExecution, innerActivity, loopCounter, collection);
     }
   }
 
