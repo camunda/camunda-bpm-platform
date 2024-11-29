@@ -41,7 +41,7 @@
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
-        desc = "Returned if a given process instance id or comment id is invalid. Or history of the engine is disabled.
+        desc = "Returned if a given process instance id or comment id is invalid or history is disabled in the engine.
                 See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response format."/>
 
     <@lib.response
