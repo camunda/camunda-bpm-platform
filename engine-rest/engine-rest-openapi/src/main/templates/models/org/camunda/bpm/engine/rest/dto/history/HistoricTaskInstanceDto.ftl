@@ -167,7 +167,13 @@
       type = "string"
       desc = "The process instance id of the root process instance that initiated the process
               containing this task."
-      last = true
+  />
+
+  <@lib.property
+    name = "taskState"
+    type = "string"
+    desc = "The task's state."
+    last = true
   />
 
 </@lib.dto>

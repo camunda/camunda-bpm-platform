@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.test.util.ExecutableProcessUtil.USER_TASK_PROCESS;
 
 import java.util.List;
 import java.util.Map;
@@ -83,14 +84,6 @@ public class JobEntityAndJobLogBatchIdTest {
     externalTaskService = engineRule.getExternalTaskService();
   }
 
-  private BpmnModelInstance getUserTaskProcess() {
-    return Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .userTask("task1")
-        .endEvent()
-        .done();
-  }
-
   private BpmnModelInstance getTwoUserTasksProcess() {
     return Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -111,7 +104,7 @@ public class JobEntityAndJobLogBatchIdTest {
   @Test
   public void shouldSetBatchIdOnJobAndJobLog_SetHistoricBatchRemovalTime() {
     // given
-    testRule.deploy(getUserTaskProcess());
+    testRule.deploy(USER_TASK_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     // create historic Batch
@@ -159,7 +152,7 @@ public class JobEntityAndJobLogBatchIdTest {
   @Test
   public void shouldSetBatchIdOnJobAndJobLog_SetVariables() {
     // given
-    testRule.deploy(getUserTaskProcess());
+    testRule.deploy(USER_TASK_PROCESS);
     ProcessInstance process = runtimeService.startProcessInstanceByKey("process");
 
     Batch batch = runtimeService.setVariablesAsync(List.of(process.getId()), Variables.createVariables().putValue("foo", "bar"));
@@ -250,7 +243,7 @@ public class JobEntityAndJobLogBatchIdTest {
   @Test
   public void shouldSetBatchIdOnJobAndJobLog_DeleteProcessInstances() {
     // given
-    testRule.deploy(getUserTaskProcess());
+    testRule.deploy(USER_TASK_PROCESS);
     ProcessInstance process = runtimeService.startProcessInstanceByKey("process");
 
     Batch batch = runtimeService.deleteProcessInstancesAsync(List.of(process.getId()), null);
@@ -289,7 +282,7 @@ public class JobEntityAndJobLogBatchIdTest {
   @Test
   public void shouldSetBatchIdOnJobAndJobLog_Migration() {
     // given
-    ProcessDefinition sourceProcessDefinition = testRule.deployAndGetDefinition(getUserTaskProcess());
+    ProcessDefinition sourceProcessDefinition = testRule.deployAndGetDefinition(USER_TASK_PROCESS);
     ProcessInstance process = runtimeService.startProcessInstanceByKey("process");
     ProcessDefinition targetProcessDefinition = testRule.deployAndGetDefinition(getTwoUserTasksProcess());
 
@@ -351,7 +344,7 @@ public class JobEntityAndJobLogBatchIdTest {
   @Test
   public void shouldSetBatchIdOnJobAndJobLog_RestartProcessInstance() {
     // given
-    testRule.deploy(getUserTaskProcess());
+    testRule.deploy(USER_TASK_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     runtimeService.deleteProcessInstance(processInstance.getId(), null);
 
@@ -411,7 +404,7 @@ public class JobEntityAndJobLogBatchIdTest {
   @Test
   public void shouldSetBatchIdOnJobAndJobLog_UpdateProcessInstancesSuspendState() {
     // given
-    testRule.deploy(getUserTaskProcess());
+    testRule.deploy(USER_TASK_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     Batch batch = runtimeService.updateProcessInstanceSuspensionState()
