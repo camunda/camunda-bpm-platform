@@ -17,3 +17,6 @@
 
 insert into ACT_GE_SCHEMA_LOG
 values ('1200', CURRENT_TIMESTAMP, '7.23.0');
+
+alter table ACT_HI_COMMENT
+    add REV_ integer default 1 not null;

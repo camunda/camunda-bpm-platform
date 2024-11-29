@@ -108,6 +108,16 @@ public class CommentManager extends AbstractHistoricManager {
     return (CommentEntity) getDbEntityManager().selectOne("selectCommentByTaskIdAndCommentId", parameters);
   }
 
+  public CommentEntity findCommentByProcessInstanceIdAndCommentId(String processInstanceId, String commentId) {
+    checkHistoryEnabled();
+
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put("processInstanceId", processInstanceId);
+    parameters.put("id", commentId);
+
+    return (CommentEntity) getDbEntityManager().selectOne("selectCommentByProcessInstanceIdAndCommentId", parameters);
+  }
+
   public DbOperation addRemovalTimeToCommentsByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime, Integer batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
@@ -141,5 +151,4 @@ public class CommentManager extends AbstractHistoricManager {
       .deletePreserveOrder(CommentEntity.class, "deleteCommentsByRemovalTime",
         new ListQueryParameterObject(parameters, 0, batchSize));
   }
-
 }

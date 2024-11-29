@@ -95,6 +95,7 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
@@ -146,8 +147,6 @@ import org.mockito.Mockito;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TaskRestServiceInteractionTest extends
     AbstractRestServiceTest {
@@ -3758,6 +3757,313 @@ public class TaskRestServiceInteractionTest extends
       .body("message", equalTo("aMessage"))
       .when()
       .post(HANDLE_BPMN_ESCALATION_URL);
+  }
+
+  @Test
+  public void testDeleteTaskCommentThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock)
+        .deleteTaskComment(MockProvider.EXAMPLE_TASK_ID, EXAMPLE_TASK_COMMENT_ID);
+
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+        .pathParam("commentId", EXAMPLE_TASK_COMMENT_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .when()
+        .delete(SINGLE_TASK_SINGLE_COMMENT_URL);
+  }
+
+  @Test
+  public void testDeleteTaskComment() {
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+        .pathParam("commentId", EXAMPLE_TASK_COMMENT_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .delete(SINGLE_TASK_SINGLE_COMMENT_URL);
+    verify(taskServiceMock).deleteTaskComment(EXAMPLE_TASK_ID, EXAMPLE_TASK_COMMENT_ID);
+  }
+
+  @Test
+  public void testDeleteTaskCommentWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+        .pathParam("commentId", EXAMPLE_TASK_COMMENT_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body(containsString("History is not enabled"))
+        .when()
+        .delete(SINGLE_TASK_SINGLE_COMMENT_URL);
+  }
+
+  @Test
+  public void testDeleteTaskCommentForNonExistingCommentId() {
+    doThrow(new NullValueException()).when(taskServiceMock).deleteTaskComment(EXAMPLE_TASK_ID, NON_EXISTING_ID);
+
+    given().pathParam("id", EXAMPLE_TASK_ID)
+        .pathParam("commentId", NON_EXISTING_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .contentType(ContentType.JSON)
+        .when()
+        .delete(SINGLE_TASK_SINGLE_COMMENT_URL);
+  }
+
+  @Test
+  public void testDeleteTaskCommentForNonExistingCommentIdWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given().pathParam("id", EXAMPLE_TASK_ID)
+        .pathParam("commentId", NON_EXISTING_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body(containsString("History is not enabled"))
+        .when()
+        .delete(SINGLE_TASK_SINGLE_COMMENT_URL);
+  }
+
+  @Test
+  public void testDeleteTaskCommentForNonExistingTask() {
+    when(historicTaskInstanceQueryMock.taskId(NON_EXISTING_ID)).thenReturn(historicTaskInstanceQueryMock);
+    when(historicTaskInstanceQueryMock.singleResult()).thenReturn(null);
+
+    given().pathParam("id", NON_EXISTING_ID)
+        .pathParam("commentId", EXAMPLE_TASK_COMMENT_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body(containsString("No task found for task id " + NON_EXISTING_ID))
+        .when()
+        .delete(SINGLE_TASK_SINGLE_COMMENT_URL);
+  }
+
+  @Test
+  public void testDeleteTaskCommentForNonExistingTaskWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given().pathParam("id", NON_EXISTING_ID)
+        .pathParam("commentId", EXAMPLE_TASK_COMMENT_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body(containsString("History is not enabled"))
+        .when()
+        .delete(SINGLE_TASK_SINGLE_COMMENT_URL);
+  }
+
+  @Test
+  public void testDeleteTaskCommentsThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).deleteTaskComments(MockProvider.EXAMPLE_TASK_ID);
+
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .when()
+        .delete(SINGLE_TASK_COMMENTS_URL);
+  }
+
+  @Test
+  public void testDeleteTaskComments() {
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .delete(SINGLE_TASK_COMMENTS_URL);
+    verify(taskServiceMock).deleteTaskComments(EXAMPLE_TASK_ID);
+  }
+
+  @Test
+  public void testDeleteTaskCommentsWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body(containsString("History is not enabled"))
+        .when()
+        .delete(SINGLE_TASK_COMMENTS_URL);
+  }
+
+  @Test
+  public void testDeleteTaskCommentsForNonExistingTask() {
+    when(historicTaskInstanceQueryMock.taskId(NON_EXISTING_ID)).thenReturn(historicTaskInstanceQueryMock);
+    when(historicTaskInstanceQueryMock.singleResult()).thenReturn(null);
+
+    given().pathParam("id", NON_EXISTING_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body(containsString("No task found for task id " + NON_EXISTING_ID))
+        .when()
+        .delete(SINGLE_TASK_COMMENTS_URL);
+  }
+
+  @Test
+  public void testDeleteTaskCommentsForNonExistingTaskWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given().pathParam("id", NON_EXISTING_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then()
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body(containsString("History is not enabled"))
+        .when()
+        .delete(SINGLE_TASK_COMMENTS_URL);
+  }
+
+  @Test
+  public void testUpdateTaskComment() {
+    Map<String, Object> json = new HashMap<>();
+
+    json.put("id", EXAMPLE_TASK_COMMENT_ID);
+    json.put("message", EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
+
+    given().pathParam("id", EXAMPLE_TASK_ID)
+        .body(json)
+        .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .put(SINGLE_TASK_COMMENTS_URL);
+
+    verify(taskServiceMock).updateTaskComment(EXAMPLE_TASK_ID, EXAMPLE_TASK_COMMENT_ID,
+        EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
+  }
+
+  @Test
+  public void testUpdateTaskCommentCommentIdNull() {
+    String message = "expected exception";
+    doThrow(new NullValueException(message)).when(taskServiceMock)
+        .updateTaskComment(EXAMPLE_TASK_ID, null, EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
+
+    Map<String, Object> json = new HashMap<>();
+
+    json.put("id", null);
+    json.put("message", EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
+
+    given().pathParam("id", EXAMPLE_TASK_ID)
+        .body(json)
+        .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when()
+        .put(SINGLE_TASK_COMMENTS_URL);
+  }
+
+  @Test
+  public void testUpdateTaskCommentMessageIdNull() {
+    String message = "expected exception";
+    doThrow(new NullValueException(message)).when(taskServiceMock)
+        .updateTaskComment(EXAMPLE_TASK_ID, EXAMPLE_TASK_COMMENT_ID, null);
+
+    Map<String, Object> json = new HashMap<>();
+
+    json.put("id", EXAMPLE_TASK_COMMENT_ID);
+    json.put("message", null);
+
+    given().pathParam("id", EXAMPLE_TASK_ID)
+        .body(json)
+        .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when()
+        .put(SINGLE_TASK_COMMENTS_URL);
+  }
+
+  @Test
+  public void testUpdateTaskCommentExtraProperties() {
+    Map<String, Object> json = new HashMap<>();
+
+    //Only id and message are used
+    json.put("id", EXAMPLE_TASK_COMMENT_ID);
+    json.put("userId", "anyUserId");
+    json.put("time", withTimezone("2014-01-01T00:00:00"));
+    json.put("message", EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
+    json.put("removalTime", withTimezone("2014-05-01T00:00:00"));
+    json.put("rootProcessInstanceId", EXAMPLE_TASK_COMMENT_ROOT_PROCESS_INSTANCE_ID);
+    json.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+
+    given().pathParam("id", EXAMPLE_TASK_ID)
+        .body(json)
+        .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .put(SINGLE_TASK_COMMENTS_URL);
+
+    verify(taskServiceMock).updateTaskComment(EXAMPLE_TASK_ID, EXAMPLE_TASK_COMMENT_ID,
+        EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
+  }
+
+  @Test
+  public void testUpdateTaskCommentTaskIdNotFound() {
+    when(historicTaskInstanceQueryMock.taskId(NON_EXISTING_ID)).thenReturn(historicTaskInstanceQueryMock);
+    when(historicTaskInstanceQueryMock.singleResult()).thenReturn(null);
+
+    Map<String, Object> json = new HashMap<>();
+
+    json.put("id", EXAMPLE_TASK_COMMENT_ID);
+    json.put("message", EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
+
+    given().pathParam("id", NON_EXISTING_ID)
+        .body(json)
+        .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body(containsString("No task found for task id " + NON_EXISTING_ID))
+        .when()
+        .put(SINGLE_TASK_COMMENTS_URL);
+  }
+
+  @Test
+  public void testUpdateTaskCommentThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock)
+        .updateTaskComment(EXAMPLE_TASK_ID, EXAMPLE_TASK_COMMENT_ID, EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
+    when(historicTaskInstanceQueryMock.taskId(EXAMPLE_TASK_ID)).thenReturn(historicTaskInstanceQueryMock);
+
+    Map<String, Object> json = new HashMap<>();
+    json.put("id", EXAMPLE_TASK_COMMENT_ID);
+    json.put("message", EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
+
+    given().pathParam("id", EXAMPLE_TASK_ID)
+        .body(json)
+        .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .contentType(ContentType.JSON)
+        .when()
+        .put(SINGLE_TASK_COMMENTS_URL);
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
