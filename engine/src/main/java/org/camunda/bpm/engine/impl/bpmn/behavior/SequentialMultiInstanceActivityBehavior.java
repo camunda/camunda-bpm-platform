@@ -48,13 +48,13 @@ public class SequentialMultiInstanceActivityBehavior extends MultiInstanceActivi
     int loopCounter = getLoopVariable(scopeExecution, LOOP_COUNTER) + 1;
     int nrOfInstances = getLoopVariable(scopeExecution, NUMBER_OF_INSTANCES);
     int nrOfCompletedInstances = getLoopVariable(scopeExecution, NUMBER_OF_COMPLETED_INSTANCES) + 1;
-    Collection<?> collection = evaluateCollection(scopeExecution);
     setLoopVariable(scopeExecution, NUMBER_OF_COMPLETED_INSTANCES, nrOfCompletedInstances);
 
     if (loopCounter == nrOfInstances || completionConditionSatisfied(scopeExecution)) {
       leave(scopeExecution);
     }
     else {
+      Collection<?> collection = evaluateCollection(scopeExecution);
       PvmActivity innerActivity = getInnerActivity(scopeExecution.getActivity());
       performInstance(scopeExecution, innerActivity, loopCounter, collection);
     }
