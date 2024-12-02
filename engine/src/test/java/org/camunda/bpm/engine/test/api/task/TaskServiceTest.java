@@ -2253,7 +2253,7 @@ public class TaskServiceTest {
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
-  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_NONE)
   public void testDeleteTaskAttachmentWithTaskIdNoLongerExists() {
     // given
     runtimeService.startProcessInstanceByKey("oneTaskProcess");

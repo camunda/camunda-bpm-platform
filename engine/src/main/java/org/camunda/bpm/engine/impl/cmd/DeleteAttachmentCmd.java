@@ -20,7 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.Objects;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -50,7 +50,7 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
 
   public Object execute(CommandContext commandContext) {
     AttachmentEntity attachment = null;
-    if (StringUtils.isNotBlank(taskId)) {
+    if (taskId != null && !taskId.isBlank()) {
       attachment = (AttachmentEntity) commandContext
           .getAttachmentManager()
           .findAttachmentByTaskIdAndAttachmentId(taskId, attachmentId);
@@ -63,16 +63,16 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
     }
 
     commandContext
-      .getDbEntityManager()
-      .delete(attachment);
+        .getDbEntityManager()
+        .delete(attachment);
 
     if (attachment.getContentId() != null) {
       commandContext
-        .getByteArrayManager()
-        .deleteByteArrayById(attachment.getContentId());
+          .getByteArrayManager()
+          .deleteByteArrayById(attachment.getContentId());
     }
 
-    if (StringUtils.isNotBlank(attachment.getTaskId())) {
+    if (attachment.getTaskId() != null && !attachment.getTaskId().isBlank()) {
       TaskEntity task = commandContext
           .getTaskManager()
           .findTaskById(attachment.getTaskId());
