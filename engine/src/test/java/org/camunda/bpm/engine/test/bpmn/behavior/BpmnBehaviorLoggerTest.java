@@ -26,6 +26,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class BpmnBehaviorLoggerTest extends PluggableProcessEngineTest {
 
@@ -44,14 +45,11 @@ public class BpmnBehaviorLoggerTest extends PluggableProcessEngineTest {
   public void shouldIncludeBpmnErrorMessageInUnhandledBpmnError() {
     // given
     processEngineConfiguration.setEnableExceptionsAfterUnhandledBpmnError(true);
-    try {
-      // when
-      runtimeService.startProcessInstanceByKey("testProcess");
-    } catch (ProcessEngineException e) {
-      // then
-      assertThat(e.getMessage()).contains(
-          "Execution with id 'serviceTask' throws an error event with errorCode 'errorCode' and errorMessage 'ouch!', but no error handler was defined");
-    }
+    String errorMessage = "Execution with id 'serviceTask' throws an error event with errorCode 'errorCode' and errorMessage 'ouch!', but no error handler was defined";
+    // when & then
+    assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testProcess"))
+        .isInstanceOf(ProcessEngineException.class)
+        .hasMessageContaining(errorMessage);
   }
 
   @Test
