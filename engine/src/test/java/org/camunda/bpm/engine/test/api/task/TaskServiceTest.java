@@ -1026,7 +1026,6 @@ public class TaskServiceTest {
     taskService.deleteTask(task.getId(), true);
   }
 
-
   @Test
   public void testSaveTaskNullTask() {
     try {
@@ -1246,7 +1245,6 @@ public class TaskServiceTest {
     task = taskService.createTaskQuery().taskId(taskId).singleResult();
     assertNull(task);
   }
-
 
   @Deployment(resources = TWO_TASKS_PROCESS)
   @Test
@@ -2702,14 +2700,45 @@ public class TaskServiceTest {
   }
 
   @Test
-  public void testDeleteTaskAttachmentWithTaskIdNull() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
-    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      try {
-        taskService.deleteTaskAttachment(null, "myAttachmentId");
-        fail("expected process engine exception");
-      } catch(ProcessEngineException e) {}
-    }
+  public void testDeleteTaskAttachmentThatDoesNotExist() {
+    assertThatThrownBy(() -> taskService.deleteTaskAttachment(null, "attachmentDoesNotExist")).isInstanceOf(
+            NullValueException.class)
+        .hasMessageContaining("No attachment exists with attachmentId 'attachmentDoesNotExist'");
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  public void testDeleteTaskAttachmentWithTaskIdEmpty() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Attachment attachment = taskService.createAttachment("web page", "", null, "weatherforcast",
+        "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
+    final String attachmentId = attachment.getId();
+    assertThat(taskService.getAttachment(attachmentId)).isNotNull();
+
+    // when
+    taskService.deleteTaskAttachment("", attachmentId);
+
+    // then
+    assertThat(taskService.getAttachment(attachmentId)).isNull();
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  public void testDeleteTaskAttachmentWithTaskIdNoLongerExists() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    final String taskId = taskService.createTaskQuery().singleResult().getId();
+    final Attachment attachment = taskService.createAttachment("web page", taskId, null, "weatherforcast",
+        "temperatures and more", "http://weather.com");
+    taskService.complete(taskId);
+    final String attachmentId = attachment.getId();
+
+    // when
+    taskService.deleteTaskAttachment(taskId, attachmentId);
+
+    // then
+    assertThat(taskService.getAttachment(attachmentId)).isNull();
   }
 
   @Test
@@ -2771,7 +2800,7 @@ public class TaskServiceTest {
   }
 
   @Test
-  public void testUpdateVariablesLocaForNullTaskId() {
+  public void testUpdateVariablesLocalForNullTaskId() {
     Map<String, Object> modifications = new HashMap<>();
     modifications.put("variable1", "anotherValue1");
     modifications.put("variable2", "anotherValue2");
@@ -3471,7 +3500,6 @@ public class TaskServiceTest {
     assertEquals("after-304", taskAfterThrow.getTaskDefinitionKey());
     assertEquals("bar",runtimeService.createVariableInstanceQuery().variableName("foo").singleResult().getValue());
   }
-
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/task/TaskServiceTest.handleUserTaskEscalation.bpmn20.xml" })
