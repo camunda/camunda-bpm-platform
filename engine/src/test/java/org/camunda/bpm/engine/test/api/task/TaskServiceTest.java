@@ -2226,7 +2226,6 @@ public class TaskServiceTest {
   }
 
   @Test
-  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_NONE)
   public void testDeleteTaskAttachmentThatDoesNotExist() {
     assertThatThrownBy(() -> taskService.deleteTaskAttachment(null, "attachmentDoesNotExist")).isInstanceOf(
             NullValueException.class)
@@ -2235,7 +2234,6 @@ public class TaskServiceTest {
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
-  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_NONE)
   public void testDeleteTaskAttachmentWithTaskIdEmpty() {
     // given
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -2253,7 +2251,6 @@ public class TaskServiceTest {
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
-  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_NONE)
   public void testDeleteTaskAttachmentWithTaskIdNoLongerExists() {
     // given
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
