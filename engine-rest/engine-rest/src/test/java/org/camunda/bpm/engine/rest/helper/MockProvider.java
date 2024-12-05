@@ -1068,7 +1068,6 @@ public abstract class MockProvider {
       .camundaFormRef(EXAMPLE_FORM_KEY, EXAMPLE_FORM_REF_BINDING, EXAMPLE_FORM_REF_VERSION)
       .tenantId(EXAMPLE_TENANT_ID)
       .taskState(EXAMPLE_HISTORIC_TASK_STATE)
-      .tenantId(EXAMPLE_TENANT_ID)
       .hasAttachment(EXAMPLE_TASK_ATTACHMENT_STATE)
       .hasComment(EXAMPLE_TASK_COMMENT_STATE);
   }
