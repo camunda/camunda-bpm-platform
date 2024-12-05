@@ -758,6 +758,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(MSSQL, "selectEventSubscriptionsByExecutionAndType", "selectEventSubscriptionsByExecutionAndType_mssql");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricDecisionInstancesByNativeQuery", "selectHistoricDecisionInstancesByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "deleteByteArraysByRemovalTime", "deleteByteArraysByRemovalTime_mssql");
+    addDatabaseSpecificStatement(MSSQL, "selectPDStatisticsCount", "selectPDStatisticsCount_mssql");
+    addDatabaseSpecificStatement(MSSQL, "selectPDStatistics", "selectPDStatistics_mssql");
 
     // related to CAM-13094
     addDatabaseSpecificStatement(MSSQL, "updateAttachmentsByRootProcessInstanceId", "updateAttachmentsByRootProcessInstanceId_mssql");
