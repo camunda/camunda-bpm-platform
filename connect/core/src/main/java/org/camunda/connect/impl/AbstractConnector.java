@@ -22,12 +22,11 @@ import java.util.List;
 
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
-import org.camunda.connect.spi.ConnectorResponse;
 import org.camunda.connect.spi.ConnectorRequestInterceptor;
+import org.camunda.connect.spi.ConnectorResponse;
 
 /**
  * Abstract implementation of the connector interface.
- *
  * This implementation provides a linked list of interceptors and related methods for
  * handling interceptor invocation.
  *
@@ -41,9 +40,9 @@ public abstract class AbstractConnector<Q extends ConnectorRequest<R>, R extends
   /**
    * The {@link ConnectorRequestInterceptor} chain
    */
-  protected List<ConnectorRequestInterceptor> requestInterceptors = new LinkedList<ConnectorRequestInterceptor>();
+  protected List<ConnectorRequestInterceptor> requestInterceptors = new LinkedList<>();
 
-  public AbstractConnector(String connectorId) {
+  protected AbstractConnector(String connectorId) {
     this.connectorId = connectorId;
   }
 
