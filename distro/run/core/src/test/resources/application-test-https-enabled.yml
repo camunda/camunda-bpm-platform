@@ -6,3 +6,4 @@ server:
     key-alias: camunda
     key-password: camunda
   port: 8443
+spring.http.client.factory: simple
