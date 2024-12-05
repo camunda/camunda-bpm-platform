@@ -165,8 +165,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
+      <groupId>org.apache.httpcomponents.core5</groupId>
+      <artifactId>httpcore5</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -352,8 +352,8 @@
           <scope>test</scope>
           <exclusions>
             <exclusion>
-              <artifactId>httpclient</artifactId>
-              <groupId>org.apache.httpcomponents</groupId>
+              <artifactId>httpclient5</artifactId>
+              <groupId>org.apache.httpcomponents.client5</groupId>
             </exclusion>
           </exclusions>
         </dependency>
@@ -556,8 +556,8 @@
           <scope>test</scope>
           <exclusions>
             <exclusion>
-              <artifactId>httpclient</artifactId>
-              <groupId>org.apache.httpcomponents</groupId>
+              <artifactId>httpclient5</artifactId>
+              <groupId>org.apache.httpcomponents.client5</groupId>
             </exclusion>
           </exclusions>
         </dependency>

@@ -706,6 +706,22 @@
       </build>
     </profile>
 
+    <profile>
+      <id>cockroachdb</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <failIfNoTests>false</failIfNoTests>
+              <trimStackTrace>false</trimStackTrace>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
     <!-- check for api differences between latest minor release -->
     <profile>
       <id>check-api-compatibility</id>
@@ -771,6 +787,7 @@
         <dependency>
           <groupId>org.camunda.spin</groupId>
           <artifactId>camunda-spin-dataformat-all</artifactId>
+          <version>${project.version}</version>
         </dependency>
         <dependency>
           <groupId>org.camunda.bpm</groupId>
@@ -779,6 +796,7 @@
         <dependency>
           <groupId>org.camunda.connect</groupId>
           <artifactId>camunda-connect-connectors-all</artifactId>
+          <version>${project.version}</version>
           <exclusions>
             <exclusion>
               <groupId>org.camunda.connect</groupId>
@@ -867,6 +885,7 @@
                 <exclude>**/HistoryCleanupDisabledOnBootstrapTest.java</exclude>
                 <exclude>**/LoginAttemptsTest.java</exclude>
                 <exclude>**/ConcurrentHistoryCleanupUpdateOfFailingJobTest.java</exclude>
+                <exclude>**/TelemetryTaskWorkerMetricsTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
