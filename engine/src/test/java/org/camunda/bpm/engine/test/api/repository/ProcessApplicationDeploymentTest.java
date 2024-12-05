@@ -775,7 +775,7 @@ public class ProcessApplicationDeploymentTest {
         .name("first-deployment-without-a-source")
         .addModelInstance("process.bpmn", model));
 
-    assertNull(deploymentQuery.deploymentName("first-deployment-without-a-source")
+    assertEquals("process application", deploymentQuery.deploymentName("first-deployment-without-a-source")
                    .singleResult()
                    .getSource());
 
@@ -787,7 +787,7 @@ public class ProcessApplicationDeploymentTest {
         .addModelInstance("process.bpmn", model));
 
     // then
-    assertNull(deploymentQuery.deploymentName("second-deployment-with-a-source")
+    assertEquals("process application", deploymentQuery.deploymentName("second-deployment-with-a-source")
                    .singleResult()
                    .getSource());
   }
