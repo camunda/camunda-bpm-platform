@@ -61,6 +61,11 @@ public class CamundaScriptEngineManager extends ScriptEngineManager {
 
   }
 
+  /**
+   * Fetches the config logic of a given engine from the mappings and executes it in case it exists.
+   *
+   * @param engineName the given engine name
+   */
   protected void executeConfigurationBeforeEngineCreation(String engineName) {
     var config = engineNameToInitLogicMappings.get(engineName);
     if (config != null) {
