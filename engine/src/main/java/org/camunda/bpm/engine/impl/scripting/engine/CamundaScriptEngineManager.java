@@ -33,13 +33,13 @@ import static org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines.GRAA
  * If custom logic is needed for a specific engine after the classpath detection, before the engine creation,
  * it can be added to the classes map.
  */
-public class CustomScriptEngineManager extends ScriptEngineManager {
+public class CamundaScriptEngineManager extends ScriptEngineManager {
 
   protected final Map<String, Runnable> engineNameToInitLogicMappings = Map.of(
       GRAAL_JS_SCRIPT_ENGINE_NAME, this::disableGraalVMInterpreterOnlyModeWarnings
   );
 
-  public CustomScriptEngineManager() {
+  public CamundaScriptEngineManager() {
     super(); // creates engine factories after classpath discovery
     applyConfigOnEnginesAfterClasspathDiscovery();
   }

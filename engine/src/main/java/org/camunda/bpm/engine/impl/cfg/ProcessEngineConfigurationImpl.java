@@ -338,7 +338,7 @@ import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultDeserializationTypeValidator;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.BeansResolverFactory;
-import org.camunda.bpm.engine.impl.scripting.engine.CustomScriptEngineManager;
+import org.camunda.bpm.engine.impl.scripting.engine.CamundaScriptEngineManager;
 import org.camunda.bpm.engine.impl.scripting.engine.DefaultScriptEngineResolver;
 import org.camunda.bpm.engine.impl.scripting.engine.ResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptBindingsFactory;
@@ -2642,7 +2642,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       resolverFactories.add(new BeansResolverFactory());
     }
     if (scriptEngineResolver == null) {
-      scriptEngineResolver = new DefaultScriptEngineResolver(new CustomScriptEngineManager());
+      scriptEngineResolver = new DefaultScriptEngineResolver(new CamundaScriptEngineManager());
     }
     if (scriptingEngines == null) {
       scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(resolverFactories), scriptEngineResolver);
