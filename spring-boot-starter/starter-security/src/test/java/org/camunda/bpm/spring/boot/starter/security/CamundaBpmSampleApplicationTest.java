@@ -16,35 +16,29 @@
  */
 package org.camunda.bpm.spring.boot.starter.security;
 
-import jakarta.annotation.PostConstruct;
-import my.own.custom.spring.boot.project.SampleApplication;
+import org.camunda.bpm.spring.boot.starter.security.oauth2.CamundaBpmSpringSecurityDisableAutoConfiguration;
+import org.camunda.bpm.spring.boot.starter.security.oauth2.CamundaSpringSecurityOAuth2AutoConfiguration;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = SampleApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CamundaBpmSampleApplicationTest {
-
-  private String baseUrl;
-
-  @LocalServerPort
-  private int port;
+public class CamundaBpmSampleApplicationTest extends AbstractSpringSecurityTest {
 
   @Autowired
   private TestRestTemplate testRestTemplate;
 
-  @PostConstruct
-  public void postConstruct() {
-    baseUrl = "http://localhost:" + port;
+  @Autowired
+  private WebApplicationContext webApplicationContext;
+
+  @Test
+  public void SpringSecurityAutoConfigurationCorrectlySet() {
+    assertThat(getBeanForClass(CamundaSpringSecurityOAuth2AutoConfiguration.class, webApplicationContext)).isNull();
+    assertThat(getBeanForClass(CamundaBpmSpringSecurityDisableAutoConfiguration.class, webApplicationContext)).isNotNull();
   }
 
   @Test
@@ -57,6 +51,6 @@ public class CamundaBpmSampleApplicationTest {
   public void restApiIsAvailable() {
     ResponseEntity<String> entity = testRestTemplate.getForEntity(baseUrl + "/engine-rest/engine/", String.class);
     assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(entity.getBody()).isEqualTo("[{\"name\":\"default\"}]");
+    assertThat(entity.getBody()).isEqualTo(EXPECTED_NAME_DEFAULT);
   }
 }
