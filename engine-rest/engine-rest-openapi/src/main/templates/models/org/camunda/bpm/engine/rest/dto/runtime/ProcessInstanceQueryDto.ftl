@@ -172,6 +172,12 @@
                 If set to true variableValue and variablevalue are treated as equal." />
 
     <@lib.property
+        name = "withVariablesInReturn"
+        type = "boolean"
+        desc = "Indicates if the variables associated with the process instance should be returned.
+                Value may only be true, as false is the default behavior." />
+
+    <@lib.property
         name = "orQueries"
         type = "array"
         dto = "ProcessInstanceQueryDto"
