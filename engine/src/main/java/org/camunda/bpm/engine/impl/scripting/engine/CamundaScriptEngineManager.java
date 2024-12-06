@@ -48,7 +48,7 @@ public class CamundaScriptEngineManager extends ScriptEngineManager {
     var engineNames = getEngineNamesFoundInClasspath();
 
     for (var engineName : engineNames) {
-      configureBeforeEngineCreation(engineName);
+      executeConfigurationBeforeEngineCreation(engineName);
     }
   }
 
@@ -61,7 +61,7 @@ public class CamundaScriptEngineManager extends ScriptEngineManager {
 
   }
 
-  protected void configureBeforeEngineCreation(String engineName) {
+  protected void executeConfigurationBeforeEngineCreation(String engineName) {
     var config = engineNameToInitLogicMappings.get(engineName);
     if (config != null) {
       config.run();
