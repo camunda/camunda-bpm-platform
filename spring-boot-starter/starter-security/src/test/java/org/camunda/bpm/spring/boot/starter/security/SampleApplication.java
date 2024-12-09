@@ -14,15 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package my.own.custom.spring.boot.project;
+package org.camunda.bpm.spring.boot.starter.security;
 
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 public class SampleApplication {
@@ -31,15 +33,15 @@ public class SampleApplication {
     SpringApplication.run(SampleApplication.class, args);
   }
 
-  @Bean
-  public TestRestTemplate restTemplate(RestTemplateBuilder builder) {
-    builder.requestFactory(() -> {
-      var factory = new HttpComponentsClientHttpRequestFactory();
-      var httpClient = HttpClientBuilder.create().disableRedirectHandling().build();
-      factory.setHttpClient(httpClient);
-      return factory;
-    });
-    return new TestRestTemplate(builder);
-  }
+  @RestController
+  @RequestMapping("/camunda/api/engine/engine")
+  public static class TestController {
 
+    @GetMapping("/{username}/user")
+    public List<Map<String, String>> getUserInfo(@PathVariable("username") String username) {
+      Map<String, String> users = new HashMap<>();
+      users.put("name", username);
+      return List.of(users);
+    }
+  }
 }
