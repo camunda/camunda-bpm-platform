@@ -18,14 +18,18 @@ package org.camunda.connect.httpclient.impl.util;
 
 import java.util.Map;
 
-import org.apache.http.client.config.RequestConfig.Builder;
-import org.camunda.connect.httpclient.impl.RequestConfigOption;
-import org.camunda.connect.httpclient.impl.HttpConnectorLogger;
+import org.apache.hc.client5.http.config.RequestConfig.Builder;
 import org.camunda.connect.httpclient.impl.HttpLogger;
+import org.camunda.connect.httpclient.impl.HttpConnectorLogger;
+import org.camunda.connect.httpclient.impl.RequestConfigOption;
 
-public class ParseUtil {
+public final class ParseUtil {
 
-  protected static HttpConnectorLogger LOG = HttpLogger.HTTP_LOGGER;
+  private static final HttpConnectorLogger LOG = HttpLogger.HTTP_LOGGER;
+
+  private ParseUtil() {
+    /* hidden */
+  }
 
   public static void parseConfigOptions(Map<String, Object> configOptions, Builder configBuilder) {
     for (RequestConfigOption option : RequestConfigOption.values()) {
