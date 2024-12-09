@@ -101,7 +101,6 @@
                   (
                     select
                         I.PROC_DEF_ID_
-                      , I.INCIDENT_TYPE_
                       , count(I.ID_) as INCIDENT_COUNT_
                     from
                         ${prefix}ACT_RU_INCIDENT I
@@ -111,7 +110,7 @@
                       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
                     </where>
                     group by
-                        I.PROC_DEF_ID_, I.INCIDENT_TYPE_
+                        I.PROC_DEF_ID_
                   ) INC
               on
                   PROCDEF.ID_ = INC.PROC_DEF_ID_
