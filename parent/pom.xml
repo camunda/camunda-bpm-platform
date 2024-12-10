@@ -49,7 +49,7 @@
     <version.logback>1.2.11</version.logback>
     <version.junit>4.13.1</version.junit>
     <version.assertj>2.9.1</version.assertj>
-    <version.mockito>5.10.0</version.mockito>
+    <version.mockito>5.14.2</version.mockito>
     <version.wiremock>2.27.2</version.wiremock>
     <version.testcontainers>1.16.0</version.testcontainers>
 
