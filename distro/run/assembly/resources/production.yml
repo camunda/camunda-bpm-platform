@@ -29,6 +29,8 @@ camunda.bpm:
 # https://docs.camunda.org/manual/latest/user-guide/security/#authentication
 # https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#authentication
     auth.enabled: true
+    rest.disable-wadl: true
+    deployment.deploy-changed-only: true
 # https://docs.camunda.org/manual/latest/user-guide/process-engine/identity-service/#configuration-properties-of-the-ldap-plugin
 # https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#ldap-identity-service
 # Uncomment this section to enable LDAP support for Camunda Run

@@ -1666,7 +1666,7 @@
     "PLGN_SEAR_PI_VARIABLE": "Prozessinstanz : Variable",
     "PLGN_SEAR_PI_WITHOUT_TENANT_ID": "Prozessinstanz : ohne Mandanten Id",
     "PLGN_SEAR_PI_WITH_INCIDENTS_ONLY": "Prozessinstanz : Nur mit Zwischenfällen",
-    "PLGN_SEAR_PI_WITH_ROOT_INCIDENTS_ONLY": "Prozessinstanz: Nur mit verursachenden Zwischenfällen",
+    "PLGN_SEAR_PI_WITH_ROOT_INCIDENTS_ONLY": "Prozessinstanz : Nur mit verursachenden Zwischenfällen",
     "PLGN_SEAR_PROCESS_DEFINITION_ID": "Prozessdefinitions-ID",
     "PLGN_SEAR_PROCESS_INSTANCE": "Prozessinstanz",
     "PLGN_SEAR_PROCINST_ID": "Prozessinstanz-ID",
@@ -1758,6 +1758,7 @@
     "PLGN_SETA_CONF_PROCESS_DEFINITION_NAME": "Prozessdefinitions-Name",
     "PLGN_SETA_CONF_PROCESS_INSTANCE_ID": "Prozessinstanz-ID",
     "PLGN_SETA_CONF_PROCESS_VARIABLE": "Prozess-Variable",
+    "PLGN_SETA_CONF_ROOT_PROCESS_INSTANCE_ID": "Root Process Instance ID",
     "PLGN_SETA_CONF_TASK_ASSIGNEE": "Task-Assignee",
     "PLGN_SETA_CONF_TASK_DEFINITION_KEY": "Task-Definitions-Schlüssel",
     "PLGN_SETA_CONF_TASK_DELETE_REASON": "Löschgrund des Tasks",
@@ -2554,6 +2555,10 @@
     "VARIABLE_UPLOAD_PROGRESS": "Fortschritt: {{progress}}%",
     "VARIABLE_UPLOAD_SELECT_FILE": "Wähle die Datei, die den binären Inhalt für die Variable beinhaltet",
     "VARIABLE_UPLOAD_UPLOAD": "Hochladen",
-    "WITHOUT_DUE_DATE": "Ohne Fälligkeitsdatum"
+    "WITHOUT_DUE_DATE": "Ohne Fälligkeitsdatum",
+    "SEARCH_LESS_THAN": "<",
+    "SEARCH_LESS_THAN_EQUALS": "<=",
+    "SEARCH_GREATER_THAN": ">",
+    "SEARCH_GREATER_THAN_EQUALS": ">="
   }
 }

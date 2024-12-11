@@ -34,11 +34,22 @@ public class SetExecutionVariablesCmd extends AbstractSetVariableCmd {
 
   private static final long serialVersionUID = 1L;
 
+  protected boolean failIfNotExists = true;
+
   public SetExecutionVariablesCmd(String executionId,
                                   Map<String, ?> variables,
                                   boolean isLocal,
                                   boolean skipJavaSerializationFormatCheck) {
     super(executionId, variables, isLocal, skipJavaSerializationFormatCheck);
+  }
+
+  public SetExecutionVariablesCmd(String executionId,
+                                  Map<String, ?> variables,
+                                  boolean isLocal,
+                                  boolean skipJavaSerializationFormatCheck,
+                                  boolean failIfNotExists) {
+    this(executionId, variables, isLocal, skipJavaSerializationFormatCheck);
+    this.failIfNotExists = failIfNotExists;
   }
 
   public SetExecutionVariablesCmd(String executionId, Map<String, ? extends Object> variables, boolean isLocal) {
@@ -52,9 +63,13 @@ public class SetExecutionVariablesCmd extends AbstractSetVariableCmd {
       .getExecutionManager()
       .findExecutionById(entityId);
 
-    ensureNotNull("execution " + entityId + " doesn't exist", "execution", execution);
+    if (failIfNotExists) {
+      ensureNotNull("execution " + entityId + " doesn't exist", "execution", execution);
+    }
 
-    checkSetExecutionVariables(execution);
+    if(execution != null) {
+      checkSetExecutionVariables(execution);
+    }
 
     return execution;
   }

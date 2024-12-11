@@ -1758,6 +1758,7 @@
     "PLGN_SETA_CONF_PROCESS_DEFINITION_NAME": "Process Definition Name",
     "PLGN_SETA_CONF_PROCESS_INSTANCE_ID": "Process Instance ID",
     "PLGN_SETA_CONF_PROCESS_VARIABLE": "Process Variable",
+    "PLGN_SETA_CONF_ROOT_PROCESS_INSTANCE_ID": "Root Process Instance ID",
     "PLGN_SETA_CONF_TASK_ASSIGNEE": "Task Assignee",
     "PLGN_SETA_CONF_TASK_DEFINITION_KEY": "Task Definition Key",
     "PLGN_SETA_CONF_TASK_DELETE_REASON": "Task Delete Reason",

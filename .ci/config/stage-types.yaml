@@ -32,7 +32,9 @@ db-unit:
   - 'mariadb'
   - 'sqlserver'
   - 'postgresql'
-  jdkVersion: 'openjdk-jdk-11-latest'
+  podSpec:
+    cpu: 4
+    images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
 sql-scripts:
   directory: 'distro/sql-script'
   command: 'install -Pcheck-sql,'
@@ -46,12 +48,18 @@ sql-scripts:
   - 'mariadb'
   - 'sqlserver'
   - 'postgresql'
+  podSpec:
+    cpu: 4
+    images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
 instance-migration:
   directory: 'qa/test-db-instance-migration'
   command: 'verify -Pinstance-migration,'
   stash:
     runtimeStash: true
     qaStash: true
+  podSpec:
+    cpu: 4
+    images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
 old-engine:
   directory: 'qa'
   command: 'verify -Pold-engine,'
@@ -65,17 +73,27 @@ old-engine:
   - 'mariadb'
   - 'sqlserver'
   - 'postgresql'
+  podSpec:
+    cpu: 4
+    images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
 rolling-update:
   directory: 'qa/test-db-rolling-update'
   command: 'verify -Prolling-update,'
   stash:
     runtimeStash: true
     qaStash: true
+  podSpec:
+    cpu: 4
+    images: [ 'maven:3.9.7-eclipse-temurin-11', 'postgres:17.0' ]
 large-data-tests:
   directory: 'qa/large-data-tests'
   command: 'verify -Plarge-data-tests,'
   stash:
     runtimeStash: true
+  podSpec:
+    cpu: 4
+    images: [ 'maven:3.9.7-eclipse-temurin-11', 'postgres:17.0' ]
+
 engine-rest-unit-jersey-2:
   directory: 'engine-rest/engine-rest'
   command: 'clean install -Pjersey2'
@@ -130,27 +148,31 @@ engine-rest-jakarta-unit-compatibility-wildfly:
     - 'rest-api'
   nodeLabel: 'h2'
   jdkVersion: 'openjdk-jdk-17-latest'
-platform-jdk-openjdk-jdk-17-latest:
+platform-jdk-temurin-jdk-17-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'openjdk-jdk-17-latest'
   withNpm: true
-platform-jdk-openjdk-jdk-21-latest:
+  jdkVersion: 'jdk-17-latest'
+  podSpec:
+    cpu: 4
+    images: ['maven:3.9.7-eclipse-temurin-17']
+platform-jdk-temurin-jdk-21-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'openjdk-jdk-21-latest'
   withNpm: true
-platform-jdk-openjdk-jdk-11-latest:
+  jdkVersion: 'jdk-21-latest'
+  podSpec:
+    cpu: 4
+    images: ['maven:3.9.7-eclipse-temurin-21']
+platform-jdk-temurin-jdk-11-latest:
   directory: '.'
   command: 'install source:jar source:test-jar
     -pl ''!spring-boot-starter,!spring-boot-starter/starter,!spring-boot-starter/starter-client/spring,!spring-boot-starter/starter-client/spring-boot,
-          !spring-boot-starter/starter-qa,!spring-boot-starter/starter-rest,!spring-boot-starter/starter-test,!spring-boot-starter/starter-webapp,
+          !spring-boot-starter/starter-qa,!spring-boot-starter/starter-rest,!spring-boot-starter/starter-test,!spring-boot-starter/starter-webapp,!spring-boot-starter/starter-security,
           !spring-boot-starter/starter-webapp-core,
           !spring-boot-starter/starter-qa/integration-test-liquibase,!spring-boot-starter/starter-qa/integration-test-plugins,
           !spring-boot-starter/starter-qa/integration-test-plugins/spin,!spring-boot-starter/starter-qa/integration-test-plugins/spin/spin-dataformat-all,
@@ -159,17 +181,19 @@ platform-jdk-openjdk-jdk-11-latest:
           !spring-boot-starter/starter-qa/integration-test-webapp,!spring-boot-starter/starter-qa/integration-test-webapp/invoice-example,
           !spring-boot-starter/starter-qa/integration-test-webapp/runtime,
           !distro/run,!distro/run/assembly,!distro/run/core,!distro/run/distro,!distro/run/modules,!distro/run/modules/example,
-          !distro/run/modules/rest,!distro/run/modules/webapps,!distro/run/qa,!distro/run/qa/integration-tests,
+          !distro/run/modules/rest,!distro/run/modules/webapps,!distro/run/modules/oauth2,!distro/run/qa,!distro/run/qa/integration-tests,
           !distro/run/qa/runtime,!distro/run/qa/example-plugin''
     -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'openjdk-jdk-11-latest'
   withNpm: true
+  jdkVersion: 'jdk-11-latest'
+  podSpec:
+    cpu: 4
+    images: ['maven:3.9.7-eclipse-temurin-11']
 platform-jdk-jdk-17-latest:
   directory: '.'
-  command: 'install source:jar source:test-jar -Pdistro,distro-ce,distro-wildfly'
+  command: 'install source:jar source:test-jar -Pdistro,distro-ce,distro-wildfly -Dskip.frontend.build=true'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
@@ -177,7 +201,7 @@ platform-jdk-jdk-17-latest:
   withNpm: true
 platform-jdk-jdk-21-latest:
   directory: '.'
-  command: 'install source:jar source:test-jar -Pdistro,distro-ce,distro-wildfly'
+  command: 'install source:jar source:test-jar -Pdistro,distro-ce,distro-wildfly -Dskip.frontend.build=true'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
@@ -187,7 +211,7 @@ platform-jdk-jdk-11-latest:
   directory: '.'
   command: 'install source:jar source:test-jar
     -pl ''!spring-boot-starter,!spring-boot-starter/starter,!spring-boot-starter/starter-client/spring,!spring-boot-starter/starter-client/spring-boot,
-          !spring-boot-starter/starter-qa,!spring-boot-starter/starter-rest,!spring-boot-starter/starter-test,!spring-boot-starter/starter-webapp,
+          !spring-boot-starter/starter-qa,!spring-boot-starter/starter-rest,!spring-boot-starter/starter-test,!spring-boot-starter/starter-webapp,!spring-boot-starter/starter-security,
           !spring-boot-starter/starter-webapp-core,
           !spring-boot-starter/starter-qa/integration-test-liquibase,!spring-boot-starter/starter-qa/integration-test-plugins,
           !spring-boot-starter/starter-qa/integration-test-plugins/spin,!spring-boot-starter/starter-qa/integration-test-plugins/spin/spin-dataformat-all,
@@ -196,11 +220,13 @@ platform-jdk-jdk-11-latest:
           !spring-boot-starter/starter-qa/integration-test-webapp,!spring-boot-starter/starter-qa/integration-test-webapp/invoice-example,
           !spring-boot-starter/starter-qa/integration-test-webapp/runtime,
           !distro/run,!distro/run/assembly,!distro/run/core,!distro/run/distro,!distro/run/modules,!distro/run/modules/example,
-          !distro/run/modules/rest,!distro/run/modules/webapps,!distro/run/qa,!distro/run/qa/integration-tests,
+          !distro/run/modules/rest,!distro/run/modules/webapps,!distro/run/modules/oauth2,!distro/run/qa,!distro/run/qa/integration-tests,
           !distro/run/qa/runtime,!distro/run/qa/example-plugin''
-    -Pdistro,distro-ce,distro-wildfly'
+    -Pdistro,distro-ce,distro-wildfly
+    -Dskip.frontend.build=true'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'jdk-11-latest'
   withNpm: true
+

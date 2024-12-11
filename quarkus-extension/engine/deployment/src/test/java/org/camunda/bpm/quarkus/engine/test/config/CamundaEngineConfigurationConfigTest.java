@@ -49,9 +49,9 @@ public class CamundaEngineConfigurationConfigTest {
     // given a custom application.properties file
 
     // then
-    assertThat(config.genericConfig.get("cmmn-enabled")).isEqualTo("false");
-    assertThat(config.genericConfig.get("dmn-enabled")).isEqualTo("false");
-    assertThat(config.genericConfig.get("history")).isEqualTo("none");
+    assertThat(config.genericConfig().get("cmmn-enabled")).isEqualTo("false");
+    assertThat(config.genericConfig().get("dmn-enabled")).isEqualTo("false");
+    assertThat(config.genericConfig().get("history")).isEqualTo("none");
   }
 
   @Test

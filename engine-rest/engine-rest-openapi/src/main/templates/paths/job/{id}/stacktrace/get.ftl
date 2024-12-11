@@ -27,6 +27,7 @@
         code = "200"
         mediaType= "text/plain"
         desc = "Request successful."
+        contentDesc = "Returns the stacktrace of the exception for the job with the given ID."
         examples = ['"example-1": {
                        "description": "GET `/job/aJobId/stacktrace`",
                        "value": "java.lang.RuntimeException: A exception message!

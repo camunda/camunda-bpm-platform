@@ -62,6 +62,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String DELEGATION_STATE = "delegationState";
   public static final String CANDIDATE_USER = "candidateUser";
   public static final String CANDIDATE_GROUP = "candidateGroup";
+  public static final String CANDIDATE_GROUP_LIKE = "candidateGroupLike";
   public static final String CANDIDATE_GROUPS = "candidateGroups";
   public static final String WITH_CANDIDATE_GROUPS = "withCandidateGroups";
   public static final String WITHOUT_CANDIDATE_GROUPS = "withoutCandidateGroups";
@@ -166,6 +167,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     JsonUtil.addField(json, DELEGATION_STATE, query.getDelegationStateString());
     JsonUtil.addField(json, CANDIDATE_USER, query.getCandidateUser());
     JsonUtil.addField(json, CANDIDATE_GROUP, query.getCandidateGroup());
+    JsonUtil.addField(json, CANDIDATE_GROUP_LIKE, query.getCandidateGroupLike());
     JsonUtil.addListField(json, CANDIDATE_GROUPS, query.getCandidateGroupsInternal());
     JsonUtil.addDefaultField(json, WITH_CANDIDATE_GROUPS, false, query.isWithCandidateGroups());
     JsonUtil.addDefaultField(json, WITHOUT_CANDIDATE_GROUPS, false, query.isWithoutCandidateGroups());
@@ -362,6 +364,9 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     }
     if (json.has(CANDIDATE_GROUP)) {
       query.taskCandidateGroup(JsonUtil.getString(json, CANDIDATE_GROUP));
+    }
+    if (json.has(CANDIDATE_GROUP_LIKE)) {
+      query.taskCandidateGroupLike(JsonUtil.getString(json, CANDIDATE_GROUP_LIKE));
     }
     if (json.has(CANDIDATE_GROUPS) && !json.has(CANDIDATE_USER) && !json.has(CANDIDATE_GROUP)) {
       query.taskCandidateGroupIn(getList(JsonUtil.getArray(json, CANDIDATE_GROUPS)));

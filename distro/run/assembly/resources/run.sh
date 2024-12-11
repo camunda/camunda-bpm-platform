@@ -5,11 +5,13 @@ BASEDIR=$(dirname "$0")
 PARENTDIR=$(builtin cd "$BASEDIR/.."; pwd)
 DEPLOYMENT_DIR=$PARENTDIR/configuration/resources
 WEBAPPS_PATH=$BASEDIR/webapps/
+OAUTH2_PATH=$BASEDIR/oauth2/
 REST_PATH=$BASEDIR/rest/
 EXAMPLE_PATH=$BASEDIR/example
 PID_PATH=$BASEDIR/run.pid
 OPTIONS_HELP="Options:
   --webapps    - Enables the Camunda Platform Webapps
+  --oauth2     - Enables the Camunda Platform Spring Security OAuth2 integration
   --rest       - Enables the REST API
   --example    - Enables the example application
   --production - Applies the production.yaml configuration file
@@ -57,6 +59,10 @@ if [ "$1" = "start" ] ; then
                      classPath=$WEBAPPS_PATH,$classPath
                      echo WebApps enabled
                      ;;
+      --oauth2 )     optionalComponentChosen=true
+                     classPath=$OAUTH2_PATH,$classPath
+                     echo Spring Security OAuth2 enabled
+                     ;;
       --rest )       optionalComponentChosen=true
                      restChosen=true
                      classPath=$REST_PATH,$classPath
@@ -76,7 +82,10 @@ if [ "$1" = "start" ] ; then
       --help )       printf "%s" "$OPTIONS_HELP"
                      exit 0
                      ;;
-      * )            exit 1
+      * )            printf "Unexpected argument '%s'!" "$1"
+                     printf "%s" "$OPTIONS_HELP"
+                     exit 1
+                     ;;
     esac
     shift
   done

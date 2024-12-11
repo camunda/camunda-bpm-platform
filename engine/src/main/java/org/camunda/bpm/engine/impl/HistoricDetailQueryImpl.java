@@ -20,7 +20,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Date;
 import java.util.List;
-
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
@@ -49,6 +48,7 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   protected String type;
   protected String variableInstanceId;
   protected String[] variableTypes;
+  protected String variableNameLike;
   protected String[] tenantIds;
   protected boolean isTenantIdSet;
   protected String[] processInstanceIds;
@@ -84,6 +84,12 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   public HistoricDetailQuery variableTypeIn(String... variableTypes) {
     ensureNotNull("Variable types", (Object[]) variableTypes);
     this.variableTypes = lowerCase(variableTypes);
+    return this;
+  }
+
+  public HistoricDetailQuery variableNameLike(String variableNameLike) {
+    ensureNotNull("Variable name like", variableNameLike);
+    this.variableNameLike = variableNameLike;
     return this;
   }
 

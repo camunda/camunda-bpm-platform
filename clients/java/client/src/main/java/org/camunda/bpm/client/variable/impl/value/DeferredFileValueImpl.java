@@ -37,7 +37,7 @@ public class DeferredFileValueImpl extends FileValueImpl implements DeferredFile
   protected boolean isLoaded = false;
 
   protected String variableName;
-  protected String processInstanceId;
+  protected String executionId;
   protected EngineClient engineClient;
 
   public DeferredFileValueImpl(String filename, EngineClient engineClient) {
@@ -47,7 +47,7 @@ public class DeferredFileValueImpl extends FileValueImpl implements DeferredFile
 
   protected void load() {
     try {
-      byte[] bytes = engineClient.getLocalBinaryVariable(variableName, processInstanceId);
+      byte[] bytes = engineClient.getLocalBinaryVariable(variableName, executionId);
       setValue(bytes);
 
       this.isLoaded = true;
@@ -71,17 +71,22 @@ public class DeferredFileValueImpl extends FileValueImpl implements DeferredFile
     return super.getValue();
   }
 
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
-
   public void setVariableName(String variableName) {
     this.variableName = variableName;
   }
 
+  public void setExecutionId(String executionId){
+    this.executionId = executionId;
+  };
+
+  public String getExecutionId() {
+    return executionId;
+  }
+
   @Override
   public String toString() {
-    return "DeferredFileValueImpl [mimeType=" + mimeType + ", filename=" + filename + ", type=" + type + ", isTransient=" + isTransient + ", isLoaded=" + isLoaded + "]";
+    return "DeferredFileValueImpl [mimeType=" + mimeType + ", filename=" + filename + ", type=" + type + ", "
+        + "isTransient=" + isTransient + ", isLoaded=" + isLoaded + "]";
   }
 
 }

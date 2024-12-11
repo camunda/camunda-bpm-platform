@@ -109,11 +109,13 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private Boolean withoutTenantId;
   private List<String> executedActivityIdIn;
   private List<String> activeActivityIdIn;
+  private List<String> activityIdIn;
   private Boolean active;
   private Boolean suspended;
   private Boolean completed;
   private Boolean externallyTerminated;
   private Boolean internallyTerminated;
+  private List<String> incidentIds;
 
   private List<VariableQueryParameterDto> variables;
 
@@ -306,6 +308,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     this.incidentType = incidentType;
   }
 
+  @CamundaQueryParam(value = "incidentIdIn", converter = StringListConverter.class)
+  public void setIncidentIdIn(List<String> incidentIds) {
+    this.incidentIds = incidentIds;
+  }
+
   @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
   public void setTenantIdIn(List<String> tenantIds) {
     this.tenantIds = tenantIds;
@@ -334,6 +341,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   @CamundaQueryParam(value = "activeActivityIdIn", converter = StringListConverter.class)
   public void setActiveActivityIdIn(List<String> activeActivityIdIn) {
     this.activeActivityIdIn = activeActivityIdIn;
+  }
+
+  @CamundaQueryParam(value = "activityIdIn", converter = StringListConverter.class)
+  public void setActivityIdIn(List<String> activityIdIn) {
+    this.activityIdIn = activityIdIn;
   }
 
   @CamundaQueryParam(value = "executedJobAfter", converter = DateConverter.class)
@@ -443,6 +455,9 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     if (withRootIncidents != null && withRootIncidents) {
       query.withRootIncidents();
     }
+    if (incidentIds != null && !incidentIds.isEmpty()) {
+      query.incidentIdIn(incidentIds.toArray(new String[0]));
+    }
     if (incidentStatus != null) {
       query.incidentStatus(incidentStatus);
     }
@@ -537,6 +552,10 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
 
     if (activeActivityIdIn != null && !activeActivityIdIn.isEmpty()) {
       query.activeActivityIdIn(activeActivityIdIn.toArray(new String[0]));
+    }
+
+    if(activityIdIn!= null && !activityIdIn.isEmpty()) {
+      query.activityIdIn(activityIdIn.toArray(new String[0]));
     }
 
     if (executedJobAfter != null) {

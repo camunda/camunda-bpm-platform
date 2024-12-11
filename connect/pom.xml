@@ -2,12 +2,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.camunda.connect</groupId>
-    <artifactId>camunda-connect-bom</artifactId>
-    <version>7.22.0-SNAPSHOT</version>
-    <relativePath>bom</relativePath>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-parent</artifactId>
+    <relativePath>../parent</relativePath>
+    <version>7.23.0-SNAPSHOT</version>
   </parent>
 
+  <groupId>org.camunda.connect</groupId>
   <artifactId>camunda-connect-root</artifactId>
   <name>Camunda Platform - connect - root</name>
   <inceptionYear>2014</inceptionYear>
@@ -15,7 +16,7 @@
 
   <properties>
     <commons-codec.version>1.15</commons-codec.version>
-    <connect.version.old>1.6.0</connect.version.old>
+    <connect.version.old>7.22.0</connect.version.old>
     <mockito.version>1.9.5</mockito.version>
     <wiremock.version>1.58</wiremock.version>
     <maven-bundle-plugin.version>5.1.1</maven-bundle-plugin.version>
@@ -34,14 +35,6 @@
 
   <dependencyManagement>
     <dependencies>
-
-      <dependency>
-        <groupId>org.camunda.commons</groupId>
-        <artifactId>camunda-commons-bom</artifactId>
-        <version>${project.version}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
 
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>

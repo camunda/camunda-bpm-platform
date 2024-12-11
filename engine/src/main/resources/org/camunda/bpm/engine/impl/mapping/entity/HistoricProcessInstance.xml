@@ -55,7 +55,8 @@
       CASE_INST_ID_,
       DELETE_REASON_,
       TENANT_ID_,
-      STATE_
+      STATE_,
+      RESTARTED_PROC_INST_ID_
     ) values (
       #{id ,jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
@@ -75,7 +76,8 @@
       #{caseInstanceId, jdbcType=VARCHAR},
       #{deleteReason, jdbcType=VARCHAR},
       #{tenantId, jdbcType=VARCHAR},
-      #{state, jdbcType=VARCHAR}
+      #{state, jdbcType=VARCHAR},
+      #{restartedProcessInstanceId, jdbcType=VARCHAR}
     )
   </insert>
 
@@ -171,7 +173,7 @@
 
   <update id="updateHistoricProcessInstanceByProcessInstanceId"
           parameterType="java.util.Map">
-    update 
+    update
       <if test="maxResults != null">
         ${limitBeforeWithoutOffset}
       </if>
@@ -313,8 +315,9 @@
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
     <result property="state" column="STATE_" jdbcType="VARCHAR"/>
+    <result property="restartedProcessInstanceId" column="RESTARTED_PROC_INST_ID_" jdbcType="VARCHAR"/>
   </resultMap>
-  
+
   <resultMap type="org.camunda.bpm.engine.impl.util.ImmutablePair" id="deploymentIdMapping">
     <id property="left" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
     <id property="right" column="ID_" jdbcType="VARCHAR" />
@@ -363,7 +366,7 @@
     <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
     ${countDistinctAfterEnd}
   </select>
-  
+
   <select id="selectHistoricProcessInstanceDeploymentIdMappingsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl" resultMap="deploymentIdMapping">
     select distinct RES.DEPLOYMENT_ID_, RES.ID_
     <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
@@ -399,6 +402,7 @@
 
     <bind name="INC_JOIN" value="false" />
     <bind name="HAI_JOIN" value="false" />
+    <bind name="RU_EXE_JOIN" value="false" />
     <bind name="JOIN_TYPE" value="'inner join'" />
 
     <foreach collection="queries" item="query">
@@ -406,12 +410,16 @@
         <bind name="JOIN_TYPE" value="'left join'" />
       </if>
 
-      <if test="query != null &amp;&amp; (query.withIncidents || query.withRootIncidents || query.incidentStatus != null || query.incidentMessage != null || query.incidentMessageLike != null || query.incidentType != null)">
+      <if test="query != null &amp;&amp; (query.withIncidents || query.withRootIncidents || query.incidentStatus != null || query.incidentMessage != null || query.incidentMessageLike != null || query.incidentType != null || (incidentIds != null &amp;&amp; incidentIds.length > 0))">
         <bind name="INC_JOIN" value="true" />
       </if>
 
       <if test="query != null &amp;&amp; (query.executedActivityIds != null and query.executedActivityIds.length > 0) || (query.activeActivityIds != null and query.activeActivityIds.length > 0)">
         <bind name="HAI_JOIN" value="true" />
+      </if>
+
+      <if test="query != null &amp;&amp; (query.activityIds != null and query.activityIds.length > 0)">
+        <bind name="RU_EXE_JOIN" value="true" />
       </if>
     </foreach>
 
@@ -422,8 +430,11 @@
       LEFT JOIN ${prefix}ACT_HI_ACTINST HAI
       ON HAI.PROC_INST_ID_ = SELF.ID_
     </if>
-    
-    <!-- actual value conditions are checked in the WHERE part; 
+    <if test="RU_EXE_JOIN">
+      LEFT JOIN ${prefix}ACT_RU_EXECUTION EXE on SELF.PROC_INST_ID_ = EXE.PROC_INST_ID_
+    </if>
+
+    <!-- actual value conditions are checked in the WHERE part;
        however here we must join once for every variable condition.
        It is important that in the WHERE part we use the same table
        names for the respective conditions (i.e. VI0, VI1, VI2, ...) -->
@@ -550,6 +561,14 @@
             <if test="query.incidentType != null">
               ${queryType} INC.INCIDENT_TYPE_ = #{query.incidentType}
             </if>
+
+            <if test="query.incidentIds != null &amp;&amp; query.incidentIds.length > 0">
+              ${queryType} INC.ID_ IN
+              <foreach item="incidentId" index="index" collection="query.incidentIds" open="(" separator="," close=")">
+                  #{incidentId}
+              </foreach>
+            </if>
+
             <if test="query.incidentMessage != null">
               ${queryType} INC.INCIDENT_MSG_ = #{query.incidentMessage}
             </if>
@@ -620,6 +639,16 @@
                   AND (START_TIME_ &lt;= #{query.executedActivityBefore} OR END_TIME_ &lt;= #{query.executedActivityBefore})
                 </if>
               </where>
+              )
+            </if>
+
+            <if test="query.activityIds != null &amp;&amp; query.activityIds.length > 0">
+              ${queryType} (EXE.IS_EVENT_SCOPE_ = ${falseConstant}
+              and EXE.ACT_ID_ in
+              <foreach item="activityId" index="index" collection="query.activityIds"
+                       open="(" separator="," close=")">
+                #{activityId}
+              </foreach>
               )
             </if>
 

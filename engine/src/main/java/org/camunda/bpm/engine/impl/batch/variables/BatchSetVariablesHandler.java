@@ -51,7 +51,7 @@ public class BatchSetVariablesHandler extends AbstractBatchJobHandler<BatchConfi
 
     for (String processInstanceId : processInstanceIds) {
       commandContext.executeWithOperationLogPrevented(
-          new SetExecutionVariablesCmd(processInstanceId, variables, false, true));
+          new SetExecutionVariablesCmd(processInstanceId, variables, false, true, false));
     }
   }
 

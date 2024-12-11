@@ -46,10 +46,12 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
 import org.camunda.bpm.client.util.RecordingInvocationHandler;
 import org.camunda.bpm.client.util.RecordingInvocationHandler.RecordedInvocation;
+import org.camunda.bpm.client.variable.impl.value.DeferredFileValueImpl;
 import org.camunda.bpm.client.variable.value.DeferredFileValue;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.commons.utils.IoUtil;
 import org.junit.Before;
@@ -63,6 +65,8 @@ public class FileSerializationIT {
   protected static final String VARIABLE_NAME_FILE = "fileVariable";
   protected static final String VARIABLE_VALUE_FILE_NAME = "aFileName.txt";
   protected static final byte[] VARIABLE_VALUE_FILE_VALUE = "ABC".getBytes();
+  protected static final String LOCAL_VARIABLE_NAME_FILE = "localFileName.txt";
+
   protected static final String VARIABLE_VALUE_FILE_ENCODING = "UTF-8";
   protected static final String VARIABLE_VALUE_FILE_MIME_TYPE = "text/plain";
 
@@ -118,6 +122,41 @@ public class FileSerializationIT {
   }
 
   @Test
+  public void shouldGetLocalAndGlobalVariables() {
+    // given
+    ProcessDefinitionDto processDefinitionDto = engineRule.deploy(
+        Bpmn.createExecutableProcess("process")
+        .startEvent("startEvent")
+        .serviceTask("serviceTaskFoo")
+          .camundaExternalTask(EXTERNAL_TASK_TOPIC_FOO)
+            // create the local file variable with the same content but different name
+          .camundaInputParameter(LOCAL_VARIABLE_NAME_FILE, "${execution.getVariableTyped('fileVariable')}")
+        .serviceTask("serviceTaskBar")
+          .camundaExternalTask(EXTERNAL_TASK_TOPIC_BAR)
+        .endEvent("endEvent")
+        .done()
+    ).get(0);
+
+    engineRule.startProcessInstance(processDefinitionDto.getId(), VARIABLE_NAME_FILE, VARIABLE_VALUE_FILE);
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+        .handler(handler)
+        .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    // then
+    assertThat(task.getAllVariables().size()).isEqualTo(2);
+    assertThat(IoUtil.inputStreamAsString(task.getVariable(VARIABLE_NAME_FILE)))
+        .isEqualTo(new String(VARIABLE_VALUE_FILE_VALUE));
+    assertThat(IoUtil.inputStreamAsString(task.getVariable(LOCAL_VARIABLE_NAME_FILE)))
+        .isEqualTo(new String(VARIABLE_VALUE_FILE_VALUE));
+  }
+
+  @Test
   public void shouldGetAll() {
     // given
     Map<String, TypedValue> variables = new HashMap<>();
@@ -145,7 +184,9 @@ public class FileSerializationIT {
   @Test
   public void shouldGetTyped_Deferred() {
     // given
-    engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_FILE, VARIABLE_VALUE_FILE);
+    ProcessInstanceDto processInstanceDto = engineRule.startProcessInstance(processDefinition.getId(),
+        VARIABLE_NAME_FILE,
+        VARIABLE_VALUE_FILE);
 
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
       .handler(handler)
@@ -163,6 +204,48 @@ public class FileSerializationIT {
     assertThat(typedValue.isLoaded()).isFalse();
     assertThat(typedValue.getEncoding()).isNull();
     assertThat(typedValue.getMimeType()).isNull();
+
+    DeferredFileValueImpl typedValueImpl = (DeferredFileValueImpl) typedValue;
+    assertThat(typedValueImpl.getExecutionId()).isEqualTo(task.getExecutionId());
+  }
+
+  @Test
+  public void shouldGetVariableTypedForLocalVariable() {
+    // given
+    ProcessDefinitionDto processDefinitionDto = engineRule.deploy(
+        Bpmn.createExecutableProcess("process")
+        .startEvent("startEvent")
+        .serviceTask("serviceTaskFoo")
+          .camundaExternalTask(EXTERNAL_TASK_TOPIC_FOO)
+            // create the local file variable with the same content but different name
+          .camundaInputParameter(LOCAL_VARIABLE_NAME_FILE, "${execution.getVariableTyped('fileVariable')}")
+        .serviceTask("serviceTaskBar")
+          .camundaExternalTask(EXTERNAL_TASK_TOPIC_BAR)
+        .endEvent("endEvent")
+        .done()
+    ).get(0);
+
+    engineRule.startProcessInstance(processDefinitionDto.getId(), VARIABLE_NAME_FILE, VARIABLE_VALUE_FILE);
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+        .handler(handler)
+        .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    // then
+    DeferredFileValue typedValue = task.getVariableTyped(LOCAL_VARIABLE_NAME_FILE);
+    assertThat(typedValue.getFilename()).isEqualTo(VARIABLE_VALUE_FILE_NAME);
+    assertThat(typedValue.getType()).isEqualTo(FILE);
+    assertThat(typedValue.isLoaded()).isFalse();
+    assertThat(typedValue.getEncoding()).isNull();
+    assertThat(typedValue.getMimeType()).isNull();
+
+    InputStream value = typedValue.getValue();
+    assertThat(IoUtil.inputStreamAsString(value)).isEqualTo(new String(VARIABLE_VALUE_FILE_VALUE));
   }
 
   @Test

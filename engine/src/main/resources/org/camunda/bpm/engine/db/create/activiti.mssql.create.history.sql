@@ -35,6 +35,7 @@ create table ACT_HI_PROCINST (
     DELETE_REASON_ nvarchar(4000),
     TENANT_ID_ nvarchar(64),
     STATE_ nvarchar(255),
+    RESTARTED_PROC_INST_ID_ nvarchar(64),
     primary key (ID_),
     unique (PROC_INST_ID_)
 );
@@ -184,6 +185,7 @@ create table ACT_HI_COMMENT (
     FULL_MSG_ image,
     TENANT_ID_ nvarchar(64),
     REMOVAL_TIME_ datetime2,
+    REV_ integer not null default 1,
     primary key (ID_)
 );
 
@@ -286,6 +288,7 @@ create table ACT_HI_JOB_LOG (
     TENANT_ID_ nvarchar(64),
     HOSTNAME_ nvarchar(255),
     REMOVAL_TIME_ datetime2,
+    BATCH_ID_ nvarchar(64),
     primary key (ID_)
 );
 
@@ -338,6 +341,7 @@ create index ACT_IDX_HI_PRO_INST_PROC_TIME on ACT_HI_PROCINST(START_TIME_, END_T
 create index ACT_IDX_HI_PI_PDEFID_END_TIME on ACT_HI_PROCINST(PROC_DEF_ID_, END_TIME_);
 create index ACT_IDX_HI_PRO_INST_ROOT_PI on ACT_HI_PROCINST(ROOT_PROC_INST_ID_);
 create index ACT_IDX_HI_PRO_INST_RM_TIME on ACT_HI_PROCINST(REMOVAL_TIME_);
+create index ACT_IDX_HI_PRO_RST_PRO_INST_ID on ACT_HI_PROCINST(RESTARTED_PROC_INST_ID_);
 
 create index ACT_IDX_HI_ACTINST_ROOT_PI on ACT_HI_ACTINST(ROOT_PROC_INST_ID_);
 create index ACT_IDX_HI_ACT_INST_START_END on ACT_HI_ACTINST(START_TIME_, END_TIME_);

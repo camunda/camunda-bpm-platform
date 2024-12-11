@@ -11,7 +11,7 @@
 
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-root</artifactId>
-  <version>7.22.0-SNAPSHOT</version>
+  <version>7.23.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Camunda Platform - Root Pom</name>
   <inceptionYear>2013</inceptionYear>
@@ -28,7 +28,7 @@
     <version.mybatis>3.5.15</version.mybatis>
     <version.joda-time>2.12.5</version.joda-time>
     <version.uuid-generator>4.3.0</version.uuid-generator>
-    <version.feel-scala>1.17.5</version.feel-scala>
+    <version.feel-scala>1.18.1</version.feel-scala>
   </properties>
 
   <build>
@@ -134,10 +134,18 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
+              <top><![CDATA[
+                <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                  'https://ssgtm.camunda.org/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                  })(window,document,'script','dataLayer','GTM-PP9MHKW');</script>
+              ]]></top>
               <failOnError>false</failOnError>
               <additionalJOptions>
                 <additionalJOption>-Xdoclint:none</additionalJOption>
                 <additionalJOption>--ignore-source-errors</additionalJOption>
+                <additionalJOption>--allow-script-in-comments</additionalJOption>
               </additionalJOptions>
               <doctitle>Camunda Platform Javadocs ${project.version}</doctitle>
               <windowtitle>Camunda Platform Javadocs ${project.version}</windowtitle>
