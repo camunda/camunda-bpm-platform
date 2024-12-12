@@ -94,6 +94,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   protected List<String> tenantIds;
   protected Boolean withoutTenantId;
   protected Boolean includeJobsWithoutTenantId;
+  protected Boolean executing;
 
   protected List<ConditionQueryParameterDto> dueDates;
   protected List<ConditionQueryParameterDto> createTimes;
@@ -232,6 +233,11 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   @CamundaQueryParam(value = "includeJobsWithoutTenantId", converter = BooleanConverter.class)
   public void setIncludeJobsWithoutTenantId(Boolean includeJobsWithoutTenantId) {
     this.includeJobsWithoutTenantId = includeJobsWithoutTenantId;
+  }
+
+  @CamundaQueryParam(value="executing", converter = BooleanConverter.class)
+  public void setExecuting(Boolean executing) {
+    this.executing = executing;
   }
 
   @Override
@@ -417,6 +423,9 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
     }
     if (TRUE.equals(includeJobsWithoutTenantId)) {
       query.includeJobsWithoutTenantId();
+    }
+    if (TRUE.equals(executing)) {
+      query.executing();
     }
   }
 
