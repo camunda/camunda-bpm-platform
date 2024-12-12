@@ -14,49 +14,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.spring.boot.starter.security;
+package org.camunda.bpm.spring.boot.starter.security.oauth2;
 
-import jakarta.annotation.PostConstruct;
-import my.own.custom.spring.boot.project.SampleApplication;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = SampleApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CamundaBpmSampleApplicationTest {
-
-  private String baseUrl;
-
-  @LocalServerPort
-  private int port;
+public class CamundaBpmSampleApplicationIT extends AbstractSpringSecurityIT {
 
   @Autowired
   private TestRestTemplate testRestTemplate;
 
-  @PostConstruct
-  public void postConstruct() {
-    baseUrl = "http://localhost:" + port;
+  @Autowired
+  private WebApplicationContext webApplicationContext;
+
+  @Test
+  public void testSpringSecurityAutoConfigurationCorrectlySet() {
+    // given oauth2 client not configured
+    // when retrieving config beans then only SpringSecurityDisabledAutoConfiguration is present
+    assertThat(getBeanForClass(CamundaSpringSecurityOAuth2AutoConfiguration.class, webApplicationContext)).isNull();
+    assertThat(getBeanForClass(CamundaBpmSpringSecurityDisableAutoConfiguration.class, webApplicationContext)).isNotNull();
   }
 
   @Test
-  public void webappApiIsAvailableAndAuthorized() {
+  public void testWebappApiIsAvailableAndRequiresAuthorization() {
+    // given oauth2 client disabled
+    // when calling the webapp api
     ResponseEntity<String> entity = testRestTemplate.getForEntity(baseUrl + "/camunda/api/engine/engine/default/user", String.class);
+    // then webapp api returns unauthorized
     assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
   }
 
   @Test
-  public void restApiIsAvailable() {
+  public void testRestApiIsAvailable() {
+    // given oauth2 client disabled
+    // when calling the rest api
     ResponseEntity<String> entity = testRestTemplate.getForEntity(baseUrl + "/engine-rest/engine/", String.class);
+    // then rest api is accessible
     assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(entity.getBody()).isEqualTo("[{\"name\":\"default\"}]");
+    assertThat(entity.getBody()).isEqualTo(EXPECTED_NAME_DEFAULT);
   }
 }
