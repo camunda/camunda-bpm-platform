@@ -53,7 +53,9 @@ Most of the components that make up the platform can even be completely embedded
 
 ## Contributing
 
-Please see our [contribution guidelines](CONTRIBUTING.md) for how to raise issues and how to contribute code to our project.
+Camunda 7 Community Edition will reach its end of life by next October and the Enterprise Edition will move into maintenance mode, receiving only critical updates from that point forward. Looking ahead, [Camunda 8](https://github.com/camunda/camunda) is the successor to this project, so we strongly encourage you to explore it and contribute there instead.
+
+If you’d still like to contribute to this project, please see our [contribution guidelines](CONTRIBUTING.md) for how to raise issues and how to contribute code to our project.
 
 ## Tests
 
