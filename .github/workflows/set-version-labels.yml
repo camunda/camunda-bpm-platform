@@ -1,0 +1,11 @@
+name: Set Version Labels
+
+on:
+  issues:
+    types:
+      - closed
+
+jobs:
+  call-reusable-flow:
+    uses: camunda/automation-platform-github-actions/.github/workflows/set-version-labels.yml@main
+    secrets: inherit
