@@ -9,6 +9,7 @@ on:
 jobs:
   comment-on-external:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - name: Check if external user
         id: check_user
