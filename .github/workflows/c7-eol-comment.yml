@@ -1,0 +1,49 @@
+name: C7 EOL Comment
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened, synchronize, edited]
+  workflow_call:
+
+jobs:
+  comment-on-external:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if external user
+        id: check_user
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const username = context.payload.sender.login;
+            const internalUsers = ['internal'];
+            if (internalUsers.includes(username)) {
+              console.log(`${username} is an internal user`);
+              core.setOutput('external', 'false');
+            } else {
+              console.log(`${username} is an external user`);
+              core.setOutput('external', 'true');
+            }
+      - name: Comment if external
+        if: ${{ steps.check_user.outputs.external == 'true' }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            console.log('commenting');
+            const issue_number = context.payload.pull_request ? context.payload.pull_request.number : context.payload.issue ? context.payload.issue.number : null;
+            console.log("issue number is " + issue_number);
+            if (!issue_number) {
+              throw new Error('No issue or pull request found in the payload');
+            }
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue_number,
+              body: `Hello @${context.payload.sender.login},
+
+              Thank you so much for your contribution! We truly appreciate your time and effort in improving this project.
+            
+              However, we wanted to let you know that Camunda 7 Community Edition will reach its **end of life by October 2025**, and the Enterprise Edition will move into maintenance mode, receiving only maintenance improvements, bug fixes, and security fixes from that point forward. Looking ahead, [Camunda 8](https://github.com/camunda/camunda) is the successor to this project, so we strongly encourage you to explore it and contribute there instead.
+            
+              Thank you for understanding, and we look forward to your contributions to Camunda 8!`
+              });
