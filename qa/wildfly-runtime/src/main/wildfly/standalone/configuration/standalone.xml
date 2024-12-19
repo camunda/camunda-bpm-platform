@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<server xmlns="urn:jboss:domain:20.0">
+<server xmlns="urn:jboss:domain:community:20.0">
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.connector"/>
@@ -129,7 +129,7 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:bean-validation:1.0"/>
         <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
-        <subsystem xmlns="urn:jboss:domain:datasources:7.1">
+        <subsystem xmlns="urn:jboss:domain:datasources:7.2">
             <datasources>
                 <drivers>
                     <!-- all drivers needed in QA are listed here -->
@@ -400,7 +400,7 @@
         <subsystem xmlns="urn:jboss:domain:io:4.0" default-worker="default">
             <worker name="default"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:jaxrs:3.0"/>
+        <subsystem xmlns="urn:jboss:domain:jaxrs:4.0"/>
         <subsystem xmlns="urn:jboss:domain:jca:6.0">
             <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
             <bean-validation enabled="true"/>
