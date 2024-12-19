@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<host xmlns="urn:jboss:domain:20.0" name="primary">
+<host xmlns="urn:jboss:domain:community:20.0" name="primary">
     <extensions>
         <extension module="org.jboss.as.jmx"/>
         <extension module="org.wildfly.extension.core-management"/>
