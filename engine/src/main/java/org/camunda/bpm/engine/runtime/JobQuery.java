@@ -191,4 +191,10 @@ public interface JobQuery extends Query<JobQuery, Job> {
    */
   JobQuery orderByTenantId();
 
+  /**
+   * Only select jobs that are executing,
+   * ie. lock expiration time is not null, lock expiration is in future and suspension state is 1
+   */
+  JobQuery executing();
+
 }
