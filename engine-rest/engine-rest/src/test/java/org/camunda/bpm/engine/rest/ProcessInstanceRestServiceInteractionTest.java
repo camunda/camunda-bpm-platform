@@ -45,6 +45,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static org.mockito.Mockito.mockStatic;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -104,6 +105,7 @@ import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsUntypedValue;
 import org.camunda.bpm.engine.rest.util.JsonPathUtil;
 import org.camunda.bpm.engine.rest.util.ModificationInstructionBuilder;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.runtime.MessageCorrelationAsyncBuilder;
@@ -130,6 +132,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
+import org.mockito.MockedStatic;
 
 public class ProcessInstanceRestServiceInteractionTest extends AbstractRestServiceTest {
 
@@ -4891,5 +4894,76 @@ public class ProcessInstanceRestServiceInteractionTest extends AbstractRestServi
     assertEquals(mockComment.getUserId(), returnedUserId);
     assertEquals(mockComment.getTime(), returnedTime);
     assertEquals(mockComment.getFullMessage(), returnedFullMessage);
+  }
+
+  @Test
+  public void testWithVariablesInReturnSetToFalseGetProcessList() {
+    List<ProcessInstance> mockProcessInstanceList = new ArrayList<>();
+    ProcessInstance mockInstance = MockProvider.createMockInstance();
+    mockProcessInstanceList.add(mockInstance);
+		
+    ProcessInstanceQuery sampleInstanceQuery = mock(ProcessInstanceQuery.class);
+			
+    MockedStatic<QueryUtil> mockedStatic = mockStatic(QueryUtil.class);
+    Mockito.when(QueryUtil.list(sampleInstanceQuery, 0, 1)).thenReturn(mockProcessInstanceList);
+    assertEquals(1, QueryUtil.list(sampleInstanceQuery, 0, 1).size());
+
+    when(runtimeServiceMock.createProcessInstanceQuery()).thenReturn(sampleInstanceQuery);
+    when(sampleInstanceQuery.processInstanceId(anyString())).thenReturn(sampleInstanceQuery);
+    when(sampleInstanceQuery.listPage(0, 1)).thenReturn(mockProcessInstanceList);
+	         
+    VariableMap mockInstanceWithVariable = MockProvider.createMockSerializedVariables();
+    when(runtimeServiceMock.getVariables(anyString())).thenReturn(mockInstanceWithVariable);
+
+    given()
+      .queryParam("withVariablesInReturn", false)
+      .queryParam("firstResult", 0) .queryParam("maxResults", 1)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+      .contentType(MediaType.APPLICATION_JSON)
+      .body("[0].id", Matchers.equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .body("[0].definitionId", Matchers.equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+      .body("[0].businessKey", Matchers.equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
+      .body("[0].suspended", Matchers.equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
+      .body("[0].tenantId", Matchers.equalTo(MockProvider.EXAMPLE_TENANT_ID))
+      .body("[0].variables",  Matchers.nullValue())
+    .when().get(PROCESS_INSTANCE_URL);
+	    
+    mockedStatic.close();
+
+  }
+  
+  @Test
+  public void testWithVariablesInReturnSetToTrueGetProcessList() {
+    List<ProcessInstance> mockProcessInstanceList = new ArrayList<>();
+    ProcessInstance mockInstance = MockProvider.createMockInstance();
+    mockProcessInstanceList.add(mockInstance);
+	
+    ProcessInstanceQuery sampleInstanceQuery = mock(ProcessInstanceQuery.class);
+		
+    MockedStatic<QueryUtil> mockedStatic = mockStatic(QueryUtil.class);
+    Mockito.when(QueryUtil.list(sampleInstanceQuery, 0, 1)).thenReturn(mockProcessInstanceList);
+    assertEquals(1, QueryUtil.list(sampleInstanceQuery, 0, 1).size());
+
+    when(runtimeServiceMock.createProcessInstanceQuery()).thenReturn(sampleInstanceQuery);
+    when(sampleInstanceQuery.processInstanceId(anyString())).thenReturn(sampleInstanceQuery);
+    when(sampleInstanceQuery.listPage(0, 1)).thenReturn(mockProcessInstanceList);
+         
+    VariableMap mockInstanceWithVariable = MockProvider.createMockSerializedVariables();
+    when(runtimeServiceMock.getVariables(anyString())).thenReturn(mockInstanceWithVariable);
+
+    given()
+      .queryParam("withVariablesInReturn", true)
+ 	    .queryParam("firstResult", 0) .queryParam("maxResults", 1)
+ 	  .then().expect().statusCode(Status.OK.getStatusCode())
+ 	    .contentType(MediaType.APPLICATION_JSON)
+      .body("[0].id", Matchers.equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .body("[0].definitionId", Matchers.equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+ 	    .body("[0].businessKey", Matchers.equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
+ 	    .body("[0].suspended", Matchers.equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
+ 	    .body("[0].tenantId", Matchers.equalTo(MockProvider.EXAMPLE_TENANT_ID))
+      .body("[0].variables",  Matchers.notNullValue())
+   	.when().get(PROCESS_INSTANCE_URL);
+    
+    mockedStatic.close();
   }
 }
