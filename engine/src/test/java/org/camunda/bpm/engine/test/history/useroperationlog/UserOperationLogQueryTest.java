@@ -1409,7 +1409,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstance(variableInstanceId);
 
     // then
-    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
+    verifyHistoricVariableOperationAssertsWithTaskId(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
     verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
 
@@ -1427,7 +1427,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstance(variableInstanceId);
 
     // then
-    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
+    verifyHistoricVariableOperationAssertsWithTaskId(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
     verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
 
@@ -1810,6 +1810,31 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
       assertEquals(process.getProcessInstanceId(), logEntry.getProcessInstanceId());
       assertEquals(deploymentId, logEntry.getDeploymentId());
       assertNull(logEntry.getTaskId());
+      assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, logEntry.getCategory());
+    }
+  }
+
+  private void verifyHistoricVariableOperationAssertsWithTaskId(int countAssertValue, String operationType) {
+    String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
+    UserOperationLogQuery logQuery = query().entityType(EntityTypes.VARIABLE).operationType(operationType);
+    assertEquals(countAssertValue, logQuery.count());
+
+    if(countAssertValue > 1) {
+      List<UserOperationLogEntry> logEntryList = logQuery.list();
+
+      for (UserOperationLogEntry logEntry : logEntryList) {
+        assertEquals(process.getProcessDefinitionId(), logEntry.getProcessDefinitionId());
+        assertEquals(process.getProcessInstanceId(), logEntry.getProcessInstanceId());
+        assertEquals(deploymentId, logEntry.getDeploymentId());
+        assertNotNull(logEntry.getTaskId());
+        assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, logEntry.getCategory());
+      }
+    } else {
+      UserOperationLogEntry logEntry = logQuery.singleResult();
+      assertEquals(process.getProcessDefinitionId(), logEntry.getProcessDefinitionId());
+      assertEquals(process.getProcessInstanceId(), logEntry.getProcessInstanceId());
+      assertEquals(deploymentId, logEntry.getDeploymentId());
+      assertNotNull(logEntry.getTaskId());
       assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, logEntry.getCategory());
     }
   }
