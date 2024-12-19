@@ -235,7 +235,7 @@ public class JacksonJsonDataFormat implements DataFormat<SpinJsonNode> {
       return createJsonNode((Long) parameter);
 
     } else if(parameter instanceof Number) {
-      return createJsonNode(((Number) parameter).floatValue());
+      return createJsonNode(((Number) parameter).doubleValue());
 
     } else if(parameter instanceof List) {
       return createJsonNode((List<Object>) parameter);
@@ -259,6 +259,10 @@ public class JacksonJsonDataFormat implements DataFormat<SpinJsonNode> {
   }
 
   public JsonNode createJsonNode(Float parameter) {
+    return objectMapper.getNodeFactory().numberNode(parameter);
+  }
+
+  public JsonNode createJsonNode(Double parameter) {
     return objectMapper.getNodeFactory().numberNode(parameter);
   }
 
