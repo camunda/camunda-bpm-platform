@@ -22,3 +22,4 @@ alter table ACT_HI_COMMENT
     add column REV_ integer not null
     default 1;
 
+alter table ACT_RU_EXECUTION add PROC_DEF_KEY_ varchar(255);

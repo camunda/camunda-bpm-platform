@@ -89,6 +89,7 @@
                            "links": [],
                              "id": "aProcInstId",
                              "definitionId": "aProcDefId",
+                             "definitionKey": "aProcDefKey",
                              "businessKey": "aKey",
                              "caseInstanceId": "aCaseInstId",
                              "ended": false,

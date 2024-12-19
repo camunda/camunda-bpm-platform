@@ -176,4 +176,9 @@ public class ExecutionTree implements Execution {
     return sb.toString();
   }
 
+  @Override
+  public String getProcessDefinitionKey() {
+    return wrappedExecution.getProcessDefinitionKey();
+  }
+
 }
