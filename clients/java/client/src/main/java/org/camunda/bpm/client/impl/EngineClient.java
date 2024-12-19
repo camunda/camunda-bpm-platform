@@ -57,7 +57,7 @@ public class EngineClient {
   public static final String PROCESS_INSTANCE_ID_RESOURCE_PATH = PROCESS_INSTANCE_RESOURCE_PATH + "/" + ID_PATH_PARAM;
   public static final String GET_BINARY_VARIABLE =
       PROCESS_INSTANCE_ID_RESOURCE_PATH + "/variables/" + NAME_PATH_PARAM + "/data";
-  protected String baseUrl;
+  protected UrlResolver urlResolver;
   protected String workerId;
   protected int maxTasks;
   protected boolean usePriority;

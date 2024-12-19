@@ -34,7 +34,7 @@ public interface ExternalTaskClientBuilder {
   /**
    * Base url of the Camunda BPM Platform REST API. This information is mandatory.
    *
-   * if use this method, it will create a permanent url resolver with the given baseUrl
+   * If this method is used, it will create a permanent url resolver with the given baseUrl.
    *
    * @param baseUrl of the Camunda BPM Platform REST API
    * @return the builder
@@ -43,9 +43,9 @@ public interface ExternalTaskClientBuilder {
 
 
   /**
-   * url resovler of the Camunda BPM Platform REST API. This information is mandatory.
+   * Url resolver of the Camunda BPM Platform REST API. This information is mandatory.
    *
-   * if the server is ther cluster or you are using spring cloud. you can create a class implements UrlResolver
+   * If the server is in a cluster or you are using spring cloud, you can create a class which implements UrlResolver..
    *
    * this is a sample for spring cloud DiscoveryClient
    *

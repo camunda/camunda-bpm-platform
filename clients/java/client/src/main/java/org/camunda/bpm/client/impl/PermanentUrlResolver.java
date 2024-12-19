@@ -19,7 +19,7 @@ package org.camunda.bpm.client.impl;
 import org.camunda.bpm.client.UrlResolver;
 
 /**
- * urlResolver with permanent address
+ * UrlResolver with permanent address
  */
 public class PermanentUrlResolver implements UrlResolver {
 
@@ -27,10 +27,11 @@ public class PermanentUrlResolver implements UrlResolver {
     protected String baseUrl;
 
     public PermanentUrlResolver(String baseUrl) {
-        this.baseUrl = baseUrl;
+        this.setBaseUrl(baseUrl);
     }
 
     public void setBaseUrl(String baseUrl) {
+        assert baseUrl != null && !baseUrl.isEmpty() : "camunda address can not be null or empty";
         this.baseUrl = baseUrl;
     }
 

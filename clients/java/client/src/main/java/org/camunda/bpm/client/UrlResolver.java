@@ -17,7 +17,7 @@
 package org.camunda.bpm.client;
 
 /**
- * get service url from camunda server
+ * Get service url of the Camunda server
  */
 public interface UrlResolver {
 

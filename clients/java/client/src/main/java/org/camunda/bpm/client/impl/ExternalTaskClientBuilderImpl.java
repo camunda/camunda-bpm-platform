@@ -216,7 +216,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
       throw LOG.lockDurationIsNotGreaterThanZeroException(lockDuration);
     }
 
-    if (urlResolver == null) {
+    if (urlResolver == null || getBaseUrl() == null || getBaseUrl().isEmpty()) {
       throw LOG.baseUrlNullException();
     }
 
