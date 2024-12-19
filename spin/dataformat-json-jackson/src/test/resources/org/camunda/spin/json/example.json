@@ -18,8 +18,8 @@
   ],
   "orderDetails": {
     "article": "camundaBPM",
-    "price": 32000.45,
-    "roundedPrice": 32000,
+    "price": 1234567.13,
+    "roundedPrice": 1234567,
     "currencies": [
       "euro",
       "dollar"

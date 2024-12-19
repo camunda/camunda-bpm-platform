@@ -202,7 +202,7 @@ public abstract class JsonTreeReadPropertyScriptTest extends ScriptTest {
 
     // python returns bigInt instead of Long
     assertThat(value2.longValue()).isEqualTo(1234567890987654321L);
-    assertThat(value3).isEqualTo(32000.45);
+    assertThat(value3).isEqualTo(1234567.13);
   }
 
   @Test(expected = SpinJsonDataFormatException.class)
@@ -260,7 +260,7 @@ public abstract class JsonTreeReadPropertyScriptTest extends ScriptTest {
     assertThat(property2).isNotNull();
 
     // Ruby casts this to long instead int
-    assertThat(value1.intValue()).isEqualTo(32000);
+    assertThat(value1.longValue()).isEqualTo(1234567L);
     assertThat(value2).isEqualTo("dollar");
   }
 

@@ -22,7 +22,7 @@ public class OrderDetails {
 
   private String article;
   private double price;
-  private int roundedPrice;
+  private long roundedPrice;
   private List<String> currencies;
   private boolean paid;
 
@@ -38,10 +38,10 @@ public class OrderDetails {
   public void setPrice(double price) {
     this.price = price;
   }
-  public int getRoundedPrice() {
+  public long getRoundedPrice() {
     return roundedPrice;
   }
-  public void setRoundedPrice(int roundedPrice) {
+  public void setRoundedPrice(long roundedPrice) {
     this.roundedPrice = roundedPrice;
   }
   public List<String> getCurrencies() {
