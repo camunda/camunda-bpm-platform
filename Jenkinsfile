@@ -406,7 +406,8 @@ pipeline {
                 cambpmRunMaven('qa/',
                   'clean install -Pwildfly,h2,webapps-integration',
                   runtimeStash: true,
-                  archiveStash: true)
+                  archiveStash: true,
+                  jdkVersion: 'jdk-17-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
