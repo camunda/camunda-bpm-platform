@@ -16,13 +16,12 @@
  */
 package org.camunda.bpm.client;
 
+import java.util.function.Consumer;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.backoff.ExponentialBackoffStrategy;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
-
-import java.util.function.Consumer;
 
 /**
  * <p>A fluent builder to configure the Camunda client</p>
@@ -33,7 +32,7 @@ public interface ExternalTaskClientBuilder {
 
   /**
    * Base url of the Camunda BPM Platform REST API. This information is mandatory.
-   *
+   * <p>
    * If this method is used, it will create a permanent url resolver with the given baseUrl.
    *
    * @param baseUrl of the Camunda BPM Platform REST API
@@ -41,35 +40,31 @@ public interface ExternalTaskClientBuilder {
    */
   ExternalTaskClientBuilder baseUrl(String baseUrl);
 
-
   /**
    * Url resolver of the Camunda BPM Platform REST API. This information is mandatory.
-   *
+   * <p>
    * If the server is in a cluster or you are using spring cloud, you can create a class which implements UrlResolver..
-   *
+   * <p>
    * this is a sample for spring cloud DiscoveryClient
-   *
+   * <p>
    * public class CustomUrlResolver implements UrlResolver{
-   *
-   *    protected String serviceId;
-   *
-   *    protected DiscoveryClient discoveryClient;
-   *
-   *    protected String getRandomServiceInstance() {
-   *      List<ServiceInstance> serviceInstances = discoveryClient.getInstances(serviceId);
-   *      Random random = new Random();
-   *      return serviceInstances.get(random.nextInt(serviceInstances.size())).getUri().toString();
-   *    }
-   *
-   *    @Override
-   *    public String getBaseUrl() {
-   *      return getRandomServiceInstance();
-   *    }
+   * <p>
+   * protected String serviceId;
+   * <p>
+   * protected DiscoveryClient discoveryClient;
+   * <p>
+   * protected String getRandomServiceInstance() {
+   * List<ServiceInstance> serviceInstances = discoveryClient.getInstances(serviceId);
+   * Random random = new Random();
+   * return serviceInstances.get(random.nextInt(serviceInstances.size())).getUri().toString();
    * }
-   *
    *
    * @param urlResolver of the Camunda BPM Platform REST API
    * @return the builder
+   * @Override public String getBaseUrl() {
+   * return getRandomServiceInstance();
+   * }
+   * }
    */
   ExternalTaskClientBuilder urlResolver(UrlResolver urlResolver);
 
@@ -178,10 +173,10 @@ public interface ExternalTaskClientBuilder {
 
   /**
    * @param lockDuration <ul>
-   *                       <li> in milliseconds to lock the external tasks
-   *                       <li> must be greater than zero
-   *                       <li> the default lock duration is 20 seconds (20,000 milliseconds)
-   *                       <li> is overridden by the lock duration configured on a topic subscription
+   *                     <li> in milliseconds to lock the external tasks
+   *                     <li> must be greater than zero
+   *                     <li> the default lock duration is 20 seconds (20,000 milliseconds)
+   *                     <li> is overridden by the lock duration configured on a topic subscription
    *                     </ul>
    * @return the builder
    */
@@ -208,7 +203,7 @@ public interface ExternalTaskClientBuilder {
    * Disables the client-side backoff strategy. On invocation, the configuration option {@link #backoffStrategy} is ignored.
    * <p>
    * NOTE: Please bear in mind that disabling the client-side backoff can lead to heavy load situations on engine side.
-   *       To avoid this, please specify an appropriate {@link #asyncResponseTimeout(long)}.
+   * To avoid this, please specify an appropriate {@link #asyncResponseTimeout(long)}.
    *
    * @return the builder
    */
@@ -227,15 +222,14 @@ public interface ExternalTaskClientBuilder {
   /**
    * Bootstraps the Camunda client
    *
-   * @throws ExternalTaskClientException
-   * <ul>
-   *   <li> if base url is null or string is empty
-   *   <li> if hostname cannot be retrieved
-   *   <li> if maximum amount of tasks is not greater than zero
-   *   <li> if maximum asynchronous response timeout is not greater than zero
-   *   <li> if lock duration is not greater than zero
-   * </ul>
    * @return the builder
+   * @throws ExternalTaskClientException <ul>
+   *                                       <li> if base url is null or string is empty
+   *                                       <li> if hostname cannot be retrieved
+   *                                       <li> if maximum amount of tasks is not greater than zero
+   *                                       <li> if maximum asynchronous response timeout is not greater than zero
+   *                                       <li> if lock duration is not greater than zero
+   *                                     </ul>
    */
   ExternalTaskClient build();
 

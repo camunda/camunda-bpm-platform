@@ -21,5 +21,5 @@ package org.camunda.bpm.client;
  */
 public interface UrlResolver {
 
-    String getBaseUrl();
+  String getBaseUrl();
 }
