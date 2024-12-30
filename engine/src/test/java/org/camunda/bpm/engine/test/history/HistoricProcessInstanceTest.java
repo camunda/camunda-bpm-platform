@@ -36,9 +36,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -549,14 +551,34 @@ public class HistoricProcessInstanceTest {
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionNameLike("%One Task\\_Process").count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionNameLike("%One Task%").count());
 
-    List<String> exludeIds = new ArrayList<String>();
-    exludeIds.add("unexistingProcessDefinition");
 
-    assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKeyNotIn(exludeIds).count());
+    Set<String> excludeIdsSet = new HashSet<>();
+    excludeIdsSet.add("unexistingProcessDefinition");
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().processInstanceIdNotIn(excludeIdsSet).count());
 
-    exludeIds.add("oneTaskProcess");
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTaskProcess").processDefinitionKeyNotIn(exludeIds).count());
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKeyNotIn(exludeIds).count());
+    String processInstanceId = processInstance.getId();
+    excludeIdsSet.add(processInstanceId);
+    assertEquals(0,
+        historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId). processInstanceIdNotIn(excludeIdsSet).count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processInstanceIdNotIn(excludeIdsSet).count());
+
+    // TODO this would fail when using array but not with set. The check in the processInstanceIdNotIn differ 
+    // try {
+    //   historyService.createHistoricProcessInstanceQuery().processInstanceIdNotIn(Set.of(""));
+    //   fail("Exception expected");
+    // }
+    // catch (NotValidException e) {
+    //   // expected
+    // }
+
+    List<String> exludeIdsList = new ArrayList<String>();
+    exludeIdsList.add("unexistingProcessDefinition");
+
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKeyNotIn(exludeIdsList).count());
+
+    exludeIdsList.add("oneTaskProcess");
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTaskProcess").processDefinitionKeyNotIn(exludeIdsList).count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKeyNotIn(exludeIdsList).count());
 
     try {
       // oracle handles empty string like null which seems to lead to undefined behavior of the LIKE comparison
