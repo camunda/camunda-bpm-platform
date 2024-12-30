@@ -52,6 +52,12 @@
     "desc": "Filter by process instance ids. ${listTypeDescription}."
   },
 
+  "processInstanceIdNotIn": {
+    "type": "array",
+    "itemType": "string",
+    "desc": "Exclude instances by process instance ids. ${listTypeDescription}."
+  },
+
   "processDefinitionId": {
     "type": "string",
     "desc": "Filter by the process definition the instances run on."

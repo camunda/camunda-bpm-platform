@@ -87,6 +87,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String processDefinitionKey;
   protected String[] processDefinitionKeys;
   protected Set<String> processInstanceIds;
+  protected Set<String> processInstanceIdNotIn;
   protected String[] tenantIds;
   protected boolean isTenantIdSet;
   protected String[] executedActivityIds;
@@ -117,6 +118,12 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public HistoricProcessInstanceQuery processInstanceIds(Set<String> processInstanceIds) {
     ensureNotEmpty("Set of process instance ids", processInstanceIds);
     this.processInstanceIds = processInstanceIds;
+    return this;
+  }
+
+  public HistoricProcessInstanceQuery processInstanceIdNotIn(Set<String> processDefinitionIdNotIn){
+    ensureNotEmpty("Set of process instance ids", processDefinitionIdNotIn);
+    this.processInstanceIdNotIn = processDefinitionIdNotIn;
     return this;
   }
 
