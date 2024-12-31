@@ -71,7 +71,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   protected String failedActivityId;
   protected boolean noRetriesLeft;
   protected SuspensionState suspensionState;
-  protected boolean executing;
+  protected boolean acquired;
 
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
@@ -258,8 +258,8 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     return this;
   }
 
-  public JobQuery executing() {
-    executing = true;
+  public JobQuery acquired() {
+    acquired = true;
     return this;
   }
 
@@ -408,8 +408,8 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   public String getExceptionMessage() {
     return exceptionMessage;
   }
-  public boolean getExecuting() {
-    return executing;
+  public boolean getAcquired() {
+    return acquired;
   }
 
 }

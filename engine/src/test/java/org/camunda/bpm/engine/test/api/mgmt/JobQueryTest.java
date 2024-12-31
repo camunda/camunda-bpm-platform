@@ -872,7 +872,7 @@ public class JobQueryTest {
   }
 
   @Test
-  public void testQueryByExecuting() {
+  public void testQueryByAcquired() {
     Calendar lockExpDate = Calendar.getInstance();
     //given - lock expiration date in future
     lockExpDate.add(Calendar.MILLISECOND, 30000000);
@@ -882,7 +882,7 @@ public class JobQueryTest {
     Job job = managementService.createJobQuery().jobId(timerEntity.getId()).singleResult();
     assertNotNull(job);
 
-    List<Job> list = managementService.createJobQuery().executing().list();
+    List<Job> list = managementService.createJobQuery().acquired().list();
     assertEquals(list.size(), 1);
     deleteJobInDatabase();
 
@@ -890,7 +890,7 @@ public class JobQueryTest {
     lockExpDate.add(Calendar.MILLISECOND, -60000000);
     createJobWithLockExpiration(lockExpDate.getTime());
 
-    list = managementService.createJobQuery().executing().list();
+    list = managementService.createJobQuery().acquired().list();
     assertEquals(list.size(), 0);
 
     deleteJobInDatabase();
@@ -913,22 +913,20 @@ public class JobQueryTest {
 
   private void createJobWithLockExpiration(Date lockDate) {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
-    commandExecutor.execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-        JobManager jobManager = commandContext.getJobManager();
-        timerEntity = new TimerEntity();
-        timerEntity.setLockOwner(UUID.randomUUID().toString());
-        timerEntity.setDuedate(new Date());
-        timerEntity.setRetries(0);
-        timerEntity.setLockExpirationTime(lockDate);
+    commandExecutor.execute((Command<Void>) commandContext -> {
+      JobManager jobManager = commandContext.getJobManager();
+      timerEntity = new TimerEntity();
+      timerEntity.setLockOwner(UUID.randomUUID().toString());
+      timerEntity.setDuedate(new Date());
+      timerEntity.setRetries(0);
+      timerEntity.setLockExpirationTime(lockDate);
 
-        jobManager.insert(timerEntity);
+      jobManager.insert(timerEntity);
 
-        assertNotNull(timerEntity.getId());
+      assertNotNull(timerEntity.getId());
 
-        return null;
+      return null;
 
-      }
     });
   }
 
