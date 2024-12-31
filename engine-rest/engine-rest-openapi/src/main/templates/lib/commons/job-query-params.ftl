@@ -164,9 +164,9 @@
     "desc": "Include jobs which belong to no tenant. Can be used in combination with `tenantIdIn`.
              Value may only be `true`, as `false` is the default behavior."
     },
-  "executing": {
+  "acquired": {
     "type": "boolean",
-    "desc": "Only select jobs which are executing, i.e.,  lock expiration date is not null, lock expiration
+    "desc": "Only select jobs which are acquired, i.e.,  lock expiration date is not null, lock expiration
              date is in future and suspension state is 1. Value may only be `true`, as `false` is the default
              behavior."
   }

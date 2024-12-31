@@ -360,13 +360,13 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testExecutingParameter() {
+  public void testAcquiredParameter() {
     Map<String, Object> parameters = new HashMap<>();
-    parameters.put("executing", MockProvider.EXAMPLE_EXECUTING);
+    parameters.put("acquired", MockProvider.EXAMPLE_ACQUIRED);
 
     given().queryParams(parameters).then().expect().statusCode(Status.OK.getStatusCode()).when().get(JOBS_RESOURCE_URL);
 
-    verify(mockQuery).executing();
+    verify(mockQuery).acquired();
     verify(mockQuery).list();
   }
 
@@ -432,7 +432,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("priorityLowerThanOrEquals", JOB_QUERY_MAX_PRIORITY);
     parameters.put("priorityHigherThanOrEquals", JOB_QUERY_MIN_PRIORITY);
     parameters.put("jobDefinitionId", MockProvider.EXAMPLE_JOB_DEFINITION_ID);
-    parameters.put("executing", MockProvider.EXAMPLE_EXECUTING);
+    parameters.put("acquired", MockProvider.EXAMPLE_ACQUIRED);
     return parameters;
   }
 
@@ -470,7 +470,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).priorityLowerThanOrEquals(JOB_QUERY_MAX_PRIORITY);
     verify(mockQuery).priorityHigherThanOrEquals(JOB_QUERY_MIN_PRIORITY);
     verify(mockQuery).jobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
-    verify(mockQuery).executing();
+    verify(mockQuery).acquired();
   }
 
   private void testDateParameters(DateParameters parameters) {

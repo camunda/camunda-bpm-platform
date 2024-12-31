@@ -420,7 +420,7 @@
       <if test="suspensionState != null">
         and RES.SUSPENSION_STATE_ = #{suspensionState.stateCode}
       </if>
-      <if test="executing">
+      <if test="acquired">
         AND
         RES.SUSPENSION_STATE_ = 1
         AND

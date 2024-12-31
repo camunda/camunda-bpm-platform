@@ -531,7 +531,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_AUTHORIZATION_ID = "someAuthorizationId";
   public static final int EXAMPLE_AUTHORIZATION_TYPE = 0;
   public static final String EXAMPLE_AUTHORIZATION_TYPE_STRING = "0";
-  public static final Boolean EXAMPLE_EXECUTING = true;
+  public static final Boolean EXAMPLE_ACQUIRED = true;
 
 
   // process applications
