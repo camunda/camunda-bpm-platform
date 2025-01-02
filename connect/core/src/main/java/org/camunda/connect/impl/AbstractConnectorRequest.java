@@ -32,15 +32,15 @@ public abstract class AbstractConnectorRequest<R extends ConnectorResponse> impl
 
   protected Connector connector;
 
-  protected Map<String, Object> requestParameters = new HashMap<String, Object>();
+  protected Map<String, Object> requestParameters = new HashMap<>();
 
-  public AbstractConnectorRequest(Connector connector) {
+  protected AbstractConnectorRequest(Connector connector) {
     this.connector = connector;
   }
 
   @SuppressWarnings("unchecked")
   public R execute() {
-    if(!isRequestValid()) {
+    if (!isRequestValid()) {
       throw new RuntimeException("The request is invalid");
     }
     return (R) connector.execute(this);
