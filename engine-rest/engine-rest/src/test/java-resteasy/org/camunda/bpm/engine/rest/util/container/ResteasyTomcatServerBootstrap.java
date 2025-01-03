@@ -35,7 +35,7 @@ public class ResteasyTomcatServerBootstrap extends TomcatServerBootstrap {
 
     wa.addAsLibraries(resolver.addDependencies(
       MavenDependencies.createDependency("org.jboss.resteasy:resteasy-jaxrs:" + restEasyVersion, ScopeType.TEST, false,
-        MavenDependencies.createExclusion("org.apache.httpcomponents:httpclient"))).resolve()
+        MavenDependencies.createExclusion("org.apache.httpcomponents.client5:httpclient5"))).resolve()
       .withTransitivity().asFile());
   }
 
