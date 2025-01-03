@@ -15,6 +15,10 @@
   <description>This is the root of Camunda Platform Run</description>
   <packaging>pom</packaging>
 
+  <properties>
+    <version.spring-boot>3.4.1</version.spring-boot>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
 
