@@ -54,7 +54,6 @@ public class DefaultDmnDecisionContext {
 
   public DefaultDmnDecisionContext(DefaultDmnEngineConfiguration configuration) {
     evaluationListeners = configuration.getDecisionEvaluationListeners();
-
     evaluationHandlers = new HashMap<Class<? extends DmnDecisionLogic>, DmnDecisionLogicEvaluationHandler>();
     evaluationHandlers.put(DmnDecisionTableImpl.class, new DecisionTableEvaluationHandler(configuration));
     evaluationHandlers.put(DmnDecisionLiteralExpressionImpl.class, new DecisionLiteralExpressionEvaluationHandler(configuration));
@@ -67,7 +66,7 @@ public class DefaultDmnDecisionContext {
    * @param variableContext the available variable context
    * @return the result of the decision evaluation
    */
-  public DmnDecisionResult evaluateDecision(DmnDecision decision, VariableContext variableContext) {
+  public DmnDecisionResult evaluateDecision(DmnDecision decision, VariableContext variableContext, String decisionInstanceId) {
 
     if(decision.getKey() == null) {
       throw LOG.unableToFindAnyDecisionTable();
@@ -90,8 +89,11 @@ public class DefaultDmnDecisionContext {
         addResultToVariableContext(evaluatedResult, variableMap, evaluateDecision);
       }
     }
-
-    generateDecisionEvaluationEvent(evaluatedEvents);
+    /**
+     * Setting generated decisionInstanceId to the events to persist the generated value as ID for ACT_HI_DECINST table
+     */
+    generateDecisionEvaluationEvent(evaluatedEvents, decisionInstanceId);
+    evaluatedResult.setDmnDecisionInstanceId(decisionInstanceId);
     return evaluatedResult;
   }
 
@@ -162,7 +164,7 @@ public class DefaultDmnDecisionContext {
     return isDecisionTableWithCollectHitPolicy;
   }
 
-  protected void generateDecisionEvaluationEvent(List<DmnDecisionLogicEvaluationEvent> evaluatedEvents) {
+  protected void generateDecisionEvaluationEvent(List<DmnDecisionLogicEvaluationEvent> evaluatedEvents, String decisionInstanceId) {
 
     DmnDecisionLogicEvaluationEvent rootEvaluatedEvent = null;
     DmnDecisionEvaluationEventImpl decisionEvaluationEvent = new DmnDecisionEvaluationEventImpl();
@@ -176,6 +178,8 @@ public class DefaultDmnDecisionContext {
     decisionEvaluationEvent.setDecisionResult(rootEvaluatedEvent);
     decisionEvaluationEvent.setExecutedDecisionInstances(evaluatedEvents.size());
     decisionEvaluationEvent.setExecutedDecisionElements(executedDecisionElements);
+    //Setting decisionInstanceId to the event to persist the generated id for the history event
+    decisionEvaluationEvent.setDecisionInstanceId(decisionInstanceId);
 
     evaluatedEvents.remove(rootEvaluatedEvent);
     decisionEvaluationEvent.setRequiredDecisionResults(evaluatedEvents);
