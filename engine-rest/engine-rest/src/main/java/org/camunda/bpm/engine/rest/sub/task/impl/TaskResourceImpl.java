@@ -74,13 +74,23 @@ public class TaskResourceImpl implements TaskResource {
   protected String rootResourcePath;
   protected ObjectMapper objectMapper;
   protected boolean withCommentAttachmentInfo;
+  protected boolean withTaskVariablesInReturn;
+  protected boolean withTaskLocalVariablesInReturn;
 
-  public TaskResourceImpl(ProcessEngine engine, String taskId, String rootResourcePath, ObjectMapper objectMapper, boolean withCommentAttachmentInfo) {
+  public TaskResourceImpl(ProcessEngine engine,
+                          String taskId,
+                          String rootResourcePath,
+                          ObjectMapper objectMapper,
+                          boolean withCommentAttachmentInfo,
+                          boolean withTaskVariablesInReturn,
+                          boolean withTaskLocalVariablesInReturn) {
     this.engine = engine;
     this.taskId = taskId;
     this.rootResourcePath = rootResourcePath;
     this.objectMapper = objectMapper;
     this.withCommentAttachmentInfo = withCommentAttachmentInfo;
+    this.withTaskVariablesInReturn = withTaskVariablesInReturn;
+    this.withTaskLocalVariablesInReturn = withTaskLocalVariablesInReturn;
   }
 
   @Override
@@ -193,10 +203,17 @@ public class TaskResourceImpl implements TaskResource {
     if (task == null) {
       throw new InvalidRequestException(Status.NOT_FOUND, "No matching task with id " + taskId);
     }
-    if (withCommentAttachmentInfo) {
-      return TaskWithAttachmentAndCommentDto.fromEntity(task);
+    if ((withTaskVariablesInReturn || withTaskLocalVariablesInReturn) && withCommentAttachmentInfo) {
+      Map<String, VariableValueDto> taskVariables = getTaskVariables(withTaskVariablesInReturn);
+      return TaskWithAttachmentAndCommentDto.fromEntity(task, taskVariables);
     }
-    else {
+    if (withCommentAttachmentInfo) {
+      return TaskWithAttachmentAndCommentDto.fromEntity(task, null);
+    }
+    if (withTaskVariablesInReturn || withTaskLocalVariablesInReturn) {
+      Map<String, VariableValueDto> taskVariables = getTaskVariables(withTaskVariablesInReturn);
+      return TaskWithVariablesDto.fromEntity(task, taskVariables);
+    } else {
       return TaskDto.fromEntity(task);
     }
   }
@@ -466,6 +483,16 @@ public class TaskResourceImpl implements TaskResource {
     } finally {
       identityService.setAuthentication(currentAuthentication);
     }
+  }
+
+  private Map<String, VariableValueDto> getTaskVariables(boolean withTaskVariablesInReturn) {
+    VariableResource variableResource;
+    if (withTaskVariablesInReturn) {
+      variableResource = this.getVariables();
+    } else {
+      variableResource = this.getLocalVariables();
+    }
+    return variableResource.getVariables(true);
   }
 
 }
