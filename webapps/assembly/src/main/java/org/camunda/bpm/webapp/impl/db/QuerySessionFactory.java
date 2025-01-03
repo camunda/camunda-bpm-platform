@@ -56,6 +56,7 @@ public class QuerySessionFactory extends StandaloneProcessEngineConfiguration {
     setDatabaseType(processEngineConfiguration.getDatabaseType());
     setDataSource(processEngineConfiguration.getDataSource());
     setDatabaseTablePrefix(processEngineConfiguration.getDatabaseTablePrefix());
+    setSkipIsolationLevelCheck(processEngineConfiguration.getSkipIsolationLevelCheck());
 
     setHistoryLevel(processEngineConfiguration.getHistoryLevel());
     setHistory(processEngineConfiguration.getHistory());
