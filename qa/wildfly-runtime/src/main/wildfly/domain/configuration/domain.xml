@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<domain xmlns="urn:jboss:domain:20.0">
+<domain xmlns="urn:jboss:domain:community:20.0">
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.clustering.jgroups"/>
@@ -107,15 +107,15 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:bean-validation:1.0"/>
             <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:datasources:7.1">
+            <subsystem xmlns="urn:jboss:domain:datasources:7.2">
                 <datasources>
                     <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
-                        <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+                        <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=${wildfly.h2.compatibility.mode:REGULAR}</connection-url>
                         <driver>h2</driver>
                         <security user-name="sa" password="sa"/>
                     </datasource>
                     <datasource jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngineDS" enabled="true" use-java-context="true">
-                        <connection-url>jdbc:h2:mem:processengine;DB_CLOSE_DELAY=-1</connection-url>
+                        <connection-url>jdbc:h2:mem:processengine;DB_CLOSE_DELAY=-1;MODE=${wildfly.h2.compatibility.mode:REGULAR}</connection-url>
                         <driver>h2</driver>
                         <security user-name="sa" password="sa"/>
                     </datasource>
@@ -359,7 +359,7 @@
             <subsystem xmlns="urn:jboss:domain:io:4.0" default-worker="default">
                 <worker name="default"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:jaxrs:3.0"/>
+            <subsystem xmlns="urn:jboss:domain:jaxrs:4.0"/>
             <subsystem xmlns="urn:jboss:domain:jca:6.0">
                 <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
                 <bean-validation enabled="true"/>
@@ -546,10 +546,10 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:bean-validation:1.0"/>
             <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:datasources:7.1">
+            <subsystem xmlns="urn:jboss:domain:datasources:7.2">
                 <datasources>
                     <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
-                        <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+                        <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=${wildfly.h2.compatibility.mode:REGULAR}</connection-url>
                         <driver>h2</driver>
                         <security user-name="sa" password="sa"/>
                     </datasource>
@@ -772,7 +772,7 @@
                         <expiration interval="0"/>
                     </replicated-cache>
                 </cache-container>
-                <cache-container name="web" default-cache="dist" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.web.infinispan">
+                <cache-container name="web" default-cache="dist" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.session.infinispan.embedded">
                     <transport lock-timeout="60000"/>
                     <replicated-cache name="sso">
                         <locking isolation="REPEATABLE_READ"/>
@@ -810,7 +810,7 @@
             <subsystem xmlns="urn:jboss:domain:io:4.0" default-worker="default">
                 <worker name="default"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:jaxrs:3.0"/>
+            <subsystem xmlns="urn:jboss:domain:jaxrs:4.0"/>
             <subsystem xmlns="urn:jboss:domain:jca:6.0">
                 <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
                 <bean-validation enabled="true"/>
@@ -1012,10 +1012,10 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:bean-validation:1.0"/>
             <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:datasources:7.1">
+            <subsystem xmlns="urn:jboss:domain:datasources:7.2">
                 <datasources>
                     <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
-                        <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+                        <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=${wildfly.h2.compatibility.mode:REGULAR}</connection-url>
                         <driver>h2</driver>
                         <security user-name="sa" password="sa"/>
                     </datasource>
@@ -1269,7 +1269,7 @@
             <subsystem xmlns="urn:jboss:domain:io:4.0" default-worker="default">
                 <worker name="default"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:jaxrs:3.0"/>
+            <subsystem xmlns="urn:jboss:domain:jaxrs:4.0"/>
             <subsystem xmlns="urn:jboss:domain:jca:6.0">
                 <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
                 <bean-validation enabled="true"/>
@@ -1447,10 +1447,10 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:bean-validation:1.0"/>
             <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:datasources:7.1">
+            <subsystem xmlns="urn:jboss:domain:datasources:7.2">
                 <datasources>
                     <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
-                        <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+                        <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=${wildfly.h2.compatibility.mode:REGULAR}</connection-url>
                         <driver>h2</driver>
                         <security user-name="sa" password="sa"/>
                     </datasource>
@@ -1683,7 +1683,7 @@
                         <expiration interval="0"/>
                     </replicated-cache>
                 </cache-container>
-                <cache-container name="web" default-cache="dist" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.web.infinispan">
+                <cache-container name="web" default-cache="dist" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.session.infinispan.embedded">
                     <transport lock-timeout="60000"/>
                     <replicated-cache name="sso">
                         <locking isolation="REPEATABLE_READ"/>
@@ -1721,7 +1721,7 @@
             <subsystem xmlns="urn:jboss:domain:io:4.0" default-worker="default">
                 <worker name="default"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:jaxrs:3.0"/>
+            <subsystem xmlns="urn:jboss:domain:jaxrs:4.0"/>
             <subsystem xmlns="urn:jboss:domain:jca:6.0">
                 <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
                 <bean-validation enabled="true"/>
@@ -2300,6 +2300,7 @@
             <excluded-extensions>
                 <extension module="org.wildfly.extension.clustering.ejb"/>
                 <extension module="org.wildfly.extension.elytron-oidc-client"/>
+                <extension module="org.wildfly.extension.jakarta.data"/>
                 <extension module="org.wildfly.extension.opentelemetry"/>
                 <extension module="org.wildfly.extension.micrometer"/>
                 <extension module="org.wildfly.extension.microprofile.lra-participant"/>
@@ -2313,6 +2314,7 @@
             <excluded-extensions>
                 <extension module="org.wildfly.extension.clustering.ejb"/>
                 <extension module="org.wildfly.extension.elytron-oidc-client"/>
+                <extension module="org.wildfly.extension.jakarta.data"/>
                 <extension module="org.wildfly.extension.opentelemetry"/>
                 <extension module="org.wildfly.extension.micrometer"/>
                 <extension module="org.wildfly.extension.microprofile.lra-participant"/>
@@ -2325,6 +2327,7 @@
             <host-release id="WildFly25.0"/>
             <excluded-extensions>
                 <extension module="org.wildfly.extension.clustering.ejb"/>
+                <extension module="org.wildfly.extension.jakarta.data"/>
                 <extension module="org.wildfly.extension.micrometer"/>
                 <extension module="org.wildfly.extension.microprofile.lra-participant"/>
                 <extension module="org.wildfly.extension.microprofile.lra-coordinator"/>
@@ -2336,6 +2339,7 @@
             <host-release id="WildFly26.0"/>
             <excluded-extensions>
                 <extension module="org.wildfly.extension.clustering.ejb"/>
+                <extension module="org.wildfly.extension.jakarta.data"/>
                 <extension module="org.wildfly.extension.micrometer"/>
                 <extension module="org.wildfly.extension.microprofile.lra-participant"/>
                 <extension module="org.wildfly.extension.microprofile.lra-coordinator"/>
@@ -2346,6 +2350,7 @@
         <host-exclude name="WildFly27.0">
             <host-release id="WildFly27.0"/>
             <excluded-extensions>
+                <extension module="org.wildfly.extension.jakarta.data"/>
                 <extension module="org.wildfly.extension.micrometer"/>
                 <extension module="org.wildfly.extension.microprofile.lra-participant"/>
                 <extension module="org.wildfly.extension.microprofile.lra-coordinator"/>
@@ -2356,25 +2361,47 @@
         <host-exclude name="WildFly28.0">
             <host-release id="WildFly28.0"/>
             <excluded-extensions>
+                <extension module="org.wildfly.extension.jakarta.data"/>
                 <extension module="org.wildfly.extension.mvc-krazo"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly29.0">
             <host-release id="WildFly29.0"/>
             <excluded-extensions>
+                <extension module="org.wildfly.extension.jakarta.data"/>
                 <extension module="org.wildfly.extension.mvc-krazo"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly30.0">
             <host-release id="WildFly30.0"/>
             <excluded-extensions>
+                <extension module="org.wildfly.extension.jakarta.data"/>
                 <extension module="org.wildfly.extension.mvc-krazo"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly31.0">
             <host-release id="WildFly31.0"/>
             <excluded-extensions>
+                <extension module="org.wildfly.extension.jakarta.data"/>
                 <extension module="org.wildfly.extension.mvc-krazo"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly32.0">
+            <host-release id="WildFly32.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.jakarta.data"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly33.0">
+            <host-release id="WildFly33.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.jakarta.data"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly34.0">
+            <host-api-version major-version="27" minor-version="0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.jakarta.data"/>
             </excluded-extensions>
         </host-exclude>
     </host-excludes>
