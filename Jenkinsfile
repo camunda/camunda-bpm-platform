@@ -404,7 +404,7 @@ pipeline {
               agentLabel: 'chrome_112',
               runSteps: {
                 cambpmRunMaven('qa/',
-                  'clean install -Pwildfly,h2,webapps-integration',
+                  "clean install -Pwildfly,h2,webapps-integration -pl '!integration-tests-engine-jakarta'",
                   runtimeStash: true,
                   archiveStash: true,
                   jdkVersion: 'jdk-17-latest')
