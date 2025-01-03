@@ -379,7 +379,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   @Override
   @SuppressWarnings("unchecked")
-  public void initialize() {
+  public void initialize(Map<String, Object> variables, boolean fireHistoricStartEvent) {
     LOG.initializeExecution(this);
 
     ScopeImpl scope = getScopeActivity();
@@ -398,6 +398,17 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
         String authenticatedUserId = Context.getCommandContext().getAuthenticatedUserId();
         setVariable(initiatorVariableName, authenticatedUserId);
       }
+    }
+
+    // Fire before setting variables to ensure variables can receive removal time on strategy = start
+    if (fireHistoricStartEvent) {
+      fireHistoricProcessStartEvent();
+    }
+
+    // Set variables before creating event subscriptions to allow variable expression resolution
+    // e.g., when setting a variable when starting a process instance in a signal expression in an embedded event subprocess
+    if (variables != null) {
+      setVariables(variables);
     }
 
     // create event subscriptions for the current scope
