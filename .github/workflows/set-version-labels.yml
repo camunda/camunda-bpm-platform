@@ -7,5 +7,6 @@ on:
 
 jobs:
   call-reusable-flow:
+    if: ${{ github.event.issue.state_reason != 'not_planned' }}
     uses: camunda/automation-platform-github-actions/.github/workflows/set-version-labels.yml@main
     secrets: inherit
