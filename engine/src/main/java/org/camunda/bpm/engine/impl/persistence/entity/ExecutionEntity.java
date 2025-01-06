@@ -102,6 +102,14 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
+  /**
+   * Process instance ID that can be used in 
+   * DefaultAuthorizationProvider.newProcessInstance() to distinguish the
+   * process instance from executions going from the start event element in
+   * the process definition.
+   */
+  protected static final String NEW_PROCESS_INSTANCE_TEMP_ID = "NEW";
+
   // Persistent refrenced entities state //////////////////////////////////////
   public static final int EVENT_SUBSCRIPTIONS_STATE_BIT = 1;
   public static final int TASKS_STATE_BIT = 2;
@@ -323,6 +331,18 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   protected static ExecutionEntity createNewExecution() {
     ExecutionEntity newExecution = new ExecutionEntity();
+    initializeAssociations(newExecution);
+    newExecution.insert();
+
+    return newExecution;
+  }
+
+  // necessary to be able to distinguish process instance from paths going from the start of the process
+  protected static ExecutionEntity createNewProcessInstanceExecution() {
+    ExecutionEntity newExecution = new ExecutionEntity();
+    // assign some temporary process instance ID as it will be relaced later with actual ID that will be generated
+    // it has to be assigned directly, as using setProcessInstance() is comparing it with this execution ID which is not yet assigned
+    newExecution.processInstanceId = NEW_PROCESS_INSTANCE_TEMP_ID;
     initializeAssociations(newExecution);
     newExecution.insert();
 
