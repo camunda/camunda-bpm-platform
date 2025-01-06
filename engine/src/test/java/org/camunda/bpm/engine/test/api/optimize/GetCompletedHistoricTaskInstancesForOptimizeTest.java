@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
@@ -69,6 +70,7 @@ public class GetCompletedHistoricTaskInstancesForOptimizeTest {
   private RuntimeService runtimeService;
   private AuthorizationService authorizationService;
   private TaskService taskService;
+  private HistoryService historyService;
 
 
   @Before
@@ -80,6 +82,7 @@ public class GetCompletedHistoricTaskInstancesForOptimizeTest {
     runtimeService = engineRule.getRuntimeService();
     authorizationService = engineRule.getAuthorizationService();
     taskService = engineRule.getTaskService();
+    historyService = engineRule.getHistoryService();
 
     createUser(userId);
   }
@@ -94,6 +97,9 @@ public class GetCompletedHistoricTaskInstancesForOptimizeTest {
     }
     for (Authorization authorization : authorizationService.createAuthorizationQuery().list()) {
       authorizationService.deleteAuthorization(authorization.getId());
+    }
+    for (HistoricTaskInstance task: historyService.createHistoricTaskInstanceQuery().list()) {
+      historyService.deleteHistoricTaskInstance(task.getId());
     }
     ClockUtil.reset();
   }
@@ -291,6 +297,20 @@ public class GetCompletedHistoricTaskInstancesForOptimizeTest {
     assertThat(completedHistoricTaskInstances.get(0).getTaskDefinitionKey(), is("userTask1"));
   }
 
+  @Test
+  public void doNotReturnCompletedStandaloneTasks() {
+    // given
+    Task task = taskService.newTask("standaloneTaskId");
+    taskService.saveTask(task);
+    completeAllUserTasks();
+
+    // when
+    List<HistoricTaskInstance> completedHistoricTaskInstances =
+        optimizeService.getCompletedHistoricTaskInstances(null, null, 10);
+
+    // then
+    assertTrue(completedHistoricTaskInstances.isEmpty());
+  }
 
   private Date pastDate() {
     return new Date(2L);
