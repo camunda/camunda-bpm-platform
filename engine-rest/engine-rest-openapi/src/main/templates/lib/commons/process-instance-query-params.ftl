@@ -141,6 +141,11 @@
       defaultValue = 'false'
       desc = "Restrict the query to all process instances that are top level process instances."/>
 
+  <@lib.parameter name = "rootProcessInstanceId"
+      location = "query"
+      type = "string"
+      desc = "Filter by root process instance id."/>
+
   <@lib.parameter name = "leafProcessInstances"
       location = "query"
       type = "boolean"

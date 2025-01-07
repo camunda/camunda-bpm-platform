@@ -247,6 +247,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY = "aKey";
   public static final String EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY_LIKE = "aKeyLike";
   public static final String EXAMPLE_PROCESS_INSTANCE_ID = "aProcInstId";
+  public static final String EXAMPLE_ROOT_PROCESS_INSTANCE_ID = "aRootProcessInstanceId";
   public static final String EXAMPLE_ROOT_HISTORIC_PROCESS_INSTANCE_ID = "aRootProcInstId";
   public static final String ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID = "anotherId";
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED = false;
