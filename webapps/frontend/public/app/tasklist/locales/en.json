@@ -513,6 +513,10 @@
     "name": "Name",
     "owner": "Owner",
     "parentTask": "Parent task",
-    "priority": "Priority"
+    "priority": "Priority",
+    "SEARCH_LESS_THAN": "<",
+    "SEARCH_LESS_THAN_EQUALS": "<=",
+    "SEARCH_GREATER_THAN": ">",
+    "SEARCH_GREATER_THAN_EQUALS": ">="
   }
 }

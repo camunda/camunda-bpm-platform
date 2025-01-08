@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <parent>
+    <artifactId>camunda-connect-root</artifactId>
+    <groupId>org.camunda.connect</groupId>
+    <version>7.23.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>camunda-connect-http-client</artifactId>
+  <name>Camunda Platform - connect - http client</name>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.camunda.connect</groupId>
+      <artifactId>camunda-connect-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+    </dependency>
+    <!-- commons-codec is a transitive dependency of httpclient;
+      we override its version here in order to update the default commons-codec
+      version which has known vulnerabilities, see https://jira.camunda.com/browse/CAM-12774 -->
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <!-- check for api differences between latest minor release -->
+  <profiles>
+    <profile>
+      <id>check-api-compatibility</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>clirr-maven-plugin</artifactId>
+            <version>2.8</version>
+            <configuration>
+              <comparisonVersion>${connect.version.old}</comparisonVersion>
+              <logResults>true</logResults>
+              <excludes>
+                <exclude>org/camunda/connect/httpclient/impl/**</exclude>
+              </excludes>
+            </configuration>
+            <executions>
+              <execution>
+                <id>all</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>check-no-fork</goal>
+                </goals>
+                <configuration>
+                  <textOutputFile>${project.build.directory}/clirr-all.txt</textOutputFile>
+                  <failOnWarning>false</failOnWarning>
+                  <failOnError>false</failOnError>
+                </configuration>
+              </execution>
+              <execution>
+                <id>restrictive</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>check-no-fork</goal>
+                </goals>
+                <configuration>
+                  <textOutputFile>${project.build.directory}/clirr-restrictive.txt</textOutputFile>
+                  <failOnWarning>true</failOnWarning>
+                  <ignoredDifferencesFile>../.clirr-jenkins-ignore.xml</ignoredDifferencesFile>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>

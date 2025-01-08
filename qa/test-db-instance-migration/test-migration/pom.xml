@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa.upgrade</groupId>
     <artifactId>camunda-qa-db-instance-migration</artifactId>
-    <version>7.22.0-SNAPSHOT</version>
+    <version>7.23.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-qa-upgrade-test-migration</artifactId>
@@ -21,7 +21,6 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.camunda.bpm</groupId>
@@ -41,7 +40,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-jsr223</artifactId>
     </dependency>
 
@@ -205,34 +204,6 @@
       </build>
     </profile>
 
-    <profile>
-      <id>cockroachdb</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <!-- exclude instance migration tests for older Camunda versions (<7.14) before Cockroachdb support was added -->
-              <excludes combine.children="append">
-                <exclude>**/authorization/**</exclude>
-                <exclude>**/scenarios720/**</exclude>
-                <exclude>**/scenarios730/**</exclude>
-                <exclude>**/scenarios750/**</exclude>
-                <exclude>**/scenarios760/**</exclude>
-                <exclude>**/scenarios770/**</exclude>
-                <exclude>**/scenarios780/**</exclude>
-                <exclude>**/scenarios790/**</exclude>
-                <exclude>**/scenarios7110/**</exclude>
-                <exclude>**/scenarios7120/**</exclude>
-                <exclude>**/scenarios7130/**</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
   </profiles>
 
 

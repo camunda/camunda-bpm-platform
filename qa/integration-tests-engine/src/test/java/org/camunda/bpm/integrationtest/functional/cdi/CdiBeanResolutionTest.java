@@ -60,7 +60,7 @@ public class CdiBeanResolutionTest extends AbstractFoxPlatformIntegrationTest {
             .addClass(AbstractFoxPlatformIntegrationTest.class)
             .addAsLibraries(DeploymentHelper.getEngineCdi());
 
-    TestContainer.addContainerSpecificResourcesForNonPa(deployment);
+    TestContainer.addContainerSpecificResourcesForNonPaEmbedCdiLib(deployment);
 
     return deployment;
   }

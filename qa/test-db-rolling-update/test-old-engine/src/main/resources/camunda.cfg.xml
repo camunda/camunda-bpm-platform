@@ -24,9 +24,6 @@
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
 
-        <!-- telemetry configuration -->
-    <property name="telemetryReporterActivate" value="false"/>
-
     <property name="jdbcBatchProcessing" value="false"/>
 
   </bean>

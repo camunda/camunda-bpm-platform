@@ -164,6 +164,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     String returnedJobDefinitionId= from(content).getString("[0].jobDefinitionId");
     String returnedTenantId = from(content).getString("[0].tenantId");
     String returnedCreateTime = from(content).getString("[0].createTime");
+    String returnedBatchId = from(content).getString("[0].batchId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_JOB_ID, returnedJobId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
@@ -179,6 +180,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     Assert.assertEquals(MockProvider.EXAMPLE_JOB_DEFINITION_ID, returnedJobDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
     Assert.assertEquals(MockProvider.EXAMPLE_JOB_CREATE_TIME, returnedCreateTime);
+    Assert.assertEquals(MockProvider.EXAMPLE_BATCH_ID, returnedBatchId);
   }
 
   private interface DateParameters {

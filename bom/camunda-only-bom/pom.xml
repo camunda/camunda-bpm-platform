@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-bom-root</artifactId>
-    <version>7.22.0-SNAPSHOT</version>
+    <version>7.23.0-SNAPSHOT</version>
     <relativePath>../</relativePath>
   </parent>
 
@@ -181,6 +181,11 @@
       </dependency>
       <dependency>
         <groupId>org.camunda.bpm.springboot</groupId>
+        <artifactId>camunda-bpm-spring-boot-starter-security</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.springboot</groupId>
         <artifactId>camunda-bpm-spring-boot-starter-webapp-ee</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -208,16 +213,27 @@
         <groupId>org.camunda.spin</groupId>
         <artifactId>camunda-spin-bom</artifactId>
         <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
       <dependency>
         <groupId>org.camunda.commons</groupId>
         <artifactId>camunda-commons-bom</artifactId>
         <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
       <dependency>
         <groupId>org.camunda.template-engines</groupId>
         <artifactId>camunda-template-engines-freemarker</artifactId>
         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.connect</groupId>
+        <artifactId>camunda-connect-bom</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
 
       <!-- dmn engine dependencies
@@ -258,22 +274,6 @@
         <groupId>org.camunda.bpm.springboot</groupId>
         <artifactId>camunda-bpm-spring-boot-starter-external-task-client</artifactId>
         <version>${project.version}</version>
-      </dependency>
-
-      <!-- camunda-commons-typed-values: part of the platform and shares the same version -->
-      <dependency>
-        <groupId>org.camunda.commons</groupId>
-        <artifactId>camunda-commons-typed-values</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- optional dependencies -->
-      <dependency>
-        <groupId>org.camunda.connect</groupId>
-        <artifactId>camunda-connect-bom</artifactId>
-        <version>${version.camunda.connect}</version>
-        <scope>import</scope>
-        <type>pom</type>
       </dependency>
     </dependencies>
   </dependencyManagement>

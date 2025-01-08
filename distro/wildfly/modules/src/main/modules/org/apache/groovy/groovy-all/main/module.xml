@@ -1,0 +1,17 @@
+<module xmlns="urn:jboss:module:1.0" name="org.apache.groovy.groovy-all">
+  <resources>
+    <resource-root path="groovy-@version.groovy@.jar" />
+    <resource-root path="groovy-jsr223-@version.groovy@.jar" />
+    <resource-root path="groovy-json-@version.groovy@.jar" />
+    <resource-root path="groovy-xml-@version.groovy@.jar" />
+    <resource-root path="groovy-templates-@version.groovy@.jar" /> 
+    <resource-root path="groovy-dateutil-@version.groovy@.jar" /> 
+    <resource-root path="groovy-datetime-@version.groovy@.jar" /> 
+  </resources>
+
+  <dependencies>
+    <module name="javax.api" />
+    <module name="sun.jdk" />
+    <module name="org.camunda.spin.camunda-spin-core" />
+  </dependencies>
+</module>

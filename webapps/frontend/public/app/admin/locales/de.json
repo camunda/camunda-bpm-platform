@@ -676,6 +676,10 @@
     "USER_MEMBERSHIP_TENANT_SELECT_TENANTS": "Mandanten auswählen",
     "USER_MEMBERSHIP_TENANT_TENANT_ID": "Mandanten-ID",
     "USER_MEMBERSHIP_TENANT_TENANT_NAME": "Mandanten-Name",
-    "VALUE": "Wert"
+    "VALUE": "Wert",
+    "SEARCH_LESS_THAN": "<",
+    "SEARCH_LESS_THAN_EQUALS": "<=",
+    "SEARCH_GREATER_THAN": ">",
+    "SEARCH_GREATER_THAN_EQUALS": ">="
   }
 }

@@ -22,7 +22,6 @@
                    xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
 
-  <property name="db.name" value="cockroachdb" dbms="cockroachdb"/>
   <property name="db.name" value="db2" dbms="db2"/>
   <property name="db.name" value="h2" dbms="h2"/>
   <property name="db.name" value="mariadb" dbms="mariadb"/>
@@ -143,6 +142,18 @@
 
   <changeSet author="Camunda" id="7.22.0-tag">
     <tagDatabase tag="7.22.0"/>
+  </changeSet>
+
+  <changeSet author="Camunda" id="7.22-to-7.23">
+    <sqlFile path="upgrade/${db.name}_engine_7.22_to_7.23.sql"
+             encoding="UTF-8"
+             relativeToChangelogFile="true"
+             splitStatements="true"
+             stripComments="true"/>
+  </changeSet>
+
+  <changeSet author="Camunda" id="7.23.0-tag">
+    <tagDatabase tag="7.23.0"/>
   </changeSet>
 
 </databaseChangeLog>

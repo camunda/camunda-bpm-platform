@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- HEADS-UP: Do not use camunda-parent as parent,
+  it would introduce a cyclic dependency to this bom -->
+  <parent>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-root</artifactId>
+    <version>7.23.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <groupId>org.camunda.connect</groupId>
+  <artifactId>camunda-connect-bom</artifactId>
+  <version>7.23.0-SNAPSHOT</version>
+  <name>Camunda Platform - connect - bom</name>
+  <packaging>pom</packaging>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>org.camunda.connect</groupId>
+        <artifactId>camunda-connect-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.camunda.connect</groupId>
+        <artifactId>camunda-connect-http-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.camunda.connect</groupId>
+        <artifactId>camunda-connect-soap-http-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.camunda.connect</groupId>
+        <artifactId>camunda-connect-connectors-all</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <scm>
+    <url>https://github.com/camunda/camunda-bpm-platform</url>
+    <connection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</connection>
+    <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+</project>

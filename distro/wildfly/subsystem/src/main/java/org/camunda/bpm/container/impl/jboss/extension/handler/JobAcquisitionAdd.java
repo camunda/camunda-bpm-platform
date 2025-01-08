@@ -45,6 +45,10 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler {
 
   public static final JobAcquisitionAdd INSTANCE = new JobAcquisitionAdd();
 
+  protected JobAcquisitionAdd() {
+    super(SubsystemAttributeDefinitons.JOB_ACQUISITION_ATTRIBUTES);
+  }
+
   @Override
   protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model) throws OperationFailedException {
 
@@ -52,7 +56,7 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler {
 
     // start new service for job executor
     ServiceName serviceName = ServiceNames.forMscRuntimeContainerJobExecutorService(acquisitionName);
-    ServiceBuilder<?> serviceBuilder = context.getCapabilityServiceTarget().addService(serviceName);
+    ServiceBuilder<?> serviceBuilder = context.getServiceTarget().addService(serviceName);
     serviceBuilder.requires(ServiceNames.forMscRuntimeContainerDelegate());
     serviceBuilder.requires(ServiceNames.forMscExecutorService());
     Consumer<RuntimeContainerJobExecutor> provider = serviceBuilder.provides(serviceName);

@@ -1,0 +1,292 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>camunda-qa-tomcat9-runtime</artifactId>
+  <packaging>pom</packaging>
+
+  <name>Camunda Platform - QA Tomcat 9 Test Runtime</name>
+
+  <parent>
+    <groupId>org.camunda.bpm.qa</groupId>
+    <artifactId>camunda-qa</artifactId>
+    <version>7.23.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    <!--
+      database drivers
+      we deploy all and only activate one through server.xml
+    -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.python</groupId>
+      <artifactId>jython</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jruby</groupId>
+      <artifactId>jruby-complete</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.qa</groupId>
+      <artifactId>camunda-qa-ensure-clean-db</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
+  </dependencies>
+
+  <profiles>
+    <profile>
+      <id>tomcat9</id>
+
+      <!-- Tomcat 9 Dependencies used during assembly -->
+      <dependencies>
+
+        <dependency>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat</artifactId>
+          <version>${version.tomcat9}</version>
+          <type>tar.gz</type>
+        </dependency>
+
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.mybatis</groupId>
+          <artifactId>mybatis</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>com.fasterxml.uuid</groupId>
+          <artifactId>java-uuid-generator</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.apache.groovy</groupId>
+          <artifactId>groovy</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.groovy</groupId>
+          <artifactId>groovy-jsr223</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.groovy</groupId>
+          <artifactId>groovy-json</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.groovy</groupId>
+          <artifactId>groovy-xml</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.groovy</groupId>
+          <artifactId>groovy-templates</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.groovy</groupId>
+          <artifactId>groovy-dateutil</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.groovy</groupId>
+          <artifactId>groovy-datetime</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.graalvm.js</groupId>
+          <artifactId>js</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.graalvm.js</groupId>
+          <artifactId>js-scriptengine</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine</artifactId>
+          <exclusions>
+            <exclusion>
+              <groupId>org.springframework</groupId>
+              <artifactId>spring-beans</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.springframework</groupId>
+              <artifactId>spring-core</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.bpm.identity</groupId>
+          <artifactId>camunda-identity-ldap</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.spin</groupId>
+          <artifactId>camunda-spin-core</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine-plugin-spin</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.spin</groupId>
+          <artifactId>camunda-spin-dataformat-all</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.connect</groupId>
+          <artifactId>camunda-connect-core</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine-plugin-connect</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.connect</groupId>
+          <artifactId>camunda-connect-connectors-all</artifactId>
+          <exclusions>
+            <exclusion>
+              <groupId>org.camunda.connect</groupId>
+              <artifactId>camunda-connect-http-client</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.camunda.connect</groupId>
+              <artifactId>camunda-connect-soap-http-client</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.template-engines</groupId>
+          <artifactId>camunda-template-engines-freemarker</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-jdk14</artifactId>
+        </dependency>
+
+      </dependencies>
+
+      <build>
+        <resources>
+          <resource>
+            <directory>src/main</directory>
+            <filtering>true</filtering>
+          </resource>
+        </resources>
+
+        <!-- The order of declaration of the plugin executions is important to preserve the correct build sequence of
+             a) packing b) unpacking the server c) copy libs so that the properties are resolved correctly. -->
+        <plugins>
+          <!-- Produces the camunda-qa-tomcat9.tar.gz -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>assemble</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <descriptors>
+                    <descriptor>src/assembly.xml</descriptor>
+                  </descriptors>
+                  <attach>true</attach>
+                  <appendAssemblyId>false</appendAssemblyId>
+                  <outputDirectory>target/</outputDirectory>
+                  <workDirectory>target/assembly/work</workDirectory>
+                  <tarLongFileMode>gnu</tarLongFileMode>
+                  <finalName>camunda-qa-tomcat9</finalName>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- Unpack the assembled Tomcat 9 Server -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>3.0.0</version>
+            <executions>
+              <execution>
+                <id>unpack-tar</id>
+                <phase>generate-resources</phase>
+                <configuration>
+                  <target>
+                    <untar src="${project.build.directory}/camunda-qa-tomcat9.tar.gz" dest="${project.build.directory}/" compression="gzip" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- Copy Runtime Dependencies to the lib folder -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-libs</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>copy-dependencies</goal>
+                </goals>
+                <inherited>false</inherited>
+                <configuration>
+                  <includeScope>runtime</includeScope>
+                  <outputDirectory>${project.build.directory}/server/apache-tomcat-${version.tomcat9}/lib</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- Copy Filtered Configuration Resources -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <configuration>
+              <delimiters>
+                <delimiter>${*}</delimiter>
+              </delimiters>
+              <useDefaultDelimiters>false</useDefaultDelimiters>
+            </configuration>
+            <executions>
+              <execution>
+                <id>copy-resources</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>resources</goal>
+                </goals>
+                <configuration>
+                  <overwrite>true</overwrite>
+                  <outputDirectory>target/server/apache-tomcat-${version.tomcat9}</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

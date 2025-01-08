@@ -1,0 +1,143 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-parent</artifactId>
+    <relativePath>../parent</relativePath>
+    <version>7.23.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.camunda.connect</groupId>
+  <artifactId>camunda-connect-root</artifactId>
+  <name>Camunda Platform - connect - root</name>
+  <inceptionYear>2014</inceptionYear>
+  <packaging>pom</packaging>
+
+  <properties>
+    <commons-codec.version>1.15</commons-codec.version>
+    <connect.version.old>7.22.0</connect.version.old>
+    <mockito.version>1.9.5</mockito.version>
+    <wiremock.version>1.58</wiremock.version>
+    <maven-bundle-plugin.version>5.1.1</maven-bundle-plugin.version>
+
+    <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
+    <additionalparam>-Xdoclint:none</additionalparam>
+  </properties>
+
+  <modules>
+    <module>bom</module>
+    <module>core</module>
+    <module>http-client</module>
+    <module>soap-http-client</module>
+    <module>connectors-all</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>${version.httpclient}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>${commons-codec.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${version.junit}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${version.assertj}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${version.logback}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.github.tomakehurst</groupId>
+        <artifactId>wiremock</artifactId>
+        <version>${wiremock.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>${maven-bundle-plugin.version}</version>
+          <configuration>
+            <instructions>
+              <Export-Package>
+                org.camunda.connect*
+              </Export-Package>
+            </instructions>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.17</version>
+          <configuration>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.14</version>
+        <configuration>
+          <acceptPomPackaging>true</acceptPomPackaging>
+          <excludedScopes>test</excludedScopes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>license-header-check</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.mycila</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <scm>
+    <url>https://github.com/camunda/camunda-bpm-platform</url>
+    <connection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</connection>
+    <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+</project>

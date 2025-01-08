@@ -19,11 +19,9 @@ package org.camunda.bpm.engine.test.concurrency;
 import static org.assertj.core.api.Assumptions.assumeThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
 
-import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.impl.HistoryLevelSetupCommand;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
@@ -75,15 +73,7 @@ public class ConcurrentHistoryLevelTest extends ConcurrencyTestCase {
 
     assertNull(thread1.getException());
     Throwable thread2Exception = thread2.getException();
-    if (testRule.isOptimisticLockingExceptionSuppressible()) {
-      assertNull(thread2Exception);
-    } else {
-      // on CRDB, the pessimistic lock is disabled and the concurrent transaction
-      // with fail with a CrdbTransactionRetryException and will be retried. However,
-      // by default, the CRDB-related `commandRetries` property is set to 0, so retryable commands
-      // will still re-throw the `CrdbTransactionRetryException` to the caller and fail.
-      assertThat(thread2Exception).isInstanceOf(CrdbTransactionRetryException.class);
-    }
+    assertNull(thread2Exception);
     HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
     assertEquals("full", historyLevel.getName());
   }

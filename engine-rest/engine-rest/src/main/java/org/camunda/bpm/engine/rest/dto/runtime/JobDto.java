@@ -36,6 +36,7 @@ public class JobDto {
   protected long priority;
   protected String tenantId;
   protected Date createTime;
+  protected String batchId;
 
   public static JobDto fromJob(Job job) {
     JobDto dto = new JobDto();
@@ -53,6 +54,7 @@ public class JobDto {
     dto.priority = job.getPriority();
     dto.tenantId = job.getTenantId();
     dto.createTime = job.getCreateTime();
+    dto.batchId = job.getBatchId();
 
     return dto;
   }
@@ -111,6 +113,10 @@ public class JobDto {
 
   public Date getCreateTime() {
     return createTime;
+  }
+
+  public String getBatchId() {
+    return batchId;
   }
 
 }

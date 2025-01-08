@@ -162,6 +162,9 @@ public abstract class MockProvider {
   public static final String ANOTHER_EXAMPLE_TENANT_ID = "anotherTenantId";
   public static final String EXAMPLE_TENANT_ID_LIST = EXAMPLE_TENANT_ID + "," + ANOTHER_EXAMPLE_TENANT_ID;
 
+  // task State
+  public static final String EXAMPLE_HISTORIC_TASK_STATE = "aTaskState";
+
   public static final String EXAMPLE_TENANT_NAME = "aTenantName";
 
   // case activity ids
@@ -194,6 +197,10 @@ public abstract class MockProvider {
   public static final int EXAMPLE_TASK_PRIORITY = 42;
   public static final String EXAMPLE_TASK_DEFINITION_KEY = "aTaskDefinitionKey";
   public static final boolean EXAMPLE_TASK_SUSPENSION_STATE = false;
+
+  public static final boolean EXAMPLE_TASK_ATTACHMENT_STATE = false;
+
+  public static final boolean EXAMPLE_TASK_COMMENT_STATE = false;
 
   // task comment
   public static final String EXAMPLE_TASK_COMMENT_ID = "aTaskCommentId";
@@ -1011,7 +1018,6 @@ public abstract class MockProvider {
   public static final InternalsImpl EXAMPLE_TELEMETRY_INTERNALS = new InternalsImpl(EXAMPLE_TELEMETRY_DATABASE,
       EXAMPLE_TELEMETRY_SERVER, EXAMPLE_TELEMETRY_LICENSE, EXAMPLE_TELEMETRY_JDK);
   static {
-    EXAMPLE_TELEMETRY_INTERNALS.setTelemetryEnabled(false);
     EXAMPLE_TELEMETRY_INTERNALS.setCamundaIntegration(
         Stream.of("spring-boot-starter", "camunda-bpm-run").collect(Collectors.toCollection(HashSet::new)));
     EXAMPLE_TELEMETRY_INTERNALS
@@ -1055,7 +1061,11 @@ public abstract class MockProvider {
       .caseExecutionId(EXAMPLE_CASE_EXECUTION_ID)
       .formKey(EXAMPLE_FORM_KEY)
       .camundaFormRef(EXAMPLE_FORM_KEY, EXAMPLE_FORM_REF_BINDING, EXAMPLE_FORM_REF_VERSION)
-      .tenantId(EXAMPLE_TENANT_ID);
+      .tenantId(EXAMPLE_TENANT_ID)
+      .taskState(EXAMPLE_HISTORIC_TASK_STATE)
+      .tenantId(EXAMPLE_TENANT_ID)
+      .hasAttachment(EXAMPLE_TASK_ATTACHMENT_STATE)
+      .hasComment(EXAMPLE_TASK_COMMENT_STATE);
   }
 
   public static List<Task> createMockTasks() {
@@ -1858,7 +1868,8 @@ public abstract class MockProvider {
       .priority(EXAMPLE_JOB_PRIORITY)
       .jobDefinitionId(EXAMPLE_JOB_DEFINITION_ID)
       .createTime(DateTimeUtil.parseDate(EXAMPLE_JOB_CREATE_TIME))
-      .failedActivityId(EXAMPLE_JOB_FAILED_ACTIVITY_ID);
+      .failedActivityId(EXAMPLE_JOB_FAILED_ACTIVITY_ID)
+      .batchId(EXAMPLE_BATCH_ID);
   }
 
   public static List<Job> createMockJobs() {
@@ -2181,6 +2192,7 @@ public abstract class MockProvider {
     when(mock.getCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID);
     when(mock.getTenantId()).thenReturn(tenantId);
     when(mock.getState()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_STATE);
+    when(mock.getRestartedProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
 
     return mock;
   }
@@ -2574,6 +2586,7 @@ public abstract class MockProvider {
     when(taskInstance.getTenantId()).thenReturn(tenantId);
     when(taskInstance.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_TASK_INST_REMOVAL_TIME));
     when(taskInstance.getRootProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_ROOT_PROC_INST_ID);
+    when(taskInstance.getTaskState()).thenReturn(EXAMPLE_HISTORIC_TASK_STATE);
 
     return taskInstance;
   }
@@ -2973,6 +2986,7 @@ public abstract class MockProvider {
     when(mock.getTenantId()).thenReturn(tenantId);
     when(mock.getRootProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_ROOT_PROC_INST_ID);
     when(mock.getHostname()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_HOSTNAME);
+    when(mock.getBatchId()).thenReturn(EXAMPLE_BATCH_ID);
 
     when(mock.isCreationLog()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_IS_CREATION_LOG);
     when(mock.isFailureLog()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_IS_FAILURE_LOG);

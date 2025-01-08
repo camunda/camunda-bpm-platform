@@ -5,10 +5,11 @@
 
   <dependencies>
 
-    <module name="javax.api" />
-    <module name="javax.transaction.api" />
-    <module name="javax.enterprise.api" />
-    <module name="javax.inject.api" />
+    <module name="java.base" />
+    <module name="java.sql" />
+    <module name="jakarta.transaction.api" />
+    <module name="jakarta.enterprise.api" />
+    <module name="jakarta.inject.api" />
 
     <module name="org.jboss.staxmapper" />
     <module name="org.jboss.as.controller" />

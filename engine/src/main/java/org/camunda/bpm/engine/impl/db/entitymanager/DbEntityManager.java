@@ -353,8 +353,6 @@ public class DbEntityManager implements Session, EntityLoadListener {
           // this method throws an exception in case the flush cannot be continued;
           // accordingly, this method will be left as well in this case
           handleConcurrentModification(failedOperation);
-        } else if (failureState == State.FAILED_CONCURRENT_MODIFICATION_CRDB) {
-          handleConcurrentModificationCrdb(failedOperation);
         } else if (failureState == State.FAILED_CONCURRENT_MODIFICATION_EXCEPTION) {
           handleConcurrentModificationWithRolledBackTransaction(failedOperation);
         } else if (failureState == State.FAILED_ERROR) {
@@ -411,18 +409,6 @@ public class DbEntityManager implements Session, EntityLoadListener {
       default:
         throw LOG.concurrentUpdateDbEntityException(dbOperation);
     }
-  }
-
-  protected void handleConcurrentModificationCrdb(DbOperation dbOperation) {
-    OptimisticLockingResult handlingResult = invokeOptimisticLockingListeners(dbOperation);
-
-    if (OptimisticLockingResult.IGNORE.equals(handlingResult)) {
-      LOG.crdbFailureIgnored(dbOperation);
-    }
-
-    // CRDB concurrent modification exceptions always lead to the transaction
-    // being aborted, so we must always throw an exception.
-    throw LOG.crdbTransactionRetryException(dbOperation);
   }
 
   protected void handleConcurrentModificationWithRolledBackTransaction(DbOperation dbOperation) {

@@ -38,7 +38,6 @@ import org.junit.Test;
  *
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
-@RequiredDatabase(excludes = {DbSqlSessionFactory.CRDB })
 public class TransactionIsolationReadCommittedTest extends ConcurrencyTestCase {
 
   private ThreadControl thread1;

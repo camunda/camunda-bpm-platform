@@ -323,17 +323,9 @@ public class ConcurrentJobExecutorTest {
     // then the acquisition will not fail with optimistic locking
     assertNull(jobSuspensionThread.exception);
 
-    if (testRule.isOptimisticLockingExceptionSuppressible()) {
-      assertNull(acquisitionThread.exception);
-      // but the job will also not be acquired
-      assertEquals(0, acquisitionThread.acquiredJobs.size());
-    } else {
-      // on CockroachDB, the TX of the acquisition thread
-      // will fail with an un-ignorable OLE and needs to be retried
-      assertThat(acquisitionThread.exception).isInstanceOf(OptimisticLockingException.class);
-      // and no result will be returned
-      assertNull(acquisitionThread.acquiredJobs);
-    }
+    assertNull(acquisitionThread.exception);
+    // but the job will also not be acquired
+    assertEquals(0, acquisitionThread.acquiredJobs.size());
 
     //--------------------------------------------
 
@@ -424,18 +416,10 @@ public class ConcurrentJobExecutorTest {
     executionThread.proceedAndWaitTillDone();
 
     long remainingJobCount = managementService.createJobQuery().count();
-    if (testRule.isOptimisticLockingExceptionSuppressible()) {
-      assertNull(executionThread.exception);
+    assertNull(executionThread.exception);
 
-      // and ultimately only one job with an updated priority is left
-      assertEquals(1L, remainingJobCount);
-    } else {
-      // on CockroachDB, the TX of the execution thread
-      // will fail with an un-ignorable OLE and needs to be retried
-      assertThat(executionThread.exception).isInstanceOf(OptimisticLockingException.class);
-      // and both jobs will remain available
-      assertEquals(2L, remainingJobCount);
-    }
+    // and ultimately only one job with an updated priority is left
+    assertEquals(1L, remainingJobCount);
   }
 
   @Test

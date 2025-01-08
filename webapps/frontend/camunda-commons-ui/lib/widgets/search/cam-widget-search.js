@@ -141,31 +141,27 @@ module.exports = [
           $scope.translations[key] = $translate.instant(value);
         });
 
-        const initTypes = () => {
-          $scope.types.map(function(el) {
-            el.id.value = $translate.instant(el.id.value);
-            if (el.operators) {
-              el.operators = el.operators.map(function(op) {
-                op.value = $translate.instant(op.value);
-                return op;
-              });
-            }
+        $scope.types.map(function(el) {
+          el.id.value = $translate.instant(el.id.value);
+          if (el.operators) {
+            el.operators = el.operators.map(function(op) {
+              op.value = $translate.instant(op.value);
+              return op;
+            });
+          }
 
-            if (el.options && typeof el.options[0] === 'object') {
-              el.mappedOptions = el.options.map(({key, value}) => {
-                return {
-                  key: key,
-                  value: $translate.instant(value)
-                };
-              });
+          if (el.options && typeof el.options[0] === 'object') {
+            el.mappedOptions = el.options.map(({key, value}) => {
+              return {
+                key: key,
+                value: $translate.instant(value)
+              };
+            });
 
-              el.options = el.mappedOptions.map(({value}) => value);
-            }
-            return el;
-          });
-        };
-
-        if ($scope.types) initTypes();
+            el.options = el.mappedOptions.map(({value}) => value);
+          }
+          return el;
+        });
 
         angular.forEach($scope.operators, function(operatorGroupedByType) {
           angular.forEach(operatorGroupedByType, function(operator) {
@@ -735,7 +731,7 @@ module.exports = [
 
             if (
               $scope.matchAny &&
-              !$location.search().hasOwnProperty(searchId + 'OrQuery')// eslint-disable-line
+              !$location.search().hasOwnProperty(searchId + 'OrQuery') // eslint-disable-line
             ) {
               newLocation = $location.url() + '&' + searchId + 'OrQuery';
             } else if (!$scope.matchAny) {
@@ -775,11 +771,11 @@ module.exports = [
         $scope.$on('$locationChangeSuccess', function() {
           $scope.matchAny = $location
             .search()
-            .hasOwnProperty(searchId + 'OrQuery');// eslint-disable-line
+            .hasOwnProperty(searchId + 'OrQuery'); // eslint-disable-line
 
           if (
             !IGNORE_URL_UPDATE &&
-            $location.search().hasOwnProperty(searchId + 'Query')// eslint-disable-line
+            $location.search().hasOwnProperty(searchId + 'Query') // eslint-disable-line
           ) {
             // make new array of searches from the url
             var searches = getSearchesFromURL();
@@ -825,11 +821,9 @@ module.exports = [
             $scope.searches[i].type.values = types;
           }
         };
-
         $scope.$watch(
           'types',
           function() {
-            initTypes();
             //in case if array of types changed - update dropdown values
             $scope.searchTypes = $scope.types.map(function(el) {
               return el.id;

@@ -26,7 +26,6 @@
 
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
-    <property name="telemetryReporterActivate" value="false" />
     <property name="taskMetricsEnabled" value="false" />
 
     <!-- mail server configurations -->
@@ -35,9 +34,6 @@
     <property name="historyCleanupBatchWindowStartTime" value="16:00" />
 
     <property name="jdbcBatchProcessing" value="false"/>
-
-    <!-- telemetry configuration -->
-    <property name="telemetryEndpoint" value="http://localhost:8081/pings"/>
 
     <property name="enforceHistoryTimeToLive" value="false" />
 

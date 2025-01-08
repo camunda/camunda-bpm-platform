@@ -17,12 +17,12 @@
 package org.camunda.qa;
 
 import org.camunda.bpm.application.ProcessApplication;
-import org.camunda.bpm.application.impl.ServletProcessApplication;
+import org.camunda.bpm.application.impl.JakartaServletProcessApplication;
 
 /**
  * @author Tassilo Weidner
  */
 @ProcessApplication
-public class Application extends ServletProcessApplication {
+public class Application extends JakartaServletProcessApplication {
 
 }

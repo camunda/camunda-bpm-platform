@@ -25,12 +25,20 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
  */
 public class TestContainer {
 
+  /**
+   * In some scenarios, Tomcat 10 and Weld 5 have issues when the Weld library is embedded into the WAR.
+   * To solve these issues, Weld is added to the Tomcat server libs folder.
+   */
+  public static void addContainerSpecificResourcesEmbedCdiLib(WebArchive webArchive) {
+    addContainerSpecificResources(webArchive);
+    webArchive.addAsLibraries(DeploymentHelper.getWeld());
+  }
+
   public static void addContainerSpecificResources(WebArchive webArchive) {
     webArchive
-      .addAsManifestResource("context.xml")
-      .addAsLibraries(DeploymentHelper.getWeld())
-      .addClass(TestProcessApplication.class)
-      .addAsWebInfResource("web.xml");
+        .addAsManifestResource("context.xml")
+        .addClass(TestProcessApplication.class)
+        .addAsWebInfResource("web.xml");
   }
 
   public static void addContainerSpecificResourcesWithoutWeld(WebArchive webArchive) {
@@ -40,11 +48,19 @@ public class TestContainer {
       .addAsWebInfResource("web-without-weld.xml", "web.xml");
   }
 
+  /**
+   * In some scenarios, Tomcat 10 and Weld 5 have issues when the Weld library is embedded into the WAR.
+   * To solve these issues, Weld is added to the Tomcat server libs folder.
+   */
+  public static void addContainerSpecificResourcesForNonPaEmbedCdiLib(WebArchive webArchive) {
+    addContainerSpecificResourcesForNonPa(webArchive);
+    webArchive.addAsLibraries(DeploymentHelper.getWeld());
+  }
+
   public static void addContainerSpecificResourcesForNonPa(WebArchive webArchive) {
     webArchive
-      .addAsManifestResource("context.xml")
-      .addAsLibraries(DeploymentHelper.getWeld())
-      .addAsWebInfResource("web.xml");
+        .addAsManifestResource("context.xml")
+        .addAsWebInfResource("web.xml");
   }
 
   public static void addContainerSpecificResourcesForNonPaWithoutWeld(WebArchive webArchive) {
