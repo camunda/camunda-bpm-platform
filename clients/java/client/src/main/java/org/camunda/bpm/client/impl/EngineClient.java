@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.client.UrlResolver;
 import org.camunda.bpm.client.task.OrderingConfig;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
@@ -52,12 +53,11 @@ public class EngineClient {
   public static final String FAILURE_RESOURCE_PATH = ID_RESOURCE_PATH + "/failure";
   public static final String BPMN_ERROR_RESOURCE_PATH = ID_RESOURCE_PATH + "/bpmnError";
   public static final String NAME_PATH_PARAM = "{name}";
-  public static final String EXECUTION_RESOURCE_PATH = "/execution";
-  public static final String EXECUTION_ID_RESOURCE_PATH = EXECUTION_RESOURCE_PATH + "/" + ID_PATH_PARAM;
-  public static final String GET_LOCAL_VARIABLE =  EXECUTION_ID_RESOURCE_PATH + "/localVariables/" + NAME_PATH_PARAM;
-  public static final String GET_LOCAL_BINARY_VARIABLE =  GET_LOCAL_VARIABLE + "/data";
-
-  protected String baseUrl;
+  public static final String PROCESS_INSTANCE_RESOURCE_PATH = "/process-instance";
+  public static final String PROCESS_INSTANCE_ID_RESOURCE_PATH = PROCESS_INSTANCE_RESOURCE_PATH + "/" + ID_PATH_PARAM;
+  public static final String GET_BINARY_VARIABLE =
+      PROCESS_INSTANCE_ID_RESOURCE_PATH + "/variables/" + NAME_PATH_PARAM + "/data";
+  protected UrlResolver urlResolver;
   protected String workerId;
   protected int maxTasks;
   protected boolean usePriority;
@@ -66,26 +66,43 @@ public class EngineClient {
   protected RequestExecutor engineInteraction;
   protected TypedValues typedValues;
 
-  public EngineClient(String workerId, int maxTasks, Long asyncResponseTimeout, String baseUrl, RequestExecutor engineInteraction) {
-    this(workerId, maxTasks, asyncResponseTimeout, baseUrl, engineInteraction, true, OrderingConfig.empty());
-  }
+    public EngineClient(String workerId, int maxTasks, Long asyncResponseTimeout, String baseUrl, RequestExecutor engineInteraction) {
+        this(workerId, maxTasks, asyncResponseTimeout, baseUrl, engineInteraction, true, OrderingConfig.empty());
+    }
 
-  public EngineClient(String workerId, int maxTasks, Long asyncResponseTimeout, String baseUrl, RequestExecutor engineInteraction,
-                      boolean usePriority, OrderingConfig orderingConfig) {
-    this.workerId = workerId;
-    this.asyncResponseTimeout = asyncResponseTimeout;
-    this.maxTasks = maxTasks;
-    this.usePriority = usePriority;
-    this.engineInteraction = engineInteraction;
-    this.baseUrl = baseUrl;
-    this.orderingConfig = orderingConfig;
-  }
+    public EngineClient(String workerId, int maxTasks, Long asyncResponseTimeout, String baseUrl, RequestExecutor engineInteraction,
+                        boolean usePriority, OrderingConfig orderingConfig) {
+        this.workerId = workerId;
+        this.asyncResponseTimeout = asyncResponseTimeout;
+        this.maxTasks = maxTasks;
+        this.usePriority = usePriority;
+        this.engineInteraction = engineInteraction;
+        this.urlResolver = new PermanentUrlResolver(baseUrl);
+        this.orderingConfig = orderingConfig;
+    }
+
+
+    public EngineClient(String workerId, int maxTasks, Long asyncResponseTimeout,  UrlResolver urlResolver, RequestExecutor engineInteraction) {
+        this(workerId, maxTasks, asyncResponseTimeout, urlResolver, engineInteraction, true, OrderingConfig.empty());
+    }
+
+
+    public EngineClient(String workerId, int maxTasks, Long asyncResponseTimeout, UrlResolver urlResolver, RequestExecutor engineInteraction,
+                        boolean usePriority, OrderingConfig orderingConfig) {
+        this.workerId = workerId;
+        this.asyncResponseTimeout = asyncResponseTimeout;
+        this.maxTasks = maxTasks;
+        this.usePriority = usePriority;
+        this.engineInteraction = engineInteraction;
+        this.urlResolver = urlResolver;
+        this.orderingConfig = orderingConfig;
+    }
 
   public List<ExternalTask> fetchAndLock(List<TopicRequestDto> topics)  {
     FetchAndLockRequestDto payload = new FetchAndLockRequestDto(workerId, maxTasks, asyncResponseTimeout,
         topics, usePriority, orderingConfig);
 
-    String resourceUrl = baseUrl + FETCH_AND_LOCK_RESOURCE_PATH;
+    String resourceUrl = getBaseUrl() + FETCH_AND_LOCK_RESOURCE_PATH;
     ExternalTask[] externalTasks = engineInteraction.postRequest(resourceUrl, payload, ExternalTaskImpl[].class);
     return Arrays.asList(externalTasks);
   }
@@ -93,13 +110,13 @@ public class EngineClient {
   public void lock(String taskId, long lockDuration)  {
     LockRequestDto payload = new LockRequestDto(workerId, lockDuration);
     String resourcePath = LOCK_RESOURCE_PATH.replace("{id}", taskId);
-    String resourceUrl = baseUrl + resourcePath;
+    String resourceUrl = getBaseUrl() + resourcePath;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
   public void unlock(String taskId)  {
     String resourcePath = UNLOCK_RESOURCE_PATH.replace("{id}", taskId);
-    String resourceUrl = baseUrl + resourcePath;
+    String resourceUrl = getBaseUrl() + resourcePath;
     engineInteraction.postRequest(resourceUrl, null, Void.class);
   }
 
@@ -109,7 +126,7 @@ public class EngineClient {
 
     CompleteRequestDto payload = new CompleteRequestDto(workerId, typedValueDtoMap, localTypedValueDtoMap);
     String resourcePath = COMPLETE_RESOURCE_PATH.replace("{id}", taskId);
-    String resourceUrl = baseUrl + resourcePath;
+    String resourceUrl = getBaseUrl() + resourcePath;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
@@ -117,7 +134,7 @@ public class EngineClient {
     Map<String, TypedValueField> typedValueDtoMap = typedValues.serializeVariables(variables);
     SetVariablesRequestDto payload = new SetVariablesRequestDto(workerId, typedValueDtoMap);
     String resourcePath = SET_VARIABLES_RESOURCE_PATH.replace("{id}", processId);
-    String resourceUrl = baseUrl + resourcePath;
+    String resourceUrl = getBaseUrl() + resourcePath;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
@@ -128,7 +145,7 @@ public class EngineClient {
 
     FailureRequestDto payload = new FailureRequestDto(workerId, errorMessage, errorDetails, retries, retryTimeout, typedValueDtoMap, localTypedValueDtoMap);
     String resourcePath = FAILURE_RESOURCE_PATH.replace("{id}", taskId);
-    String resourceUrl = baseUrl + resourcePath;
+    String resourceUrl = getBaseUrl() + resourcePath;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
@@ -136,27 +153,27 @@ public class EngineClient {
     Map<String, TypedValueField> typeValueDtoMap = typedValues.serializeVariables(variables);
     BpmnErrorRequestDto payload = new BpmnErrorRequestDto(workerId, errorCode, errorMessage, typeValueDtoMap);
     String resourcePath = BPMN_ERROR_RESOURCE_PATH.replace("{id}", taskId);
-    String resourceUrl = baseUrl + resourcePath;
+    String resourceUrl = getBaseUrl() + resourcePath;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
   public void extendLock(String taskId, long newDuration)  {
     ExtendLockRequestDto payload = new ExtendLockRequestDto(workerId, newDuration);
     String resourcePath = EXTEND_LOCK_RESOURCE_PATH.replace("{id}", taskId);
-    String resourceUrl = baseUrl + resourcePath;
+    String resourceUrl = getBaseUrl() + resourcePath;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
-  public byte[] getLocalBinaryVariable(String variableName, String processInstanceId)  {
-    String resourcePath = baseUrl + GET_LOCAL_BINARY_VARIABLE
-            .replace(ID_PATH_PARAM, processInstanceId)
+  public byte[] getLocalBinaryVariable(String variableName, String executionId)  {
+    String resourcePath =  getBaseUrl()  + GET_BINARY_VARIABLE
+            .replace(ID_PATH_PARAM, executionId)
             .replace(NAME_PATH_PARAM, variableName);
 
     return engineInteraction.getRequest(resourcePath);
   }
 
   public String getBaseUrl() {
-    return baseUrl;
+    return this.urlResolver.getBaseUrl();
   }
 
   public String getWorkerId() {
