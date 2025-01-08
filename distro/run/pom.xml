@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
-    <version>7.22.0-SNAPSHOT</version>
+    <version>7.23.0-SNAPSHOT</version>
     <relativePath>../../database</relativePath>
   </parent>
 
@@ -87,6 +87,7 @@
       <modules>
         <module>modules</module>
         <module>modules/rest</module>
+        <module>modules/oauth2</module>
         <module>modules/example</module>
         <module>core</module>
         <module>assembly</module>

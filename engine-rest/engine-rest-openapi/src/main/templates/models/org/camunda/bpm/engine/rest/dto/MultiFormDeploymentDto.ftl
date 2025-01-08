@@ -17,7 +17,7 @@
         defaultValue = 'false'
         desc = "A flag indicating whether the process engine should perform duplicate checking on a per-resource basis.
                 If set to true, only those resources that have actually changed are deployed.
-                Checks are made against resources included previous deployments of the same name and only against the latest versions of those resources.
+                Checks are made against resources included previous deployments of the same name and source and only against the latest versions of those resources.
                 If set to true, the option enable-duplicate-filtering is overridden and set to true." />
 
     <@lib.property

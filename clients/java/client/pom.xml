@@ -10,20 +10,19 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-external-task-client-root</artifactId>
-    <version>7.22.0-SNAPSHOT</version>
+    <version>7.23.0-SNAPSHOT</version>
   </parent>
 
   <properties>
-    <version.httpclient>5.3</version.httpclient>
     <engine.runtime>${project.build.directory}/camunda-tomcat</engine.runtime>
     <tomcat.runtime>${engine.runtime}/server/apache-tomcat-${version.tomcat}</tomcat.runtime>
     <http.port>${tomcat.connector.http.port}</http.port>
 
-    <tomcat.connector.http.port>48080</tomcat.connector.http.port>
-    <tomcat.connector.http.redirectPort>48443</tomcat.connector.http.redirectPort>
-    <tomcat.connector.ajp.port>48009</tomcat.connector.ajp.port>
-    <tomcat.connector.ajp.redirectPort>48443</tomcat.connector.ajp.redirectPort>
-    <tomcat.server.port>48005</tomcat.server.port>
+    <tomcat.connector.http.port>50080</tomcat.connector.http.port>
+    <tomcat.connector.http.redirectPort>50443</tomcat.connector.http.redirectPort>
+    <tomcat.connector.ajp.port>50009</tomcat.connector.ajp.port>
+    <tomcat.connector.ajp.redirectPort>50443</tomcat.connector.ajp.redirectPort>
+    <tomcat.server.port>50005</tomcat.server.port>
 
     <cargo.timeout>240000</cargo.timeout>
     <cargo.deploy.timeout>60000</cargo.deploy.timeout>
@@ -54,19 +53,17 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-typed-values</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.httpcomponents.client5</groupId>
       <artifactId>httpclient5</artifactId>
-      <version>${version.httpclient}</version>
+      <version>${version.httpclient5}</version>
     </dependency>
 
     <dependency>
@@ -109,7 +106,6 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-all</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
 

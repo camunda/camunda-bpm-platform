@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.22.0-SNAPSHOT</version>
+    <version>7.23.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-qa-old-engine</artifactId>
@@ -12,7 +12,7 @@
   <name>Camunda Platform - QA - test new schema with old engine</name>
 
   <properties>
-    <camunda.old.engine.version>7.21.0</camunda.old.engine.version>
+    <camunda.old.engine.version>7.22.0</camunda.old.engine.version>
   </properties>
 
   <build>
@@ -99,7 +99,7 @@
             <groupId>org.camunda.bpm</groupId>
             <artifactId>camunda-bom</artifactId>
             <!-- Cannot use variables due to bug in Maven Release Plugin -->
-            <version>7.21.0</version>
+            <version>7.22.0</version>
             <scope>import</scope>
             <type>pom</type>
           </dependency>
@@ -227,7 +227,6 @@
         <dependency>
           <groupId>org.camunda.commons</groupId>
           <artifactId>camunda-commons-testing</artifactId>
-          <version>${project.version}</version>
           <scope>test</scope>
         </dependency>
 
@@ -410,6 +409,12 @@
 
                 <exclude>**/ManagementServiceTableCountTest.java</exclude>
 
+                <!-- The test is not relevant in `old-engine` setup since the feature has been removed -->
+                <!-- See https://github.com/camunda/camunda-bpm-platform/pull/4544#discussion_r1728748399 -->
+                <exclude>**/ConcurrentTelemetryConfigurationTest.java</exclude>
+
+                <!-- The test is not relevant in `old-engine` setup and lacks necessary resource files -->
+                <exclude>**DatabaseNamingConsistencyTest.java</exclude>
               </excludes>
               <testFailureIgnore>false</testFailureIgnore>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>

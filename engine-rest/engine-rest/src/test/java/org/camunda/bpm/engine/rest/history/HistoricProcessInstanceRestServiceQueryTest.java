@@ -73,6 +73,8 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
   protected static final String QUERY_PARAM_EXECUTED_ACTIVITY_AFTER = "executedActivityAfter";
   protected static final String QUERY_PARAM_EXECUTED_ACTIVITY_IDS = "executedActivityIdIn";
   protected static final String QUERY_PARAM_ACTIVE_ACTIVITY_IDS = "activeActivityIdIn";
+  protected static final String QUERY_PARAM_INCIDENT_IDS = "incidentIdIn";
+  protected static final String QUERY_PARAM_ACTIVE_OR_FAILING_ACTIVITY_IDS = "activityIdIn";
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
@@ -429,6 +431,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
     String returnedTenantId = from(content).getString("[0].tenantId");
     String returnedState = from(content).getString("[0].state");
+    String restartedProcessInstanceId = from(content).getString("[0].restartedProcessInstanceId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY, returnedProcessInstanceBusinessKey);
@@ -449,6 +452,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID, returnedCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STATE, returnedState);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, restartedProcessInstanceId);
   }
 
   @Test
@@ -2314,6 +2318,61 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
         .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).rootProcessInstances();
+  }
+  @Test
+  public void testQueryByIncidentIdIn() {
+    given()
+        .queryParam(QUERY_PARAM_INCIDENT_IDS, "1,2")
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).incidentIdIn("1", "2");
+  }
+
+  @Test
+  public void testQueryByIncidentIdInAsPost() {
+    Map<String, List<String>> parameters = new HashMap<String, List<String>>();
+    parameters.put(QUERY_PARAM_INCIDENT_IDS, Arrays.asList("1", "2"));
+
+    given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).incidentIdIn("1", "2");
+  }
+
+  @Test
+  public void testQueryByActivityIdIn() {
+    given()
+        .queryParam(QUERY_PARAM_ACTIVE_OR_FAILING_ACTIVITY_IDS, "1,2")
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).activityIdIn("1", "2");
+  }
+
+  @Test
+  public void testQueryByActivityIdInAsPost() {
+    Map<String, List<String>> parameters = new HashMap<String, List<String>>();
+    parameters.put(QUERY_PARAM_ACTIVE_OR_FAILING_ACTIVITY_IDS, Arrays.asList("1", "2"));
+
+    given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).activityIdIn("1", "2");
   }
 
 }

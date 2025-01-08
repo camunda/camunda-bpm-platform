@@ -118,4 +118,9 @@ public interface HistoricProcessInstance {
    *  STATE_INTERNALLY_TERMINATED - terminated internally, for instance by terminating boundary event
    */
   String getState();
+
+  /**
+   * The id of the original process instance which was restarted.
+  */
+  String getRestartedProcessInstanceId();
 }

@@ -92,26 +92,48 @@ mvn jetty:run -Pdevelop
 npm run start
 ```
 
-#### AngularJS libraries from XLTS.dev
+#### Extended Support libraries from HeroDevs
 
-Since December 31, 2021, AngularJS is no longer officially supported by the original maintainers (Google). We replaced the official AngularJS libraries with the ones from [XLTS.dev](https://XLTS.dev) to ensure that our used libraries stay secure and supported. We include the AngularJS libraries from XLTS.dev in our Community Edition releases from 7.18.0-alpha2 on.
+##### AngularJS
+Since December 31, 2021, AngularJS is no longer officially supported by the original maintainers (Google). We replaced the official AngularJS libraries with the ones from [HeroDevs](https://www.herodevs.com/) to ensure that our used libraries stay secure and supported. We include the AngularJS libraries from HeroDevs in our Community Edition releases from 7.18.0-alpha2 on.
 
-**Heads-up:** If you build the Webapps from source code, the build includes the no longer maintained AngularJS libraries in version 1.8.2 unless you have access to the XLTS.dev registry and configure it as shown below.
+**Heads-up:** If you build the Webapps from source code, the build includes the no longer maintained AngularJS libraries in version 1.8.2 unless you have access to the HeroDevs registry and configure it as shown below.
 
-To enable pulling the XLTS.dev AngularJS libraries while building the Webapps, please configure the npm registry. Add the XLTS.dev npm registry by replacing the variables `${XLTS_REGISTRY}` and `${XLTS_AUTH_TOKEN}` in the following commands and execute the commands in your terminal.
+##### Bootstrap
+Since December 31, 2021, the legacy Bootstrap 3 library is no longer officially supported by the original maintainers (twbs Bootstrap). We replaced the official Bootstrap 3 libraries with the ones from [HeroDevs](https://www.herodevs.com/) to ensure that our used libraries stay secure and supported. We include the Bootstrap 3 libraries from HeroDevs in our Community Edition releases from 7.23.0-alpha2 on.
 
-Commands to configure the XLTS.dev npm registry:
+**Heads-up:** If you build the Webapps from source code, the build includes the no longer maintained Bootstrap 3 libraries in version 3.4.1 unless you have access to the HeroDevs registry and configure it as shown below.
+
+#### angular-ui-bootstrap
+The angular-ui-bootstrap project is no longer being maintained. We replaced the official angular-ui-bootstrap libraries with the ones from [HeroDevs](https://www.herodevs.com/) to ensure that our used libraries stay secure and supported. We include the angular-ui-bootstrap libraries from HeroDevs in our Community Edition releases from 7.23.0-alpha2 on.
+
+**Heads-up:** If you build the Webapps from source code, the build includes the no longer maintained angular-ui-bootstrap libraries in version 2.5.6 unless you have access to the HeroDevs registry and configure it as shown below.
+
+#### angular-translate
+Since 2024-01-15 the angular-translate project has been archived. We replaced the official angular-translate libraries with the ones from [HeroDevs](https://www.herodevs.com/) to ensure that our used libraries stay secure and supported. We include the angular-translate libraries from HeroDevs in our Community Edition releases from 7.23.0-alpha2 on.
+
+**Heads-up:** If you build the Webapps from source code, the build includes the no longer maintained angular-translate libraries in version 2.19.0 unless you have access to the HeroDevs registry and configure it as shown below.
+
+#### angular-moment
+The angular-moment project has been archived on Nov 30, 2021. We replaced the official angular-moment libraries with the ones from [HeroDevs](https://www.herodevs.com/) to ensure that our used libraries stay secure and supported. We include the angular-moment libraries from HeroDevs in our Community Edition releases from 7.23.0-alpha2 on.
+
+**Heads-up:** If you build the Webapps from source code, the build includes the no longer maintained angular-moment libraries in version 1.3.0 unless you have access to the HeroDevs registry and configure it as shown below.
+
+##### Configure the HeroDevs registry
+To enable pulling the HeroDevs extended support libraries while building the Webapps, please configure the npm registry. Add the HeroDevs npm registry by replacing the variables `${HERODEVS_REGISTRY}` and `${HERODEVS_AUTH_TOKEN}` in the following commands and execute the commands in your terminal.
+
+Commands to configure the HeroDevs npm registry:
 
 ```
-npm set @xlts.dev:registry https://${XLTS_REGISTRY}/
-npm set //${XLTS_REGISTRY}/:_authToken ${XLTS_AUTH_TOKEN}
+npm set @neverendingsupport:registry=https://${HERODEVS_REGISTRY}/
+npm set //${HERODEVS_REGISTRY}/:_authToken ${HERODEVS_AUTH_TOKEN}
 ```
 
 Alternatively, you can set the following environment variables:
 
 ```sh
-export XLTS_REGISTRY = "example.com" # Hostname without protocol (e.g., "https://"), leading or trailing slashes
-export XLTS_AUTH_TOKEN = "abc..."    # Token to authenticate against the registry
+export HERODEVS_REGISTRY = "example.com" # Hostname without protocol (e.g., "https://"), leading or trailing slashes
+export HERODEVS_AUTH_TOKEN = "abc..."    # Token to authenticate against the registry
 ```
 
 You receive the information about the registry and the auth token directly from XLTS.dev.

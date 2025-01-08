@@ -659,13 +659,13 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     Connection connection = null;
     PreparedStatement prepStat = null;
     ResultSet tablesRs = null;
-    String selectTableNamesFromOracle = "SELECT table_name FROM all_tables WHERE table_name LIKE ?";
+    String selectTableNamesFromOracle = "SELECT table_name FROM all_tables WHERE table_name LIKE ? ESCAPE '-'";
     String databaseTablePrefix = getDbSqlSessionFactory().getDatabaseTablePrefix();
 
     try {
       connection = Context.getProcessEngineConfiguration().getDataSource().getConnection();
       prepStat = connection.prepareStatement(selectTableNamesFromOracle);
-      prepStat.setString(1, databaseTablePrefix + "ACT_%");
+      prepStat.setString(1, databaseTablePrefix + "ACT-_%");
 
       tablesRs = prepStat.executeQuery();
       while (tablesRs.next()) {

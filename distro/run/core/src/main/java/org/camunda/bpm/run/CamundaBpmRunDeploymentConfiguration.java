@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.run;
 
+import org.apache.commons.lang3.StringUtils;
+import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultDeploymentConfiguration;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,23 +31,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
-import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultDeploymentConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-
 public class CamundaBpmRunDeploymentConfiguration extends DefaultDeploymentConfiguration {
 
-  public static final String CAMUNDA_DEPLOYMENT_DIR_PROPERTY = "camunda.deploymentDir";
+  private final String deploymentDir;
 
-  @Autowired
-  private Environment env;
+  public CamundaBpmRunDeploymentConfiguration(String deploymentDir) {
+    this.deploymentDir = deploymentDir;
+  }
 
   @Override
   public Set<Resource> getDeploymentResources() {
-    String deploymentDir = env.getProperty(CAMUNDA_DEPLOYMENT_DIR_PROPERTY);
     if (!StringUtils.isEmpty(deploymentDir)) {
       Path resourceDir = Paths.get(deploymentDir);
 
@@ -52,5 +51,14 @@ public class CamundaBpmRunDeploymentConfiguration extends DefaultDeploymentConfi
       }
     }
     return Collections.emptySet();
+  }
+
+  protected String getNormalizedDeploymentDir() {
+    String result = deploymentDir;
+
+    if(File.separator.equals("\\")) {
+      result = result.replace("\\", "/");
+    }
+    return result;
   }
 }

@@ -36,19 +36,25 @@ pipeline {
       }
       steps {
         cambpmConditionalRetry([
-          agentLabel: 'h2_perf32',
+          podSpec: [
+            cpu: 32,
+            images: ['maven:3.9.7-eclipse-temurin-17']
+            ],
           suppressErrors: false,
           runSteps: {
+            sh(label: 'GIT: Mark current directory as safe', script: "git config --global --add safe.directory \$PWD")
             skipTests = ""
+
             if (env.CHANGE_ID != null && pullRequest.labels.contains('ci:skipTests')) {
                skipTests = "-DskipTests "
             }
+
             withVault([vaultSecrets: [
                 [
-                    path        : 'secret/products/cambpm/ci/xlts.dev',
+                    path        : 'secret/products/cambpm/ci/hero-devs',
                     secretValues: [
-                        [envVar: 'XLTS_REGISTRY', vaultKey: 'registry'],
-                        [envVar: 'XLTS_AUTH_TOKEN', vaultKey: 'authToken']]
+                        [envVar: 'HERODEVS_REGISTRY', vaultKey: 'registry'],
+                        [envVar: 'HERODEVS_AUTH_TOKEN', vaultKey: 'authToken']]
                 ]]]) {
               cambpmRunMaven('.',
                   'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true '+ skipTests,
@@ -68,6 +74,7 @@ pipeline {
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war')
+
             if (env.CHANGE_ID != null && pullRequest.labels.contains('ci:distro')) {
               cambpmArchiveArtifacts(
                      '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-*.zip',

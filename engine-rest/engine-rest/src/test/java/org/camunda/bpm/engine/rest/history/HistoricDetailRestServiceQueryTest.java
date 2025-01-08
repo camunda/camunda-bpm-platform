@@ -16,8 +16,32 @@
  */
 package org.camunda.bpm.engine.rest.history;
 
+import static io.restassured.RestAssured.expect;
+import static io.restassured.RestAssured.given;
+import static io.restassured.path.json.JsonPath.from;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricFormField;
@@ -41,31 +65,6 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static io.restassured.RestAssured.expect;
-import static io.restassured.RestAssured.given;
-import static io.restassured.path.json.JsonPath.from;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
 /**
  * @author Roman Smirnov
  * @author Nikola Koevski
@@ -88,7 +87,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
 
   @Before
   public void setUpRuntimeData() {
-    List<HistoricDetail> details = new ArrayList<HistoricDetail>();
+    List<HistoricDetail> details = new ArrayList<>();
 
     historicUpdateBuilder = MockProvider.mockHistoricVariableUpdate();
     historicUpdateMock = historicUpdateBuilder.build();
@@ -258,7 +257,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
   }
 
   protected void executeAndVerifySortingAsPost(List<Map<String, Object>> sortingJson, Status expectedStatus) {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("sorting", sortingJson);
 
     given()
@@ -616,7 +615,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     MockHistoricVariableUpdateBuilder builder = MockProvider.mockHistoricVariableUpdate()
         .typedValue(serializedValue);
 
-    List<HistoricDetail> details = new ArrayList<HistoricDetail>();
+    List<HistoricDetail> details = new ArrayList<>();
     details.add(builder.build());
 
     // GET
@@ -665,7 +664,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
             .objectTypeName("aRootType")
             .create());
 
-    List<HistoricDetail> details = new ArrayList<HistoricDetail>();
+    List<HistoricDetail> details = new ArrayList<>();
     details.add(builder.build());
 
     // GET
@@ -726,7 +725,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     reset(mockedQuery);
 
     // POST
-    Map<String, String> jsonBody = new HashMap<String, String>();
+    Map<String, String> jsonBody = new HashMap<>();
     jsonBody.put("processInstanceId", processInstanceId);
 
     given()
@@ -760,7 +759,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     reset(mockedQuery);
 
     // POST
-    Map<String, String> jsonBody = new HashMap<String, String>();
+    Map<String, String> jsonBody = new HashMap<>();
     jsonBody.put("executionId", executionId);
 
     given()
@@ -794,7 +793,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     reset(mockedQuery);
 
     // POST
-    Map<String, String> jsonBody = new HashMap<String, String>();
+    Map<String, String> jsonBody = new HashMap<>();
     jsonBody.put("userOperationId", operationId);
 
     given()
@@ -828,7 +827,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     reset(mockedQuery);
 
     // POST
-    Map<String, String> jsonBody = new HashMap<String, String>();
+    Map<String, String> jsonBody = new HashMap<>();
     jsonBody.put("activityInstanceId", activityInstanceId);
 
     given()
@@ -862,7 +861,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     reset(mockedQuery);
 
     // POST
-    Map<String, String> jsonBody = new HashMap<String, String>();
+    Map<String, String> jsonBody = new HashMap<>();
     jsonBody.put("taskId", taskId);
 
     given()
@@ -896,7 +895,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     reset(mockedQuery);
 
     // POST
-    Map<String, String> jsonBody = new HashMap<String, String>();
+    Map<String, String> jsonBody = new HashMap<>();
     jsonBody.put("variableInstanceId", variableInstanceId);
 
     given()
@@ -931,7 +930,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     reset(mockedQuery);
 
     // POST
-    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    Map<String, Object> jsonBody = new HashMap<>();
     String[] variableTypeIn = { aVariableType, anotherVariableType};
     jsonBody.put("variableTypeIn", variableTypeIn);
 
@@ -946,6 +945,43 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
       .post(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).variableTypeIn(aVariableType, anotherVariableType);
+  }
+
+  @Test
+  public void shouldQueryByVariableNameLike_GET() {
+    String variableNameLike = "foo%";
+
+    // GET
+    given()
+      .queryParam("variableNameLike", variableNameLike)
+      .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).variableNameLike(variableNameLike);
+  }
+
+  @Test
+  public void shouldQueryByVariableNameLike_POST() {
+    String variableNameLike = "foo%";
+
+    // POST
+    Map<String, Object> jsonBody = new HashMap<>();
+    jsonBody.put("variableNameLike", variableNameLike);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(jsonBody)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).variableNameLike(variableNameLike);
   }
 
   @Test
@@ -964,7 +1000,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     reset(mockedQuery);
 
     // POST
-    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    Map<String, Object> jsonBody = new HashMap<>();
     jsonBody.put("formFields", true);
 
     given()
@@ -996,7 +1032,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     reset(mockedQuery);
 
     // POST
-    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    Map<String, Object> jsonBody = new HashMap<>();
     jsonBody.put("variableUpdates", true);
 
     given()
@@ -1028,7 +1064,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     reset(mockedQuery);
 
     // POST
-    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    Map<String, Object> jsonBody = new HashMap<>();
     jsonBody.put("excludeTaskDetails", true);
 
     given()
@@ -1059,7 +1095,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     reset(mockedQuery);
 
     // POST
-    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    Map<String, Object> jsonBody = new HashMap<>();
     jsonBody.put("caseInstanceId", MockProvider.EXAMPLE_CASE_INSTANCE_ID);
 
     given()
@@ -1091,7 +1127,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     reset(mockedQuery);
 
     // POST
-    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    Map<String, Object> jsonBody = new HashMap<>();
     jsonBody.put("caseExecutionId", MockProvider.EXAMPLE_CASE_EXECUTION_ID);
 
     given()
@@ -1131,7 +1167,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     mockedQuery = setUpMockedDetailsQuery(createMockHistoricDetailsTwoTenants());
 
     // POST
-    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    Map<String, Object> jsonBody = new HashMap<>();
     String[] exampleTenantIdList = {MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID};
     jsonBody.put("tenantIdIn", exampleTenantIdList);
     jsonBody.put("variableUpdates", true);
@@ -1158,7 +1194,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
   @Test
   public void testQueryWithoutTenantIdQueryParameter() {
     // given
-    List<HistoricDetail> details = new ArrayList<HistoricDetail>();
+    List<HistoricDetail> details = new ArrayList<>();
 
     historicUpdateBuilder = MockProvider.mockHistoricVariableUpdate(null);
     historicUpdateMock = historicUpdateBuilder.build();
@@ -1192,7 +1228,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
   @Test
   public void testQueryWithoutTenantIdPostParameter() {
     // given
-    List<HistoricDetail> details = new ArrayList<HistoricDetail>();
+    List<HistoricDetail> details = new ArrayList<>();
 
     historicUpdateBuilder = MockProvider.mockHistoricVariableUpdate(null);
     historicUpdateMock = historicUpdateBuilder.build();
@@ -1261,7 +1297,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     reset(mockedQuery);
 
      // POST
-     Map<String, Object> jsonBody = new HashMap<String, Object>();
+     Map<String, Object> jsonBody = new HashMap<>();
      String[] processInstanceIdIn = {aProcessInstanceId, anotherProcessInstanceId};
      jsonBody.put("processInstanceIdIn", processInstanceIdIn);
 
@@ -1296,7 +1332,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     reset(mockedQuery);
 
     // POST
-    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    Map<String, Object> jsonBody = new HashMap<>();
     jsonBody.put("occurredBefore", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME);
 
     given()
@@ -1330,7 +1366,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     reset(mockedQuery);
 
     // POST
-    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    Map<String, Object> jsonBody = new HashMap<>();
     jsonBody.put("occurredAfter", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME);
 
     given()

@@ -123,6 +123,12 @@
     "desc": "Only include process instances which have a root incident. Value may only be `true`, as `false` is the default behavior."
   },
 
+  "incidentIdIn": {
+    "type": "array",
+    "itemType": "string",
+    "desc": "Restrict to instances that have an incident with one of the given ids. ${listTypeDescription}"
+  },
+
   "incidentType": {
     "type": "string",
     "desc": "Filter by the incident type. See the [User Guide](${docsUrl}/user-guide/process-engine/incidents/#incident-types) for a list of incident types."
@@ -229,6 +235,12 @@
   "withoutTenantId": {
     "type": "boolean",
     "desc": "Only include historic process instances which belong to no tenant. Value may only be `true`, as `false` is the default behavior."
+  },
+
+  "activityIdIn": {
+    "type": "array",
+    "itemType": "string",
+    "desc": "Restrict to instances with an active activity with one of the given ids. In contrast to the `activeActivityIdIn` filter, it can query for async and incident activities. ${listTypeDescription}"
   },
 
   "executedActivityIdIn": {

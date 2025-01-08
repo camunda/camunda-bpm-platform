@@ -63,6 +63,8 @@ public class HistoricJobLogEvent extends HistoryEvent {
 
   protected String hostname;
 
+  protected String batchId;
+
   public Date getTimestamp() {
     return timestamp;
   }
@@ -235,4 +237,11 @@ public class HistoricJobLogEvent extends HistoryEvent {
     this.failedActivityId = failedActivityId;
   }
 
+  public String getBatchId() {
+    return batchId;
+  }
+
+  public void setBatchId(String batchId) {
+    this.batchId = batchId;
+  }
 }

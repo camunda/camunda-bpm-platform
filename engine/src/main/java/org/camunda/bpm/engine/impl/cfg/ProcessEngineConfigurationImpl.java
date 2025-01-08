@@ -41,7 +41,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import javax.naming.InitialContext;
-import javax.script.ScriptEngineManager;
 import javax.sql.DataSource;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
@@ -339,6 +338,7 @@ import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultDeserializationTypeValidator;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.BeansResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.CamundaScriptEngineManager;
 import org.camunda.bpm.engine.impl.scripting.engine.DefaultScriptEngineResolver;
 import org.camunda.bpm.engine.impl.scripting.engine.ResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptBindingsFactory;
@@ -390,7 +390,7 @@ import org.camunda.bpm.engine.variable.Variables;
  */
 public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfiguration {
 
-  protected final static ConfigurationLogger LOG = ConfigurationLogger.CONFIG_LOGGER;
+  protected static ConfigurationLogger LOG = ConfigurationLogger.CONFIG_LOGGER;
 
   public static final String DB_SCHEMA_UPDATE_CREATE = "create";
   public static final String DB_SCHEMA_UPDATE_DROP_CREATE = "drop-create";
@@ -413,6 +413,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected static final String PRODUCT_NAME = "Camunda BPM Runtime";
 
   public static SqlSessionFactory cachedSqlSessionFactory;
+
+  protected static final Map<Integer, String> ISOLATION_LEVEL_CONSTANT_NAMES = Map.of(
+      Connection.TRANSACTION_READ_COMMITTED, "READ_COMMITTED",
+      Connection.TRANSACTION_READ_UNCOMMITTED, "READ_UNCOMMITTED",
+      Connection.TRANSACTION_REPEATABLE_READ, "REPEATABLE_READ",
+      Connection.TRANSACTION_SERIALIZABLE, "SERIALIZABLE");
 
   // SERVICES /////////////////////////////////////////////////////////////////
 
@@ -601,6 +607,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableScriptEngineLoadExternalResources = false;
   protected boolean enableScriptEngineNashornCompatibility = false;
   protected boolean configureScriptEngineHostAccess = true;
+  protected boolean skipIsolationLevelCheck = false;
 
   /**
    * When set to false, the following behavior changes:
@@ -1681,8 +1688,32 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       }
     }
 
+    if (dataSource != null) {
+      checkTransactionIsolationLevel();
+    }
+
     if (databaseType == null) {
       initDatabaseType();
+    }
+  }
+
+  protected void checkTransactionIsolationLevel() {
+    Integer currentIsolationLevel = getCurrentTransactionIsolationLevel();
+    if (currentIsolationLevel != null && currentIsolationLevel != Connection.TRANSACTION_READ_COMMITTED) {
+      String isolationLevelName = ISOLATION_LEVEL_CONSTANT_NAMES.get(currentIsolationLevel);
+      if (skipIsolationLevelCheck) {
+        LOG.logSkippedIsolationLevelCheck(isolationLevelName);
+      } else {
+        throw LOG.invalidTransactionIsolationLevel(isolationLevelName);
+      }
+    }
+  }
+
+  protected Integer getCurrentTransactionIsolationLevel() {
+    try (Connection connection = dataSource.getConnection()) {
+      return connection.getTransactionIsolation();
+    } catch (SQLException e) {
+      return null;
     }
   }
 
@@ -1910,6 +1941,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       properties.put("authJoin1Separator", DbSqlSessionFactory.databaseSpecificAuth1JoinSeparator.get(databaseType));
 
       properties.put("extractTimeUnitFromDate", DbSqlSessionFactory.databaseSpecificExtractTimeUnitFromDate.get(databaseType));
+      properties.put("authCheckMethodSuffix", DbSqlSessionFactory.databaseSpecificAuthCheckMethodSuffix.getOrDefault(databaseType, ""));
 
       Map<String, String> constants = DbSqlSessionFactory.dbSpecificConstants.get(databaseType);
       for (Entry<String, String> entry : constants.entrySet()) {
@@ -2610,7 +2642,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       resolverFactories.add(new BeansResolverFactory());
     }
     if (scriptEngineResolver == null) {
-      scriptEngineResolver = new DefaultScriptEngineResolver(new ScriptEngineManager());
+      scriptEngineResolver = new DefaultScriptEngineResolver(new CamundaScriptEngineManager());
     }
     if (scriptingEngines == null) {
       scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(resolverFactories), scriptEngineResolver);
@@ -3535,6 +3567,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setBeans(Map<Object, Object> beans) {
     this.beans = beans;
+  }
+
+  public boolean getSkipIsolationLevelCheck() {
+    return this.skipIsolationLevelCheck;
+  }
+
+  public ProcessEngineConfigurationImpl setSkipIsolationLevelCheck(boolean skipIsolationLevelCheck) {
+    this.skipIsolationLevelCheck = skipIsolationLevelCheck;
+    return this;
   }
 
   @Override

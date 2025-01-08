@@ -137,4 +137,20 @@ public class ConfigurationLogger extends ProcessEngineLogger {
         + "* Set a default historyTimeToLive as a global process engine configuration\n"
         + "* (Not recommended) Deactivate the enforceTTL config to disable this check"));
   }
+
+  public ProcessEngineException invalidTransactionIsolationLevel(String transactionIsolationLevel) {
+    return new ProcessEngineException(exceptionMessage("019",
+        "The transaction isolation level set for the database is '{}' which differs from the recommended value. "
+            + "Please change the isolation level to 'READ_COMMITTED' or set property 'skipIsolationLevelCheck' to true. "
+            + "Please keep in mind that some levels are known to cause deadlocks and other unexpected behaviours.",
+        transactionIsolationLevel));
+
+  }
+
+  public void logSkippedIsolationLevelCheck(String transactionIsolationLevel) {
+    logWarn("020", "The transaction isolation level set for the database is '{}' which differs from the recommended value "
+            + "and property skipIsolationLevelCheck is enabled. "
+            + "Please keep in mind that levels different from 'READ_COMMITTED' are known to cause deadlocks and other unexpected behaviours.",
+        transactionIsolationLevel);
+  }
 }

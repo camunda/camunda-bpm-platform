@@ -68,6 +68,7 @@
                      "description": "Logical query: assignee = \\"John Munda\\" AND (name = \\"Approve Invoice\\" OR priority = 5) AND (suspended = false OR taskDefinitionKey = \\"approveInvoice\\")",
                      "value": {
                        "assignee": "John Munda",
+                       "withCommentAttachmentInfo": "true",
                        "orQueries": [
                          {
                            "name": "Approve Invoice",
@@ -86,7 +87,7 @@
 
     <@lib.response
         code = "200"
-        dto = "TaskDto"
+        dto = "TaskWithAttachmentAndCommentDto"
         array = true
         desc = "Request successful."
         examples = ['"example-1": {
@@ -150,7 +151,9 @@
                            "suspended": false,
                            "formKey": "embedded:app:develop/invoice-forms/approve-invoice.html",
                            "tenantId": null,
-                           "taskState": "aTaskState"
+                           "taskState": "aTaskState",
+                           "attachment":false,
+                           "comment":false
                          }
                        ]
                      }'

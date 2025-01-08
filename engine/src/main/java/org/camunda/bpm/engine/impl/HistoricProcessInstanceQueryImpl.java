@@ -91,7 +91,9 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected boolean isTenantIdSet;
   protected String[] executedActivityIds;
   protected String[] activeActivityIds;
+  protected String[] activityIds;
   protected String state;
+  protected String[] incidentIds;
 
   protected String caseInstanceId;
 
@@ -177,6 +179,12 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public HistoricProcessInstanceQuery withRootIncidents() {
     this.withRootIncidents = true;
+    return this;
+  }
+  
+  public HistoricProcessInstanceQuery incidentIdIn(String... incidentIds) {
+    ensureNotNull("incidentIds", (Object[]) incidentIds);
+    this.incidentIds = incidentIds;
     return this;
   }
 
@@ -471,6 +479,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     return activeActivityIds;
   }
 
+  public String[] getActivityIds() {
+    return activityIds;
+  }
+
   public String getBusinessKey() {
     return businessKey;
   }
@@ -730,6 +742,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     return tenantIds;
   }
 
+  public String[] getIncidentIds() {
+    return incidentIds;
+  }
+
   @Override
   public HistoricProcessInstanceQuery executedActivityAfter(Date date) {
     this.executedActivityAfter = date;
@@ -767,6 +783,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     ensureNotNull(BadUserRequestException.class, "activity ids", (Object[]) ids);
     ensureNotContainsNull(BadUserRequestException.class, "activity ids", Arrays.asList(ids));
     this.activeActivityIds = ids;
+    return this;
+  }
+
+  @Override
+  public HistoricProcessInstanceQuery activityIdIn(String... ids) {
+    ensureNotNull(BadUserRequestException.class, "activity ids", (Object[]) ids);
+    ensureNotContainsNull(BadUserRequestException.class, "activity ids", Arrays.asList(ids));
+    this.activityIds = ids;
     return this;
   }
 

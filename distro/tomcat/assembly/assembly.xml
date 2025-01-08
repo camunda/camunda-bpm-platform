@@ -111,6 +111,7 @@
         <include>org.camunda.bpm.model:*:jar</include>
 
         <include>org.camunda.bpm.dmn:*:jar</include>
+        <include>org.camunda.bpm.juel:*:jar</include>
 
         <include>org.camunda.feel:*:jar</include>
 

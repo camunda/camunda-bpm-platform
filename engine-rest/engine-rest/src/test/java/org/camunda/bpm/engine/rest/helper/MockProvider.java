@@ -198,11 +198,20 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TASK_DEFINITION_KEY = "aTaskDefinitionKey";
   public static final boolean EXAMPLE_TASK_SUSPENSION_STATE = false;
 
+  public static final boolean EXAMPLE_TASK_ATTACHMENT_STATE = false;
+
+  public static final boolean EXAMPLE_TASK_COMMENT_STATE = false;
+
   // task comment
   public static final String EXAMPLE_TASK_COMMENT_ID = "aTaskCommentId";
   public static final String EXAMPLE_TASK_COMMENT_FULL_MESSAGE = "aTaskCommentFullMessage";
   public static final String EXAMPLE_TASK_COMMENT_TIME = withTimezone("2014-04-24T14:10:44");
   public static final String EXAMPLE_TASK_COMMENT_ROOT_PROCESS_INSTANCE_ID = "aRootProcInstId";
+
+  //process instance comment
+  public static final String EXAMPLE_PROCESS_INSTANCE_COMMENT_ID = "aProcessInstanceCommentId";
+  public static final String EXAMPLE_PROCESS_INSTANCE_COMMENT_FULL_MESSAGE = "aProcessInstanceCommentFullMessage";
+
 
   // task attachment
   public static final String EXAMPLE_TASK_ATTACHMENT_ID = "aTaskAttachmentId";
@@ -1057,7 +1066,11 @@ public abstract class MockProvider {
       .caseExecutionId(EXAMPLE_CASE_EXECUTION_ID)
       .formKey(EXAMPLE_FORM_KEY)
       .camundaFormRef(EXAMPLE_FORM_KEY, EXAMPLE_FORM_REF_BINDING, EXAMPLE_FORM_REF_VERSION)
-      .tenantId(EXAMPLE_TENANT_ID).taskState(EXAMPLE_HISTORIC_TASK_STATE);
+      .tenantId(EXAMPLE_TENANT_ID)
+      .taskState(EXAMPLE_HISTORIC_TASK_STATE)
+      .tenantId(EXAMPLE_TENANT_ID)
+      .hasAttachment(EXAMPLE_TASK_ATTACHMENT_STATE)
+      .hasComment(EXAMPLE_TASK_COMMENT_STATE);
   }
 
   public static List<Task> createMockTasks() {
@@ -1860,7 +1873,8 @@ public abstract class MockProvider {
       .priority(EXAMPLE_JOB_PRIORITY)
       .jobDefinitionId(EXAMPLE_JOB_DEFINITION_ID)
       .createTime(DateTimeUtil.parseDate(EXAMPLE_JOB_CREATE_TIME))
-      .failedActivityId(EXAMPLE_JOB_FAILED_ACTIVITY_ID);
+      .failedActivityId(EXAMPLE_JOB_FAILED_ACTIVITY_ID)
+      .batchId(EXAMPLE_BATCH_ID);
   }
 
   public static List<Job> createMockJobs() {
@@ -2183,6 +2197,7 @@ public abstract class MockProvider {
     when(mock.getCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID);
     when(mock.getTenantId()).thenReturn(tenantId);
     when(mock.getState()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_STATE);
+    when(mock.getRestartedProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
 
     return mock;
   }
@@ -2976,6 +2991,7 @@ public abstract class MockProvider {
     when(mock.getTenantId()).thenReturn(tenantId);
     when(mock.getRootProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_ROOT_PROC_INST_ID);
     when(mock.getHostname()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_HOSTNAME);
+    when(mock.getBatchId()).thenReturn(EXAMPLE_BATCH_ID);
 
     when(mock.isCreationLog()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_IS_CREATION_LOG);
     when(mock.isFailureLog()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_IS_FAILURE_LOG);
