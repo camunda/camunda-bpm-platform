@@ -34,10 +34,44 @@ public interface ExternalTaskClientBuilder {
   /**
    * Base url of the Camunda BPM Platform REST API. This information is mandatory.
    *
+   * If this method is used, it will create a permanent url resolver with the given baseUrl.
+   *
    * @param baseUrl of the Camunda BPM Platform REST API
    * @return the builder
    */
   ExternalTaskClientBuilder baseUrl(String baseUrl);
+
+
+  /**
+   * Url resolver of the Camunda BPM Platform REST API. This information is mandatory.
+   *
+   * If the server is in a cluster or you are using spring cloud, you can create a class which implements UrlResolver..
+   *
+   * this is a sample for spring cloud DiscoveryClient
+   *
+   * public class CustomUrlResolver implements UrlResolver{
+   *
+   *    protected String serviceId;
+   *
+   *    protected DiscoveryClient discoveryClient;
+   *
+   *    protected String getRandomServiceInstance() {
+   *      List<ServiceInstance> serviceInstances = discoveryClient.getInstances(serviceId);
+   *      Random random = new Random();
+   *      return serviceInstances.get(random.nextInt(serviceInstances.size())).getUri().toString();
+   *    }
+   *
+   *    @Override
+   *    public String getBaseUrl() {
+   *      return getRandomServiceInstance();
+   *    }
+   * }
+   *
+   *
+   * @param urlResolver of the Camunda BPM Platform REST API
+   * @return the builder
+   */
+  ExternalTaskClientBuilder urlResolver(UrlResolver urlResolver);
 
   /**
    * A custom worker id the Workflow Engine is aware of. This information is optional.
