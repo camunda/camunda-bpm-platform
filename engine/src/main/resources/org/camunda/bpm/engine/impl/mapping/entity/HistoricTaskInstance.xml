@@ -738,6 +738,7 @@
       <if test="parameter.finishedAfter == null and parameter.finishedAt == null">
         and RES.END_TIME_ is not null
       </if>
+      and TASK_DEF_KEY_ is not null
     </where>
 
     ORDER BY RES.END_TIME_ ASC
@@ -758,6 +759,7 @@
         and RES.START_TIME_ = #{parameter.startedAt}
       </if>
       and RES.END_TIME_ is null
+      and TASK_DEF_KEY_ is not null
     </where>
 
     ORDER BY RES.START_TIME_ ASC
