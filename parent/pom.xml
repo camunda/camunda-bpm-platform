@@ -63,8 +63,8 @@
     <version.wildfly26>26.0.1.Final</version.wildfly26>
     <version.wildfly26.core>18.0.4.Final</version.wildfly26.core>
 
-    <version.tomcat9>9.0.90</version.tomcat9>
-    <version.tomcat>10.1.30</version.tomcat>
+    <version.tomcat9>9.0.98</version.tomcat9>
+    <version.tomcat>10.1.34</version.tomcat>
 
     <version.arquillian>1.1.10.Final</version.arquillian>
     <version.shrinkwrap.resolvers>2.2.2</version.shrinkwrap.resolvers>
