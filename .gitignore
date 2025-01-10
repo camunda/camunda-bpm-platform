@@ -21,5 +21,9 @@ faces-config.NavData
 **/overlays
 **/node_modules
 camunda-h2-dbs
+.factorypath
 
 *.DS_Store
+
+# zed editor
+.zed
