@@ -80,6 +80,7 @@ import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
@@ -1766,7 +1767,10 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     if (variables != null && !variables.isEmpty()) {
       activityExecution.setVariables(variables);
     }
-    EscalationHandler.propagateEscalation(activityExecution, escalationCode);
+
+    // TODO: why are there two sources for variables here? which one is optimal?
+    TypedValue escalationData = activityExecution.getVariableTyped(EscalationHandler.ESCALATION_DATA_VARIABLE);
+    EscalationHandler.propagateEscalation(activityExecution, escalationCode, escalationData);
   }
 
   public static enum TaskState {

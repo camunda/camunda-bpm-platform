@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.bpmn.parser.EscalationEventDefinition;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * The activity behavior for an intermediate throwing escalation event and an escalation end event.
@@ -41,7 +42,12 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
   public void execute(ActivityExecution execution) throws Exception {
     final PvmActivity currentActivity = execution.getActivity();
 
-    EscalationEventDefinition escalationEventDefinition = EscalationHandler.executeEscalation(execution, escalation.getEscalationCode());
+    // A "magic" variable that is set by an execution listener, and then follows the event as it
+    // propagates up the hierarchy. This is used to pass data from the throwing event to the catching
+    // event.
+    TypedValue escalationData = execution.getVariableTyped(EscalationHandler.ESCALATION_DATA_VARIABLE);
+
+    EscalationEventDefinition escalationEventDefinition = EscalationHandler.executeEscalation(execution, escalation.getEscalationCode(), escalationData);
 
     if (escalationEventDefinition == null || !escalationEventDefinition.isCancelActivity()) {
       leaveExecution(execution, currentActivity, escalationEventDefinition);

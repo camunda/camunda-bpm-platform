@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.tree.ActivityExecutionMappingCollector;
 import org.camunda.bpm.engine.impl.tree.ActivityExecutionTuple;
 import org.camunda.bpm.engine.impl.tree.OutputVariablesPropagator;
 import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * Helper class handling the propagation of escalation.
@@ -35,8 +36,10 @@ public class EscalationHandler {
 
   private final static BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
-  public static void propagateEscalation(ActivityExecution execution, String escalationCode) {
-    EscalationEventDefinition escalationEventDefinition = executeEscalation(execution, escalationCode);
+  public static void propagateEscalation(ActivityExecution execution, String escalationCode, TypedValue escalationData) {
+    // TODO: could we get the escalation data variable from the execution instead of parameter?
+
+    EscalationEventDefinition escalationEventDefinition = executeEscalation(execution, escalationCode, escalationData);
 
     if (escalationEventDefinition == null ) {
       throw LOG.missingBoundaryCatchEventEscalation(execution.getActivity().getId(), escalationCode);
@@ -48,7 +51,7 @@ public class EscalationHandler {
    * @return the escalation event definition if found matching escalation catch event
    */
   public static EscalationEventDefinition executeEscalation(ActivityExecution execution,
-      String escalationCode) {
+      String escalationCode, TypedValue escalationData) {
     final PvmActivity currentActivity = execution.getActivity();
 
     final EscalationEventDefinitionFinder escalationEventDefinitionFinder = new EscalationEventDefinitionFinder(escalationCode, currentActivity);
@@ -69,12 +72,14 @@ public class EscalationHandler {
 
     EscalationEventDefinition escalationEventDefinition = escalationEventDefinitionFinder.getEscalationEventDefinition();
     if (escalationEventDefinition != null) {
-      executeEscalationHandler(escalationEventDefinition, activityExecutionMappingCollector, escalationCode);
+      executeEscalationHandler(escalationEventDefinition, activityExecutionMappingCollector, escalationCode, escalationData);
     }
     return escalationEventDefinition;
   }
 
-  protected static void executeEscalationHandler(EscalationEventDefinition escalationEventDefinition, ActivityExecutionMappingCollector activityExecutionMappingCollector, String escalationCode) {
+  public final static String ESCALATION_DATA_VARIABLE = "__stacc_escalationData";
+
+  protected static void executeEscalationHandler(EscalationEventDefinition escalationEventDefinition, ActivityExecutionMappingCollector activityExecutionMappingCollector, String escalationCode, TypedValue escalationData) {
 
     PvmActivity escalationHandler = escalationEventDefinition.getEscalationHandler();
     PvmScope escalationScope = getScopeForEscalation(escalationEventDefinition);
@@ -83,6 +88,10 @@ public class EscalationHandler {
     if (escalationEventDefinition.getEscalationCodeVariable() != null) {
       escalationExecution.setVariable(escalationEventDefinition.getEscalationCodeVariable(), escalationCode);
     }
+
+    // Extract the data embedded in the escalation event and set it as a variable
+    // to make it available in the surrounding execution for an execution listener.
+    escalationExecution.setVariableLocal(ESCALATION_DATA_VARIABLE, escalationData);
 
     escalationExecution.executeActivity(escalationHandler);
   }
