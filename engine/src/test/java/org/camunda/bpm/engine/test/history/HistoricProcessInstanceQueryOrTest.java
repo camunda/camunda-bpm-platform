@@ -624,42 +624,11 @@ public class HistoricProcessInstanceQueryOrTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void shouldReturnHistoricProcInstWithMultipleStates() {
     // given
-    BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-            .name("process1")
-            .startEvent()
-            .userTask()
-            .endEvent()
-            .done();
-
-    String deploymentId = repositoryService
-            .createDeployment()
-            .addModelInstance("foo.bpmn", aProcessDefinition)
-            .deploy()
-            .getId();
-
-    deploymentIds.add(deploymentId);
-
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("aProcessDefinition");
-
-    BpmnModelInstance anotherProcessDefinition = Bpmn.createExecutableProcess("anotherProcessDefinition")
-            .startEvent()
-            .userTask()
-            .endEvent()
-            .done();
-
-    deploymentId = repositoryService
-            .createDeployment()
-            .addModelInstance("foo.bpmn", anotherProcessDefinition)
-            .deploy()
-            .getId();
-
-    deploymentIds.add(deploymentId);
-
-    runtimeService.startProcessInstanceByKey("anotherProcessDefinition");
-    runtimeService.updateProcessInstanceSuspensionState()
-            .byProcessInstanceId(processInstance1.getId()).suspend();
+    setupMultipleProcessInstances();
 
     // when
     List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
@@ -674,8 +643,25 @@ public class HistoricProcessInstanceQueryOrTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void shouldReturnHistoricProcInstWithMatchingState() {
     // given
+    setupMultipleProcessInstances();
+
+    // when
+    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
+            .or()
+            .active()
+            .endOr()
+            .list();
+
+    // then
+    assertEquals(1, processInstances.size());
+    assertEquals("ACTIVE", processInstances.get(0).getState());
+  }
+
+  public void setupMultipleProcessInstances() {
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
             .name("process1")
             .startEvent()
@@ -710,17 +696,6 @@ public class HistoricProcessInstanceQueryOrTest {
     runtimeService.startProcessInstanceByKey("anotherProcessDefinition");
     runtimeService.updateProcessInstanceSuspensionState()
             .byProcessInstanceId(processInstance1.getId()).suspend();
-
-    // when
-    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
-            .or()
-            .active()
-            .endOr()
-            .list();
-
-    // then
-    assertEquals(1, processInstances.size());
-    assertEquals("ACTIVE", processInstances.get(0).getState());
   }
 
   @Test
@@ -918,6 +893,7 @@ public class HistoricProcessInstanceQueryOrTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void shouldReturnHistoricProcInstWithVarValue1OrVarValue21() {
     // given
@@ -970,6 +946,7 @@ public class HistoricProcessInstanceQueryOrTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void shouldReturnHistoricProcInstWithVarValue1OrVarValue23() {
     // given
