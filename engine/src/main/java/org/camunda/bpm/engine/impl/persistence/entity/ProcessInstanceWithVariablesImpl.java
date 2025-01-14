@@ -86,4 +86,9 @@ public class ProcessInstanceWithVariablesImpl implements ProcessInstanceWithVari
   public String getTenantId() {
     return executionEntity.getTenantId();
   }
+
+   @Override
+  public String getProcessDefinitionKey() {
+    return executionEntity.getProcessDefinitionKey();
+  }
 }

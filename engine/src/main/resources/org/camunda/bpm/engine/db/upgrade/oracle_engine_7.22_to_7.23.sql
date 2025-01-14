@@ -20,3 +20,5 @@ values ('1200', CURRENT_TIMESTAMP, '7.23.0');
 
 alter table ACT_HI_COMMENT
     add REV_ integer default 1 not null;
+
+alter table ACT_RU_EXECUTION add PROC_DEF_KEY_ NVARCHAR2(255);

@@ -102,6 +102,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
 
     List<ProcessInstance> pi = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").list();
     assertEquals(1, pi.size());
+    assertEquals("startTimerEventExample", pi.get(0).getProcessDefinitionKey());
 
     assertEquals(0, jobQuery.count());
 
