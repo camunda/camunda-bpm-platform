@@ -235,6 +235,29 @@ public class ClientIT {
   }
 
   @Test
+  public void shouldThrowExceptionDueToBaseUrlResolverIsNull() {
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      ExternalTaskClientBuilder externalTaskClientBuilder = ExternalTaskClient.create();
+
+      // then
+      thrown.expect(ExternalTaskClientException.class);
+
+      // when
+      client = externalTaskClientBuilder
+          .urlResolver(null)
+          .build();
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
   public void shouldThrowExceptionDueToBaseUrlAndBaseUrlResolverIsNull() {
     ExternalTaskClient client = null;
 
