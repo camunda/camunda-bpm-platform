@@ -41,30 +41,32 @@ public interface ExternalTaskClientBuilder {
   ExternalTaskClientBuilder baseUrl(String baseUrl);
 
   /**
-   * Url resolver of the Camunda BPM Platform REST API. This information is mandatory.
+   * Url resolver of the Camunda 7 REST API. This information is mandatory.
    * <p>
    * If the server is in a cluster or you are using spring cloud, you can create a class which implements UrlResolver..
    * <p>
    * this is a sample for spring cloud DiscoveryClient
-   * <p>
+   * <pre>
+   * {@code
    * public class CustomUrlResolver implements UrlResolver{
-   * <p>
    * protected String serviceId;
-   * <p>
-   * protected DiscoveryClient discoveryClient;
-   * <p>
-   * protected String getRandomServiceInstance() {
-   * List<ServiceInstance> serviceInstances = discoveryClient.getInstances(serviceId);
-   * Random random = new Random();
-   * return serviceInstances.get(random.nextInt(serviceInstances.size())).getUri().toString();
-   * }
    *
-   * @param urlResolver of the Camunda BPM Platform REST API
+   * protected DiscoveryClient discoveryClient;
+   *
+   *   protected String getRandomServiceInstance() {
+   *     List serviceInstances = discoveryClient.getInstances(serviceId);
+   *     Random random = new Random();
+   *
+   *     return serviceInstances.get(random.nextInt(serviceInstances.size())).getUri().toString();
+   *   }
+   *
+   *   public String getBaseUrl() {
+   *     return getRandomServiceInstance();
+   *   }
+   * }
+   * </pre>
+   * @param urlResolver of the Camunda 7 REST API
    * @return the builder
-   * @Override public String getBaseUrl() {
-   * return getRandomServiceInstance();
-   * }
-   * }
    */
   ExternalTaskClientBuilder urlResolver(UrlResolver urlResolver);
 
