@@ -87,6 +87,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String processDefinitionKey;
   protected String[] processDefinitionKeys;
   protected Set<String> processInstanceIds;
+  protected String[] processInstanceIdNotIn;
   protected String[] tenantIds;
   protected boolean isTenantIdSet;
   protected String[] executedActivityIds;
@@ -117,6 +118,12 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public HistoricProcessInstanceQuery processInstanceIds(Set<String> processInstanceIds) {
     ensureNotEmpty("Set of process instance ids", processInstanceIds);
     this.processInstanceIds = processInstanceIds;
+    return this;
+  }
+
+  public HistoricProcessInstanceQuery processInstanceIdNotIn(String... processDefinitionIdNotIn){
+    ensureNotNull("processDefinitionIdNotIn", (Object[]) processDefinitionIdNotIn);
+    this.processInstanceIdNotIn = processDefinitionIdNotIn;
     return this;
   }
 
@@ -310,7 +317,9 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
       || CompareUtil.areNotInAscendingOrder(startedAfter, startedBefore)
       || CompareUtil.areNotInAscendingOrder(finishedAfter, finishedBefore)
       || CompareUtil.elementIsContainedInList(processDefinitionKey, processKeyNotIn)
-      || CompareUtil.elementIsNotContainedInList(processInstanceId, processInstanceIds);
+      || CompareUtil.elementIsNotContainedInList(processInstanceId, processInstanceIds)
+      || CompareUtil.elementIsContainedInArray(processInstanceId, processInstanceIdNotIn)
+      || CompareUtil.elementsAreContainedInArray(processInstanceIds, processInstanceIdNotIn);
   }
 
 	public HistoricProcessInstanceQuery orderByProcessInstanceBusinessKey() {
@@ -557,6 +566,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public Set<String> getProcessInstanceIds() {
     return processInstanceIds;
+  }
+
+  public String[] getProcessInstanceIdNotIn() {
+    return processInstanceIdNotIn;
   }
 
   public String getStartedBy() {
