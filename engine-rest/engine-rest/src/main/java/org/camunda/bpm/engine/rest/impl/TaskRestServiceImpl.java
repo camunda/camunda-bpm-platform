@@ -102,18 +102,14 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
     List<Task> matchingTasks = executeTaskQuery(firstResult, maxResults, query);
     List<TaskDto> tasks = new ArrayList<TaskDto>();
 
-    if ((Boolean.TRUE.equals(queryDto.getWithTaskVariablesInReturn()) || Boolean.TRUE.equals(
-        queryDto.getWithTaskLocalVariablesInReturn())) && Boolean.TRUE.equals(
-        queryDto.getWithCommentAttachmentInfo())) {
-      return getVariablesForTasks(engine, matchingTasks, Boolean.TRUE.equals(queryDto.getWithTaskVariablesInReturn()),
-          true);
+    boolean withTaskVariables = Boolean.TRUE.equals(queryDto.getWithTaskVariablesInReturn());
+    boolean withTaskLocalVariables = Boolean.TRUE.equals(queryDto.getWithTaskLocalVariablesInReturn());
+    boolean withCommentInfo = Boolean.TRUE.equals(queryDto.getWithCommentAttachmentInfo());
+
+    if (withTaskVariables || withTaskLocalVariables) {
+      return getVariablesForTasks(engine, matchingTasks, withTaskVariables, withCommentInfo);
     }
-    if (Boolean.TRUE.equals(queryDto.getWithTaskVariablesInReturn()) || Boolean.TRUE.equals(
-        queryDto.getWithTaskLocalVariablesInReturn())) {
-      return getVariablesForTasks(engine, matchingTasks, Boolean.TRUE.equals(queryDto.getWithTaskVariablesInReturn()),
-          false);
-    }
-    if (Boolean.TRUE.equals(queryDto.getWithCommentAttachmentInfo())) {
+    if (withCommentInfo) {
       tasks = matchingTasks.stream().map(TaskWithAttachmentAndCommentDto::fromEntity).collect(Collectors.toList());
     }
     else {
