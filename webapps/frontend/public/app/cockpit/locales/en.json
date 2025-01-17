@@ -1570,6 +1570,8 @@
     "PLGN_SEAR_CASE_INSTANCE_ID": "Case Instance ID",
     "PLGN_SEAR_CAUSE_INCIDENT": "Cause Incident",
     "PLGN_SEAR_CONFIGURATION": "Configuration",
+    "PLGN_SEAR_COPIED": "Copied",
+    "PLGN_SEAR_COPY_SELECTED_IDS": "Copy selected Instance IDs",
     "PLGN_SEAR_DEFINITION_ID": "Definition ID",
     "PLGN_SEAR_DEFINITION_KEY": "Definition Key",
     "PLGN_SEAR_DEFINITION_NAME": "Definition Name",
