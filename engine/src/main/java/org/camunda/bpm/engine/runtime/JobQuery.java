@@ -193,7 +193,7 @@ public interface JobQuery extends Query<JobQuery, Job> {
 
   /**
    * Only select jobs that are currently being acquired,
-   * ie. lock expiration time is not null, lock expiration is in future and suspension state is 1
+   * ie. lock expiration time is not null, lock expiration is in future
    */
   JobQuery acquired();
 
