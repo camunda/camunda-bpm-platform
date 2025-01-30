@@ -58,8 +58,6 @@ public interface DecisionDefinitionResource {
   @Produces(MediaType.APPLICATION_JSON)
   List<Map<String, VariableValueDto>> evaluateDecision(@Context UriInfo context, EvaluateDecisionDto parameters);
 
-  //This api evaluates dmn decision and returns the associated decisionInstanceId in the response
-
   @POST
   @Path("/evaluate-with-id")
   @Consumes(MediaType.APPLICATION_JSON)

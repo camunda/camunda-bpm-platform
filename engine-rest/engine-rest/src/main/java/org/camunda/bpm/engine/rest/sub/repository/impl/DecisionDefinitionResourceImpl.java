@@ -166,6 +166,7 @@ public class DecisionDefinitionResourceImpl implements DecisionDefinitionResourc
     }
   }
 
+  @Override
   public DecisionEvaluationDto evaluateDecisionWithId(UriInfo context, EvaluateDecisionDto parameters) {
     DecisionService decisionService = engine.getDecisionService();
 
@@ -182,19 +183,15 @@ public class DecisionDefinitionResourceImpl implements DecisionDefinitionResourc
       response.setDecisionInstanceId(decisionResult.getDmnDecisionInstanceId());
       return response;
 
-    }
-    catch (AuthorizationException e) {
+    } catch (AuthorizationException e) {
       throw e;
-    }
-    catch (NotFoundException e) {
+    } catch (NotFoundException e) {
       String errorMessage = String.format("Cannot evaluate decision %s: %s", decisionDefinitionId, e.getMessage());
       throw new InvalidRequestException(Status.NOT_FOUND, e, errorMessage);
-    }
-    catch (NotValidException e) {
+    } catch (NotValidException e) {
       String errorMessage = String.format("Cannot evaluate decision %s: %s", decisionDefinitionId, e.getMessage());
       throw new InvalidRequestException(Status.BAD_REQUEST, e, errorMessage);
-    }
-    catch (ProcessEngineException|DmnEngineException e) {
+    } catch (ProcessEngineException | DmnEngineException e) {
       String errorMessage = String.format("Cannot evaluate decision %s: %s", decisionDefinitionId, e.getMessage());
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
     }
