@@ -68,12 +68,22 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   protected boolean isByteArrayFetchingEnabled = true;
   protected boolean isCustomObjectDeserializationEnabled = true;
+  protected String variableIdAfter;
 
   public HistoricVariableInstanceQueryImpl() {
   }
 
   public HistoricVariableInstanceQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
+  }
+
+  public HistoricVariableInstanceQuery idAfter(String id) {
+    variableIdAfter = id;
+    return this;
+  }
+
+  public String getVariableIdAfter() {
+    return variableIdAfter;
   }
 
   public HistoricVariableInstanceQuery variableNameIn(String... names) {
@@ -285,6 +295,11 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   public HistoricVariableInstanceQuery orderByTenantId() {
     orderBy(HistoricVariableInstanceQueryProperty.TENANT_ID);
+    return this;
+  }
+
+  public HistoricVariableInstanceQuery orderByVariableId() {
+    orderBy(HistoricVariableInstanceQueryProperty.VARIABLE_ID);
     return this;
   }
 
