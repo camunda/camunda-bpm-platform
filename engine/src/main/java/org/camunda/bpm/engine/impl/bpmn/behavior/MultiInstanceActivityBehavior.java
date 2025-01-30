@@ -73,26 +73,31 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
     }
   }
 
-  protected void performInstance(ActivityExecution execution, PvmActivity activity, int loopCounter) {
+  protected void performInstance(ActivityExecution execution, PvmActivity activity, int loopCounter, Collection<?> collection) {
     setLoopVariable(execution, LOOP_COUNTER, loopCounter);
-    evaluateCollectionVariable(execution, loopCounter);
+    evaluateCollectionVariable(execution, collection, loopCounter);
     execution.setEnded(false);
     execution.setActive(true);
     execution.executeActivity(activity);
   }
 
-  protected void evaluateCollectionVariable(ActivityExecution execution, int loopCounter) {
+  protected void evaluateCollectionVariable(ActivityExecution execution, Collection<?> collection, int loopCounter) {
+    if (usesCollection() && collectionElementVariable != null && collection != null) {
+      Object value = getElementAtIndex(loopCounter, collection);
+      setLoopVariable(execution, collectionElementVariable, value);
+    }
+  }
+
+  protected Collection<?> evaluateCollection(ActivityExecution execution) {
+    Collection<?> collection = null;
     if (usesCollection() && collectionElementVariable != null) {
-      Collection<?> collection = null;
       if (collectionExpression != null) {
         collection = (Collection<?>) collectionExpression.getValue(execution);
       } else if (collectionVariable != null) {
         collection = (Collection<?>) execution.getVariable(collectionVariable);
       }
-
-      Object value = getElementAtIndex(loopCounter, collection);
-      setLoopVariable(execution, collectionElementVariable, value);
     }
+    return collection;
   }
 
   protected abstract void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception;

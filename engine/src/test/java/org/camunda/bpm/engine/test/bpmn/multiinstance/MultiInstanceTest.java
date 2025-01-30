@@ -422,7 +422,6 @@ public class MultiInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
-  @Ignore
   @Test
   public void testParallelUserTasksBasedOnCollectionExpression() {
     DelegateEvent.clearEvents();
