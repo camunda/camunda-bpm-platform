@@ -59,6 +59,7 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
     if (isHistoryCleanupStrategyRemovalTimeBased(commandContext)) {
       cleanupHandler = getTimeBasedHandler();
     } else {
+      // legacy
       cleanupHandler = new HistoryCleanupBatch();
     }
 

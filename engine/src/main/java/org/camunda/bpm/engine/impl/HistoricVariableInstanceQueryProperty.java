@@ -27,7 +27,8 @@ import org.camunda.bpm.engine.query.QueryProperty;
  */
 public interface HistoricVariableInstanceQueryProperty {
 
-  public static final QueryProperty PROCESS_INSTANCE_ID = new QueryPropertyImpl("PROC_INST_ID_");
-  public static final QueryProperty VARIABLE_NAME = new QueryPropertyImpl("NAME_");
-  public static final QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
+  QueryProperty PROCESS_INSTANCE_ID = new QueryPropertyImpl("PROC_INST_ID_");
+  QueryProperty VARIABLE_NAME = new QueryPropertyImpl("NAME_");
+  QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
+  QueryProperty VARIABLE_ID = new QueryPropertyImpl("ID_");
 }

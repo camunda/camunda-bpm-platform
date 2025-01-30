@@ -462,6 +462,9 @@
         <trim suffixOverrides="and">
           1 = 1 and
           <trim prefixOverrides="or|and">
+            <if test="query.processInstanceIdAfter != null">
+              ${queryType} SELF.PROC_INST_ID_ > #{query.processInstanceIdAfter}
+            </if>
             <if test="query.processInstanceId != null">
               ${queryType} SELF.PROC_INST_ID_ = #{query.processInstanceId}
             </if>

@@ -24,6 +24,7 @@ module.exports = function(ngModule, appRoot, appName) {
     '$translateSanitization',
     function($sanitize) {
       return function(translationKey) {
+        console.log("foo");
         return $sanitize.sanitize(translationKey, 'text', 'escape');
       };
     }
@@ -110,9 +111,9 @@ module.exports = function(ngModule, appRoot, appName) {
     '$translateProvider',
     'configurationProvider',
     function($translateProvider, configurationProvider) {
-      $translateProvider.useMissingTranslationHandler(
+      /*$translateProvider.useMissingTranslationHandler(
         'sanitizeMissingTranslationKey'
-      );
+      );*/
       var avail = configurationProvider.getAvailableLocales();
       var fallback = configurationProvider.getFallbackLocale();
 
