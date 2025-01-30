@@ -95,6 +95,8 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
    */
   HistoricVariableInstanceQuery orderByTenantId();
 
+  HistoricVariableInstanceQuery orderByVariableId();
+
   /**
    * Disable fetching of byte array and file values. By default, the query will fetch such values.
    * By calling this method you can prevent the values of (potentially large) blob data chunks
