@@ -167,7 +167,7 @@
   "acquired": {
     "type": "boolean",
     "desc": "Only select jobs which are acquired, i.e.,  lock expiration date is not null, lock expiration
-             date is in future and suspension state is 1. Value may only be `true`, as `false` is the default
+             date is in future. Value may only be `true`, as `false` is the default
              behavior."
   }
 }>
