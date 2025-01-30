@@ -17,6 +17,8 @@
 package org.camunda.bpm.webapp.impl.security.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mockStatic;
 
 import java.util.Date;
 import javax.ws.rs.core.Response;
@@ -37,6 +39,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.MockedStatic;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
@@ -200,6 +203,28 @@ public class UserAuthenticationResourceTest {
       .get(0);
     assertThat(userAuthentication.getCacheValidationTime())
       .isEqualTo(new Date(ClockUtil.getCurrentTime().getTime() + 1000 * 60 * 5));
+  }
+
+  @Test
+  public void assertNullAuthenticationThrowsNPE() {
+    // given
+    User jonny = identityService.newUser("jonny");
+    jonny.setPassword("jonnyspassword");
+    identityService.saveUser(jonny);
+
+    try (MockedStatic<AuthenticationUtil> authenticationUtilMock = mockStatic(AuthenticationUtil.class)) {
+      authenticationUtilMock.when(() -> AuthenticationUtil.createAuthentication("webapps-test-engine", "jonny")).thenReturn(null);
+
+      // when
+      UserAuthenticationResource authResource = new UserAuthenticationResource();
+      authResource.request = new MockHttpServletRequest();
+      assertThatThrownBy(() -> authResource.doLogin("webapps-test-engine", "tasklist", "jonny", "jonnyspassword"))
+          // then
+          .isInstanceOf(NullPointerException.class);
+
+      // we should get a forbidden return code
+      // Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
+    }
   }
 
   protected void setAuthentication(String user, String engineName) {
