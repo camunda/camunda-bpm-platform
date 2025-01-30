@@ -421,11 +421,9 @@
         and RES.SUSPENSION_STATE_ = #{suspensionState.stateCode}
       </if>
       <if test="acquired">
-        AND
-        RES.SUSPENSION_STATE_ = 1
-        AND
+        and
         RES.LOCK_EXP_TIME_ IS NOT NULL
-        AND
+        and
         RES.LOCK_EXP_TIME_  > #{now, jdbcType=TIMESTAMP}
       </if>
       <if test="isTenantIdSet">

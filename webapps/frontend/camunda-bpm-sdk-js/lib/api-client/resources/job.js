@@ -67,7 +67,7 @@ Job.get = function(id, done) {
  * @param  {String}   [params.firstResult]          Pagination of results. Specifies the index of the first result to return.
  * @param  {String}   [params.maxResults]           Pagination of results. Specifies the maximum number of results to return. Will return less results if there are no more results left.
  * @param  {Bool}     [params.acquired]             Select jobs which are acquired, ie. lock expiration time is not
- *                                                  null,lock expiration is in future and suspension state is 1
+ *                                                  null,lock expiration is in future
  * @param  {Function} done
  */
 Job.list = function(params, done) {
