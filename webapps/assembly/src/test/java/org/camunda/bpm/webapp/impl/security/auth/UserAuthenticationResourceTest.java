@@ -17,7 +17,6 @@
 package org.camunda.bpm.webapp.impl.security.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mockStatic;
 
 import java.util.Date;
@@ -206,24 +205,22 @@ public class UserAuthenticationResourceTest {
   }
 
   @Test
-  public void assertNullAuthenticationThrowsNPE() {
+  public void shouldReturnUnauthorizedOnNullAuthentication() {
     // given
     User jonny = identityService.newUser("jonny");
     jonny.setPassword("jonnyspassword");
     identityService.saveUser(jonny);
+    UserAuthenticationResource authResource = new UserAuthenticationResource();
+    authResource.request = new MockHttpServletRequest();
 
     try (MockedStatic<AuthenticationUtil> authenticationUtilMock = mockStatic(AuthenticationUtil.class)) {
       authenticationUtilMock.when(() -> AuthenticationUtil.createAuthentication("webapps-test-engine", "jonny")).thenReturn(null);
 
       // when
-      UserAuthenticationResource authResource = new UserAuthenticationResource();
-      authResource.request = new MockHttpServletRequest();
-      assertThatThrownBy(() -> authResource.doLogin("webapps-test-engine", "tasklist", "jonny", "jonnyspassword"))
-          // then
-          .isInstanceOf(NullPointerException.class);
+      Response response = authResource.doLogin("webapps-test-engine", "tasklist", "jonny", "jonnyspassword");
 
-      // we should get a forbidden return code
-      // Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
+      // then
+      Assert.assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     }
   }
 
