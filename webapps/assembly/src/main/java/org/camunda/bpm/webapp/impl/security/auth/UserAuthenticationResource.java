@@ -99,6 +99,12 @@ public class UserAuthenticationResource {
     }
 
     UserAuthentication authentication = AuthenticationUtil.createAuthentication(processEngine, username);
+    if (authentication == null) {
+      if(isWebappsAuthenticationLoggingEnabled(processEngine)) {
+        LOGGER.infoWebappFailedLogin(username, "not authorized");
+      }
+      return unauthorized();
+    }
 
     ServletContext servletContext = request.getServletContext();
     Date cacheValidationTime = ServletContextUtil.getAuthCacheValidationTime(servletContext);
