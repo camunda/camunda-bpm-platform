@@ -164,6 +164,13 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   HistoricProcessInstanceQuery incidentMessageLike(String incidentMessageLike);
 
   /**
+   * Only select historic process instances which are associated with jobs that have exceptions and retries left.
+   *
+   * @return HistoricProcessInstanceQuery
+   */
+  HistoricProcessInstanceQuery withJobsRetrying();
+
+  /**
    * Only select historic process instances which are associated with the given case instance id.
    */
   HistoricProcessInstanceQuery caseInstanceId(String caseInstanceId);

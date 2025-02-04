@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+						 xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+						 targetNamespace="Examples">
+
+	<process id="processWithJobsRetrying" name="Process with jobs retrying" isExecutable="true">
+		<startEvent id="start" />
+		<sequenceFlow id="flow1" sourceRef="start" targetRef="serviceTask1" />
+		<serviceTask id="serviceTask1" camunda:expression="true" camunda:async="true" name="Succeeding service task"/>
+		<sequenceFlow id="flow2" sourceRef="serviceTask1" targetRef="serviceTaskFail" />
+		<serviceTask id="serviceTaskFail" camunda:async="true"
+								 camunda:class="org.camunda.bpm.engine.test.api.runtime.FailingDelegate" name="Failing service task"/>
+		<sequenceFlow id="flow4" sourceRef="serviceTaskFail" targetRef="end" />
+		<endEvent id="end" />
+	</process>
+
+</definitions>

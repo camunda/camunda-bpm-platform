@@ -63,6 +63,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String businessKeyLike;
   protected boolean finished = false;
   protected boolean unfinished = false;
+  protected boolean withJobsRetrying = false;
   protected boolean withIncidents = false;
   protected boolean withRootIncidents = false;
   protected String incidentType;
@@ -211,6 +212,12 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     ensureNotNull("incidentMessageLike", incidentMessageLike);
     this.incidentMessageLike = incidentMessageLike;
 
+    return this;
+  }
+
+  @Override
+  public HistoricProcessInstanceQuery withJobsRetrying(){
+    this.withJobsRetrying = true;
     return this;
   }
 
@@ -653,6 +660,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public boolean getIsTenantIdSet() {
     return isTenantIdSet;
+  }
+
+  public boolean isWithJobsRetrying(){
+    return withJobsRetrying;
   }
 
   public boolean isWithIncidents() {
