@@ -85,6 +85,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private Boolean rootProcessInstances;
   private Boolean finished;
   private Boolean unfinished;
+  private Boolean withJobsRetrying;
   private Boolean withIncidents;
   private Boolean withRootIncidents;
   private String incidentType;
@@ -207,6 +208,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   @CamundaQueryParam(value = "unfinished", converter = BooleanConverter.class)
   public void setUnfinished(Boolean unfinished) {
     this.unfinished = unfinished;
+  }
+
+  @CamundaQueryParam(value = "withJobsRetrying", converter = BooleanConverter.class)
+  public void setWithJobsRetrying(Boolean withJobsRetrying) {
+    this.withJobsRetrying = withJobsRetrying;
   }
 
   @CamundaQueryParam(value = "withIncidents", converter = BooleanConverter.class)
@@ -448,6 +454,9 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     }
     if (unfinished != null && unfinished) {
       query.unfinished();
+    }
+    if (withJobsRetrying != null && withJobsRetrying) {
+      query.withJobsRetrying();
     }
     if (withIncidents != null && withIncidents) {
       query.withIncidents();
