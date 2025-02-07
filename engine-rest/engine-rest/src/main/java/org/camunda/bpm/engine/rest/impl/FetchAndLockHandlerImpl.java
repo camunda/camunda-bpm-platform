@@ -51,14 +51,16 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   private static final Logger LOG = Logger.getLogger(FetchAndLockHandlerImpl.class.getName());
 
   protected static final String UNIQUE_WORKER_REQUEST_PARAM_NAME = "fetch-and-lock-unique-worker-request";
+  protected static final String BLOCKING_QUEUE_CAPACITY_PARAM_NAME = "fetch-and-lock-queue-capacity";
 
   protected static final long PENDING_REQUEST_FETCH_INTERVAL = 30L * 1000;
   protected static final long MAX_BACK_OFF_TIME = Long.MAX_VALUE;
   protected static final long MAX_REQUEST_TIMEOUT = 1800000; // 30 minutes
+  protected static final int DEFAULT_BLOCKING_QUEUE_CAPACITY = 200;
 
   protected SingleConsumerCondition condition;
 
-  protected BlockingQueue<FetchAndLockRequest> queue = new ArrayBlockingQueue<>(200);
+  protected BlockingQueue<FetchAndLockRequest> queue;
   protected List<FetchAndLockRequest> pendingRequests = new ArrayList<>();
   protected List<FetchAndLockRequest> newRequests = new ArrayList<>();
 
@@ -180,6 +182,9 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
 
     isRunning = true;
     handlerThread.start();
+    if (queue == null) {
+      initializeQueue(DEFAULT_BLOCKING_QUEUE_CAPACITY);
+    }
 
     ProcessEngineImpl.EXT_TASK_CONDITIONS.addConsumer(condition);
   }
@@ -337,15 +342,19 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   }
 
   public void contextInitialized(ServletContextEvent servletContextEvent) {
-    ServletContext servletContext = null;
+    ServletContext servletContext;
+    int queueCapacity = DEFAULT_BLOCKING_QUEUE_CAPACITY;
 
     if (servletContextEvent != null) {
       servletContext = servletContextEvent.getServletContext();
 
       if (servletContext != null) {
         parseUniqueWorkerRequestParam(servletContext.getInitParameter(UNIQUE_WORKER_REQUEST_PARAM_NAME));
+        queueCapacity = parseBlockingQueueCapacityParam(servletContext.getInitParameter(BLOCKING_QUEUE_CAPACITY_PARAM_NAME));
       }
     }
+
+    initializeQueue(queueCapacity);
   }
 
   protected void parseUniqueWorkerRequestParam(String uniqueWorkerRequestParam) {
@@ -354,6 +363,27 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
     } else {
       isUniqueWorkerRequest = false; // default configuration
     }
+  }
+
+  protected void initializeQueue(int capacity) {
+    LOG.log(Level.FINEST, "Initializing queue with capacity [{0}]", capacity);
+    queue = new ArrayBlockingQueue<>(capacity);
+  }
+
+  private static int parseBlockingQueueCapacityParam(String queueSizeRequestParam) {
+    int capacity = DEFAULT_BLOCKING_QUEUE_CAPACITY;
+    if (queueSizeRequestParam != null) {
+      try {
+        final int parsedCapacity = Integer.parseInt(queueSizeRequestParam);
+        if (parsedCapacity <= 0) {
+          throw new NumberFormatException("Parameter " + BLOCKING_QUEUE_CAPACITY_PARAM_NAME + " has to be greater than zero");
+        }
+        capacity = parsedCapacity;
+      } catch (NumberFormatException e) {
+        LOG.log(Level.WARNING, "Invalid blocking queue capacity parameter: [" + queueSizeRequestParam + "], falling back to default value", e);
+      }
+    }
+    return capacity;
   }
 
   public List<FetchAndLockRequest> getPendingRequests() {

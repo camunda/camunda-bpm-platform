@@ -52,4 +52,9 @@ public interface Execution {
    */
   String getTenantId();
 
+  /**
+   * The Key of the process definition.
+   */
+  String getProcessDefinitionKey();
+
 }

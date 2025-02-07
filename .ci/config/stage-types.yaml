@@ -183,7 +183,7 @@ platform-jdk-temurin-jdk-11-latest:
           !distro/run,!distro/run/assembly,!distro/run/core,!distro/run/distro,!distro/run/modules,!distro/run/modules/example,
           !distro/run/modules/rest,!distro/run/modules/webapps,!distro/run/modules/oauth2,!distro/run/qa,!distro/run/qa/integration-tests,
           !distro/run/qa/runtime,!distro/run/qa/example-plugin''
-    -Pdistro,distro-ce,distro-wildfly'
+    -Pdistro,distro-ce'
   stash:
     runtimeStash: true
   withNpm: true
@@ -222,7 +222,7 @@ platform-jdk-jdk-11-latest:
           !distro/run,!distro/run/assembly,!distro/run/core,!distro/run/distro,!distro/run/modules,!distro/run/modules/example,
           !distro/run/modules/rest,!distro/run/modules/webapps,!distro/run/modules/oauth2,!distro/run/qa,!distro/run/qa/integration-tests,
           !distro/run/qa/runtime,!distro/run/qa/example-plugin''
-    -Pdistro,distro-ce,distro-wildfly
+    -Pdistro,distro-ce
     -Dskip.frontend.build=true'
   stash:
     runtimeStash: true
