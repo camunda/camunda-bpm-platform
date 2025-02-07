@@ -140,7 +140,7 @@ module.exports = [
       'searchQuery',
       function(currentFilter, searchQuery) {
         if (!currentFilter) {
-          return null;
+          return angular.copy(searchQuery);
         }
 
         var taskListQuery = angular.copy(searchQuery);
@@ -198,7 +198,11 @@ module.exports = [
           lastRequest = deferred;
           lastQuery = taskListQuery;
 
-          if (!taskListQuery || taskListQuery.id === null) {
+          if (
+            !taskListQuery ||
+            taskListQuery.id === null ||
+            taskListQuery.id === undefined
+          ) {
             // no filter selected
             deferred.resolve({
               count: 0,
