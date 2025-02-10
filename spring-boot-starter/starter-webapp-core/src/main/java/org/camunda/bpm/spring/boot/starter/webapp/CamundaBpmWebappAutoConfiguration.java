@@ -29,10 +29,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.resource.PathResourceResolver;
+
+import java.io.IOException;
 
 @Configuration
 @ConditionalOnProperty(prefix = WebappProperty.PREFIX, name = "enabled", matchIfMissing = true)
@@ -66,6 +71,15 @@ public class CamundaBpmWebappAutoConfiguration implements WebMvcConfigurer {
     return new LazyInitRegistration();
   }
 
+  public static class FaviconResourceResolver extends PathResourceResolver {
+    @Override
+    protected Resource getResource(String resourcePath, @NonNull Resource location) throws IOException {
+      final var idx = resourcePath.lastIndexOf(47);
+      // cut off `applicationPath` before getting the resource
+      return super.getResource(resourcePath.substring(idx), location);
+    }
+  }
+
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
     final String classpath = "classpath:" + properties.getWebapp().getWebjarClasspath();
@@ -80,8 +94,12 @@ public class CamundaBpmWebappAutoConfiguration implements WebMvcConfigurer {
         .addResourceLocations(classpath + "/app/");
     registry.addResourceHandler(applicationPath + "/assets/**")
         .addResourceLocations(classpath + "/assets/");
+    //registry.addResourceHandler(applicationPath + "/favicon.ico")
+    //        .addResourceLocations(classpath);
     registry.addResourceHandler(applicationPath + "/favicon.ico")
-        .addResourceLocations(classpath);
+            .addResourceLocations(classpath + "/") // add slash to get rid of the WARN log message
+            .resourceChain(true)
+            .addResolver(new FaviconResourceResolver());
   }
 
   @Override
