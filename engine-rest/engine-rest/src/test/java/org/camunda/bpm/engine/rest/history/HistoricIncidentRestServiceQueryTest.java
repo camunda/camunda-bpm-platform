@@ -390,6 +390,7 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
     Date returnedRemovalTime = DateTimeUtil.parseDate(from(content).getString("[0].removalTime"));
     String returnedRootProcessInstanceId = from(content).getString("[0].rootProcessInstanceId");
     String returnedAnnotation = from(content).getString("[0].annotation");
+    String returnedRootCauseIncidentMessage = from(content).getString("[0].rootCauseIncidentMessage");
 
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_PROC_INST_ID, returnedProcessInstanceId);
@@ -413,6 +414,7 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
     Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HIST_INCIDENT_REMOVAL_TIME), returnedRemovalTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_ROOT_PROC_INST_ID, returnedRootProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_USER_OPERATION_ANNOTATION, returnedAnnotation);
+    Assert.assertEquals(MockProvider.EXAMPLE_HIST_ROOT_CAUSE_INCIDENT_MSG, returnedRootCauseIncidentMessage);
 
   }
 
@@ -721,6 +723,41 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
 
     verify(mockedQuery).jobDefinitionIdIn(EXAMPLE_JOB_DEFINITION_ID, NON_EXISTING_JOB_DEFINITION_ID);
     verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testIncidentWithRootCauseIncidentMessage() {
+    Response response = given()
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(HISTORY_INCIDENT_QUERY_URL);
+
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> incidents = from(content).getList("");
+    assertThat(incidents).hasSize(1);
+
+    assertThat(from(content).getString("[0].rootCauseIncidentMessage")).isEqualTo(MockProvider.EXAMPLE_HIST_ROOT_CAUSE_INCIDENT_MSG);
+  }
+
+  @Test
+  public void testIncidentWithoutRootCauseIncidentMessage() {
+    mockedQuery = setUpMockHistoricIncidentQuery(MockProvider.createMockHistoricIncidentsWithoutRootCauseIncidentMessage());
+    Response response = given()
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(HISTORY_INCIDENT_QUERY_URL);
+
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> incidents = from(content).getList("");
+    assertThat(incidents).hasSize(1);
+
+    assertThat(from(content).getString("[0].rootCauseIncidentMessage")).isNull();
   }
 
 }

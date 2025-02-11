@@ -742,6 +742,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HIST_INCIDENT_PROC_DEF_KEY = "aProcDefKey";
   public static final String EXAMPLE_HIST_INCIDENT_ROOT_PROC_INST_ID = "aRootProcInstId";
   public static final String EXAMPLE_HIST_INCIDENT_CAUSE_INCIDENT_ID = "aCauseIncidentId";
+  public static final String EXAMPLE_HIST_ROOT_CAUSE_INCIDENT_MSG = "aRootCauseIncidentMessage";
   public static final String EXAMPLE_HIST_INCIDENT_ROOT_CAUSE_INCIDENT_ID = "aRootCauseIncidentId";
   public static final String EXAMPLE_HIST_INCIDENT_CONFIGURATION = "aConfiguration";
   public static final String EXAMPLE_HIST_INCIDENT_HISTORY_CONFIGURATION = "aHistoryConfiguration";
@@ -2636,6 +2637,19 @@ public abstract class MockProvider {
     return createMockHistoricIncident(EXAMPLE_TENANT_ID);
   }
 
+  public static HistoricIncident createMockHistoricIncidentWithoutRootCauseIncidentMessage() {
+    HistoricIncident incident = createMockHistoricIncident(EXAMPLE_TENANT_ID);
+    when(incident.getRootCauseIncidentMessage()).thenReturn(null);
+    return incident;
+  }
+
+  public static List<HistoricIncident> createMockHistoricIncidentsWithoutRootCauseIncidentMessage() {
+    List<HistoricIncident> entries = new ArrayList<>();
+    entries.add(createMockHistoricIncidentWithoutRootCauseIncidentMessage());
+    return entries;
+  }
+
+
   public static HistoricIncident createMockHistoricIncident(String tenantId) {
     HistoricIncident incident = mock(HistoricIncident.class);
 
@@ -2661,6 +2675,7 @@ public abstract class MockProvider {
     when(incident.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HIST_INCIDENT_REMOVAL_TIME));
     when(incident.getRootProcessInstanceId()).thenReturn(EXAMPLE_HIST_INCIDENT_ROOT_PROC_INST_ID);
     when(incident.getAnnotation()).thenReturn(EXAMPLE_USER_OPERATION_ANNOTATION);
+    when(incident.getRootCauseIncidentMessage()).thenReturn(EXAMPLE_HIST_ROOT_CAUSE_INCIDENT_MSG);
 
     return incident;
   }

@@ -388,16 +388,21 @@
     <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
 
+  <resultMap id="historicIncidentResultWithRootCauseIncidentMessageMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity" extends="historicIncidentResultMap">
+    <result property="rootCauseIncidentMessage" column="ROOT_CAUSE_INCIDENT_MESSAGE_" jdbcType="VARCHAR"/>
+  </resultMap>
+
   <!-- HISTORIC INCIDENT SELECT -->
   
   <select id="selectHistoricIncidentById" resultMap="historicIncidentResultMap">
     select RES.* from ${prefix}ACT_HI_INCIDENT RES where RES.ID_ = #{id}
   </select>
 
-  <select id="selectHistoricIncidentByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIncidentQueryImpl" resultMap="historicIncidentResultMap">
+  <select id="selectHistoricIncidentByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIncidentQueryImpl" resultMap="historicIncidentResultWithRootCauseIncidentMessageMap">
+    <bind name="includeRootCauseIncidentMessage" value="'Y'"/>
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select ${distinct} RES.*
+    select ${distinct} RES.*, ROOT_INCIDENT.INCIDENT_MSG_ as ROOT_CAUSE_INCIDENT_MESSAGE_
     ${limitBetween}
     <include refid="selectHistoricIncidentByQueryCriteriaSql"/>
     ${orderBy}
@@ -405,6 +410,7 @@
   </select>
 
   <select id="selectHistoricIncidentCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIncidentQueryImpl" resultType="long">
+    <bind name="includeRootCauseIncidentMessage" value="'N'"/>
     ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectHistoricIncidentByQueryCriteriaSql"/>
     ${countDistinctAfterEnd}
@@ -427,6 +433,11 @@
         </if>
         ${authJoinEnd}
       )
+    </if>
+
+    <if test="includeRootCauseIncidentMessage == 'Y'">
+      left join ${prefix}ACT_HI_INCIDENT ROOT_INCIDENT
+      on ROOT_INCIDENT.ID_ = RES.ROOT_CAUSE_INCIDENT_ID_
     </if>
 
     <where>

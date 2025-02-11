@@ -160,4 +160,9 @@ public interface HistoricIncident {
    * Returns the annotation of this incident
    */
   String getAnnotation();
+
+  /**
+   * Returns the incident message of the root incident
+   */
+  String getRootCauseIncidentMessage();
 }
