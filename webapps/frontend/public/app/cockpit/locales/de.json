@@ -1839,6 +1839,7 @@
     "PLUGIN_ADD_VARIABLE_NEW_VARIABLE": "Neue Variable zur Prozessinstanz hinzufügen",
     "PLUGIN_CALLED_PROCESS": "Aufgerufene Prozessdefinition",
     "PLUGIN_CALLED_PROCESS_ACTIVITY": "Aktivität",
+    "PLUGIN_CALLED_PROCESS_BUSINESS_KEY": "Fachlicher Schlüssel",
     "PLUGIN_CALLED_PROCESS_DEFINITIONS_LABEL": "Aufgerufene Prozessdefinitionen",
     "PLUGIN_CALLED_PROCESS_DEFINITIONS_REFERENCED_LABEL": "Referenziert",
     "PLUGIN_CALLED_PROCESS_DEFINITIONS_RUNNING_AND_REFERENCED_LABEL": "Laufend und referenziert",

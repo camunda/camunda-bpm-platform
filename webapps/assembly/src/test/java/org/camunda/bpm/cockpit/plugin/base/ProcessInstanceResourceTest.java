@@ -19,6 +19,7 @@ package org.camunda.bpm.cockpit.plugin.base;
 import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.CalledProcessInstanceDto;
@@ -125,6 +126,28 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
       assertThat(dto.getProcessDefinitionKey()).isEqualTo(compareWith.getKey());
     }
   }
+
+  @Test
+  @Deployment(resources = {
+      "processes/two-parallel-call-activities-calling-different-process.bpmn",
+      "processes/user-task-process.bpmn",
+      "processes/another-user-task-process.bpmn"
+  })
+  public void testGetCalledProcessInstancesByParentProcessInstanceIdContainsBusinessKey() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess", "myBusinessKey");
+
+    resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
+    executeAvailableJobs();
+
+    CalledProcessInstanceQueryDto queryParameter = new CalledProcessInstanceQueryDto();
+
+    List<CalledProcessInstanceDto> result = resource.queryCalledProcessInstances(queryParameter);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(2);
+    assertThat(result.get(0).getBusinessKey()).isEqualTo("firstCall:myBusinessKey");
+    assertThat(result.get(1).getBusinessKey()).isEqualTo("secondCall:myBusinessKey");
+  }
+
 
   @Test
   @Deployment(resources = {
