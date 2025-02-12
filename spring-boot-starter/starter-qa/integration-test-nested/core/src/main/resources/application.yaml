@@ -1,0 +1,10 @@
+camunda:
+  bpm:
+    generic-properties:
+      properties:
+        historyTimeToLive: P1D
+    process-engine-name: default
+management:
+  health:
+    camunda:
+      enabled: false
