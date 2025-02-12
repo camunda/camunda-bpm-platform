@@ -150,9 +150,9 @@ public class ClassPathProcessApplicationScanner implements ProcessApplicationSca
     }
     // Required for Spring Boot 3.2 Nested Jar Support
     // https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.2-Release-Notes#nested-jar-support
-    if (urlPath.startsWith("nested:")) {
-      urlPath = urlPath.substring(7);
-    }
+//    if (urlPath.startsWith("nested:")) {
+//      urlPath = urlPath.substring(7);
+//    }
 
     File file = new File(urlPath);
     if (file.isDirectory()) {
