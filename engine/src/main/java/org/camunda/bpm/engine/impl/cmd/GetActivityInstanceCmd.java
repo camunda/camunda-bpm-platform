@@ -212,6 +212,10 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     actInst.setProcessDefinitionId(scopeExecution.getProcessDefinitionId());
     actInst.setBusinessKey(scopeExecution.getBusinessKey());
     actInst.setActivityId(scope.getId());
+    PvmExecutionImpl subProcessInstance = scopeExecution.getSubProcessInstance();
+    if (subProcessInstance != null) {
+      actInst.setSubProcessInstanceId(subProcessInstance.getId());
+    }
 
     String name = scope.getName();
     if (name == null) {
@@ -269,6 +273,10 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     transitionInstance.setProcessDefinitionId(execution.getProcessDefinitionId());
     transitionInstance.setExecutionId(execution.getId());
     transitionInstance.setActivityId(execution.getActivityId());
+    PvmExecutionImpl subProcessInstance = execution.getSubProcessInstance();
+    if (subProcessInstance != null) {
+      transitionInstance.setSubProcessInstanceId(subProcessInstance.getId());
+    }
 
     ActivityImpl activity = execution.getActivity();
     if (activity != null) {
