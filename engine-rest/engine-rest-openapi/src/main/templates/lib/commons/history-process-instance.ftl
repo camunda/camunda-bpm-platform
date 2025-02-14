@@ -102,6 +102,11 @@
     "desc": "Restrict the query to all process instances that are top level process instances."
   },
 
+  "rootProcessInstanceId": {
+    "type": "string",
+    "desc": "Filter by root process instance id."
+  },
+
   "finished": {
     "type": "boolean",
     "desc": "Only include finished process instances. This flag includes all process instances
