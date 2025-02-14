@@ -16,8 +16,10 @@
  */
 package org.camunda.bpm.engine.test.standalone.calendar;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -27,7 +29,7 @@ import org.junit.After;
 import org.junit.Test;
 
 public class CycleBusinessCalendarTest {
-  
+
   @After
   public void tearDown() {
     ClockUtil.reset();
@@ -89,6 +91,21 @@ public class CycleBusinessCalendarTest {
     Date expectedDuedate = simpleDateFormat.parse("2010 06 13 - 23:33");
 
     assertEquals(expectedDuedate, duedate);
+  }
+
+  @Test
+  public void testEndOfMonthRelativeExpressions() throws ParseException {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy MM dd HH:mm");
+    CycleBusinessCalendar cbc = new CycleBusinessCalendar();
+
+    Date startDate = sdf.parse("2025 02 14 12:00");
+
+    // All of these assertions should pass
+    assertThat(sdf.format(cbc.resolveDuedate("0 37 14 L-22 * ?", startDate))).isEqualTo("2025 03 09 14:37");
+    assertThat(sdf.format(cbc.resolveDuedate("0 23 8 L-2 * ?", startDate))).isEqualTo("2025 02 26 08:23");
+    assertThat(sdf.format(cbc.resolveDuedate("0 37 8 L-1 * ?", startDate))).isEqualTo("2025 02 27 08:37");
+    assertThat(sdf.format(cbc.resolveDuedate("0 0 12 L-15 * ?", startDate))).isEqualTo("2025 03 16 12:00");
+    assertThat(sdf.format(cbc.resolveDuedate("0 0 12 L-27 * ?", startDate))).isEqualTo("2025 03 04 12:00");
   }
 
 }
