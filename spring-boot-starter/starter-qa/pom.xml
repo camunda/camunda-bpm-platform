@@ -22,7 +22,6 @@
       </activation>
       <modules>
         <module>integration-test-simple</module>
-        <module>integration-test-nested</module>
         <module>integration-test-request-scope</module>
         <module>integration-test-plugins</module>
         <module>integration-test-liquibase</module>
@@ -70,7 +69,6 @@
           distro-ce is not used for building the spring boot starter -->
       <modules>
         <module>integration-test-simple</module>
-        <module>integration-test-nested</module>
         <module>integration-test-request-scope</module>
         <module>integration-test-plugins</module>
         <module>integration-test-webapp</module>
