@@ -562,7 +562,7 @@ public class HistoricProcessInstanceTest {
     runtimeService.startProcessInstanceByKey("processWithJobsRetrying");
 
     // then
-    assertEquals(0, queryWithJobsRetrying.count());
+    assertThat(queryWithJobsRetrying.count()).isZero();
     assertThat(queryWithJobsRetrying.list()).isEmpty();
 
     // when we have 1 instance with a job that has an exception and retries left
@@ -576,16 +576,16 @@ public class HistoricProcessInstanceTest {
     executeFailingJob(failingJob);
 
     // then
-    assertEquals(1, queryWithJobsRetrying.count());
-    assertEquals(1, queryWithJobsRetrying.list().size());
-    assertEquals(instanceWithRetryingJob.getId(), queryWithJobsRetrying.singleResult().getRootProcessInstanceId());
+    assertThat(queryWithJobsRetrying.count()).isEqualTo(1L);
+    assertThat(queryWithJobsRetrying.list()).hasSize(1);
+    assertThat(instanceWithRetryingJob.getId()).isEqualTo(queryWithJobsRetrying.singleResult().getId());
 
     // when all retries are exhausted, so now the instance has a job with exception but no retries left
     executeFailingJob(failingJob);
     executeFailingJob(failingJob);
 
     // then
-    assertEquals(0, queryWithJobsRetrying.count());
+    assertThat(queryWithJobsRetrying.count()).isZero();
     assertThat(queryWithJobsRetrying.list()).isEmpty();
   }
 
@@ -2731,10 +2731,10 @@ public class HistoricProcessInstanceTest {
     managementService.executeJob(job.getId());
   }
 
-  private void executeFailingJob(Job job){
+  private void executeFailingJob(Job job) {
     try {
       managementService.executeJob(job.getId());
-    } catch(RuntimeException re) {
+    } catch (RuntimeException re) {
       // Exception expected. Do nothing
     }
   }
