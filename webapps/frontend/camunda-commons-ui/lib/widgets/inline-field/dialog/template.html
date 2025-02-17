@@ -8,9 +8,13 @@
     <p>{{ 'CAM_WIDGET_INLINE_FIELD_CRIT_VALUE_CHANGE' | translate }}</p>
     <form class="form-horizontal">
       <textarea ng-model="formData.editValue"
-                rows="10"
+                rows="8"
                 class="form-control"></textarea>
-    </form>
+    </form>    
+      <button class="btn btn-default btn-sm"
+              ng-click="formatValue()">
+        Format list
+      </button>
   </div>
 </div>
 

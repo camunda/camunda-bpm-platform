@@ -32,5 +32,9 @@ module.exports = [
         .join(','); // allow line break as separator
       $scope.$dismiss();
     };
+
+    $scope.formatValue = () => {
+      $scope.formData.editValue = $scope.formData.editValue.replace(/,/g, '\n');
+    };
   }
 ];

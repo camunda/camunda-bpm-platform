@@ -87,6 +87,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String processDefinitionKey;
   protected String[] processDefinitionKeys;
   protected Set<String> processInstanceIds;
+  protected Set<String> processInstanceIdNotIn;
   protected String[] tenantIds;
   protected boolean isTenantIdSet;
   protected String[] executedActivityIds;
@@ -117,6 +118,12 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public HistoricProcessInstanceQuery processInstanceIds(Set<String> processInstanceIds) {
     ensureNotEmpty("Set of process instance ids", processInstanceIds);
     this.processInstanceIds = processInstanceIds;
+    return this;
+  }
+
+  public HistoricProcessInstanceQuery processInstanceIdNotIn(Set<String> processDefinitionIdNotIn){
+    ensureNotEmpty("Set of process instance ids", processDefinitionIdNotIn);
+    this.processInstanceIdNotIn = processDefinitionIdNotIn;
     return this;
   }
 
@@ -311,6 +318,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
       || CompareUtil.areNotInAscendingOrder(finishedAfter, finishedBefore)
       || CompareUtil.elementIsContainedInList(processDefinitionKey, processKeyNotIn)
       || CompareUtil.elementIsNotContainedInList(processInstanceId, processInstanceIds);
+      // TODO Create following CompareUtil functions
+      // TODO Add appropriate test
+      // || CompareUtil.elementIsNotTheOnlyEntryInList(processInstanceId, processInstanceIdNotIn);
+      // || CompareUtil.listDoesNotContainExactly(processInstanceIds, processInstanceIdNotIn);
   }
 
 	public HistoricProcessInstanceQuery orderByProcessInstanceBusinessKey() {
@@ -557,6 +568,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public Set<String> getProcessInstanceIds() {
     return processInstanceIds;
+  }
+
+  public Set<String> getProcessInstanceIdNotIn() {
+    return processInstanceIdNotIn;
   }
 
   public String getStartedBy() {
