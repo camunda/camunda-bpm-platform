@@ -160,8 +160,8 @@ module.exports = [
            * observe the task list query
            */
           tasksData.observe('taskListQuery', function(taskListQuery) {
+            var oldQuery = $scope.query;
             if (taskListQuery) {
-              var oldQuery = $scope.query;
               var searchParams = $location.search() || {};
               var forceDisplayTask = searchParams.forceDisplayTask;
               // parse pagination properties from query
@@ -179,7 +179,7 @@ module.exports = [
               if (oldQuery.id && oldQuery.id !== taskListQuery.id) {
                 clearSelectedTask();
               }
-            } else {
+            } else if (!angular.equals(oldQuery, {})) {
               clearSelectedTask();
             }
           });
