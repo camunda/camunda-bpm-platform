@@ -28,6 +28,7 @@ import {
 window.define = define;
 window.require = rjsrequire;
 window.bust = CAMUNDA_VERSION; // eslint-disable-line
+window.DOMPurify = require('dompurify');
 
 // camunda-welcome-bootstrap is copied as-is, so we have to inline everything
 const appRoot = document.querySelector('base').getAttribute('app-root');
