@@ -40,7 +40,8 @@ module.exports = function(ngModule) {
         { class: 'state', request: 'incidents', sortable: true, content: 'State' },
         { class: 'called-process-instance', request: 'id', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_PROCESS_INSTANCE')},
         { class: 'process-definition', request: 'processDefinitionLabel', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_PROCESS_DEFINITION')},
-        { class: 'activity', request: 'instance.name', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_ACTIVITY')}
+        { class: 'activity', request: 'instance.name', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_ACTIVITY')},
+        { class: 'business-key', request: 'businessKey', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_BUSINESS_KEY')}
       ];
 
       // Default sorting
