@@ -688,6 +688,18 @@
               )
             </if>
 
+            <if test="query.withJobsRetrying">
+              ${queryType} EXISTS (
+              SELECT 1
+              FROM ${prefix}ACT_RU_JOB
+              <where>
+                PROCESS_INSTANCE_ID_ = SELF.ID_
+                AND RETRIES_ > 0
+                AND (EXCEPTION_MSG_ IS NOT NULL OR EXCEPTION_STACK_ID_ IS NOT NULL)
+              </where>
+              )
+            </if>
+
             <if test="query.isTenantIdSet">
               <if test="query.tenantIds != null &amp;&amp; query.tenantIds.length > 0">
                 ${queryType} SELF.TENANT_ID_ in
