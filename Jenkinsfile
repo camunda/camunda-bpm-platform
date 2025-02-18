@@ -149,6 +149,8 @@ pipeline {
             cambpmPublishTestResult()
             // archive any heap dumps generated in the target folder
             cambpmArchiveArtifacts(false, '**/target/*.hprof')
+            // archive Tomcat server log
+            cambpmArchiveArtifacts(false, '**/target/camunda-tomcat/server/apache-tomcat-*/logs/catalina.out')
           }
         ])
 
