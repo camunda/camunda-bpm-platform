@@ -73,6 +73,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
 
   private String processInstanceId;
   private Set<String> processInstanceIds;
+  private List<String> processInstanceIdNotIn;
   private String processDefinitionId;
   private String processDefinitionKey;
   private List<String> processDefinitionKeys;
@@ -143,6 +144,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   @CamundaQueryParam(value = "processInstanceIds", converter = StringSetConverter.class)
   public void setProcessInstanceIds(Set<String> processInstanceIds) {
     this.processInstanceIds = processInstanceIds;
+  }
+
+  @CamundaQueryParam(value = "processInstanceIdNotIn", converter = StringSetConverter.class)
+  public void setProcessInstanceIdNotIn(List<String> processInstanceIdNotIn) {
+    this.processInstanceIdNotIn = processInstanceIdNotIn;
   }
 
   public String getProcessDefinitionId() {
@@ -412,6 +418,9 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     }
     if (processInstanceIds != null) {
       query.processInstanceIds(processInstanceIds);
+    }
+    if (processInstanceIdNotIn != null && !processInstanceIdNotIn.isEmpty()) {
+      query.processInstanceIdNotIn(processInstanceIdNotIn.toArray(new String[0]));
     }
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);

@@ -471,6 +471,13 @@
               <bind name="fieldName" value="'SELF.PROC_INST_ID_'" />
               <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection" />
             </if>
+            <if test="query.processInstanceIdNotIn != null and query.processInstanceIdNotIn.length > 0">
+            ${queryType} SELF.PROC_INST_ID_ NOT IN
+              <foreach item="processInstanceId" index="index" collection="query.processInstanceIdNotIn"
+                       open="(" separator="," close=")">
+                #{processInstanceId}
+              </foreach>
+            </if>
             <if test="query.caseInstanceId != null">
               ${queryType} SELF.CASE_INST_ID_ = #{query.caseInstanceId}
             </if>

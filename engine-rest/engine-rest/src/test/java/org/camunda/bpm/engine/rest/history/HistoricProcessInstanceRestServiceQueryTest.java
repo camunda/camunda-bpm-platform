@@ -1079,6 +1079,43 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
   }
 
   @Test
+  public void testQueryByProcessInstanceIdNotIn() {
+    given()
+        .queryParam("processInstanceIdNotIn", "firstProcessInstanceId,secondProcessInstanceId")
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processInstanceIdNotIn("firstProcessInstanceId", "secondProcessInstanceId");
+    verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testQueryByProcessInstanceIdNotInAsPost() {
+    Map<String, Set<String>> parameters = new HashMap<String, Set<String>>();
+
+    Set<String> processInstanceIds = new HashSet<String>();
+    processInstanceIds.add("firstProcessInstanceId");
+    processInstanceIds.add("secondProcessInstanceId");
+
+    parameters.put("processInstanceIdNotIn", processInstanceIds);
+
+    given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processInstanceIdNotIn("firstProcessInstanceId", "secondProcessInstanceId");
+    verify(mockedQuery).list();
+  }
+
+  @Test
   public void testQueryByProcessDefinitionKeyNotIn() {
     given()
       .queryParam("processDefinitionKeyNotIn", "firstProcessInstanceKey,secondProcessInstanceKey")
