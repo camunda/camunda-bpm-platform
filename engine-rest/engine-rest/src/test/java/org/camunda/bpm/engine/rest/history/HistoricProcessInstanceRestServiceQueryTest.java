@@ -794,6 +794,40 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
   }
 
   @Test
+  public void testQueryWithJobsRetrying() {
+    given()
+      .queryParam("withJobsRetrying", true)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    InOrder inOrder = inOrder(mockedQuery);
+    inOrder.verify(mockedQuery).withJobsRetrying();
+    inOrder.verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testQueryWithJobsRetryingAsPost() {
+    Map<String, Boolean> body = new HashMap<String, Boolean>();
+    body.put("withJobsRetrying", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(body)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    InOrder inOrder = inOrder(mockedQuery);
+    inOrder.verify(mockedQuery).withJobsRetrying();
+    inOrder.verify(mockedQuery).list();
+  }
+
+  @Test
   public void testQueryWithIncidents() {
     given()
       .queryParam("withIncidents", true)
