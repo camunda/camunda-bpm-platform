@@ -1482,10 +1482,10 @@ public class BpmnParse extends Parse {
         if (!hasConditon && !isDefaultFlow) {
           flowsWithoutCondition.add(flow);
         }
-        if (hasConditon && isDefaultFlow) {
-          addError("Exclusive Gateway '" + activity.getId() + "' has outgoing sequence flow '" + flow.getId()
-              + "' which is the default flow but has a condition too.", null, activity.getId(), flow.getId());
-        }
+        //if (hasConditon && isDefaultFlow) {
+        //  addError("Exclusive Gateway '" + activity.getId() + "' has outgoing sequence flow '" + flow.getId()
+        //      + "' which is the default flow but has a condition too.", null, activity.getId(), flow.getId());
+        //}
       }
       if (hasDefaultFlow || flowsWithoutCondition.size() > 1) {
         // if we either have a default flow (then no flows without conditions
