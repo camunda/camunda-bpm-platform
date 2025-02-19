@@ -131,6 +131,7 @@
         type="{{ valueType }}"
         in-operator="operator.value.key === 'In'"
         not-in-operator="operator.value.key === 'NotIn'"
+        hide-expand-button="operator.value.hideExpandButton"
         change="changeSearch('value', varValue, $event)"
         on-start-editing="clearEditTrigger('value')"
         ng-if="!basic"
