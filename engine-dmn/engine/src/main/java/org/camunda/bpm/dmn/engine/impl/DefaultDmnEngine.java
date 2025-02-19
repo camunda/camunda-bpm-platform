@@ -112,7 +112,7 @@ public class DefaultDmnEngine implements DmnEngine {
     if (decision instanceof DmnDecisionImpl && decision.isDecisionTable()) {
       DefaultDmnDecisionContext decisionContext = new DefaultDmnDecisionContext(dmnEngineConfiguration);
 
-      DmnDecisionResult decisionResult = decisionContext.evaluateDecision(decision, variableContext);
+      DmnDecisionResult decisionResult = decisionContext.evaluateDecision(decision, variableContext, null);
       return DmnDecisionTableResultImpl.wrap(decisionResult);
     }
     else {
@@ -158,13 +158,26 @@ public class DefaultDmnEngine implements DmnEngine {
     return evaluateDecision(decision, Variables.fromMap(variables).asVariableContext());
   }
 
+  public DmnDecisionResult evaluateDecision(DmnDecision decision, VariableContext variableContext, String decisionInstanceId) {
+    ensureNotNull("decision", decision);
+    ensureNotNull("variableContext", variableContext);
+
+    if (decision instanceof DmnDecisionImpl) {
+      DefaultDmnDecisionContext decisionContext = new DefaultDmnDecisionContext(dmnEngineConfiguration);
+      return decisionContext.evaluateDecision(decision, variableContext, decisionInstanceId);
+    }
+    else {
+      throw LOG.decisionTypeNotSupported(decision);
+    }
+  }
+
   public DmnDecisionResult evaluateDecision(DmnDecision decision, VariableContext variableContext) {
     ensureNotNull("decision", decision);
     ensureNotNull("variableContext", variableContext);
 
     if (decision instanceof DmnDecisionImpl) {
       DefaultDmnDecisionContext decisionContext = new DefaultDmnDecisionContext(dmnEngineConfiguration);
-      return decisionContext.evaluateDecision(decision, variableContext);
+      return decisionContext.evaluateDecision(decision, variableContext, null);
     }
     else {
       throw LOG.decisionTypeNotSupported(decision);

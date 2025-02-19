@@ -89,6 +89,7 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
 
   protected static final String EVALUATE_DECISION_URL = SINGLE_DECISION_DEFINITION_URL + "/evaluate";
   protected static final String EVALUATE_DECISION_BY_KEY_URL = SINGLE_DECISION_DEFINITION_BY_KEY_URL + "/evaluate";
+  protected static final String EVALUATE_DECISION_WITH_DECINST_ID_URL = SINGLE_DECISION_DEFINITION_BY_KEY_URL + "/evaluate-with-id";
   protected static final String EVALUATE_DECISION_BY_KEY_AND_TENANT_ID_URL = SINGLE_DECISION_DEFINITION_BY_KEY_AND_TENANT_ID_URL + "/evaluate";
   protected static final String UPDATE_HISTORY_TIME_TO_LIVE_URL = SINGLE_DECISION_DEFINITION_URL + "/history-time-to-live";
 
@@ -394,6 +395,139 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
     Assert.assertEquals("image/gif", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("decision.gif"));
     Assert.assertEquals("image/bmp", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("decision.bmp"));
     Assert.assertEquals("application/octet-stream", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("decision.UNKNOWN"));
+  }
+
+  @Test
+  public void testEvaluateDecisionByKeyWithDecisionInstanceId() {
+    DmnDecisionResult decisionResult = MockProvider.createMockDecisionResult();
+    decisionResult.setDmnDecisionInstanceId("test-instance-id");
+
+    when(decisionEvaluationBuilderMock.evaluate()).thenReturn(decisionResult);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables",
+            VariablesBuilder.create()
+                    .variable("amount", 420)
+                    .variable("invoiceCategory", "MISC")
+                    .getVariables()
+    );
+
+    given().pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+            .contentType(POST_JSON_CONTENT_TYPE).body(json)
+            .then().expect()
+            .statusCode(Status.OK.getStatusCode())
+            .body("decisionInstanceId", is("test-instance-id"))
+            .when().post(EVALUATE_DECISION_WITH_DECINST_ID_URL);
+
+    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put("amount", 420);
+    expectedVariables.put("invoiceCategory", "MISC");
+
+    verify(decisionEvaluationBuilderMock).variables(expectedVariables);
+    verify(decisionEvaluationBuilderMock).evaluate();
+  }
+
+  @Test
+  public void testEvaluateDecisionByKeyWithDecisionInstanceId_NotFound() {
+    String message = "expected message";
+    when(decisionEvaluationBuilderMock.evaluate()).thenThrow(new NotFoundException(message));
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+            .contentType(POST_JSON_CONTENT_TYPE).body(json)
+            .then().expect()
+            .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+            .body("type", is(InvalidRequestException.class.getSimpleName()))
+            .body("message", containsString(message))
+            .when().post(EVALUATE_DECISION_WITH_DECINST_ID_URL);
+  }
+
+  @Test
+  public void testEvaluateDecisionByKeyWithDecisionInstanceId_shouldReturnErrorCode() {
+    when(decisionEvaluationBuilderMock.evaluate())
+            .thenThrow(new ProcessEngineException("foo", 123));
+
+    Map<String, Object> json = new HashMap<>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+            .contentType(POST_JSON_CONTENT_TYPE).body(json)
+            .then().expect()
+            .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+            .body("type", is(RestException.class.getSimpleName()))
+            .body("message", containsString("foo"))
+            .body("code", equalTo(123))
+            .when().post(EVALUATE_DECISION_WITH_DECINST_ID_URL);
+  }
+
+  @Test
+  public void testEvaluateDecisionByKeyWithDecisionInstanceId_NotValid() {
+    String message = "expected message";
+    when(decisionEvaluationBuilderMock.evaluate()).thenThrow(new NotValidException(message));
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+            .contentType(POST_JSON_CONTENT_TYPE).body(json)
+            .then().expect()
+            .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+            .body("type", is(InvalidRequestException.class.getSimpleName()))
+            .body("message", containsString(message))
+            .when().post(EVALUATE_DECISION_WITH_DECINST_ID_URL);
+  }
+
+  @Test
+  public void testEvaluateDecisionByKeyWithDecisionInstanceId_NotAuthorized() {
+    String message = "expected message";
+    when(decisionEvaluationBuilderMock.evaluate()).thenThrow(new AuthorizationException(message));
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+            .contentType(POST_JSON_CONTENT_TYPE).body(json)
+            .then().expect()
+            .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
+            .body("type", is(AuthorizationException.class.getSimpleName()))
+            .body("message", containsString(message))
+            .when().post(EVALUATE_DECISION_WITH_DECINST_ID_URL);
+  }
+
+  @Test
+  public void testEvaluateDecisionByKeyWithDecisionInstanceId_ProcessEngineException() {
+    String message = "expected message";
+    when(decisionEvaluationBuilderMock.evaluate()).thenThrow(new ProcessEngineException(message));
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+            .contentType(POST_JSON_CONTENT_TYPE).body(json)
+            .then().expect()
+            .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+            .body("type", is(RestException.class.getSimpleName()))
+            .body("message", containsString(message))
+            .when().post(EVALUATE_DECISION_WITH_DECINST_ID_URL);
+  }
+
+  @Test
+  public void testEvaluateDecisionByKeyWithDecisionInstanceId_DmnEngineException() {
+    String message = "expected message";
+    when(decisionEvaluationBuilderMock.evaluate()).thenThrow(new DmnEngineException(message));
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+            .contentType(POST_JSON_CONTENT_TYPE).body(json)
+            .then().expect()
+            .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+            .body("type", is(RestException.class.getSimpleName()))
+            .body("message", containsString(message))
+            .when().post(EVALUATE_DECISION_WITH_DECINST_ID_URL);
   }
 
   @Test
