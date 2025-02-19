@@ -111,4 +111,15 @@ public interface DmnDecisionResult extends List<DmnDecisionResultEntries>, Seria
    */
   <T extends TypedValue> T getSingleEntryTyped();
 
+  /** Returns the value of decisionInstanceId that's part of DMN decision evaluation
+   * @return the decisionInstanceId generated
+   * Returns null for a standalone dmn engine
+   */
+  String getDmnDecisionInstanceId();
+
+  /** Set generated decisionInstanceId that's generated part of DMN evaluation
+   * @param dmnDecisionInstanceId
+   */
+  void setDmnDecisionInstanceId(String dmnDecisionInstanceId);
+
 }
