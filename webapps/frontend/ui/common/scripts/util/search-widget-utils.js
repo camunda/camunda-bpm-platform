@@ -256,7 +256,7 @@ function isDateType(type) {
 }
 
 function isOperatorAppendable(op) {
-  return includes(['After', 'Before', 'Like'], op);
+  return includes(['After', 'Before', 'Like', 'NotIn'], op);
 }
 
 function getSearchValue(search) {
