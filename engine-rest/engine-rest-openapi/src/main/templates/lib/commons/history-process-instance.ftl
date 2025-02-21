@@ -119,6 +119,12 @@
     "desc": "Only include unfinished process instances. Value may only be `true`, as `false` is the default behavior."
   },
 
+  "withJobsRetrying": {
+    "type": "boolean",
+    "desc": "Only include process instances which are associated with jobs that have encountered exceptions and still
+     have retries left. Value may only be `true`, as `false` is the default behavior."
+  },
+
   "withIncidents": {
     "type": "boolean",
     "desc": "Only include process instances which have an incident. Value may only be `true`, as `false` is the default behavior."
