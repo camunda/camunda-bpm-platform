@@ -241,7 +241,11 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'postgresql_142',
               runSteps: {
-                cambpmRunMaven('qa/', 'clean install -Ptomcat9,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
+                cambpmRunMaven('qa/',
+                'clean install -Ptomcat9,postgresql,engine-integration',
+                runtimeStash: true,
+                archiveStash: true,
+                jdkVersion: 'jdk-11-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -303,7 +307,11 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'postgresql_142',
               runSteps: {
-                cambpmRunMaven('qa/', 'clean install -Pwildfly26,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
+                cambpmRunMaven('qa/',
+                'clean install -Pwildfly26,postgresql,engine-integration',
+                runtimeStash: true,
+                archiveStash: true,
+                jdkVersion: 'jdk-11-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -440,7 +448,7 @@ pipeline {
                   'clean install -Pwildfly26,h2,webapps-integration',
                   runtimeStash: true,
                   archiveStash: true,
-                  jdkVersion: 'jdk-17-latest')
+                  jdkVersion: 'jdk-11-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
