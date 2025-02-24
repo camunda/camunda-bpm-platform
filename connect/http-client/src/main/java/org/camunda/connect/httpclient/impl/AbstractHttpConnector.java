@@ -18,25 +18,27 @@ package org.camunda.connect.httpclient.impl;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.config.RequestConfig.Builder;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpOptions;
-import org.apache.http.client.methods.HttpPatch;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.methods.HttpTrace;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.classic.methods.HttpOptions;
+import org.apache.hc.client5.http.classic.methods.HttpPatch;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.classic.methods.HttpTrace;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.config.RequestConfig.Builder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.InputStreamEntity;
+import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
 import org.camunda.connect.httpclient.HttpBaseRequest;
 import org.camunda.connect.httpclient.HttpResponse;
 import org.camunda.connect.httpclient.impl.util.ParseUtil;
@@ -44,15 +46,15 @@ import org.camunda.connect.impl.AbstractConnector;
 
 public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R extends HttpResponse> extends AbstractConnector<Q, R> {
 
-  protected static HttpConnectorLogger LOG = HttpLogger.HTTP_LOGGER;
+  protected static final HttpConnectorLogger LOG = HttpLogger.HTTP_LOGGER;
 
   protected CloseableHttpClient httpClient;
   protected final Charset charset;
 
-  public AbstractHttpConnector(String connectorId) {
+  protected AbstractHttpConnector(String connectorId) {
     super(connectorId);
     httpClient = createClient();
-    charset = Charset.forName("utf-8");
+    charset = StandardCharsets.UTF_8;
   }
 
   protected CloseableHttpClient createClient() {
@@ -70,10 +72,10 @@ public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R e
   @Override
   public R execute(Q request) {
     R invocationResult;
-    HttpRequestBase httpRequest = createHttpRequest(request);
+    BasicClassicHttpRequest httpRequest = createHttpRequest(request);
     HttpRequestInvocation invocation = new HttpRequestInvocation(httpRequest, request, requestInterceptors, httpClient);
     try {
-      invocationResult = createResponse((CloseableHttpResponse) invocation.proceed());
+      invocationResult = createResponse((ClassicHttpResponse) invocation.proceed());
     } catch (Exception e) {
       throw LOG.unableToExecuteRequest(e);
     }
@@ -93,18 +95,15 @@ public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R e
     }
   }
 
-  protected abstract R createResponse(CloseableHttpResponse response);
-
-  @Override
-  public abstract Q createRequest();
+  protected abstract R createResponse(ClassicHttpResponse response);
 
   /**
-   * creates a apache Http* representation of the request.
+   * creates a apache Http representation of the request.
    *
    * @param request the given request
-   * @return {@link HttpRequestBase} an apache representation of the request
+   * @return {@link BasicClassicHttpRequest} an apache representation of the request
    */
-  protected <T extends HttpRequestBase> T createHttpRequest(Q request) {
+  protected <T extends BasicClassicHttpRequest> T createHttpRequest(Q request) {
     T httpRequest = createHttpRequestBase(request);
 
     applyConfig(httpRequest, request.getConfigOptions());
@@ -117,7 +116,7 @@ public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R e
   }
 
   @SuppressWarnings("unchecked")
-  protected <T extends HttpRequestBase> T createHttpRequestBase(Q request) {
+  protected <T extends BasicClassicHttpRequest> T createHttpRequestBase(Q request) {
     String url = request.getUrl();
     if (url != null && !url.trim().isEmpty()) {
       String method = request.getMethod();
@@ -140,13 +139,12 @@ public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R e
       } else {
         throw LOG.unknownHttpMethod(method);
       }
-    }
-    else {
+    } else {
       throw LOG.requestUrlRequired();
     }
   }
 
-  protected <T extends HttpRequestBase> void applyHeaders(T httpRequest, Map<String, String> headers) {
+  protected <T extends BasicClassicHttpRequest> void applyHeaders(T httpRequest, Map<String, String> headers) {
     if (headers != null) {
       for (Map.Entry<String, String> entry : headers.entrySet()) {
         httpRequest.setHeader(entry.getKey(), entry.getValue());
@@ -155,31 +153,32 @@ public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R e
     }
   }
 
-  protected <T extends HttpRequestBase> void applyPayload(T httpRequest, Q request) {
+  protected <T extends BasicClassicHttpRequest> void applyPayload(T httpRequest, Q request) {
     if (httpMethodSupportsPayload(httpRequest)) {
       if (request.getPayload() != null) {
         byte[] bytes = request.getPayload().getBytes(charset);
         ByteArrayInputStream payload = new ByteArrayInputStream(bytes);
-        InputStreamEntity entity = new InputStreamEntity(payload, bytes.length);
-        ((HttpEntityEnclosingRequestBase) httpRequest).setEntity(entity);
+        InputStreamEntity entity = new InputStreamEntity(payload, bytes.length, ContentType.parse(request.getContentType()));
+        httpRequest.setEntity(entity);
       }
-    }
-    else if (request.getPayload() != null) {
+    } else if (request.getPayload() != null) {
       LOG.payloadIgnoredForHttpMethod(request.getMethod());
     }
   }
 
-  protected <T extends HttpRequestBase> boolean httpMethodSupportsPayload(T httpRequest) {
-    return httpRequest instanceof HttpEntityEnclosingRequestBase;
+  protected <T extends BasicClassicHttpRequest> boolean httpMethodSupportsPayload(T httpRequest) {
+    return httpRequest instanceof HttpUriRequestBase;
   }
 
-  protected <T extends HttpRequestBase> void applyConfig(T httpRequest, Map<String, Object> configOptions) {
-    Builder configBuilder = RequestConfig.custom();
-    if (configOptions != null && !configOptions.isEmpty()) {
-      ParseUtil.parseConfigOptions(configOptions, configBuilder);
+  protected <T extends BasicClassicHttpRequest> void applyConfig(T httpRequest, Map<String, Object> configOptions) {
+    if (httpMethodSupportsPayload(httpRequest)) {
+      Builder configBuilder = RequestConfig.custom();
+      if (configOptions != null && !configOptions.isEmpty()) {
+        ParseUtil.parseConfigOptions(configOptions, configBuilder);
+      }
+      RequestConfig requestConfig = configBuilder.build();
+      ((HttpUriRequestBase) httpRequest).setConfig(requestConfig);
     }
-    RequestConfig requestConfig = configBuilder.build();
-    httpRequest.setConfig(requestConfig);
   }
 
 
