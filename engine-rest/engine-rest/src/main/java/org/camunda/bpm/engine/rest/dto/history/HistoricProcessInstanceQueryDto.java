@@ -147,7 +147,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     this.processInstanceIds = processInstanceIds;
   }
 
-  @CamundaQueryParam(value = "processInstanceIdNotIn", converter = StringSetConverter.class)
+  @CamundaQueryParam(value = "processInstanceIdNotIn", converter = StringListConverter.class)
   public void setProcessInstanceIdNotIn(List<String> processInstanceIdNotIn) {
     this.processInstanceIdNotIn = processInstanceIdNotIn;
   }
