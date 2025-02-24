@@ -122,9 +122,9 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     return this;
   }
 
-  public HistoricProcessInstanceQuery processInstanceIdNotIn(String... processDefinitionIdNotIn){
-    ensureNotNull("processDefinitionIdNotIn", (Object[]) processDefinitionIdNotIn);
-    this.processInstanceIdNotIn = processDefinitionIdNotIn;
+  public HistoricProcessInstanceQuery processInstanceIdNotIn(String... processInstanceIdNotIn){
+    ensureNotNull("processInstanceIdNotIn", (Object[]) processInstanceIdNotIn);
+    this.processInstanceIdNotIn = processInstanceIdNotIn;
     return this;
   }
 
