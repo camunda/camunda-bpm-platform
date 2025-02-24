@@ -1669,6 +1669,7 @@
     "PLGN_SEAR_PI_WITHOUT_TENANT_ID": "Prozessinstanz : ohne Mandanten Id",
     "PLGN_SEAR_PI_WITH_INCIDENTS_ONLY": "Prozessinstanz : Nur mit Zwischenfällen",
     "PLGN_SEAR_PI_WITH_ROOT_INCIDENTS_ONLY": "Prozessinstanz : Nur mit verursachenden Zwischenfällen",
+    "PLGN_SEAR_PI_WITH_JOBS_RETRYING": "Prozessinstanz : Jobs werden aktuell erneut ausgeführt",
     "PLGN_SEAR_PROCESS_DEFINITION_ID": "Prozessdefinitions-ID",
     "PLGN_SEAR_PROCESS_INSTANCE": "Prozessinstanz",
     "PLGN_SEAR_PROCINST_ID": "Prozessinstanz-ID",
