@@ -62,7 +62,7 @@ instance-migration:
     images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
 old-engine:
   directory: 'qa'
-  command: 'verify -Pold-engine,'
+  command: 'verify -Pold-engine,exclude-post-jdk15-tests,'
   stash:
     runtimeStash: true
   labels:
