@@ -137,6 +137,14 @@ module.exports = function(config, app) {
         );
       };
 
+      this.getCascade = function() {
+        return angular.extend(
+          {},
+          defaultConfig.cascade,
+          config.cascade
+        );
+      };
+
       this.getRuntimeActivityInstanceMetrics = function() {
         var param = 'runtimeActivityInstanceMetrics';
         return angular.extend({}, defaultConfig[param], config[param]).display;
