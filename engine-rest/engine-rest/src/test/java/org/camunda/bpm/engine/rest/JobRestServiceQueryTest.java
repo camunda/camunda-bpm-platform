@@ -360,11 +360,17 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testAcquiredParameter() {
+  public void testAcquiredParameterAsPost() {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("acquired", MockProvider.EXAMPLE_ACQUIRED);
 
-    given().queryParams(parameters).then().expect().statusCode(Status.OK.getStatusCode()).when().get(JOBS_RESOURCE_URL);
+    given()
+        .queryParams(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(JOBS_RESOURCE_URL);
 
     verify(mockQuery).acquired();
     verify(mockQuery).list();
