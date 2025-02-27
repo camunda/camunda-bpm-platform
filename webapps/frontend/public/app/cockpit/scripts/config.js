@@ -60,6 +60,9 @@ export default {
   //   default: true,
   //   hidden: false
   // },
+  // cascade: {
+  //   default: true,
+  // },
   // 'batchOperation' : {
   //   // select mode of query for process instances or decision instances
   //   // possible values: filter, search
