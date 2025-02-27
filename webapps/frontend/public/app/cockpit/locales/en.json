@@ -1669,6 +1669,7 @@
     "PLGN_SEAR_PI_WITHOUT_TENANT_ID": "Process Instance : without Tenant Id",
     "PLGN_SEAR_PI_WITH_INCIDENTS_ONLY": "Process Instance : With Incidents Only",
     "PLGN_SEAR_PI_WITH_ROOT_INCIDENTS_ONLY": "Process Instance : With Root Incidents Only",
+    "PLGN_SEAR_PI_WITH_JOBS_RETRYING": "Process Instance : With jobs retrying",
     "PLGN_SEAR_PROCESS_DEFINITION_ID": "Process Definition ID",
     "PLGN_SEAR_PROCESS_INSTANCE": "Process Instance",
     "PLGN_SEAR_PROCINST_ID": "Process Instance ID",
