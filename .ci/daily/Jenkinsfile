@@ -296,7 +296,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMavenByStageType('large-data-tests', 'h2')
+                cambpmRunMavenByStageType('large-data-tests', 'h2', jdkVersion: 'jdk-17-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
