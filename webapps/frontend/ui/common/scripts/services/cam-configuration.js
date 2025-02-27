@@ -138,11 +138,7 @@ module.exports = function(config, app) {
       };
 
       this.getCascade = function() {
-        return angular.extend(
-          {},
-          defaultConfig.cascade,
-          config.cascade
-        );
+        return angular.extend({}, defaultConfig.cascade, config.cascade);
       };
 
       this.getRuntimeActivityInstanceMetrics = function() {
