@@ -88,16 +88,6 @@
       </modules>
     </profile>
 
-    <profile>
-      <id>jdk17</id>
-      <activation>
-        <jdk>[17,)</jdk>
-      </activation>
-      <modules>
-        <module>integration-tests-engine-jakarta</module>
-      </modules>
-    </profile>
-
     <!-- Server profiles -->
 
     <profile>
