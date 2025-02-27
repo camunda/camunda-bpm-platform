@@ -56,6 +56,11 @@
       <artifactId>camunda-cmmn-model</artifactId>
     </dependency>
 
+<!--    <dependency>-->
+<!--      <groupId>org.camunda.bpm.juel</groupId>-->
+<!--      <artifactId>camunda-juel</artifactId>-->
+<!--    </dependency>-->
+
     <dependency>
       <groupId>org.camunda.bpm.juel</groupId>
       <artifactId>camunda-juel</artifactId>
