@@ -532,7 +532,6 @@ public abstract class MockProvider {
   public static final String EXAMPLE_AUTHORIZATION_TYPE_STRING = "0";
   public static final Boolean EXAMPLE_ACQUIRED = true;
 
-
   // process applications
   public static final String EXAMPLE_PROCESS_APPLICATION_NAME = "aProcessApplication";
   public static final String EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH = "http://camunda.org/someContext";
