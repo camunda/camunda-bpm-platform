@@ -467,7 +467,7 @@ public class RedeploymentTest {
 
     // then
     assertNotNull(deployment2);
-    assertNull(deployment2.getSource());
+    assertEquals("process application", deployment2.getSource());
   }
 
   @Test
