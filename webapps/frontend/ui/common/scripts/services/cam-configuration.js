@@ -40,6 +40,9 @@ var defaultConfig = {
     default: true,
     hidden: false
   },
+  cascade: {
+    default: false
+  },
   runtimeActivityInstanceMetrics: {
     display: true
   },
