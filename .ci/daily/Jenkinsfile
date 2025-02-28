@@ -277,7 +277,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMavenByStageType('rolling-update', 'h2', jdkVersion: 'jdk-17-latest')
+                cambpmRunMavenByStageType('rolling-update', 'h2', jdkVersion: 'jdk-11-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
