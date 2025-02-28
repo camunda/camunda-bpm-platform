@@ -44,9 +44,10 @@ module.exports = [
 
     var SKIP_CUSTOM_LISTENERS = configuration.getSkipCustomListeners();
     var SKIP_IO_MAPPINGS = ($scope.SKIP_IO_MAPPINGS = configuration.getSkipIoMappings());
+    var CASCADE = configuration.getCascade();
 
     var options = ($scope.options = {
-      cascade: false,
+      cascade: CASCADE.default,
       skipCustomListeners: SKIP_CUSTOM_LISTENERS.default,
       skipIoMappings: SKIP_IO_MAPPINGS.default
     });
