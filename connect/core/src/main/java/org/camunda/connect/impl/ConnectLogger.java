@@ -22,6 +22,6 @@ public abstract class ConnectLogger extends BaseLogger {
 
   public static final String PROJECT_CODE = "CNCT";
 
-  public static ConnectCoreLogger CORE_LOGGER = createLogger(ConnectCoreLogger.class, PROJECT_CODE, "org.camunda.bpm.connect", "01");
+  public static final ConnectCoreLogger CORE_LOGGER = createLogger(ConnectCoreLogger.class, PROJECT_CODE, "org.camunda.bpm.connect", "01");
 
 }
