@@ -1680,14 +1680,14 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     variableJson.put("name", "varName");
     variableJson.put("value", "varValue");
     variableJson.put("operator", "eq");
-
+    
     List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
     variables.add(variableJson);
-
+    
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", variables);
     json.put("variableValuesIgnoreCase", true);
-
+    
     given()
     .contentType(POST_JSON_CONTENT_TYPE)
     .body(json)
@@ -1696,7 +1696,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     .statusCode(Status.OK.getStatusCode())
     .when()
     .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
-
+    
     verify(mockedQuery).matchVariableValuesIgnoreCase();
     verify(mockedQuery).variableValueEquals("varName", "varValue");
   }
@@ -1707,14 +1707,14 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     variableJson.put("name", "varName");
     variableJson.put("value", "varValue");
     variableJson.put("operator", "neq");
-
+    
     List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
     variables.add(variableJson);
-
+    
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", variables);
     json.put("variableValuesIgnoreCase", true);
-
+    
     given()
     .contentType(POST_JSON_CONTENT_TYPE)
     .body(json)
@@ -1723,7 +1723,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     .statusCode(Status.OK.getStatusCode())
     .when()
     .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
-
+    
     verify(mockedQuery).matchVariableValuesIgnoreCase();
     verify(mockedQuery).variableValueNotEquals("varName", "varValue");
   }
@@ -1734,14 +1734,14 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     variableJson.put("name", "varName");
     variableJson.put("value", "varValue");
     variableJson.put("operator", "like");
-
+    
     List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
     variables.add(variableJson);
-
+    
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", variables);
     json.put("variableValuesIgnoreCase", true);
-
+    
     given()
     .contentType(POST_JSON_CONTENT_TYPE)
     .body(json)
@@ -1750,7 +1750,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     .statusCode(Status.OK.getStatusCode())
     .when()
     .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
-
+    
     verify(mockedQuery).matchVariableValuesIgnoreCase();
     verify(mockedQuery).variableValueLike("varName", "varValue");
   }
@@ -1762,14 +1762,14 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     variableJson.put("name", "varName");
     variableJson.put("value", "varValue");
     variableJson.put("operator", "eq");
-
+    
     List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
     variables.add(variableJson);
-
+    
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", variables);
     json.put("variableNamesIgnoreCase", true);
-
+    
     given()
     .contentType(POST_JSON_CONTENT_TYPE)
     .body(json)
@@ -1778,7 +1778,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     .statusCode(Status.OK.getStatusCode())
     .when()
     .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
-
+    
     verify(mockedQuery).matchVariableNamesIgnoreCase();
     verify(mockedQuery).variableValueEquals("varName", "varValue");
   }
@@ -1789,14 +1789,14 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     variableJson.put("name", "varName");
     variableJson.put("value", "varValue");
     variableJson.put("operator", "neq");
-
+    
     List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
     variables.add(variableJson);
-
+    
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", variables);
     json.put("variableNamesIgnoreCase", true);
-
+    
     given()
     .contentType(POST_JSON_CONTENT_TYPE)
     .body(json)
@@ -1805,7 +1805,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     .statusCode(Status.OK.getStatusCode())
     .when()
     .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
-
+    
     verify(mockedQuery).matchVariableNamesIgnoreCase();
     verify(mockedQuery).variableValueNotEquals("varName", "varValue");
   }
