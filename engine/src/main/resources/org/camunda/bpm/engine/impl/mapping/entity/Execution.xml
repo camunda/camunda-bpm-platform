@@ -17,8 +17,8 @@
     limitations under the License.
 
 -->
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity">
 
   <!-- EXECUTION INSERT -->
@@ -75,7 +75,7 @@
   </insert>
 
   <!-- EXECUTION UPDATE -->
-
+  
   <update id="updateExecution" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity">
     update ${prefix}ACT_RU_EXECUTION set
       REV_ = #{revisionNext, jdbcType=INTEGER},
@@ -97,7 +97,7 @@
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
-
+  
   <update id="updateExecutionSuspensionStateByParameters" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     update ${prefix}ACT_RU_EXECUTION set
       REV_ = 1 + REV_ ,
@@ -111,7 +111,7 @@
       </if>
       <if test="parameter.processDefinitionKey != null">
         and PROC_DEF_ID_ IN (
-        SELECT ID_
+          SELECT ID_ 
           FROM ${prefix}ACT_RE_PROCDEF PD
           WHERE PD.KEY_ = #{parameter.processDefinitionKey, jdbcType=VARCHAR}
           <if test="parameter.isTenantIdSet">
@@ -160,23 +160,23 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR"/>  
   </resultMap>
-
+  
   <resultMap type="org.camunda.bpm.engine.impl.util.ImmutablePair" id="deploymentIdMapping">
     <id property="left" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
     <id property="right" column="ID_" jdbcType="VARCHAR" />
   </resultMap>
-
+  
   <!-- EXECUTION SELECT -->
-
+  
   <select id="selectExecution" parameterType="string" resultMap="executionResultMap">
     select * from ${prefix}ACT_RU_EXECUTION where ID_ = #{id}
   </select>
-
+  
   <select id="selectExecutionsByParentExecutionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
     select * from ${prefix}ACT_RU_EXECUTION
     where PARENT_ID_ = #{parameter}
   </select>
-
+  
   <select id="selectExecutionsByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
     select * from ${prefix}ACT_RU_EXECUTION
     where PROC_INST_ID_ = #{parameter}
@@ -187,7 +187,7 @@
     from ${prefix}ACT_RU_EXECUTION
     where PROC_DEF_ID_ = #{parameter} and PARENT_ID_ is null
   </select>
-
+  
   <select id="selectExecutionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ExecutionQueryImpl" resultMap="executionResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
@@ -198,13 +198,13 @@
     ${orderBy}
     ${limitAfter}
   </select>
-
+  
   <select id="selectExecutionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ExecutionQueryImpl" resultType="long">
     ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectExecutionsByQueryCriteriaSql"/>
     ${countDistinctAfterEnd}
   </select>
-
+  
   <select id="selectProcessInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultMap="executionResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
@@ -215,7 +215,7 @@
     ${orderBy}
     ${limitAfter}
   </select>
-
+  
   <select id="selectProcessInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultType="long">
     ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectProcessInstanceByQueryCriteriaSql"/>
@@ -226,7 +226,7 @@
     select distinct RES.ID_
     <include refid="selectProcessInstanceByQueryCriteriaSql"/>
   </select>
-
+  
   <select id="selectProcessInstanceDeploymentIdMappingsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultMap="deploymentIdMapping">
     select distinct P.DEPLOYMENT_ID_, RES.ID_
     <include refid="selectProcessInstanceByQueryCriteriaSql"/>
@@ -262,7 +262,7 @@
     inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
       AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart} RES.ID_ ${authJoinSeparator} P.KEY_ ${authJoinSeparator} '*' ${authJoinEnd})
     </if>
 
@@ -561,7 +561,7 @@
     <if test="resultType == 'LIST_PAGE'">
         ${limitBeforeNativeQuery}
     </if>
-    ${sql}
+    ${sql} 
     <if test="resultType == 'LIST_PAGE'">
       ${limitAfter}
     </if>
@@ -569,6 +569,6 @@
 
   <select id="selectExecutionCountByNativeQuery" parameterType="java.util.Map" resultType="long">
     ${sql}
-  </select>
-
+  </select>  
+  
 </mapper>
