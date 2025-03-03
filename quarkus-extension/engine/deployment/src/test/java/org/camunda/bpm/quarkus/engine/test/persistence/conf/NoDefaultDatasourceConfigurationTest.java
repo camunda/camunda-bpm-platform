@@ -33,7 +33,7 @@ public class NoDefaultDatasourceConfigurationTest {
   static QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
       .withConfigurationResource("org/camunda/bpm/quarkus/engine/test/persistence/conf/secondary-datasource-application.properties")
       .assertException(throwable -> assertThat(throwable)
-          .hasMessage("No datasource named '<default>' exists")
+          .hasMessage("No bean found for required type [interface io.agroal.api.AgroalDataSource] and qualifiers [[@jakarta.enterprise.inject.Default()]]")
           .isInstanceOf(IllegalArgumentException.class))
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
