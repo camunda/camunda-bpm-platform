@@ -32,8 +32,8 @@ public class ChooseNotExistingDatasourceConfigurationTest {
       .withConfigurationResource("org/camunda/bpm/quarkus/engine/test/persistence/conf/multiple-datasources-application.properties")
       .overrideConfigKey("quarkus.camunda.datasource", "quaternary")
       .assertException(throwable -> assertThat(throwable)
-          .hasMessage("No datasource named 'quaternary' exists")
-          .isInstanceOf(IllegalArgumentException.class))
+          .hasMessage("No bean found for required type [interface io.agroal.api.AgroalDataSource] and qualifiers [[@io.quarkus.agroal.DataSource(value=\"quaternary\")]]")
+          .isInstanceOf(UnsatisfiedResolutionException.class))
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
   @Test
