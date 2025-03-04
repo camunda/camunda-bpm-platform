@@ -22,10 +22,9 @@ import java.util.List;
 import org.camunda.bpm.webapp.impl.security.auth.Authentication;
 import org.camunda.bpm.webapp.impl.security.filter.RequestMatcher.Match;
 import org.camunda.bpm.webapp.impl.security.filter.util.FilterRules;
-import org.springframework.util.PathMatcher;
 
 /**
- * <p>A {@link SecurityFilterRule} that deleagates to a set of {@link PathMatcher}s</p>
+ * <p>A {@link SecurityFilterRule} that delegates to a set of path matchers</p>
  *
  * <p>How this thing works:
  * <ul>

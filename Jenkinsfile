@@ -13,7 +13,7 @@ pipeline {
   environment {
     LOGGER_LOG_LEVEL = 'DEBUG'
     MAVEN_VERSION = 'maven-3.8-latest'
-    DEF_JDK_VERSION = 'jdk-11-latest'
+    DEF_JDK_VERSION = 'jdk-17-latest'
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
@@ -168,7 +168,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMavenByStageType('db-unit', 'h2')
+                cambpmRunMavenByStageType('db-unit', 'h2', jdkVersion: 'jdk-17-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -187,7 +187,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMaven('engine/', 'verify -Pcfghistoryaudit', runtimeStash: true)
+                cambpmRunMaven('engine/', 'verify -Pcfghistoryaudit', runtimeStash: true, jdkVersion: 'jdk-17-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -205,7 +205,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMaven('engine/', 'verify -Pcfghistoryactivity', runtimeStash: true)
+                cambpmRunMaven('engine/', 'verify -Pcfghistoryactivity', runtimeStash: true, jdkVersion: 'jdk-17-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -241,7 +241,11 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'postgresql_142',
               runSteps: {
-                cambpmRunMaven('qa/', 'clean install -Ptomcat9,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
+                cambpmRunMaven('qa/',
+                'clean install -Ptomcat9,postgresql,engine-integration',
+                runtimeStash: true,
+                archiveStash: true,
+                jdkVersion: 'jdk-11-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -303,7 +307,11 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'postgresql_142',
               runSteps: {
-                cambpmRunMaven('qa/', 'clean install -Pwildfly26,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
+                cambpmRunMaven('qa/',
+                'clean install -Pwildfly26,postgresql,engine-integration',
+                runtimeStash: true,
+                archiveStash: true,
+                jdkVersion: 'jdk-11-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -366,7 +374,11 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'chrome_112',
               runSteps: {
-                cambpmRunMaven('qa/', 'clean install -Ptomcat9,h2,webapps-integration', runtimeStash: true, archiveStash: true)
+                cambpmRunMaven('qa/',
+                'clean install -Ptomcat9,h2,webapps-integration',
+                runtimeStash: true,
+                archiveStash: true,
+                jdkVersion: 'jdk-17-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -385,7 +397,11 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'chrome_112',
               runSteps: {
-                cambpmRunMaven('qa/', 'clean install -Ptomcat,h2,webapps-integration', runtimeStash: true, archiveStash: true)
+                cambpmRunMaven('qa/',
+                  'clean install -Ptomcat,h2,webapps-integration',
+                  runtimeStash: true,
+                  archiveStash: true,
+                  jdkVersion: 'jdk-17-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -406,7 +422,7 @@ pipeline {
               agentLabel: 'chrome_112',
               runSteps: {
                 cambpmRunMaven('qa/',
-                  "clean install -Pwildfly,h2,webapps-integration -pl '!integration-tests-engine-jakarta'",
+                  "clean install -Pwildfly,h2,webapps-integration",
                   runtimeStash: true,
                   archiveStash: true,
                   jdkVersion: 'jdk-17-latest')
@@ -428,7 +444,11 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'chrome_112',
               runSteps: {
-                cambpmRunMaven('qa/', 'clean install -Pwildfly26,h2,webapps-integration', runtimeStash: true, archiveStash: true)
+                cambpmRunMaven('qa/',
+                  'clean install -Pwildfly26,h2,webapps-integration',
+                  runtimeStash: true,
+                  archiveStash: true,
+                  jdkVersion: 'jdk-11-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -514,7 +534,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMaven('engine/', 'clean verify -Pcheck-api-compatibility', runtimeStash: true)
+                cambpmRunMaven('engine/', 'clean verify -Pcheck-api-compatibility', runtimeStash: true, jdkVersion: 'jdk-17-latest')
               }
             ])
           }
@@ -529,7 +549,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMaven('engine/', 'clean test -Pdb-table-prefix', runtimeStash: true)
+                cambpmRunMaven('engine/', 'clean test -Pdb-table-prefix', runtimeStash: true, jdkVersion: 'jdk-17-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()

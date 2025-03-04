@@ -34,7 +34,7 @@ db-unit:
   - 'postgresql'
   podSpec:
     cpu: 4
-    images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
+    images: ['maven:3.9.7-eclipse-temurin-17', 'postgres:17.0']
 sql-scripts:
   directory: 'distro/sql-script'
   command: 'install -Pcheck-sql,'
@@ -139,6 +139,7 @@ engine-rest-IT-embedded-wildfly26:
   labels:
   - 'rest-api'
   nodeLabel: 'h2'
+  jdkVersion: 'jdk-11-0-21'
 engine-rest-jakarta-unit-compatibility-wildfly:
   directory: 'engine-rest/engine-rest-jakarta'
   command: 'clean install -Pwildfly-compatibility'
