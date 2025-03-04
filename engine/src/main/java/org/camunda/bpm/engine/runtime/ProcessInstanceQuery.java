@@ -336,4 +336,7 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
   ProcessInstanceQuery endOr();
 
   ProcessInstanceQuery rootProcessInstance(String id);
+
+  ProcessInstanceQuery idAfter(String id);
+
 }
