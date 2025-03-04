@@ -418,13 +418,39 @@
               </excludes>
               <testFailureIgnore>false</testFailureIgnore>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <argLine>-Xmx2g -Duser.language=en -Duser.region=US -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${project.build.directory}/heap_dump.hprof</argLine>
+              <argLine>-Xmx2g -Duser.language=en -Duser.region=US -XX:+HeapDumpOnOutOfMemoryError
+                -XX:HeapDumpPath=${project.build.directory}/heap_dump.hprof
+                --add-opens=java.base/java.util=ALL-UNNAMED
+                --add-opens=java.base/java.lang=ALL-UNNAMED</argLine>
             </configuration>
           </plugin>
 
         </plugins>
       </build>
     </profile>
+
+    <profile>
+     <id>exclude-post-jdk15-tests</id>
+      <activation>
+        <jdk>[15,)</jdk>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <!-- Nashorn is not part of the JDK anymore in Java 15+ -->
+                <excludes combine.children="append">
+                  <exclude>**/*NashornTest.java</exclude>
+                </excludes>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
   </profiles>
 
 </project>

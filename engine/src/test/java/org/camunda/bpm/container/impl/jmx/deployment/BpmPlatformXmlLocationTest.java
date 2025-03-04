@@ -35,9 +35,9 @@ import java.net.URL;
 import java.net.URLDecoder;
 
 import org.camunda.bpm.container.impl.tomcat.deployment.TomcatParseBpmPlatformXmlStep;
-import org.junit.Rule;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.springframework.mock.jndi.SimpleNamingContext;
 
 /**
  * Checks the correct retrieval of bpm-platform.xml file through JNDI,
@@ -63,8 +63,19 @@ public class BpmPlatformXmlLocationTest {
   private static final String BPM_PLATFORM_XML_LOCATION_URL_HTTP_PROTOCOL = "http://localhost:8080/camunda/" + BPM_PLATFORM_XML_FILE;
   private static final String BPM_PLATFORM_XML_LOCATION_URL_HTTPS_PROTOCOL = "https://localhost:8080/camunda/" + BPM_PLATFORM_XML_FILE;
 
-  @Rule
-  public MockInitialContextRule initialContextRule = new MockInitialContextRule(new SimpleNamingContext());
+  protected Context context;
+
+  @Before
+  public void setUp() throws NamingException {
+    context = new InitialContext();
+  }
+
+  @After
+  public void close() throws NamingException {
+    if (context != null) {
+      context.close();
+    }
+  }
 
   @Test
   public void checkValidBpmPlatformXmlResourceLocationForUrl() throws NamingException, MalformedURLException {
@@ -121,7 +132,6 @@ public class BpmPlatformXmlLocationTest {
 
   @Test
   public void getBpmPlatformXmlLocationFromJndi() throws NamingException, MalformedURLException {
-    Context context = new InitialContext();
     context.bind("java:comp/env/" + BPM_PLATFORM_XML_LOCATION, BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION);
 
     URL url = new TomcatParseBpmPlatformXmlStep().lookupBpmPlatformXmlLocationFromJndi();
@@ -184,7 +194,6 @@ public class BpmPlatformXmlLocationTest {
 
   @Test
   public void lookupBpmPlatformXml() throws NamingException, MalformedURLException {
-    Context context = new InitialContext();
     context.bind("java:comp/env/" + BPM_PLATFORM_XML_LOCATION, BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION);
 
     URL url = new TomcatParseBpmPlatformXmlStep().lookupBpmPlatformXml();

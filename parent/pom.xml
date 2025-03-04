@@ -144,7 +144,10 @@
             <systemPropertyVariables>
               <myWorkingDir>${project.build.directory}</myWorkingDir>
             </systemPropertyVariables>
-            <argLine>-Xmx968m -Duser.language=en -Duser.region=US -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${project.build.directory}/heap_dump.hprof</argLine>
+            <argLine>-Xmx968m -Duser.language=en -Duser.region=US -XX:+HeapDumpOnOutOfMemoryError
+              -XX:HeapDumpPath=${project.build.directory}/heap_dump.hprof
+              --add-opens=java.base/java.util=ALL-UNNAMED
+              --add-opens=java.base/java.lang=ALL-UNNAMED</argLine>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
           </configuration>
         </plugin>

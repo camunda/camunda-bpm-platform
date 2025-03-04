@@ -166,6 +166,17 @@
           <scope>test</scope>
           <type>war</type>
         </dependency>
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine</artifactId>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>org.springframework</groupId>
+              <artifactId>spring-beans</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
       </dependencies>
       <build>
         <plugins>

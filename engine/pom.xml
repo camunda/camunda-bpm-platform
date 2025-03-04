@@ -26,7 +26,7 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-framework-bom</artifactId>
-        <version>${version.spring.framework}</version>
+        <version>${version.spring.framework6}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -331,6 +331,13 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-bpm-archunit</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.h-thurow</groupId>
+      <artifactId>simple-jndi</artifactId>
+      <version>0.24.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -875,7 +882,7 @@
     </profile>
 
     <profile>
-      <id>java15</id>
+     <id>exclude-post-jdk15-tests</id>
       <activation>
         <jdk>[15,)</jdk>
       </activation>
@@ -944,6 +951,24 @@
      <properties>
       <test.excludes>bpmn|cmmn</test.excludes>
      </properties>
+    </profile>
+
+    <profile>
+      <id>java11</id>
+      <activation>
+        <jdk>11</jdk>
+      </activation>
+      <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-framework-bom</artifactId>
+            <version>${version.spring.framework}</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
     </profile>
 
   </profiles>

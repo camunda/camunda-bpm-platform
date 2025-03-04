@@ -198,7 +198,7 @@
   
   <profiles>
     <profile>
-      <id>java15</id>
+     <id>exclude-post-jdk15-tests</id>
       <activation>
         <jdk>[15,)</jdk>
       </activation>
