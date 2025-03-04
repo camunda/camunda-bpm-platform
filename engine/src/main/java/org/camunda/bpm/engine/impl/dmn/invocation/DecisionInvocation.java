@@ -53,8 +53,8 @@ public class DecisionInvocation extends DelegateInvocation {
   protected void invoke() throws Exception {
     final DmnEngine dmnEngine = Context.getProcessEngineConfiguration()
       .getDmnEngine();
-
-    invocationResult = dmnEngine.evaluateDecision((DmnDecision) decisionDefinition, variableContext);
+    String decisionInstanceId = Context.getProcessEngineConfiguration().getIdGenerator().getNextId();
+    invocationResult = dmnEngine.evaluateDecision((DmnDecision) decisionDefinition, variableContext, decisionInstanceId);
   }
 
   @Override
