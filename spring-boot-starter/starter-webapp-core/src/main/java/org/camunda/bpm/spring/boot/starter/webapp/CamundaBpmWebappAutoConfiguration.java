@@ -66,6 +66,11 @@ public class CamundaBpmWebappAutoConfiguration implements WebMvcConfigurer {
     return new LazyInitRegistration();
   }
 
+  @Bean
+  public FaviconResourceResolver faviconResourceResolver() {
+    return new FaviconResourceResolver();
+  }
+
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
     final String classpath = "classpath:" + properties.getWebapp().getWebjarClasspath();
@@ -80,8 +85,10 @@ public class CamundaBpmWebappAutoConfiguration implements WebMvcConfigurer {
         .addResourceLocations(classpath + "/app/");
     registry.addResourceHandler(applicationPath + "/assets/**")
         .addResourceLocations(classpath + "/assets/");
-    registry.addResourceHandler(applicationPath + "/favicon.ico")
-        .addResourceLocations(classpath);
+     registry.addResourceHandler(applicationPath + "/favicon.ico")
+         .addResourceLocations(classpath + "/") // add slash to get rid of the WARN log
+         .resourceChain(true)
+         .addResolver(faviconResourceResolver());
   }
 
   @Override
