@@ -16,8 +16,10 @@
  */
 package org.camunda.bpm.engine.test.standalone.calendar;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -91,4 +93,35 @@ public class CycleBusinessCalendarTest {
     assertEquals(expectedDuedate, duedate);
   }
 
+  @Test
+  public void testEndOfMonthRelativeExpressions() throws ParseException {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy MM dd HH:mm");
+    CycleBusinessCalendar cbc = new CycleBusinessCalendar();
+
+    Date startDate = sdf.parse("2025 02 14 12:00");
+
+    // All of these assertions should pass
+    assertThat(sdf.format(cbc.resolveDuedate("0 37 14 L-22 * ?", startDate))).isEqualTo("2025 03 09 14:37");
+    assertThat(sdf.format(cbc.resolveDuedate("0 23 8 L-2 * ?", startDate))).isEqualTo("2025 02 26 08:23");
+    assertThat(sdf.format(cbc.resolveDuedate("0 37 8 L-1 * ?", startDate))).isEqualTo("2025 02 27 08:37");
+    assertThat(sdf.format(cbc.resolveDuedate("0 0 12 L-15 * ?", startDate))).isEqualTo("2025 03 16 12:00");
+    assertThat(sdf.format(cbc.resolveDuedate("0 0 12 L-27 * ?", startDate))).isEqualTo("2025 03 04 12:00");
+  }
+
+  @Test
+  public void compareWithQuartzCronExpressionsTest() throws ParseException {
+    String expression = "0 0 12 L-27 * ?";
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy MM dd HH:mm");
+    Date startDate = sdf.parse("2025 02 14 12:00");
+
+    // Test with Quartz library
+    org.quartz.CronExpression ce1 = new org.quartz.CronExpression(expression);
+    Date d1 = ce1.getTimeAfter(startDate);
+    assertThat(sdf.format(d1)).isEqualTo("2025 03 04 12:00");
+
+    // Test with our library
+    org.camunda.bpm.engine.impl.calendar.CronExpression ce2 = new org.camunda.bpm.engine.impl.calendar.CronExpression(expression);
+    Date d2 = ce2.getTimeAfter(startDate);
+    assertThat(sdf.format(d2)).isEqualTo("2025 03 04 12:00"); // Without the changes in CronExpression, assertion fails and returns "Feb 01 2025 - 12:00" which is in the past
+  }
 }
