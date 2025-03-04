@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.ManagementService;
@@ -37,6 +36,7 @@ import org.camunda.bpm.engine.impl.batch.DeleteBatchCmd;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.ActivateBatchCmd;
+import org.camunda.bpm.engine.impl.cmd.GetDatabaseCountsCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteJobCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteLicenseKeyCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteMetricsCmd;
@@ -74,6 +74,7 @@ import org.camunda.bpm.engine.impl.diagnostics.DiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobHelper;
+import org.camunda.bpm.engine.impl.management.DatabaseContentReport;
 import org.camunda.bpm.engine.impl.management.PurgeReport;
 import org.camunda.bpm.engine.impl.management.SetJobRetriesBuilderImpl;
 import org.camunda.bpm.engine.impl.management.SetJobRetriesByJobsAsyncBuilderImpl;
@@ -313,6 +314,9 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     return commandExecutor.execute(new PurgeDatabaseAndCacheCmd());
   }
 
+  public DatabaseContentReport getDbTableCounts() {
+    return commandExecutor.execute(new GetDatabaseCountsCmd());
+  }
 
   @Override
   public ProcessDefinitionStatisticsQuery createProcessDefinitionStatisticsQuery() {
