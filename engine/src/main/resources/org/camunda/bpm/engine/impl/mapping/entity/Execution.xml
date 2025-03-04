@@ -280,8 +280,11 @@
         <trim suffixOverrides="and">
           RES.PARENT_ID_ is null and
           <trim prefix="(" prefixOverrides="or|and" suffix=")">
+            <if test="query.idAfter != null">
+              ${queryType} P.ID_ = #{idAfter}
+            </if>
             <if test="query.rootProcessInstanceId != null">
-              ${queryType} P.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId}
+              ${queryType} P.ROOT_PROC_INST_ID_ = #{query.rootProcessInstanceId}
             </if>
             <if test="query.processDefinitionId != null">
               ${queryType} P.ID_ = #{query.processDefinitionId}
