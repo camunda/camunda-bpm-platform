@@ -172,6 +172,7 @@ public class MessageStartEventTest extends PluggableProcessEngineTest {
     taskService.complete(task.getId());
 
     testRule.assertProcessEnded(processInstance.getId());
+    assertEquals("singleMessageStartEvent", processInstance.getProcessDefinitionKey());
 
     // using startProcessInstanceByKey also triggers the message event, if there is a single start event
 
@@ -185,6 +186,7 @@ public class MessageStartEventTest extends PluggableProcessEngineTest {
     taskService.complete(task.getId());
 
     testRule.assertProcessEnded(processInstance.getId());
+    assertEquals("singleMessageStartEvent", processInstance.getProcessDefinitionKey());
 
   }
 

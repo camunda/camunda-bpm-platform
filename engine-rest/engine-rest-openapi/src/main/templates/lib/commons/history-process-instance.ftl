@@ -52,6 +52,12 @@
     "desc": "Filter by process instance ids. ${listTypeDescription}."
   },
 
+  "processInstanceIdNotIn": {
+    "type": "array",
+    "itemType": "string",
+    "desc": "Exclude instances by process instance ids. ${listTypeDescription}."
+  },
+
   "processDefinitionId": {
     "type": "string",
     "desc": "Filter by the process definition the instances run on."
@@ -113,6 +119,12 @@
     "desc": "Only include unfinished process instances. Value may only be `true`, as `false` is the default behavior."
   },
 
+  "withJobsRetrying": {
+    "type": "boolean",
+    "desc": "Only include process instances which are associated with jobs that have encountered exceptions and still
+     have retries left. Value may only be `true`, as `false` is the default behavior."
+  },
+
   "withIncidents": {
     "type": "boolean",
     "desc": "Only include process instances which have an incident. Value may only be `true`, as `false` is the default behavior."
@@ -121,6 +133,12 @@
   "withRootIncidents": {
     "type": "boolean",
     "desc": "Only include process instances which have a root incident. Value may only be `true`, as `false` is the default behavior."
+  },
+
+  "incidentIdIn": {
+    "type": "array",
+    "itemType": "string",
+    "desc": "Restrict to instances that have an incident with one of the given ids. ${listTypeDescription}"
   },
 
   "incidentType": {
@@ -229,6 +247,12 @@
   "withoutTenantId": {
     "type": "boolean",
     "desc": "Only include historic process instances which belong to no tenant. Value may only be `true`, as `false` is the default behavior."
+  },
+
+  "activityIdIn": {
+    "type": "array",
+    "itemType": "string",
+    "desc": "Restrict to instances with an active activity with one of the given ids. In contrast to the `activeActivityIdIn` filter, it can query for async and incident activities. ${listTypeDescription}"
   },
 
   "executedActivityIdIn": {

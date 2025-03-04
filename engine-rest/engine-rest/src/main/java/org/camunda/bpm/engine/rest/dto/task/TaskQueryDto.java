@@ -131,6 +131,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String[] assigneeNotIn;
   private String candidateGroup;
   private String candidateGroupExpression;
+  private String candidateGroupLike;
   private String candidateUser;
   private String candidateUserExpression;
   private Boolean includeAssignedTasks;
@@ -211,6 +212,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private List<VariableQueryParameterDto> caseInstanceVariables;
 
   private List<TaskQueryDto> orQueries;
+
+  private Boolean withCommentAttachmentInfo;
 
   public TaskQueryDto() {
 
@@ -343,6 +346,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam("candidateGroupExpression")
   public void setCandidateGroupExpression(String candidateGroupExpression) {
     this.candidateGroupExpression = candidateGroupExpression;
+  }
+
+  @CamundaQueryParam("candidateGroupLike")
+  public void setCandidateGroupLike(String candidateGroupLike) {
+    this.candidateGroupLike = candidateGroupLike;
   }
 
   @CamundaQueryParam(value = "withCandidateGroups", converter = BooleanConverter.class)
@@ -708,6 +716,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.variableValuesIgnoreCase = variableValuesCaseInsensitive;
   }
 
+  @CamundaQueryParam(value = "withCommentAttachmentInfo", converter = BooleanConverter.class)
+  public void setWithCommentAttachmentInfo(Boolean withCommentAttachmentInfo) {
+    this.withCommentAttachmentInfo = withCommentAttachmentInfo;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -812,6 +825,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   public String getCandidateGroupExpression() {
     return candidateGroupExpression;
+  }
+
+  public String getCandidateGroupLike() {
+    return candidateGroupLike;
   }
 
   public String getCandidateUser() {
@@ -1078,6 +1095,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return variableValuesIgnoreCase;
   }
 
+  public Boolean getWithCommentAttachmentInfo() { return withCommentAttachmentInfo;}
+
   @Override
   protected void applyFilters(TaskQuery query) {
     if (orQueries != null) {
@@ -1159,6 +1178,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     if (candidateGroupExpression != null) {
       query.taskCandidateGroupExpression(candidateGroupExpression);
+    }
+    if (candidateGroupLike != null) {
+      query.taskCandidateGroupLike(candidateGroupLike);
     }
     if (withCandidateGroups != null && withCandidateGroups) {
       query.withCandidateGroups();
@@ -1442,6 +1464,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
         }
       }
     }
+    if (withCommentAttachmentInfo != null && withCommentAttachmentInfo) {
+      query.withCommentAttachmentInfo();
+    }
   }
 
   @Override
@@ -1558,6 +1583,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
     dto.candidateUser = taskQuery.getCandidateUser();
     dto.candidateGroup = taskQuery.getCandidateGroup();
+    dto.candidateGroupLike = taskQuery.getCandidateGroupLike();
     dto.candidateGroups = taskQuery.getCandidateGroupsInternal();
     dto.includeAssignedTasks = taskQuery.isIncludeAssignedTasksInternal();
     dto.withCandidateGroups = taskQuery.isWithCandidateGroups();

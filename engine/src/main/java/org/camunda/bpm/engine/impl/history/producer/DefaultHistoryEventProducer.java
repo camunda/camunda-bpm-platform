@@ -204,6 +204,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setCaseInstanceId(caseInstanceId);
     evt.setTenantId(tenantId);
     evt.setRootProcessInstanceId(execution.getRootProcessInstanceId());
+    evt.setRestartedProcessInstanceId(execution.getRestartedProcessInstanceId());
 
     if (execution.getSuperCaseExecution() != null) {
       evt.setSuperCaseInstanceId(execution.getSuperCaseExecution().getCaseInstanceId());
@@ -1148,6 +1149,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setJobId(jobEntity.getId());
 
     System.out.println("In history id: "+ jobEntity.getId());
+
+    evt.setBatchId(jobEntity.getBatchId());
     evt.setJobDueDate(jobEntity.getDuedate());
     evt.setJobRetries(jobEntity.getRetries());
     evt.setJobPriority(jobEntity.getPriority());

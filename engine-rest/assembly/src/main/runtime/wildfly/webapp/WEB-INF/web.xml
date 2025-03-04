@@ -5,11 +5,19 @@
 
   <display-name>Camunda Platform rest api</display-name>
 
-  <!-- Fetch And Lock Handler (long polling): Unique Worker Request (default value: false) -->
-  <!--
+  <!-- Fetch And Lock Handler (long polling): -->
+
+  <!-- Unique Worker Request (default value: false)
   <context-param>
     <param-name>fetch-and-lock-unique-worker-request</param-name>
     <param-value>true</param-value>
+  </context-param>
+  -->
+
+  <!-- Queue capacity (default value: 200)
+  <context-param>
+    <param-name>fetch-and-lock-queue-capacity</param-name>
+    <param-value>250</param-value>
   </context-param>
   -->
 

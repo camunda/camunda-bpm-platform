@@ -40,6 +40,9 @@ var defaultConfig = {
     default: true,
     hidden: false
   },
+  cascade: {
+    default: false
+  },
   runtimeActivityInstanceMetrics: {
     display: true
   },
@@ -135,6 +138,10 @@ module.exports = function(config, app) {
           defaultConfig.skipIoMappings,
           config.skipIoMappings
         );
+      };
+
+      this.getCascade = function() {
+        return angular.extend({}, defaultConfig.cascade, config.cascade);
       };
 
       this.getRuntimeActivityInstanceMetrics = function() {

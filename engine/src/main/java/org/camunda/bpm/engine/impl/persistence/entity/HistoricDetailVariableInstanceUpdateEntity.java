@@ -144,7 +144,7 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
            + ", eventType=" + eventType
            + ", executionId=" + executionId
            + ", id=" + id
-           + ", processDefinitionId=" + processInstanceId
+           + ", processDefinitionId=" + processDefinitionId
            + ", processInstanceId=" + processInstanceId
            + ", taskId=" + taskId
            + ", timestamp=" + timestamp

@@ -1,0 +1,149 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.bpm.qa.upgrade</groupId>
+    <artifactId>camunda-qa-db-instance-migration</artifactId>
+    <version>7.23.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>camunda-qa-upgrade-test-fixture-723</artifactId>
+  <packaging>jar</packaging>
+  <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.23.0</name>
+
+  <properties>
+    <!-- delete when 7.23 is released -->
+    <camunda.version.current>${project.version}</camunda.version.current>
+    <camunda.version.previous>7.22.0</camunda.version.previous>
+  </properties>
+
+  <!-- uncomment when 7.23 is released -->
+<!--   <dependencyManagement> -->
+<!--     <dependencies> -->
+<!--       <dependency> -->
+<!--         <groupId>org.camunda.bpm</groupId> -->
+<!--         <artifactId>camunda-bom</artifactId> -->
+<!--         <version>7.23.0</version> -->
+<!--         <scope>import</scope> -->
+<!--         <type>pom</type> -->
+<!--       </dependency> -->
+<!--     </dependencies> -->
+<!--   </dependencyManagement> -->
+
+  <dependencies>
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-plugin-spin</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.qa.upgrade</groupId>
+      <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>instance-migration</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>update-db</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>update</goal>
+                </goals>
+                <configuration>
+                  <changeLogFile>camunda-changelog.xml</changeLogFile>
+                  <changeLogDirectory>${project.build.directory}/scripts-current/sql/liquibase/</changeLogDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- provide sql scripts -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-current-sql-scripts</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.distro</groupId>
+                      <artifactId>camunda-sql-scripts</artifactId>
+                      <!-- Replace after 7.23.0 release -->
+                      <version>${camunda.version.current}</version>
+                      <!--<version>7.23.0</version>-->
+                      <type>test-jar</type>
+                      <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
+                      <overWrite>true</overWrite>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- uncomment when 7.23 is released -->
+          <!--<plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <configuration>
+              <cleanupDaemonThreads>false</cleanupDaemonThreads>
+              <includeProjectDependencies>true</includeProjectDependencies>
+              <includePluginDependencies>false</includePluginDependencies>
+              <classpathScope>test</classpathScope>
+            </configuration>
+            <executions>
+              <execution>
+                <id>create-test-fixture</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+                <phase>process-test-classes</phase>
+                <configuration>
+                  <mainClass>org.camunda.bpm.qa.upgrade.TestFixture</mainClass>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>-->
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>

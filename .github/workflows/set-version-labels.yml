@@ -1,0 +1,16 @@
+name: Set Version Labels
+
+on:
+  issues:
+    types:
+      - closed
+  issue_comment:
+    types: [ created ]
+
+jobs:
+  call-reusable-flow:
+    if: >
+      (github.event_name == 'issues' && github.event.action == 'closed' && github.event.issue.state_reason != 'not_planned') ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/set-version-labels'))
+    uses: camunda/automation-platform-github-actions/.github/workflows/set-version-labels.yml@main
+    secrets: inherit

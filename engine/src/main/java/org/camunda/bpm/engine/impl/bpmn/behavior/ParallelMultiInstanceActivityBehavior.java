@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.Callback;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -40,6 +41,9 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
   protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {
     PvmActivity innerActivity = getInnerActivity(execution.getActivity());
 
+    // evaluate the collection to ensure the input of collectionExpression same as before
+    // also reduces the loop count of collectionExpression
+    Collection<?> collection = evaluateCollection(execution);
     // initialize the scope and create the desired number of child executions
     prepareScopeExecution(execution, nrOfInstances);
 
@@ -53,7 +57,7 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
     // actually be started in correct order :) )
     for (int i = (nrOfInstances - 1); i >= 0; i--) {
       ActivityExecution activityExecution = concurrentExecutions.get(i);
-      performInstance(activityExecution, innerActivity, i);
+      performInstance(activityExecution, innerActivity, i, collection);
     }
   }
 

@@ -16,13 +16,19 @@
  */
 package org.camunda.bpm.engine.rest.sub.task;
 
-import org.camunda.bpm.engine.rest.dto.task.CommentDto;
-
-import javax.ws.rs.*;
+import java.util.List;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-import java.util.List;
+import org.camunda.bpm.engine.rest.dto.task.CommentDto;
 
 public interface TaskCommentResource {
 
@@ -40,5 +46,17 @@ public interface TaskCommentResource {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   CommentDto createComment(@Context UriInfo uriInfo, CommentDto comment);
+
+  @DELETE
+  @Path("/{commentId}")
+  @Produces(MediaType.APPLICATION_JSON)
+  void deleteComment(@PathParam("commentId") String commentId);
+
+  @PUT
+  @Consumes(MediaType.APPLICATION_JSON)
+  void updateComment(CommentDto comment);
+
+  @DELETE
+  void deleteComments();
 
 }

@@ -19,10 +19,13 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.HistoricEntity;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.task.Comment;
@@ -32,7 +35,7 @@ import org.camunda.bpm.engine.task.Event;
 /**
  * @author Tom Baeyens
  */
-public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, Serializable {
+public class CommentEntity implements Comment, Event, HasDbRevision, DbEntity, HistoricEntity, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -40,8 +43,6 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
   public static final String TYPE_COMMENT = "comment";
 
   protected String id;
-
-  // If comments would be removeable, revision needs to be added!
 
   protected String type;
   protected String userId;
@@ -54,9 +55,13 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
   protected String tenantId;
   protected String rootProcessInstanceId;
   protected Date removalTime;
+  protected int revision;
 
+  @Override
   public Object getPersistentState() {
-    return CommentEntity.class;
+    Map<String, Object> persistentState = new HashMap<>();
+    persistentState.put("message", message);
+    return persistentState;
   }
 
   public byte[] getFullMessageBytes() {
@@ -86,6 +91,7 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
     message = stringBuilder.toString();
   }
 
+  @Override
   public List<String> getMessageParts() {
     if (message==null) {
       return null;
@@ -105,14 +111,17 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
 
   // getters and setters //////////////////////////////////////////////////////
 
+  @Override
   public String getId() {
     return id;
   }
 
+  @Override
   public void setId(String id) {
     this.id = id;
   }
 
+  @Override
   public String getUserId() {
     return userId;
   }
@@ -121,6 +130,7 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
     this.userId = userId;
   }
 
+  @Override
   public String getTaskId() {
     return taskId;
   }
@@ -129,6 +139,7 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
     this.taskId = taskId;
   }
 
+  @Override
   public String getMessage() {
     return message;
   }
@@ -137,6 +148,7 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
     this.message = message;
   }
 
+  @Override
   public Date getTime() {
     return time;
   }
@@ -145,6 +157,7 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
     this.time = time;
   }
 
+  @Override
   public String getProcessInstanceId() {
     return processInstanceId;
   }
@@ -161,6 +174,7 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
     this.type = type;
   }
 
+  @Override
   public String getFullMessage() {
     return fullMessage;
   }
@@ -169,6 +183,7 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
     this.fullMessage = fullMessage;
   }
 
+  @Override
   public String getAction() {
     return action;
   }
@@ -185,6 +200,7 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
     this.tenantId = tenantId;
   }
 
+  @Override
   public String getRootProcessInstanceId() {
     return rootProcessInstanceId;
   }
@@ -193,12 +209,21 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
     this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
+  @Override
   public Date getRemovalTime() {
     return removalTime;
   }
 
   public void setRemovalTime(Date removalTime) {
     this.removalTime = removalTime;
+  }
+
+  public String toEventMessage(String message) {
+    String eventMessage = message.replaceAll("\\s+", " ");
+    if (eventMessage.length() > 163) {
+      eventMessage = eventMessage.substring(0, 160) + "...";
+    }
+    return eventMessage;
   }
 
   @Override
@@ -211,11 +236,27 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
            + ", taskId=" + taskId
            + ", processInstanceId=" + processInstanceId
            + ", rootProcessInstanceId=" + rootProcessInstanceId
+           + ", revision= "+ revision
            + ", removalTime=" + removalTime
            + ", action=" + action
            + ", message=" + message
            + ", fullMessage=" + fullMessage
            + ", tenantId=" + tenantId
            + "]";
+  }
+
+  @Override
+  public void setRevision(int revision) {
+    this.revision = revision;
+  }
+
+  @Override
+  public int getRevision() {
+    return revision;
+  }
+
+  @Override
+  public int getRevisionNext() {
+    return revision + 1;
   }
 }

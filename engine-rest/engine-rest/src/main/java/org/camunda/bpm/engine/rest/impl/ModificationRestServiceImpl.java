@@ -22,9 +22,11 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.ModificationRestService;
 import org.camunda.bpm.engine.rest.dto.ModificationDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.ModificationBuilder;
@@ -72,6 +74,12 @@ public class ModificationRestServiceImpl extends AbstractRestProcessEngineAware 
     if (processInstanceQueryDto != null) {
       ProcessInstanceQuery processInstanceQuery = processInstanceQueryDto.toQuery(getProcessEngine());
       builder.processInstanceQuery(processInstanceQuery);
+    }
+
+    HistoricProcessInstanceQueryDto historicProcessInstanceQueryDto = dto.getHistoricProcessInstanceQuery();
+    if(historicProcessInstanceQueryDto != null) {
+      HistoricProcessInstanceQuery historicProcessInstanceQuery = historicProcessInstanceQueryDto.toQuery(getProcessEngine());
+      builder.historicProcessInstanceQuery(historicProcessInstanceQuery);
     }
 
     if (dto.isSkipCustomListeners()) {

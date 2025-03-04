@@ -279,10 +279,10 @@ const Controller = [
     };
 
     const initializeMonthlyData = () => {
-      // prefill last 12 months for monthly table
+      // prefill last 24 months for monthly table
       monthlyMetricUsageMap = {};
       let month = $scope.activeMonth.clone();
-      for (let i = 0; i < 12; i++) {
+      for (let i = 0; i < 24; i++) {
         // create label
         const label = createGroupLabel(month.year(), month.month() + 1);
         monthlyMetricUsageMap[label] = {
@@ -346,7 +346,8 @@ const Controller = [
           }
 
           $scope.monthlyMetrics = angular.copy(monthlyMetricsArray);
-          updateMonthlyChart(monthlyMetricsArray.reverse());
+          $scope.monthlyMetrics = $scope.monthlyMetrics.slice(0, 12);
+          updateMonthlyChart($scope.monthlyMetrics.reverse());
           $scope.loadingStateMonthly = 'LOADED';
           $scope.$apply();
         })

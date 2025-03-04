@@ -66,7 +66,7 @@ create table ACT_GE_SCHEMA_LOG (
 );
 
 insert into ACT_GE_SCHEMA_LOG
-values ('0', CURRENT_TIMESTAMP, '7.22.0');
+values ('0', CURRENT_TIMESTAMP, '7.23.0');
 
 create table ACT_RE_DEPLOYMENT (
     ID_ NVARCHAR2(64),
@@ -98,6 +98,7 @@ create table ACT_RU_EXECUTION (
     CACHED_ENT_STATE_ INTEGER,
     SEQUENCE_COUNTER_ NUMBER(19,0),
     TENANT_ID_ NVARCHAR2(64),
+    PROC_DEF_KEY_ NVARCHAR2(255),
     primary key (ID_)
 );
 
@@ -130,6 +131,7 @@ create table ACT_RU_JOB (
     TENANT_ID_ NVARCHAR2(64),
     CREATE_TIME_ TIMESTAMP(6),
     LAST_FAILURE_LOG_ID_ NVARCHAR2(64),
+    BATCH_ID_ NVARCHAR2(64),
     primary key (ID_)
 );
 

@@ -84,7 +84,7 @@
   <span ng-show="varType !== 'option'"
         class="cam-widget-inline-field btn-group">
     <button type="button"
-                ng-if="inOperator && !(varType === 'datetime' || varType === 'date' || varType === 'time')"
+                ng-if="(inOperator || notInOperator) && !(varType === 'datetime' || varType === 'date' || varType === 'time')"
                 class="btn btn-xs btn-default"
                 ng-click="expandValue()">
       <span class="glyphicon glyphicon-resize-full"></span>

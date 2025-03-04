@@ -63,6 +63,7 @@
                            "rootProcessInstanceId": "aRootProcessInstanceId",
                            "tenantId": null,
                            "hostname": "aHostname",
+                           "batchId": "aBatchId",
                            "creationLog": true,
                            "failureLog": false,
                            "successLog": false,

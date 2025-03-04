@@ -16,14 +16,12 @@
  */
 package org.camunda.bpm.run.property;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @ConfigurationProperties(CamundaBpmRunProperties.PREFIX)
 public class CamundaBpmRunProperties {
@@ -41,6 +39,12 @@ public class CamundaBpmRunProperties {
 
   @NestedConfigurationProperty
   protected List<CamundaBpmRunProcessEnginePluginProperty> processEnginePlugins = new ArrayList<>();
+
+  @NestedConfigurationProperty
+  protected CamundaBpmRunRestProperties rest = new CamundaBpmRunRestProperties();
+
+  @NestedConfigurationProperty
+  protected CamundaBpmRunDeploymentProperties deployment = new CamundaBpmRunDeploymentProperties();
 
   protected CamundaBpmRunAdministratorAuthorizationProperties adminAuth
       = new CamundaBpmRunAdministratorAuthorizationProperties();
@@ -85,6 +89,23 @@ public class CamundaBpmRunProperties {
     this.processEnginePlugins = processEnginePlugins;
   }
 
+  public CamundaBpmRunRestProperties getRest() {
+    return rest;
+  }
+
+  public void setRest(CamundaBpmRunRestProperties rest) {
+    this.rest = rest;
+  }
+
+  public CamundaBpmRunDeploymentProperties getDeployment() {
+    return deployment;
+  }
+
+  public void setDeployment(CamundaBpmRunDeploymentProperties deployment) {
+    this.deployment = deployment;
+  }
+
+
   @Override
   public String toString() {
     return "CamundaBpmRunProperties [" +
@@ -93,6 +114,8 @@ public class CamundaBpmRunProperties {
         ", ldap=" + ldap +
         ", adminAuth=" + adminAuth +
         ", plugins=" + processEnginePlugins +
+        ", rest=" + rest +
+        ", deployment=" + deployment +
         "]";
   }
 }

@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.camunda.bpm.dmn</groupId>
     <artifactId>camunda-engine-dmn-root</artifactId>
-    <version>7.22.0-SNAPSHOT</version>
+    <version>7.23.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-engine-feel-api</artifactId>
@@ -17,7 +17,6 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-typed-values</artifactId>
-      <version>${project.version}</version>
     </dependency>
   </dependencies>
 

@@ -315,6 +315,25 @@ public interface TaskQuery extends Query<TaskQuery, Task> {
   TaskQuery taskCandidateGroupExpression(String candidateGroupExpression);
 
   /**
+   * Only select tasks whose candidate users belong to groups matching the given parameter.
+   * The syntax is that of SQL: for example usage: nameLike(%camunda%)
+   *
+   * <p>
+   * Per default it only selects tasks which are not already assigned
+   * to a user. To also include assigned task in the result specify
+   * {@link #includeAssignedTasks()} in your query.
+   * </p>
+   *
+   * @throws ProcessEngineException <ul><li>When query is executed and {@link #taskCandidateUser(String)} or
+   *                                {@link #taskCandidateUserExpression(String)} (List)} has been executed on the
+   *                                "and query" instance. <br>
+   *                                No exception is thrown when query is executed and {@link #taskCandidateUser(String)} or
+   *                                {@link #taskCandidateUserExpression(String)} has been executed on the "or query" instance.</li>
+   *                                <li>When passed group is <code>null</code>.</li></ul>
+   */
+  TaskQuery taskCandidateGroupLike(String candidateGroupLike);
+
+  /**
    * Only select tasks for which the 'candidateGroup' is one of the given groups.
    *
    * <p>
@@ -1104,4 +1123,11 @@ public interface TaskQuery extends Query<TaskQuery, Task> {
    *                                this exception, {@link #or()} must be invoked first.
    */
   TaskQuery endOr();
+
+  /**
+   * Evaluates existence of attachment and comments associated with the task, defaults to false.
+   * Adding the filter will do additional attachment and comments queries to the database,
+   * it might slow down the query in case of tables having high volume of data.
+   */
+  TaskQuery withCommentAttachmentInfo();
 }

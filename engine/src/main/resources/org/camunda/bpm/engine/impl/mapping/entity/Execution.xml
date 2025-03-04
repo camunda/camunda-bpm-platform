@@ -45,6 +45,7 @@
       CACHED_ENT_STATE_,
       SEQUENCE_COUNTER_,
       TENANT_ID_,
+      PROC_DEF_KEY_,
       REV_
     )
     values
@@ -68,6 +69,7 @@
       #{cachedEntityState, jdbcType=INTEGER},
       #{sequenceCounter, jdbcType=BIGINT},
       #{tenantId, jdbcType=VARCHAR},
+      #{processDefinitionKey, jdbcType=VARCHAR},
       1
     )
   </insert>
@@ -90,7 +92,8 @@
       SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
       CACHED_ENT_STATE_ = #{cachedEntityState, jdbcType=INTEGER},
       SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=BIGINT},
-      TENANT_ID_ = #{tenantId, jdbcType=BIGINT}
+      TENANT_ID_ = #{tenantId, jdbcType=BIGINT},
+      PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -155,6 +158,7 @@
     <result property="cachedEntityState" column="CACHED_ENT_STATE_" jdbcType="INTEGER"/>
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR"/>  
   </resultMap>
   
   <resultMap type="org.camunda.bpm.engine.impl.util.ImmutablePair" id="deploymentIdMapping">

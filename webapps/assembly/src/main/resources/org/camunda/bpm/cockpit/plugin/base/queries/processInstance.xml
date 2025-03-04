@@ -17,6 +17,7 @@
 
   <resultMap id="calledProcessInstanceMap" type="org.camunda.bpm.cockpit.impl.plugin.base.dto.CalledProcessInstanceDto">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR"/>
     <result property="processDefinitionId" column="SUPER_PROC_DEF_ID_" jdbcType="VARCHAR"/>
     <result property="processDefinitionKey" column="KEY_" jdbcType="VARCHAR"/>
     <result property="processDefinitionName" column="NAME_" jdbcType="VARCHAR"/>
@@ -256,7 +257,7 @@
 
   <select id="selectCalledProcessInstances" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto"
           resultMap="calledProcessInstanceMap">
-    select distinct RES.ID_, EXEC1.ACT_INST_ID_, EXEC1.ACT_ID_, PROC_.ID_ AS SUPER_PROC_DEF_ID_, PROC_.KEY_, PROC_.NAME_, INCIDENT.INCIDENT_TYPE_, INCIDENT.INCIDENT_COUNT_
+    select distinct RES.ID_, RES.BUSINESS_KEY_, EXEC1.ACT_INST_ID_, EXEC1.ACT_ID_, PROC_.ID_ AS SUPER_PROC_DEF_ID_,PROC_.KEY_, PROC_.NAME_, INCIDENT.INCIDENT_TYPE_, INCIDENT.INCIDENT_COUNT_
     <include refid="selectCalledProcessInstancesByCriteria" />
     ${orderBy}
   </select>
