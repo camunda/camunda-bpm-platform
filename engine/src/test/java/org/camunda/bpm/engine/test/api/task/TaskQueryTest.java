@@ -85,6 +85,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 /**
  * @author Joram Barrez
@@ -1116,6 +1117,89 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     assertEquals(0l, count.longValue());
   }
 
+  @Test
+  @Deployment(resources="org/camunda/bpm/engine/test/api/task/taskDefinitionProcess.bpmn20.xml")
+  public void testTaskDefinitionKeyNotInNoKeysProvided() {
+
+    // Given
+    // Start process instance, 2 tasks will be available with:
+    // - process definition key "taskDefinitionKeyProcess"
+    // - task definition keys "taskKey_1" & "taskKey_123"
+    runtimeService.startProcessInstanceByKey("taskDefinitionKeyProcess");
+
+    // When
+    var tasks = taskService.createTaskQuery()
+            .processDefinitionKey("taskDefinitionKeyProcess")
+            .taskDefinitionKeyNotIn()
+            .list();
+    // Then
+    assertThat(tasks)
+            .extracting(Task::getTaskDefinitionKey)
+            .containsExactly("taskKey_1", "taskKey_123");
+  }
+
+  @Test
+  @Deployment(resources="org/camunda/bpm/engine/test/api/task/taskDefinitionProcess.bpmn20.xml")
+  public void testTaskDefinitionKeyNotInOneKeyProvided() {
+
+    // Given
+    // Start process instance, 2 tasks will be available with:
+    // - process definition key "taskDefinitionKeyProcess"
+    // - task definition keys "taskKey_1" & "taskKey_123"
+    runtimeService.startProcessInstanceByKey("taskDefinitionKeyProcess");
+
+    // When
+    var tasks = taskService.createTaskQuery()
+            .processDefinitionKey("taskDefinitionKeyProcess")
+            .taskDefinitionKeyNotIn("taskKey_1")
+            .list();
+    // Then
+    assertThat(tasks)
+            .extracting(Task::getTaskDefinitionKey)
+            .containsExactly("taskKey_123");
+  }
+
+  @Test
+  @Deployment(resources="org/camunda/bpm/engine/test/api/task/taskDefinitionProcess.bpmn20.xml")
+  public void testTaskDefinitionKeyNotInAllKeysProvided() {
+
+    // Given
+    // Start process instance, 2 tasks will be available with:
+    // - process definition key "taskDefinitionKeyProcess"
+    // - task definition keys "taskKey_1" & "taskKey_123"
+    runtimeService.startProcessInstanceByKey("taskDefinitionKeyProcess");
+
+    // When
+    var tasks = taskService.createTaskQuery()
+            .processDefinitionKey("taskDefinitionKeyProcess")
+            .taskDefinitionKeyNotIn("taskKey_1", "taskKey_123")
+            .list();
+    // Then
+    assertThat(tasks)
+            .isEmpty();
+  }
+
+  @Test
+  @Deployment(resources="org/camunda/bpm/engine/test/api/task/taskDefinitionProcess.bpmn20.xml")
+  public void testTaskDefinitionKeyNotInInvalidKeyProvided() {
+
+    // Given
+    // Start process instance, 2 tasks will be available with:
+    // - process definition key "taskDefinitionKeyProcess"
+    // - task definition keys "taskKey_1" & "taskKey_123"
+    runtimeService.startProcessInstanceByKey("taskDefinitionKeyProcess");
+
+    // When
+    var tasks = taskService.createTaskQuery()
+            .processDefinitionKey("taskDefinitionKeyProcess")
+            .taskDefinitionKeyNotIn("I do not exist", "I don't exist either")
+            .list();
+    // Then
+    assertThat(tasks)
+            .extracting(Task::getTaskDefinitionKey)
+            .containsExactly("taskKey_1", "taskKey_123");
+  }
+  
   @Deployment(resources="org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   @Test
   public void testTaskVariableNameEqualsIgnoreCase() throws Exception {
@@ -5370,6 +5454,41 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     String[] key = ((TaskQueryImpl) result).getKeys();
     assertEquals(1, key.length);
     assertEquals(taskDefinitionKey, key[0]);
+  }
+
+  @Test
+  public void testExtendTaskQueryList_TaskDefinitionKeyNotIn() {
+    // given
+    var taskDefinitionKey = "someKey";
+    var query = taskService.createTaskQuery()
+        .taskDefinitionKeyNotIn(taskDefinitionKey);
+
+    var extendingQuery = taskService.createTaskQuery();
+
+    // when
+    var result = ((TaskQueryImpl)query).extend(extendingQuery);
+
+    // then
+    assertThat(((TaskQueryImpl) result).getKeyNotIn())
+            .containsExactly(taskDefinitionKey);
+  }
+
+  @Test
+  public void testExtendingTaskQueryList_TaskDefinitionKeyNotIn() {
+    // given
+    var taskDefinitionKey = "someKey";
+    var query = taskService.createTaskQuery();
+
+    var extendingQuery = taskService
+        .createTaskQuery()
+        .taskDefinitionKeyNotIn(taskDefinitionKey);
+
+    // when
+    var result = ((TaskQueryImpl)query).extend(extendingQuery);
+
+    // then
+    assertThat(((TaskQueryImpl) result).getKeyNotIn())
+            .containsExactly(taskDefinitionKey);
   }
 
   @Test
