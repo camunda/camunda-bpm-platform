@@ -183,7 +183,8 @@ platform-jdk-temurin-jdk-11-latest:
           !spring-boot-starter/starter-qa/integration-test-webapp/runtime,
           !distro/run,!distro/run/assembly,!distro/run/core,!distro/run/distro,!distro/run/modules,!distro/run/modules/example,
           !distro/run/modules/rest,!distro/run/modules/webapps,!distro/run/modules/oauth2,!distro/run/qa,!distro/run/qa/integration-tests,
-          !distro/run/qa/runtime,!distro/run/qa/example-plugin''
+          !distro/run/qa/runtime,!distro/run/qa/example-plugin,
+          !qa/integration-tests-engine-jakarta''
     -Pdistro,distro-ce'
   stash:
     runtimeStash: true
@@ -222,7 +223,8 @@ platform-jdk-jdk-11-latest:
           !spring-boot-starter/starter-qa/integration-test-webapp/runtime,
           !distro/run,!distro/run/assembly,!distro/run/core,!distro/run/distro,!distro/run/modules,!distro/run/modules/example,
           !distro/run/modules/rest,!distro/run/modules/webapps,!distro/run/modules/oauth2,!distro/run/qa,!distro/run/qa/integration-tests,
-          !distro/run/qa/runtime,!distro/run/qa/example-plugin''
+          !distro/run/qa/runtime,!distro/run/qa/example-plugin,
+          !qa/integration-tests-engine-jakarta''
     -Pdistro,distro-ce
     -Dskip.frontend.build=true'
   stash:
