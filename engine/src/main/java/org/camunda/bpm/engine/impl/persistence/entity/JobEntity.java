@@ -250,6 +250,7 @@ public abstract class JobEntity extends AcquirableJobEntity
       this.execution = execution;
       executionId = execution.getId();
       processInstanceId = execution.getProcessInstanceId();
+      System.out.println("setExecution# "+processInstanceId);
       rootProcessInstanceId = execution.getRootProcessInstanceId();
       // if the execution is suspended, suspend the job entity as well to prevent unwanted job execution
       if(execution.isSuspended()) {
@@ -708,6 +709,7 @@ public abstract class JobEntity extends AcquirableJobEntity
     this.failedActivityId = failedActivityId;
   }
 
+  @Override
   public String getBatchId() {
     return batchId;
   }
