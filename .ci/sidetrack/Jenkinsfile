@@ -11,7 +11,7 @@ pipeline {
   environment {
     LOGGER_LOG_LEVEL = 'DEBUG'
     MAVEN_VERSION = 'maven-3.8-latest'
-    DEF_JDK_VERSION = 'jdk-17-latest'
+    DEF_JDK_VERSION = 'jdk-11-latest'
   }
   parameters {
     booleanParam name: 'TRIGGERED_BY_UPSTREAM', defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pipeline (pull request or default branch)'
