@@ -30,8 +30,8 @@ public abstract class AbstractConnectorResponse implements ConnectorResponse {
   protected Map<String, Object> responseParameters;
 
   public Map<String, Object> getResponseParameters() {
-    if(responseParameters == null) {
-      responseParameters = new HashMap<String, Object>();
+    if (responseParameters == null) {
+      responseParameters = new HashMap<>();
       collectResponseParameters(responseParameters);
     }
     return responseParameters;

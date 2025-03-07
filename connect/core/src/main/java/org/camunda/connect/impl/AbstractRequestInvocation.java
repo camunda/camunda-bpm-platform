@@ -18,8 +18,8 @@ package org.camunda.connect.impl;
 
 import java.util.List;
 
-import org.camunda.connect.spi.ConnectorRequest;
 import org.camunda.connect.spi.ConnectorInvocation;
+import org.camunda.connect.spi.ConnectorRequest;
 import org.camunda.connect.spi.ConnectorRequestInterceptor;
 
 /**
@@ -40,7 +40,7 @@ public abstract class AbstractRequestInvocation<T> implements ConnectorInvocatio
 
   protected ConnectorRequest<?> request;
 
-  public AbstractRequestInvocation(T target, ConnectorRequest<?> request, List<ConnectorRequestInterceptor> interceptorChain) {
+  protected AbstractRequestInvocation(T target, ConnectorRequest<?> request, List<ConnectorRequestInterceptor> interceptorChain) {
     this.target = target;
     this.request = request;
     this.interceptorChain = interceptorChain;
@@ -57,7 +57,7 @@ public abstract class AbstractRequestInvocation<T> implements ConnectorInvocatio
 
   public Object proceed() throws Exception {
     currentIndex++;
-    if(interceptorChain.size() > currentIndex) {
+    if (interceptorChain.size() > currentIndex) {
       return interceptorChain.get(currentIndex).handleInvocation(this);
 
     } else {
