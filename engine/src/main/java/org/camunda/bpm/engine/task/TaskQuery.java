@@ -495,6 +495,11 @@ public interface TaskQuery extends Query<TaskQuery, Task> {
   TaskQuery taskDefinitionKeyIn(String... taskDefinitionKeys);
 
   /**
+   * Only select tasks which do not have one of the taskDefinitionKeys.
+   **/
+  TaskQuery taskDefinitionKeyNotIn(String... taskDefinitionKeys);
+
+  /**
    * Select the tasks which are sub tasks of the given parent task.
    */
   TaskQuery taskParentTaskId(String parentTaskId);
