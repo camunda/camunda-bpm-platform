@@ -16,7 +16,7 @@
   <name>Camunda Platform - Webapp - Root</name>
 
   <properties>
-    <version.jetty>9.4.31.v20200723</version.jetty>
+    <version.jetty>9.4.57.v20241219</version.jetty>
 
     <web.resources.override>src/main/runtime/default/webapp</web.resources.override>
 
