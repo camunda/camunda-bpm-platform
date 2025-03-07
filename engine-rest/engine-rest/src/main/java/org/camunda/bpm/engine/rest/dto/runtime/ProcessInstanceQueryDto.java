@@ -75,6 +75,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   private Set<String> processInstanceIds;
   private Boolean withIncident;
   private String incidentId;
+  private String rootProcessInstanceId;
   private String incidentType;
   private String incidentMessage;
   private String incidentMessageLike;
@@ -285,6 +286,15 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     this.incidentId = incidentId;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  @CamundaQueryParam("rootProcessInstanceId")
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
   public String getIncidentType() {
     return incidentType;
   }
@@ -441,6 +451,9 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     }
     if (incidentId != null) {
       query.incidentId(incidentId);
+    }
+    if (rootProcessInstanceId != null) {
+      query.rootProcessInstanceId(rootProcessInstanceId);
     }
     if (incidentType != null) {
       query.incidentType(incidentType);
