@@ -23,6 +23,7 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import jakarta.enterprise.inject.UnsatisfiedResolutionException;
 
 import jakarta.inject.Inject;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,8 +34,8 @@ public class NoDefaultDatasourceConfigurationTest {
   static QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
       .withConfigurationResource("org/camunda/bpm/quarkus/engine/test/persistence/conf/secondary-datasource-application.properties")
       .assertException(throwable -> assertThat(throwable)
-          .hasMessage("No datasource named '<default>' exists")
-          .isInstanceOf(IllegalArgumentException.class))
+          .hasMessage("No bean found for required type [interface io.agroal.api.AgroalDataSource] and qualifiers [[@jakarta.enterprise.inject.Default()]]")
+          .isInstanceOf(UnsatisfiedResolutionException.class))
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
   @Inject
