@@ -1421,6 +1421,7 @@
     "PLGN_MOD_SEARCH_STARTED_BY_USER": "Started By User",
     "PLGN_MOD_SEARCH_START_DATE": "Start Date",
     "PLGN_MOD_SEARCH_SUB_ID": "Sub ID",
+    "PLGN_MOD_SEARCH_WITH_JOBS_RETRYING": "With jobs retrying",
     "PLGN_MOD_SEARCH_SUSPENDED": "Suspended",
     "PLGN_MOD_SEARCH_TENANT_ID": "Tenant ID",
     "PLGN_MOD_SEARCH_TYPE": "Type",
