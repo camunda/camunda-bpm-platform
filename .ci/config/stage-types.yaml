@@ -57,6 +57,8 @@ instance-migration:
   stash:
     runtimeStash: true
     qaStash: true
+  labels:
+  - 'sqlserver'
   podSpec:
     cpu: 4
     images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
@@ -82,6 +84,8 @@ rolling-update:
   stash:
     runtimeStash: true
     qaStash: true
+  labels:
+  - 'sqlserver'
   podSpec:
     cpu: 4
     images: [ 'maven:3.9.7-eclipse-temurin-11', 'postgres:17.0' ]
@@ -90,6 +94,8 @@ large-data-tests:
   command: 'verify -Plarge-data-tests,'
   stash:
     runtimeStash: true
+  labels:
+  - 'sqlserver'
   podSpec:
     cpu: 4
     images: [ 'maven:3.9.7-eclipse-temurin-11', 'postgres:17.0' ]
