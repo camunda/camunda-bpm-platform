@@ -17,6 +17,8 @@
 package org.camunda.bpm.integrationtest.functional.spin;
 
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
@@ -32,6 +34,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(Arquillian.class)
 public class FeelEngineIT extends AbstractFoxPlatformIntegrationTest {
@@ -42,6 +45,7 @@ public class FeelEngineIT extends AbstractFoxPlatformIntegrationTest {
   protected static final String DMN_XML = "feel-spin-xml-decision.dmn";
   protected static final String PROCESS_JSON = "feel-spin-json-process.bpmn";
   protected static final String PROCESS_XML = "feel-spin-xml-process.bpmn";
+  protected static final String FEEL_EXCLUSIVE_GATEWAY_BMPN = "feel-spin-process.bpmn";
 
   protected static final List<String> TEST_LIST = Arrays.asList("\"foo\"", "\"bar\"");
 
@@ -53,6 +57,7 @@ public class FeelEngineIT extends AbstractFoxPlatformIntegrationTest {
         .addAsResource(PATH + DMN_XML, DMN_XML)
         .addAsResource(PATH + PROCESS_JSON, PROCESS_JSON)
         .addAsResource(PATH + PROCESS_XML, PROCESS_XML)
+        .addAsResource(PATH + FEEL_EXCLUSIVE_GATEWAY_BMPN, FEEL_EXCLUSIVE_GATEWAY_BMPN)
         .addClass(JsonListSerializable.class)
         .addClass(XmlListSerializable.class)
         .addClass(AbstractFoxPlatformIntegrationTest.class);
@@ -92,6 +97,34 @@ public class FeelEngineIT extends AbstractFoxPlatformIntegrationTest {
 
     assertThat(hdi.getOutputs().size(), is(1));
     assertThat(hdi.getOutputs().get(0).getValue(), is(true));
+  }
+
+  @Test
+  public void testFeelEngine() {
+    // given
+    VariableMap variables = Variables.createVariables().putValue("amount", Spin.JSON("{\"value\": 25}"));
+
+    // when
+    ProcessInstance pi =  runtimeService.startProcessInstanceByKey("feelScriptExecution", variables);
+    List<String> list = runtimeService.getActiveActivityIds(pi.getId());
+
+    // then
+    assertEquals(1, list.size());
+    assertEquals("taskRequestInvoice", list.get(0));
+  }
+
+  @Test
+  public void testFeelEngineSmall() {
+    // given
+    VariableMap variables = Variables.createVariables().putValue("amount", Spin.JSON("{\"value\": 2}"));
+
+    // when
+    ProcessInstance pi =  runtimeService.startProcessInstanceByKey("feelScriptExecution", variables);
+    List<String> list = runtimeService.getActiveActivityIds(pi.getId());
+
+    // then
+    assertEquals(1, list.size());
+    assertEquals("taskApprove", list.get(0));
   }
 
   // HELPER
