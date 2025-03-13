@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  id="definitions"
+  targetNamespace="Examples"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn">
+
+  <process id="feelScriptExecution" isExecutable="true" camunda:historyTimeToLive="180">
+
+    <startEvent id="theStart" name="Start" />
+
+    <sequenceFlow id="flow0" sourceRef="theStart" targetRef="checkAmount" />
+
+    <exclusiveGateway id="checkAmount" name="Check Amount" gatewayDirection="Diverging">
+      <incoming>flow0</incoming>
+      <outgoing>flowApprove</outgoing>
+      <outgoing>flowRequestInvoice</outgoing>
+    </exclusiveGateway>
+
+    <sequenceFlow id="flowApprove" name="amount.valueSmall"
+                  sourceRef="checkAmount" targetRef="taskApprove">
+      <conditionExpression xsi:type="tFormalExpression" language="feel">
+        amount.value &lt; 25
+      </conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flowRequestInvoice" name="amount.valueLarge"
+                  sourceRef="checkAmount" targetRef="taskRequestInvoice">
+      <conditionExpression xsi:type="tFormalExpression" language="feel">
+        amount.value &gt;= 25
+      </conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="taskApprove" name="Approve Spending">
+      <incoming>flowApprove</incoming>
+      <outgoing>flowFromApprove</outgoing>
+    </userTask>
+
+    <userTask id="taskRequestInvoice" name="Request Invoice">
+      <incoming>flowRequestInvoice</incoming>
+      <outgoing>flowFromRequestInvoice</outgoing>
+    </userTask>
+
+    <sequenceFlow id="flowFromApprove" sourceRef="taskApprove" targetRef="mergePaths" />
+    <sequenceFlow id="flowFromRequestInvoice" sourceRef="taskRequestInvoice" targetRef="mergePaths" />
+
+    <exclusiveGateway id="mergePaths" name="Merge Paths" gatewayDirection="Converging">
+      <incoming>flowFromApprove</incoming>
+      <incoming>flowFromRequestInvoice</incoming>
+      <outgoing>flowToEnd</outgoing>
+    </exclusiveGateway>
+
+    <sequenceFlow id="flowToEnd" sourceRef="mergePaths" targetRef="theEnd" />
+
+    <endEvent id="theEnd" name="End" />
+
+  </process>
+
+</definitions>
