@@ -46,6 +46,7 @@ public class FeelEngineTest extends AbstractFoxPlatformIntegrationTest {
   protected static final String PROCESS_JSON = "feel-spin-json-process.bpmn";
   protected static final String PROCESS_XML = "feel-spin-xml-process.bpmn";
   protected static final String FEEL_EXCLUSIVE_GATEWAY_BMPN = "feel-spin-process.bpmn";
+  protected static final String FEEL_INPUT_OUTPUT_PROCESS_BPMN = "feel-spin-input-output.bpmn";
 
   protected static final List<String> TEST_LIST = Arrays.asList("\"foo\"", "\"bar\"");
 
@@ -58,6 +59,8 @@ public class FeelEngineTest extends AbstractFoxPlatformIntegrationTest {
         .addAsResource(PATH + PROCESS_JSON, PROCESS_JSON)
         .addAsResource(PATH + PROCESS_XML, PROCESS_XML)
         .addAsResource(PATH + FEEL_EXCLUSIVE_GATEWAY_BMPN, FEEL_EXCLUSIVE_GATEWAY_BMPN)
+        .addAsResource(PATH + FEEL_INPUT_OUTPUT_PROCESS_BPMN, FEEL_INPUT_OUTPUT_PROCESS_BPMN)
+        .addClass(FeelContextDelegate.class)
         .addClass(JsonListSerializable.class)
         .addClass(XmlListSerializable.class)
         .addClass(AbstractFoxPlatformIntegrationTest.class);
@@ -125,6 +128,17 @@ public class FeelEngineTest extends AbstractFoxPlatformIntegrationTest {
     // then
     assertEquals(1, list.size());
     assertEquals("taskApprove", list.get(0));
+  }
+
+  @Test
+  public void testFeelEngineComplexContext() {
+    // when
+    ProcessInstance pi =runtimeService.startProcessInstanceByKey("feelComplexContextProcess");
+    String result = (String) runtimeService
+        .getVariable(pi.getId(), "result");
+
+    // then
+    assertEquals("contentFromInnerContext", result);
   }
 
   // HELPER
