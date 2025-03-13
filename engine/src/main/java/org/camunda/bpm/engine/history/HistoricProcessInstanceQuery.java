@@ -55,6 +55,11 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   HistoricProcessInstanceQuery processInstanceIdNotIn(String... processInstanceIdNotIn);
 
   /**
+   * Only select historic process instances for the given root process instance id
+   */
+  HistoricProcessInstanceQuery rootProcessInstanceId(String rootProcessInstanceId);
+
+  /**
    * Only select historic process instances for the given process definition
    */
   HistoricProcessInstanceQuery processDefinitionId(String processDefinitionId);
