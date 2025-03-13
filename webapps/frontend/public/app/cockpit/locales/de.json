@@ -1421,6 +1421,7 @@
     "PLGN_MOD_SEARCH_STARTED_BY_USER": "Gestartet von Benutzer",
     "PLGN_MOD_SEARCH_START_DATE": "Anfangsdatum",
     "PLGN_MOD_SEARCH_SUB_ID": "Sub-ID",
+    "PLGN_MOD_SEARCH_WITH_JOBS_RETRYING": "Jobs werden aktuell erneut ausgeführt",
     "PLGN_MOD_SEARCH_SUSPENDED": "Deaktiviert",
     "PLGN_MOD_SEARCH_TENANT_ID": "Mandanten-ID",
     "PLGN_MOD_SEARCH_TYPE": "Typ",
