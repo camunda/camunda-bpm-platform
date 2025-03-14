@@ -77,7 +77,28 @@ const Controller = [
         .startOf('year')
         .toDate();
     }
+
+    const getContractDateHeader = () => {
+      const numberOfTheDay = moment($scope.startDate).date();
+      let translationKey;
+
+      if (numberOfTheDay === 1) {
+        translationKey = 'EXECUTION_METRICS_START_DATE_HEADER_FIRST';
+      } else if (numberOfTheDay === 2) {
+        translationKey = 'EXECUTION_METRICS_START_DATE_HEADER_SECOND';
+      } else if (numberOfTheDay === 3) {
+        translationKey = 'EXECUTION_METRICS_START_DATE_HEADER_THIRD';
+      } else {
+        translationKey = 'EXECUTION_METRICS_START_DATE_HEADER_NTH';
+      }
+
+      return $translate.instant(translationKey, {
+        firstDayOfContractMonth: numberOfTheDay
+      });
+    };
+
     $scope.startDate = dateFilter(startDate, fmtDatePicker);
+    $scope.firstDayOfContractMonthHeader = getContractDateHeader();
 
     $scope.loadingStateMonthly = 'INITIAL';
     $scope.loadingStateAnnual = 'INITIAL';
@@ -172,6 +193,7 @@ const Controller = [
       if (date.isValid()) {
         localConf.set(localConfContractStartDate, $scope.startDate);
         calculateContractDates();
+        renderMetricsDateHeader();
         return load();
       } else {
         setInputError(`Invalid Date Value. Supported pattern '${fmtRequest}'.`);
@@ -251,6 +273,10 @@ const Controller = [
           err => reject(err)
         );
       });
+    };
+
+    const renderMetricsDateHeader = () => {
+      $scope.firstDayOfContractMonthHeader = getContractDateHeader();
     };
 
     const calculateContractDates = () => {
