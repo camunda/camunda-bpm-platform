@@ -17,7 +17,6 @@
 package org.camunda.bpm.integrationtest.functional.spin;
 
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
-import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -103,35 +102,30 @@ public class FeelEngineTest extends AbstractFoxPlatformIntegrationTest {
   }
 
   @Test
-  public void testFeelEngine() {
+  public void testSpinIntegration() {
+    // Accessing SPIN object from FEEL requires the org.camunda.spin.plugin.impl.feel.integration.SpinValueMapper SPI
     // given
-    VariableMap variables = Variables.createVariables().putValue("amount", Spin.JSON("{\"value\": 25}"));
+    VariableMap variablesLarge = Variables.createVariables().putValue("amount", Spin.JSON("{\"value\": 25}"));
+    VariableMap variablesSmall = Variables.createVariables().putValue("amount", Spin.JSON("{\"value\": 2}"));
 
     // when
-    ProcessInstance pi =  runtimeService.startProcessInstanceByKey("feelScriptExecution", variables);
-    List<String> list = runtimeService.getActiveActivityIds(pi.getId());
+    ProcessInstance pi1 =  runtimeService.startProcessInstanceByKey("feelScriptExecution", variablesLarge);
+    List<String> resultsLarge = runtimeService.getActiveActivityIds(pi1.getId());
+
+    ProcessInstance pi2 =  runtimeService.startProcessInstanceByKey("feelScriptExecution", variablesSmall);
+    List<String> resultsSmall = runtimeService.getActiveActivityIds(pi2.getId());
 
     // then
-    assertEquals(1, list.size());
-    assertEquals("taskRequestInvoice", list.get(0));
-  }
+    assertEquals(1, resultsLarge.size());
+    assertEquals("taskRequestInvoice", resultsLarge.get(0));
 
-  @Test
-  public void testFeelEngineSmall() {
-    // given
-    VariableMap variables = Variables.createVariables().putValue("amount", Spin.JSON("{\"value\": 2}"));
-
-    // when
-    ProcessInstance pi =  runtimeService.startProcessInstanceByKey("feelScriptExecution", variables);
-    List<String> list = runtimeService.getActiveActivityIds(pi.getId());
-
-    // then
-    assertEquals(1, list.size());
-    assertEquals("taskApprove", list.get(0));
+    assertEquals(1, resultsSmall.size());
+    assertEquals("taskApprove", resultsSmall.get(0));
   }
 
   @Test
   public void testFeelEngineComplexContext() {
+    // Mapping complex FEEL context into Java requires the org.camunda.feel.impl.JavaValueMapper SPI to be registered
     // when
     ProcessInstance pi =runtimeService.startProcessInstanceByKey("feelComplexContextProcess");
     String result = (String) runtimeService
