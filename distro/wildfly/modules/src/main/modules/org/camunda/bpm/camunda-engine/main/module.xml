@@ -31,10 +31,9 @@
     <module name="org.graalvm.sdk.graal-sdk" services="import"/>
     <module name="org.graalvm.truffle.truffle-api" services="import"/>
     <module name="org.camunda.feel.feel-engine" services="import"/>
-    <module name="org.camunda.bpm.dmn.camunda-engine-feel-scala" services="import" export="true" />
+    <module name="org.camunda.bpm.dmn.camunda-engine-feel-scala" services="import" />
     <module name="org.camunda.bpm.camunda-engine-plugin-spin" services="import" />
 
-    
     <module name="sun.jdk" services="import"/>
 
     <module name="org.camunda.bpm.model.camunda-xml-model" />
