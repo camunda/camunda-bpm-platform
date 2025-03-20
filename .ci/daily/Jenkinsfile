@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@t268-adjust-withMaven']) _
 
 def failedStageTypes = []
 
@@ -69,28 +69,28 @@ pipeline {
           }
         }
         stage('stage-javadocs') {
-          when {
-            branch cambpmDefaultBranch();
-          }
+         // when {
+         //   branch cambpmDefaultBranch();
+         // }
           steps {
             cambpmConditionalRetry([
               agentLabel : 'centos-stable',
               runSteps   : {
-                cambpmRunMaven('.',
+                cambpmRunMaven1('.',
                   "package javadoc:javadoc javadoc:aggregate -Pdistro,distro-wildfly,distro-webjar,javadocs -pl " +
                   "'!distro/wildfly/modules,!distro/wildfly26/modules,!engine-rest/engine-rest-openapi' -DskipTests=true -Dskip.frontend.build=true",
                   withNpm: true,
                   jdkVersion: 'jdk-17-latest')
-                def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
-                cambpmPublishDocs("\"target/site/apidocs/\"", projectVersion, "javadoc")
+              //  def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
+               // cambpmPublishDocs("\"target/site/apidocs/\"", projectVersion, "javadoc")
               }
             ])
           }
         }
         stage('stage-restapi-docs') {
-          when {
-            branch cambpmDefaultBranch();
-          }
+        //  when {
+        //    branch cambpmDefaultBranch();
+        //  }
           steps {
             cambpmConditionalRetry([
               podSpec: [
@@ -99,12 +99,12 @@ pipeline {
               ],
               runSteps   : {
                 sh "apk -U add openjdk17-jdk maven rsync openssh libstdc++ libgcc bash"
-                cambpmRunMaven('./engine-rest',
+                cambpmRunMaven1('./engine-rest',
                   "package -Dmaven.test.skip -pl '!engine-rest,!assembly'",
                   withNpm: true,
                   jdkVersion: 'jdk-11-latest')
-                def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
-                cambpmPublishDocs("\"engine-rest/docs/target/index.html\"", projectVersion, "rest")
+             //   def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
+             //   cambpmPublishDocs("\"engine-rest/docs/target/index.html\"", projectVersion, "rest")
               }
             ])
           }
@@ -148,12 +148,12 @@ pipeline {
           }
         }
         stage('platform-DISTRO-maven-central') {
-          when {
-            expression {
-              // trigger stage only on the master branch
-              env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
-            }
-          }
+         // when {
+         //   expression {
+         //     // trigger stage only on the master branch
+         //     env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
+         //   }
+         // }
           steps {
             cambpmConditionalRetry([
               podSpec: [
@@ -161,19 +161,19 @@ pipeline {
                 images: ['maven:3.9.7-eclipse-temurin-17']
               ],
               runSteps: {
-                cambpmRunMaven('.',
+                cambpmRunMaven1('.',
                   "deploy source:jar source:test-jar javadoc:javadoc -Dskip-zip-frontend-sources=true -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -B",
                   withNpm: true,
                   jdkVersion: 'jdk-17-latest')
-                script {
-                  str = 's@:camunda-nexus:.*\\\$@:central:https://oss.sonatype.org/content/repositories/snapshots@g'
-                  sh(label: 'Change staging from Nexus to Maven Central snapshots', script: 'sed -i ' + str + ' staging/deferred/.index')
-                }
-
-                cambpmRunMaven('.',
-                  "org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true -B",
-                  withNpm: true,
-                  jdkVersion: 'jdk-17-latest')
+             // script {
+             //   str = 's@:camunda-nexus:.*\\\$@:central:https://oss.sonatype.org/content/repositories/snapshots@g'
+             //   sh(label: 'Change staging from Nexus to Maven Central snapshots', script: 'sed -i ' + str + ' staging/deferred/.index')
+             // }
+             //
+             // cambpmRunMaven('.',
+             //   "org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true -B",
+             //   withNpm: true,
+             //   jdkVersion: 'jdk-17-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -182,12 +182,12 @@ pipeline {
           }
         }
         stage('platform-public-nexus') {
-          when {
-            expression {
-              // trigger stage only on the master branch
-              env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
-            }
-          }
+        //when {
+        //  expression {
+        //    // trigger stage only on the master branch
+        //    env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
+        //  }
+        //}
           steps {
             cambpmConditionalRetry([
               podSpec: [
@@ -195,7 +195,7 @@ pipeline {
                 images: ['maven:3.9.7-eclipse-temurin-17']
               ],
               runSteps: {
-                cambpmRunMaven('.',
+                cambpmRunMaven1('.',
                   "install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -B",
                   withNpm: true,
                   jdkVersion: 'jdk-17-latest',

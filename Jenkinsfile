@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@t268-adjust-withMaven']) _
 
 def failedStageTypes = []
 
@@ -56,7 +56,7 @@ pipeline {
                         [envVar: 'HERODEVS_REGISTRY', vaultKey: 'registry'],
                         [envVar: 'HERODEVS_AUTH_TOKEN', vaultKey: 'authToken']]
                 ]]]) {
-              cambpmRunMaven('.',
+              cambpmRunMaven1('.',
                   'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true '+ skipTests,
                   withCatch: false,
                   withNpm: true,
