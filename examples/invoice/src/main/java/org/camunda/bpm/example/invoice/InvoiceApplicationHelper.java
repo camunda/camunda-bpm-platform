@@ -66,6 +66,8 @@ public class InvoiceApplicationHelper {
           .addInputStream("invoice.v1.bpmn", classLoader.getResourceAsStream("invoice.v1.bpmn"))
           .addInputStream("invoiceBusinessDecisions.dmn", classLoader.getResourceAsStream("invoiceBusinessDecisions.dmn"))
           .addInputStream("reviewInvoice.bpmn", classLoader.getResourceAsStream("reviewInvoice.bpmn"))
+            .addInputStream("feel-input-output.bpmn", classLoader.getResourceAsStream("feel-input-output.bpmn"))
+            .addInputStream("feel-spin.bpmn", classLoader.getResourceAsStream("feel-spin.bpmn"))
           .deploy();
       }
     }
