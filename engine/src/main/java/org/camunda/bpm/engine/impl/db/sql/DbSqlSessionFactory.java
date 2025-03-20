@@ -41,8 +41,7 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final String H2 = "h2";
   public static final String MYSQL = "mysql";
   public static final String POSTGRES = "postgres";
-  public static final String MARIADB = "mariadb";
-  public static final String[] SUPPORTED_DATABASES = {MSSQL, DB2, ORACLE, H2, MYSQL, POSTGRES, MARIADB};
+  public static final String[] SUPPORTED_DATABASES = {MSSQL, DB2, ORACLE, H2, MYSQL, POSTGRES};
 
   protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<>();
 
@@ -195,8 +194,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     dbSpecificConstants.put(H2, constants);
 
     // mysql specific
-    // use the same specific for mariadb since it based on mysql and work with the exactly same statements
-    for(String mysqlLikeDatabase : Arrays.asList(MYSQL, MARIADB)) {
+    for(String mysqlLikeDatabase : Arrays.asList(MYSQL)) {
 
       databaseSpecificLimitBeforeStatements.put(mysqlLikeDatabase, "");
       optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements.put(mysqlLikeDatabase, "");

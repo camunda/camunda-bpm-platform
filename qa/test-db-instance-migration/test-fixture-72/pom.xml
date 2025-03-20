@@ -17,7 +17,6 @@
 <!--     <camunda.version.current>7.2.0</camunda.version.current> -->
 
     <version.h2>${version.h2-v1}</version.h2>
-    <version.mariadb>${version.mariadb-v1}</version.mariadb>
   </properties>
 
   <dependencyManagement>

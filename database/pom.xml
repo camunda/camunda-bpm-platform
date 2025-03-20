@@ -20,8 +20,6 @@
     <version.h2>2.3.232</version.h2>
     <version.h2-v1>1.4.200</version.h2-v1><!-- used for instance migration qa -->
     <version.oracle>23.5.0.24.07</version.oracle>
-    <version.mariadb>1.7.6</version.mariadb>
-    <version.mariadb-v1>1.1.8</version.mariadb-v1>
     <version.mysql>8.3.0</version.mysql>
     <version.sqlserver>8.4.1.jre8</version.sqlserver>
     <version.db2-11.5>11.5.0.0</version.db2-11.5>
@@ -47,11 +45,6 @@
         <groupId>com.oracle.database.jdbc</groupId>
         <artifactId>ojdbc11</artifactId>
         <version>${version.oracle}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mariadb.jdbc</groupId>
-        <artifactId>mariadb-java-client</artifactId>
-        <version>${version.mariadb}</version>
       </dependency>
       <dependency>
         <groupId>com.mysql</groupId>
@@ -220,42 +213,6 @@
                   <groupId>com.h2database</groupId>
                   <artifactId>h2</artifactId>
                   <version>${version.h2}</version>
-                </dependency>
-              </dependencies>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-
-    <profile>
-      <id>mariadb</id>
-      <properties>
-        <database.type>mariadb</database.type>
-        <database.driver>org.mariadb.jdbc.Driver</database.driver>
-        <database.datasource.class>org.mariadb.jdbc.MySQLDataSource</database.datasource.class>
-        <database.tc.url>cammariadb:10.6</database.tc.url>
-        <database.tc.params>/${database.name}?user=${database.username}&amp;amp;password=${database.password}</database.tc.params>
-      </properties>
-
-      <dependencies>
-        <dependency>
-          <groupId>org.mariadb.jdbc</groupId>
-          <artifactId>mariadb-java-client</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>sql-maven-plugin</artifactId>
-              <dependencies>
-                <dependency>
-                  <groupId>org.mariadb.jdbc</groupId>
-                  <artifactId>mariadb-java-client</artifactId>
-                  <version>${version.mariadb}</version>
                 </dependency>
               </dependencies>
             </plugin>
