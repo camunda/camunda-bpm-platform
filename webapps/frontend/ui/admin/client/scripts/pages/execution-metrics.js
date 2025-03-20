@@ -27,8 +27,7 @@ const debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
 const debounceMonthly = debouncePromiseFactory();
 const debounceAnnual = debouncePromiseFactory();
 
-const fmtMonth = 'DD-MM-YYYY';
-const fmtYear = 'DD/MM/YYYY';
+const fmtDateTable = 'YYYY-MM-DD';
 const fmtDatePicker = 'yyyy-MM-dd';
 const fmtRequest = 'YYYY-MM-DD';
 const metrics = {
@@ -190,8 +189,8 @@ const Controller = [
         : 'EXECUTION_METRICS_ANNUAL_FORMAT';
 
       return $translate.instant(translationId, {
-        from: date.format(fmtYear),
-        to: endDate.format(fmtYear)
+        from: date.format(fmtDateTable),
+        to: endDate.format(fmtDateTable)
       });
     };
 
@@ -202,9 +201,9 @@ const Controller = [
       const contractMonth = moment({year, month: month - 1});
       let startOfContractMonth = moment({year, month: month - 1, day});
       if (contractMonth.endOf('month').date() < day) {
-        return contractMonth.endOf('month').format(fmtMonth);
+        return contractMonth.endOf('month').format(fmtDateTable);
       }
-      return startOfContractMonth.format(fmtMonth);
+      return startOfContractMonth.format(fmtDateTable);
     };
 
     const prepareTableData = (response, labelFormat, metricsGroupMap = {}) => {
