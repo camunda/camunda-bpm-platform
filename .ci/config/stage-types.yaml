@@ -57,6 +57,8 @@ instance-migration:
   podSpec:
     cpu: 4
     images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
+  labels:
+  - 'all-db'
 old-engine:
   directory: 'qa'
   command: 'verify -Pold-engine,'
@@ -72,6 +74,8 @@ old-engine:
   podSpec:
     cpu: 4
     images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
+  labels:
+  - 'all-db'
 rolling-update:
   directory: 'qa/test-db-rolling-update'
   command: 'verify -Prolling-update,'
@@ -81,6 +85,8 @@ rolling-update:
   podSpec:
     cpu: 4
     images: [ 'maven:3.9.7-eclipse-temurin-11', 'postgres:17.0' ]
+  labels:
+  - 'all-db'
 large-data-tests:
   directory: 'qa/large-data-tests'
   command: 'verify -Plarge-data-tests,'
@@ -89,6 +95,8 @@ large-data-tests:
   podSpec:
     cpu: 4
     images: [ 'maven:3.9.7-eclipse-temurin-11', 'postgres:17.0' ]
+  labels:
+  - 'all-db'
 
 engine-rest-unit-jersey-2:
   directory: 'engine-rest/engine-rest'
