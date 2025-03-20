@@ -109,10 +109,10 @@ public class FeelEngineTest extends AbstractFoxPlatformIntegrationTest {
     VariableMap variablesSmall = Variables.createVariables().putValue("amount", Spin.JSON("{\"value\": 2}"));
 
     // when
-    ProcessInstance pi1 =  runtimeService.startProcessInstanceByKey("feelScriptExecution", variablesLarge);
+    ProcessInstance pi1 = runtimeService.startProcessInstanceByKey("feelScriptExecution", variablesLarge);
     List<String> resultsLarge = runtimeService.getActiveActivityIds(pi1.getId());
 
-    ProcessInstance pi2 =  runtimeService.startProcessInstanceByKey("feelScriptExecution", variablesSmall);
+    ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("feelScriptExecution", variablesSmall);
     List<String> resultsSmall = runtimeService.getActiveActivityIds(pi2.getId());
 
     // then
@@ -127,9 +127,8 @@ public class FeelEngineTest extends AbstractFoxPlatformIntegrationTest {
   public void testFeelEngineComplexContext() {
     // Mapping complex FEEL context into Java requires the org.camunda.feel.impl.JavaValueMapper SPI to be registered
     // when
-    ProcessInstance pi =runtimeService.startProcessInstanceByKey("feelComplexContextProcess");
-    String result = (String) runtimeService
-        .getVariable(pi.getId(), "result");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("feelComplexContextProcess");
+    String result = (String) runtimeService.getVariable(pi.getId(), "result");
 
     // then
     assertEquals("contentFromInnerContext", result);

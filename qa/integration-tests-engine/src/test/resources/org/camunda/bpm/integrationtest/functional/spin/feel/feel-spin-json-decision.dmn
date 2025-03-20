@@ -4,7 +4,7 @@
              name="camunda"
              xmlns:camunda="http://camunda.org/schema/1.0/dmn"
              namespace="http://camunda.org/schema/1.0/dmn">
-  <decision id="feel-spin-json-decision" name="decision" camunda:historyTimeToLive="5">
+  <decision id="feel-spin-json-decision" name="decision" camunda:historyTimeToLive="P180D">
     <decisionTable id="decisionTable_1">
       <input id="input_1" label="inputFeelExpression">
         <inputExpression id="inputExpression_1" typeRef="integer" expressionLanguage="FEEL">
