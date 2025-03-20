@@ -211,6 +211,10 @@
         )
       </if>
 
+      <if test="parameter.tenantId != null or parameter.tenantId != empty">
+          and RES.TENANT_ID_ = #{parameter.tenantId}
+      </if>
+
       <if test="parameter.jobPriorityMin != null">
         and RES.PRIORITY_ &gt;= #{parameter.jobPriorityMin}
       </if>
