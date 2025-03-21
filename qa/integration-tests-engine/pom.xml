@@ -357,6 +357,7 @@
                 <exclude>**/TestWarDeploymentWithProcessEnginePlugin.exclude</exclude>
 
                 <exclude>**/SpringServletPATimerStartEventExpressionTest.java</exclude>
+                <exclude>**/FeelEngineTest.java</exclude>
               </excludes>
               <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
@@ -473,6 +474,7 @@
                 <exludes>**/TestWarDeploymentWithProcessEnginePlugin.java</exludes>
 
                 <exclude>**/SpringServletPATimerStartEventExpressionTest.java</exclude>
+                <exclude>**/FeelEngineTest.java</exclude>
               </excludes>
               <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0vzco26" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.31.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.22.0">
+  <bpmn:process id="feelComplexContextProcess" isExecutable="true" camunda:historyTimeToLive="12">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_1kk88fy</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1kk88fy" sourceRef="StartEvent_1" targetRef="Activity_1q08bp7" />
+    <bpmn:endEvent id="Event_1y282u4">
+      <bpmn:incoming>Flow_0sl4a4f</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0ali2qn" sourceRef="Activity_1q08bp7" targetRef="Activity_1v9lsig" />
+    <bpmn:serviceTask id="Activity_1q08bp7" camunda:class="org.camunda.bpm.integrationtest.functional.spin.FeelContextDelegate">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="context">
+            <camunda:script scriptFormat="feel">
+        {
+          text: "Hello from FEEL",
+          numbers: [1, 2, 3],
+          addOne: function(x) x + 1,
+          innerContext: {
+            content: "contentFromInnerContext",
+            sky: "blue"
+          }
+        }
+      </camunda:script>
+          </camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1kk88fy</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ali2qn</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0sl4a4f" sourceRef="Activity_1v9lsig" targetRef="Event_1y282u4" />
+    <bpmn:userTask id="Activity_1v9lsig">
+      <bpmn:incoming>Flow_0ali2qn</bpmn:incoming>
+      <bpmn:outgoing>Flow_0sl4a4f</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+</bpmn:definitions>
