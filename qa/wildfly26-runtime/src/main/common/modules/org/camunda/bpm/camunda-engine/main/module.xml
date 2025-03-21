@@ -36,6 +36,10 @@
     <module name="org.camunda.template-engines.camunda-template-engines-freemarker" services="import" />
     <module name="org.camunda.spin.camunda-spin-core" services="import" />
 
+    <module name="org.camunda.feel.feel-engine" services="import" />
+    <module name="org.camunda.bpm.dmn.camunda-engine-feel-scala" services="import" export="true" />
+    <module name="org.camunda.bpm.camunda-engine-plugin-spin" services="import" />
+
     <module name="org.camunda.bpm.dmn.camunda-engine-dmn" />
     <module name="org.camunda.bpm.juel.camunda-juel" services="import"/>
 
