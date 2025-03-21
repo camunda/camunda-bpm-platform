@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.dmn.EvaluateDecisionDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionDefinitionDto;
+import org.camunda.bpm.engine.rest.dto.repository.DecisionEvaluationDto;
 
 public interface DecisionDefinitionResource {
 
@@ -56,6 +57,12 @@ public interface DecisionDefinitionResource {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   List<Map<String, VariableValueDto>> evaluateDecision(@Context UriInfo context, EvaluateDecisionDto parameters);
+
+  @POST
+  @Path("/evaluate-with-id")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  DecisionEvaluationDto evaluateDecisionWithId(@Context UriInfo context, EvaluateDecisionDto parameters);
 
   @PUT
   @Path("/history-time-to-live")
