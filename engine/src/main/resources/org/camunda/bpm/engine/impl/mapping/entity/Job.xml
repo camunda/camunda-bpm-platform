@@ -181,6 +181,7 @@
     ${limitBefore}
     select RES.ID_,
       RES.REV_,
+      RES.TENANT_ID_,
       RES.DUEDATE_,
     <if test="parameter.applyExclusiveOverProcessHierarchies">
       RES.ROOT_PROC_INST_ID_,
