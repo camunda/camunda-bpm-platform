@@ -135,7 +135,6 @@ Docker image can be used this way, please perform the following steps:
 At the moment, Testcontainers can be used with the Camunda-supported versions of the following databases. Please make 
 sure that the database image is configured according to [this guide](https://docs.camunda.org/manual/latest/user-guide/process-engine/database/database-configuration/#isolation-level-configuration):
 * PostgreSQL
-* MariaDB
 * MySQL
 * MS-SQL 2017/2019 ([MSSQL-specific configuraion guide](https://docs.camunda.org/manual/latest/user-guide/process-engine/database/mssql-configuration/))
 

@@ -24,7 +24,6 @@
 
   <property name="db.name" value="db2" dbms="db2"/>
   <property name="db.name" value="h2" dbms="h2"/>
-  <property name="db.name" value="mariadb" dbms="mariadb"/>
   <property name="db.name" value="mssql" dbms="mssql"/>
   <property name="db.name" value="mysql" dbms="mysql"/>
   <property name="db.name" value="oracle" dbms="oracle"/>
