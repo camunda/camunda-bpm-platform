@@ -258,6 +258,7 @@
     "EXECUTION_METRICS_START_DATE": "Anfangsdatum",
     "EXECUTION_METRICS_TW": "Task Benutzer (Task Users, kurz TU)",
 	  "EXECUTION_METRICS_MONTHLY_TABLE_TITLE": "Statistik der letzten 12 Monate",
+    "EXECUTION_METRICS_MONTHLY_START_DATE": "Anfangsdatum",
     "EXECUTION_METRICS_SHOW_LEGACY": "Zeige ursprüngliche Metriken (FNI/EDE)",
     "EXECUTION_METRICS_ANNUAL_TABLE_TITLE": "Ausführungs-Metriken je Vertragsjahr",
     "EXECUTION_METRICS_COPY_HEADER": "Kopieren",

@@ -27,8 +27,7 @@ const debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
 const debounceMonthly = debouncePromiseFactory();
 const debounceAnnual = debouncePromiseFactory();
 
-const fmtMonth = 'MMMM YYYY';
-const fmtYear = 'DD/MM/YYYY';
+const fmtDateTable = 'YYYY-MM-DD';
 const fmtDatePicker = 'yyyy-MM-dd';
 const fmtRequest = 'YYYY-MM-DD';
 const metrics = {
@@ -190,24 +189,30 @@ const Controller = [
         : 'EXECUTION_METRICS_ANNUAL_FORMAT';
 
       return $translate.instant(translationId, {
-        from: date.format(fmtYear),
-        to: endDate.format(fmtYear)
+        from: date.format(fmtDateTable),
+        to: endDate.format(fmtDateTable)
       });
     };
 
-    const createGroupLabel = (year, month) => {
+    const createGroupLabel = (year, month, day) => {
       if (!month) {
         return year;
-      } else {
-        return `${year}.${String(month).padStart(2, '0')}`;
       }
+      const contractMonth = moment({year, month: month - 1});
+      let startOfContractMonth = moment({year, month: month - 1, day});
+      if (contractMonth.endOf('month').date() < day) {
+        return contractMonth.endOf('month').format(fmtDateTable);
+      }
+      return startOfContractMonth.format(fmtDateTable);
     };
 
     const prepareTableData = (response, labelFormat, metricsGroupMap = {}) => {
+      const day = moment($scope.startDate).date();
       for (const metricUsage of response) {
         const label = createGroupLabel(
           metricUsage.subscriptionYear,
-          metricUsage.subscriptionMonth
+          metricUsage.subscriptionMonth,
+          day
         );
         let labelFmt;
         if (angular.isFunction(labelFormat)) {
@@ -245,7 +250,7 @@ const Controller = [
           endDate
         }).$promise.then(
           monthlyMetrics => {
-            prepareTableData(monthlyMetrics, fmtMonth, monthlyMetricUsageMap);
+            prepareTableData(monthlyMetrics, null, monthlyMetricUsageMap);
             resolve();
           },
           err => reject(err)
@@ -281,13 +286,14 @@ const Controller = [
     const initializeMonthlyData = () => {
       // prefill last 24 months for monthly table
       monthlyMetricUsageMap = {};
+      const day = moment($scope.startDate).date();
       let month = $scope.activeMonth.clone();
       for (let i = 0; i < 24; i++) {
         // create label
-        const label = createGroupLabel(month.year(), month.month() + 1);
+        const label = createGroupLabel(month.year(), month.month() + 1, day);
         monthlyMetricUsageMap[label] = {
           label,
-          labelFmt: month.format(fmtMonth),
+          labelFmt: label,
           activeYear: !month.isBefore($scope.activeYear)
         };
 
