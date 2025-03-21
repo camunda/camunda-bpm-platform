@@ -21,7 +21,7 @@
     <version.quarkus> 3.19.2</version.quarkus>
     <version.spring.framework>5.3.39</version.spring.framework>
     <version.spring.framework6>6.2.4</version.spring.framework6>
-    <version.spring-boot>3.4.3</version.spring-boot>
+    <version.spring-boot>3.4.4</version.spring-boot>
     <version.resteasy>3.15.6.Final</version.resteasy>
     <version.jersey2>2.34</version.jersey2>
     <!-- use minimum version of resteasy and jersey -->
