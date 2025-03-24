@@ -258,6 +258,7 @@
     "EXECUTION_METRICS_START_DATE": "Contract start date:",
     "EXECUTION_METRICS_TW": "Task Users (TU)",
     "EXECUTION_METRICS_MONTHLY_TABLE_TITLE": "Usage last 12 months by month",
+    "EXECUTION_METRICS_MONTHLY_START_DATE": "Start date",
     "EXECUTION_METRICS_SHOW_LEGACY": "Display legacy metrics (FNI/EDE)",
     "EXECUTION_METRICS_ANNUAL_TABLE_TITLE": "Annual usage metrics by subscription term",
     "EXECUTION_METRICS_COPY_HEADER": "Copy",
