@@ -20,6 +20,9 @@
     <module name="org.joda.time" slot="2.1" />
     <module name="org.apache.groovy.groovy-all" services="import"/>
     <module name="org.graalvm.js.js-scriptengine" services="import"/>
+    <module name="org.camunda.feel.feel-engine" services="import"/>
+    <module name="org.camunda.bpm.dmn.camunda-engine-feel-scala" services="import" />
+    <module name="org.camunda.bpm.camunda-engine-plugin-spin" optional="true" services="import" />
 
     <module name="sun.jdk" services="import"/>
 
