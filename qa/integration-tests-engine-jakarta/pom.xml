@@ -790,7 +790,7 @@
                 <exclude>**/TestWarDeploymentWithProcessEnginePlugin.exclude</exclude>
 
                 <exclude>**/SpringServletPATimerStartEventExpressionTest.java</exclude>
-                <!-- CAM-5037 -->
+                <!-- https://github.com/camunda/camunda-bpm-platform/issues/5037-->
                 <exclude>**/FeelEngineTest.java</exclude>
               </excludes>
               <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
@@ -913,7 +913,7 @@
                 <!-- CAM-1778 -->
                 <exludes>**/TestWarDeploymentWithProcessEnginePlugin.java</exludes>
 
-                <!-- CAM-5037 -->
+                <!-- https://github.com/camunda/camunda-bpm-platform/issues/5037 -->
                 <exclude>**/FeelEngineTest.java</exclude>
                 <exclude>**/SpringServletPATimerStartEventExpressionTest.java</exclude>
               </excludes>
