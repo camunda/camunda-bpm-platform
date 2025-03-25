@@ -212,7 +212,7 @@
         )
       </if>
 
-      <if test="parameter.tenantId != null or parameter.tenantId != empty">
+      <if test="parameter.tenantId != null">
           and RES.TENANT_ID_ = #{parameter.tenantId}
       </if>
 
