@@ -18,7 +18,7 @@
   </description>
 
   <properties>
-    <version.quarkus>3.20.0.CR1</version.quarkus>
+    <version.quarkus>3.20.0</version.quarkus>
     <version.spring.framework>5.3.39</version.spring.framework>
     <version.spring.framework6>6.2.4</version.spring.framework6>
     <version.spring-boot>3.4.4</version.spring-boot>
