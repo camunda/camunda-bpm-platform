@@ -16,6 +16,6 @@
     <module name="org.camunda.bpm.model.camunda-dmn-model" />
     <module name="org.camunda.bpm.dmn.camunda-engine-feel-api" />
     <module name="org.camunda.bpm.dmn.camunda-engine-feel-juel" />
-    <module name="org.camunda.bpm.dmn.camunda-engine-feel-scala" export="true" services="import" />
+    <module name="org.camunda.bpm.dmn.camunda-engine-feel-scala" export="true" />
   </dependencies>
 </module>
