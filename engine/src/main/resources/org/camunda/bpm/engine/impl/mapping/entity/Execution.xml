@@ -306,6 +306,9 @@
             <if test="query.processInstanceId != null">
               ${queryType} RES.PROC_INST_ID_ = #{query.processInstanceId}
             </if>
+            <if test="query.rootProcessInstanceId != null">
+              ${queryType} RES.ROOT_PROC_INST_ID_ = #{query.rootProcessInstanceId}
+            </if>
             <if test="query.processInstanceIds != null and !query.processInstanceIds.isEmpty()">
               ${queryType}
               <bind name="listOfIds" value="query.processInstanceIds" />
