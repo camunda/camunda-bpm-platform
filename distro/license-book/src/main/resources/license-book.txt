@@ -1,7 +1,7 @@
 License Book for Camunda Platform 7.23
 
 This is a license book. It contains licensing information for third-party libraries which are used in this release of Camunda Platform 7.23
-(Document generated on: 2025-03-26)
+(Document generated on: 2025-03-31)
 
 Introduction
 This Licensing Information document is a part of the program documentation and is intended to help you understand the license terms and copyright for third-party libraries associated with the Camunda Platform software.
@@ -31,7 +31,7 @@ The Libraries used within the Camunda Platform v7.23 are published under the fol
 * OFL 
 * Unicode
 * UPL
-* XLTS for AngularJS – EULA
+* The HeroDevs NES License
 
 GNU Lesser/Library General Public License LGPL (any version)
 Where the Camunda Platform binaries contain components licensed under any version of LGPL, that licence allows you to extract the object code of the LGPL component from the binary as distributed by us (this is normally distributed as a compressed .tar.gz file which contains a number of files, such as .jar files which are themselves archives containing further components, all of which can be extracted using commonly available tools such as gzip). Using the source code of the library (which we will provide on request, or you can download it from the location specified in this license book), you can make modifications or bug fixes to the library, recompile the library (again, using commonly available tools) and replace the binary of the library you extracted with the recompiled object code. Full details of this process are available on request. This will enable you to modify any LGPL-licensed library and re-integrate that modified library into the Camunda Platform binaries (accepting that this will only work provided you have not broken the library or the interface). 
@@ -923,41 +923,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ===========================================================================================
 
-EULA for the downstream recipient of XLTS for AngularJS 2022-04-30 (XLTS for AngularJS – EULA)
+The HeroDevs NES License
+Copyright © 2023-present, HeroDevs, Inc. All Rights Reserved.
 
-The following license text for the XLTS for AngularJS – EULA is cited only once. 
+Access to this source code is restricted, regardless of medium, to parties authorized by a valid commercial license. Use of this source code, as well as any other associated asset, is also subject to the terms and conditions of the Never-Ending Support program. For more information, visit https://docs.herodevs.com.
 
-Last updated: 2022-04-30
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-1. Facts and Objectives.
-  a. AngularJS is a JavaScript-based open-source front-end web application framework which was historically maintained principally by Google. As of December 31, 2021, Google terminated support for all versions of AngularJS software.
-  b. XLTS.dev (“Licensor”) creates patches and fixes to the code of specified versions of AngularJS (“XLTS for AngularJS”) in the form of “Updates” developed by Licensor. c. The Updates developed by Licensor together with the code of XLTS for AngularJS constitute the “Software” licensed by Licensor.
-  c. The terms and conditions of the License and Support Services relating to the Software are set forth and defined in a certain “Extended Long Term Support Agreement” (the “Support Agreement”) entered into between Licensor and its customers (the “Customers”).
-  d. Certain Customers create their own software products for license or distribution to downstream users in which the Software is embedded into Customer’s products (the “Customer Products”).
-  e. This End User License Agreement (“EULA”) sets forth the terms and conditions applicable to end users who receive Customer Products from Customers (“Customer End Users”), or any other Customer End Users.
-  f. By consideration of the use of the Software as part of the Customer Products, the Customer End User agrees that its obligations set forth in this EULA are supported by good and valuable consideration, the receipt and sufficiency are acknowledged.
-  g. By downloading the Customer Products of which the Software is a part, Customer End User agrees to be bound by the terms and conditions of this EULA. 
-2. Grant. Customer End Users may use and run the Software only as part of Customer Products and for no other purpose.
-3. Use Restrictions. Customer End User may not:
-  a. Download the Software except as an integral part of the Customer Products;
-  b. Separate out the Software from the Customer Products;
-  c. Copy the Software except as an integral part of the Customer Products;
-  d. Remove, delete, alter, or obscure any trademarks or any copyright, trademark, patent, or other intellectual property or proprietary rights notices provided on or with the Software;
-  e. Sublicense, rent, lease, lend, or sell the Software, or any features or functionality of the Software apart from the Customer Products; or
-  f. Use the Software in violation of any law, regulation, or rule.
-4. Third-Party Materials. The Software includes software, content, data, or other materials, including related documentation (AngularJS Documentation), that are owned by Persons other than Licensor and that are provided to Customer in addition to and/or different from those contained in the Support Agreement ("Third-Party Licenses"). A list of all materials included in the Software and provided under Third-Party Licenses is set forth in Schedule B of the Support Agreement, and the applicable Third-Party Licenses are accessible via links therefrom. Customer End User is bound by and shall comply with all Third-Party Licenses.
-5. Responsibility for Use of Software. Customer is responsible and liable for all uses of the Software embedded in the Customer Products.
-6. No Maintenance and Support. Customer End User acknowledges and agrees that Licensor shall have no obligation to provide maintenance, support, updates, bug fixes, patches, or error corrections to Customer End User with respect to the Software. Customer End User shall have no right to use any customer support or rely on any service level agreements provided by Licensor to the Customer under the Support Agreement.
-7. Intellectual Property Rights. Customer End User acknowledges and agrees that Customer End User does not acquire any ownership interest in the Software or any other rights thereto, other than to use the same as part of the Customer Products and otherwise in accordance with this EULA. Licensor and its licensors reserve and shall retain their entire right, title, and interest in and to the Software and all Intellectual Property Rights arising out of or relating to the Software. Customer End User shall use commercially reasonable efforts to safeguard the Software from infringement, misappropriation, theft, misuse, or unauthorized access. Customer End User shall promptly notify Licensor if Customer End User becomes aware of any infringement of the Licensor's Intellectual Property Rights in the Software and shall reasonably cooperate with Licensor, at Licensor's sole expense, in any legal action taken by Licensor to enforce its Intellectual Property Rights in the Software.
-8. No Warranties. Customer End User agrees and acknowledges that Licensor makes absolutely no representations and warranties to Customer End User with respect to the Software, and that the Software is provided "as is" with all faults and defects. Licensor, on its own behalf and on behalf of its affiliates and its and their respective licensors and service providers, expressly disclaims all warranties, whether express, implied, statutory, or otherwise, with respect to the Software, including all implied warranties of merchantability, fitness for a particular purpose, title, and non-infringement, and warranties that may arise out of course of dealing, course of performance, usage, or trade practice; and Customer End User waives all such claims against Licensor. Licensor provides no warranty that the Software will meet the Customer End User's requirements, achieve any intended results, be compatible with the Customer Products or any other software or systems, or operate without interruption, meet any performance reliability standards or be error free.
-9. No Liability.
-  a. Customer End User agrees that in no event shall Licensor, its affiliates, or any of its or their respective licensors or service providers, be liable to Customer End User for lost revenues or profits; or for any consequential, incidental, indirect, exemplary, special, or punitive damages, whether arising out of or in connection with use of the Software as a part of the Customer Products; whether based on breach of contract, tort (including negligence), or otherwise, regardless of whether such damages were foreseeable and whether or not Customer End User was advised of the possibility of such damages.
-  b. In no event will Licensor or its affiliates, or any of its or their respective licensors or service providers, be liable to Customer End User or any third party, without limitation, for (i) any use, interruption, delay, or inability to use the Customer Products, (ii) delays, interruption, or loss of services, business, or goodwill, (iii) failure to accurately transfer, read, or transmit information (iv) failure to update or provide correct information; (v) loss or corruption of data; loss resulting from system or system service failure, malfunction, or shutdown; (vi) system incompatibility or provision of incorrect compatibility information; or (vi) breaches in system security. 
-10. Export Regulation. Customer End User agrees to comply with any US export control laws, including the Export Control Reform Act and its associated regulations, in respect of the Software or the Customer Products.
-11. Invalidity or Unenforceability. If any term or provision of this EULA is invalid, illegal, or unenforceable in any jurisdiction, such invalidity, illegality, or unenforceability shall not affect any other term or provision of this EULA or invalidate or render unenforceable such term or provision in any other jurisdiction.
-12. Enforcement of EULA. In the event of breach of any provision of this EULA by Customer End User, Licensor may enforce its rights under this EULA in any court having jurisdiction of Customer End User. In any such action, the laws of the State of Utah shall apply, without reference to its choice of law principles. In any such enforcement action, the prevailing party shall be entitled to recovery of its costs of suit, including without limitation reasonable attorneys’ fees. 
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 ===========================================================================================
+
 
 ===========================================================================================
 ch.qos.logback:logback-classic:jar:1.5.18
@@ -4143,7 +4119,7 @@ THE SOFTWARE.
 ===========================================================================================
 
 ===========================================================================================
-@neverendingsupport/angularjs@1.9.7-animate
+@neverendingsupport/angularjs@1.9.7-cookies
 
 Licensed under SEE LICENSE IN LICENSE.md
 Notice file:
@@ -4212,7 +4188,7 @@ THE SOFTWARE.
 ===========================================================================================
 
 ===========================================================================================
-@neverendingsupport/angularjs@1.9.7-cookies
+@neverendingsupport/angularjs@1.9.7-animate
 
 Licensed under SEE LICENSE IN LICENSE.md
 Notice file:
