@@ -6,13 +6,13 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-root</artifactId>
-    <version>7.23.0-SNAPSHOT</version>
+    <version>7.23.0</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <groupId>org.camunda.connect</groupId>
   <artifactId>camunda-connect-bom</artifactId>
-  <version>7.23.0-SNAPSHOT</version>
+  <version>7.23.0</version>
   <name>Camunda Platform - connect - bom</name>
   <packaging>pom</packaging>
 
@@ -50,7 +50,7 @@
     <url>https://github.com/camunda/camunda-bpm-platform</url>
     <connection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>7.23.0</tag>
   </scm>
 
 </project>
