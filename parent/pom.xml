@@ -42,8 +42,7 @@
     <version.xml.jaxb-impl>2.3.6</version.xml.jaxb-impl>
     <version.xml.jaxb-impl4>4.0.5</version.xml.jaxb-impl4>
     <version.jakarta.xml.bind-api>4.0.2</version.jakarta.xml.bind-api>
-    <version.httpclient>4.5.14</version.httpclient>
-    <version.httpclient5>5.4.1</version.httpclient5>
+    <version.httpclient>5.4.1</version.httpclient>
 
     <version.slf4j>1.7.26</version.slf4j>
     <version.logback>1.2.11</version.logback>
