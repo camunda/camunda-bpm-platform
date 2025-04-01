@@ -602,7 +602,7 @@
             <inet-address value="${jboss.bind.address:127.0.0.1}"/>
         </interface>
     </interfaces>
-    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="0">
+    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
         <socket-binding name="ajp" port="${jboss.ajp.port}"/>
         <socket-binding name="http" port="${jboss.http.port}"/>
         <socket-binding name="https" port="${jboss.https.port}"/>
