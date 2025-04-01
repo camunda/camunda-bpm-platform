@@ -49,6 +49,8 @@ public class MockDecisionResultBuilder {
 
     private static final long serialVersionUID = 1L;
 
+    private String dmnDecisionInstanceId;
+
     @Override
     public DmnDecisionResultEntries getFirstResult() {
       throw new UnsupportedOperationException();
@@ -77,6 +79,16 @@ public class MockDecisionResultBuilder {
     @Override
     public <T extends TypedValue> T getSingleEntryTyped() {
       throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getDmnDecisionInstanceId() {
+      return this.dmnDecisionInstanceId;
+    }
+
+    @Override
+    public void setDmnDecisionInstanceId(String dmnDecisionInstanceId) {
+        this.dmnDecisionInstanceId = dmnDecisionInstanceId;
     }
 
   }
