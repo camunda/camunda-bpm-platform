@@ -27,7 +27,6 @@ engine-rest:
   - 'engine-rest-unit-jersey-2'
   - 'engine-rest-unit-resteasy'
   - 'engine-rest-unit-compatibility-wildfly'
-  - 'engine-rest-IT-embedded-wildfly26'
   - 'engine-rest-jakarta-unit-resteasy'
   - 'engine-rest-jakarta-unit-compatibility-wildfly'
 daily-stages:
