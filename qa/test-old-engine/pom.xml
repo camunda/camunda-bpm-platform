@@ -242,6 +242,13 @@
         </dependency>
 
         <dependency>
+          <groupId>com.github.h-thurow</groupId>
+          <artifactId>simple-jndi</artifactId>
+          <version>0.24.0</version>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
           <groupId>org.jboss</groupId>
           <artifactId>jboss-vfs</artifactId>
           <version>3.1.0.Final</version>
