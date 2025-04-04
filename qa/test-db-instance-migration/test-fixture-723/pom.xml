@@ -103,7 +103,7 @@
                     <artifactItem>
                       <groupId>org.camunda.bpm.distro</groupId>
                       <artifactId>camunda-sql-scripts</artifactId>
-                      <version>7.23</version>
+                      <version>7.23.0</version>
                       <type>test-jar</type>
                       <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
                       <overWrite>true</overWrite>
