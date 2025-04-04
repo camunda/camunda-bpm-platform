@@ -155,4 +155,16 @@
     <tagDatabase tag="7.23.0"/>
   </changeSet>
 
+  <changeSet author="Camunda" id="7.23-to-7.24">
+    <sqlFile path="upgrade/${db.name}_engine_7.23_to_7.24.sql"
+             encoding="UTF-8"
+             relativeToChangelogFile="true"
+             splitStatements="true"
+             stripComments="true"/>
+  </changeSet>
+
+  <changeSet author="Camunda" id="7.24.0-tag">
+    <tagDatabase tag="7.24.0"/>
+  </changeSet>
+
 </databaseChangeLog>
