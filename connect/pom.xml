@@ -16,7 +16,7 @@
 
   <properties>
     <commons-codec.version>1.15</commons-codec.version>
-    <connect.version.old>7.22.0</connect.version.old>
+    <connect.version.old>7.23.0</connect.version.old>
     <mockito.version>1.9.5</mockito.version>
     <wiremock.version>1.58</wiremock.version>
     <maven-bundle-plugin.version>5.1.1</maven-bundle-plugin.version>
