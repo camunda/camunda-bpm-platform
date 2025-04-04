@@ -54,11 +54,4 @@ public class TelemetryStaticDataTest {
     assertThat(server.getVendor()).isEqualTo("WebLogic Server");
   }
 
-  @Test
-  public void shouldValidateWebSphereVendor() {
-    // given
-    ApplicationServerImpl server = new ApplicationServerImpl("IBM WebSphere Application Server/8.5");
-    assertThat(server.getVendor()).isEqualTo("IBM WebSphere Application Server");
-  }
-
 }

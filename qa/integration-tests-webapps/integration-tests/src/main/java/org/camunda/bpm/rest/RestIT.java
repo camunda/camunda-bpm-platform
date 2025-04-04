@@ -329,7 +329,7 @@ public class RestIT extends AbstractWebIntegrationTest {
   protected void assertMediaType(ClientResponse response, String expected) {
     MediaType actual = response.getType();
     assertEquals(200, response.getStatus());
-    // use startsWith cause sometimes server also returns quality parameters (e.g. websphere/wink)
+    // use startsWith cause sometimes server also returns quality parameters
     assertTrue("Expected: " + expected + " Actual: " + actual, actual.toString().startsWith(expected.toString()));
   }
 
