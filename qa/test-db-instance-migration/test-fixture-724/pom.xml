@@ -7,25 +7,28 @@
     <version>7.24.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>camunda-qa-upgrade-test-fixture-723</artifactId>
+  <artifactId>camunda-qa-upgrade-test-fixture-724</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.23.0</name>
+  <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.24.0</name>
 
   <properties>
+    <!-- delete when 7.24 is released -->
+    <camunda.version.current>${project.version}</camunda.version.current>
     <camunda.version.previous>7.23.0</camunda.version.previous>
   </properties>
 
-   <dependencyManagement>
-     <dependencies>
-       <dependency>
-         <groupId>org.camunda.bpm</groupId>
-         <artifactId>camunda-bom</artifactId>
-         <version>7.23.0</version>
-         <scope>import</scope>
-         <type>pom</type>
-       </dependency>
-     </dependencies>
-   </dependencyManagement>
+  <!-- uncomment when 7.24 is released -->
+  <!--   <dependencyManagement> -->
+  <!--     <dependencies> -->
+  <!--       <dependency> -->
+  <!--         <groupId>org.camunda.bpm</groupId> -->
+  <!--         <artifactId>camunda-bom</artifactId> -->
+  <!--         <version>7.24.0</version> -->
+  <!--         <scope>import</scope> -->
+  <!--         <type>pom</type> -->
+  <!--       </dependency> -->
+  <!--     </dependencies> -->
+  <!--   </dependencyManagement> -->
 
   <dependencies>
     <dependency>
@@ -103,7 +106,9 @@
                     <artifactItem>
                       <groupId>org.camunda.bpm.distro</groupId>
                       <artifactId>camunda-sql-scripts</artifactId>
-                      <version>7.23.0</version>
+                      <!-- Replace after 7.24.0 release -->
+                      <version>${camunda.version.current}</version>
+                      <!--<version>7.24.0</version>-->
                       <type>test-jar</type>
                       <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
                       <overWrite>true</overWrite>
@@ -113,7 +118,8 @@
               </execution>
             </executions>
           </plugin>
-          <plugin>
+          <!-- uncomment when 7.24 is released -->
+          <!--<plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <configuration>
@@ -134,7 +140,7 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>
+          </plugin>-->
         </plugins>
       </build>
     </profile>

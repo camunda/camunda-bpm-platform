@@ -28,7 +28,7 @@
     <version.liquibase>4.8.0</version.liquibase>
 
     <!-- needed for sql script and backward compatibility checks -->
-    <camunda.version.old>7.22.0</camunda.version.old>
+    <camunda.version.old>7.23.0</camunda.version.old>
 
     <!-- Testcontainers JDBC URL parameters. By default, an empty string -->
     <database.tc.params />
