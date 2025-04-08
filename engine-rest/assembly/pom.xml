@@ -115,24 +115,6 @@
           </execution>
 
           <execution>
-            <id>was</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>assembly-war-was.xml</descriptor>
-              </descriptors>
-              <finalName>camunda-engine-rest-${project.version}</finalName>
-              <attach>true</attach>
-              <classifier>was</classifier>
-              <outputDirectory>target/</outputDirectory>
-              <workDirectory>target/assembly/work</workDirectory>
-            </configuration>
-          </execution>
-
-          <execution>
             <id>wls</id>
             <phase>package</phase>
             <goals>

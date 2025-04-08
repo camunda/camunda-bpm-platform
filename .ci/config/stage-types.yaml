@@ -126,16 +126,6 @@ engine-rest-unit-compatibility-wildfly:
   - 'rest-api'
   nodeLabel: 'h2'
   jdkVersion: 'jdk-11-0-21'
-engine-rest-IT-embedded-wildfly26:
-  directory: 'qa'
-  command: 'clean install -Pwildfly26,h2,webapps-integration,embedded-engine-rest'
-  stash:
-    runtimeStash: true
-    archiveStash: true
-  labels:
-  - 'rest-api'
-  nodeLabel: 'h2'
-  jdkVersion: 'jdk-11-0-21'
 engine-rest-jakarta-unit-compatibility-wildfly:
   directory: 'engine-rest/engine-rest-jakarta'
   command: 'clean install -Pwildfly-compatibility'

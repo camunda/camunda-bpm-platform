@@ -105,7 +105,7 @@ pipeline {
               upstreamProjectName = "/" + env.JOB_NAME
               upstreamBuildNumber = env.BUILD_NUMBER
 
-              if (env.BRANCH_NAME == cambpmDefaultBranch() || cambpmWithLabels('webapp-integration', 'all-as', 'h2', 'websphere', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'e2e')) {
+              if (env.BRANCH_NAME == cambpmDefaultBranch() || cambpmWithLabels('webapp-integration', 'all-as', 'h2', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'e2e')) {
                 cambpmTriggerDownstream(
                   platformVersionDir + "/cambpm-ee/" + eeMainProjectBranch,
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
@@ -297,30 +297,6 @@ pipeline {
             ])
           }
         }
-        stage('engine-IT-wildfly26-postgresql-142') {
-          when {
-            expression {
-              cambpmWithLabels('all-as', 'wildfly')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'postgresql_142',
-              runSteps: {
-                cambpmRunMaven('qa/',
-                'clean install -Pwildfly26,postgresql,engine-integration',
-                runtimeStash: true,
-                archiveStash: true,
-                jdkVersion: 'jdk-11-latest')
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-                cambpmAddFailedStageType(failedStageTypes, 'engine-IT-wildfly26')
-                cambpmArchiveArtifacts('qa/wildfly26-runtime/target/**/standalone/log/server.log')
-              }
-            ])
-          }
-        }
         stage('engine-IT-XA-wildfly-postgresql-142') {
           when {
             expression {
@@ -341,25 +317,6 @@ pipeline {
               postFailure: {
                 cambpmPublishTestResult()
                 cambpmArchiveArtifacts('qa/wildfly-runtime/target/**/standalone/log/server.log')
-              }
-            ])
-          }
-        }
-        stage('engine-IT-XA-wildfly26-postgresql-142') {
-          when {
-            expression {
-              cambpmWithLabels('wildfly')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'postgresql_142',
-              runSteps: {
-                cambpmRunMaven('qa/', 'clean install -Pwildfly26,postgresql,postgresql-xa,engine-integration', runtimeStash: true, archiveStash: true, jdkVersion: 'jdk-11-latest')
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-                cambpmArchiveArtifacts('qa/wildfly26-runtime/target/**/standalone/log/server.log')
               }
             ])
           }
@@ -426,29 +383,6 @@ pipeline {
                   runtimeStash: true,
                   archiveStash: true,
                   jdkVersion: 'jdk-17-latest')
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-                cambpmArchiveArtifacts('qa/integration-tests-webapps/shared-engine/target/selenium-screenshots/*')
-              }
-            ])
-          }
-        }
-        stage('webapp-IT-wildfly26-h2') {
-          when {
-            expression {
-              cambpmWithLabels('webapp-integration', 'h2', 'wildfly')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'chrome_112',
-              runSteps: {
-                cambpmRunMaven('qa/',
-                  'clean install -Pwildfly26,h2,webapps-integration',
-                  runtimeStash: true,
-                  archiveStash: true,
-                  jdkVersion: 'jdk-11-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -614,42 +548,6 @@ pipeline {
                   archiveStash: true,
                   // we need to use JDK 17 for Spring 6
                   jdkVersion: 'jdk-17-latest')
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-              }
-            ])
-          }
-        }
-        stage('engine-IT-wildfly26-domain') {
-          when {
-            expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly26') && cambpmWithLabels('wildfly')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMaven('qa/', 'clean install -Pwildfly26-domain,h2,engine-integration', runtimeStash: true, archiveStash: true, jdkVersion: 'jdk-11-latest')
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-              }
-            ])
-          }
-        }
-        stage('engine-IT-wildfly26-servlet') {
-          when {
-            expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly26') && cambpmWithLabels('wildfly')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMaven('qa/', 'clean install -Pwildfly26,wildfly26-servlet,h2,engine-integration', runtimeStash: true, archiveStash: true, jdkVersion: 'jdk-11-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
