@@ -17,6 +17,7 @@
 package org.camunda.bpm.client.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
@@ -24,7 +25,9 @@ import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.core5.util.Timeout;
 import org.camunda.bpm.client.ExternalTaskClient;
+import org.camunda.bpm.client.ExternalTaskClientBuilder;
 import org.camunda.bpm.client.UrlResolver;
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -89,6 +92,19 @@ public class ExternalTaskClientBuilderImplTest {
     public String getBaseUrl() {
       return baseUrl;
     }
+  }
+
+  @Test
+  public void testWithNullBaseUrl() {
+    // given
+    ExternalTaskClientBuilderImpl builder = new ExternalTaskClientBuilderImpl();
+
+    // when building with null base url then exception is thrown
+    assertThat(builder.getBaseUrl()).isNull();
+    assertThatThrownBy(builder::build)
+        .isInstanceOf(ExternalTaskClientException.class)
+        .hasMessageContaining("Base URL cannot be null or an empty string");
+
   }
 
 }
