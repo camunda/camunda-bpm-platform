@@ -943,6 +943,41 @@ public class BatchMigrationTest {
     Assertions.assertThat(historicBatch.getExecutionStartTime()).isEqualToIgnoringMillis(TEST_DATE);
   }
 
+  @Test
+  public void shouldCreateProcessInstanceRelatedBatchJobsForSingleInvocations() {
+    RuntimeService runtimeService = engineRule.getRuntimeService();
+    int processInstanceCount = 2;
+
+    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    List<String> processInstanceIds = new ArrayList<>();
+    for (int i = 0; i < processInstanceCount; i++) {
+      processInstanceIds.add(
+              runtimeService.startProcessInstanceById(sourceProcessDefinition.getId()).getId()
+      );
+    }
+
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+            .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+            .mapEqualActivities()
+            .build();
+
+    // when
+    Batch batch = runtimeService.newMigration(migrationPlan)
+            .processInstanceIds(processInstanceIds)
+            .executeAsync();
+
+    helper.executeSeedJob(batch);
+    List<Job> executionJobs = helper.getExecutionJobs(batch);
+
+    // then
+    //Making sure that processInstanceId is set in execution jobs #4205
+    assertThat(executionJobs)
+            .extracting("processInstanceId")
+            .containsExactlyInAnyOrder(processInstanceIds.toArray());
+  }
+
   protected void assertBatchCreated(Batch batch, int processInstanceCount) {
     assertNotNull(batch);
     assertNotNull(batch.getId());
