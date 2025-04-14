@@ -72,7 +72,7 @@ public class PurgeDatabaseAndCacheCmd implements Command<PurgeReport>, Serializa
 
   private DatabasePurgeReport purgeDatabase(CommandContext commandContext) {
     DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
-    // For MySQL and MariaDB we have to disable foreign key check,
+    // For MySQL we have to disable foreign key check,
     // to delete the table data as bulk operation (execution, incident etc.)
     // The flag will be reset by the DBEntityManager after flush.
     dbEntityManager.setIgnoreForeignKeysForNextFlush(true);

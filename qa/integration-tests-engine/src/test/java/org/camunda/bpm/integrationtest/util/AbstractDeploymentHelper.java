@@ -127,7 +127,6 @@ public abstract class AbstractDeploymentHelper {
 
   public static JavaArchive[] getJodaTimeModuleForServer(String server) {
     if (server.equals("tomcat") ||
-        server.equals("websphere9") ||
         server.equals("weblogic") ||
         server.equals("glassfish")) {
       return Maven.configureResolver()
@@ -154,7 +153,6 @@ public abstract class AbstractDeploymentHelper {
 
   public static JavaArchive[] getSpinJacksonJsonDataFormatForServer(String server) {
     if (server.equals("tomcat") ||
-        server.equals("websphere9") ||
         server.equals("weblogic") ||
         server.equals("glassfish")) {
       return Maven.configureResolver()

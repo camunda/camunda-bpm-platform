@@ -17,6 +17,4 @@ jobs:
       sec-webhook-secret: SEC_CHANNEL_SLACK_WEBHOOK_URL
       translation-webhook-secret: TRANSLATION_CHANNEL_SLACK_WEBHOOK_URL
       translation-notification-matcher: 7\.[0-9]+\.0
-      devex-webhook-secret: DEVEX_CHANNEL_SLACK_WEBHOOK_URL
-      devex-notification-matcher: 7\.[0-9]+\.0
       sec-dri-secret: SEC_DRI_SLACK_ID

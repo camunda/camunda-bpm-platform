@@ -11,7 +11,7 @@
 
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-root</artifactId>
-  <version>7.23.0-SNAPSHOT</version>
+  <version>7.24.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Camunda Platform - Root Pom</name>
   <inceptionYear>2013</inceptionYear>

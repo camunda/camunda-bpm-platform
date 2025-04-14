@@ -310,7 +310,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
     LOG.databaseFlushSummary(operationsToFlush);
 
     // If we want to delete all table data as bulk operation, on tables which have self references,
-    // We need to turn the foreign key check off on MySQL and MariaDB.
+    // We need to turn the foreign key check off on MySQL.
     // On other databases we have to do nothing, the mapped statement will be empty.
     if (isIgnoreForeignKeysForNextFlush) {
       persistenceSession.executeNonEmptyUpdateStmt(TOGGLE_FOREIGN_KEY_STMT, false);

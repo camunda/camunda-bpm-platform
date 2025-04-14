@@ -56,7 +56,7 @@ pipeline {
         stage('check-sql-scripts') {
           when {
             expression {
-              cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql')
+              cambpmWithLabels('all-db','h2','db2','mysql','oracle','sqlserver','postgresql')
             }
           }
           steps {

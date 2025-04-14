@@ -6,13 +6,13 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-root</artifactId>
-    <version>7.23.0-SNAPSHOT</version>
+    <version>7.24.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <groupId>org.camunda.connect</groupId>
   <artifactId>camunda-connect-bom</artifactId>
-  <version>7.23.0-SNAPSHOT</version>
+  <version>7.24.0-SNAPSHOT</version>
   <name>Camunda Platform - connect - bom</name>
   <packaging>pom</packaging>
 

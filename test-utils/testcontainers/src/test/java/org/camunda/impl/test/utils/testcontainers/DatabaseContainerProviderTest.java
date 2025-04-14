@@ -53,9 +53,6 @@ public class DatabaseContainerProviderTest {
       // The Camunda PostgreSQL 13.2 image is compatible with Testcontainers.
       // For older versions, please use the public Docker images (DockerHub repo: postgres).
       { "jdbc:tc:campostgresql:13.2:///process-engine", "SELECT version();", "13.2" },
-      // The current Camunda MariaDB images are compatible with Testcontainers.
-      // The username and password need to be explicitly declared.
-      { "jdbc:tc:cammariadb:10.0://localhost:3306/process-engine?user=camunda&password=camunda", "SELECT version();", "10.0" },
       // The current Camunda MySQL images are compatible with Testcontainers.
       // The username and password need to be explicitly declared.
       { "jdbc:tc:cammysql:5.7://localhost:3306/process-engine?user=camunda&password=camunda", "SELECT version();", "5.7" },

@@ -18,6 +18,8 @@ package org.camunda.bpm.engine.test.standalone.db;
 
 import static org.junit.Assert.assertEquals;
 
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.Test;
 
@@ -25,17 +27,11 @@ import org.junit.Test;
 /**
  * @author Tom Baeyens
  */
+@RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
 public class MetaDataTest extends PluggableProcessEngineTest {
 
   @Test
-  public void testMariaDbDatabaseType() {
-    if (isMariaDbConfigured()) {
-      assertEquals("mariadb",  processEngineConfiguration.getDatabaseType());
-    }
-  }
-
-  public boolean isMariaDbConfigured() {
-    return processEngineConfiguration.getJdbcUrl().toLowerCase().contains("mariadb") ||
-      processEngineConfiguration.getJdbcDriver().toLowerCase().contains("mariadb");
+  public void testMySQLDatabaseType() {
+    assertEquals("mysql", processEngineConfiguration.getDatabaseType());
   }
 }

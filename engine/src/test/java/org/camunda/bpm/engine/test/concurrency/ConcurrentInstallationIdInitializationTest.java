@@ -46,7 +46,7 @@ public class ConcurrentInstallationIdInitializationTest extends ConcurrencyTestC
   }
 
   @Test
-  @RequiredDatabase(excludes = {DbSqlSessionFactory.H2, DbSqlSessionFactory.MARIADB})
+  @RequiredDatabase(excludes = {DbSqlSessionFactory.H2})
   public void test() throws InterruptedException {
     Integer transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
     assumeThat((transactionIsolationLevel != null && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED)));

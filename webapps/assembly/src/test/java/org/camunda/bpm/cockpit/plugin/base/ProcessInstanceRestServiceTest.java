@@ -503,7 +503,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
   @Deployment(resources = {
     "processes/variables-process.bpmn"
   })
-  @RequiredDatabase(excludes = {DbSqlSessionFactory.MYSQL, DbSqlSessionFactory.MARIADB})
+  @RequiredDatabase(excludes = {DbSqlSessionFactory.MYSQL})
   public void testQueryWithComplexVariableFilter() {
     // given
     startProcessInstances("variableProcess", 2);

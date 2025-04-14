@@ -37,8 +37,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.DB2;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.H2;
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MARIADB_MYSQL;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MSSQL;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MYSQL;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.ORACLE;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.POSTGRES;
 
@@ -90,11 +90,10 @@ public class DeadlockTest {
   public void shouldProvokeDeadlock() throws InterruptedException {
     String databaseType = engineRule.getProcessEngineConfiguration().getDatabaseType();
     switch (databaseType) {
-    case DbSqlSessionFactory.MARIADB:
     case DbSqlSessionFactory.MYSQL:
       provokeDeadlock();
-      assertThat(sqlException.getSQLState()).isEqualTo(MARIADB_MYSQL.getSqlState());
-      assertThat(sqlException.getErrorCode()).isEqualTo(MARIADB_MYSQL.getErrorCode());
+      assertThat(sqlException.getSQLState()).isEqualTo(MYSQL.getSqlState());
+      assertThat(sqlException.getErrorCode()).isEqualTo(MYSQL.getErrorCode());
       break;
     case DbSqlSessionFactory.MSSQL:
       provokeDeadlock();

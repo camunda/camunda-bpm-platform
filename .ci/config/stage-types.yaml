@@ -14,7 +14,6 @@
 #   timeout: [MAP; OPTIONAL - default timeout is 3600 seconds; Doc: defines a map containing Job timeouts (in seconds) for each DB type.]
 #     postgresql: [INT; OPTIONAL;]
 #     mysql: [INT; OPTIONAL;]
-#     mariadb: [INT; OPTIONAL;]
 #     oracle: [INT; OPTIONAL;]
 #     h2: [INT; OPTIONAL;]
 #     db2: [INT; OPTIONAL;]
@@ -29,7 +28,6 @@ db-unit:
   - 'db2'
   - 'mysql'
   - 'oracle'
-  - 'mariadb'
   - 'sqlserver'
   - 'postgresql'
   podSpec:
@@ -45,7 +43,6 @@ sql-scripts:
   - 'db2'
   - 'mysql'
   - 'oracle'
-  - 'mariadb'
   - 'sqlserver'
   - 'postgresql'
   podSpec:
@@ -70,7 +67,6 @@ old-engine:
   - 'db2'
   - 'mysql'
   - 'oracle'
-  - 'mariadb'
   - 'sqlserver'
   - 'postgresql'
   podSpec:
@@ -126,16 +122,6 @@ engine-rest-unit-compatibility-wildfly:
   command: 'clean install -Pwildfly-compatibility'
   stash:
     runtimeStash: true
-  labels:
-  - 'rest-api'
-  nodeLabel: 'h2'
-  jdkVersion: 'jdk-11-0-21'
-engine-rest-IT-embedded-wildfly26:
-  directory: 'qa'
-  command: 'clean install -Pwildfly26,h2,webapps-integration,embedded-engine-rest'
-  stash:
-    runtimeStash: true
-    archiveStash: true
   labels:
   - 'rest-api'
   nodeLabel: 'h2'
