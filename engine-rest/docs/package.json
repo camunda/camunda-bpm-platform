@@ -6,6 +6,8 @@
     "build": "node build"
   },
   "dependencies": {
-    "redoc": "2.1.1"
+    "redoc": "2.5.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
   }
 }
