@@ -66,10 +66,7 @@ public class MessageCorrelationBatchJobHandler extends AbstractBatchJobHandler<M
 
   @Override
   protected void postProcessJob(MessageCorrelationBatchConfiguration configuration, JobEntity job, MessageCorrelationBatchConfiguration jobConfiguration) {
-    // if there is only one process instance to adjust, set its ID to the job so exclusive scheduling is possible
-    if (jobConfiguration.getIds() != null && jobConfiguration.getIds().size() == 1) {
-      job.setProcessInstanceId(jobConfiguration.getIds().get(0));
-    }
+
   }
 
   @Override
