@@ -71,7 +71,6 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   protected String[] activityIds;
   protected boolean isRootProcessInstances;
   protected boolean isLeafProcessInstances;
-  protected String rootProcessInstanceId;
   protected String idAfter;
 
   protected boolean isTenantIdSet = false;
@@ -389,10 +388,6 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public String getProcessInstanceId() {
     return processInstanceId;
-  }
-
-  public String getRootProcessInstanceId() {
-    return rootProcessInstanceId;
   }
 
   public Set<String> getProcessInstanceIds() {
