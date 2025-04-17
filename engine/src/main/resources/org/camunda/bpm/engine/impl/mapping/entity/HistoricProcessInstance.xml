@@ -406,12 +406,12 @@
     <bind name="JOIN_TYPE" value="'inner join'" />
 
     <foreach collection="queries" item="query">
-      <if test="query.isOrQueryActive">
-        <bind name="JOIN_TYPE" value="'left join'" />
-      </if>
 
       <if test="query != null &amp;&amp; (query.withIncidents || query.withRootIncidents || query.incidentStatus != null || query.incidentMessage != null || query.incidentMessageLike != null || query.incidentType != null || (incidentIds != null &amp;&amp; incidentIds.length > 0))">
         <bind name="INC_JOIN" value="true" />
+        <if test="query.isOrQueryActive">
+          <bind name="JOIN_TYPE" value="'left join'" />
+        </if>
       </if>
 
       <if test="query != null &amp;&amp; (query.executedActivityIds != null and query.executedActivityIds.length > 0) || (query.activeActivityIds != null and query.activeActivityIds.length > 0)">
@@ -537,8 +537,15 @@
                 </foreach>
               )
             </if>
-            <if test="query.state != null">
-              ${queryType} SELF.STATE_ = #{query.state}
+
+            <if test="query.state != null and !query.state.isEmpty()">
+              ${queryType} (
+              SELF.STATE_ IS NOT NULL
+              AND SELF.STATE_ IN
+              <foreach item="state" index="index" collection="query.state" open="(" separator="," close=")">
+                #{state}
+              </foreach>
+              )
             </if>
 
 
