@@ -105,7 +105,7 @@ pipeline {
               upstreamProjectName = "/" + env.JOB_NAME
               upstreamBuildNumber = env.BUILD_NUMBER
 
-              if (env.BRANCH_NAME == cambpmDefaultBranch() || cambpmWithLabels('webapp-integration', 'all-as', 'h2', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'e2e')) {
+              if (env.BRANCH_NAME == cambpmDefaultBranch() || cambpmWithLabels('all','webapp-integration', 'all-as', 'h2', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'e2e')) {
                 cambpmTriggerDownstream(
                   platformVersionDir + "/cambpm-ee/" + eeMainProjectBranch,
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
@@ -118,7 +118,7 @@ pipeline {
               // or PR builds only, master builds should be excluded.
               // The Sidetrack pipeline contains Azure DB stages,
               // triggered with the sqlserver PR labels.
-              if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('all-db', 'sqlserver')) {
+              if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('all','all-db', 'sqlserver')) {
                 cambpmTriggerDownstream(
                   platformVersionDir + "/cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}",
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
@@ -128,7 +128,7 @@ pipeline {
 
               // don't trigger the daily pipeline from a master branch build
               // or if a PR has no relevant labels
-              if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('default-build', 'jdk', 'rolling-update', 'migration', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'sqlserver', 'postgresql')) {
+              if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('all','default-build', 'jdk', 'rolling-update', 'migration', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'sqlserver', 'postgresql')) {
                 cambpmTriggerDownstream(
                   platformVersionDir + "/cambpm-ce/cambpm-daily/${env.BRANCH_NAME}",
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
@@ -161,7 +161,7 @@ pipeline {
         stage('db-UNIT-h2') {
           when {
             expression {
-              cambpmWithLabels('h2', 'rolling-update', 'migration', 'all-db', 'default-build')
+              cambpmWithLabels('all','h2', 'rolling-update', 'migration', 'all-db', 'default-build')
             }
           }
           steps {
@@ -180,7 +180,7 @@ pipeline {
         stage('engine-UNIT-historylevel-audit') {
           when {
             expression {
-              cambpmWithLabels('default-build')
+              cambpmWithLabels('all','default-build')
             }
           }
           steps {
@@ -198,7 +198,7 @@ pipeline {
         stage('engine-UNIT-historylevel-activity') {
           when {
             expression {
-              cambpmWithLabels('default-build')
+              cambpmWithLabels('all', 'default-build')
             }
           }
           steps {
@@ -216,7 +216,7 @@ pipeline {
         stage('quarkus-UNIT') {
           when {
             expression {
-              cambpmWithLabels('h2', 'default-build')
+              cambpmWithLabels('all', 'h2', 'default-build')
             }
           }
           steps {
@@ -234,7 +234,7 @@ pipeline {
         stage('engine-IT-tomcat-9-postgresql-142') {
           when {
             expression {
-              cambpmWithLabels('all-as', 'tomcat')
+              cambpmWithLabels('all', 'all-as', 'tomcat')
             }
           }
           steps {
@@ -256,7 +256,7 @@ pipeline {
         stage('engine-IT-tomcat-10-postgresql-142') {
           when {
             expression {
-              cambpmWithLabels('all-as', 'tomcat')
+              cambpmWithLabels('all', 'all-as', 'tomcat')
             }
           }
           steps {
@@ -275,7 +275,7 @@ pipeline {
         stage('engine-IT-wildfly-postgresql-142') {
           when {
             expression {
-              cambpmWithLabels('all-as', 'wildfly')
+              cambpmWithLabels('all', 'all-as', 'wildfly')
             }
           }
           steps {
@@ -300,7 +300,7 @@ pipeline {
         stage('engine-IT-XA-wildfly-postgresql-142') {
           when {
             expression {
-              cambpmWithLabels('wildfly')
+              cambpmWithLabels('all', 'wildfly')
             }
           }
           steps {
@@ -324,7 +324,7 @@ pipeline {
         stage('webapp-IT-tomcat-9-h2') {
           when {
             expression {
-              cambpmWithLabels('webapp-integration', 'h2')
+              cambpmWithLabels('all', 'webapp-integration', 'h2')
             }
           }
           steps {
@@ -347,7 +347,7 @@ pipeline {
         stage('webapp-IT-tomcat-10-h2') {
           when {
             expression {
-              cambpmWithLabels('webapp-integration', 'h2')
+              cambpmWithLabels('all', 'webapp-integration', 'h2')
             }
           }
           steps {
@@ -371,7 +371,7 @@ pipeline {
         stage('webapp-IT-wildfly-h2') {
           when {
             expression {
-              cambpmWithLabels('webapp-integration', 'h2', 'wildfly')
+              cambpmWithLabels('all', 'webapp-integration', 'h2', 'wildfly')
             }
           }
           steps {
@@ -394,7 +394,7 @@ pipeline {
         stage('camunda-run-IT') {
           when {
             expression {
-              cambpmWithLabels('run', 'spring-boot', 'tomcat', 'all-as')
+              cambpmWithLabels('all', 'run', 'spring-boot', 'tomcat', 'all-as')
             }
           }
           steps {
@@ -414,7 +414,7 @@ pipeline {
         stage('spring-boot-starter-IT') {
           when {
             expression {
-              cambpmWithLabels('spring-boot', 'tomcat', 'all-as')
+              cambpmWithLabels('all', 'spring-boot', 'tomcat', 'all-as')
             }
           }
           steps {
@@ -461,7 +461,7 @@ pipeline {
         stage('engine-api-compatibility') {
           when {
             expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('default-build')
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('all', 'default-build')
             }
           }
           steps {
@@ -476,7 +476,7 @@ pipeline {
         stage('engine-UNIT-database-table-prefix') {
           when {
             expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('all-db','h2','db2','mysql','oracle','sqlserver','postgresql')
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('all','all-db','h2','db2','mysql','oracle','sqlserver','postgresql')
             }
           }
           steps {
@@ -494,7 +494,7 @@ pipeline {
         stage('webapp-UNIT-database-table-prefix') {
           when {
             expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'webapp-unit') && cambpmWithLabels()
+              cambpmIsNotFailedStageType(failedStageTypes, 'webapp-unit') && cambpmWithLabels('all')
             }
           }
           steps {
@@ -512,7 +512,7 @@ pipeline {
         stage('engine-IT-wildfly-domain') {
           when {
             expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('wildfly')
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('all', 'wildfly')
             }
           }
           steps {
@@ -535,7 +535,7 @@ pipeline {
         stage('engine-IT-wildfly-servlet') {
           when {
             expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('wildfly')
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('all', 'wildfly')
             }
           }
           steps {
