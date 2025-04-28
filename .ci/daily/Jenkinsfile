@@ -55,9 +55,10 @@ pipeline {
       parallel {
         stage('check-sql-scripts') {
           when {
-            expression {
-              cambpmWithLabels('all-db','h2','db2','mysql','oracle','sqlserver','postgresql')
-            }
+            branch cambpmDefaultBranch();
+            // expression {
+            //  cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql')
+            //}
           }
           steps {
             cambpmConditionalRetry([
@@ -69,9 +70,9 @@ pipeline {
           }
         }
         stage('stage-javadocs') {
-         // when {
-         //   branch cambpmDefaultBranch();
-         // }
+          when {
+            branch cambpmDefaultBranch();
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel : 'centos-stable',
@@ -88,9 +89,9 @@ pipeline {
           }
         }
         stage('stage-restapi-docs') {
-        //  when {
-        //    branch cambpmDefaultBranch();
-        //  }
+          when {
+            branch cambpmDefaultBranch();
+          }
           steps {
             cambpmConditionalRetry([
               podSpec: [
@@ -148,12 +149,12 @@ pipeline {
           }
         }
         stage('platform-DISTRO-maven-central') {
-         // when {
-         //   expression {
-         //     // trigger stage only on the master branch
-         //     env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
-         //   }
-         // }
+          when {
+            expression {
+              // trigger stage only on the master branch
+              env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
+            }
+          }
           steps {
             cambpmConditionalRetry([
               podSpec: [
@@ -182,12 +183,12 @@ pipeline {
           }
         }
         stage('platform-public-nexus') {
-        //when {
-        //  expression {
-        //    // trigger stage only on the master branch
-        //    env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
-        //  }
-        //}
+          when {
+            expression {
+              // trigger stage only on the master branch
+              env.BRANCH_NAME == cambpmDefaultBranch() && cambpmIsDevelopmentVersion()
+            }
+          }
           steps {
             cambpmConditionalRetry([
               podSpec: [
