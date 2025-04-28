@@ -56,13 +56,14 @@ pipeline {
                         [envVar: 'HERODEVS_REGISTRY', vaultKey: 'registry'],
                         [envVar: 'HERODEVS_AUTH_TOKEN', vaultKey: 'authToken']]
                 ]]]) {
-              cambpmRunMaven1('.',
+              cambpmRunMaven('.',
                   'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true '+ skipTests,
                   withCatch: false,
                   withNpm: true,
                   // we use JDK 17 to build the artifacts, as it is required for supporting Spring Boot 3
                   // the compiler source and target is set to JDK 11 in the release parents
-                  jdkVersion: 'jdk-17-latest')
+                  jdkVersion: 'jdk-17-latest',
+                  withPodSpec: true)
             }
 
             // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
@@ -141,7 +142,8 @@ pipeline {
                 cambpmRunMaven('.',
                     'org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true',
                     withCatch: false,
-                    withNpm: true)
+                    withNpm: true,
+                    withPodSpec: true)
               }
             }
           },
