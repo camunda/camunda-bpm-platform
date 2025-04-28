@@ -462,9 +462,10 @@ pipeline {
       parallel {
         stage('engine-api-compatibility') {
           when {
-            expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('default-build')
-            }
+            branch cambpmDefaultBranch();
+           // expression {
+           //   cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('default-build')
+           // }
           }
           steps {
             cambpmConditionalRetry([
