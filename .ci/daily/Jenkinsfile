@@ -55,10 +55,9 @@ pipeline {
       parallel {
         stage('check-sql-scripts') {
           when {
-            branch cambpmDefaultBranch();
-            // expression {
-            //  cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql')
-            //}
+            expression {
+              cambpmWithLabels('all-db','h2','db2','mysql','oracle','sqlserver','postgresql')
+            }
           }
           steps {
             cambpmConditionalRetry([
