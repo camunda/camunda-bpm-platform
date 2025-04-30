@@ -6,14 +6,14 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-root</artifactId>
-    <version>7.23.0-SNAPSHOT</version>
+    <version>7.24.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <groupId>org.camunda.spin</groupId>
   <artifactId>camunda-spin-bom</artifactId>
   <name>camunda spin - bom</name>
-  <version>7.23.0-SNAPSHOT</version>
+  <version>7.24.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <dependencyManagement>

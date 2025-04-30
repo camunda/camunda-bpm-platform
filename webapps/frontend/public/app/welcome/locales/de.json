@@ -17,7 +17,7 @@
     "AUTH_LOGOUT_SUCCESSFUL": "Sie haben sich erfolgreich abgemeldet",
     "AUTH_LOGOUT_THANKS": "Vielen Dank für die Nutzung von Camunda. Wir wünschen einen schönen {{dayContext}}!",
     "BACK": "Zurück",
-    "BANNER_CE_EOL_TEXT": "Probiere doch mal Camunda 8 aus! Das letzte Release von Camunda 7 CE wird im Oktober 2025 sein. Wenn du Fragen dazu hast, kontaktiere uns im <a href=\"https://forum.camunda.io/t/important-update-camunda-7-community-edition-end-of-life-announced/50921\">Forum</a>.",
+    "BANNER_CE_EOL_TEXT": "Es ist Zeit zu Camunda 8 zu migrieren! Das letzte Release von Camunda 7 CE wird im Oktober 2025 sein. Werfe einen Blick in den <a href=\"https://docs.camunda.io/docs/guides/migrating-from-camunda-7/\">Migrations-Guide</a>.",
     "BOOLEAN": "Boolean",
     "CAM_WIDGET_BPMN_VIEWER_ERROR": "Diagramm konnte nicht gerendert werden:",
     "CAM_WIDGET_BPMN_VIEWER_LOADING": "Diagramm laden",

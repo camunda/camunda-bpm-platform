@@ -17,9 +17,7 @@
 package org.camunda.bpm.engine.impl.db.sql;
 
 import java.sql.Connection;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -41,8 +39,7 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final String H2 = "h2";
   public static final String MYSQL = "mysql";
   public static final String POSTGRES = "postgres";
-  public static final String MARIADB = "mariadb";
-  public static final String[] SUPPORTED_DATABASES = {MSSQL, DB2, ORACLE, H2, MYSQL, POSTGRES, MARIADB};
+  public static final String[] SUPPORTED_DATABASES = {MSSQL, DB2, ORACLE, H2, MYSQL, POSTGRES};
 
   protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<>();
 
@@ -195,303 +192,299 @@ public class DbSqlSessionFactory implements SessionFactory {
     dbSpecificConstants.put(H2, constants);
 
     // mysql specific
-    // use the same specific for mariadb since it based on mysql and work with the exactly same statements
-    for(String mysqlLikeDatabase : Arrays.asList(MYSQL, MARIADB)) {
 
-      databaseSpecificLimitBeforeStatements.put(mysqlLikeDatabase, "");
-      optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements.put(mysqlLikeDatabase, "");
-      databaseSpecificLimitAfterStatements.put(mysqlLikeDatabase, "LIMIT #{maxResults} OFFSET #{firstResult}");
-      optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements.put(mysqlLikeDatabase, "LIMIT #{maxResults}");
-      databaseSpecificLimitBeforeWithoutOffsetStatements.put(mysqlLikeDatabase, "");
-      databaseSpecificLimitAfterWithoutOffsetStatements.put(mysqlLikeDatabase, "LIMIT #{maxResults}");
-      databaseSpecificInnerLimitAfterStatements.put(mysqlLikeDatabase, databaseSpecificLimitAfterStatements.get(mysqlLikeDatabase));
-      databaseSpecificLimitBetweenStatements.put(mysqlLikeDatabase, "");
-      databaseSpecificLimitBetweenFilterStatements.put(mysqlLikeDatabase, "");
-      databaseSpecificLimitBetweenAcquisitionStatements.put(mysqlLikeDatabase, "");
-      databaseSpecificLimitBeforeInUpdate.put(mysqlLikeDatabase, "INNER JOIN ( SELECT ID_ FROM ");
-      databaseSpecificLimitAfterInUpdate.put(mysqlLikeDatabase, databaseSpecificLimitAfterWithoutOffsetStatements.get(mysqlLikeDatabase) + ") tmp USING (ID_)");
-      databaseSpecificOrderByStatements.put(mysqlLikeDatabase, defaultOrderBy);
-      databaseSpecificLimitBeforeNativeQueryStatements.put(mysqlLikeDatabase, "");
-      databaseSpecificDistinct.put(mysqlLikeDatabase, "distinct");
-      databaseSpecificNumericCast.put(mysqlLikeDatabase, "");
+    databaseSpecificLimitBeforeStatements.put(MYSQL, "");
+    optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements.put(MYSQL, "");
+    databaseSpecificLimitAfterStatements.put(MYSQL, "LIMIT #{maxResults} OFFSET #{firstResult}");
+    optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements.put(MYSQL, "LIMIT #{maxResults}");
+    databaseSpecificLimitBeforeWithoutOffsetStatements.put(MYSQL, "");
+    databaseSpecificLimitAfterWithoutOffsetStatements.put(MYSQL, "LIMIT #{maxResults}");
+    databaseSpecificInnerLimitAfterStatements.put(MYSQL, databaseSpecificLimitAfterStatements.get(MYSQL));
+    databaseSpecificLimitBetweenStatements.put(MYSQL, "");
+    databaseSpecificLimitBetweenFilterStatements.put(MYSQL, "");
+    databaseSpecificLimitBetweenAcquisitionStatements.put(MYSQL, "");
+    databaseSpecificLimitBeforeInUpdate.put(MYSQL, "INNER JOIN ( SELECT ID_ FROM ");
+    databaseSpecificLimitAfterInUpdate.put(MYSQL, databaseSpecificLimitAfterWithoutOffsetStatements.get(MYSQL) + ") tmp USING (ID_)");
+    databaseSpecificOrderByStatements.put(MYSQL, defaultOrderBy);
+    databaseSpecificLimitBeforeNativeQueryStatements.put(MYSQL, "");
+    databaseSpecificDistinct.put(MYSQL, "distinct");
+    databaseSpecificNumericCast.put(MYSQL, "");
 
-      databaseSpecificCountDistinctBeforeStart.put(mysqlLikeDatabase, defaultDistinctCountBeforeStart);
-      databaseSpecificCountDistinctBeforeEnd.put(mysqlLikeDatabase, defaultDistinctCountBeforeEnd);
-      databaseSpecificCountDistinctAfterEnd.put(mysqlLikeDatabase, defaultDistinctCountAfterEnd);
+    databaseSpecificCountDistinctBeforeStart.put(MYSQL, defaultDistinctCountBeforeStart);
+    databaseSpecificCountDistinctBeforeEnd.put(MYSQL, defaultDistinctCountBeforeEnd);
+    databaseSpecificCountDistinctAfterEnd.put(MYSQL, defaultDistinctCountAfterEnd);
 
-      databaseSpecificEscapeChar.put(mysqlLikeDatabase, "'\\\\'");
+    databaseSpecificEscapeChar.put(MYSQL, "'\\\\'");
 
-      databaseSpecificBitAnd1.put(mysqlLikeDatabase, "");
-      databaseSpecificBitAnd2.put(mysqlLikeDatabase, " & ");
-      databaseSpecificBitAnd3.put(mysqlLikeDatabase, "");
-      databaseSpecificDatepart1.put(mysqlLikeDatabase, "");
-      databaseSpecificDatepart2.put(mysqlLikeDatabase, "(");
-      databaseSpecificDatepart3.put(mysqlLikeDatabase, ")");
+    databaseSpecificBitAnd1.put(MYSQL, "");
+    databaseSpecificBitAnd2.put(MYSQL, " & ");
+    databaseSpecificBitAnd3.put(MYSQL, "");
+    databaseSpecificDatepart1.put(MYSQL, "");
+    databaseSpecificDatepart2.put(MYSQL, "(");
+    databaseSpecificDatepart3.put(MYSQL, ")");
 
-      databaseSpecificDummyTable.put(mysqlLikeDatabase, "");
-      databaseSpecificTrueConstant.put(mysqlLikeDatabase, "1");
-      databaseSpecificFalseConstant.put(mysqlLikeDatabase, "0");
-      databaseSpecificIfNull.put(mysqlLikeDatabase, "IFNULL");
+    databaseSpecificDummyTable.put(MYSQL, "");
+    databaseSpecificTrueConstant.put(MYSQL, "1");
+    databaseSpecificFalseConstant.put(MYSQL, "0");
+    databaseSpecificIfNull.put(MYSQL, "IFNULL");
 
-      databaseSpecificDaysComparator.put(mysqlLikeDatabase, "DATEDIFF(#{currentTimestamp}, ${date}) >= ${days}");
+    databaseSpecificDaysComparator.put(MYSQL, "DATEDIFF(#{currentTimestamp}, ${date}) >= ${days}");
 
-      databaseSpecificCollationForCaseSensitivity.put(mysqlLikeDatabase, "");
+    databaseSpecificCollationForCaseSensitivity.put(MYSQL, "");
 
-      databaseSpecificAuthJoinStart.put(mysqlLikeDatabase, "=");
-      databaseSpecificAuthJoinEnd.put(mysqlLikeDatabase, "");
-      databaseSpecificAuthJoinSeparator.put(mysqlLikeDatabase, "OR AUTH.RESOURCE_ID_ =");
+    databaseSpecificAuthJoinStart.put(MYSQL, "=");
+    databaseSpecificAuthJoinEnd.put(MYSQL, "");
+    databaseSpecificAuthJoinSeparator.put(MYSQL, "OR AUTH.RESOURCE_ID_ =");
 
-      databaseSpecificAuth1JoinStart.put(mysqlLikeDatabase, "=");
-      databaseSpecificAuth1JoinEnd.put(mysqlLikeDatabase, "");
-      databaseSpecificAuth1JoinSeparator.put(mysqlLikeDatabase, "OR AUTH1.RESOURCE_ID_ =");
+    databaseSpecificAuth1JoinStart.put(MYSQL, "=");
+    databaseSpecificAuth1JoinEnd.put(MYSQL, "");
+    databaseSpecificAuth1JoinSeparator.put(MYSQL, "OR AUTH1.RESOURCE_ID_ =");
 
-      databaseSpecificExtractTimeUnitFromDate.put(mysqlLikeDatabase, defaultExtractTimeUnitFromDate);
+    databaseSpecificExtractTimeUnitFromDate.put(MYSQL, defaultExtractTimeUnitFromDate);
 
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "toggleForeignKey", "toggleForeignKey_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "selectDeploymentsByQueryCriteria", "selectDeploymentsByQueryCriteria_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "selectDeploymentCountByQueryCriteria", "selectDeploymentCountByQueryCriteria_mysql");
+    addDatabaseSpecificStatement(MYSQL, "toggleForeignKey", "toggleForeignKey_mysql");
+    addDatabaseSpecificStatement(MYSQL, "selectDeploymentsByQueryCriteria", "selectDeploymentsByQueryCriteria_mysql");
+    addDatabaseSpecificStatement(MYSQL, "selectDeploymentCountByQueryCriteria", "selectDeploymentCountByQueryCriteria_mysql");
 
-      // related to CAM-8064
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteExceptionByteArraysByIds", "deleteExceptionByteArraysByIds_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteErrorDetailsByteArraysByIds", "deleteErrorDetailsByteArraysByIds_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricDetailsByIds", "deleteHistoricDetailsByIds_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricDetailByteArraysByIds", "deleteHistoricDetailByteArraysByIds_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricIdentityLinksByTaskProcessInstanceIds", "deleteHistoricIdentityLinksByTaskProcessInstanceIds_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricIdentityLinksByTaskCaseInstanceIds", "deleteHistoricIdentityLinksByTaskCaseInstanceIds_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricDecisionInputInstanceByteArraysByDecisionInstanceIds", "deleteHistoricDecisionInputInstanceByteArraysByDecisionInstanceIds_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricDecisionOutputInstanceByteArraysByDecisionInstanceIds", "deleteHistoricDecisionOutputInstanceByteArraysByDecisionInstanceIds_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricVariableInstanceByIds", "deleteHistoricVariableInstanceByIds_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricVariableInstanceByteArraysByIds", "deleteHistoricVariableInstanceByteArraysByIds_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteCommentsByIds", "deleteCommentsByIds_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteAttachmentByteArraysByIds", "deleteAttachmentByteArraysByIds_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteAttachmentByIds", "deleteAttachmentByIds_mysql");
+    // related to CAM-8064
+    addDatabaseSpecificStatement(MYSQL, "deleteExceptionByteArraysByIds", "deleteExceptionByteArraysByIds_mysql");
+    addDatabaseSpecificStatement(MYSQL, "deleteErrorDetailsByteArraysByIds", "deleteErrorDetailsByteArraysByIds_mysql");
+    addDatabaseSpecificStatement(MYSQL, "deleteHistoricDetailsByIds", "deleteHistoricDetailsByIds_mysql");
+    addDatabaseSpecificStatement(MYSQL, "deleteHistoricDetailByteArraysByIds", "deleteHistoricDetailByteArraysByIds_mysql");
+    addDatabaseSpecificStatement(MYSQL, "deleteHistoricIdentityLinksByTaskProcessInstanceIds", "deleteHistoricIdentityLinksByTaskProcessInstanceIds_mysql");
+    addDatabaseSpecificStatement(MYSQL, "deleteHistoricIdentityLinksByTaskCaseInstanceIds", "deleteHistoricIdentityLinksByTaskCaseInstanceIds_mysql");
+    addDatabaseSpecificStatement(MYSQL, "deleteHistoricDecisionInputInstanceByteArraysByDecisionInstanceIds", "deleteHistoricDecisionInputInstanceByteArraysByDecisionInstanceIds_mysql");
+    addDatabaseSpecificStatement(MYSQL, "deleteHistoricDecisionOutputInstanceByteArraysByDecisionInstanceIds", "deleteHistoricDecisionOutputInstanceByteArraysByDecisionInstanceIds_mysql");
+    addDatabaseSpecificStatement(MYSQL, "deleteHistoricVariableInstanceByIds", "deleteHistoricVariableInstanceByIds_mysql");
+    addDatabaseSpecificStatement(MYSQL, "deleteHistoricVariableInstanceByteArraysByIds", "deleteHistoricVariableInstanceByteArraysByIds_mysql");
+    addDatabaseSpecificStatement(MYSQL, "deleteCommentsByIds", "deleteCommentsByIds_mysql");
+    addDatabaseSpecificStatement(MYSQL, "deleteAttachmentByteArraysByIds", "deleteAttachmentByteArraysByIds_mysql");
+    addDatabaseSpecificStatement(MYSQL, "deleteAttachmentByIds", "deleteAttachmentByIds_mysql");
 
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricIncidentsByBatchIds", "deleteHistoricIncidentsByBatchIds_mysql");
+    addDatabaseSpecificStatement(MYSQL, "deleteHistoricIncidentsByBatchIds", "deleteHistoricIncidentsByBatchIds_mysql");
 
-      // related to CAM-9505
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateUserOperationLogByRootProcessInstanceId", "updateUserOperationLogByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateExternalTaskLogByRootProcessInstanceId", "updateExternalTaskLogByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricIncidentsByRootProcessInstanceId", "updateHistoricIncidentsByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricIncidentsByBatchId", "updateHistoricIncidentsByBatchId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateIdentityLinkLogByRootProcessInstanceId", "updateIdentityLinkLogByRootProcessInstanceId_mysql");
+    // related to CAM-9505
+    addDatabaseSpecificStatement(MYSQL, "updateUserOperationLogByRootProcessInstanceId", "updateUserOperationLogByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateExternalTaskLogByRootProcessInstanceId", "updateExternalTaskLogByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricIncidentsByRootProcessInstanceId", "updateHistoricIncidentsByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricIncidentsByBatchId", "updateHistoricIncidentsByBatchId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateIdentityLinkLogByRootProcessInstanceId", "updateIdentityLinkLogByRootProcessInstanceId_mysql");
 
-      // related to CAM-10172
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateUserOperationLogByProcessInstanceId", "updateUserOperationLogByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateExternalTaskLogByProcessInstanceId", "updateExternalTaskLogByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricIncidentsByProcessInstanceId", "updateHistoricIncidentsByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateIdentityLinkLogByProcessInstanceId", "updateIdentityLinkLogByProcessInstanceId_mysql");
+    // related to CAM-10172
+    addDatabaseSpecificStatement(MYSQL, "updateUserOperationLogByProcessInstanceId", "updateUserOperationLogByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateExternalTaskLogByProcessInstanceId", "updateExternalTaskLogByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricIncidentsByProcessInstanceId", "updateHistoricIncidentsByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateIdentityLinkLogByProcessInstanceId", "updateIdentityLinkLogByProcessInstanceId_mysql");
 
-      // related to CAM-10664
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateOperationLogAnnotationByOperationId", "updateOperationLogAnnotationByOperationId_mysql");
+    // related to CAM-10664
+    addDatabaseSpecificStatement(MYSQL, "updateOperationLogAnnotationByOperationId", "updateOperationLogAnnotationByOperationId_mysql");
 
-      // related to CAM-12070
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateByteArraysByBatchId", "updateByteArraysByBatchId_mysql");
+    // related to CAM-12070
+    addDatabaseSpecificStatement(MYSQL, "updateByteArraysByBatchId", "updateByteArraysByBatchId_mysql");
 
-      // related to https://github.com/camunda/camunda-bpm-platform/issues/3064
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateAttachmentsByRootProcessInstanceId", "updateAttachmentsByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateAttachmentsByProcessInstanceId", "updateAttachmentsByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateAuthorizationsByRootProcessInstanceId", "updateAuthorizationsByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateAuthorizationsByProcessInstanceId", "updateAuthorizationsByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateCommentsByRootProcessInstanceId", "updateCommentsByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateCommentsByProcessInstanceId", "updateCommentsByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricActivityInstancesByRootProcessInstanceId", "updateHistoricActivityInstancesByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricActivityInstancesByProcessInstanceId", "updateHistoricActivityInstancesByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricDecisionInputInstancesByRootProcessInstanceId", "updateHistoricDecisionInputInstancesByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricDecisionInputInstancesByProcessInstanceId", "updateHistoricDecisionInputInstancesByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricDecisionInstancesByRootProcessInstanceId", "updateHistoricDecisionInstancesByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricDecisionInstancesByProcessInstanceId", "updateHistoricDecisionInstancesByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricDecisionOutputInstancesByRootProcessInstanceId", "updateHistoricDecisionOutputInstancesByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricDecisionOutputInstancesByProcessInstanceId", "updateHistoricDecisionOutputInstancesByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricDetailsByRootProcessInstanceId", "updateHistoricDetailsByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricDetailsByProcessInstanceId", "updateHistoricDetailsByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateJobLogByRootProcessInstanceId", "updateJobLogByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateJobLogByProcessInstanceId", "updateJobLogByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricProcessInstanceEventsByRootProcessInstanceId", "updateHistoricProcessInstanceEventsByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricProcessInstanceByProcessInstanceId", "updateHistoricProcessInstanceByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricTaskInstancesByRootProcessInstanceId", "updateHistoricTaskInstancesByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricTaskInstancesByProcessInstanceId", "updateHistoricTaskInstancesByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricVariableInstancesByRootProcessInstanceId", "updateHistoricVariableInstancesByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricVariableInstancesByProcessInstanceId", "updateHistoricVariableInstancesByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateByteArraysByRootProcessInstanceId", "updateByteArraysByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateVariableByteArraysByProcessInstanceId", "updateVariableByteArraysByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateDecisionInputsByteArraysByProcessInstanceId", "updateDecisionInputsByteArraysByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateDecisionOutputsByteArraysByProcessInstanceId", "updateDecisionOutputsByteArraysByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateJobLogByteArraysByProcessInstanceId", "updateJobLogByteArraysByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateExternalTaskLogByteArraysByProcessInstanceId", "updateExternalTaskLogByteArraysByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateAttachmentByteArraysByProcessInstanceId", "updateAttachmentByteArraysByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateExternalTaskLogByRootProcessInstanceId", "updateExternalTaskLogByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateExternalTaskLogByProcessInstanceId", "updateExternalTaskLogByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateIdentityLinkLogByRootProcessInstanceId", "updateIdentityLinkLogByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateIdentityLinkLogByProcessInstanceId", "updateIdentityLinkLogByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricIncidentsByRootProcessInstanceId", "updateHistoricIncidentsByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricIncidentsByProcessInstanceId", "updateHistoricIncidentsByProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateUserOperationLogByRootProcessInstanceId", "updateUserOperationLogByRootProcessInstanceId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateUserOperationLogByProcessInstanceId", "updateUserOperationLogByProcessInstanceId_mysql");
+    // related to https://github.com/camunda/camunda-bpm-platform/issues/3064
+    addDatabaseSpecificStatement(MYSQL, "updateAttachmentsByRootProcessInstanceId", "updateAttachmentsByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateAttachmentsByProcessInstanceId", "updateAttachmentsByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateAuthorizationsByRootProcessInstanceId", "updateAuthorizationsByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateAuthorizationsByProcessInstanceId", "updateAuthorizationsByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateCommentsByRootProcessInstanceId", "updateCommentsByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateCommentsByProcessInstanceId", "updateCommentsByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricActivityInstancesByRootProcessInstanceId", "updateHistoricActivityInstancesByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricActivityInstancesByProcessInstanceId", "updateHistoricActivityInstancesByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricDecisionInputInstancesByRootProcessInstanceId", "updateHistoricDecisionInputInstancesByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricDecisionInputInstancesByProcessInstanceId", "updateHistoricDecisionInputInstancesByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricDecisionInstancesByRootProcessInstanceId", "updateHistoricDecisionInstancesByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricDecisionInstancesByProcessInstanceId", "updateHistoricDecisionInstancesByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricDecisionOutputInstancesByRootProcessInstanceId", "updateHistoricDecisionOutputInstancesByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricDecisionOutputInstancesByProcessInstanceId", "updateHistoricDecisionOutputInstancesByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricDetailsByRootProcessInstanceId", "updateHistoricDetailsByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricDetailsByProcessInstanceId", "updateHistoricDetailsByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateJobLogByRootProcessInstanceId", "updateJobLogByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateJobLogByProcessInstanceId", "updateJobLogByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricProcessInstanceEventsByRootProcessInstanceId", "updateHistoricProcessInstanceEventsByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricProcessInstanceByProcessInstanceId", "updateHistoricProcessInstanceByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricTaskInstancesByRootProcessInstanceId", "updateHistoricTaskInstancesByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricTaskInstancesByProcessInstanceId", "updateHistoricTaskInstancesByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricVariableInstancesByRootProcessInstanceId", "updateHistoricVariableInstancesByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricVariableInstancesByProcessInstanceId", "updateHistoricVariableInstancesByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateByteArraysByRootProcessInstanceId", "updateByteArraysByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateVariableByteArraysByProcessInstanceId", "updateVariableByteArraysByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateDecisionInputsByteArraysByProcessInstanceId", "updateDecisionInputsByteArraysByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateDecisionOutputsByteArraysByProcessInstanceId", "updateDecisionOutputsByteArraysByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateJobLogByteArraysByProcessInstanceId", "updateJobLogByteArraysByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateExternalTaskLogByteArraysByProcessInstanceId", "updateExternalTaskLogByteArraysByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateAttachmentByteArraysByProcessInstanceId", "updateAttachmentByteArraysByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateExternalTaskLogByRootProcessInstanceId", "updateExternalTaskLogByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateExternalTaskLogByProcessInstanceId", "updateExternalTaskLogByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateIdentityLinkLogByRootProcessInstanceId", "updateIdentityLinkLogByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateIdentityLinkLogByProcessInstanceId", "updateIdentityLinkLogByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricIncidentsByRootProcessInstanceId", "updateHistoricIncidentsByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateHistoricIncidentsByProcessInstanceId", "updateHistoricIncidentsByProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateUserOperationLogByRootProcessInstanceId", "updateUserOperationLogByRootProcessInstanceId_mysql");
+    addDatabaseSpecificStatement(MYSQL, "updateUserOperationLogByProcessInstanceId", "updateUserOperationLogByProcessInstanceId_mysql");
 
 
-      constants = new HashMap<>();
-      constants.put("constant.event", "'event'");
-      constants.put("constant.op_message", "CONCAT(NEW_VALUE_, '_|_', PROPERTY_)");
-      constants.put("constant_for_update", "for update");
-      constants.put("constant.datepart.quarter", "QUARTER");
-      constants.put("constant.datepart.month", "MONTH");
-      constants.put("constant.datepart.minute", "MINUTE");
-      constants.put("constant.null.startTime", "null START_TIME_");
-      constants.put("constant.varchar.cast", "'${key}'");
-      constants.put("constant.integer.cast", "NULL");
-      constants.put("constant.null.reporter", "NULL AS REPORTER_");
-      dbSpecificConstants.put(mysqlLikeDatabase, constants);
-    }
+    constants = new HashMap<>();
+    constants.put("constant.event", "'event'");
+    constants.put("constant.op_message", "CONCAT(NEW_VALUE_, '_|_', PROPERTY_)");
+    constants.put("constant_for_update", "for update");
+    constants.put("constant.datepart.quarter", "QUARTER");
+    constants.put("constant.datepart.month", "MONTH");
+    constants.put("constant.datepart.minute", "MINUTE");
+    constants.put("constant.null.startTime", "null START_TIME_");
+    constants.put("constant.varchar.cast", "'${key}'");
+    constants.put("constant.integer.cast", "NULL");
+    constants.put("constant.null.reporter", "NULL AS REPORTER_");
+    dbSpecificConstants.put(MYSQL, constants);
 
     // postgres specific
-    for (String postgresLikeDatabase : List.of(POSTGRES)) {
-      databaseSpecificLimitBeforeStatements.put(postgresLikeDatabase, "");
-      optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements.put(postgresLikeDatabase, "");
-      databaseSpecificLimitAfterStatements.put(postgresLikeDatabase, "LIMIT #{maxResults} OFFSET #{firstResult}");
-      optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements.put(postgresLikeDatabase, "LIMIT #{maxResults}");
-      databaseSpecificLimitBeforeWithoutOffsetStatements.put(postgresLikeDatabase, "");
-      databaseSpecificLimitAfterWithoutOffsetStatements.put(postgresLikeDatabase, "LIMIT #{maxResults}");
-      databaseSpecificInnerLimitAfterStatements.put(postgresLikeDatabase, databaseSpecificLimitAfterStatements.get(postgresLikeDatabase));
-      databaseSpecificLimitBetweenStatements.put(postgresLikeDatabase, "");
-      databaseSpecificLimitBetweenFilterStatements.put(postgresLikeDatabase, "");
-      databaseSpecificLimitBetweenAcquisitionStatements.put(postgresLikeDatabase, "");
-      databaseSpecificLimitBeforeInUpdate.put(postgresLikeDatabase, "WHERE ID_ IN (SELECT ID_ FROM ");
-      databaseSpecificLimitAfterInUpdate.put(postgresLikeDatabase, databaseSpecificLimitAfterWithoutOffsetStatements.get(postgresLikeDatabase) + ")");
-      databaseSpecificOrderByStatements.put(postgresLikeDatabase, defaultOrderBy);
-      databaseSpecificLimitBeforeNativeQueryStatements.put(postgresLikeDatabase, "");
-      databaseSpecificDistinct.put(postgresLikeDatabase, "distinct");
 
-      databaseSpecificCountDistinctBeforeStart.put(postgresLikeDatabase, "SELECT COUNT(*) FROM (SELECT DISTINCT");
-      databaseSpecificCountDistinctBeforeEnd.put(postgresLikeDatabase, "");
-      databaseSpecificCountDistinctAfterEnd.put(postgresLikeDatabase, ") countDistinct");
+    databaseSpecificLimitBeforeStatements.put(POSTGRES, "");
+    optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements.put(POSTGRES, "");
+    databaseSpecificLimitAfterStatements.put(POSTGRES, "LIMIT #{maxResults} OFFSET #{firstResult}");
+    optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements.put(POSTGRES, "LIMIT #{maxResults}");
+    databaseSpecificLimitBeforeWithoutOffsetStatements.put(POSTGRES, "");
+    databaseSpecificLimitAfterWithoutOffsetStatements.put(POSTGRES, "LIMIT #{maxResults}");
+    databaseSpecificInnerLimitAfterStatements.put(POSTGRES, databaseSpecificLimitAfterStatements.get(POSTGRES));
+    databaseSpecificLimitBetweenStatements.put(POSTGRES, "");
+    databaseSpecificLimitBetweenFilterStatements.put(POSTGRES, "");
+    databaseSpecificLimitBetweenAcquisitionStatements.put(POSTGRES, "");
+    databaseSpecificLimitBeforeInUpdate.put(POSTGRES, "WHERE ID_ IN (SELECT ID_ FROM ");
+    databaseSpecificLimitAfterInUpdate.put(POSTGRES, databaseSpecificLimitAfterWithoutOffsetStatements.get(POSTGRES) + ")");
+    databaseSpecificOrderByStatements.put(POSTGRES, defaultOrderBy);
+    databaseSpecificLimitBeforeNativeQueryStatements.put(POSTGRES, "");
+    databaseSpecificDistinct.put(POSTGRES, "distinct");
 
-      databaseSpecificEscapeChar.put(postgresLikeDatabase, defaultEscapeChar);
+    databaseSpecificCountDistinctBeforeStart.put(POSTGRES, "SELECT COUNT(*) FROM (SELECT DISTINCT");
+    databaseSpecificCountDistinctBeforeEnd.put(POSTGRES, "");
+    databaseSpecificCountDistinctAfterEnd.put(POSTGRES, ") countDistinct");
 
-      databaseSpecificBitAnd1.put(postgresLikeDatabase, "");
-      databaseSpecificBitAnd2.put(postgresLikeDatabase, " & ");
-      databaseSpecificBitAnd3.put(postgresLikeDatabase, "");
-      databaseSpecificDatepart1.put(postgresLikeDatabase, "extract(");
-      databaseSpecificDatepart2.put(postgresLikeDatabase, " from ");
-      databaseSpecificDatepart3.put(postgresLikeDatabase, ")");
+    databaseSpecificEscapeChar.put(POSTGRES, defaultEscapeChar);
 
-      databaseSpecificDummyTable.put(postgresLikeDatabase, "");
-      databaseSpecificTrueConstant.put(postgresLikeDatabase, "true");
-      databaseSpecificFalseConstant.put(postgresLikeDatabase, "false");
-      databaseSpecificIfNull.put(postgresLikeDatabase, "COALESCE");
+    databaseSpecificBitAnd1.put(POSTGRES, "");
+    databaseSpecificBitAnd2.put(POSTGRES, " & ");
+    databaseSpecificBitAnd3.put(POSTGRES, "");
+    databaseSpecificDatepart1.put(POSTGRES, "extract(");
+    databaseSpecificDatepart2.put(POSTGRES, " from ");
+    databaseSpecificDatepart3.put(POSTGRES, ")");
 
-      databaseSpecificCollationForCaseSensitivity.put(postgresLikeDatabase, "");
+    databaseSpecificDummyTable.put(POSTGRES, "");
+    databaseSpecificTrueConstant.put(POSTGRES, "true");
+    databaseSpecificFalseConstant.put(POSTGRES, "false");
+    databaseSpecificIfNull.put(POSTGRES, "COALESCE");
 
-      databaseSpecificAuthJoinStart.put(postgresLikeDatabase, defaultAuthOnStart);
-      databaseSpecificAuthJoinEnd.put(postgresLikeDatabase, defaultAuthOnEnd);
-      databaseSpecificAuthJoinSeparator.put(postgresLikeDatabase, defaultAuthOnSeparator);
+    databaseSpecificCollationForCaseSensitivity.put(POSTGRES, "");
 
-      databaseSpecificAuth1JoinStart.put(postgresLikeDatabase, defaultAuthOnStart);
-      databaseSpecificAuth1JoinEnd.put(postgresLikeDatabase, defaultAuthOnEnd);
-      databaseSpecificAuth1JoinSeparator.put(postgresLikeDatabase, defaultAuthOnSeparator);
+    databaseSpecificAuthJoinStart.put(POSTGRES, defaultAuthOnStart);
+    databaseSpecificAuthJoinEnd.put(POSTGRES, defaultAuthOnEnd);
+    databaseSpecificAuthJoinSeparator.put(POSTGRES, defaultAuthOnSeparator);
 
-      databaseSpecificExtractTimeUnitFromDate.put(postgresLikeDatabase, defaultExtractTimeUnitFromDate);
+    databaseSpecificAuth1JoinStart.put(POSTGRES, defaultAuthOnStart);
+    databaseSpecificAuth1JoinEnd.put(POSTGRES, defaultAuthOnEnd);
+    databaseSpecificAuth1JoinSeparator.put(POSTGRES, defaultAuthOnSeparator);
 
-      addDatabaseSpecificStatement(postgresLikeDatabase, "insertByteArray", "insertByteArray_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateByteArray", "updateByteArray_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectByteArray", "selectByteArray_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectByteArrays", "selectByteArrays_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectResourceByDeploymentIdAndResourceName", "selectResourceByDeploymentIdAndResourceName_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectResourceByDeploymentIdAndResourceNames", "selectResourceByDeploymentIdAndResourceNames_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectResourceByDeploymentIdAndResourceId", "selectResourceByDeploymentIdAndResourceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectResourceByDeploymentIdAndResourceIds", "selectResourceByDeploymentIdAndResourceIds_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectResourcesByDeploymentId", "selectResourcesByDeploymentId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectResourceById", "selectResourceById_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectLatestResourcesByDeploymentName", "selectLatestResourcesByDeploymentName_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "insertIdentityInfo", "insertIdentityInfo_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateIdentityInfo", "updateIdentityInfo_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectIdentityInfoById", "selectIdentityInfoById_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectIdentityInfoByUserIdAndKey", "selectIdentityInfoByUserIdAndKey_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectIdentityInfoByUserId", "selectIdentityInfoByUserId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectIdentityInfoDetails", "selectIdentityInfoDetails_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "insertComment", "insertComment_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectCommentsByTaskId", "selectCommentsByTaskId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectCommentsByProcessInstanceId", "selectCommentsByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectCommentByTaskIdAndCommentId", "selectCommentByTaskIdAndCommentId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectCommentByProcessInstanceIdAndCommentId", "selectCommentByProcessInstanceIdAndCommentId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectEventsByTaskId", "selectEventsByTaskId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectFilterByQueryCriteria", "selectFilterByQueryCriteria_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "selectFilter", "selectFilter_postgres");
+    databaseSpecificExtractTimeUnitFromDate.put(POSTGRES, defaultExtractTimeUnitFromDate);
 
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteAttachmentsByRemovalTime", "deleteAttachmentsByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteCommentsByRemovalTime", "deleteCommentsByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteHistoricActivityInstancesByRemovalTime", "deleteHistoricActivityInstancesByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteHistoricDecisionInputInstancesByRemovalTime", "deleteHistoricDecisionInputInstancesByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteHistoricDecisionInstancesByRemovalTime", "deleteHistoricDecisionInstancesByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteHistoricDecisionOutputInstancesByRemovalTime", "deleteHistoricDecisionOutputInstancesByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteHistoricDetailsByRemovalTime", "deleteHistoricDetailsByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteExternalTaskLogByRemovalTime", "deleteExternalTaskLogByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteHistoricIdentityLinkLogByRemovalTime", "deleteHistoricIdentityLinkLogByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteHistoricIncidentsByRemovalTime", "deleteHistoricIncidentsByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteJobLogByRemovalTime", "deleteJobLogByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteHistoricProcessInstancesByRemovalTime", "deleteHistoricProcessInstancesByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteHistoricTaskInstancesByRemovalTime", "deleteHistoricTaskInstancesByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteHistoricVariableInstancesByRemovalTime", "deleteHistoricVariableInstancesByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteUserOperationLogByRemovalTime", "deleteUserOperationLogByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteByteArraysByRemovalTime", "deleteByteArraysByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteHistoricBatchesByRemovalTime", "deleteHistoricBatchesByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteAuthorizationsByRemovalTime", "deleteAuthorizationsByRemovalTime_postgres_or_db2");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "deleteTaskMetricsByRemovalTime", "deleteTaskMetricsByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "insertByteArray", "insertByteArray_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateByteArray", "updateByteArray_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectByteArray", "selectByteArray_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectByteArrays", "selectByteArrays_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectResourceByDeploymentIdAndResourceName", "selectResourceByDeploymentIdAndResourceName_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectResourceByDeploymentIdAndResourceNames", "selectResourceByDeploymentIdAndResourceNames_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectResourceByDeploymentIdAndResourceId", "selectResourceByDeploymentIdAndResourceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectResourceByDeploymentIdAndResourceIds", "selectResourceByDeploymentIdAndResourceIds_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectResourcesByDeploymentId", "selectResourcesByDeploymentId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectResourceById", "selectResourceById_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectLatestResourcesByDeploymentName", "selectLatestResourcesByDeploymentName_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "insertIdentityInfo", "insertIdentityInfo_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateIdentityInfo", "updateIdentityInfo_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectIdentityInfoById", "selectIdentityInfoById_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectIdentityInfoByUserIdAndKey", "selectIdentityInfoByUserIdAndKey_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectIdentityInfoByUserId", "selectIdentityInfoByUserId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectIdentityInfoDetails", "selectIdentityInfoDetails_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "insertComment", "insertComment_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectCommentsByTaskId", "selectCommentsByTaskId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectCommentsByProcessInstanceId", "selectCommentsByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectCommentByTaskIdAndCommentId", "selectCommentByTaskIdAndCommentId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectCommentByProcessInstanceIdAndCommentId", "selectCommentByProcessInstanceIdAndCommentId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectEventsByTaskId", "selectEventsByTaskId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectFilterByQueryCriteria", "selectFilterByQueryCriteria_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectFilter", "selectFilter_postgres");
 
-      // related to https://github.com/camunda/camunda-bpm-platform/issues/3064
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateAttachmentsByRootProcessInstanceId", "updateAttachmentsByRootProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateAttachmentsByProcessInstanceId", "updateAttachmentsByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateAuthorizationsByRootProcessInstanceId", "updateAuthorizationsByRootProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateAuthorizationsByProcessInstanceId", "updateAuthorizationsByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateCommentsByRootProcessInstanceId", "updateCommentsByRootProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateCommentsByProcessInstanceId", "updateCommentsByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricActivityInstancesByRootProcessInstanceId", "updateHistoricActivityInstancesByRootProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricActivityInstancesByProcessInstanceId", "updateHistoricActivityInstancesByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricDecisionInputInstancesByRootProcessInstanceId", "updateHistoricDecisionInputInstancesByRootProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricDecisionInputInstancesByProcessInstanceId", "updateHistoricDecisionInputInstancesByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricDecisionInstancesByRootProcessInstanceId", "updateHistoricDecisionInstancesByRootProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricDecisionInstancesByProcessInstanceId", "updateHistoricDecisionInstancesByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricDecisionOutputInstancesByRootProcessInstanceId", "updateHistoricDecisionOutputInstancesByRootProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricDecisionOutputInstancesByProcessInstanceId", "updateHistoricDecisionOutputInstancesByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricDetailsByRootProcessInstanceId", "updateHistoricDetailsByRootProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricDetailsByProcessInstanceId", "updateHistoricDetailsByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateJobLogByRootProcessInstanceId", "updateJobLogByRootProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateJobLogByProcessInstanceId", "updateJobLogByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricProcessInstanceEventsByRootProcessInstanceId", "updateHistoricProcessInstanceEventsByRootProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricProcessInstanceByProcessInstanceId", "updateHistoricProcessInstanceByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricTaskInstancesByRootProcessInstanceId", "updateHistoricTaskInstancesByRootProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricTaskInstancesByProcessInstanceId", "updateHistoricTaskInstancesByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricVariableInstancesByRootProcessInstanceId", "updateHistoricVariableInstancesByRootProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricVariableInstancesByProcessInstanceId", "updateHistoricVariableInstancesByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateByteArraysByRootProcessInstanceId", "updateByteArraysByRootProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateVariableByteArraysByProcessInstanceId", "updateVariableByteArraysByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateDecisionInputsByteArraysByProcessInstanceId", "updateDecisionInputsByteArraysByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateDecisionOutputsByteArraysByProcessInstanceId", "updateDecisionOutputsByteArraysByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateJobLogByteArraysByProcessInstanceId", "updateJobLogByteArraysByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateExternalTaskLogByteArraysByProcessInstanceId", "updateExternalTaskLogByteArraysByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateAttachmentByteArraysByProcessInstanceId", "updateAttachmentByteArraysByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateExternalTaskLogByRootProcessInstanceId", "updateExternalTaskLogByRootProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateExternalTaskLogByProcessInstanceId", "updateExternalTaskLogByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateIdentityLinkLogByRootProcessInstanceId", "updateIdentityLinkLogByRootProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateIdentityLinkLogByProcessInstanceId", "updateIdentityLinkLogByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricIncidentsByRootProcessInstanceId", "updateHistoricIncidentsByRootProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateHistoricIncidentsByProcessInstanceId", "updateHistoricIncidentsByProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateUserOperationLogByRootProcessInstanceId", "updateUserOperationLogByRootProcessInstanceId_postgres");
-      addDatabaseSpecificStatement(postgresLikeDatabase, "updateUserOperationLogByProcessInstanceId", "updateUserOperationLogByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "deleteAttachmentsByRemovalTime", "deleteAttachmentsByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteCommentsByRemovalTime", "deleteCommentsByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricActivityInstancesByRemovalTime", "deleteHistoricActivityInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricDecisionInputInstancesByRemovalTime", "deleteHistoricDecisionInputInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricDecisionInstancesByRemovalTime", "deleteHistoricDecisionInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricDecisionOutputInstancesByRemovalTime", "deleteHistoricDecisionOutputInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricDetailsByRemovalTime", "deleteHistoricDetailsByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteExternalTaskLogByRemovalTime", "deleteExternalTaskLogByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricIdentityLinkLogByRemovalTime", "deleteHistoricIdentityLinkLogByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricIncidentsByRemovalTime", "deleteHistoricIncidentsByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteJobLogByRemovalTime", "deleteJobLogByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricProcessInstancesByRemovalTime", "deleteHistoricProcessInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricTaskInstancesByRemovalTime", "deleteHistoricTaskInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricVariableInstancesByRemovalTime", "deleteHistoricVariableInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteUserOperationLogByRemovalTime", "deleteUserOperationLogByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteByteArraysByRemovalTime", "deleteByteArraysByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricBatchesByRemovalTime", "deleteHistoricBatchesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteAuthorizationsByRemovalTime", "deleteAuthorizationsByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteTaskMetricsByRemovalTime", "deleteTaskMetricsByRemovalTime_postgres_or_db2");
+
+    // related to https://github.com/camunda/camunda-bpm-platform/issues/3064
+    addDatabaseSpecificStatement(POSTGRES, "updateAttachmentsByRootProcessInstanceId", "updateAttachmentsByRootProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateAttachmentsByProcessInstanceId", "updateAttachmentsByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateAuthorizationsByRootProcessInstanceId", "updateAuthorizationsByRootProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateAuthorizationsByProcessInstanceId", "updateAuthorizationsByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateCommentsByRootProcessInstanceId", "updateCommentsByRootProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateCommentsByProcessInstanceId", "updateCommentsByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricActivityInstancesByRootProcessInstanceId", "updateHistoricActivityInstancesByRootProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricActivityInstancesByProcessInstanceId", "updateHistoricActivityInstancesByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricDecisionInputInstancesByRootProcessInstanceId", "updateHistoricDecisionInputInstancesByRootProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricDecisionInputInstancesByProcessInstanceId", "updateHistoricDecisionInputInstancesByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricDecisionInstancesByRootProcessInstanceId", "updateHistoricDecisionInstancesByRootProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricDecisionInstancesByProcessInstanceId", "updateHistoricDecisionInstancesByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricDecisionOutputInstancesByRootProcessInstanceId", "updateHistoricDecisionOutputInstancesByRootProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricDecisionOutputInstancesByProcessInstanceId", "updateHistoricDecisionOutputInstancesByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricDetailsByRootProcessInstanceId", "updateHistoricDetailsByRootProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricDetailsByProcessInstanceId", "updateHistoricDetailsByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateJobLogByRootProcessInstanceId", "updateJobLogByRootProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateJobLogByProcessInstanceId", "updateJobLogByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricProcessInstanceEventsByRootProcessInstanceId", "updateHistoricProcessInstanceEventsByRootProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricProcessInstanceByProcessInstanceId", "updateHistoricProcessInstanceByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricTaskInstancesByRootProcessInstanceId", "updateHistoricTaskInstancesByRootProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricTaskInstancesByProcessInstanceId", "updateHistoricTaskInstancesByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricVariableInstancesByRootProcessInstanceId", "updateHistoricVariableInstancesByRootProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricVariableInstancesByProcessInstanceId", "updateHistoricVariableInstancesByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateByteArraysByRootProcessInstanceId", "updateByteArraysByRootProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateVariableByteArraysByProcessInstanceId", "updateVariableByteArraysByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateDecisionInputsByteArraysByProcessInstanceId", "updateDecisionInputsByteArraysByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateDecisionOutputsByteArraysByProcessInstanceId", "updateDecisionOutputsByteArraysByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateJobLogByteArraysByProcessInstanceId", "updateJobLogByteArraysByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateExternalTaskLogByteArraysByProcessInstanceId", "updateExternalTaskLogByteArraysByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateAttachmentByteArraysByProcessInstanceId", "updateAttachmentByteArraysByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateExternalTaskLogByRootProcessInstanceId", "updateExternalTaskLogByRootProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateExternalTaskLogByProcessInstanceId", "updateExternalTaskLogByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateIdentityLinkLogByRootProcessInstanceId", "updateIdentityLinkLogByRootProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateIdentityLinkLogByProcessInstanceId", "updateIdentityLinkLogByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricIncidentsByRootProcessInstanceId", "updateHistoricIncidentsByRootProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateHistoricIncidentsByProcessInstanceId", "updateHistoricIncidentsByProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateUserOperationLogByRootProcessInstanceId", "updateUserOperationLogByRootProcessInstanceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "updateUserOperationLogByProcessInstanceId", "updateUserOperationLogByProcessInstanceId_postgres");
 
 
-      constants = new HashMap<>();
-      constants.put("constant.event", "'event'");
-      constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
-      constants.put("constant_for_update", "for update");
-      constants.put("constant.datepart.quarter", "QUARTER");
-      constants.put("constant.datepart.month", "MONTH");
-      constants.put("constant.datepart.minute", "MINUTE");
-      constants.put("constant.null.startTime", "null START_TIME_");
-      constants.put("constant.varchar.cast", "cast('${key}' as varchar(64))");
-      constants.put("constant.integer.cast", "cast(NULL as integer)");
-      constants.put("constant.null.reporter", "CAST(NULL AS VARCHAR) AS REPORTER_");
-      dbSpecificConstants.put(postgresLikeDatabase, constants);
-    }
+    constants = new HashMap<>();
+    constants.put("constant.event", "'event'");
+    constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
+    constants.put("constant_for_update", "for update");
+    constants.put("constant.datepart.quarter", "QUARTER");
+    constants.put("constant.datepart.month", "MONTH");
+    constants.put("constant.datepart.minute", "MINUTE");
+    constants.put("constant.null.startTime", "null START_TIME_");
+    constants.put("constant.varchar.cast", "cast('${key}' as varchar(64))");
+    constants.put("constant.integer.cast", "cast(NULL as integer)");
+    constants.put("constant.null.reporter", "CAST(NULL AS VARCHAR) AS REPORTER_");
+    dbSpecificConstants.put(POSTGRES, constants);
     databaseSpecificDaysComparator.put(POSTGRES, "EXTRACT (DAY FROM #{currentTimestamp} - ${date}) >= ${days}");
     databaseSpecificNumericCast.put(POSTGRES, "");
 
