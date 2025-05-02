@@ -52,6 +52,12 @@
     "desc": "Filter by process instance ids. ${listTypeDescription}."
   },
 
+  "processInstanceIdNotIn": {
+    "type": "array",
+    "itemType": "string",
+    "desc": "Exclude instances by process instance ids. ${listTypeDescription}."
+  },
+
   "processDefinitionId": {
     "type": "string",
     "desc": "Filter by the process definition the instances run on."
@@ -102,6 +108,11 @@
     "desc": "Restrict the query to all process instances that are top level process instances."
   },
 
+  "rootProcessInstanceId": {
+    "type": "string",
+    "desc": "Filter by root process instance id."
+  },
+
   "finished": {
     "type": "boolean",
     "desc": "Only include finished process instances. This flag includes all process instances
@@ -111,6 +122,12 @@
   "unfinished": {
     "type": "boolean",
     "desc": "Only include unfinished process instances. Value may only be `true`, as `false` is the default behavior."
+  },
+
+  "withJobsRetrying": {
+    "type": "boolean",
+    "desc": "Only include process instances which are associated with jobs that have encountered exceptions and still
+     have retries left. Value may only be `true`, as `false` is the default behavior."
   },
 
   "withIncidents": {
@@ -240,7 +257,7 @@
   "activityIdIn": {
     "type": "array",
     "itemType": "string",
-    "desc": "Restrict to instances with an active activity with one of the given ids. This filter behaves differently as `activeActivityIdIn` since it also yields results when filtering for activities with an incident. ${listTypeDescription}"
+    "desc": "Restrict to instances with an active activity with one of the given ids. In contrast to the `activeActivityIdIn` filter, it can query for async and incident activities. ${listTypeDescription}"
   },
 
   "executedActivityIdIn": {

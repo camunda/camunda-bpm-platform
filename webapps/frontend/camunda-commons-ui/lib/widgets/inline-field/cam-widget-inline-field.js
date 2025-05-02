@@ -53,6 +53,7 @@ module.exports = [
         varValue: '=value',
         varType: '@type',
         inOperator: '=?',
+        notInOperator: '=?',
         validator: '&validate',
         change: '&',
         onStart: '&onStartEditing',

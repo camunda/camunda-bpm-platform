@@ -49,6 +49,17 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   HistoricProcessInstanceQuery processInstanceIds(Set<String> processInstanceIds);
 
   /**
+   * Only select historic process instances whose id is not in the given set of ids.
+   * {@link ProcessInstance) ids and {@link HistoricProcessInstance} ids match.
+   */
+  HistoricProcessInstanceQuery processInstanceIdNotIn(String... processInstanceIdNotIn);
+
+  /**
+   * Only select historic process instances for the given root process instance id
+   */
+  HistoricProcessInstanceQuery rootProcessInstanceId(String rootProcessInstanceId);
+
+  /**
    * Only select historic process instances for the given process definition
    */
   HistoricProcessInstanceQuery processDefinitionId(String processDefinitionId);
@@ -162,6 +173,13 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
    * @return HistoricProcessInstanceQuery
    */
   HistoricProcessInstanceQuery incidentMessageLike(String incidentMessageLike);
+
+  /**
+   * Only select historic process instances which are associated with jobs that have exceptions and retries left.
+   *
+   * @return HistoricProcessInstanceQuery
+   */
+  HistoricProcessInstanceQuery withJobsRetrying();
 
   /**
    * Only select historic process instances which are associated with the given case instance id.
@@ -441,7 +459,8 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   HistoricProcessInstanceQuery activeActivityIdIn(String... ids);
 
   /**
-   * Only select historic process instances with an active activity with one of the given ids. This filter behaves differently as `activeActivityIdIn` since it also yields results when filtering for activities with an incident.
+   * Only select historic process instances with an active activity with one of the given ids.
+   * In contrast to the `activeActivityIdIn` filter, it can query for async and incident activities.
    */
   HistoricProcessInstanceQuery activityIdIn(String... ids);
 

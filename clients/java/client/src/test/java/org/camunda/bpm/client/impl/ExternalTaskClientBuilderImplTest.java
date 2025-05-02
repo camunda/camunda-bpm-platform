@@ -16,17 +16,18 @@
  */
 package org.camunda.bpm.client.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.core5.util.Timeout;
 import org.camunda.bpm.client.ExternalTaskClient;
+import org.camunda.bpm.client.UrlResolver;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 
 public class ExternalTaskClientBuilderImplTest {
 
@@ -61,6 +62,43 @@ public class ExternalTaskClientBuilderImplTest {
         client.stop();
       }
     }
+  }
+
+  @Test
+  public void testCustomBaseUrlResolver() {
+    // given
+    var expectedBaseUrl = "expectedBaseUrl";
+    TestUrlResolver testUrlResolver = new TestUrlResolver(expectedBaseUrl);
+
+    // when
+    var clientBuilder = new ExternalTaskClientBuilderImpl();
+    clientBuilder.urlResolver(testUrlResolver);
+    clientBuilder.build();
+
+    // then
+    assertThat(spy(clientBuilder).engineClient.getBaseUrl()).isEqualTo(expectedBaseUrl);
+  }
+
+  static class TestUrlResolver implements UrlResolver {
+    final String baseUrl;
+
+    public TestUrlResolver(final String baseURl) {
+      this.baseUrl = baseURl;
+    }
+
+    public String getBaseUrl() {
+      return baseUrl;
+    }
+  }
+
+  @Test
+  public void testBuilderWithUnsetBaseUrl() {
+    // given unbuilt builder
+    ExternalTaskClientBuilderImpl builder = new ExternalTaskClientBuilderImpl();
+
+    // when getting base url and url resolver, then they are correctly initialized
+    assertThat(builder.getBaseUrl()).isNull();
+    assertThat(builder.urlResolver).isNotNull();
   }
 
 }

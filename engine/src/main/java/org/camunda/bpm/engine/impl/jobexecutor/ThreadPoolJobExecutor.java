@@ -47,6 +47,12 @@ public class ThreadPoolJobExecutor extends JobExecutor {
       logRejectedExecution(processEngine, jobIds.size());
       rejectedJobsHandler.jobsRejected(jobIds, processEngine, this);
 
+    } finally {
+      int totalQueueCapacity = calculateTotalQueueCapacity(threadPoolExecutor.getQueue().size(),
+          threadPoolExecutor.getQueue().remainingCapacity());
+
+      logJobExecutionInfo(processEngine, threadPoolExecutor.getQueue().size(), totalQueueCapacity,
+          threadPoolExecutor.getMaximumPoolSize(), threadPoolExecutor.getPoolSize());
     }
   }
 

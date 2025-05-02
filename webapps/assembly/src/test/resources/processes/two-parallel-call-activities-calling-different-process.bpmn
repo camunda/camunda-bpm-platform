@@ -10,11 +10,17 @@
     <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="ParallelGateway_1" targetRef="firstCallActivity"/>
     <bpmn2:sequenceFlow id="SequenceFlow_3" sourceRef="ParallelGateway_1" targetRef="secondCallActivity"/>
     <bpmn2:callActivity id="secondCallActivity" name="Calling Another Failing Process" calledElement="anotherUserTaskProcess">
+      <bpmn2:extensionElements>
+        <camunda:in businessKey="secondCall:#{execution.processBusinessKey}" />
+      </bpmn2:extensionElements>
       <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_5</bpmn2:outgoing>
     </bpmn2:callActivity>
     <bpmn2:sequenceFlow id="SequenceFlow_5" name="" sourceRef="secondCallActivity" targetRef="ParallelGateway_2"/>
     <bpmn2:callActivity id="firstCallActivity" name="Call Failing Process" calledElement="userTaskProcess">
+      <bpmn2:extensionElements>
+        <camunda:in businessKey="firstCall:#{execution.processBusinessKey}" />
+      </bpmn2:extensionElements>
       <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_4</bpmn2:outgoing>
     </bpmn2:callActivity>

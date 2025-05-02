@@ -79,7 +79,7 @@ public abstract class JsonTreeJsonPathScriptTest extends ScriptTest {
   public void shouldGetNumberFromJsonPath() {
     Number number = script.getVariable("numberValue");
 
-    assertThat(number.longValue()).isEqualTo(1234567890987654321L);
+    assertThat(number.doubleValue()).isEqualTo(1234567.13d);
   }
 
   @Test

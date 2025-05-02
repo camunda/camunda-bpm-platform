@@ -41,7 +41,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import javax.naming.InitialContext;
-import javax.script.ScriptEngineManager;
 import javax.sql.DataSource;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
@@ -339,6 +338,7 @@ import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultDeserializationTypeValidator;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.BeansResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.CamundaScriptEngineManager;
 import org.camunda.bpm.engine.impl.scripting.engine.DefaultScriptEngineResolver;
 import org.camunda.bpm.engine.impl.scripting.engine.ResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptBindingsFactory;
@@ -1719,14 +1719,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected static Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
   protected static final String MY_SQL_PRODUCT_NAME = "MySQL";
-  protected static final String MARIA_DB_PRODUCT_NAME = "MariaDB";
   protected static final String POSTGRES_DB_PRODUCT_NAME = "PostgreSQL";
 
   protected static Properties getDefaultDatabaseTypeMappings() {
     Properties databaseTypeMappings = new Properties();
     databaseTypeMappings.setProperty("H2", "h2");
     databaseTypeMappings.setProperty(MY_SQL_PRODUCT_NAME, "mysql");
-    databaseTypeMappings.setProperty(MARIA_DB_PRODUCT_NAME, "mariadb");
     databaseTypeMappings.setProperty("Oracle", "oracle");
     databaseTypeMappings.setProperty(POSTGRES_DB_PRODUCT_NAME, "postgres");
     databaseTypeMappings.setProperty("Microsoft SQL Server", "mssql");
@@ -1758,12 +1756,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       connection = dataSource.getConnection();
       DatabaseMetaData databaseMetaData = connection.getMetaData();
       String databaseProductName = databaseMetaData.getDatabaseProductName();
-      if (MY_SQL_PRODUCT_NAME.equals(databaseProductName)) {
-        databaseProductName = checkForMariaDb(databaseMetaData, databaseProductName);
-      }
-      if (POSTGRES_DB_PRODUCT_NAME.equals(databaseProductName)) {
-        databaseProductName = POSTGRES_DB_PRODUCT_NAME;
-      }
+
       LOG.debugDatabaseproductName(databaseProductName);
       databaseType = databaseTypeMappings.getProperty(databaseProductName);
       ensureNotNull("couldn't deduct database type from database product name '" + databaseProductName + "'", "databaseType", databaseType);
@@ -1782,36 +1775,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         LOG.databaseConnectionCloseException(e);
       }
     }
-  }
-
-  /**
-   * The product name of mariadb is still 'MySQL'. This method
-   * tries if it can find some evidence for mariadb. If it is successful
-   * it will return "MariaDB", otherwise the provided database name.
-   */
-  protected String checkForMariaDb(DatabaseMetaData databaseMetaData, String databaseName) {
-    try {
-      String databaseProductVersion = databaseMetaData.getDatabaseProductVersion();
-      if (databaseProductVersion != null && databaseProductVersion.toLowerCase().contains("mariadb")) {
-        return MARIA_DB_PRODUCT_NAME;
-      }
-    } catch (SQLException ignore) {
-    }
-
-    try {
-      String driverName = databaseMetaData.getDriverName();
-      if (driverName != null && driverName.toLowerCase().contains("mariadb")) {
-        return MARIA_DB_PRODUCT_NAME;
-      }
-    } catch (SQLException ignore) {
-    }
-
-    String metaDataClassName = databaseMetaData.getClass().getName();
-    if (metaDataClassName != null && metaDataClassName.toLowerCase().contains("mariadb")) {
-      return MARIA_DB_PRODUCT_NAME;
-    }
-
-    return databaseName;
   }
 
   protected void initDatabaseVendorAndVersion(DatabaseMetaData databaseMetaData) throws SQLException {
@@ -1941,6 +1904,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       properties.put("authJoin1Separator", DbSqlSessionFactory.databaseSpecificAuth1JoinSeparator.get(databaseType));
 
       properties.put("extractTimeUnitFromDate", DbSqlSessionFactory.databaseSpecificExtractTimeUnitFromDate.get(databaseType));
+      properties.put("authCheckMethodSuffix", DbSqlSessionFactory.databaseSpecificAuthCheckMethodSuffix.getOrDefault(databaseType, ""));
 
       Map<String, String> constants = DbSqlSessionFactory.dbSpecificConstants.get(databaseType);
       for (Entry<String, String> entry : constants.entrySet()) {
@@ -2641,7 +2605,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       resolverFactories.add(new BeansResolverFactory());
     }
     if (scriptEngineResolver == null) {
-      scriptEngineResolver = new DefaultScriptEngineResolver(new ScriptEngineManager());
+      scriptEngineResolver = new DefaultScriptEngineResolver(new CamundaScriptEngineManager());
     }
     if (scriptingEngines == null) {
       scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(resolverFactories), scriptEngineResolver);

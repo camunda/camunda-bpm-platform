@@ -62,6 +62,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
 import org.junit.Before;
@@ -208,9 +209,11 @@ public class ProcessInstanceQueryTest {
   @Test
   public void testQueryByProcessDefinitionKeySingleResult() {
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY_2);
+    ProcessInstance processInstance = query.singleResult();
     assertEquals(1, query.count());
     assertEquals(1, query.list().size());
-    assertNotNull(query.singleResult());
+    assertNotNull(processInstance);
+    assertEquals(PROCESS_DEFINITION_KEY_2, processInstance.getProcessDefinitionKey());
   }
 
   @Test
@@ -2223,6 +2226,45 @@ public class ProcessInstanceQueryTest {
     List<ProcessInstance> list = query.list();
     assertEquals(1, list.size());
     assertEquals(processInstanceId, list.get(0).getId());
+  }
+
+  @Test
+  public void testQueryByRootProcessInstanceId() {
+    // given a parent process instance with a couple of subprocesses
+    BpmnModelInstance baseProcess = Bpmn.createExecutableProcess("baseProcess")
+        .startEvent("startRoot")
+        .callActivity()
+        .calledElement("levelOneProcess")
+        .endEvent("endRoot")
+        .done();
+
+    BpmnModelInstance levelOneProcess = Bpmn.createExecutableProcess("levelOneProcess")
+        .startEvent("startLevelOne")
+        .callActivity()
+        .calledElement("levelTwoProcess")
+        .endEvent("endLevelOne")
+        .done();
+
+    BpmnModelInstance levelTwoProcess = Bpmn.createExecutableProcess("levelTwoProcess")
+        .startEvent("startLevelTwo")
+        .userTask("Task1")
+        .endEvent("endLevelTwo")
+        .done();
+
+    testHelper.deploy(baseProcess, levelOneProcess, levelTwoProcess);
+    String rootProcessId = runtimeService.startProcessInstanceByKey("baseProcess").getId();
+    List<ProcessInstance> allProcessInstances = runtimeService.createProcessInstanceQuery().list();
+
+    // when
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .rootProcessInstanceId(rootProcessId);
+
+    // then
+    assertEquals(3, allProcessInstances.stream()
+        .filter(process -> process.getRootProcessInstanceId().equals(rootProcessId))
+        .count());
+    assertEquals(3, processInstanceQuery.count());
+    assertEquals(3, processInstanceQuery.list().size());
   }
 
   @Test

@@ -55,6 +55,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   private static final long serialVersionUID = 1L;
   protected String processInstanceId;
+  protected String rootProcessInstanceId;
   protected String processDefinitionId;
   protected String processDefinitionName;
   protected String processDefinitionNameLike;
@@ -63,6 +64,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String businessKeyLike;
   protected boolean finished = false;
   protected boolean unfinished = false;
+  protected boolean withJobsRetrying = false;
   protected boolean withIncidents = false;
   protected boolean withRootIncidents = false;
   protected String incidentType;
@@ -87,6 +89,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String processDefinitionKey;
   protected String[] processDefinitionKeys;
   protected Set<String> processInstanceIds;
+  protected String[] processInstanceIdNotIn;
   protected String[] tenantIds;
   protected boolean isTenantIdSet;
   protected String[] executedActivityIds;
@@ -117,6 +120,18 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public HistoricProcessInstanceQuery processInstanceIds(Set<String> processInstanceIds) {
     ensureNotEmpty("Set of process instance ids", processInstanceIds);
     this.processInstanceIds = processInstanceIds;
+    return this;
+  }
+
+  public HistoricProcessInstanceQuery processInstanceIdNotIn(String... processInstanceIdNotIn){
+    ensureNotNull("processInstanceIdNotIn", (Object[]) processInstanceIdNotIn);
+    this.processInstanceIdNotIn = processInstanceIdNotIn;
+    return this;
+  }
+
+  public HistoricProcessInstanceQuery rootProcessInstanceId(String rootProcessInstanceId) {
+    ensureNotNull("Root process instance id", rootProcessInstanceId);
+    this.rootProcessInstanceId = rootProcessInstanceId;
     return this;
   }
 
@@ -181,7 +196,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     this.withRootIncidents = true;
     return this;
   }
-  
+
   public HistoricProcessInstanceQuery incidentIdIn(String... incidentIds) {
     ensureNotNull("incidentIds", (Object[]) incidentIds);
     this.incidentIds = incidentIds;
@@ -211,6 +226,12 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     ensureNotNull("incidentMessageLike", incidentMessageLike);
     this.incidentMessageLike = incidentMessageLike;
 
+    return this;
+  }
+
+  @Override
+  public HistoricProcessInstanceQuery withJobsRetrying(){
+    this.withJobsRetrying = true;
     return this;
   }
 
@@ -310,7 +331,9 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
       || CompareUtil.areNotInAscendingOrder(startedAfter, startedBefore)
       || CompareUtil.areNotInAscendingOrder(finishedAfter, finishedBefore)
       || CompareUtil.elementIsContainedInList(processDefinitionKey, processKeyNotIn)
-      || CompareUtil.elementIsNotContainedInList(processInstanceId, processInstanceIds);
+      || CompareUtil.elementIsNotContainedInList(processInstanceId, processInstanceIds)
+      || CompareUtil.elementIsContainedInArray(processInstanceId, processInstanceIdNotIn)
+      || CompareUtil.elementsAreContainedInArray(processInstanceIds, processInstanceIdNotIn);
   }
 
 	public HistoricProcessInstanceQuery orderByProcessInstanceBusinessKey() {
@@ -555,8 +578,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     return processInstanceId;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
   public Set<String> getProcessInstanceIds() {
     return processInstanceIds;
+  }
+
+  public String[] getProcessInstanceIdNotIn() {
+    return processInstanceIdNotIn;
   }
 
   public String getStartedBy() {
@@ -653,6 +684,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public boolean getIsTenantIdSet() {
     return isTenantIdSet;
+  }
+
+  public boolean isWithJobsRetrying(){
+    return withJobsRetrying;
   }
 
   public boolean isWithIncidents() {

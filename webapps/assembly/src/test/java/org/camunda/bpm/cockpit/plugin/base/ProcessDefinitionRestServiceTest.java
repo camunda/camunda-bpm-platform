@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
@@ -391,5 +392,74 @@ public class ProcessDefinitionRestServiceTest extends AbstractCockpitPluginTest 
     // verify order by incidents
     verifyOrderedResult("incidents", "asc", Arrays.asList("p2", "B", "p1", "A"));
     verifyOrderedResult("incidents", "desc", Arrays.asList("A", "p1", "B", "p2"));
+  }
+
+  @Test
+  public void shouldReturnCorrectStatistics() {
+    // given a process with two process instances
+    deployProcesses(1, "A", "Process A", 2, 0, "tenant1");
+
+    var processInstances = runtimeService.createExecutionQuery()
+        .processDefinitionKey("A")
+        .list();
+
+    assertThat(processInstances).hasSize(2);
+
+    var processIncidents = runtimeService.createIncidentQuery()
+        .processDefinitionKeyIn("A")
+        .list();
+
+    assertIncidentSize(processIncidents, 0);
+
+    var pi1 = processInstances.get(0);
+    var pi2 = processInstances.get(1);
+
+    // and two different (failedJob, failedExternalTask) incidents occur for each process instance
+
+    addIncidentToProcess(pi1, "failedJob");
+    addIncidentToProcess(pi1, "failedExternalTask");
+
+    addIncidentToProcess(pi2, "failedJob");
+    addIncidentToProcess(pi2, "failedExternalTask");
+
+    processIncidents = runtimeService.createIncidentQuery()
+        .processDefinitionKeyIn("A")
+        .list();
+
+    assertIncidentSize(processIncidents, 4);
+
+    assertIncidentSize(processIncidents, "failedJob", 2);
+    assertIncidentSize(processIncidents, "failedExternalTask", 2);
+
+    // when
+    var results = resource.queryStatistics(uriInfo, 0, 50);
+
+    // then statistics should be correct
+    assertThat(results)
+        .withFailMessage("The result should contain one entry (process definition 'Process A')")
+        .hasSize(1);
+
+    assertThat(results.get(0).getInstances())
+        .withFailMessage("The number of process instances should be 2")
+        .isEqualTo(2);
+
+    assertThat(results.get(0).getIncidents())
+        .withFailMessage("The total number of incidents should be 4")
+        .isEqualTo(4);
+  }
+
+  private void addIncidentToProcess(Execution processInstance, String incidentType) {
+    runtimeService.createIncident(incidentType, processInstance.getId(), "someConfig", "The message of failure");
+  }
+
+  private void assertIncidentSize(List<Incident> incidents, int size) {
+    assertThat(incidents.size()).isEqualTo(size);
+  }
+
+  private void assertIncidentSize(List<Incident> incidents, String incidentType, int size) {
+    assertThat(incidents.stream()
+        .filter(incident -> incidentType.equals(incident.getIncidentType()))
+        .count())
+        .isEqualTo(size);
   }
 }

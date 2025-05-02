@@ -17,3 +17,9 @@
 
 insert into ACT_GE_SCHEMA_LOG
 values ('1200', CURRENT_TIMESTAMP, '7.23.0');
+
+alter table ACT_HI_COMMENT
+    add column REV_ INTEGER not null
+    default 1;
+
+alter table ACT_RU_EXECUTION add column PROC_DEF_KEY_ varchar(255);

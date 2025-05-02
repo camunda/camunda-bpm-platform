@@ -130,6 +130,7 @@
         ng-keydown="onKeydown($event, 'value')"
         type="{{ valueType }}"
         in-operator="operator.value.key === 'In'"
+        not-in-operator="operator.value.key === 'NotIn'"
         change="changeSearch('value', varValue, $event)"
         on-start-editing="clearEditTrigger('value')"
         ng-if="!basic"

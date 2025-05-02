@@ -52,6 +52,7 @@ public class CamundaBpmWebappAutoConfigurationIntegrationTest {
     contextRunner.run(context -> {
       assertThat(context).hasNotFailed();
       assertThat(context).hasSingleBean(CamundaBpmWebappInitializer.class);
+      assertThat(context).hasSingleBean(FaviconResourceResolver.class);
     });
   }
 
@@ -60,6 +61,7 @@ public class CamundaBpmWebappAutoConfigurationIntegrationTest {
     contextRunner.withPropertyValues(bpmEnabled).run(context -> {
       assertThat(context).hasNotFailed();
       assertThat(context).hasSingleBean(CamundaBpmWebappInitializer.class);
+      assertThat(context).hasSingleBean(FaviconResourceResolver.class);
     });
   }
 
@@ -68,6 +70,7 @@ public class CamundaBpmWebappAutoConfigurationIntegrationTest {
     contextRunner.withPropertyValues(bpmDisabled).run(context -> {
       assertThat(context).hasNotFailed();
       assertThat(context).doesNotHaveBean(CamundaBpmWebappInitializer.class);
+      assertThat(context).doesNotHaveBean(FaviconResourceResolver.class);
     });
   }
 
@@ -76,6 +79,7 @@ public class CamundaBpmWebappAutoConfigurationIntegrationTest {
     contextRunner.withPropertyValues(webappEnabled).run(context -> {
       assertThat(context).hasNotFailed();
       assertThat(context).hasSingleBean(CamundaBpmWebappInitializer.class);
+      assertThat(context).hasSingleBean(FaviconResourceResolver.class);
     });
   }
 
@@ -84,6 +88,7 @@ public class CamundaBpmWebappAutoConfigurationIntegrationTest {
     contextRunner.withPropertyValues(bpmEnabled, webappEnabled).run(context -> {
       assertThat(context).hasNotFailed();
       assertThat(context).hasSingleBean(CamundaBpmWebappInitializer.class);
+      assertThat(context).hasSingleBean(FaviconResourceResolver.class);
     });
   }
 
@@ -92,6 +97,7 @@ public class CamundaBpmWebappAutoConfigurationIntegrationTest {
     contextRunner.withPropertyValues(bpmDisabled, webappEnabled).run(context -> {
       assertThat(context).hasNotFailed();
       assertThat(context).doesNotHaveBean(CamundaBpmWebappInitializer.class);
+      assertThat(context).doesNotHaveBean(FaviconResourceResolver.class);
     });
   }
 
@@ -100,6 +106,7 @@ public class CamundaBpmWebappAutoConfigurationIntegrationTest {
     contextRunner.withPropertyValues(webappDisabled).run(context -> {
       assertThat(context).hasNotFailed();
       assertThat(context).doesNotHaveBean(CamundaBpmWebappInitializer.class);
+      assertThat(context).doesNotHaveBean(FaviconResourceResolver.class);
     });
   }
 
@@ -108,6 +115,7 @@ public class CamundaBpmWebappAutoConfigurationIntegrationTest {
     contextRunner.withPropertyValues(bpmEnabled, webappDisabled).run(context -> {
       assertThat(context).hasNotFailed();
       assertThat(context).doesNotHaveBean(CamundaBpmWebappInitializer.class);
+      assertThat(context).doesNotHaveBean(FaviconResourceResolver.class);
     });
   }
 
@@ -116,6 +124,7 @@ public class CamundaBpmWebappAutoConfigurationIntegrationTest {
     contextRunner.withPropertyValues(bpmDisabled, webappDisabled).run(context -> {
       assertThat(context).hasNotFailed();
       assertThat(context).doesNotHaveBean(CamundaBpmWebappInitializer.class);
+      assertThat(context).doesNotHaveBean(FaviconResourceResolver.class);
     });
   }
 }

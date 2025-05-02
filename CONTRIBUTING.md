@@ -27,7 +27,7 @@ Found a bug in the code or have a feature that you would like to see in the futu
 Try to apply our best practices for creating issues:
 
 * Only Raise an issue if your request requires a code change in Camunda Platform 7
-  * If you want to contact the Camunda customer support, please see our [Enterprise Support Guide](https://docs.camunda.org/enterprise/support/).
+  * If you want to contact the Camunda customer support, please see our [Enterprise Support Guide](https://camunda.com/services/enterprise-support-guide/).
   * If you have an understanding question or need help building your solution, check out our [user forum](https://forum.camunda.io/).
 * Create a high-quality issue:
   * Give enough context so that a person who doesn't know your project can understand your request
