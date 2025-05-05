@@ -1175,7 +1175,7 @@
     "PLGN_HIST_VALUE_COL": "Value",
     "PLGN_HIST_VALUE_INFO": "Value Info:",
     "PLGN_HIST_VARIABLES": "Variables",
-    "PLGN_HIST_VARIABLE_LOG": "<strong>foo</strong> {{ name }}",
+    "PLGN_HIST_VARIABLE_LOG": "Variable Log: {{ name }}",
     "PLGN_JRET_DIALOG_CLOSE": "Close",
     "PLGN_JRET_DIALOG_INCREMENT": "The number of retries of all failed jobs associated with the selected job definition will be incremented.",
     "PLGN_JRET_DIALOG_INCREMENT_SURE": "Are you sure to increment the number of retries?",
