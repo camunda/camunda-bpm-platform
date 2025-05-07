@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.runtime;
 import java.io.Serializable;
 import java.util.Set;
 
-import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.query.Query;
@@ -339,9 +338,4 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    *                                this exception, {@link #or()} must be invoked first.
    */
   ProcessInstanceQuery endOr();
-
-  ProcessInstanceQuery rootProcessInstance(String id);
-
-  ProcessInstanceQuery idAfter(String id);
-
 }

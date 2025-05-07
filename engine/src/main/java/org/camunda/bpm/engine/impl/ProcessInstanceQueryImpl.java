@@ -185,13 +185,6 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return this;
   }
 
-  @Override
-  public ProcessInstanceQuery rootProcessInstance(String id) {
-    rootProcessInstanceId = id;
-    return this;
-  }
-
-  @Override
   public ProcessInstanceQuery idAfter(String id) {
     idAfter = id;
     return this;
