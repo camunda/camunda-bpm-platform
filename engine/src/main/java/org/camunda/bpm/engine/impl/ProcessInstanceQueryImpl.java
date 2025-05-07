@@ -383,6 +383,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return processInstanceId;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
   public Set<String> getProcessInstanceIds() {
     return processInstanceIds;
   }
@@ -502,10 +506,6 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public String[] getTenantIds() {
     return tenantIds;
-  }
-
-  public String getRootProcessInstanceId() {
-    return rootProcessInstanceId;
   }
 
   public String getIdAfter() {
