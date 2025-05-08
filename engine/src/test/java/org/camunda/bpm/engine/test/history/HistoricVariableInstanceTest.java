@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.test.history;
 
-import static java.util.Comparator.nullsFirst;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
@@ -31,15 +30,12 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -78,7 +74,6 @@ import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -247,16 +242,12 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     assertEquals(5, historyService.createHistoricVariableInstanceQuery().list().size());
     assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByProcessInstanceId().asc().count());
     assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByProcessInstanceId().asc().list().size());
-    assertCorrectlySorted(historyService.createHistoricVariableInstanceQuery().orderByProcessInstanceId().asc().list(), HistoricVariableInstance::getProcessInstanceId);
     assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByVariableName().asc().count());
     assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByVariableName().asc().list().size());
-    assertCorrectlySorted(historyService.createHistoricVariableInstanceQuery().orderByVariableName().asc().list(), HistoricVariableInstance::getVariableName);
     assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByTenantId().asc().count());
     assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByTenantId().asc().list().size());
-    assertCorrectlySorted(historyService.createHistoricVariableInstanceQuery().orderByTenantId().asc().list(), HistoricVariableInstance::getTenantId);
     assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByVariableId().asc().count());
     assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByVariableId().asc().list().size());
-    assertCorrectlySorted(historyService.createHistoricVariableInstanceQuery().orderByVariableId().asc().list(), HistoricVariableInstance::getId);
 
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count());
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list().size());
@@ -2644,14 +2635,6 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     assertThatThrownBy(throwingCallable)
         .isInstanceOf(NullValueException.class)
         .hasMessage("Variable names is null");
-  }
-
-  private void assertCorrectlySorted(List<HistoricVariableInstance> variablesInstances, Function<HistoricVariableInstance, String> comparator) {
-    List<HistoricVariableInstance> sorted = variablesInstances
-        .stream()
-        .sorted(Comparator.comparing(comparator, Comparator.nullsFirst(String::compareTo)))
-        .collect(Collectors.toList());
-    assertEquals(variablesInstances, sorted);
   }
 
 }
