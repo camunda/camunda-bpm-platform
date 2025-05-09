@@ -25,8 +25,10 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,7 +118,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     .endEvent().done();
 
   protected final Date START_DATE = new Date(1363607000000L);
-  protected final Date END_DATE = new Date(1363608000000L);
+  protected final Date END_DATE = new GregorianCalendar(2013, Calendar.MARCH, 18, 13, 0, 0).getTime();
 
   @Test
   @Deployment(resources = {
@@ -338,11 +340,11 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   /**
-   * Test excluded on MariaDB, MySQL and CRDB for now since it is failing randomly there.
+   * Test excluded on MySQL for now since it is failing randomly there.
    * See CAM-13291 for details.
    */
   @Test
-  @RequiredDatabase(excludes = {DbSqlSessionFactory.MARIADB, DbSqlSessionFactory.MYSQL, DbSqlSessionFactory.CRDB})
+  @RequiredDatabase(excludes = {DbSqlSessionFactory.MYSQL})
   public void shouldResolveHistoricActivityInstanceInConcurrentEnvironment() {
     // given
     int degreeOfParallelism = 30;

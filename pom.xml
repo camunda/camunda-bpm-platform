@@ -11,7 +11,7 @@
 
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-root</artifactId>
-  <version>7.22.0-SNAPSHOT</version>
+  <version>7.24.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Camunda Platform - Root Pom</name>
   <inceptionYear>2013</inceptionYear>
@@ -28,11 +28,7 @@
     <version.mybatis>3.5.15</version.mybatis>
     <version.joda-time>2.12.5</version.joda-time>
     <version.uuid-generator>4.3.0</version.uuid-generator>
-    <version.camunda.commons>1.13.0</version.camunda.commons>
-    <version.camunda.connect>1.6.0</version.camunda.connect>
-    <version.camunda.spin>1.23.0</version.camunda.spin>
-    <version.camunda.freemarker.template.engine>2.2.0</version.camunda.freemarker.template.engine>
-    <version.feel-scala>1.17.5</version.feel-scala>
+    <version.feel-scala>1.19.3</version.feel-scala>
   </properties>
 
   <build>
@@ -74,9 +70,12 @@
         <module>javaee/jobexecutor-rar</module>
 
         <module>model-api</module>
-        <module>typed-values</module>
         <module>engine-dmn</module>
+        <module>connect</module>
         <module>juel</module>
+        <module>spin</module>
+        <module>commons</module>
+        <module>freemarker-template-engine</module>
 
         <module>test-utils/testcontainers</module>
         <module>test-utils/junit5-extension</module>
@@ -135,10 +134,18 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
+              <top><![CDATA[
+                <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                  'https://ssgtm.camunda.org/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                  })(window,document,'script','dataLayer','GTM-PP9MHKW');</script>
+              ]]></top>
               <failOnError>false</failOnError>
               <additionalJOptions>
                 <additionalJOption>-Xdoclint:none</additionalJOption>
                 <additionalJOption>--ignore-source-errors</additionalJOption>
+                <additionalJOption>--allow-script-in-comments</additionalJOption>
               </additionalJOptions>
               <doctitle>Camunda Platform Javadocs ${project.version}</doctitle>
               <windowtitle>Camunda Platform Javadocs ${project.version}</windowtitle>
@@ -266,9 +273,12 @@
         <module>engine-spring</module>
         <module>engine-rest</module>
 
-        <module>typed-values</module>
         <module>engine-dmn</module>
+        <module>connect</module>
         <module>juel</module>
+        <module>spin</module>
+        <module>commons</module>
+        <module>freemarker-template-engine</module>
 
         <module>javaee/ejb-client</module>
         <module>javaee/ejb-client-jakarta</module>

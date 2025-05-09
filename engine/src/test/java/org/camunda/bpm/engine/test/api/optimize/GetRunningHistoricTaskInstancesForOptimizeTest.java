@@ -20,11 +20,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.List;
-
 import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
@@ -67,7 +68,7 @@ public class GetRunningHistoricTaskInstancesForOptimizeTest {
   private RuntimeService runtimeService;
   private AuthorizationService authorizationService;
   private TaskService taskService;
-
+  private HistoryService historyService;
 
   @Before
   public void init() {
@@ -78,6 +79,7 @@ public class GetRunningHistoricTaskInstancesForOptimizeTest {
     runtimeService = engineRule.getRuntimeService();
     authorizationService = engineRule.getAuthorizationService();
     taskService = engineRule.getTaskService();
+    historyService = engineRule.getHistoryService();
 
     createUser(userId);
   }
@@ -92,6 +94,9 @@ public class GetRunningHistoricTaskInstancesForOptimizeTest {
     }
     for (Authorization authorization : authorizationService.createAuthorizationQuery().list()) {
       authorizationService.deleteAuthorization(authorization.getId());
+    }
+    for (HistoricTaskInstance task : historyService.createHistoricTaskInstanceQuery().list()) {
+      historyService.deleteHistoricTaskInstance(task.getId());
     }
     ClockUtil.reset();
   }
@@ -162,7 +167,7 @@ public class GetRunningHistoricTaskInstancesForOptimizeTest {
     engineRule.getRuntimeService().startProcessInstanceByKey("process");
 
     // when
-    List<HistoricTaskInstance> runningHistoricTaskInstances =                                               
+    List<HistoricTaskInstance> runningHistoricTaskInstances =
       optimizeService.getRunningHistoricTaskInstances(null, now, 10);
 
     // then
@@ -270,6 +275,26 @@ public class GetRunningHistoricTaskInstancesForOptimizeTest {
     // then
     assertThat(runningHistoricTaskInstances.size(), is(1));
     assertThat(runningHistoricTaskInstances.get(0).getTaskDefinitionKey(), is("userTask2"));
+  }
+
+  @Test
+  public void doNotReturnRunningStandaloneTasks() {
+    try {
+      // given
+      Task task = taskService.newTask("standaloneTaskId");
+      taskService.saveTask(task);
+
+      // when
+      List<HistoricTaskInstance> runningHistoricTaskInstances = optimizeService.getRunningHistoricTaskInstances(null,
+          null, 10);
+
+      // then
+      assertTrue(runningHistoricTaskInstances.isEmpty());
+    } finally {
+      for (Task task : taskService.createTaskQuery().list()) {
+        taskService.deleteTask(task.getId());
+      }
+    }
   }
 
   private Date pastDate() {

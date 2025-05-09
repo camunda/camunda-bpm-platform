@@ -16,11 +16,10 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.CRDB;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.DB2;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.H2;
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MARIADB_MYSQL;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MSSQL;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MYSQL;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.ORACLE;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.POSTGRES;
 
@@ -212,7 +211,7 @@ public class ExceptionUtil {
     // SqlServer & PostgreSQL
     return message.contains("foreign key constraint") ||
         "23000".equals(sqlState) && errorCode == 547 ||
-        // MySql & MariaDB & PostgreSQL
+        // MySql & PostgreSQL
         "23000".equals(sqlState) && errorCode == 1452 ||
         // Oracle & H2
         message.contains("integrity constraint") ||
@@ -244,7 +243,7 @@ public class ExceptionUtil {
     String sqlState = sqlException.getSQLState();
     int errorCode = sqlException.getErrorCode();
 
-    // MySQL & MariaDB
+    // MySQL
     return (message.contains("act_uniq_variable") && "23000".equals(sqlState) && errorCode == 1062)
         // PostgreSQL
         || (message.contains("act_uniq_variable") && "23505".equals(sqlState) && errorCode == 0)
@@ -256,49 +255,12 @@ public class ExceptionUtil {
         || (message.contains("act_uniq_variable") && "23505".equals(sqlState) && errorCode == 23505);
   }
 
-  public static boolean checkCrdbTransactionRetryException(Throwable exception) {
-    SQLException sqlException = null;
-
-    if (exception instanceof PersistenceException) {
-      sqlException = unwrapException((PersistenceException) exception);
-
-    } else if (exception instanceof ProcessEngineException) {
-      sqlException = unwrapException((ProcessEngineException) exception);
-
-    } else {
-      return false;
-
-    }
-
-    if (sqlException == null) {
-      return false;
-    }
-
-    return checkCrdbTransactionRetryException(sqlException);
-  }
-
-  public static boolean checkCrdbTransactionRetryException(SQLException sqlException) {
-    String errorMessage = sqlException.getMessage();
-    int errorCode = sqlException.getErrorCode();
-    if ((errorCode == 40001 || errorMessage != null)) {
-      errorMessage = errorMessage.toLowerCase();
-      return (errorMessage.contains("restart transaction") || errorMessage.contains("retry txn"))
-          // TX retry errors with RETRY_COMMIT_DEADLINE_EXCEEDED are handled
-          // as a ProcessEngineException (cause: Process engine persistence exception)
-          // due to a long-running transaction
-          && !errorMessage.contains("retry_commit_deadline_exceeded");
-    }
-    return false;
-  }
-
   public enum DEADLOCK_CODES {
-
-    MARIADB_MYSQL(1213, "40001"),
+    MYSQL(1213, "40001"),
     MSSQL(1205, "40001"),
     DB2(-911, "40001"),
     ORACLE(60, "61000"),
     POSTGRES(0, "40P01"),
-    CRDB(0, "40001"),
     H2(40001, "40001");
 
     protected final int errorCode;
@@ -333,12 +295,11 @@ public class ExceptionUtil {
 
     int errorCode = sqlException.getErrorCode();
 
-    return MARIADB_MYSQL.equals(errorCode, sqlState) ||
+    return MYSQL.equals(errorCode, sqlState) ||
         MSSQL.equals(errorCode, sqlState) ||
         DB2.equals(errorCode, sqlState) ||
         ORACLE.equals(errorCode, sqlState) ||
         POSTGRES.equals(errorCode, sqlState) ||
-        CRDB.equals(errorCode, sqlState) ||
         H2.equals(errorCode, sqlState);
   }
 

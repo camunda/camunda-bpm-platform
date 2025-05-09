@@ -81,7 +81,6 @@ public class CamundaEngineProgrammaticAndConfigFileTest {
     assertThat(configuration.isCmmnEnabled()).isFalse();
     assertThat(configuration.isDmnEnabled()).isFalse();
     assertThat(configuration.getHistory()).isEqualTo("none");
-    assertThat(configuration.isInitializeTelemetry()).isFalse();
     // assert job executor properties
     assertThat(jobExecutor.getMaxJobsPerAcquisition()).isEqualTo(5);
     assertThat(jobExecutor.getLockTimeInMillis()).isEqualTo(500000);
@@ -89,10 +88,10 @@ public class CamundaEngineProgrammaticAndConfigFileTest {
     assertThat(jobExecutor.getMaxWait()).isEqualTo(65000);
     assertThat(jobExecutor.getBackoffTimeInMillis()).isEqualTo(5);
     // assert correct thread pool config
-    assertThat(config.jobExecutor.threadPool.maxPoolSize).isEqualTo(12);
-    assertThat(config.jobExecutor.threadPool.queueSize).isEqualTo(5);
+    assertThat(config.jobExecutor().threadPool().maxPoolSize()).isEqualTo(12);
+    assertThat(config.jobExecutor().threadPool().queueSize()).isEqualTo(5);
     // assert correct datasource
-    assertThat(config.datasource).hasValue("camunda");
+    assertThat(config.datasource()).hasValue("camunda");
     assertThat(configuration.getDataSource().getConnection()).asString().contains("h2:mem:camunda");
   }
 }

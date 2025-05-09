@@ -1,0 +1,188 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.spin</groupId>
+    <artifactId>camunda-spin-root</artifactId>
+    <version>7.24.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>camunda-spin-dataformat-all</artifactId>
+  <name>camunda Spin - all dataformats in one</name>
+
+  <properties>
+    <!-- We shade artifacts into the jar, so we need to generate 
+    a dependency BOM for the license book -->
+    <skip-third-party-bom>false</skip-third-party-bom>
+    <!-- json-smart and accessors-smart are runtime dependencies of json-path -->
+    <third-party-bom-scopes>compile|runtime</third-party-bom-scopes>
+  </properties>
+  
+  <dependencies>
+
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-dataformat-xml-dom</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-impl</artifactId>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.5.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <createDependencyReducedPom>true</createDependencyReducedPom>
+              <createSourcesJar>true</createSourcesJar>
+              <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+              <artifactSet>
+                <excludes>
+                  <exclude>org.camunda.commons:*</exclude>
+                  <exclude>org.camunda.spin:camunda-spin-core</exclude>
+                  <exclude>org.slf4j:*</exclude>
+                </excludes>
+              </artifactSet>
+              <relocations>
+                <relocation>
+                  <pattern>com.fasterxml</pattern>
+                  <shadedPattern>spinjar.com.fasterxml</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.jayway</pattern>
+                  <shadedPattern>spinjar.com.jayway</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>net.minidev</pattern>
+                  <shadedPattern>spinjar.com.minidev</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.objectweb</pattern>
+                  <shadedPattern>spinjar.com.objectweb</shadedPattern>
+                </relocation>
+
+                <relocation>
+                  <pattern>com.sun.istack</pattern>
+                  <shadedPattern>spinjar.com.sun.istack</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.sun.activation</pattern>
+                  <shadedPattern>spinjar.com.sun.activation</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.sun.xml.bind</pattern>
+                  <shadedPattern>spinjar.com.sun.xml.bind</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.sun.xml.txw2</pattern>
+                  <shadedPattern>spinjar.com.sun.xml.txw2</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>javax.xml.bind</pattern>
+                  <shadedPattern>spinjar.javax.xml.bind</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>javax.activation</pattern>
+                  <shadedPattern>spinjar.javax.activation</shadedPattern>
+                </relocation>
+              </relocations>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+              </transformers>
+              <filters>
+                <filter>
+                  <artifact>com.sun.xml.bind:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/services/javax.xml.bind.JAXBContext</exclude>
+                  </excludes>
+                </filter>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>module-info.class</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <!-- make sure javadocs are generated for spin-all -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <includeDependencySources>true</includeDependencySources>
+          <includeTransitiveDependencySources>true</includeTransitiveDependencySources>
+          <dependencySourceIncludes><include>org.camunda.spin:*</include></dependencySourceIncludes>
+          <additionalDependencies>
+           <additionalDependency>
+             <groupId>junit</groupId>
+             <artifactId>junit</artifactId>
+             <version>${version.junit}</version>
+           </additionalDependency>
+          </additionalDependencies>
+        </configuration>
+      </plugin>
+       <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <unpackBundle>false</unpackBundle>
+          <instructions>
+            <Export-Package>
+              ${project.groupId}*
+            </Export-Package>
+            <Import-Package>
+              !spinjar*,
+              !org.junit*,
+              !org.slf4j.impl,
+              !com.fasterxml*,
+              !com.jayway,
+              !net.minidev.json*,
+              !org.codehaus.jackson*,
+              org.slf4j,
+              org.camunda.commons.utils,
+              org.camunda.commons.logging,
+              *
+            </Import-Package>
+            <Bundle-ClassPath>.</Bundle-ClassPath>
+            <Embed-Dependency>*;inline=true</Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
+          </instructions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

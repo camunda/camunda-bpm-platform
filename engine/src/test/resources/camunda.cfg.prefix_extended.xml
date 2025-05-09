@@ -26,15 +26,11 @@
 
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
-    <property name="telemetryReporterActivate" value="false" />
     <property name="taskMetricsEnabled" value="false" />
 
     <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
 
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
-
-    <!-- telemetry configuration -->
-    <property name="telemetryEndpoint" value="http://localhost:8081/pings"/>
 
     <property name="enforceHistoryTimeToLive" value="false" />
 

@@ -19,6 +19,7 @@ assignees:
 - [ ] [Release GitHub issues](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-ReleaseGitHubissues)
 - [ ] [Remind QA to create the alpha release test plan and to update the minor release test plan](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-RemindQAtocreatethealphareleasetestplanandtoupdatetheminorreleasetestplan)
 - [ ] [Monitor CI](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-MonitorCI)
+- [ ] [Check Portainer](https://confluence.camunda.com/pages/viewpage.action?spaceKey=AP&title=Performing+an+Alpha+Release#PerforminganAlphaRelease-CheckPortainer)
 - [ ] [Check Preconditions](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-CheckPreconditions)
 - [ ] [Code Freeze](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-CodeFreeze.1)
 - [ ] [Trigger the Release Build](https://confluence.camunda.com/display/AP/Performing+an+Alpha+Release#PerforminganAlphaRelease-TriggertheReleaseBuild)

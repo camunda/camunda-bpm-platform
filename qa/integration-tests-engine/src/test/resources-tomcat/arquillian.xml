@@ -10,8 +10,8 @@
 
   <container qualifier="tomcat" default="true">
     <configuration>
-      <property name="catalinaHome">${tomcat.runtime.location}</property>
-      <property name="catalinaBase">${tomcat.runtime.location}</property>
+      <property name="catalinaHome">${tomcat9.runtime.location}</property>
+      <property name="catalinaBase">${tomcat9.runtime.location}</property>
       <property name="bindHttpPort">${tomcat.connector.http.port}</property>
       <property name="user">arquillian</property>
       <property name="pass">arquillian</property>

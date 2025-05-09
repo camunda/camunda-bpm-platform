@@ -18,9 +18,12 @@ package org.camunda.bpm.engine.test.api.mgmt.telemetry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.junit.Test;
 
+@RequiredDatabase(includes = DbSqlSessionFactory.H2) // it's h2-specific test
 public class TelemetryStaticDataTest {
 
   @Test
@@ -49,13 +52,6 @@ public class TelemetryStaticDataTest {
     // given
     ApplicationServerImpl server = new ApplicationServerImpl("WebLogic Server 12.2.1.0.0 Tue Oct 6 10:05:47 PDT 2015 1721936 WebLogic JAX-RS 2.0 Portable Server / Jersey 2.x integration module");
     assertThat(server.getVendor()).isEqualTo("WebLogic Server");
-  }
-
-  @Test
-  public void shouldValidateWebSphereVendor() {
-    // given
-    ApplicationServerImpl server = new ApplicationServerImpl("IBM WebSphere Application Server/8.5");
-    assertThat(server.getVendor()).isEqualTo("IBM WebSphere Application Server");
   }
 
 }

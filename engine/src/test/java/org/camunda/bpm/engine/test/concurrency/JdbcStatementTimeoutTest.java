@@ -87,15 +87,8 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestHelper {
     Thread.interrupted();
   }
 
-  /**
-   * CockroachDB is excluded since it doesn't implement query cancellation yet.
-   * (see https://github.com/cockroachdb/cockroach/issues/41335)
-   */
   @Test
-  @RequiredDatabase(excludes = { DbSqlSessionFactory.MARIADB,
-      DbSqlSessionFactory.DB2,
-      DbSqlSessionFactory.CRDB,
-      DbSqlSessionFactory.H2})
+  @RequiredDatabase(excludes = { DbSqlSessionFactory.DB2, DbSqlSessionFactory.H2 })
   public void testTimeoutOnUpdate() {
     createJobEntity();
 

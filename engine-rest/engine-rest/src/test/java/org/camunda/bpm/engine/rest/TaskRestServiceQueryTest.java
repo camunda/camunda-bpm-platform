@@ -212,6 +212,32 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     assertThat(MockProvider.EXAMPLE_TENANT_ID).isEqualTo(returnedTenantId);
 
   }
+  @Test
+  public void testTaskQueryWithAttachmentAndComment() {
+    String queryName = "name";
+
+    Response response = given().queryParam("name", queryName)
+            .queryParam("withCommentAttachmentInfo","true")
+            .header("accept", MediaType.APPLICATION_JSON)
+            .then().expect().statusCode(Status.OK.getStatusCode())
+            .when().get(TASK_QUERY_URL);
+
+    InOrder inOrder = inOrder(mockQuery);
+    inOrder.verify(mockQuery).taskName(queryName);
+    inOrder.verify(mockQuery).list();
+
+    String content = response.asString();
+    List<LinkedHashMap<String, String>> instances = from(content).getList("");
+    assertThat(instances).hasSize(1).as("There should be one task returned.");
+    assertThat(instances.get(0)).isNotNull().as("The returned task should not be null.");
+
+    boolean returnedAttachmentsInfo = from(content).getBoolean("[0].attachment");
+    boolean returnedCommentsInfo = from(content).getBoolean("[0].comment");
+
+    assertThat(MockProvider.EXAMPLE_TASK_ATTACHMENT_STATE).isEqualTo(returnedAttachmentsInfo);
+    assertThat(MockProvider.EXAMPLE_TASK_COMMENT_STATE).isEqualTo(returnedCommentsInfo);
+
+  }
 
   @Test
   public void testSimpleHalTaskQuery() {
@@ -482,6 +508,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("assignee", "anAssignee");
     parameters.put("assigneeLike", "anAssigneeLike");
     parameters.put("candidateGroup", "aCandidateGroup");
+    parameters.put("candidateGroupLike", "aCandidateGroupLike");
     parameters.put("candidateUser", "aCandidate");
     parameters.put("includeAssignedTasks", "false");
     parameters.put("taskId", "aTaskId");
@@ -521,6 +548,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("withCandidateUsers", true);
     parameters.put("withoutCandidateUsers", true);
     parameters.put("withoutDueDate", true);
+    parameters.put("withCommentAttachmentInfo", true);
 
     return parameters;
   }
@@ -539,6 +567,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).taskAssignee(stringQueryParameters.get("assignee"));
     verify(mockQuery).taskAssigneeLike(stringQueryParameters.get("assigneeLike"));
     verify(mockQuery).taskCandidateGroup(stringQueryParameters.get("candidateGroup"));
+    verify(mockQuery).taskCandidateGroupLike(stringQueryParameters.get("candidateGroupLike"));
     verify(mockQuery).taskCandidateUser(stringQueryParameters.get("candidateUser"));
     verify(mockQuery).taskDefinitionKey(stringQueryParameters.get("taskDefinitionKey"));
     verify(mockQuery).taskDefinitionKeyLike(stringQueryParameters.get("taskDefinitionKeyLike"));
@@ -586,6 +615,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).withCandidateUsers();
     verify(mockQuery).withoutCandidateUsers();
     verify(mockQuery).withoutDueDate();
+    verify(mockQuery).withCommentAttachmentInfo();
   }
 
   @Test

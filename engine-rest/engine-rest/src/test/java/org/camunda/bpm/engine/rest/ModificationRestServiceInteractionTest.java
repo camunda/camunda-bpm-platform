@@ -32,9 +32,12 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
+import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.util.ModificationInstructionBuilder;
@@ -57,12 +60,16 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
   protected static final String EXECUTE_MODIFICATION_ASYNC_URL = PROCESS_INSTANCE_URL + "/executeAsync";
 
   protected RuntimeService runtimeServiceMock;
+  protected HistoryService historyServiceMock;
   protected ModificationBuilder modificationBuilderMock;
 
   @Before
   public void setUpRuntimeData() {
     runtimeServiceMock = mock(RuntimeService.class);
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
+
+    historyServiceMock = mock(HistoryService.class);
+    when(processEngine.getHistoryService()).thenReturn(historyServiceMock);
 
     modificationBuilderMock = mock(ModificationBuilder.class);
     when(modificationBuilderMock.cancelAllForActivity(any())).thenReturn(modificationBuilderMock);
@@ -300,6 +307,39 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
   }
 
   @Test
+  public void executeModificationWithValidHistoricProcessInstanceQuerySync() {
+
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(new HistoricProcessInstanceQueryImpl());
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.startAfter().activityId("activityId").getJson());
+    json.put("processDefinitionId", "processDefinitionId");
+
+    HistoricProcessInstanceQueryDto historicProcessInstanceQueryDto = new HistoricProcessInstanceQueryDto();
+    historicProcessInstanceQueryDto.setProcessInstanceBusinessKey("foo");
+
+    json.put("historicProcessInstanceQuery", historicProcessInstanceQueryDto);
+
+    json.put("instructions", instructions);
+
+    given()
+        .contentType(ContentType.JSON)
+        .body(json)
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .post(EXECUTE_MODIFICATION_SYNC_URL);
+
+    verify(historyServiceMock, times(1)).createHistoricProcessInstanceQuery();
+    verify(modificationBuilderMock).startAfterActivity("activityId");
+    verify(modificationBuilderMock).historicProcessInstanceQuery(historicProcessInstanceQueryDto.toQuery(processEngine));
+    verify(modificationBuilderMock).execute();
+  }
+
+
+  @Test
   public void executeModificationWithValidProcessInstanceQueryAsync() {
 
     when(runtimeServiceMock.createProcessInstanceQuery()).thenReturn(new ProcessInstanceQueryImpl());
@@ -326,6 +366,74 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
 
     verify(runtimeServiceMock, times(1)).createProcessInstanceQuery();
     verify(modificationBuilderMock).startAfterActivity("activityId");
+    verify(modificationBuilderMock).processInstanceQuery(processInstanceQueryDto.toQuery(processEngine));
+    verify(modificationBuilderMock).executeAsync();
+  }
+
+  @Test
+  public void executeModificationWithValidHistoricProcessInstanceQueryAsync() {
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(new HistoricProcessInstanceQueryImpl());
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.startAfter().activityId("activityId").getJson());
+
+    HistoricProcessInstanceQueryDto historicProcessInstanceQueryDto = new HistoricProcessInstanceQueryDto();
+    historicProcessInstanceQueryDto.setProcessInstanceBusinessKey("foo");
+
+    json.put("historicProcessInstanceQuery", historicProcessInstanceQueryDto);
+    json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+
+    given()
+        .contentType(ContentType.JSON)
+        .body(json)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(EXECUTE_MODIFICATION_ASYNC_URL);
+
+    verify(historyServiceMock, times(1)).createHistoricProcessInstanceQuery();
+    verify(modificationBuilderMock).startAfterActivity("activityId");
+    verify(modificationBuilderMock).historicProcessInstanceQuery(historicProcessInstanceQueryDto.toQuery(processEngine));
+    verify(modificationBuilderMock).executeAsync();
+  }
+
+  @Test
+  public void executeModificationWithBothProcessInstanceQueries() {
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(new HistoricProcessInstanceQueryImpl());
+    when(runtimeServiceMock.createProcessInstanceQuery()).thenReturn(new ProcessInstanceQueryImpl());
+
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.startAfter().activityId("activityId").getJson());
+
+    HistoricProcessInstanceQueryDto historicProcessInstanceQueryDto = new HistoricProcessInstanceQueryDto();
+    historicProcessInstanceQueryDto.setProcessInstanceBusinessKey("foo");
+
+    ProcessInstanceQueryDto processInstanceQueryDto = new ProcessInstanceQueryDto();
+    processInstanceQueryDto.setBusinessKey("foo");
+
+    json.put("processInstanceQuery", processInstanceQueryDto);
+    json.put("historicProcessInstanceQuery", historicProcessInstanceQueryDto);
+    json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+
+    given()
+        .contentType(ContentType.JSON)
+        .body(json)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(EXECUTE_MODIFICATION_ASYNC_URL);
+
+    verify(historyServiceMock, times(1)).createHistoricProcessInstanceQuery();
+    verify(modificationBuilderMock).startAfterActivity("activityId");
+    verify(modificationBuilderMock).historicProcessInstanceQuery(historicProcessInstanceQueryDto.toQuery(processEngine));
+    verify(runtimeServiceMock, times(1)).createProcessInstanceQuery();
     verify(modificationBuilderMock).processInstanceQuery(processInstanceQueryDto.toQuery(processEngine));
     verify(modificationBuilderMock).executeAsync();
   }
@@ -360,6 +468,35 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
   }
 
   @Test
+  public void executeModificationWithInvalidHistoricProcessInstanceQuerySync() {
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(new HistoricProcessInstanceQueryImpl());
+
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    String message = "Process instance ids is null";
+    doThrow(new BadUserRequestException(message)).when(modificationBuilderMock).execute();
+
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.startAfter().activityId("acivityId").getJson());
+
+    HistoricProcessInstanceQueryDto historicProcessInstanceQueryDto = new HistoricProcessInstanceQueryDto();
+    historicProcessInstanceQueryDto.setProcessInstanceBusinessKey("foo");
+
+    json.put("historicProcessInstanceQuery", historicProcessInstanceQueryDto);
+    json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+
+    given()
+        .contentType(ContentType.JSON)
+        .body(json)
+        .then()
+        .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when()
+        .post(EXECUTE_MODIFICATION_SYNC_URL);
+  }
+
+  @Test
   public void executeModificationWithInvalidProcessInstanceQueryAsync() {
 
     when(runtimeServiceMock.createProcessInstanceQuery()).thenReturn(new ProcessInstanceQueryImpl());
@@ -382,6 +519,31 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
       .statusCode(Status.OK.getStatusCode())
     .when()
       .post(EXECUTE_MODIFICATION_ASYNC_URL);
+  }
+
+  @Test
+  public void executeModificationWithInvalidHistoricProcessInstanceQueryAsync() {
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(new HistoricProcessInstanceQueryImpl());
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.startAfter().activityId("acivityId").getJson());
+
+    HistoricProcessInstanceQueryDto historicProcessInstanceQueryDto = new HistoricProcessInstanceQueryDto();
+    historicProcessInstanceQueryDto.setProcessInstanceBusinessKey("foo");
+
+    json.put("historicProcessInstanceQuery", historicProcessInstanceQueryDto);
+    json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+
+    given()
+        .contentType(ContentType.JSON)
+        .body(json)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(EXECUTE_MODIFICATION_ASYNC_URL);
   }
 
   @Test

@@ -343,14 +343,8 @@ public class SetExternalTasksRetriesTest extends AbstractAsyncOperationsTest {
     }
   }
 
-  /**
-   * Excluded on CRDB since the problem does not occur on it. The test execution also times out
-   * during test cleanup, on DELETE-ing the deployments, due the the slowness of the SQL statements on CRDB.
-   * See CAM-12239 for the performance.
-   */
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
   public void shouldSetExternalTaskRetriesWithLargeList() {
     // given
     engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(1010);

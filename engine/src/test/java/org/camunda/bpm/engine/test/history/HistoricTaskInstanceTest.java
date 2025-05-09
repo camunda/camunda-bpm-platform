@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -45,6 +46,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.Test;
+
 
 
 /**
@@ -87,6 +89,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     assertNull(historicTaskInstance.getCaseDefinitionId());
     assertNull(historicTaskInstance.getCaseInstanceId());
     assertNull(historicTaskInstance.getCaseExecutionId());
+    assertEquals("Updated", historicTaskInstance.getTaskState());
 
     // the activity instance id is set
     assertEquals(((TaskEntity)runtimeTask).getExecution().getActivityInstanceId(), historicTaskInstance.getActivityInstanceId());
@@ -114,6 +117,8 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     assertNotNull(historicTaskInstance.getDurationInMillis());
     assertTrue(historicTaskInstance.getDurationInMillis() >= 1000);
     assertTrue(((HistoricTaskInstanceEntity)historicTaskInstance).getDurationRaw() >= 1000);
+    assertEquals("Completed", historicTaskInstance.getTaskState());
+
 
     assertNull(historicTaskInstance.getCaseDefinitionId());
     assertNull(historicTaskInstance.getCaseInstanceId());
@@ -299,6 +304,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     // task exists & has no assignee:
     HistoricTaskInstance hti = historyService.createHistoricTaskInstanceQuery().singleResult();
     assertNull(hti.getAssignee());
+    assertEquals("Created", hti.getTaskState());
 
     // assign task to jonny:
     taskService.setAssignee(task.getId(), "jonny");
@@ -307,8 +313,15 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     hti = historyService.createHistoricTaskInstanceQuery().singleResult();
     assertEquals("jonny", hti.getAssignee());
     assertNull(hti.getOwner());
+    assertEquals("Updated", hti.getTaskState());
 
     taskService.deleteTask(task.getId());
+    HistoricTaskInstance htiDeleted = historyService
+            .createHistoricTaskInstanceQuery()
+            .taskId(task.getId())
+            .singleResult();
+    assertEquals("Deleted", htiDeleted.getTaskState());
+
     historyService.deleteHistoricTaskInstance(hti.getId());
   }
 
@@ -1131,5 +1144,28 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     // then
     assertEquals(0, query.processInstanceBusinessKeyIn(businessKey1, businessKey2).processInstanceBusinessKey(unexistingBusinessKey).count());
     assertEquals(1, query.processInstanceBusinessKeyIn(businessKey2, businessKey3).processInstanceBusinessKey(businessKey2).count());
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/history/multiprocess/rootProcess.bpmn",
+      "org/camunda/bpm/engine/test/api/history/multiprocess/secondLevelProcess.bpmn",
+      "org/camunda/bpm/engine/test/api/history/multiprocess/thirdLevelProcess.bpmn" })
+  @Test
+  public void testQueryByRootProcessInstanceId() {
+    // given
+    String rootProcessId = runtimeService.startProcessInstanceByKey("root-process").getId();
+    runtimeService.startProcessInstanceByKey("process-3");
+    while (historyService.createHistoricProcessInstanceQuery().unfinished().count() > 0) {
+      taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+    }
+    List<HistoricTaskInstance> allTaskInstances = historyService.createHistoricTaskInstanceQuery().list();
+
+    // when
+    HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery().rootProcessInstanceId(rootProcessId);
+
+    // then
+    assertEquals(8, allTaskInstances.size());
+    assertEquals(6, allTaskInstances.stream().filter(task -> task.getRootProcessInstanceId().equals(rootProcessId)).count());
+    assertEquals(6, historicTaskInstanceQuery.count());
+    assertEquals(6, historicTaskInstanceQuery.list().size());
   }
 }

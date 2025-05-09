@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.test.errorcode;
 
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
-import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -36,11 +35,10 @@ import java.util.concurrent.CountDownLatch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.CRDB;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.DB2;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.H2;
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MARIADB_MYSQL;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MSSQL;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MYSQL;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.ORACLE;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.POSTGRES;
 
@@ -92,11 +90,10 @@ public class DeadlockTest {
   public void shouldProvokeDeadlock() throws InterruptedException {
     String databaseType = engineRule.getProcessEngineConfiguration().getDatabaseType();
     switch (databaseType) {
-    case DbSqlSessionFactory.MARIADB:
     case DbSqlSessionFactory.MYSQL:
       provokeDeadlock();
-      assertThat(sqlException.getSQLState()).isEqualTo(MARIADB_MYSQL.getSqlState());
-      assertThat(sqlException.getErrorCode()).isEqualTo(MARIADB_MYSQL.getErrorCode());
+      assertThat(sqlException.getSQLState()).isEqualTo(MYSQL.getSqlState());
+      assertThat(sqlException.getErrorCode()).isEqualTo(MYSQL.getErrorCode());
       break;
     case DbSqlSessionFactory.MSSQL:
       provokeDeadlock();
@@ -117,11 +114,6 @@ public class DeadlockTest {
       provokeDeadlock();
       assertThat(sqlException.getSQLState()).isEqualTo(POSTGRES.getSqlState());
       assertThat(sqlException.getErrorCode()).isEqualTo(POSTGRES.getErrorCode());
-      break;
-    case DbSqlSessionFactory.CRDB:
-      provokeDeadlock();
-      assertThat(sqlException.getSQLState()).isEqualTo(CRDB.getSqlState());
-      assertThat(sqlException.getErrorCode()).isEqualTo(CRDB.getErrorCode());
       break;
     case DbSqlSessionFactory.H2:
       provokeDeadlock();

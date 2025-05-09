@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.cmd.AbstractProcessInstanceModificationCommand;
 import org.camunda.bpm.engine.impl.cmd.ActivityAfterInstantiationCmd;
 import org.camunda.bpm.engine.impl.cmd.ActivityBeforeInstantiationCmd;
@@ -40,6 +41,7 @@ public class ModificationBuilderImpl implements ModificationBuilder {
 
   protected CommandExecutor commandExecutor;
   protected ProcessInstanceQuery processInstanceQuery;
+  protected HistoricProcessInstanceQuery historicProcessInstanceQuery;
   protected List<String> processInstanceIds;
   protected List<AbstractProcessInstanceModificationCommand> instructions;
   protected String processDefinitionId;
@@ -115,6 +117,12 @@ public class ModificationBuilderImpl implements ModificationBuilder {
   }
 
   @Override
+  public ModificationBuilder historicProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery) {
+    this.historicProcessInstanceQuery = historicProcessInstanceQuery;
+    return this;
+  }
+
+  @Override
   public ModificationBuilder skipCustomListeners() {
     this.skipCustomListeners = true;
     return this;
@@ -151,6 +159,10 @@ public class ModificationBuilderImpl implements ModificationBuilder {
 
   public ProcessInstanceQuery getProcessInstanceQuery() {
     return processInstanceQuery;
+  }
+
+  public HistoricProcessInstanceQuery getHistoricProcessInstanceQuery() {
+    return historicProcessInstanceQuery;
   }
 
   public List<String> getProcessInstanceIds() {

@@ -100,7 +100,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
 
     List<ServiceName> deploymentServiceNames = new ArrayList<>();
 
-    ServiceBuilder<?> stopServiceBuilder = phaseContext.getRequirementServiceTarget().addService(paStopServiceName);
+    ServiceBuilder<?> stopServiceBuilder = phaseContext.getServiceTarget().addService(paStopServiceName);
     Consumer<ProcessApplicationStopService> paStopProvider = stopServiceBuilder.provides(paStopServiceName);
     stopServiceBuilder.requires(phaseContext.getPhaseServiceName());
     Supplier<BpmPlatformPlugins> platformPluginsSupplier = stopServiceBuilder.requires(ServiceNames.forBpmPlatformPlugins());
@@ -139,7 +139,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
           processArchiveName = UUID.randomUUID().toString();
         }
         ServiceName deploymentServiceName = ServiceNames.forProcessApplicationDeploymentService(deploymentUnit.getName(), processArchiveName);
-        ServiceBuilder<?> deploymentServiceBuilder = phaseContext.getRequirementServiceTarget().addService(deploymentServiceName);
+        ServiceBuilder<?> deploymentServiceBuilder = phaseContext.getServiceTarget().addService(deploymentServiceName);
 
         Consumer<ProcessApplicationDeploymentService> paDeploymentProvider = deploymentServiceBuilder.provides(deploymentServiceName);
         deploymentServiceBuilder.requires(phaseContext.getPhaseServiceName());
@@ -182,8 +182,8 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     AnnotationInstance preUndeploy = ProcessApplicationAttachments.getPreUndeployDescription(deploymentUnit);
 
     // register the managed process application start service
-    ServiceBuilder<?> processApplicationStartServiceBuilder = phaseContext.getRequirementServiceTarget().addService(paStartServiceName);
-    Consumer<ProcessApplicationStartService> paStartProvider =processApplicationStartServiceBuilder.provides(paStartServiceName);
+    ServiceBuilder<?> processApplicationStartServiceBuilder = phaseContext.getServiceTarget().addService(paStartServiceName);
+    Consumer<ProcessApplicationStartService> paStartProvider = processApplicationStartServiceBuilder.provides(paStartServiceName);
 
     processApplicationStartServiceBuilder.requires(phaseContext.getPhaseServiceName());
     Supplier<BpmPlatformPlugins> platformPluginsSupplierStartService = processApplicationStartServiceBuilder.requires(ServiceNames.forBpmPlatformPlugins());

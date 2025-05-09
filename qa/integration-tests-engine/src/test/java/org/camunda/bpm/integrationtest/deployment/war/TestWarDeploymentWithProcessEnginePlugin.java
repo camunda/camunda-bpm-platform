@@ -51,7 +51,7 @@ public class TestWarDeploymentWithProcessEnginePlugin extends AbstractFoxPlatfor
         .addAsLibraries(Maven.resolver()
             .offline()
             .loadPomFromFile("pom.xml")
-            .resolve("org.codehaus.groovy:groovy-jsr223")
+            .resolve("org.apache.groovy:groovy-jsr223")
             .withoutTransitivity()
             .as(JavaArchive.class));
   }

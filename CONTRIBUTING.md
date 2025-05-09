@@ -27,7 +27,7 @@ Found a bug in the code or have a feature that you would like to see in the futu
 Try to apply our best practices for creating issues:
 
 * Only Raise an issue if your request requires a code change in Camunda Platform 7
-  * If you want to contact the Camunda customer support, please see our [Enterprise Support Guide](https://docs.camunda.org/enterprise/support/).
+  * If you want to contact the Camunda customer support, please see our [Enterprise Support Guide](https://camunda.com/services/enterprise-support-guide/).
   * If you have an understanding question or need help building your solution, check out our [user forum](https://forum.camunda.io/).
 * Create a high-quality issue:
   * Give enough context so that a person who doesn't know your project can understand your request
@@ -111,8 +111,8 @@ An entire repository can then be built by running `mvn clean install` in the roo
 This will build all sub modules and execute unit tests.
 Furthermore, you can restrict the build to just the module you are changing by running the same command in the corresponding directory.
 Check the repository's or module's README for additional module-specific instructions.
-The `webapps` and `swagger-ui` modules requires NodeJS.
-You can exclude building them by running `mvn clean install -pl '!webapps,!webapps/assembly,!webapps/assembly-jakarta,!org.camunda.bpm.run:camunda-bpm-run-modules-swaggerui'`.
+The `webapps` module requires NodeJS.
+You can exclude building them by running `mvn clean install -pl '!webapps,!webapps/assembly,!webapps/assembly-jakarta'`.
 
 Integration tests (e.g. tests that run in an actual application server) are usually not part of the default Maven profiles. If you think they are relevant to your contribution, please ask us in the ticket, on the forum or in your pull request for how to run them. Smaller contributions usually do not need this.
 

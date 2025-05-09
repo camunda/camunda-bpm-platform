@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
+import org.camunda.bpm.client.UrlResolver;
 import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.backoff.ErrorAwareBackoffStrategy;
 import org.camunda.bpm.client.dto.ProcessDefinitionDto;
@@ -224,6 +225,53 @@ public class ClientIT {
       // when
       client = externalTaskClientBuilder
           .baseUrl(null)
+          .build();
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToBaseUrlResolverIsNull() {
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      ExternalTaskClientBuilder externalTaskClientBuilder = ExternalTaskClient.create();
+
+      // then
+      thrown.expect(ExternalTaskClientException.class);
+
+      // when
+      client = externalTaskClientBuilder
+          .urlResolver(null)
+          .build();
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToBaseUrlAndBaseUrlResolverIsNull() {
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      ExternalTaskClientBuilder externalTaskClientBuilder = ExternalTaskClient.create();
+
+      // then
+      thrown.expect(ExternalTaskClientException.class);
+
+      // when
+      client = externalTaskClientBuilder
+          .baseUrl(null)
+          .urlResolver(null)
           .build();
     }
     finally {

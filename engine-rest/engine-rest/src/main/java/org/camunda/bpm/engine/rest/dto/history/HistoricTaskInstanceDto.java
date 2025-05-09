@@ -52,6 +52,10 @@ public class HistoricTaskInstanceDto {
   private String tenantId;
   protected Date removalTime;
   protected String rootProcessInstanceId;
+  /**
+   * Returns task State of history tasks
+   */
+  protected String taskState;
 
   public String getId() {
     return id;
@@ -157,6 +161,11 @@ public class HistoricTaskInstanceDto {
     return rootProcessInstanceId;
   }
 
+  /**
+   * Returns task State of history tasks
+   */
+  public String getTaskState() { return taskState; }
+
   public static HistoricTaskInstanceDto fromHistoricTaskInstance(HistoricTaskInstance taskInstance) {
 
     HistoricTaskInstanceDto dto = new HistoricTaskInstanceDto();
@@ -187,6 +196,7 @@ public class HistoricTaskInstanceDto {
     dto.tenantId = taskInstance.getTenantId();
     dto.removalTime = taskInstance.getRemovalTime();
     dto.rootProcessInstanceId = taskInstance.getRootProcessInstanceId();
+    dto.taskState = taskInstance.getTaskState();
 
     return dto;
   }

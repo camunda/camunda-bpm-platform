@@ -13,16 +13,6 @@
 
   <profiles>
     <profile>
-      <id>cockroachdb</id>
-      <properties>
-        <database.host>localhost</database.host>
-        <database.port>26257</database.port>
-        <database.name>postgres</database.name>
-        <database.username>root</database.username>
-        <database.password></database.password>
-      </properties>
-    </profile>
-    <profile>
       <id>db2</id>
       <properties>
         <database.host>localhost</database.host>
@@ -40,16 +30,6 @@
         <database.name>process-engine</database.name>
         <database.username>sa</database.username>
         <database.password>sa</database.password>
-      </properties>
-    </profile>
-    <profile>
-      <id>mariadb</id>
-      <properties>
-        <database.host>localhost</database.host>
-        <database.port>3306</database.port>
-        <database.name>process-engine</database.name>
-        <database.username>camunda</database.username>
-        <database.password>camunda</database.password>
       </properties>
     </profile>
     <profile>

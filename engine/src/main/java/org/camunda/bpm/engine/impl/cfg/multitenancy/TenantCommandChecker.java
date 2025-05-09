@@ -30,7 +30,16 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.*;
+import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -196,6 +205,7 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
   public void checkReadProcessInstance(String processInstanceId) {
     if (getTenantManager().isTenantCheckEnabled()) {
       ExecutionEntity execution = findExecutionById(processInstanceId);
@@ -205,6 +215,7 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
   public void checkReadJob(JobEntity job) {
     if (job != null && !getTenantManager().isAuthenticatedTenant(job.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("read the job '"+ job.getId() + "'");
@@ -223,6 +234,7 @@ public class TenantCommandChecker implements CommandChecker {
     checkReadProcessInstance(execution);
   }
 
+  @Override
   public void checkDeleteProcessInstance(ExecutionEntity execution) {
     if (execution != null && !getTenantManager().isAuthenticatedTenant(execution.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("delete the process instance '"+ execution.getId() + "'");
@@ -246,6 +258,7 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
   public void checkReadTask(TaskEntity task) {
     if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("read the task '"+ task.getId() + "'");
@@ -331,12 +344,14 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
   public void checkTaskAssign(TaskEntity task) {
     if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("assign the task '"+ task.getId() + "'");
     }
   }
 
+  @Override
   public void checkCreateTask(TaskEntity task) {
     if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("create the task '"+ task.getId() + "'");
@@ -347,12 +362,14 @@ public class TenantCommandChecker implements CommandChecker {
   public void checkCreateTask() {
   }
 
+  @Override
   public void checkTaskWork(TaskEntity task) {
     if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("work on task '"+ task.getId() +"'");
     }
   }
 
+  @Override
   public void checkReadDecisionDefinition(DecisionDefinitionEntity decisionDefinition) {
     if (decisionDefinition != null && !getTenantManager().isAuthenticatedTenant(decisionDefinition.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("get the decision definition '"+ decisionDefinition.getId() + "'");
@@ -369,18 +386,21 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
   public void checkReadDecisionRequirementsDefinition(DecisionRequirementsDefinitionEntity decisionRequirementsDefinition) {
     if (decisionRequirementsDefinition != null && !getTenantManager().isAuthenticatedTenant(decisionRequirementsDefinition.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("get the decision requirements definition '"+ decisionRequirementsDefinition.getId() + "'");
     }
   }
 
+  @Override
   public void checkReadCaseDefinition(CaseDefinition caseDefinition) {
     if (caseDefinition != null && !getTenantManager().isAuthenticatedTenant(caseDefinition.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("get the case definition '"+ caseDefinition.getId() + "'");
     }
   }
 
+  @Override
   public void checkUpdateCaseDefinition(CaseDefinition caseDefinition) {
     if (caseDefinition != null && !getTenantManager().isAuthenticatedTenant(caseDefinition.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("update the case definition '" + caseDefinition.getId() + "'");
@@ -501,15 +521,7 @@ public class TenantCommandChecker implements CommandChecker {
   }
 
   @Override
-  public void checkReadTelemetryData() {
-  }
-
-  @Override
-  public void checkConfigureTelemetry() {
-  }
-
-  @Override
-  public void checkReadTelemetryCollectionStatusData() {
+  public void checkReadDiagnosticsData() {
   }
 
   @Override

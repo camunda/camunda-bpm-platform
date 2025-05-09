@@ -36,7 +36,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.telemetry.PlatformTelemetryRegistry;
+import org.camunda.bpm.engine.impl.diagnostics.PlatformDiagnosticsRegistry;
 import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -257,7 +257,7 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
     clearServiceReferences();
 
-    PlatformTelemetryRegistry.clear();
+    PlatformDiagnosticsRegistry.clear();
   }
 
   public void setCurrentTime(Date currentTime) {

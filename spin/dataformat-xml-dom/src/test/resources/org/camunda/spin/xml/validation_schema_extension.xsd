@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://camunda.org/test-example"
+           targetNamespace="http://camunda.org/test-example"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+    <xs:complexType name="order-details">
+      <xs:sequence>
+        <xs:element name="date" type="xs:dateTime" />
+        <xs:element name="id" type="xs:long" />
+        <xs:element name="product" type="xs:string" minOccurs="1" maxOccurs="5"/>
+      </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

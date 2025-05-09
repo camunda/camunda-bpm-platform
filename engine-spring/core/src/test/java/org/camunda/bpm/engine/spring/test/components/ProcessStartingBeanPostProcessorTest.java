@@ -105,7 +105,7 @@ public class ProcessStartingBeanPostProcessorTest {
 		String processInstance = processInitiatingPojo.startProcessA(id);
 		Long customerId = (Long) processEngine.getRuntimeService().getVariable(processInstance, "customerId");
 		assertEquals("the process variable should both exist and be equal to the value given, " + id, customerId, (Long) id);
-		log.info("the customerId fromt he ProcessInstance is " + customerId);
+		log.info("the customerId from the ProcessInstance is " + customerId);
 		assertNotNull("processInstanc can't be null", processInstance);
 		assertNotNull("the variable should be non-null", customerId);
 	}

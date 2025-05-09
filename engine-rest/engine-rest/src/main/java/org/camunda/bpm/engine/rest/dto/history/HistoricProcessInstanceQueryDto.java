@@ -73,6 +73,8 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
 
   private String processInstanceId;
   private Set<String> processInstanceIds;
+  private List<String> processInstanceIdNotIn;
+  private String rootProcessInstanceId;
   private String processDefinitionId;
   private String processDefinitionKey;
   private List<String> processDefinitionKeys;
@@ -85,6 +87,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private Boolean rootProcessInstances;
   private Boolean finished;
   private Boolean unfinished;
+  private Boolean withJobsRetrying;
   private Boolean withIncidents;
   private Boolean withRootIncidents;
   private String incidentType;
@@ -109,11 +112,13 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private Boolean withoutTenantId;
   private List<String> executedActivityIdIn;
   private List<String> activeActivityIdIn;
+  private List<String> activityIdIn;
   private Boolean active;
   private Boolean suspended;
   private Boolean completed;
   private Boolean externallyTerminated;
   private Boolean internallyTerminated;
+  private List<String> incidentIds;
 
   private List<VariableQueryParameterDto> variables;
 
@@ -141,6 +146,20 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   @CamundaQueryParam(value = "processInstanceIds", converter = StringSetConverter.class)
   public void setProcessInstanceIds(Set<String> processInstanceIds) {
     this.processInstanceIds = processInstanceIds;
+  }
+
+  @CamundaQueryParam(value = "processInstanceIdNotIn", converter = StringListConverter.class)
+  public void setProcessInstanceIdNotIn(List<String> processInstanceIdNotIn) {
+    this.processInstanceIdNotIn = processInstanceIdNotIn;
+  }
+
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  @CamundaQueryParam("rootProcessInstanceId")
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
   public String getProcessDefinitionId() {
@@ -205,6 +224,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   @CamundaQueryParam(value = "unfinished", converter = BooleanConverter.class)
   public void setUnfinished(Boolean unfinished) {
     this.unfinished = unfinished;
+  }
+
+  @CamundaQueryParam(value = "withJobsRetrying", converter = BooleanConverter.class)
+  public void setWithJobsRetrying(Boolean withJobsRetrying) {
+    this.withJobsRetrying = withJobsRetrying;
   }
 
   @CamundaQueryParam(value = "withIncidents", converter = BooleanConverter.class)
@@ -306,6 +330,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     this.incidentType = incidentType;
   }
 
+  @CamundaQueryParam(value = "incidentIdIn", converter = StringListConverter.class)
+  public void setIncidentIdIn(List<String> incidentIds) {
+    this.incidentIds = incidentIds;
+  }
+
   @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
   public void setTenantIdIn(List<String> tenantIds) {
     this.tenantIds = tenantIds;
@@ -334,6 +363,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   @CamundaQueryParam(value = "activeActivityIdIn", converter = StringListConverter.class)
   public void setActiveActivityIdIn(List<String> activeActivityIdIn) {
     this.activeActivityIdIn = activeActivityIdIn;
+  }
+
+  @CamundaQueryParam(value = "activityIdIn", converter = StringListConverter.class)
+  public void setActivityIdIn(List<String> activityIdIn) {
+    this.activityIdIn = activityIdIn;
   }
 
   @CamundaQueryParam(value = "executedJobAfter", converter = DateConverter.class)
@@ -401,6 +435,12 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     if (processInstanceIds != null) {
       query.processInstanceIds(processInstanceIds);
     }
+    if (processInstanceIdNotIn != null && !processInstanceIdNotIn.isEmpty()) {
+      query.processInstanceIdNotIn(processInstanceIdNotIn.toArray(new String[0]));
+    }
+    if (rootProcessInstanceId != null) {
+      query.rootProcessInstanceId(rootProcessInstanceId);
+    }
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);
     }
@@ -437,11 +477,17 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     if (unfinished != null && unfinished) {
       query.unfinished();
     }
+    if (withJobsRetrying != null && withJobsRetrying) {
+      query.withJobsRetrying();
+    }
     if (withIncidents != null && withIncidents) {
       query.withIncidents();
     }
     if (withRootIncidents != null && withRootIncidents) {
       query.withRootIncidents();
+    }
+    if (incidentIds != null && !incidentIds.isEmpty()) {
+      query.incidentIdIn(incidentIds.toArray(new String[0]));
     }
     if (incidentStatus != null) {
       query.incidentStatus(incidentStatus);
@@ -537,6 +583,10 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
 
     if (activeActivityIdIn != null && !activeActivityIdIn.isEmpty()) {
       query.activeActivityIdIn(activeActivityIdIn.toArray(new String[0]));
+    }
+
+    if(activityIdIn!= null && !activityIdIn.isEmpty()) {
+      query.activityIdIn(activityIdIn.toArray(new String[0]));
     }
 
     if (executedJobAfter != null) {

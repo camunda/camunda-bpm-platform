@@ -112,7 +112,7 @@
     />
     
     <@lib.property
-        name = "ouputs"
+        name = "outputs"
         type = "array"
         dto = "HistoricDecisionOutputInstanceDto"
         desc = "The list of decision output values. **Only exists** if `includeOutputs`

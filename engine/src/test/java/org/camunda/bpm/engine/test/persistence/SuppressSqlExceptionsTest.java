@@ -175,7 +175,6 @@ public class SuppressSqlExceptionsTest {
   }
 
   @RequiredHistoryLevel(ProcessEngineConfigurationImpl.HISTORY_ACTIVITY)
-  @RequiredDatabase(excludes = DbSqlSessionFactory.MARIADB)
   @Test
   public void shouldThrowExceptionOnInsert_ColumnSizeExceeded() {
     // given
@@ -320,7 +319,6 @@ public class SuppressSqlExceptionsTest {
 
 
   @Test
-  @RequiredDatabase(excludes = DbSqlSessionFactory.MARIADB)
   public void shouldThrowExceptionOnUpdate() {
     // given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process")
@@ -417,12 +415,12 @@ public class SuppressSqlExceptionsTest {
 
   /**
    * This test expects an exception when performing a pessimistic lock
-   * in this scenario. Since pessimistic locks are disabled on H2 and CRDB,
+   * in this scenario. Since pessimistic locks are disabled on H2,
    * this test will fail, and it needs to be excluded from the test suite
-   * for these two databases.
+   * for this database.
    */
   @Test
-  @RequiredDatabase(excludes = { DbSqlSessionFactory.H2, DbSqlSessionFactory.CRDB })
+  @RequiredDatabase(excludes = DbSqlSessionFactory.H2)
   public void shouldThrowExceptionOnLock() {
     // given
     failForSqlStatement("lockDeploymentLockProperty");

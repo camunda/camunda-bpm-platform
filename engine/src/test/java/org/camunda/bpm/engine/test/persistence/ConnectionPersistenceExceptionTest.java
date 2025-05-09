@@ -38,7 +38,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-@RequiredDatabase(excludes = { DbSqlSessionFactory.H2 })
+// This test is excluded on Oracle since the SQL State changed with the new version of the JDBC driver.
+@RequiredDatabase(excludes = { DbSqlSessionFactory.H2, DbSqlSessionFactory.ORACLE })
 public class ConnectionPersistenceExceptionTest {
 
   @Rule

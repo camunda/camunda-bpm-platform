@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-const scope = 'xlts.dev';
+const scope = 'neverendingsupport';
 
 const {execSync} = require('child_process');
 
@@ -33,36 +33,59 @@ const exec = (cmd, successMsg) => {
   }).toString();
 };
 
+const lastOpenSourceVersions = {
+  'angular-translate': '2.19.1',
+  'angular-moment': '1.3.0',
+  'angular-ui-bootstrap': '2.5.6'
+};
+
+const getVersionPostFix = angularPackage =>
+  angularPackage === 'angular' ? '' : '-' + angularPackage.split('-')[1];
+
+const getDependencyVersion = (nameSpace, npmPackage, xltsVersion) => {
+  switch (nameSpace) {
+    case 'angularjs-essentials':
+      return `${npmPackage}@npm:@${scope}/${nameSpace}@${lastOpenSourceVersions[npmPackage]}-${npmPackage}-${xltsVersion}`;
+    case 'angular':
+      return `${npmPackage}@npm:@${scope}/angularjs@${xltsVersion}${getVersionPostFix(
+        npmPackage
+      )}`;
+    default:
+      return `${npmPackage}@npm:@${scope}/${npmPackage}@${xltsVersion}`;
+  }
+};
+
 const registryConfigured = exec(`npm get @${scope}:registry`) !== 'undefined\n';
 
-const {XLTS_REGISTRY, XLTS_AUTH_TOKEN} = process.env;
+const {HERODEVS_REGISTRY, HERODEVS_AUTH_TOKEN} = process.env;
 
-if (!registryConfigured && XLTS_REGISTRY && XLTS_AUTH_TOKEN) {
+if (!registryConfigured && HERODEVS_REGISTRY && HERODEVS_AUTH_TOKEN) {
   exec(
-    `npm set @${scope}:registry https://${XLTS_REGISTRY}/`,
-    'XLTS.dev registry configured.'
+    `npm set @${scope}:registry https://${HERODEVS_REGISTRY}/`,
+    'XLTS registry configured.'
   );
 
   exec(
-    `npm set //${XLTS_REGISTRY}/:_authToken ${XLTS_AUTH_TOKEN}`,
-    'XLTS.dev auth token configured.'
+    `npm set //${HERODEVS_REGISTRY}/:_authToken ${HERODEVS_AUTH_TOKEN}`,
+    'XLTS auth token configured.'
   );
 }
 
 if (
-  (registryConfigured || (XLTS_REGISTRY && XLTS_AUTH_TOKEN)) &&
+  (registryConfigured || (HERODEVS_REGISTRY && HERODEVS_AUTH_TOKEN)) &&
   process.argv[2] === 'install'
 ) {
-  const {xltsVersion, dependencies} = require('../package.json').xlts;
+  const xlts = require('../package.json').xlts;
 
-  const getNpmPackages = dependencies =>
-    dependencies
-      .map(
-        npmPackage => `${npmPackage}@npm:@${scope}/${npmPackage}@${xltsVersion}`
+  const npmPackages = Object.entries(xlts)
+    .flatMap(([nameSpace, settings]) =>
+      Object.entries(settings).map(([npmPackage, version]) =>
+        getDependencyVersion(nameSpace, npmPackage, version)
       )
-      .join(' ');
+    )
+    .join(' ');
 
-  exec(`npm i --save-exact ${getNpmPackages(dependencies)}`);
+  exec(`npm i --save-exact ${npmPackages}`);
 } else {
   console.log('XLTS installation skipped.'); // eslint-disable-line
 }

@@ -34,7 +34,7 @@
 
     <dependencySet>
         <includes>
-            <include>org.camunda.bpm:camunda-engine-rest:war:*</include>
+            <include>org.camunda.bpm:camunda-engine-rest-jakarta:war:*</include>
         </includes>
         <outputDirectory>server/apache-tomcat-${version.tomcat}/webapps/engine-rest</outputDirectory>
         <unpack>true</unpack>
@@ -42,7 +42,7 @@
 
     <dependencySet>
         <includes>
-            <include>org.camunda.bpm.webapp:camunda-webapp-tomcat:war:*</include>
+            <include>org.camunda.bpm.webapp:camunda-webapp-tomcat-jakarta:war:*</include>
         </includes>
         <outputDirectory>server/apache-tomcat-${version.tomcat}/webapps/camunda</outputDirectory>
         <unpack>true</unpack>
@@ -50,7 +50,7 @@
 
     <dependencySet>
         <includes>
-            <include>org.camunda.bpm.example:camunda-example-invoice:war:*</include>
+            <include>org.camunda.bpm.example:camunda-example-invoice-jakarta:war:*</include>
         </includes>
         <outputDirectory>server/apache-tomcat-${version.tomcat}/webapps/camunda-invoice</outputDirectory>
         <unpack>true</unpack>

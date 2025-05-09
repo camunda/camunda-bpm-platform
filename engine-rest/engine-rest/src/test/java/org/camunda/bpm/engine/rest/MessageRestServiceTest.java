@@ -263,6 +263,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     //process instance should be filled and execution should be null
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, from(content).get("[" + idx + "].processInstance.id"));
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, from(content).get("[" + idx + "].processInstance.definitionId"));
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, from(content).get("[" + idx + "].processInstance.definitionKey"));
     Assert.assertNull(from(content).get("[" + idx + "].execution"));
   }
 
@@ -1261,6 +1262,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     String content = response.asString();
     assertTrue(!content.isEmpty());
     checkVariablesInResult(content, 0);
+    checkExecutionResult(content, 0);
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
     verify(messageCorrelationBuilderMock).correlateWithResultAndVariables(false);

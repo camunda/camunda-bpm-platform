@@ -42,11 +42,14 @@
         <include>org.mybatis:mybatis:jar:*</include>
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>
-        <include>org.codehaus.groovy:groovy:jar:*</include>
-        <include>org.codehaus.groovy:groovy-jsr223:jar:*</include>
-        <include>org.codehaus.groovy:groovy-json:jar:*</include>
-        <include>org.codehaus.groovy:groovy-xml:jar:*</include>
-        <include>org.codehaus.groovy:groovy-templates:jar:*</include>
+        <include>org.apache.groovy:groovy:jar:*</include>
+        <include>org.apache.groovy:groovy-jsr223:jar:*</include>
+        <include>org.apache.groovy:groovy-json:jar:*</include>
+        <include>org.apache.groovy:groovy-xml:jar:*</include>
+        <include>org.apache.groovy:groovy-templates:jar:*</include>
+        <include>org.apache.groovy:groovy-dateutil:jar:*</include>
+        <include>org.apache.groovy:groovy-datetime:jar:*</include>
+
         <include>org.graalvm.js:*</include>
         <include>org.graalvm.regex:regex:jar:*</include>
         <include>org.graalvm.truffle:truffle-api:jar:*</include>
@@ -56,7 +59,8 @@
         <include>org.slf4j:slf4j-jdk14:jar:*</include>
 
         <include>org.camunda.bpm:camunda-engine-plugin-*:jar</include>
-        <include>org.camunda.spin:*:jar</include>
+        <include>org.camunda.spin:camunda-spin-core*:jar</include>
+        <include>org.camunda.spin:camunda-spin-dataformat-all*:jar</include>
         <include>org.camunda.connect:*:jar</include>
         <include>org.camunda.commons:*:jar</include>
 
@@ -83,11 +87,13 @@
         <include>org.mybatis:mybatis:jar:*</include>
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>
-        <include>org.codehaus.groovy:groovy:jar:*</include>
-        <include>org.codehaus.groovy:groovy-jsr223:jar:*</include>
-        <include>org.codehaus.groovy:groovy-json:jar:*</include>
-        <include>org.codehaus.groovy:groovy-xml:jar:*</include>
-        <include>org.codehaus.groovy:groovy-templates:jar:*</include>
+        <include>org.apache.groovy:groovy:jar:*</include>
+        <include>org.apache.groovy:groovy-jsr223:jar:*</include>
+        <include>org.apache.groovy:groovy-json:jar:*</include>
+        <include>org.apache.groovy:groovy-xml:jar:*</include>
+        <include>org.apache.groovy:groovy-templates:jar:*</include>
+        <include>org.apache.groovy:groovy-dateutil:jar:*</include>
+        <include>org.apache.groovy:groovy-datetime:jar:*</include>
         <include>org.graalvm.js:*</include>
         <include>org.graalvm.regex:regex:jar:*</include>
         <include>org.graalvm.truffle:truffle-api:jar:*</include>
@@ -97,13 +103,15 @@
         <include>org.slf4j:slf4j-jdk14:jar:*</include>
 
         <include>org.camunda.bpm:camunda-engine-plugin-*:jar</include>
-        <include>org.camunda.spin:*:jar</include>
+        <include>org.camunda.spin:camunda-spin-core*:jar</include>
+        <include>org.camunda.spin:camunda-spin-dataformat-all*:jar</include>
         <include>org.camunda.connect:*:jar</include>
         <include>org.camunda.commons:*:jar</include>
 
         <include>org.camunda.bpm.model:*:jar</include>
 
         <include>org.camunda.bpm.dmn:*:jar</include>
+        <include>org.camunda.bpm.juel:*:jar</include>
 
         <include>org.camunda.feel:*:jar</include>
 

@@ -90,6 +90,16 @@
         type = "string"
         format = "date-time"
         desc = "The date on which this job has been created."
+    />
+
+    <@lib.property
+        name = "batchId"
+        type = "string"
+        desc = "The ID of the batch associated with this job. `null` if no batch is associated with this job. The
+        following jobs are associated with batches:
+        * Seed Jobs
+        * Monitor Jobs
+        * Batch Execution Jobs"
         last = true
     />
 

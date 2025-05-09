@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns="urn:maven:assembly:1.1.2">
+
+  <id>tomcat</id>
+
+  <formats>
+    <format>war</format>
+  </formats>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <dependencySets>
+
+    <!-- Copy the engine-rest-core-jakarta along with its transitive dependencies (compile)  -->
+    <dependencySet>
+      <outputDirectory>WEB-INF/lib</outputDirectory>
+      <useTransitiveDependencies>true</useTransitiveDependencies>
+      <useTransitiveFiltering>true</useTransitiveFiltering>
+      <includes>
+        <include>org.camunda.bpm:camunda-engine-rest-core-jakarta:jar</include>
+      </includes>
+    </dependencySet>
+
+    <!-- Copy the provided dependencies -->
+    <dependencySet>
+      <outputDirectory>WEB-INF/lib</outputDirectory>
+      <useTransitiveDependencies>true</useTransitiveDependencies>
+      <useTransitiveFiltering>true</useTransitiveFiltering>
+      <scope>provided</scope>
+      <includes>
+
+        <!-- Jakarta APIs -->
+        <include>jakarta.servlet:jakarta.servlet-api:jar</include>
+        <include>jakarta.activation:jakarta.activation-api:jar</include>
+        <include>jakarta.ws.rs:jakarta.ws.rs-api:jar</include>
+        <include>jakarta.xml.bind:jakarta.xml.bind-api:jar</include>
+
+        <!-- Resteasy -->
+        <include>org.jboss.resteasy:resteasy-core</include>
+
+      </includes>
+      <excludes>
+        <exclude>org.camunda.bpm:camunda-engine-rest-core-jakarta:jar:tests</exclude>
+        <exclude>org.camunda.bpm:camunda-engine-rest-core-jakarta:jar:sources</exclude>
+      </excludes>
+
+    </dependencySet>
+
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>org.camunda.bpm:camunda-engine-rest-jakarta:war:*</include>
+      </includes>
+      <unpack>true</unpack>
+      <unpackOptions>
+        <excludes>
+          <exclude>**/web.xml</exclude>
+        </excludes>
+      </unpackOptions>
+    </dependencySet>
+  </dependencySets>
+
+  <!-- Adds the web.xml that triggers the rest listeners for tomcat -->
+  <fileSets>
+    <fileSet>
+      <directory>src/main/runtime/tomcat/webapp</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+  </fileSets>
+
+</assembly>

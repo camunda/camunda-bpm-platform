@@ -53,7 +53,7 @@ public class CdiRetryConfigurationTest extends AbstractFoxPlatformIntegrationTes
             .addClass(DependentScopedBean.class)
             .addAsLibraries(DeploymentHelper.getEngineCdi());
 
-    TestContainer.addContainerSpecificResourcesForNonPa(deployment);
+    TestContainer.addContainerSpecificResourcesForNonPaEmbedCdiLib(deployment);
 
     return deployment;
   }

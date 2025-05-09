@@ -4,8 +4,9 @@
   <@lib.endpointInfo
       id = "getTelemetryData"
       tag = "Telemetry"
+      deprecated = true
       summary = "Fetch Telemetry Data"
-      desc = "Fetches Telemetry Data." />
+      desc = "Deprecated: Always returns false. The sending telemetry feature is removed. Please remove the endpoint usages as they are no longer needed." />
 
   "parameters" : [],
 

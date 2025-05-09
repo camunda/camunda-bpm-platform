@@ -41,9 +41,6 @@ insert into ACT_GE_PROPERTY
 values ('startup.lock', '0', 1);
 
 insert into ACT_GE_PROPERTY
-values ('telemetry.lock', '0', 1);
-
-insert into ACT_GE_PROPERTY
 values ('installationId.lock', '0', 1);
 
 create table ACT_GE_BYTEARRAY (
@@ -69,7 +66,7 @@ create table ACT_GE_SCHEMA_LOG (
 );
 
 insert into ACT_GE_SCHEMA_LOG
-values ('0', CURRENT_TIMESTAMP, '7.22.0');
+values ('0', CURRENT_TIMESTAMP, '7.24.0');
 
 create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64),
@@ -101,6 +98,7 @@ create table ACT_RU_EXECUTION (
     CACHED_ENT_STATE_ integer,
     SEQUENCE_COUNTER_ bigint,
     TENANT_ID_ varchar(64),
+    PROC_DEF_KEY_ varchar(255),
     primary key (ID_)
 );
 
@@ -133,6 +131,7 @@ create table ACT_RU_JOB (
     TENANT_ID_ varchar(64),
     CREATE_TIME_ timestamp,
     LAST_FAILURE_LOG_ID_ varchar(64),
+    BATCH_ID_ varchar(64),
     primary key (ID_)
 );
 
@@ -204,6 +203,7 @@ create table ACT_RU_TASK (
     FOLLOW_UP_DATE_ timestamp,
     SUSPENSION_STATE_ integer,
     TENANT_ID_ varchar(64),
+    TASK_STATE_ varchar(64),
     primary key (ID_)
 );
 

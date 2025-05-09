@@ -310,7 +310,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
     LOG.databaseFlushSummary(operationsToFlush);
 
     // If we want to delete all table data as bulk operation, on tables which have self references,
-    // We need to turn the foreign key check off on MySQL and MariaDB.
+    // We need to turn the foreign key check off on MySQL.
     // On other databases we have to do nothing, the mapped statement will be empty.
     if (isIgnoreForeignKeysForNextFlush) {
       persistenceSession.executeNonEmptyUpdateStmt(TOGGLE_FOREIGN_KEY_STMT, false);
@@ -353,8 +353,6 @@ public class DbEntityManager implements Session, EntityLoadListener {
           // this method throws an exception in case the flush cannot be continued;
           // accordingly, this method will be left as well in this case
           handleConcurrentModification(failedOperation);
-        } else if (failureState == State.FAILED_CONCURRENT_MODIFICATION_CRDB) {
-          handleConcurrentModificationCrdb(failedOperation);
         } else if (failureState == State.FAILED_CONCURRENT_MODIFICATION_EXCEPTION) {
           handleConcurrentModificationWithRolledBackTransaction(failedOperation);
         } else if (failureState == State.FAILED_ERROR) {
@@ -411,18 +409,6 @@ public class DbEntityManager implements Session, EntityLoadListener {
       default:
         throw LOG.concurrentUpdateDbEntityException(dbOperation);
     }
-  }
-
-  protected void handleConcurrentModificationCrdb(DbOperation dbOperation) {
-    OptimisticLockingResult handlingResult = invokeOptimisticLockingListeners(dbOperation);
-
-    if (OptimisticLockingResult.IGNORE.equals(handlingResult)) {
-      LOG.crdbFailureIgnored(dbOperation);
-    }
-
-    // CRDB concurrent modification exceptions always lead to the transaction
-    // being aborted, so we must always throw an exception.
-    throw LOG.crdbTransactionRetryException(dbOperation);
   }
 
   protected void handleConcurrentModificationWithRolledBackTransaction(DbOperation dbOperation) {

@@ -114,6 +114,8 @@ public abstract class JobEntity extends AcquirableJobEntity
 
   protected Map<String, Class> persistedDependentEntities;
 
+  protected String batchId;
+
   public void execute(CommandContext commandContext) {
     if (executionId != null) {
       ExecutionEntity execution = getExecution();
@@ -705,6 +707,14 @@ public abstract class JobEntity extends AcquirableJobEntity
     this.failedActivityId = failedActivityId;
   }
 
+  public String getBatchId() {
+    return batchId;
+  }
+
+  public void setBatchId(String batchId) {
+    this.batchId = batchId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -726,6 +736,7 @@ public abstract class JobEntity extends AcquirableJobEntity
            + ", deploymentId=" + deploymentId
            + ", priority=" + priority
            + ", tenantId=" + tenantId
+           + ", batchId=" + batchId
            + "]";
   }
 

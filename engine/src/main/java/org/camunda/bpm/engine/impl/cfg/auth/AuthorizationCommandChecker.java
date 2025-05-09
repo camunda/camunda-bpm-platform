@@ -16,6 +16,36 @@
  */
 package org.camunda.bpm.engine.impl.cfg.auth;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_TASK;
+import static org.camunda.bpm.engine.authorization.Permissions.TASK_ASSIGN;
+import static org.camunda.bpm.engine.authorization.Permissions.TASK_WORK;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
+import static org.camunda.bpm.engine.authorization.Resources.BATCH;
+import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.DECISION_REQUIREMENTS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Resources.TASK;
+
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
+import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.SystemPermissions;
+import org.camunda.bpm.engine.authorization.TaskPermissions;
+import org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -29,23 +59,19 @@ import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.*;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
-
-import static org.camunda.bpm.engine.authorization.Authorization.ANY;
-import static org.camunda.bpm.engine.authorization.Permissions.*;
-import static org.camunda.bpm.engine.authorization.Resources.*;
-
-import org.camunda.bpm.engine.authorization.Permission;
-import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
-import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
-import org.camunda.bpm.engine.authorization.Resources;
-import org.camunda.bpm.engine.authorization.SystemPermissions;
-import org.camunda.bpm.engine.authorization.TaskPermissions;
-import org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions;
 
 /**
  * {@link CommandChecker} that uses the {@link AuthorizationManager} to perform
@@ -202,6 +228,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     getAuthorizationManager().checkAuthorization(suspensionStatePermission);
   }
 
+  @Override
   public void checkReadProcessInstance(String processInstanceId) {
     ExecutionEntity execution = findExecutionById(processInstanceId);
     if (execution != null) {
@@ -209,6 +236,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
   public void checkDeleteProcessInstance(ExecutionEntity execution) {
     ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
 
@@ -281,6 +309,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     getAuthorizationManager().checkAuthorization(suspensionStatePermission);
   }
 
+  @Override
   public void checkUpdateJob(JobEntity job) {
     if (job.getProcessDefinitionKey() == null) {
       // "standalone" job: nothing to do!
@@ -324,6 +353,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
   public void checkMigrateProcessInstance(ExecutionEntity processInstance, ProcessDefinition targetProcessDefinition) {
   }
 
+  @Override
   public void checkReadProcessInstance(ExecutionEntity execution) {
     ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
 
@@ -358,6 +388,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
   public void checkReadJob(JobEntity job) {
     if (job.getProcessDefinitionKey() == null) {
       // "standalone" job: nothing to do!
@@ -438,6 +469,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
   public void checkUpdateTaskVariable(TaskEntity task) {
     String taskId = task.getId();
 
@@ -512,14 +544,17 @@ public class AuthorizationCommandChecker implements CommandChecker {
     getAuthorizationManager().checkAuthorization(DELETE_HISTORY, BATCH, batch.getId());
   }
 
+  @Override
   public void checkSuspendBatch(BatchEntity batch) {
     getAuthorizationManager().checkAuthorization(UPDATE, BATCH, batch.getId());
   }
 
+  @Override
   public void checkActivateBatch(BatchEntity batch) {
     getAuthorizationManager().checkAuthorization(UPDATE, BATCH, batch.getId());
   }
 
+  @Override
   public void checkReadHistoricBatch() {
     getAuthorizationManager().checkAuthorization(READ_HISTORY, BATCH);
   }
@@ -528,22 +563,26 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   // create permission ////////////////////////////////////////////////
 
+  @Override
   public void checkCreateDeployment() {
     getAuthorizationManager().checkAuthorization(CREATE, DEPLOYMENT);
   }
 
   // read permission //////////////////////////////////////////////////
 
+  @Override
   public void checkReadDeployment(String deploymentId) {
     getAuthorizationManager().checkAuthorization(READ, DEPLOYMENT, deploymentId);
   }
 
   // delete permission //////////////////////////////////////////////////
 
+  @Override
   public void checkDeleteDeployment(String deploymentId) {
     getAuthorizationManager().checkAuthorization(DELETE, DEPLOYMENT, deploymentId);
   }
 
+  @Override
   public void checkReadDecisionDefinition(DecisionDefinitionEntity decisionDefinition) {
     getAuthorizationManager().checkAuthorization(READ, DECISION_DEFINITION, decisionDefinition.getKey());
   }
@@ -552,6 +591,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     getAuthorizationManager().checkAuthorization(UPDATE, DECISION_DEFINITION, decisionDefinition.getKey());
   }
 
+  @Override
   public void checkReadDecisionRequirementsDefinition(DecisionRequirementsDefinitionEntity decisionRequirementsDefinition) {
     getAuthorizationManager().checkAuthorization(READ, DECISION_REQUIREMENTS_DEFINITION, decisionRequirementsDefinition.getKey());
   }
@@ -566,6 +606,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   // delete permission ////////////////////////////////////////
 
+  @Override
   public void checkDeleteHistoricTaskInstance(HistoricTaskInstanceEntity task) {
     // deleting unexisting historic task instance should be silently ignored
     // see javaDoc HistoryService.deleteHistoricTaskInstance
@@ -578,33 +619,40 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   // delete permission /////////////////////////////////////////////////
 
+  @Override
   public void checkDeleteHistoricProcessInstance(HistoricProcessInstance instance) {
     getAuthorizationManager().checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, instance.getProcessDefinitionKey());
   }
 
+  @Override
   public void checkDeleteHistoricCaseInstance(HistoricCaseInstance instance) {
   }
 
+  @Override
   public void checkDeleteHistoricDecisionInstance(String decisionDefinitionKey) {
     getAuthorizationManager().checkAuthorization(DELETE_HISTORY, DECISION_DEFINITION, decisionDefinitionKey);
   }
 
+  @Override
   public void checkDeleteHistoricDecisionInstance(HistoricDecisionInstance decisionInstance) {
     getAuthorizationManager().checkAuthorization(
         DELETE_HISTORY, DECISION_DEFINITION, decisionInstance.getDecisionDefinitionKey()
     );
   }
 
+  @Override
   public void checkReadHistoricJobLog(HistoricJobLogEventEntity historicJobLog) {
     if (historicJobLog.getProcessDefinitionKey() != null) {
       getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, historicJobLog.getProcessDefinitionKey());
     }
   }
 
+  @Override
   public void checkReadHistoryAnyProcessDefinition() {
     getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, ANY);
   }
 
+  @Override
   public void checkReadHistoryProcessDefinition(String processDefinitionKey) {
     getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, processDefinitionKey);
   }
@@ -617,6 +665,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
   public void checkReadCaseInstance(CaseExecution caseExecution) {
   }
 
+  @Override
   public void checkTaskAssign(TaskEntity task) {
 
     String taskId = task.getId();
@@ -664,10 +713,12 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   // create permission /////////////////////////////////////////////
 
+  @Override
   public void checkCreateTask(TaskEntity entity) {
     getAuthorizationManager().checkAuthorization(CREATE, TASK);
   }
 
+  @Override
   public void checkCreateTask() {
     getAuthorizationManager().checkAuthorization(CREATE, TASK);
   }
@@ -718,6 +769,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
   public void checkDeleteTask(TaskEntity task) {
     String taskId = task.getId();
 
@@ -818,17 +870,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   @Override
-  public void checkReadTelemetryData() {
-    getAuthorizationManager().checkAuthorization(SystemPermissions.READ, Resources.SYSTEM);
-  }
-
-  @Override
-  public void checkConfigureTelemetry() {
-    getAuthorizationManager().checkAuthorization(SystemPermissions.SET, Resources.SYSTEM);
-  }
-
-  @Override
-  public void checkReadTelemetryCollectionStatusData() {
+  public void checkReadDiagnosticsData() {
     getAuthorizationManager().checkAuthorization(SystemPermissions.READ, Resources.SYSTEM);
   }
 

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.22.0-SNAPSHOT</version>
+    <version>7.24.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -81,18 +81,6 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.github.tomakehurst</groupId>
-      <artifactId>wiremock-jre8-standalone</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- required for wiremock-jre8-standalone - see CAM-14755 -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-jdk14</artifactId>
     </dependency>
 
     <dependency>
@@ -245,7 +233,7 @@
 
     <!-- required for TestWarDeploymentWithProcessEnginePlugin -->
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-jsr223</artifactId>
       <scope>test</scope>
     </dependency>
@@ -369,6 +357,7 @@
                 <exclude>**/TestWarDeploymentWithProcessEnginePlugin.exclude</exclude>
 
                 <exclude>**/SpringServletPATimerStartEventExpressionTest.java</exclude>
+                <exclude>**/FeelEngineTest.java</exclude>
               </excludes>
               <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
@@ -485,6 +474,7 @@
                 <exludes>**/TestWarDeploymentWithProcessEnginePlugin.java</exludes>
 
                 <exclude>**/SpringServletPATimerStartEventExpressionTest.java</exclude>
+                <exclude>**/FeelEngineTest.java</exclude>
               </excludes>
               <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
@@ -494,7 +484,7 @@
     </profile>
 
     <profile>
-      <id>tomcat</id>
+      <id>tomcat9</id>
       <dependencyManagement>
         <dependencies>
           <!-- import internal dependencies before JBoss to preserve internal versions, e.g. for JUnit -->
@@ -518,7 +508,7 @@
         <dependency>
           <!-- make sure this comes after runtime in the reactor build -->
           <groupId>org.camunda.bpm.qa</groupId>
-          <artifactId>camunda-qa-tomcat-runtime</artifactId>
+          <artifactId>camunda-qa-tomcat9-runtime</artifactId>
           <version>${project.version}</version>
           <scope>provided</scope>
           <type>pom</type>
@@ -551,7 +541,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-tomcat</source>
+                    <source>src/test/java-tomcat9</source>
                   </sources>
                 </configuration>
               </execution>

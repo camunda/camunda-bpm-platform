@@ -6,7 +6,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-parent</artifactId>
     <relativePath>../parent</relativePath>
-    <version>7.22.0-SNAPSHOT</version>
+    <version>7.24.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-core-internal-dependencies</artifactId>
@@ -62,7 +62,7 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.8.0</version>
+        <version>2.17.0</version>
       </dependency>
       <dependency>
         <groupId>commons-fileupload</groupId>
@@ -137,11 +137,6 @@
         <version>1.1.1</version>
       </dependency>
       <dependency>
-        <groupId>org.opensaml</groupId>
-        <artifactId>opensaml</artifactId>
-        <version>1.1</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.openjpa</groupId>
         <artifactId>openjpa</artifactId>
         <version>${version.openjpa}</version>
@@ -149,7 +144,7 @@
 
       <!-- groovy script engine dependencies -->
       <dependency>
-        <groupId>org.codehaus.groovy</groupId>
+        <groupId>org.apache.groovy</groupId>
         <artifactId>groovy-bom</artifactId>
         <version>${version.groovy}</version>
         <scope>import</scope>
@@ -165,11 +160,6 @@
         <groupId>org.graalvm.js</groupId>
         <artifactId>js-scriptengine</artifactId>
         <version>${version.graal.js}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.json</groupId>
-        <artifactId>json</artifactId>
-        <version>20070829</version>
       </dependency>
       <dependency>
         <groupId>org.hamcrest</groupId>
@@ -359,13 +349,6 @@
       </dependency>
 
       <dependency>
-        <groupId>com.github.tomakehurst</groupId>
-        <artifactId>wiremock-jre8-standalone</artifactId>
-        <version>${version.wiremock-jre8}</version>
-        <scope>test</scope>
-      </dependency>
-
-      <dependency>
         <groupId>org.skyscreamer</groupId>
         <artifactId>jsonassert</artifactId>
         <version>1.5.0</version>
@@ -384,22 +367,12 @@
       </dependency>
       <dependency>
         <groupId>org.testcontainers</groupId>
-        <artifactId>mariadb</artifactId>
-        <version>${version.testcontainers}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.testcontainers</groupId>
         <artifactId>postgresql</artifactId>
         <version>${version.testcontainers}</version>
       </dependency>
       <dependency>
         <groupId>org.testcontainers</groupId>
         <artifactId>mssqlserver</artifactId>
-        <version>${version.testcontainers}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.testcontainers</groupId>
-        <artifactId>cockroachdb</artifactId>
         <version>${version.testcontainers}</version>
       </dependency>
     </dependencies>
