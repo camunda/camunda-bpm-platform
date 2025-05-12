@@ -95,6 +95,9 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
    */
   HistoricVariableInstanceQuery orderByTenantId();
 
+  /**
+   * Order by id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   HistoricVariableInstanceQuery orderByVariableId();
 
   /**

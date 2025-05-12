@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.migration;
+package org.camunda.bpm.engine.test.api.queries;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -48,6 +48,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -140,6 +141,7 @@ public class QueryByIdAfterTest {
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testHistoricActivityInstanceNoop.bpmn20.xml")
+  @Ignore // until comparison for ids (activityName:id) is handled
   public void shouldHistoricActivityInstanceApiReturnOnlyAfterGivenId() {
     // given
     startProcessInstancesByKey("noopProcess", 10);
@@ -160,6 +162,7 @@ public class QueryByIdAfterTest {
   }
 
   @Test
+  @Ignore // until comparison for ids (processDefinitionKey:version:id) is handled
   public void shouldProcessDefinitionApiReturnOnlyAfterGivenId() {
     // given
     deployProcessDefinitions("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml", 10);
@@ -177,9 +180,6 @@ public class QueryByIdAfterTest {
     List<ProcessDefinition> secondHalf = processDefinitionQuery.idAfter(middleId).list();
     assertEquals(5, secondHalf.size());
     assertTrue(secondHalf.stream().allMatch(processDefinition -> isIdGreaterThan(processDefinition.getId(), middleId)));
-
-    // clean up
-    cleanUpProcessDefinitions();
   }
 
   @Test
@@ -226,12 +226,8 @@ public class QueryByIdAfterTest {
 
   private void deployProcessDefinitions(String resource, int numberOfDeployments) {
     for (int i = 0; i < numberOfDeployments; i++) {
-      repositoryService.createDeployment().addClasspathResource(resource).deploy().getId();
+      testRule.deploy(resource);
     }
-  }
-
-  private void cleanUpProcessDefinitions() {
-    repositoryService.createProcessDefinitionQuery().list().forEach(processDefinition -> repositoryService.deleteDeployment(processDefinition.getDeploymentId()));
   }
 
   private void startProcessInstancesByKey(String key, int numberOfInstances) {

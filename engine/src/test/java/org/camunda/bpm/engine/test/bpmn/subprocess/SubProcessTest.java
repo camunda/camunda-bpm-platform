@@ -510,6 +510,8 @@ public class SubProcessTest extends PluggableProcessEngineTest {
 
     // then
     assertNotNull(subProcessInstanceId);
+    ProcessInstance subProcess = runtimeService.createProcessInstanceQuery().processDefinitionKey("simpleSubProcess").singleResult();
+    assertEquals(subProcess.getId(), subProcessInstanceId);
   }
 
   @Deployment
