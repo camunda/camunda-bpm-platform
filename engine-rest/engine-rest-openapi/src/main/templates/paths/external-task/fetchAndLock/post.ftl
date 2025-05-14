@@ -136,6 +136,9 @@
                                "value": "3456",
                                "valueInfo": {}
                              }
+                           },
+                           "extensionProperties": {
+                             "key": "value"
                            }
                          }
                        ]
