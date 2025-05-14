@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@t268-adjust-withMaven']) _
 
 def failedStageTypes = []
 
@@ -62,7 +62,8 @@ pipeline {
                   withNpm: true,
                   // we use JDK 17 to build the artifacts, as it is required for supporting Spring Boot 3
                   // the compiler source and target is set to JDK 11 in the release parents
-                  jdkVersion: 'jdk-17-latest')
+                  jdkVersion: 'jdk-17-latest',
+                  withPodSpec: true)
             }
 
             // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
@@ -141,7 +142,8 @@ pipeline {
                 cambpmRunMaven('.',
                     'org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true',
                     withCatch: false,
-                    withNpm: true)
+                    withNpm: true,
+                    withPodSpec: true)
               }
             }
           },
