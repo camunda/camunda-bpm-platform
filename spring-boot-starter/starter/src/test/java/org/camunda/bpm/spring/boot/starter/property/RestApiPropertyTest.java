@@ -19,8 +19,6 @@ package org.camunda.bpm.spring.boot.starter.property;
 import org.junit.Test;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 
