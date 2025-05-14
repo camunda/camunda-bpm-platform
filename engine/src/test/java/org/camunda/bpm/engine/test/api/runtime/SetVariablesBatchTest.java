@@ -686,7 +686,10 @@ public class SetVariablesBatchTest {
     batchRule.executeSeedJobs(batch);
 
     // then
+
+   //Making sure that processInstanceId is set in execution jobs #4205
     List<Job> executionJobs = batchRule.getExecutionJobs(batch);
+
     assertThat(executionJobs)
         .extracting("processInstanceId")
         .containsExactlyInAnyOrder(processInstanceIdOne, processInstanceIdTwo);

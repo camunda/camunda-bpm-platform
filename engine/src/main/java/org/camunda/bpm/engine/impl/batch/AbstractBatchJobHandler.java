@@ -21,6 +21,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.camunda.bpm.engine.impl.batch.externaltask.SetExternalTaskRetriesJobHandler;
+import org.camunda.bpm.engine.impl.batch.job.SetJobRetriesJobHandler;
+import org.camunda.bpm.engine.impl.batch.removaltime.DecisionSetRemovalTimeJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
@@ -28,6 +32,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingResult;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
+import org.camunda.bpm.engine.impl.dmn.batch.DeleteHistoricDecisionInstancesJobHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -169,6 +174,17 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
       ByteArrayEntity configurationEntity = saveConfiguration(byteArrayManager, jobConfiguration);
 
       JobEntity job = createBatchJob(batch, configurationEntity);
+
+      if (jobConfiguration.getIds() != null && jobConfiguration.getIds().size() == 1
+          && !(this instanceof DecisionSetRemovalTimeJobHandler)
+          && !(this instanceof DeleteHistoricDecisionInstancesJobHandler)
+          && !(this instanceof SetJobRetriesJobHandler)
+          && !(this instanceof SetExternalTaskRetriesJobHandler)
+//          && !(this instanceof BatchSetRemovalTimeJobHandler)
+          ) {
+        job.setProcessInstanceId(jobConfiguration.getIds().get(0));
+      }
+
       job.setDeploymentId(deploymentId);
       postProcessJob(configuration, job, jobConfiguration);
       jobManager.insertAndHintJobExecutor(job);
