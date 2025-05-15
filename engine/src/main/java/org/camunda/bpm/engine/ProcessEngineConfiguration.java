@@ -417,13 +417,6 @@ public abstract class ProcessEngineConfiguration {
    */
   protected boolean skipOutputMappingOnCanceledActivities = false;
 
-  /**
-   * This legacy behavior sets the retry counter to 3 in the context when running a the job for the first time.
-   * This has been patched up to fetch the correct counter value.
-   */
-  protected boolean enableLegacyJobRetryBehavior = false;
-
-
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
   }
@@ -1066,13 +1059,5 @@ public abstract class ProcessEngineConfiguration {
 
   public void setSkipOutputMappingOnCanceledActivities(boolean skipOutputMappingOnCanceledActivities) {
     this.skipOutputMappingOnCanceledActivities = skipOutputMappingOnCanceledActivities;
-  }
-
-  public boolean isLegacyJobRetryBehaviorEnabled() {
-    return enableLegacyJobRetryBehavior;
-  }
-
-  public void setLegacyJobRetryBehaviorEnable(boolean enableLegacyJobRetryBehavior) {
-    this.enableLegacyJobRetryBehavior = enableLegacyJobRetryBehavior;
   }
 }

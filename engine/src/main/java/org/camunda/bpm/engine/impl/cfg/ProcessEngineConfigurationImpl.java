@@ -1063,6 +1063,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected int removalTimeUpdateChunkSize = 500;
 
   /**
+   * This legacy behavior sets the retry counter to 3 in the context when running a the job for the first time.
+   * This has been patched up to fetch the correct counter value.
+   */
+  protected boolean legacyJobRetryBehaviorEnabled = false;
+
+  /**
    * @return {@code true} if the exception code feature is disabled and vice-versa.
    */
   public boolean isDisableExceptionCode() {
@@ -5303,6 +5309,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfiguration setDiagnosticsRegistry(DiagnosticsRegistry diagnosticsRegistry) {
     this.diagnosticsRegistry = diagnosticsRegistry;
+    return this;
+  }
+
+  public boolean isLegacyJobRetryBehaviorEnabled() {
+    return legacyJobRetryBehaviorEnabled;
+  }
+  
+  public ProcessEngineConfiguration setLegacyJobRetryBehaviorEnabled(boolean legacyJobRetryBehaviorEnabled) {
+    this.legacyJobRetryBehaviorEnabled = legacyJobRetryBehaviorEnabled;
     return this;
   }
 }
