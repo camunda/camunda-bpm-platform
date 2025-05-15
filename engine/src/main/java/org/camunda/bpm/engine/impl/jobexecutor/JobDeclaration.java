@@ -131,7 +131,6 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
           retries = retryConfiguration.getRetries();
         }
       }
-      // TODO test this
       // When expression has 0 retries, set initial retries to 1 to avoid immediately raising an incident
       if (retries != null && retries == 0) {
         retries = 1;
