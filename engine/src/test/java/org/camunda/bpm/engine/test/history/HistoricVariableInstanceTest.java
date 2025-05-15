@@ -19,6 +19,8 @@ package org.camunda.bpm.engine.test.history;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.propertyComparator;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -244,6 +246,10 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByProcessInstanceId().asc().list().size());
     assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByVariableName().asc().count());
     assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByVariableName().asc().list().size());
+    assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByTenantId().asc().count());
+    assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByTenantId().asc().list().size());
+    assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByVariableId().asc().count());
+    assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByVariableId().asc().list().size());
 
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count());
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list().size());
@@ -2631,6 +2637,18 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     assertThatThrownBy(throwingCallable)
         .isInstanceOf(NullValueException.class)
         .hasMessage("Variable names is null");
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testCallSimpleSubProcess.bpmn20.xml", "org/camunda/bpm/engine/test/history/simpleSubProcess.bpmn20.xml" })
+  @Test
+  public void shouldBeCorrectlySortedWhenSortingByVariableId() {
+    // given
+    runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
+    // when
+    List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery().orderByVariableId().asc().list();
+    // then
+    assertEquals(5, historicVariableInstances.size());
+    verifySorting(historicVariableInstances, propertyComparator(HistoricVariableInstance::getId));
   }
 
 }

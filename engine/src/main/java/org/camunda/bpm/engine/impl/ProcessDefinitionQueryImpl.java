@@ -90,6 +90,8 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   protected String versionTag;
   protected String versionTagLike;
 
+  protected String processDefinitionIdAfter;
+
   protected boolean isStartableInTasklist = false;
   protected boolean isNotStartableInTasklist = false;
   protected boolean startablePermissionCheck = false;
@@ -107,6 +109,15 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   public ProcessDefinitionQuery processDefinitionId(String processDefinitionId) {
     this.id = processDefinitionId;
     return this;
+  }
+
+  public ProcessDefinitionQueryImpl idAfter(String processDefinitionId) {
+    this.processDefinitionIdAfter = processDefinitionId;
+    return this;
+  }
+
+  public String getProcessDefinitionIdAfter() {
+    return processDefinitionIdAfter;
   }
 
   public ProcessDefinitionQuery processDefinitionIdIn(String... ids) {
