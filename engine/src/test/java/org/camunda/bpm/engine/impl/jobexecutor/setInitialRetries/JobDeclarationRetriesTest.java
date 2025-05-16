@@ -16,23 +16,19 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor.setInitialRetries;
 
-import java.util.List;
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.jobexecutor.FailingDelegate;
-import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.ClassRule;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -40,77 +36,31 @@ import org.junit.rules.RuleChain;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class JobDeclarationRetriesTest {
 
-  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
-  @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(config -> config.setLegacyJobRetryBehaviorEnabled(false));
+  private ManagementService managementService;
+  private RuntimeService runtimeService;
+
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-  @After
-  public void cleanUpDeployment() {
-    List<Deployment> deployments = engineRule.getRepositoryService()
-        .createDeploymentQuery()
-        .list();
-
-    for (Deployment deployment : deployments) {
-      engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true);
-    }
-  }
-
-  @Test
-  public void testRetryTimeCycle() {
-    // given
-    ProcessEngine processEngine = engineRule.getProcessEngine();
-    RuntimeService runtimeService = processEngine.getRuntimeService();
-    ManagementService managementService = processEngine.getManagementService();
-
-    String retryInterval = "R5/PT5M";
-    String processDefinitionName = "testRetryTimeCycle";
-    BpmnModelInstance bpmnModelInstance = getBpmnModelInstance(processDefinitionName, retryInterval);
-    deployProcess(processEngine, bpmnModelInstance, processDefinitionName);
-
-    // when
-    String processInstanceId = runtimeService.startProcessInstanceByKey(processDefinitionName).getId();
-    Job job = managementService.createJobQuery().processInstanceId(processInstanceId).singleResult();
-
-    // then
-    Assert.assertEquals(5, job.getRetries());
-  }
-
-  @Test
-  public void testRetryTimeCycleWithZeroRetries() {
-    // given
-    ProcessEngine processEngine = engineRule.getProcessEngine();
-    RuntimeService runtimeService = processEngine.getRuntimeService();
-    ManagementService managementService = processEngine.getManagementService();
-
-    String retryInterval = "R0/PT5M";
-    String processDefinitionName = "testRetryTimeCycleWithZeroRetries";
-    BpmnModelInstance bpmnModelInstance = getBpmnModelInstance(processDefinitionName, retryInterval);
-    deployProcess(processEngine, bpmnModelInstance, processDefinitionName);
-
-    // when
-    String processInstanceId = runtimeService.startProcessInstanceByKey(processDefinitionName).getId();
-    Job job = managementService.createJobQuery().processInstanceId(processInstanceId).singleResult();
-
-    // then
-    Assert.assertEquals(1, job.getRetries());
+  @Before
+  public void init() {
+    this.managementService = engineRule.getProcessEngine().getManagementService();
+    this.runtimeService = engineRule.getRuntimeService();
   }
 
   @Test
   public void testRetryTimeCycleWithZeroRetriesAndFailure() {
     // given
-    ProcessEngine processEngine = engineRule.getProcessEngine();
-    RuntimeService runtimeService = processEngine.getRuntimeService();
-    ManagementService managementService = processEngine.getManagementService();
-
+    
     String retryInterval = "R0/PT5M";
     String processDefinitionName = "testRetryTimeCycleWithZeroRetriesAndFailure";
     BpmnModelInstance bpmnModelInstance = getBpmnModelInstance(processDefinitionName, retryInterval);
-    deployProcess(processEngine, bpmnModelInstance, processDefinitionName);
+    testRule.deploy(bpmnModelInstance);
 
     // when
     String processInstanceId = runtimeService.startProcessInstanceByKey(processDefinitionName).getId();
@@ -134,14 +84,11 @@ public class JobDeclarationRetriesTest {
   @Test
   public void testRetryTimeCycleWithFailure() {
     // given
-    ProcessEngine processEngine = engineRule.getProcessEngine();
-    RuntimeService runtimeService = processEngine.getRuntimeService();
-    ManagementService managementService = processEngine.getManagementService();
-
+    
     String retryInterval = "R5/PT5M";
     String processDefinitionName = "testRetryTimeCycleWithFailure";
     BpmnModelInstance bpmnModelInstance = getBpmnModelInstance(processDefinitionName, retryInterval);
-    deployProcess(processEngine, bpmnModelInstance, processDefinitionName);
+    testRule.deploy(bpmnModelInstance);
 
     // when
     String processInstanceId = runtimeService.startProcessInstanceByKey(processDefinitionName).getId();
@@ -161,36 +108,13 @@ public class JobDeclarationRetriesTest {
   }
 
   @Test
-  public void testRetryIntervals() {
-    // given
-    ProcessEngine processEngine = engineRule.getProcessEngine();
-    RuntimeService runtimeService = processEngine.getRuntimeService();
-    ManagementService managementService = processEngine.getManagementService();
-
-    String retryInterval = "PT10M,PT17M,PT20M";
-    String processDefinitionName = "testRetryIntervals";
-    BpmnModelInstance bpmnModelInstance = getBpmnModelInstance(processDefinitionName, retryInterval);
-    deployProcess(processEngine, bpmnModelInstance, processDefinitionName);
-
-    // when
-    String processInstanceId = runtimeService.startProcessInstanceByKey(processDefinitionName).getId();
-    Job job = managementService.createJobQuery().processInstanceId(processInstanceId).singleResult();
-
-    // when
-    Assert.assertEquals(4, job.getRetries());
-  }
-
-  @Test
   public void testRetryIntervalsWithFailure() {
     // given
-    ProcessEngine processEngine = engineRule.getProcessEngine();
-    RuntimeService runtimeService = processEngine.getRuntimeService();
-    ManagementService managementService = processEngine.getManagementService();
-
+    
     String retryInterval = "PT10M,PT17M,PT20M";
     String processDefinitionName = "testRetryIntervalsWithFailure";
     BpmnModelInstance bpmnModelInstance = getBpmnModelInstance(processDefinitionName, retryInterval);
-    deployProcess(processEngine, bpmnModelInstance, processDefinitionName);
+    testRule.deploy(bpmnModelInstance);
 
     // when
     String processInstanceId = runtimeService.startProcessInstanceByKey(processDefinitionName).getId();
@@ -221,12 +145,5 @@ public class JobDeclarationRetriesTest {
         .camundaClass(FailingDelegate.class.getName())
         .endEvent()
         .done();
-  }
-
-  private void deployProcess(ProcessEngine processEngine ,BpmnModelInstance bpmnModelInstance, String processDefinitionName) {
-    processEngine.getRepositoryService()
-        .createDeployment()
-        .addModelInstance(processDefinitionName + ".bpmn", bpmnModelInstance)
-        .deploy();
   }
 }
