@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:camunda="http://camunda.org/schema/1.0/dmn" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/2.0" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" id="Definitions_DecisionRule" name="Definitions_DecisionRule" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="5.34.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.22.0">
+  <decision id="Decision_DecisionRule" name="DecisionRule">
+    <informationRequirement id="InformationRequirement_02uz17b">
+      <requiredInput href="#InputData_VarA" />
+    </informationRequirement>
+    <informationRequirement id="InformationRequirement_1un341o">
+      <requiredInput href="#InputData_VarB" />
+    </informationRequirement>
+    <decisionTable id="DecisionTable_16y8m1h" hitPolicy="COLLECT">
+      <input id="Input_1" label="VarA" biodi:width="192" camunda:inputVariable="VarA">
+        <inputExpression id="InputExpression_1" typeRef="string">
+          <text>VarA</text>
+        </inputExpression>
+        <inputValues id="UnaryTests_16xv203">
+          <text>"A","B","C","D","E"</text>
+        </inputValues>
+      </input>
+      <input id="InputClause_0ruyh0u" label="VarB" camunda:inputVariable="VarB">
+        <inputExpression id="LiteralExpression_13haooi" typeRef="boolean">
+          <text>VarB</text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" label="rulesOutput" name="rulesOutput" typeRef="integer" biodi:width="193" />
+      <rule id="DecisionRule_1dw97rt">
+        <inputEntry id="UnaryTests_1t6qmhy">
+          <text>"A","B","C"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1ljzs7z">
+          <text>true,false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0fcuye3">
+          <text>1</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0oxtftw">
+        <inputEntry id="UnaryTests_1qdtrjr">
+          <text>"D","E"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0a74nm6">
+          <text>true,false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0muesmx">
+          <text>2</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_073wnba">  <!-- removing this rule fixes the test -->
+        <inputEntry id="UnaryTests_1358dif">
+          <text>not(negand)</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_12vkpyy">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0uv6nke">
+          <text></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <inputData id="InputData_VarB" name="VarB" />
+  <inputData id="InputData_VarA" name="VarA" />
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="Decision_DecisionRule">
+        <dc:Bounds height="80" width="180" x="220" y="100" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_1vpxeht" dmnElementRef="InputData_VarB">
+        <dc:Bounds height="45" width="125" x="387" y="278" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_011sdno" dmnElementRef="InputData_VarA">
+        <dc:Bounds height="45" width="125" x="158" y="278" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_0jisz4z" dmnElementRef="InformationRequirement_02uz17b">
+        <di:waypoint x="221" y="278" />
+        <di:waypoint x="280" y="200" />
+        <di:waypoint x="280" y="180" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_0965oop" dmnElementRef="InformationRequirement_1un341o">
+        <di:waypoint x="450" y="278" />
+        <di:waypoint x="340" y="200" />
+        <di:waypoint x="340" y="180" />
+      </dmndi:DMNEdge>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

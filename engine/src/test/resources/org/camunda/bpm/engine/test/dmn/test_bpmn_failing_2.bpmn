@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_02w4mzp" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.34.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.19.0">
+  <bpmn:process id="TestCollectDmn" name="TestCollectDmn" isExecutable="true" camunda:candidateStarterGroups="user" camunda:historyTimeToLive="10">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_0490czu</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:businessRuleTask id="DecisionTaskRule" name="DecisionTaskRule" camunda:resultVariable="rules" camunda:decisionRef="Decision_DecisionRule" camunda:mapDecisionResult="collectEntries">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="VarA">${VarA}</camunda:inputParameter>
+          <camunda:inputParameter name="VarB">${VarB}</camunda:inputParameter>
+          <camunda:outputParameter name="rulesOutput" />
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_111tstz</bpmn:incoming>
+      <bpmn:outgoing>Flow_09oiyry</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:sequenceFlow id="Flow_09oiyry" sourceRef="DecisionTaskRule" targetRef="Event_0717fn3" />
+    <bpmn:sequenceFlow id="Flow_0490czu" sourceRef="StartEvent_1" targetRef="setVariables" />
+    <bpmn:sequenceFlow id="Flow_111tstz" sourceRef="setVariables" targetRef="DecisionTaskRule" />
+    <bpmn:scriptTask id="setVariables" name="Set Variables" scriptFormat="javascript">
+      <bpmn:incoming>Flow_0490czu</bpmn:incoming>
+      <bpmn:outgoing>Flow_111tstz</bpmn:outgoing>
+      <bpmn:script>execution.setVariable('VarA', 'Z')
+execution.setVariable('VarB', true)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="Event_0717fn3">
+      <bpmn:incoming>Flow_09oiyry</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:error id="Error_0d4klpq" name="Error_400" errorCode="bpf.call-rest-service.http-status-400" camunda:errorMessage="Error 400" />
+  <bpmn:error id="Error_1q53lti" name="Error_404" errorCode="bpf.call-rest-service.http-status-404" camunda:errorMessage="Error 404" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="TestCollectDmn">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0pmvmvb_di" bpmnElement="DecisionTaskRule">
+        <dc:Bounds x="370" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1vwykvi_di" bpmnElement="setVariables">
+        <dc:Bounds x="220" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0717fn3_di" bpmnElement="Event_0717fn3">
+        <dc:Bounds x="542" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_09oiyry_di" bpmnElement="Flow_09oiyry">
+        <di:waypoint x="470" y="117" />
+        <di:waypoint x="542" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0490czu_di" bpmnElement="Flow_0490czu">
+        <di:waypoint x="188" y="117" />
+        <di:waypoint x="220" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_111tstz_di" bpmnElement="Flow_111tstz">
+        <di:waypoint x="320" y="117" />
+        <di:waypoint x="370" y="117" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
