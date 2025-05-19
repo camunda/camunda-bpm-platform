@@ -17,11 +17,9 @@
 package org.camunda.bpm.engine.impl.jobexecutor.setInitialRetries;
 
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.jobexecutor.FailingDelegate;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -33,7 +31,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
-@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class JobDeclarationRetriesTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
