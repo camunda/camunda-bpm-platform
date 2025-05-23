@@ -347,7 +347,7 @@ pipeline {
         stage('webapp-IT-tomcat-10-h2') {
           when {
             expression {
-              cambpmWithLabels('all', 'webapp-integration', 'h2')
+              cambpmWithLabels('all', 'webapp-integration', 'h2', 'tomcat')
             }
           }
           steps {
