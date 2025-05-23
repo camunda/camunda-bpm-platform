@@ -535,7 +535,7 @@ pipeline {
         stage('engine-IT-wildfly-servlet') {
           when {
             expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('all', 'wildfly')
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('all', 'all-as', 'wildfly')
             }
           }
           steps {
