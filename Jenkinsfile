@@ -300,7 +300,7 @@ pipeline {
         stage('engine-IT-XA-wildfly-postgresql-142') {
           when {
             expression {
-              cambpmWithLabels('all', 'wildfly')
+              cambpmWithLabels('all', 'all-as', 'wildfly')
             }
           }
           steps {
