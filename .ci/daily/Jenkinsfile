@@ -80,8 +80,7 @@ pipeline {
                   "package javadoc:javadoc javadoc:aggregate -Pdistro,distro-wildfly,distro-webjar,javadocs -pl " +
                   "'!distro/wildfly/modules,!distro/wildfly26/modules,!engine-rest/engine-rest-openapi' -DskipTests=true -Dskip.frontend.build=true",
                   withNpm: true,
-                  jdkVersion: 'jdk-17-latest',
-                  withPodSpec: true)
+                  jdkVersion: 'jdk-17-latest')
               //  def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
                // cambpmPublishDocs("\"target/site/apidocs/\"", projectVersion, "javadoc")
               }
