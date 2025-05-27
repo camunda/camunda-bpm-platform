@@ -170,7 +170,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMavenByStageType(false, 'db-unit', 'h2', jdkVersion: 'jdk-17-latest')
+                cambpmRunMavenByStageType('db-unit', 'h2', jdkVersion: 'jdk-17-latest', withPodSpec: false)
               },
               postFailure: {
                 cambpmPublishTestResult()

@@ -225,7 +225,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMavenByStageType(false, 'sql-scripts', 'h2')
+                cambpmRunMavenByStageType('sql-scripts', 'h2')
               },
               postFailure: {
                 cambpmAddFailedStageType(failedStageTypes, 'sql-scripts')
@@ -243,7 +243,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMavenByStageType(false, 'instance-migration', 'h2', jdkVersion: 'jdk-11-latest')
+                cambpmRunMavenByStageType('instance-migration', 'h2', jdkVersion: 'jdk-11-latest', withPodSpec: false)
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -262,7 +262,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMavenByStageType(false, 'old-engine', 'h2', jdkVersion: 'jdk-11-latest')
+                cambpmRunMavenByStageType('old-engine', 'h2', jdkVersion: 'jdk-11-latest', withPodSpec: false)
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -281,7 +281,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMavenByStageType(false, 'rolling-update', 'h2', jdkVersion: 'jdk-11-latest')
+                cambpmRunMavenByStageType('rolling-update', 'h2', jdkVersion: 'jdk-11-latest', withPodSpec: false)
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -300,7 +300,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMavenByStageType(false, 'large-data-tests', 'h2', jdkVersion: 'jdk-17-latest')
+                cambpmRunMavenByStageType('large-data-tests', 'h2', jdkVersion: 'jdk-17-latest', withPodSpec: false)
               },
               postFailure: {
                 cambpmPublishTestResult()
