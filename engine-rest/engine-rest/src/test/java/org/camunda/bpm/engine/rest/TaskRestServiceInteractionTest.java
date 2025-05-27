@@ -42,6 +42,7 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_USER_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricTaskInstance;
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
@@ -108,11 +109,13 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.form.CamundaFormRefImpl;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidationException;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.hal.Hal;
@@ -140,7 +143,9 @@ import org.camunda.bpm.engine.variable.value.FileValue;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
@@ -205,6 +210,9 @@ public class TaskRestServiceInteractionTest extends
 
   private Attachment mockTaskAttachment;
   private List<Attachment> mockTaskAttachments;
+
+  @Rule
+  public final ErrorCollector collector = new ErrorCollector();
 
   @Before
   public void setUpRuntimeData() {
@@ -4064,6 +4072,66 @@ public class TaskRestServiceInteractionTest extends
         .contentType(ContentType.JSON)
         .when()
         .put(SINGLE_TASK_COMMENTS_URL);
+  }
+
+  @Test
+  public void testCreateTaskParameters() {
+    Map<String, Object> json = new HashMap<>();
+
+    json.put("id", "anyTaskId");
+    json.put("name", "A Task");
+    json.put("assignee", "demo");
+    json.put("owner", "mary");
+    json.put("created", withTimezone("2014-01-01T00:00:00"));
+    json.put("due", withTimezone("2014-01-01T00:00:00"));
+    json.put("followUp", withTimezone("2014-01-01T00:00:00"));
+    json.put("delegationState", "PENDING");
+    json.put("description", "Some description");
+    json.put("executionId", "anExecutionId");
+    json.put("parentTaskId", "aParentTaskId");
+    json.put("priority", 30);
+    json.put("processDefinitionId", "aProcessDefinitionId");
+    json.put("processInstanceId", "aProcessInstanceId");
+    json.put("caseExecutionId", "aCaseExecutionId");
+    json.put("caseDefinitionId", "aCaseDefinitionId");
+    json.put("caseInstanceId", "aCaseInstanceId");
+    json.put("taskDefinitionKey", "aTaskDefinitionKey");
+    json.put("suspended", false);
+    json.put("tenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    Task newTask = new TaskEntity("anyTaskId");
+    when(taskServiceMock.newTask(anyString())).thenReturn(newTask);
+
+    given()
+        .body(json)
+        .contentType(ContentType.JSON)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .post(TASK_CREATE_URL);
+
+    collector.checkThat(newTask.getId(), equalTo(json.get("id")));
+    collector.checkThat(newTask.getName(), equalTo(json.get("name")));
+    collector.checkThat(newTask.getAssignee(), equalTo(json.get("assignee")));
+    collector.checkThat(newTask.getOwner(), equalTo(json.get("owner")));
+    collector.checkThat(newTask.getCreateTime(), notNullValue());
+    collector.checkThat(newTask.getDueDate(), notNullValue());
+    collector.checkThat(newTask.getFollowUpDate(), notNullValue());
+    collector.checkThat(newTask.getDelegationState(), equalTo(DelegationState.valueOf((String) json.get("delegationState"))));
+    collector.checkThat(newTask.getDescription(), equalTo(json.get("description")));
+    collector.checkThat(newTask.getExecutionId(), equalTo(json.get("executionId"))); // failing
+    collector.checkThat(newTask.getParentTaskId(), equalTo(json.get("parentTaskId")));
+    collector.checkThat(newTask.getPriority(), equalTo(json.get("priority")));
+    collector.checkThat(newTask.getProcessDefinitionId(), equalTo(json.get("processDefinitionId"))); // failing
+    collector.checkThat(newTask.getProcessInstanceId(), equalTo(json.get("processInstanceId"))); // failing
+    collector.checkThat(newTask.getCaseExecutionId(), equalTo(json.get("caseExecutionId"))); // failing
+    collector.checkThat(newTask.getCaseDefinitionId(), equalTo(json.get("caseDefinitionId"))); // failing
+    collector.checkThat(newTask.getCaseInstanceId(), equalTo(json.get("caseInstanceId")));
+    collector.checkThat(newTask.getTaskDefinitionKey(), equalTo(json.get("taskDefinitionKey"))); // failing
+    collector.checkThat(newTask.isSuspended(), equalTo(json.get("suspended")));
+
+    verify(taskServiceMock).saveTask(newTask);
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
