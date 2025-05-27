@@ -128,7 +128,11 @@
 
         <#if additionalProperties>
           "additionalProperties": {
-            "$ref": "#/components/schemas/${dto}"
+            <#if dto="">
+              "type": "${itemType}"
+            <#else>
+              "$ref": "#/components/schemas/${dto}"
+            </#if>
           },
         </#if>
 
