@@ -215,6 +215,24 @@ pipeline {
             ])
           }
         }
+        stage('engine-UNIT-historylevel-none') {
+          when {
+            expression {
+              cambpmWithLabels('default-build')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMaven('engine/', 'verify -Pcfghistorynone', runtimeStash: true, jdkVersion: 'jdk-17-latest')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+              }
+            ])
+          }
+        }
         stage('quarkus-UNIT') {
           when {
             expression {
