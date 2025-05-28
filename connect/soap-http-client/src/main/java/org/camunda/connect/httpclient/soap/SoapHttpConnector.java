@@ -21,6 +21,6 @@ import org.camunda.connect.spi.Connector;
 
 public interface SoapHttpConnector extends Connector<SoapHttpRequest> {
 
-  static final String ID = Connectors.SOAP_HTTP_CONNECTOR_ID;
+  String ID = Connectors.SOAP_HTTP_CONNECTOR_ID;
 
 }
