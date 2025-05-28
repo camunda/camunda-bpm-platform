@@ -156,6 +156,7 @@ platform-jdk-temurin-jdk-17-latest:
     runtimeStash: true
   withNpm: true
   jdkVersion: 'jdk-17-latest'
+  withPodSpec: true
   podSpec:
     cpu: 4
     images: ['maven:3.9.7-eclipse-temurin-17']
@@ -166,6 +167,7 @@ platform-jdk-temurin-jdk-21-latest:
     runtimeStash: true
   withNpm: true
   jdkVersion: 'jdk-21-latest'
+  withPodSpec: true
   podSpec:
     cpu: 4
     images: ['maven:3.9.7-eclipse-temurin-21']
@@ -190,6 +192,7 @@ platform-jdk-temurin-jdk-11-latest:
     runtimeStash: true
   withNpm: true
   jdkVersion: 'jdk-11-latest'
+  withPodSpec: true
   podSpec:
     cpu: 4
     images: ['maven:3.9.7-eclipse-temurin-11']
