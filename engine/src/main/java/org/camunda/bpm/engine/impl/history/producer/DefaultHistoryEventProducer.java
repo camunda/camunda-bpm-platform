@@ -25,7 +25,6 @@ import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -36,16 +35,15 @@ import org.camunda.bpm.engine.history.ExternalTaskState;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.IncidentState;
 import org.camunda.bpm.engine.history.JobState;
-import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.cfg.ConfigurationLogger;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.DefaultHistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
@@ -138,11 +136,11 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   }
 
   protected void initActivityInstanceEvent(HistoricActivityInstanceEventEntity evt,
-      ExecutionEntity execution,
-      PvmScope eventSource,
-      String activityInstanceId,
-      String parentActivityInstanceId,
-      HistoryEventType eventType) {
+                                           ExecutionEntity execution,
+                                           PvmScope eventSource,
+                                           String activityInstanceId,
+                                           String parentActivityInstanceId,
+                                           HistoryEventType eventType) {
 
     evt.setId(activityInstanceId);
     evt.setEventType(eventType.getEventName());
@@ -309,7 +307,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   }
 
   protected void initUserOperationLogEvent(UserOperationLogEntryEventEntity evt, UserOperationLogContext context,
-      UserOperationLogContextEntry contextEntry, PropertyChange propertyChange) {
+                                           UserOperationLogContextEntry contextEntry, PropertyChange propertyChange) {
     // init properties
     fillProcessDefinitionData(evt, contextEntry);
     evt.setDeploymentId(contextEntry.getDeploymentId());
@@ -400,8 +398,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     if(variableInstance.getExecutionId() != null) {
       ExecutionEntity scopeExecution = Context.getCommandContext()
-        .getDbEntityManager()
-        .selectById(ExecutionEntity.class, variableInstance.getExecutionId());
+          .getDbEntityManager()
+          .selectById(ExecutionEntity.class, variableInstance.getExecutionId());
 
       if (variableInstance.getTaskId() == null
           && !variableInstance.isConcurrentLocal()) {
@@ -637,20 +635,20 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   protected void addRemovalTimeToHistoricDecisions(String rootProcessInstanceId, Date removalTime) {
     Context.getCommandContext()
-      .getHistoricDecisionInstanceManager()
-      .addRemovalTimeToDecisionsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+        .getHistoricDecisionInstanceManager()
+        .addRemovalTimeToDecisionsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
   }
 
   protected void addRemovalTimeToHistoricProcessInstances(String rootProcessInstanceId, Date removalTime) {
     Context.getCommandContext()
-      .getHistoricProcessInstanceManager()
-      .addRemovalTimeToProcessInstancesByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+        .getHistoricProcessInstanceManager()
+        .addRemovalTimeToProcessInstancesByRootProcessInstanceId(rootProcessInstanceId, removalTime);
   }
 
   protected boolean isDmnEnabled() {
     return Context.getCommandContext()
-      .getProcessEngineConfiguration()
-      .isDmnEnabled();
+        .getProcessEngineConfiguration()
+        .isDmnEnabled();
   }
 
   protected void determineEndState(ExecutionEntity executionEntity, HistoricProcessInstanceEventEntity evt) {
@@ -1243,7 +1241,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   protected String getHistoryRemovalTimeStrategy() {
     return Context.getProcessEngineConfiguration()
-      .getHistoryRemovalTimeStrategy();
+        .getHistoryRemovalTimeStrategy();
   }
 
   protected Date calculateRemovalTime(HistoryEvent historyEvent) {
@@ -1251,14 +1249,14 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     ProcessDefinition processDefinition = findProcessDefinitionById(processDefinitionId);
 
     return Context.getProcessEngineConfiguration()
-      .getHistoryRemovalTimeProvider()
-      .calculateRemovalTime((HistoricProcessInstanceEventEntity) historyEvent, processDefinition);
+        .getHistoryRemovalTimeProvider()
+        .calculateRemovalTime((HistoricProcessInstanceEventEntity) historyEvent, processDefinition);
   }
 
   protected Date calculateRemovalTime(HistoricBatchEntity historicBatch) {
     return Context.getProcessEngineConfiguration()
-      .getHistoryRemovalTimeProvider()
-      .calculateRemovalTime(historicBatch);
+        .getHistoryRemovalTimeProvider()
+        .calculateRemovalTime(historicBatch);
   }
 
   protected void provideRemovalTime(HistoricBatchEntity historicBatch) {
@@ -1272,7 +1270,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     String rootProcessInstanceId = historyEvent.getRootProcessInstanceId();
     if (rootProcessInstanceId != null) {
       HistoricProcessInstanceEventEntity historicRootProcessInstance =
-        getHistoricRootProcessInstance(rootProcessInstanceId);
+          getHistoricRootProcessInstance(rootProcessInstanceId);
 
       if (historicRootProcessInstance != null) {
         Date removalTime = historicRootProcessInstance.getRemovalTime();
@@ -1283,35 +1281,35 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   protected HistoricProcessInstanceEventEntity getHistoricRootProcessInstance(String rootProcessInstanceId) {
     return Context.getCommandContext()
-      .getDbEntityManager()
-      .selectById(HistoricProcessInstanceEventEntity.class, rootProcessInstanceId);
+        .getDbEntityManager()
+        .selectById(HistoricProcessInstanceEventEntity.class, rootProcessInstanceId);
   }
 
   protected ProcessDefinition findProcessDefinitionById(String processDefinitionId) {
     return Context.getCommandContext()
-      .getProcessEngineConfiguration()
-      .getDeploymentCache()
-      .findDeployedProcessDefinitionById(processDefinitionId);
+        .getProcessEngineConfiguration()
+        .getDeploymentCache()
+        .findDeployedProcessDefinitionById(processDefinitionId);
   }
 
   protected HistoricBatchEntity getHistoricBatchById(String batchId) {
     return Context.getCommandContext()
-      .getHistoricBatchManager()
-      .findHistoricBatchById(batchId);
+        .getHistoricBatchManager()
+        .findHistoricBatchById(batchId);
   }
 
   protected HistoricBatchEntity getHistoricBatchByJobId(String jobId) {
     return Context.getCommandContext()
-      .getHistoricBatchManager()
-      .findHistoricBatchByJobId(jobId);
+        .getHistoricBatchManager()
+        .findHistoricBatchByJobId(jobId);
   }
 
   protected void addRemovalTimeToHistoricJobLog(HistoricBatchEntity historicBatch) {
     Date removalTime = historicBatch.getRemovalTime();
     if (removalTime != null) {
       Context.getCommandContext()
-        .getHistoricJobLogManager()
-        .addRemovalTimeToJobLogByBatchId(historicBatch.getId(), removalTime);
+          .getHistoricJobLogManager()
+          .addRemovalTimeToJobLogByBatchId(historicBatch.getId(), removalTime);
     }
   }
 
@@ -1319,8 +1317,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     Date removalTime = historicBatch.getRemovalTime();
     if (removalTime != null) {
       Context.getCommandContext()
-        .getHistoricIncidentManager()
-        .addRemovalTimeToHistoricIncidentsByBatchId(historicBatch.getId(), removalTime);
+          .getHistoricIncidentManager()
+          .addRemovalTimeToHistoricIncidentsByBatchId(historicBatch.getId(), removalTime);
     }
   }
 
@@ -1342,7 +1340,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     event.setSequenceCounter(sequenceCounter);
   }
 
-  private static void fillProcessDefinitionData(HistoryEvent event, ExternalTask externalTask) {
+  private void fillProcessDefinitionData(HistoryEvent event, ExternalTask externalTask) {
     String processDefinitionId = externalTask.getProcessDefinitionId();
     if (processDefinitionId != null) {
       fillProcessDefinitionData(event, processDefinitionId);
@@ -1351,7 +1349,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     }
   }
 
-  private static void fillProcessDefinitionData(HistoryEvent event, Task task) {
+  private void fillProcessDefinitionData(HistoryEvent event, Task task) {
     String processDefinitionId = task.getProcessDefinitionId();
     if (processDefinitionId != null) {
       fillProcessDefinitionData(event, processDefinitionId);
@@ -1379,7 +1377,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     }
   }
 
-  private static void fillProcessDefinitionData(HistoryEvent event, ExecutionEntity execution) {
+  private void fillProcessDefinitionData(HistoryEvent event, ExecutionEntity execution) {
     String processDefinitionId = execution.getProcessDefinitionId();
     if (processDefinitionId != null) {
       fillProcessDefinitionData(event, processDefinitionId);
@@ -1398,7 +1396,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     }
   }
 
-  private static void fillProcessDefinitionData(HistoryEvent event, UserOperationLogContextEntry userOperationLogContextEntry) {
+  private void fillProcessDefinitionData(HistoryEvent event, UserOperationLogContextEntry userOperationLogContextEntry) {
     String processDefinitionId = userOperationLogContextEntry.getProcessDefinitionId();
     if (processDefinitionId != null) {
       fillProcessDefinitionData(event, processDefinitionId);
@@ -1408,30 +1406,23 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     }
   }
 
-  private static void fillProcessDefinitionData(HistoryEvent event, String processDefinitionId) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-
-    DbEntityManager dbEntityManager = (Context.getCommandContext() != null)
-        ? Context.getCommandContext().getDbEntityManager() : null;
-
-    ProcessDefinitionEntity entity = null;
-
-    if (processEngineConfiguration != null) {
-      entity = processEngineConfiguration
-          .getDeploymentCache()
-          .findProcessDefinitionFromCache(processDefinitionId);
-    }
-
-    if (entity == null && dbEntityManager != null) {
-      entity = dbEntityManager
-          .selectById(ProcessDefinitionEntity.class, processDefinitionId);
-    }
-
+  private void fillProcessDefinitionData(HistoryEvent event, String processDefinitionId) {
+    ProcessDefinitionEntity entity = this.getProcessDefinitionEntity(processDefinitionId);
     if (entity != null) {
       event.setProcessDefinitionId(entity.getId());
       event.setProcessDefinitionKey(entity.getKey());
       event.setProcessDefinitionVersion(entity.getVersion());
       event.setProcessDefinitionName(entity.getName());
     }
+  }
+
+  protected ProcessDefinitionEntity getProcessDefinitionEntity(String processDefinitionId) {
+    DbEntityManager dbEntityManager = (Context.getCommandContext() != null)
+        ? Context.getCommandContext().getDbEntityManager() : null;
+    if (dbEntityManager != null) {
+      return dbEntityManager
+          .selectById(ProcessDefinitionEntity.class, processDefinitionId);
+    }
+    return null;
   }
 }
