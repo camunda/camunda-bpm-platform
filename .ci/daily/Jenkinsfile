@@ -102,7 +102,8 @@ pipeline {
                 cambpmRunMaven('./engine-rest',
                   "package -Dmaven.test.skip -pl '!engine-rest,!assembly'",
                   withNpm: true,
-                  jdkVersion: 'jdk-11-latest')
+                  jdkVersion: 'jdk-11-latest',
+                  withPodSpec: true)
                 def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
                 cambpmPublishDocs("\"engine-rest/docs/target/index.html\"", projectVersion, "rest")
               }
@@ -164,16 +165,18 @@ pipeline {
                 cambpmRunMaven('.',
                   "deploy source:jar source:test-jar javadoc:javadoc -Dskip-zip-frontend-sources=true -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -B",
                   withNpm: true,
-                  jdkVersion: 'jdk-17-latest')
+                  jdkVersion: 'jdk-17-latest',
+                  withPodSpec: true)
                 script {
                   str = 's@:camunda-nexus:.*\\\$@:central:https://oss.sonatype.org/content/repositories/snapshots@g'
                   sh(label: 'Change staging from Nexus to Maven Central snapshots', script: 'sed -i ' + str + ' staging/deferred/.index')
                 }
-
+               
                 cambpmRunMaven('.',
                   "org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true -B",
                   withNpm: true,
-                  jdkVersion: 'jdk-17-latest')
+                  jdkVersion: 'jdk-17-latest',
+                  withPodSpec: true)
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -199,7 +202,8 @@ pipeline {
                   "install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -B",
                   withNpm: true,
                   jdkVersion: 'jdk-17-latest',
-                  settingsXml: 'public-repo')
+                  settingsXml: 'public-repo',
+                  withPodSpec: true)
               },
               postFailure: {
                 cambpmPublishTestResult()
