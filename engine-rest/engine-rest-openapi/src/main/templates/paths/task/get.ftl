@@ -109,6 +109,101 @@
                            "comment":false
                          }
                        ]
+                     }',
+        '"example-3": {
+                       "summary": "Status 200 response 3",
+                       "description": "Response for GET
+                       `/task?assignee=anAssignee&withCommentAttachmentInfo=true&withTaskVariablesInReturn=true`",
+                       "value": [
+                         {
+                           "id":"anId",
+                           "name":"aName",
+                           "assignee":"anAssignee",
+                           "created":"2013-01-23T13:42:42.657+0200",
+                           "due":"2013-01-23T13:49:42.323+0200",
+                           "followUp:":"2013-01-23T13:44:42.987+0200",
+                           "lastUpdated:":"2013-01-23T13:44:42.987+0200",
+                           "delegationState":"RESOLVED",
+                           "description":"aDescription",
+                           "executionId":"anExecution",
+                           "owner":"anOwner",
+                           "parentTaskId":"aParentId",
+                           "priority":42,
+                           "processDefinitionId":"aProcDefId",
+                           "processInstanceId":"aProcInstId",
+                           "caseDefinitionId":"aCaseDefId",
+                           "caseInstanceId":"aCaseInstId",
+                           "caseExecutionId":"aCaseExecution",
+                           "taskDefinitionKey":"aTaskDefinitionKey",
+                           "suspended": false,
+                           "formKey":"aFormKey",
+                           "camundaFormRef":{
+                             "key": "aCamundaFormKey",
+                             "binding": "version",
+                             "version": 2
+                           },
+                           "tenantId": "aTenantId",
+                           "variables": {
+                             "aVariableKey": {
+                               "type": "String",
+                               "value": "aVariableValue",
+                               "valueInfo": {}
+                             },
+                             "anotherVariableKey": {
+                               "type": "String",
+                               "value": "anotherVariableValue",
+                               "valueInfo": {}
+                             }
+			                     },
+                           "attachment":false,
+                           "comment":false
+                         }
+                       ]
+                     }',
+        '"example-4": {
+                       "summary": "Status 200 response 4",
+                       "description": "Response for GET
+                       `/task?assignee=anAssignee&withCommentAttachmentInfo=true&withTaskLocalVariablesInReturn=true`",
+                       "value": [
+                         {
+                           "id":"anId",
+                           "name":"aName",
+                           "assignee":"anAssignee",
+                           "created":"2013-01-23T13:42:42.657+0200",
+                           "due":"2013-01-23T13:49:42.323+0200",
+                           "followUp:":"2013-01-23T13:44:42.987+0200",
+                           "lastUpdated:":"2013-01-23T13:44:42.987+0200",
+                           "delegationState":"RESOLVED",
+                           "description":"aDescription",
+                           "executionId":"anExecution",
+                           "owner":"anOwner",
+                           "parentTaskId":"aParentId",
+                           "priority":42,
+                           "processDefinitionId":"aProcDefId",
+                           "processInstanceId":"aProcInstId",
+                           "caseDefinitionId":"aCaseDefId",
+                           "caseInstanceId":"aCaseInstId",
+                           "caseExecutionId":"aCaseExecution",
+                           "taskDefinitionKey":"aTaskDefinitionKey",
+                           "suspended": false,
+                           "formKey":"aFormKey",
+                           "camundaFormRef":{
+                             "key": "aCamundaFormKey",
+                             "binding": "version",
+                             "version": 2
+                           },
+                           "tenantId": "aTenantId",
+                           "variables": {
+                             "anotherVariableKey": {
+                               "type": "String",
+                               "value": "anotherVariableValue",
+                               "valueInfo": {}
+                             }
+			                     },
+                           "attachment":false,
+                           "comment":false
+                         }
+                       ]
                      }'] />
 
     <@lib.response
