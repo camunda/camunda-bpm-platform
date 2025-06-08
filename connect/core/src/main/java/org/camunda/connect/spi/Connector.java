@@ -87,4 +87,5 @@ public interface Connector<Q extends ConnectorRequest<?>> {
    * @return the result.
    */
   ConnectorResponse execute(Q request);
+
 }
