@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.bpmn.async;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -191,6 +192,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTest {
     Job job = managementService.createJobQuery().list().get(0);
     assertNotNull(job);
     String jobId = job.getId();
+    assertThat(job.getRetries()).isEqualTo(5);
 
     waitForExecutedJobWithRetriesLeft(4, jobId);
     stillOneJobWithExceptionAndRetriesLeft(jobId);
@@ -242,7 +244,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTest {
 
     Job job = managementService.createJobQuery().singleResult();
 
-    assertEquals(3, job.getRetries());
+    assertEquals(5, job.getRetries());
 
     try {
       managementService.executeJob(job.getId());
@@ -496,7 +498,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTest {
     Job job = managementService.createJobQuery().singleResult();
 
     // assume
-    Assert.assertEquals(3, job.getRetries());
+    Assert.assertEquals(5, job.getRetries());
 
     // when job fails
     try {
@@ -534,7 +536,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTest {
     Job job = managementService.createJobQuery().singleResult();
 
     // assume
-    Assert.assertEquals(3, job.getRetries());
+    Assert.assertEquals(5, job.getRetries());
 
     // when job fails
     try {
@@ -570,7 +572,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTest {
     Job job = managementService.createJobQuery().singleResult();
 
     // assume
-    Assert.assertEquals(3, job.getRetries());
+    Assert.assertEquals(5, job.getRetries());
 
     // when job fails
     try {
@@ -607,7 +609,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTest {
     Job job = managementService.createJobQuery().singleResult();
 
     // assume
-    Assert.assertEquals(3, job.getRetries());
+    Assert.assertEquals(5, job.getRetries());
 
     // when job fails
     try {
@@ -644,7 +646,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTest {
     Job job = managementService.createJobQuery().singleResult();
 
     // assume
-    Assert.assertEquals(3, job.getRetries());
+    Assert.assertEquals(5, job.getRetries());
 
     // when job fails
     try {
@@ -683,7 +685,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTest {
     Job job = managementService.createJobQuery().singleResult();
 
     // assume
-    Assert.assertEquals(3, job.getRetries());
+    Assert.assertEquals(5, job.getRetries());
 
     // when job fails
     try {
@@ -720,7 +722,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTest {
     Job job = managementService.createJobQuery().singleResult();
 
     // assume
-    Assert.assertEquals(3, job.getRetries());
+    Assert.assertEquals(5, job.getRetries());
 
     // when job fails
     try {
@@ -778,7 +780,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTest {
           Date expectedDate = simpleDateFormat.parse("2019-01-01T10:11:01");
           assertEquals(expectedDate, job.getDuedate());
           assertNull(((JobEntity) job).getLockExpirationTime());
-        } else if (job.getRetries() == 3) { // the second job is not triggered yet
+        } else if (job.getRetries() == 2) { // the second job is not triggered yet
           Date expectedDate = simpleDateFormat.parse("2019-01-01T10:02:00");
           assertEquals(expectedDate, job.getDuedate());
           assertNull(((JobEntity) job).getLockExpirationTime());
