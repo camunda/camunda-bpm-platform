@@ -1,0 +1,21 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "packageRules": [
+    {
+      "packagePatterns": ["^org\.springframework\.boot"],
+      "groupName": "spring-boot-dependencies",
+      "enabled": true
+    },
+    {
+      "packagePatterns": ["^org\.springframework"],
+      "groupName": "spring-framework-dependencies",
+      "enabled": true
+    },
+    {
+      "packagePatterns": ["^org\.apache\.tomcat"],
+      "groupName": "tomcat-dependencies",
+      "enabled": true
+    }
+  ]
+}
