@@ -11,5 +11,8 @@
       ],
       "enabled": false
     }
-  ]
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": false
+  }
 }
