@@ -134,6 +134,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     String executionId = from(content).getString("[0].executionId");
     String id = from(content).getString("[0].id");
     String lockExpirationTime = from(content).getString("[0].lockExpirationTime");
+    String createTime = from(content).getString("[0].createTime");
     String processDefinitionId = from(content).getString("[0].processDefinitionId");
     String processDefinitionKey = from(content).getString("[0].processDefinitionKey");
     String processDefinitionVersionTag = from(content).getString("[0].processDefinitionVersionTag");
@@ -152,6 +153,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, executionId);
     Assert.assertEquals(MockProvider.EXTERNAL_TASK_ID, id);
     Assert.assertEquals(MockProvider.EXTERNAL_TASK_LOCK_EXPIRATION_TIME, lockExpirationTime);
+    Assert.assertEquals(MockProvider.EXTERNAL_TASK_CREATE_TIME, createTime);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, processDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, processDefinitionKey);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_VERSION_TAG, processDefinitionVersionTag);

@@ -149,6 +149,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
       .body("[0].topicName", equalTo(MockProvider.EXTERNAL_TASK_TOPIC_NAME))
       .body("[0].workerId", equalTo(MockProvider.EXTERNAL_TASK_WORKER_ID))
       .body("[0].lockExpirationTime", equalTo(MockProvider.EXTERNAL_TASK_LOCK_EXPIRATION_TIME))
+      .body("[0].createTime", equalTo(MockProvider.EXTERNAL_TASK_CREATE_TIME))
       .body("[0].processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .body("[0].executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
       .body("[0].activityId", equalTo(MockProvider.EXAMPLE_ACTIVITY_ID))

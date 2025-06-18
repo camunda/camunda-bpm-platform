@@ -39,6 +39,7 @@ public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements 
   protected String activityId;
   protected String activityName;
   protected String activityType;
+  protected String subProcessInstanceId;
 
   protected ActivityInstance[] childActivityInstances = NO_ACTIVITY_INSTANCES;
   protected TransitionInstance[] childTransitionInstances = NO_TRANSITION_INSTANCES;
@@ -203,6 +204,14 @@ public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements 
         ((ActivityInstanceImpl) childActivityInstance).collectTransitionInstances(activityId, instances);
       }
     }
+  }
+
+  public void setSubProcessInstanceId(String id) {
+    subProcessInstanceId = id;
+  }
+
+  public String getSubProcessInstanceId() {
+    return subProcessInstanceId;
   }
 
 }

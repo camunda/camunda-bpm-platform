@@ -14,21 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl;
+package org.camunda.bpm.spring.boot.starter.property;
 
-import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
-import org.camunda.bpm.engine.query.QueryProperty;
+import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Contains the possible properties which can be used in a {@link HistoricVariableInstanceQuery}.
- *
- * @author Christian Lipphardt (camunda)
- */
-public interface HistoricVariableInstanceQueryProperty {
+public class RestApiPropertyDefaultsTest extends ParsePropertiesHelper {
 
-  QueryProperty PROCESS_INSTANCE_ID = new QueryPropertyImpl("PROC_INST_ID_");
-  QueryProperty VARIABLE_NAME = new QueryPropertyImpl("NAME_");
-  QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
-  QueryProperty VARIABLE_ID = new QueryPropertyImpl("ID_");
+  @Test
+  public void shouldConfigureFetchAndLockProperties() {
+    // then
+    assertThat(restApiProperty.getFetchAndLock().isUniqueWorkerRequest()).isFalse();
+    assertThat(restApiProperty.getFetchAndLock().getQueueCapacity()).isEqualTo(200);
+  }
+
 }

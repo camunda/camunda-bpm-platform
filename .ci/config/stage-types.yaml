@@ -24,6 +24,7 @@ db-unit:
   stash:
     runtimeStash: true
   labels:
+  - 'all'
   - 'all-db'
   - 'db2'
   - 'mysql'
@@ -39,6 +40,7 @@ sql-scripts:
   stash:
     runtimeStash: true
   labels:
+  - 'all'
   - 'all-db'
   - 'db2'
   - 'mysql'
@@ -54,6 +56,8 @@ instance-migration:
   stash:
     runtimeStash: true
     qaStash: true
+  labels:
+    - 'all'
   podSpec:
     cpu: 4
     images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
@@ -63,6 +67,7 @@ old-engine:
   stash:
     runtimeStash: true
   labels:
+  - 'all'
   - 'all-db'
   - 'db2'
   - 'mysql'
@@ -78,6 +83,8 @@ rolling-update:
   stash:
     runtimeStash: true
     qaStash: true
+  labels:
+    - 'all'
   podSpec:
     cpu: 4
     images: [ 'maven:3.9.7-eclipse-temurin-11', 'postgres:17.0' ]
@@ -86,6 +93,8 @@ large-data-tests:
   command: 'verify -Plarge-data-tests,'
   stash:
     runtimeStash: true
+  labels:
+    - 'all'
   podSpec:
     cpu: 4
     images: [ 'maven:3.9.7-eclipse-temurin-11', 'postgres:17.0' ]
@@ -96,6 +105,7 @@ engine-rest-unit-jersey-2:
   stash:
     runtimeStash: true
   labels:
+  - 'all'
   - 'rest-api'
   nodeLabel: 'h2'
   jdkVersion: 'jdk-11-0-21'
@@ -105,6 +115,7 @@ engine-rest-unit-resteasy:
   stash:
     runtimeStash: true
   labels:
+  - 'all'
   - 'rest-api'
   nodeLabel: 'h2'
   jdkVersion: 'jdk-11-0-21'
@@ -114,6 +125,7 @@ engine-rest-jakarta-unit-resteasy:
   stash:
     runtimeStash: true
   labels:
+    - 'all'
     - 'rest-api'
   nodeLabel: 'h2'
   jdkVersion: 'openjdk-jdk-17-latest'
@@ -123,6 +135,7 @@ engine-rest-unit-compatibility-wildfly:
   stash:
     runtimeStash: true
   labels:
+  - 'all'
   - 'rest-api'
   nodeLabel: 'h2'
   jdkVersion: 'jdk-11-0-21'
@@ -132,6 +145,7 @@ engine-rest-jakarta-unit-compatibility-wildfly:
   stash:
     runtimeStash: true
   labels:
+    - 'all'
     - 'rest-api'
   nodeLabel: 'h2'
   jdkVersion: 'openjdk-jdk-17-latest'
@@ -142,6 +156,7 @@ platform-jdk-temurin-jdk-17-latest:
     runtimeStash: true
   withNpm: true
   jdkVersion: 'jdk-17-latest'
+  withPodSpec: true
   podSpec:
     cpu: 4
     images: ['maven:3.9.7-eclipse-temurin-17']
@@ -152,6 +167,7 @@ platform-jdk-temurin-jdk-21-latest:
     runtimeStash: true
   withNpm: true
   jdkVersion: 'jdk-21-latest'
+  withPodSpec: true
   podSpec:
     cpu: 4
     images: ['maven:3.9.7-eclipse-temurin-21']
@@ -176,6 +192,7 @@ platform-jdk-temurin-jdk-11-latest:
     runtimeStash: true
   withNpm: true
   jdkVersion: 'jdk-11-latest'
+  withPodSpec: true
   podSpec:
     cpu: 4
     images: ['maven:3.9.7-eclipse-temurin-11']

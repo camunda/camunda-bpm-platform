@@ -102,9 +102,22 @@
       type = "object"
       dto = "VariableValueDto"
       additionalProperties = true
-      last = true
       desc = "A JSON object containing a property for each of the requested variables. The key is the variable name,
               the value is a JSON object of serialized variable values with the following properties:" />
+
+  <@lib.property
+      name = "extensionProperties"
+      type = "object"
+      additionalProperties = true
+      desc = "A JSON object containing a property for each extension property. The key is the property name,
+              the value is the property value" />
+
+  <@lib.property
+      name = "createTime"
+      type = "string"
+      format = "date-time"
+      desc = "The date that the task was created."
+      last = true />
 
 </@lib.dto>
 

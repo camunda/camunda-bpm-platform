@@ -14,21 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl;
+package org.camunda.bpm.spring.boot.starter.property;
 
-import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
-import org.camunda.bpm.engine.query.QueryProperty;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
+import static org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties.joinOn;
 
-/**
- * Contains the possible properties which can be used in a {@link HistoricVariableInstanceQuery}.
- *
- * @author Christian Lipphardt (camunda)
- */
-public interface HistoricVariableInstanceQueryProperty {
+public class RestApiProperty {
 
-  QueryProperty PROCESS_INSTANCE_ID = new QueryPropertyImpl("PROC_INST_ID_");
-  QueryProperty VARIABLE_NAME = new QueryPropertyImpl("NAME_");
-  QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
-  QueryProperty VARIABLE_ID = new QueryPropertyImpl("ID_");
+  @NestedConfigurationProperty
+  protected FetchAndLockProperties fetchAndLock = new FetchAndLockProperties();
+
+  public FetchAndLockProperties getFetchAndLock() {
+    return fetchAndLock;
+  }
+
+  public void setFetchAndLock(FetchAndLockProperties fetchAndLock) {
+    this.fetchAndLock = fetchAndLock;
+  }
+
+  @Override
+  public String toString() {
+    return joinOn(this.getClass())
+      .add("fetchAndLock='" + fetchAndLock + '\'')
+      .toString();
+  }
+
 }

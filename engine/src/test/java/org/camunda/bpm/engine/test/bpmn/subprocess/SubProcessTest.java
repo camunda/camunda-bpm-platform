@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -494,6 +495,23 @@ public class SubProcessTest extends PluggableProcessEngineTest {
   public void testNestedSubProcessesWithoutEndEvents() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testNestedSubProcessesWithoutEndEvents");
     testRule.assertProcessEnded(pi.getId());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/nestedSubProcess.bpmn20.xml", "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
+  public void testInstanceSubProcessInstanceIdSet() {
+    // given
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("nestedSimpleSubProcess");
+    ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(pi.getProcessInstanceId());
+    ActivityInstance subProcessInstance = rootActivityInstance.getChildActivityInstances()[0];
+
+    // when
+    String subProcessInstanceId = ((ActivityInstanceImpl) subProcessInstance).getSubProcessInstanceId();
+
+    // then
+    assertNotNull(subProcessInstanceId);
+    ProcessInstance subProcess = runtimeService.createProcessInstanceQuery().processDefinitionKey("simpleSubProcess").singleResult();
+    assertEquals(subProcess.getId(), subProcessInstanceId);
   }
 
   @Deployment

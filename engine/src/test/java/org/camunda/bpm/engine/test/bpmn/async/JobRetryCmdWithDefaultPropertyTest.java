@@ -64,7 +64,7 @@ public class JobRetryCmdWithDefaultPropertyTest {
     Job job = managementService.createJobQuery().processInstanceId(pi.getProcessInstanceId()).singleResult();
     assertNotNull(job);
     assertEquals(pi.getProcessInstanceId(), job.getProcessInstanceId());
-    assertEquals(2, job.getRetries());
+    assertEquals(5, job.getRetries());
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })

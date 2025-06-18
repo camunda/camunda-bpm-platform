@@ -4,7 +4,7 @@
       id = "deleteProcessDefinition"
       tag = "Process Definition"
       summary = "Delete"
-      desc = "Deletes a running process instance by id." />
+      desc = "Deletes a process definition by id." />
 
   "parameters": [
 

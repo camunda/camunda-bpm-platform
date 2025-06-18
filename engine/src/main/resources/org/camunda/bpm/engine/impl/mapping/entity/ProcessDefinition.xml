@@ -254,6 +254,9 @@
       <if test="id != null">
         RES.ID_ = #{id}
       </if>
+      <if test="processDefinitionIdAfter != null">
+        RES.ID_ > #{processDefinitionIdAfter}
+      </if>
       <if test="ids != null &amp;&amp; ids.length > 0">
         and RES.ID_ in
         <foreach item="item" index="index" collection="ids"
