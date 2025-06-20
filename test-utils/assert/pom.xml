@@ -57,7 +57,7 @@
     </profile>
 
     <profile>
-      <id>sonatype-oss-release</id>
+      <id>central-sonatype-publish</id>
       <modules>
         <module>core</module>
       </modules>
