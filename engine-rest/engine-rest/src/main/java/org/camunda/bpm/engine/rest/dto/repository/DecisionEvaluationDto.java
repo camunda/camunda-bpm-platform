@@ -14,37 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.dmn.engine.delegate;
+package org.camunda.bpm.engine.rest.dto.repository;
 
-import java.util.Collection;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 
-/**
- * Event which represents the evaluation of a decision
- */
-public interface DmnDecisionEvaluationEvent {
+import java.util.List;
+import java.util.Map;
 
-  /**
-   * @return the result of the evaluated decision
-   */
-  DmnDecisionLogicEvaluationEvent getDecisionResult();
+public class DecisionEvaluationDto {
+  protected String decisionInstanceId;
+  protected List<Map<String, VariableValueDto>> result;
 
-  /**
-   * @return the collection of required decision results
-   */
-  Collection<DmnDecisionLogicEvaluationEvent> getRequiredDecisionResults();
+  public String getDecisionInstanceId() {
+    return decisionInstanceId;
+  }
 
-  /**
-   * @return the number of executed decision instances during the evaluation
-   */
-  long getExecutedDecisionInstances();
+  public void setDecisionInstanceId(String decisionInstanceId) {
+    this.decisionInstanceId = decisionInstanceId;
+  }
 
-  /**
-   * @return the number of executed decision elements during the evaluation
-   */
-  long getExecutedDecisionElements();
+  public List<Map<String, VariableValueDto>> getResult() {
+    return result;
+  }
 
-  /**
-   * @return the decisionInstanceId generated part of DMN evaluation
-   */
-  String getDecisionInstanceId();
+  public void setResult(List<Map<String, VariableValueDto>> result) {
+    this.result = result;
+  }
 }
