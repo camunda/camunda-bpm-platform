@@ -78,10 +78,7 @@ public class BatchSetVariablesHandler extends AbstractBatchJobHandler<BatchConfi
 
   @Override
   protected void postProcessJob(BatchConfiguration configuration, JobEntity job, BatchConfiguration jobConfiguration) {
-    // if there is only one process instance to adjust, set its ID to the job so exclusive scheduling is possible
-    if (jobConfiguration.getIds() != null && jobConfiguration.getIds().size() == 1) {
-      job.setProcessInstanceId(jobConfiguration.getIds().get(0));
-    }
+
   }
 
   protected ByteArrayEntity findByteArrayById(String byteArrayId, CommandContext commandContext) {
