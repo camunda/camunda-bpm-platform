@@ -190,6 +190,7 @@ public class CorrelateAllMessageBatchTest {
     assertThat(taskExecutionQueryInstanceThree.count()).isEqualTo(0L);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void shouldCorrelateAllWithHistoricInstanceQuery() {
     // given

@@ -770,6 +770,7 @@ public class SetVariablesBatchTest {
     batchRule.syncExec(batch);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void setVariablesAsyncOnCompletedProcessInstanceWithHistoricQuery() {
     // given set variables on completed process instance

@@ -636,6 +636,7 @@ public class TaskListenerTest extends AbstractTaskListenerTest {
     assertEquals(2, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE)); // create and delete attachment
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void testUpdateTaskListenerOnAttachmentDeleteWithTaskId() {
     // given
