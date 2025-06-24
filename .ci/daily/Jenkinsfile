@@ -56,7 +56,7 @@ pipeline {
         stage('check-sql-scripts') {
           when {
             expression {
-              cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql')
+              cambpmWithLabels('all','all-db','h2','db2','mysql','oracle','sqlserver','postgresql')
             }
           }
           steps {
@@ -102,7 +102,8 @@ pipeline {
                 cambpmRunMaven('./engine-rest',
                   "package -Dmaven.test.skip -pl '!engine-rest,!assembly'",
                   withNpm: true,
-                  jdkVersion: 'jdk-11-latest')
+                  jdkVersion: 'jdk-11-latest',
+                  withPodSpec: true)
                 def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
                 cambpmPublishDocs("\"engine-rest/docs/target/index.html\"", projectVersion, "rest")
               }
@@ -164,16 +165,18 @@ pipeline {
                 cambpmRunMaven('.',
                   "deploy source:jar source:test-jar javadoc:javadoc -Dskip-zip-frontend-sources=true -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -B",
                   withNpm: true,
-                  jdkVersion: 'jdk-17-latest')
+                  jdkVersion: 'jdk-17-latest',
+                  withPodSpec: true)
                 script {
                   str = 's@:camunda-nexus:.*\\\$@:central:https://oss.sonatype.org/content/repositories/snapshots@g'
                   sh(label: 'Change staging from Nexus to Maven Central snapshots', script: 'sed -i ' + str + ' staging/deferred/.index')
                 }
-
+               
                 cambpmRunMaven('.',
                   "org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true -B",
                   withNpm: true,
-                  jdkVersion: 'jdk-17-latest')
+                  jdkVersion: 'jdk-17-latest',
+                  withPodSpec: true)
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -199,7 +202,8 @@ pipeline {
                   "install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -B",
                   withNpm: true,
                   jdkVersion: 'jdk-17-latest',
-                  settingsXml: 'public-repo')
+                  settingsXml: 'public-repo',
+                  withPodSpec: true)
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -214,7 +218,7 @@ pipeline {
         stage('sql-scripts-h2') {
           when {
             expression {
-              cambpmWithLabels('h2', 'all-db')
+              cambpmWithLabels('all', 'h2', 'all-db')
             }
           }
           steps {
@@ -232,7 +236,7 @@ pipeline {
         stage('UPGRADE-instance-migration-h2') {
           when {
             expression {
-              cambpmWithLabels('default-build', 'migration')
+              cambpmWithLabels('all', 'default-build', 'migration')
             }
           }
           steps {
@@ -251,7 +255,7 @@ pipeline {
         stage('UPGRADE-old-engine-h2') {
           when {
             expression {
-              cambpmWithLabels('h2', 'all-db')
+              cambpmWithLabels('all', 'h2', 'all-db')
             }
           }
           steps {
@@ -270,7 +274,7 @@ pipeline {
         stage('UPGRADE-rolling-update-h2') {
           when {
             expression {
-              cambpmWithLabels('rolling-update', 'default-build')
+              cambpmWithLabels('all', 'rolling-update', 'default-build')
             }
           }
           steps {
@@ -289,7 +293,7 @@ pipeline {
         stage('PERFORMANCE-large-data-h2') {
           when {
             expression {
-              cambpmWithLabels()
+              cambpmWithLabels('all')
             }
           }
           steps {
@@ -326,7 +330,7 @@ pipeline {
           // see the .ci/config/matrices.yaml for the stage generation values
           // see .ci/config/stage-types.yaml for the stage configurations
           parallel(cambpmGetMatrixStages('jdk-ce-stages', failedStageTypes, { stageInfo ->
-            return cambpmWithLabels('default-build', 'jdk')
+            return cambpmWithLabels('all', 'default-build', 'jdk')
           }))
         }
       }

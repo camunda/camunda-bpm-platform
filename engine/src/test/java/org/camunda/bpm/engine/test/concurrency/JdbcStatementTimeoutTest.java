@@ -88,9 +88,7 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestHelper {
   }
 
   @Test
-  @RequiredDatabase(excludes = { DbSqlSessionFactory.MARIADB,
-      DbSqlSessionFactory.DB2,
-      DbSqlSessionFactory.H2})
+  @RequiredDatabase(excludes = { DbSqlSessionFactory.DB2, DbSqlSessionFactory.H2 })
   public void testTimeoutOnUpdate() {
     createJobEntity();
 

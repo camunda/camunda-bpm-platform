@@ -6,7 +6,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-parent</artifactId>
     <relativePath>../parent</relativePath>
-    <version>7.23.0-SNAPSHOT</version>
+    <version>7.24.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-core-internal-dependencies</artifactId>
@@ -67,7 +67,7 @@
       <dependency>
         <groupId>commons-fileupload</groupId>
         <artifactId>commons-fileupload</artifactId>
-        <version>1.5</version>
+        <version>1.6.0</version>
       </dependency>
 
       <dependency>
@@ -367,11 +367,6 @@
       </dependency>
       <dependency>
         <groupId>org.testcontainers</groupId>
-        <artifactId>mariadb</artifactId>
-        <version>${version.testcontainers}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.testcontainers</groupId>
         <artifactId>postgresql</artifactId>
         <version>${version.testcontainers}</version>
       </dependency>
@@ -379,6 +374,18 @@
         <groupId>org.testcontainers</groupId>
         <artifactId>mssqlserver</artifactId>
         <version>${version.testcontainers}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.minidev</groupId>
+        <artifactId>json-smart</artifactId>
+        <version>${version.json-smart}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.jayway.jsonpath</groupId>
+        <artifactId>json-path</artifactId>
+        <version>${version.json-path}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

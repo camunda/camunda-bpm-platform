@@ -877,7 +877,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertNotNull(jobRetryEntry);
     assertEquals(job.getId(), jobRetryEntry.getJobId());
 
-    assertEquals("3", jobRetryEntry.getOrgValue());
+    assertEquals("5", jobRetryEntry.getOrgValue());
     assertEquals("10", jobRetryEntry.getNewValue());
     assertEquals("retries", jobRetryEntry.getProperty());
     assertEquals(job.getJobDefinitionId(), jobRetryEntry.getJobDefinitionId());

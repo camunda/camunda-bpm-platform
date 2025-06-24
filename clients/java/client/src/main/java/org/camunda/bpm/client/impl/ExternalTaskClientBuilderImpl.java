@@ -107,6 +107,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     this.backoffStrategy = new ExponentialBackoffStrategy();
     this.isBackoffStrategyDisabled = false;
     this.httpClientBuilder = HttpClients.custom().useSystemProperties();
+    this.urlResolver = new PermanentUrlResolver(null);
   }
 
   public ExternalTaskClientBuilder baseUrl(String baseUrl) {

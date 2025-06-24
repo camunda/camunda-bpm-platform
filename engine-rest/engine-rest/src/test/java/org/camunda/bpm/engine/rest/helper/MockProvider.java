@@ -247,6 +247,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY = "aKey";
   public static final String EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY_LIKE = "aKeyLike";
   public static final String EXAMPLE_PROCESS_INSTANCE_ID = "aProcInstId";
+  public static final String EXAMPLE_ROOT_PROCESS_INSTANCE_ID = "aRootProcessInstanceId";
   public static final String EXAMPLE_ROOT_HISTORIC_PROCESS_INSTANCE_ID = "aRootProcInstId";
   public static final String ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID = "anotherId";
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED = false;
@@ -918,6 +919,7 @@ public abstract class MockProvider {
   public static final String EXTERNAL_TASK_ID_LIST = EXTERNAL_TASK_ID + "," + EXTERNAL_TASK_ANOTHER_ID;
   public static final String EXTERNAL_TASK_ERROR_MESSAGE = "some error";
   public static final String EXTERNAL_TASK_LOCK_EXPIRATION_TIME = withTimezone("2015-10-05T13:25:00");
+  public static final String EXTERNAL_TASK_CREATE_TIME = withTimezone("2015-10-05T12:25:00");
   public static final Integer EXTERNAL_TASK_RETRIES = 5;
   public static final boolean EXTERNAL_TASK_SUSPENDED = true;
   public static final String EXTERNAL_TASK_TOPIC_NAME = "aTopic";
@@ -3136,6 +3138,7 @@ public abstract class MockProvider {
       .errorMessage(EXTERNAL_TASK_ERROR_MESSAGE)
       .executionId(EXAMPLE_EXECUTION_ID)
       .lockExpirationTime(DateTimeUtil.parseDate(EXTERNAL_TASK_LOCK_EXPIRATION_TIME))
+      .createTime(DateTimeUtil.parseDate(EXTERNAL_TASK_CREATE_TIME))
       .processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID)
       .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY)
       .processDefinitionVersionTag(EXAMPLE_PROCESS_DEFINITION_VERSION_TAG)

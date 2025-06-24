@@ -91,4 +91,14 @@ public class ExternalTaskClientBuilderImplTest {
     }
   }
 
+  @Test
+  public void testBuilderWithUnsetBaseUrl() {
+    // given unbuilt builder
+    ExternalTaskClientBuilderImpl builder = new ExternalTaskClientBuilderImpl();
+
+    // when getting base url and url resolver, then they are correctly initialized
+    assertThat(builder.getBaseUrl()).isNull();
+    assertThat(builder.urlResolver).isNotNull();
+  }
+
 }
