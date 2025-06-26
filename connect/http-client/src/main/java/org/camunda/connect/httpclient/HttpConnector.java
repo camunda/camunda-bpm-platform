@@ -21,6 +21,6 @@ import org.camunda.connect.spi.Connector;
 
 public interface HttpConnector extends Connector<HttpRequest> {
 
-  static final String ID = Connectors.HTTP_CONNECTOR_ID;
+  String ID = Connectors.HTTP_CONNECTOR_ID;
 
 }
