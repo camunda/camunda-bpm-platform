@@ -102,6 +102,7 @@ import org.junit.rules.RuleChain;
  * @author Tom Baeyens
  * @author Falko Menge (camunda)
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class FormServiceTest {
 
   @ClassRule
