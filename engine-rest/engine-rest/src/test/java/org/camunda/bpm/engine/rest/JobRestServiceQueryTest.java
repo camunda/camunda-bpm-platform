@@ -360,7 +360,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testAcquiredParameterAsPost() {
+  public void testAcquiredParameter() {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("acquired", MockProvider.EXAMPLE_ACQUIRED);
 
@@ -374,6 +374,21 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).acquired();
     verify(mockQuery).list();
+  }
+
+  @Test
+  public void testAcquiredParameterAsPost() {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("acquired", MockProvider.EXAMPLE_ACQUIRED);
+
+    given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(JOBS_RESOURCE_URL);
   }
 
   @Test
