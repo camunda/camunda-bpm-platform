@@ -49,6 +49,7 @@ public class HistoricIncidentDto {
   protected Boolean deleted;
   protected Boolean resolved;
   protected String annotation;
+  protected String rootCauseIncidentMessage;
 
   public String getId() {
     return id;
@@ -142,6 +143,10 @@ public class HistoricIncidentDto {
     return annotation;
   }
 
+  public String getRootCauseIncidentMessage() {
+    return rootCauseIncidentMessage;
+  }
+
   public static HistoricIncidentDto fromHistoricIncident(HistoricIncident historicIncident) {
     HistoricIncidentDto dto = new HistoricIncidentDto();
 
@@ -168,6 +173,7 @@ public class HistoricIncidentDto {
     dto.removalTime = historicIncident.getRemovalTime();
     dto.rootProcessInstanceId = historicIncident.getRootProcessInstanceId();
     dto.annotation = historicIncident.getAnnotation();
+    dto.rootCauseIncidentMessage = historicIncident.getRootCauseIncidentMessage();
 
     return dto;
   }
