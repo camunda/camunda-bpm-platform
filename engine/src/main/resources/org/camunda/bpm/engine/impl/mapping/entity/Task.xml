@@ -486,6 +486,13 @@
                 #{item}
               </foreach>
             </if>
+            <if test="query.taskDefinitionKeyNotIn != null &amp;&amp; query.taskDefinitionKeyNotIn.length > 0">
+              ${queryType} RES.TASK_DEF_KEY_ not in
+              <foreach item="item" index="index" collection="query.taskDefinitionKeyNotIn"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
             <if test="query.processDefinitionId != null">
               ${queryType} RES.PROC_DEF_ID_ = #{query.processDefinitionId}
             </if>
