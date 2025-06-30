@@ -210,14 +210,12 @@ public class SequentialJobAcquisitionTest {
     // assert task completed for the first engine
     jobExecutor.start();
     waitForJobExecutorToProcessAllJobs(10000, 100, jobExecutor, engine1.getManagementService(), false);
+    waitForJobExecutionRunnablesToFinish(10000, 100, jobExecutor);
 
     // assert task completed for the second engine
     jobExecutor.start();
-
     waitForJobExecutorToProcessAllJobs(10000, 100, jobExecutor, engine2.getManagementService(), false);
     waitForJobExecutionRunnablesToFinish(10000, 100, jobExecutor);
-
-    Thread.sleep(2000);
 
     assertFalse(jobExecutor.getAcquireJobsRunnable().isJobAdded());
 
