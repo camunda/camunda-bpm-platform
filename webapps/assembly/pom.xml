@@ -188,7 +188,7 @@
 
   <profiles>
     <profile>
-      <id>sonatype-oss-release</id>
+      <id>central-sonatype-publish</id>
       <properties>
         <!-- skip building the frontend-sources zip artifact
         when releasing the community edition (alpha/minor releases) -->
