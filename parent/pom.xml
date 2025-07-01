@@ -59,8 +59,8 @@
     <version.bouncycastle>1.47</version.bouncycastle>
 
     <!-- application servers -->
-    <version.wildfly>35.0.0.Final</version.wildfly>
-    <version.wildfly.core>27.0.0.Final</version.wildfly.core>
+    <version.wildfly>37.0.0.Beta1</version.wildfly>
+    <version.wildfly.core>29.0.0.Beta6</version.wildfly.core>
 
     <version.wildfly26>26.0.1.Final</version.wildfly26>
     <version.wildfly26.core>18.0.4.Final</version.wildfly26.core>
@@ -244,7 +244,7 @@
         <plugin>
           <groupId>org.codehaus.cargo</groupId>
           <artifactId>cargo-maven3-plugin</artifactId>
-          <version>1.10.16</version>
+          <version>1.10.19</version>
         </plugin>
         <plugin>
           <groupId>net.kennychua</groupId>
