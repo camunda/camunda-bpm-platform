@@ -436,6 +436,9 @@
         <bind name="fieldName" value="'RES.NAME_'" />
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection" />
       </if>
+      <if test="variableIdAfter != null">
+        and RES.ID_ > #{variableIdAfter}
+      </if>
       <if test="variableId != null">
         and RES.ID_ = #{variableId}
       </if>

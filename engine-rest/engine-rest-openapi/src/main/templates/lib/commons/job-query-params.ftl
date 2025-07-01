@@ -163,5 +163,12 @@
     "type": "boolean",
     "desc": "Include jobs which belong to no tenant. Can be used in combination with `tenantIdIn`.
              Value may only be `true`, as `false` is the default behavior."
+    },
+  "acquired": {
+    "type": "boolean",
+    "desc": "Only select jobs which are acquired, i.e.,  lock expiration date is not null, lock expiration
+             date is in future. Value may only be `true`, as `false` is the default
+             behavior. This does not take account if the job is suspended. This filter can be used with the
+             suspension filter."
   }
 }>

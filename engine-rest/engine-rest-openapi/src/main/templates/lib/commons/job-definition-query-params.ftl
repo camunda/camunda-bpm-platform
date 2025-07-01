@@ -15,7 +15,7 @@
 <#elseif requestMethod == "POST">
   <#assign listSeparator = "">
 </#if>
-            
+
 <#assign params = {
   "jobDefinitionId": {
     "type": "string",

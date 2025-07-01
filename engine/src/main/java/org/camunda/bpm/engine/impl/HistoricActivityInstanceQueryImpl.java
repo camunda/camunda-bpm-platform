@@ -54,6 +54,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   protected ActivityInstanceState activityInstanceState;
   protected String[] tenantIds;
   protected boolean isTenantIdSet;
+  protected String activityInstanceIdAfter;
 
   public HistoricActivityInstanceQueryImpl() {
   }
@@ -76,6 +77,15 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     return commandContext
       .getHistoricActivityInstanceManager()
       .findHistoricActivityInstancesByQueryCriteria(this, page);
+  }
+
+  public HistoricActivityInstanceQueryImpl idAfter(String id) {
+    this.activityInstanceIdAfter = id;
+    return this;
+  }
+
+  public String getIdAfter() {
+    return activityInstanceIdAfter;
   }
 
   public HistoricActivityInstanceQueryImpl processInstanceId(String processInstanceId) {
