@@ -271,6 +271,12 @@
       type = "string"
       desc = "Restrict to tasks that have one of the given keys. The keys need to be in a
               comma-separated list." />
+  
+  <@lib.parameter name = "taskDefinitionKeyNotIn"
+      location = "query"
+      type = "string"
+      desc = "Exclude instances by a list of task definition keys. The keys need to be in a
+              comma-separated list." />
 
   <@lib.parameter name = "taskDefinitionKeyLike"
       location = "query"
