@@ -85,7 +85,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 /**
  * @author Joram Barrez
