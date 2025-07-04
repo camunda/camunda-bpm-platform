@@ -27,6 +27,6 @@ package org.camunda.connect.spi;
  */
 public interface CloseableConnectorResponse extends ConnectorResponse {
 
-  public void close();
+  void close();
 
 }

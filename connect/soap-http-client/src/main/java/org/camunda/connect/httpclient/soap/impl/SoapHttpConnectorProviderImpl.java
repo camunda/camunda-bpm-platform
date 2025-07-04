@@ -17,9 +17,9 @@
 package org.camunda.connect.httpclient.soap.impl;
 
 import org.camunda.connect.httpclient.soap.SoapHttpConnector;
-import org.camunda.connect.spi.ConnectorProvider;
+import org.camunda.connect.httpclient.soap.SoapHttpConnectorProvider;
 
-public class SoapHttpConnectorProviderImpl implements ConnectorProvider {
+public class SoapHttpConnectorProviderImpl implements SoapHttpConnectorProvider {
 
   public String getConnectorId() {
     return SoapHttpConnector.ID;

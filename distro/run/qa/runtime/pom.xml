@@ -82,13 +82,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- SpringBoot BOM excludes commons-logging, so we need to add it explicitly -->
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <scope>test</scope>
-    </dependency>
-
     <!-- Webapps -->
     <dependency>
       <groupId>org.camunda.bpm.qa</groupId>
@@ -109,8 +102,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
       <version>${version.httpclient}</version>
       <scope>test</scope>
     </dependency>

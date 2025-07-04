@@ -17,7 +17,6 @@
     <version.rest-assured>4.5.0</version.rest-assured>
     <!-- override groovy version with the one used by rest-assured -->
     <version.groovy>3.0.9</version.groovy>
-    <version.apache.httpcore>4.4.5</version.apache.httpcore>
     <version.commons-codec>1.15</version.commons-codec>
   </properties>
 
@@ -57,9 +56,9 @@
         <type>pom</type>
       </dependency>
       <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpcore</artifactId>
-        <version>${version.apache.httpcore}</version>
+        <groupId>org.apache.httpcomponents.core5</groupId>
+        <artifactId>httpcore5</artifactId>
+        <version>5.2.4</version>
       </dependency>
       <dependency>
         <groupId>commons-codec</groupId>
