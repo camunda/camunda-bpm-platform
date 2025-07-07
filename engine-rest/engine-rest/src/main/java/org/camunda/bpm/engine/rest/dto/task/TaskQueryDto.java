@@ -137,6 +137,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private Boolean includeAssignedTasks;
   private String taskDefinitionKey;
   private String[] taskDefinitionKeyIn;
+  private String[] taskDefinitionKeyNotIn;
   private String taskDefinitionKeyLike;
   private String taskId;
   private String[] taskIdIn;
@@ -406,6 +407,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam(value = "taskDefinitionKeyIn", converter= StringArrayConverter.class)
   public void setTaskDefinitionKeyIn(String[] taskDefinitionKeyIn) {
     this.taskDefinitionKeyIn = taskDefinitionKeyIn;
+  }
+
+  @CamundaQueryParam(value = "taskDefinitionKeyNotIn", converter= StringArrayConverter.class)
+  public void setTaskDefinitionKeyNotIn(String[] taskDefinitionKeyNotIn) {
+    this.taskDefinitionKeyNotIn = taskDefinitionKeyNotIn;
   }
 
   @CamundaQueryParam("taskDefinitionKeyLike")
@@ -855,6 +861,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return taskDefinitionKeyIn;
   }
 
+  public String[] getTaskDefinitionKeyNotIn() {
+    return taskDefinitionKeyNotIn;
+  }
+
   public String getTaskDefinitionKey() {
     return taskDefinitionKey;
   }
@@ -1208,6 +1218,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     if (taskDefinitionKeyIn != null && taskDefinitionKeyIn.length > 0) {
       query.taskDefinitionKeyIn(taskDefinitionKeyIn);
+    }
+    if (taskDefinitionKeyNotIn != null && taskDefinitionKeyNotIn.length > 0) {
+      query.taskDefinitionKeyNotIn(taskDefinitionKeyNotIn);
     }
     if (taskDefinitionKey != null) {
       query.taskDefinitionKey(taskDefinitionKey);
@@ -1615,6 +1628,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.assigneeLike = taskQuery.getAssigneeLike();
     dto.taskDefinitionKey = taskQuery.getKey();
     dto.taskDefinitionKeyIn = taskQuery.getKeys();
+    dto.taskDefinitionKeyNotIn = taskQuery.getKeyNotIn();
     dto.taskDefinitionKeyLike = taskQuery.getKeyLike();
     dto.description = taskQuery.getDescription();
     dto.descriptionLike = taskQuery.getDescriptionLike();
