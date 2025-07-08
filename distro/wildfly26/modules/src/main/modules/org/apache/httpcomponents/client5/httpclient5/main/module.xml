@@ -5,8 +5,11 @@
 
   <dependencies>
 
-    <module name="javax.api" />
+    <module name="java.base" />
+    <module name="java.naming" />
+    <module name="java.security.jgss" />
 
+    <module name="org.slf4j" />
     <module name="org.apache.httpcomponents.core5.httpcore5" export="true" />
 
   </dependencies>

@@ -3,4 +3,8 @@
     <resource-root path="camunda-juel-@project.version@.jar" />
   </resources>
 
+  <dependencies>
+    <module name="java.base" />
+    <module name="javax.el.api" />
+  </dependencies>
 </module>
