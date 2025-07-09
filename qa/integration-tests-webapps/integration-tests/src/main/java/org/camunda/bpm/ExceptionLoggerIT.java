@@ -31,7 +31,7 @@ public class ExceptionLoggerIT extends AbstractWebIntegrationTest {
   }
 
   @Test
-  public void shouldCheckExceptionLogging() {
+  public void shouldNotFailForUndefinedUser() {
     // when
     HttpResponse<String> response = Unirest.get(appBasePath + "app/admin/default/#/users/undefined?tab=profile").asString();
 

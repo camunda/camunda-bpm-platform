@@ -38,6 +38,10 @@ public class ErrorPageIT extends AbstractWebIntegrationTest {
 
     // then
     assertEquals(404, response.getStatus());
+    assertTrue(response.getHeaders().get("Content-Type").getFirst().startsWith("text/html"));
+    String responseEntity = response.getBody();
+    assertTrue(responseEntity.contains("Camunda"));
+    assertTrue(responseEntity.contains("Not Found"));
   }
 
 }

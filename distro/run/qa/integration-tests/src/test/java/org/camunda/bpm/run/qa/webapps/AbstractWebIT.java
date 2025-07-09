@@ -18,10 +18,8 @@ package org.camunda.bpm.run.qa.webapps;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import kong.unirest.ObjectMapper;
-import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import org.camunda.bpm.TestProperties;
-import org.camunda.bpm.util.TestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -43,7 +41,6 @@ public abstract class AbstractWebIT {
   public String APP_BASE_PATH;
 
   protected String appUrl;
-  protected TestUtil testUtil;
   protected TestProperties testProperties;
 
   protected static ChromeDriverService service;
@@ -76,7 +73,6 @@ public abstract class AbstractWebIT {
   @Before
   public void before() throws Exception {
     testProperties = new TestProperties(48080);
-    testUtil = new TestUtil(testProperties);
   }
 
   @After

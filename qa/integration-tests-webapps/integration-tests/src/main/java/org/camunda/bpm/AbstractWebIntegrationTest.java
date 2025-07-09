@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.MediaType;
 
 import kong.unirest.ObjectMapper;
-import org.camunda.bpm.util.TestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -54,7 +53,6 @@ public abstract class AbstractWebIntegrationTest {
 
   protected String appBasePath;
   protected String appUrl;
-  protected TestUtil testUtil;
   protected TestProperties testProperties;
 
   protected static ChromeDriverService service;
@@ -90,7 +88,6 @@ public abstract class AbstractWebIntegrationTest {
   @Before
   public void before() throws Exception {
     testProperties = new TestProperties(48080);
-    testUtil = new TestUtil(testProperties);
   }
 
   @After
@@ -197,23 +194,4 @@ public abstract class AbstractWebIntegrationTest {
     }
   }
 
-  // Helper method to create HTTP GET requests with authentication
-  protected HttpResponse<String> executeAuthenticatedGet(String path) {
-    return Unirest.get(appBasePath + path)
-        .header(COOKIE_HEADER, createCookieHeader())
-        .header(X_XSRF_TOKEN_HEADER, csrfToken)
-        .header("Accept", MediaType.APPLICATION_JSON)
-        .asString();
-  }
-
-  // Helper method to create HTTP POST requests with authentication
-  protected HttpResponse<String> executeAuthenticatedPost(String path, String body, String contentType) {
-    return Unirest.post(appBasePath + path)
-        .body(body)
-        .header("Content-Type", contentType)
-        .header(COOKIE_HEADER, createCookieHeader())
-        .header(X_XSRF_TOKEN_HEADER, csrfToken)
-        .header("Accept", MediaType.APPLICATION_JSON)
-        .asString();
-  }
 }
