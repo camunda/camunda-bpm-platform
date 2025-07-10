@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 import org.camunda.bpm.engine.task.Task;
+import org.quartz.CronExpression;
 
 public class CycleBusinessCalendar implements BusinessCalendar {
 
