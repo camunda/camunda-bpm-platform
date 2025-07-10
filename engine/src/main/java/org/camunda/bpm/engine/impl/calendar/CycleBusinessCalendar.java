@@ -48,8 +48,10 @@ public class CycleBusinessCalendar implements BusinessCalendar {
         durationHelper.setRepeatOffset(repeatOffset);
         return durationHelper.getDateAfter(startDate);
       } else {
-        CronExpression ce = new CronExpression(duedateDescription);
-        return ce.getTimeAfter(startDate == null ? ClockUtil.getCurrentTime() : startDate);
+        CronTimer cronTimer = CronTimer.parse(duedateDescription);
+        long fromEpochMilli = startDate == null ? ClockUtil.getCurrentTime().getTime() : startDate.getTime();
+        long dueDate = cronTimer.getDueDate(fromEpochMilli);
+        return new Date(dueDate);
       }
 
     }
