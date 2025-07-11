@@ -16,11 +16,21 @@
  */
 package org.camunda.bpm.engine.impl.test;
 
-import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Map;
+import org.camunda.bpm.engine.impl.cmd.GetDatabaseCountsCmd;
+import org.camunda.bpm.engine.impl.management.DatabaseContentReport;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Rule;
+import org.junit.Test;
+
 public class TestHelperTest {
+
+  @Rule
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
   @Test
   public void shouldGetPublicMethod() throws NoSuchMethodException {
@@ -62,6 +72,52 @@ public class TestHelperTest {
     // WHEN we call get method to retrieve a method with protected accessor, no exception should be thrown
     Object methodName = TestHelper.getMethod(SomeOtherTestClass.class, "testSomethingWithProtected", new Class[0]);
     assertThat(methodName.toString()).isEqualTo("protected void org.camunda.bpm.engine.impl.test.TestHelperTest$SomeTestClass.testSomethingWithProtected()");
+  }
+
+  @Test
+  public void shouldDetectCleanDbIgnoreExludedTables() {
+    // given a clean database
+    // only content should be in ignored tables (such as schema log or properties)
+
+    // then
+    boolean isClean = TestHelper.isDbClean(engineRule.getProcessEngine(), true);
+    assertThat(isClean).isTrue();
+  }
+
+  @Test
+  public void shouldDetectCleanDbIncludeExludedTables() {
+    // given a clean database
+    // only content should be in ignored tables (such as schema log or properties)
+
+    // then
+    boolean isClean = TestHelper.isDbClean(engineRule.getProcessEngine(), false);
+    assertThat(isClean).isFalse();
+    Map<String, Long> databaseContent = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new GetDatabaseCountsCmd()).getReportOnlyIncludingDirtyTables();
+    assertThat(databaseContent.keySet()).containsOnly(DatabaseContentReport.TABLE_NAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.toArray(new String[0]));
+  }
+
+  @Test
+  public void shouldDetectDirtyDbIgnoreExludedTables() {
+    // given
+    Task task = engineRule.getTaskService().newTask();
+    engineRule.getTaskService().saveTask(task);
+
+    // then
+    boolean isClean = TestHelper.isDbClean(engineRule.getProcessEngine(), true);
+    assertThat(isClean).isFalse();
+  }
+
+  @Test
+  public void shouldDetectDirtyDbIncludeExludedTables() {
+    // given
+    Task task = engineRule.getTaskService().newTask();
+    engineRule.getTaskService().saveTask(task);
+
+    // then
+    boolean isClean = TestHelper.isDbClean(engineRule.getProcessEngine(), false);
+    assertThat(isClean).isFalse();
+    Map<String, Long> databaseContent = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new GetDatabaseCountsCmd()).getReportOnlyIncludingDirtyTables();
+    assertThat(databaseContent.keySet()).contains("ACT_RU_TASK");
   }
 
   static class SomeTestClass {
