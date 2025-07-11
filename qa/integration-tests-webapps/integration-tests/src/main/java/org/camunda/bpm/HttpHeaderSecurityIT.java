@@ -16,16 +16,16 @@
  */
 package org.camunda.bpm;
 
-import com.sun.jersey.api.client.ClientResponse;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.ws.rs.core.MultivaluedMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class HttpHeaderSecurityIT extends AbstractWebIntegrationTest {
 
@@ -42,15 +42,11 @@ public class HttpHeaderSecurityIT extends AbstractWebIntegrationTest {
     // given
 
     // when
-    ClientResponse response = client.resource(appBasePath + TASKLIST_PATH)
-        .get(ClientResponse.class);
+    HttpResponse<String> response = Unirest.get(appBasePath + TASKLIST_PATH).asString();
 
     // then
     assertEquals(200, response.getStatus());
     assertHeaderPresent("X-XSS-Protection", "1; mode=block", response);
-
-    // cleanup
-    response.close();
   }
 
   @Test(timeout=10000)
@@ -58,15 +54,11 @@ public class HttpHeaderSecurityIT extends AbstractWebIntegrationTest {
     // given
 
     // when
-    ClientResponse response = client.resource(appBasePath + TASKLIST_PATH)
-        .get(ClientResponse.class);
+    HttpResponse<String> response = Unirest.get(appBasePath + TASKLIST_PATH).asString();
 
     // then
     assertEquals(200, response.getStatus());
     assertHeaderPresent("Content-Security-Policy", CSP_VALUE, response);
-
-    // cleanup
-    response.close();
   }
 
   @Test(timeout=10000)
@@ -74,15 +66,11 @@ public class HttpHeaderSecurityIT extends AbstractWebIntegrationTest {
     // given
 
     // when
-    ClientResponse response = client.resource(appBasePath + TASKLIST_PATH)
-        .get(ClientResponse.class);
+    HttpResponse<String> response = Unirest.get(appBasePath + TASKLIST_PATH).asString();
 
     // then
     assertEquals(200, response.getStatus());
     assertHeaderPresent("X-Content-Type-Options", "nosniff", response);
-
-    // cleanup
-    response.close();
   }
 
   @Test(timeout=10000)
@@ -90,26 +78,22 @@ public class HttpHeaderSecurityIT extends AbstractWebIntegrationTest {
     // given
 
     // when
-    ClientResponse response = client.resource(appBasePath + TASKLIST_PATH)
-        .get(ClientResponse.class);
+    HttpResponse<String> response = Unirest.get(appBasePath + TASKLIST_PATH).asString();
 
     // then
     assertEquals(200, response.getStatus());
-    MultivaluedMap<String, String> headers = response.getHeaders();
-    List<String> values = headers.get("Strict-Transport-Security");
-    assertNull(values);
-
-    // cleanup
-    response.close();
+    List<String> values = response.getHeaders().get("Strict-Transport-Security");
+    assertTrue(values.isEmpty());
   }
 
-  protected void assertHeaderPresent(String expectedName, String expectedValue, ClientResponse response) {
-    MultivaluedMap<String, String> headers = response.getHeaders();
+  protected void assertHeaderPresent(String expectedName, String expectedValue, HttpResponse<String> response) {
+    List<String> values = response.getHeaders().get(expectedName);
 
-    List<String> values = headers.get(expectedName);
-    for (String value : values) {
-      if (value.matches(expectedValue)) {
-        return;
+    if (values != null) {
+      for (String value : values) {
+        if (value.matches(expectedValue)) {
+          return;
+        }
       }
     }
 

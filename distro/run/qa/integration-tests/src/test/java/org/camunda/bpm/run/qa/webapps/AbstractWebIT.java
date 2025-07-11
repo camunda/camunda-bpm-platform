@@ -16,17 +16,13 @@
  */
 package org.camunda.bpm.run.qa.webapps;
 
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.client.apache4.ApacheHttpClient4;
-import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import kong.unirest.ObjectMapper;
+import kong.unirest.Unirest;
 import org.camunda.bpm.TestProperties;
-import org.camunda.bpm.util.TestUtil;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.openqa.selenium.chrome.ChromeDriverService;
 
 import java.util.logging.Logger;
@@ -45,24 +41,38 @@ public abstract class AbstractWebIT {
   public String APP_BASE_PATH;
 
   protected String appUrl;
-  protected TestUtil testUtil;
   protected TestProperties testProperties;
 
   protected static ChromeDriverService service;
 
-  public ApacheHttpClient4 client;
-  public DefaultHttpClient defaultHttpClient;
   public String httpPort;
+
+  @BeforeClass
+  public static void setUpClass() {
+    Unirest.config().reset().enableCookieManagement(false).setObjectMapper(new ObjectMapper() {
+      final com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+
+      public String writeValue(Object value) {
+        try {
+          return mapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+          throw new RuntimeException(e);
+        }
+      }
+
+      public <T> T readValue(String value, Class<T> valueType) {
+        try {
+          return mapper.readValue(value, valueType);
+        } catch (JsonProcessingException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    });
+  }
 
   @Before
   public void before() throws Exception {
     testProperties = new TestProperties(48080);
-    testUtil = new TestUtil(testProperties);
-  }
-
-  @After
-  public void destroyClient() {
-    client.destroy();
   }
 
   public void createClient(String ctxPath) throws Exception {
@@ -70,20 +80,11 @@ public abstract class AbstractWebIT {
 
     APP_BASE_PATH = testProperties.getApplicationPath("/" + ctxPath);
     LOGGER.info("Connecting to application "+APP_BASE_PATH);
-
-    ClientConfig clientConfig = new DefaultApacheHttpClient4Config();
-    clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-    client = ApacheHttpClient4.create(clientConfig);
-
-    defaultHttpClient = (DefaultHttpClient) client.getClientHandler().getHttpClient();
-    HttpParams params = defaultHttpClient.getParams();
-    HttpConnectionParams.setConnectionTimeout(params, 3 * 60 * 1000);
-    HttpConnectionParams.setSoTimeout(params, 10 * 60 * 1000);
   }
 
   public void preventRaceConditions() throws InterruptedException {
     // just wait some seconds before starting because of Wildfly / Cargo race conditions
-    Thread.sleep(5 * 1000);
+    Thread.sleep(6 * 1000);
   }
 
   protected String getWebappCtxPath() {
