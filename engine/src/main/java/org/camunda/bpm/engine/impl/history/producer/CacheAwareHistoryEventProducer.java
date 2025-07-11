@@ -23,7 +23,9 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.event.*;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.runtime.Incident;
 
 /**
@@ -112,6 +114,18 @@ public class CacheAwareHistoryEventProducer extends DefaultHistoryEventProducer 
     return Context.getCommandContext()
       .getDbEntityManager()
       .getCachedEntity(type, id);
+  }
+
+  @Override
+  protected ProcessDefinitionEntity getProcessDefinitionEntity(String processDefinitionId) {
+    CommandContext commandContext = Context.getCommandContext();
+    ProcessDefinitionEntity entity = null;
+    if(commandContext != null) {
+      entity = commandContext
+          .getDbEntityManager()
+          .getCachedEntity(ProcessDefinitionEntity.class, processDefinitionId);
+    }
+    return (entity != null) ? entity : super.getProcessDefinitionEntity(processDefinitionId);
   }
 
 }
