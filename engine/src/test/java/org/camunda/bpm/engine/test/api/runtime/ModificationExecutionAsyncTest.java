@@ -173,6 +173,13 @@ public class ModificationExecutionAsyncTest {
     Batch batch = runtimeService.createModification(processDefinition.getId()).startAfterActivity("user2").processInstanceIds(processInstanceIds).executeAsync();
 
     assertBatchCreated(batch, 2);
+
+    //Making sure that processInstanceId is set in execution jobs #4205
+    helper.executeSeedJob(batch);
+    List<Job> executionJobs = helper.getExecutionJobs(batch);
+    assertThat(executionJobs)
+            .extracting("processInstanceId")
+            .containsExactlyInAnyOrder(processInstanceIds.toArray());
   }
 
   @Test
@@ -329,7 +336,7 @@ public class ModificationExecutionAsyncTest {
       assertEquals(currentTime, modificationJob.getDuedate());
       assertNull(modificationJob.getProcessDefinitionId());
       assertNull(modificationJob.getProcessDefinitionKey());
-      assertNull(modificationJob.getProcessInstanceId());
+//      assertNull(modificationJob.getProcessInstanceId());
       assertNull(modificationJob.getExecutionId());
     }
 
