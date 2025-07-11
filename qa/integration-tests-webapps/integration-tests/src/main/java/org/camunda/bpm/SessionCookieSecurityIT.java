@@ -16,11 +16,10 @@
  */
 package org.camunda.bpm;
 
-import com.sun.jersey.api.client.ClientResponse;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.ws.rs.core.MultivaluedMap;
 
 import java.util.List;
 
@@ -41,22 +40,16 @@ public class SessionCookieSecurityIT extends AbstractWebIntegrationTest {
     // given
 
     // when
-    ClientResponse response = client.resource(appBasePath + TASKLIST_PATH)
-        .get(ClientResponse.class);
+    HttpResponse<String> response = Unirest.get(appBasePath + TASKLIST_PATH).asString();
 
     // then
     assertEquals(200, response.getStatus());
     assertTrue(isCookieHeaderValuePresent("HttpOnly", response));
     assertFalse(isCookieHeaderValuePresent("Secure", response));
-
-    // cleanup
-    response.close();
   }
 
-  protected boolean isCookieHeaderValuePresent(String expectedHeaderValue, ClientResponse response) {
-    MultivaluedMap<String, String> headers = response.getHeaders();
-
-    List<String> values = headers.get("Set-Cookie");
+  protected boolean isCookieHeaderValuePresent(String expectedHeaderValue, HttpResponse<String> response) {
+    List<String> values = response.getHeaders().get("Set-Cookie");
     for (String value : values) {
       if (value.startsWith("JSESSIONID=")) {
         return value.contains(expectedHeaderValue);

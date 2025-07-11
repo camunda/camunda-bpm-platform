@@ -66,6 +66,14 @@ public class TestProperties {
     return properties.getProperty("http.host", "localhost");
   }
 
+  public String getWebappCtxPath() {
+    return getStringProperty("webapp.ctx.path", "camunda/");
+  }
+
+  public String getRestCtxPath() {
+    return getStringProperty("rest.ctx.path", "engine-rest/");
+  }
+
   public static Properties getTestProperties() throws IOException {
     Properties properties = new Properties();
 

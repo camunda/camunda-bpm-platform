@@ -29,7 +29,7 @@ public enum RequestConfigOption {
       (builder, value) -> builder.setAuthenticationEnabled((boolean) value)),
   CIRCULAR_REDIRECTS_ALLOWED("circular-redirects-allowed",
       (builder, value) -> builder.setCircularRedirectsAllowed((boolean) value)),
-  CONNECT_TIMEOUT("connect-timeout",
+  CONNECTION_TIMEOUT("connection-timeout",
       (builder, value) -> builder.setConnectTimeout((Timeout) value)),
   CONNECTION_KEEP_ALIVE("connection-keep-alive",
       (builder, value) -> builder.setConnectionKeepAlive((Timeout) value)),

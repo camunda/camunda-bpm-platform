@@ -96,7 +96,7 @@ public class HttpRequestConfigTest {
   public void shouldParseConnectTimeout() {
     // given
     HttpRequest request = connector.createRequest()
-        .configOption(RequestConfigOption.CONNECT_TIMEOUT.getName(), Timeout.ofSeconds(10));
+        .configOption(RequestConfigOption.CONNECTION_TIMEOUT.getName(), Timeout.ofSeconds(10));
     Map<String, Object> configOptions = request.getConfigOptions();
 
     RequestConfig.Builder configBuilder = RequestConfig.custom();
@@ -321,7 +321,7 @@ public class HttpRequestConfigTest {
     // given
     HttpClient client = (HttpClient) Whitebox.getInternalState(connector, "httpClient");
     connector.createRequest().url(EXAMPLE_URL).get()
-        .configOption(RequestConfigOption.CONNECT_TIMEOUT.getName(), Timeout.ofSeconds(10))
+        .configOption(RequestConfigOption.CONNECTION_TIMEOUT.getName(), Timeout.ofSeconds(10))
         .configOption(RequestConfigOption.CONNECTION_REQUEST_TIMEOUT.getName(), Timeout.ofSeconds(10))
         .configOption(RequestConfigOption.CONNECTION_KEEP_ALIVE.getName(), Timeout.ofSeconds(10))
         .configOption(RequestConfigOption.MAX_REDIRECTS.getName(), 0)
@@ -360,12 +360,12 @@ public class HttpRequestConfigTest {
     try {
       // when
       connector.createRequest().url(EXAMPLE_URL).get()
-          .configOption(RequestConfigOption.CONNECT_TIMEOUT.getName(), "0")
+          .configOption(RequestConfigOption.CONNECTION_TIMEOUT.getName(), "0")
           .execute();
       fail("No exception thrown");
     } catch (ConnectorRequestException e) {
       // then
-      assertThat(e).hasMessageContaining("Invalid value for request configuration option: " + RequestConfigOption.CONNECT_TIMEOUT.getName());
+      assertThat(e).hasMessageContaining("Invalid value for request configuration option: " + RequestConfigOption.CONNECTION_TIMEOUT.getName());
       assertThat(e).hasCauseInstanceOf(ClassCastException.class);
       assertThat(e.getCause()).hasMessageContaining("java.lang.String cannot be cast to class org.apache.hc.core5.util.Timeout");
     }
