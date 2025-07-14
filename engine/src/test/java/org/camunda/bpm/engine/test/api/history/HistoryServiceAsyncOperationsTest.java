@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -107,6 +109,21 @@ public class HistoryServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertNoHistoryForTasks();
     assertHistoricBatchExists(testRule);
     assertAllHistoricProcessInstancesAreDeleted();
+  }
+
+  @Test
+  public void testDeleteHistoryProcessInstances_shouldCreateProcessInstanceRelatedBatchJobsForSingleInvocations() {
+    //when
+    Batch batch = historyService.deleteHistoricProcessInstancesAsync(historicProcessInstances, TEST_REASON);
+
+    completeSeedJobs(batch);
+    List<Job> executionJobs = managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list();
+
+    // then
+    //Making sure that processInstanceId is set in execution jobs #4205
+    assertThat(executionJobs)
+            .extracting("processInstanceId")
+            .containsExactlyInAnyOrder(historicProcessInstances.toArray());
   }
 
   @Test

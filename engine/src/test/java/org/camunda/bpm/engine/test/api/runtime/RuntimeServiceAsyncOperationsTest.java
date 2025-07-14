@@ -94,6 +94,27 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
   }
 
   @Deployment(resources = {
+          "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
+  public void testDeleteProcessInstances_shouldCreateProcessInstanceRelatedBatchJobsForSingleInvocations() {
+    // given
+    List<String> processIds = startTestProcesses(2);
+
+    // when
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null, TESTING_INSTANCE_DELETE);
+    completeSeedJobs(batch);
+
+    List<Job> executionJobs = managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list();
+
+    // then
+    //Making sure that processInstanceId is set in execution jobs #4205
+    assertThat(executionJobs)
+            .extracting("processInstanceId")
+            .containsExactlyInAnyOrder(processIds.toArray());
+  }
+
+
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testDeleteProcessInstancesAsyncWithLargeList() throws Exception {

@@ -54,6 +54,7 @@ public class RestartProcessInstancesJobHandler extends AbstractBatchJobHandler<R
           .findDeployedProcessDefinitionById(configuration.getProcessDefinitionId());
       job.setDeploymentId(processDefinitionEntity.getDeploymentId());
     }
+    job.setProcessDefinitionId(configuration.getProcessDefinitionId());
   }
 
   @Override
