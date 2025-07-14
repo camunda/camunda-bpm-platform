@@ -11,6 +11,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.management.MetricIntervalValue;
+import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -22,8 +23,8 @@ public class MicrometerMetrics {
     @Autowired
     ProcessEngine processEngine;
 
-    @Value("${management.health.camunda.interval:900}")
-    private long interval;
+    @Autowired
+    CamundaBpmProperties camundaBpmProperties;
 
     @PostConstruct
     public void init() {
@@ -33,17 +34,19 @@ public class MicrometerMetrics {
         executorService.scheduleAtFixedRate(() -> {
 
             List<MetricIntervalValue> metricsList = processEngine.getManagementService()
-                    .createMetricsQuery().interval();
+                    .createMetricsQuery().interval(1);
+            System.out.println("metricsList");
+            System.out.println(metricsList);
             if(metricsList.isEmpty()){
                 return;
             }
             metricsList.forEach(metric ->{
                 if(!metricsMap.containsKey(metric.getName())) {
-                    Gauge.builder(metric.getName(),metricsMap, map -> map.get(metric.getName()))
+                    Gauge.builder("camunda." + metric.getName(),metricsMap, map -> map.get(metric.getName()))
                             .register(registry);
                 }
                 metricsMap.put(metric.getName(), metric.getValue());
             });
-        }, 0, interval, TimeUnit.SECONDS);
+        }, 0, camundaBpmProperties.getMetrics().getActuator().getInterval(), TimeUnit.SECONDS);
     }
 }
