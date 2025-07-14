@@ -1,0 +1,16 @@
+<module xmlns="urn:jboss:module:1.0" name="org.apache.httpcomponents.client5.httpclient5">
+  <resources>
+    <resource-root path="httpclient5-@version.httpclient5@.jar" />
+  </resources>
+
+  <dependencies>
+
+    <module name="java.base" />
+    <module name="java.naming" />
+    <module name="java.security.jgss" />
+
+    <module name="org.slf4j" />
+    <module name="org.apache.httpcomponents.core5.httpcore5" export="true" />
+
+  </dependencies>
+</module>

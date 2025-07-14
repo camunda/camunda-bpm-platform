@@ -16,13 +16,12 @@
  */
 package org.camunda.bpm;
 
-import static org.junit.Assert.assertEquals;
-
-import javax.ws.rs.core.Response;
-
-import com.sun.jersey.api.client.ClientResponse;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class ExceptionLoggerIT extends AbstractWebIntegrationTest {
 
@@ -34,13 +33,10 @@ public class ExceptionLoggerIT extends AbstractWebIntegrationTest {
   @Test
   public void shouldNotFailForUndefinedUser() {
     // when
-    ClientResponse response = client.resource(appBasePath + "app/admin/default/#/users/undefined?tab=profile")
-                                    .get(ClientResponse.class);
+    HttpResponse<String> response = Unirest.get(appBasePath + "app/admin/default/#/users/undefined?tab=profile").asString();
 
     // then
-    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-
-    // cleanup
-    response.close();
+    assertEquals(200, response.getStatus());
   }
+
 }

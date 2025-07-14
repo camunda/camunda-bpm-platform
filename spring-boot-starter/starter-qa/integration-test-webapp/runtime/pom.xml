@@ -75,15 +75,8 @@
         </dependency>
 
         <dependency>
-          <groupId>com.sun.jersey.contribs</groupId>
-          <artifactId>jersey-apache-client4</artifactId>
-          <version>${version.jersey-apache-client}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>httpclient</artifactId>
-          <version>${version.httpclient}</version>
+          <groupId>org.apache.httpcomponents.client5</groupId>
+          <artifactId>httpclient5</artifactId>
           <scope>test</scope>
         </dependency>
 
@@ -91,12 +84,6 @@
           <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>selenium-java</artifactId>
           <version>${version.selenium}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>com.sun.jersey</groupId>
-          <artifactId>jersey-json</artifactId>
-          <version>${version.jersey-json}</version>
         </dependency>
 
         <dependency>
@@ -118,6 +105,13 @@
           <scope>test</scope>
         </dependency>
 
+        <dependency>
+          <groupId>com.konghq</groupId>
+          <artifactId>unirest-java</artifactId>
+          <version>${version.unirest-java}</version>
+          <classifier>standalone</classifier>
+          <scope>provided</scope>
+        </dependency>
       </dependencies>
 
       <build>
