@@ -25,41 +25,28 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Date;
 
 /**
  * A cron timer implementation that uses cronutils library for parsing and evaluation.
  */
 public class CronTimer {
 
-  private final Cron cron;
-  private int repetitions;
+  protected final Cron cron;
 
   public CronTimer(final Cron cron) {
     this.cron = cron;
   }
 
-  public int getRepetitions() {
-    return repetitions;
-  }
+  public Date getDueDate(final Date afterTime) {
 
-  public long getDueDate(final long fromEpochMilli) {
-    // set default value to -1
-    repetitions = -1;
+    long fromEpochMilli = afterTime.getTime();
+    final var next = ExecutionTime.forCron(cron)
+        .nextExecution(ZonedDateTime.ofInstant(Instant.ofEpochMilli(fromEpochMilli), ZoneId.systemDefault()))
+        .map(ZonedDateTime::toInstant)
+        .map(Instant::toEpochMilli);
 
-    final var next =
-        ExecutionTime.forCron(cron)
-            .nextExecution(
-                ZonedDateTime.ofInstant(
-                    Instant.ofEpochMilli(fromEpochMilli), ZoneId.systemDefault()))
-            .map(ZonedDateTime::toInstant)
-            .map(Instant::toEpochMilli);
-
-    // set `repetitions` to 0 when the next execution time does not exist
-    if (next.isEmpty()) {
-      repetitions = 0;
-    }
-
-    return next.orElse(fromEpochMilli);
+    return new Date(next.orElse(fromEpochMilli));
   }
 
   public static CronTimer parse(final String text) throws ParseException {

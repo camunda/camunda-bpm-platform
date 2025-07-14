@@ -49,9 +49,7 @@ public class CycleBusinessCalendar implements BusinessCalendar {
         return durationHelper.getDateAfter(startDate);
       } else {
         CronTimer cronTimer = CronTimer.parse(duedateDescription);
-        long fromEpochMilli = startDate == null ? ClockUtil.getCurrentTime().getTime() : startDate.getTime();
-        long dueDate = cronTimer.getDueDate(fromEpochMilli);
-        return new Date(dueDate);
+        return cronTimer.getDueDate(startDate == null ? ClockUtil.getCurrentTime() : startDate);
       }
 
     }
