@@ -50,7 +50,7 @@ public class CamundaBpmActuatorConfiguration {
   }
 
   @Bean
-  @ConditionalOnBean(name = "processEngineConfigurationImpl")
+  @ConditionalOnProperty(prefix = "camunda.bpm.metrics.actuator", name = "interval")
   public MicrometerMetrics micrometerMetrics(){
     return new MicrometerMetrics();
   }

@@ -16,12 +16,17 @@
  */
 package org.camunda.bpm.spring.boot.starter.property;
 
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
+
 import static org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties.joinOn;
 
 public class MetricsProperty {
 
   private boolean enabled = Defaults.INSTANCE.isMetricsEnabled();
   private boolean dbReporterActivate = Defaults.INSTANCE.isDbMetricsReporterActivate();
+
+  @NestedConfigurationProperty
+  private ActuatorProperty actuator = new ActuatorProperty();
 
   public boolean isEnabled() {
     return enabled;
@@ -39,11 +44,20 @@ public class MetricsProperty {
     this.dbReporterActivate = dbReporterActivate;
   }
 
+  public ActuatorProperty getActuator() {
+    return actuator;
+  }
+
+  public void setActuator(ActuatorProperty actuator) {
+    this.actuator = actuator;
+  }
+
   @Override
   public String toString() {
     return joinOn(this.getClass())
       .add("enabled=" + enabled)
       .add("dbReporterActivate=" + dbReporterActivate)
+      .add("actuator=" + actuator)
       .toString();
   }
 
