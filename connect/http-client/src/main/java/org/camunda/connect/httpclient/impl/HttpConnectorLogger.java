@@ -28,7 +28,6 @@ public class HttpConnectorLogger extends ConnectLogger {
 
   public void ignoreHeader(String field, String value) {
     logInfo("002", "Ignoring header with name '{}' and value '{}'", field, value);
-
   }
 
   public void payloadIgnoredForHttpMethod(String method) {

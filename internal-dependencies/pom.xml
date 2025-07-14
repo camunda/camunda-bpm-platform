@@ -301,8 +301,8 @@
           the exclusion here, please make sure to add it in the REST API projects -->
         <exclusions>
           <exclusion>
-            <artifactId>httpclient</artifactId>
-            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient5</artifactId>
+            <groupId>org.apache.httpcomponents.client5</groupId>
           </exclusion>
           <exclusion>
             <groupId>commons-httpclient</groupId>
