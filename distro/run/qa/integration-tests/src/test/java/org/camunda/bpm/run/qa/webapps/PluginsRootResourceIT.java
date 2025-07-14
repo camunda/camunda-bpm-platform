@@ -16,7 +16,8 @@
  */
 package org.camunda.bpm.run.qa.webapps;
 
-import com.sun.jersey.api.client.ClientResponse;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
 import org.camunda.bpm.run.qa.util.SpringBootManagedContainer;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,8 +28,6 @@ import org.junit.runners.Parameterized.BeforeParam;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -95,26 +94,19 @@ public class PluginsRootResourceIT extends AbstractWebIT {
   @Test
   public void shouldGetAssetIfAllowed() {
     // when
-    ClientResponse response = getAsset("api/admin/plugin/adminPlugins/static/" + assetName);
+    HttpResponse<String> response = Unirest.get(APP_BASE_PATH + "api/admin/plugin/adminPlugins/static/" + assetName).asString();
 
     // then
     assertResponse(assetName, response);
-
-    // cleanup
-    response.close();
   }
 
-  protected ClientResponse getAsset(String path) {
-    return client.resource(APP_BASE_PATH + path).get(ClientResponse.class);
-  }
-
-  protected void assertResponse(String asset, ClientResponse response) {
+  protected void assertResponse(String asset, HttpResponse<String> response) {
     if (assetAllowed) {
-      assertEquals(Status.OK.getStatusCode(), response.getStatus());
+      assertEquals(200, response.getStatus());
     } else {
-      assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
-      assertTrue(response.getType().toString().startsWith(MediaType.APPLICATION_JSON));
-      String responseEntity = response.getEntity(String.class);
+      assertEquals(403, response.getStatus());
+      assertTrue(response.getHeaders().getFirst("Content-Type").startsWith("application/json"));
+      String responseEntity = response.getBody();
       assertTrue(responseEntity.contains("\"type\":\"RestException\""));
       assertTrue(responseEntity.contains("\"message\":\"Not allowed to load the following file '" + asset + "'.\""));
     }

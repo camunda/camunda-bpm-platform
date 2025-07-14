@@ -31,8 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.run.qa.util.SpringBootManagedContainer;
@@ -102,7 +100,7 @@ public class AutoDeploymentIT {
     // then
     // one deployment was made
     deploymentResponse.then()
-      .statusCode(Status.OK.getStatusCode())
+      .statusCode(200)
       .body("count", is(1));
 
     // when
@@ -111,7 +109,7 @@ public class AutoDeploymentIT {
     // then
     // only the dummy file was deployed
     definitionResponse.then()
-      .statusCode(Status.OK.getStatusCode())
+      .statusCode(200)
       .body("size()", is(1))
       .body("[0].key", is("process1"));
   }

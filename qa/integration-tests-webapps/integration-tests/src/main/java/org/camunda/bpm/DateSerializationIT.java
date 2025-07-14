@@ -22,16 +22,15 @@ import static org.junit.Assert.fail;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import javax.ws.rs.core.MediaType;
+import kong.unirest.HttpResponse;
+import kong.unirest.JsonNode;
+import kong.unirest.Unirest;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.sun.jersey.api.client.ClientResponse;
 
 public class DateSerializationIT extends AbstractWebIntegrationTest {
   
@@ -45,18 +44,18 @@ public class DateSerializationIT extends AbstractWebIntegrationTest {
   }
 
   @Test
-  public void shouldSerializeDateWithDefinedFormat() throws JSONException {
+  public void shouldSerializeDateWithDefinedFormat() {
     // when
-    ClientResponse response = client
-      .resource(appBasePath + SCHEMA_LOG_PATH)
-      .accept(MediaType.APPLICATION_JSON)
-      .header(X_XSRF_TOKEN_HEADER, csrfToken)
-      .header(COOKIE_HEADER, createCookieHeader())
-      .get(ClientResponse.class);
+    HttpResponse<JsonNode> response = Unirest.get(appBasePath + SCHEMA_LOG_PATH)
+        .header("Accept", "application/json")
+        .header(X_XSRF_TOKEN_HEADER, csrfToken)
+        .header(COOKIE_HEADER, createCookieHeader())
+        .asJson();
+
     // then
     assertEquals(200, response.getStatus());
-    JSONObject logElement = response.getEntity(JSONArray.class).getJSONObject(0);
-    response.close();
+    JSONArray logArray = response.getBody().getArray();
+    JSONObject logElement = logArray.getJSONObject(0);
     String timestamp = logElement.getString("timestamp");
     try {
       new SimpleDateFormat(JacksonConfigurator.DEFAULT_DATE_FORMAT).parse(timestamp);

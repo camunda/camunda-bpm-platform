@@ -5,12 +5,13 @@
 
   <dependencies>
     <module name="java.base" />
+    <module name="org.slf4j" />
     <module name="org.camunda.commons.camunda-commons-logging" />
     <module name="org.camunda.commons.camunda-commons-utils" />
 
     <module name="org.camunda.connect.camunda-connect-core" />
     <module name="org.camunda.connect.camunda-connect-http-client" />
 
-    <module name="org.apache.httpcomponents.httpclient" />
+    <module name="org.apache.httpcomponents.client5.httpclient5" />
   </dependencies>
 </module>

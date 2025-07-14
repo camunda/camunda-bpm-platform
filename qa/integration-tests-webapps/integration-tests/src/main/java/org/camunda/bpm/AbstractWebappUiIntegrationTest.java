@@ -43,7 +43,7 @@ public class AbstractWebappUiIntegrationTest extends AbstractWebIntegrationTest 
   @BeforeClass
   public static void createDriver() {
     String chromeDriverExecutable = "chromedriver";
-    if (System.getProperty( "os.name" ).toLowerCase(Locale.US).indexOf("windows") > -1) {
+    if (System.getProperty("os.name").toLowerCase(Locale.US).contains("windows")) {
       chromeDriverExecutable += ".exe";
     }
 
@@ -100,11 +100,6 @@ public class AbstractWebappUiIntegrationTest extends AbstractWebIntegrationTest 
     preventRaceConditions();
     createClient(getWebappCtxPath());
     appUrl = testProperties.getApplicationPath("/" + getWebappCtxPath());
-  }
-
-  @After
-  public void after() {
-    testUtil.destroy();
   }
 
   @AfterClass

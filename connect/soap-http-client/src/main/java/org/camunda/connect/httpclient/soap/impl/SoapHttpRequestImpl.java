@@ -16,7 +16,8 @@
  */
 package org.camunda.connect.httpclient.soap.impl;
 
-import org.apache.http.client.methods.HttpPost;
+
+import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.camunda.connect.httpclient.impl.AbstractHttpRequest;
 import org.camunda.connect.httpclient.soap.SoapHttpConnector;
 import org.camunda.connect.httpclient.soap.SoapHttpRequest;
@@ -24,7 +25,7 @@ import org.camunda.connect.httpclient.soap.SoapHttpResponse;
 
 public class SoapHttpRequestImpl extends AbstractHttpRequest<SoapHttpRequest, SoapHttpResponse> implements SoapHttpRequest {
 
-  protected static final SoapHttpConnectorLogger LOG = SoapHttpLogger.SOAP_CONNECTOR_LOGGER;
+  protected static final SoapHttpConnectorLogger LOG = SoapHttpLogger.SOAP_HTTP_CONNECTOR_LOGGER;
 
   public SoapHttpRequestImpl(SoapHttpConnector connector) {
     super(connector);
