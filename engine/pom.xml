@@ -503,6 +503,10 @@
               <pattern>com.google.gson</pattern>
               <shadedPattern>camundajar.impl.com.google.gson</shadedPattern>
             </relocation>
+            <relocation>
+              <pattern>com.cronutils</pattern>
+              <shadedPattern>camundajar.impl.com.cronutils</shadedPattern>
+            </relocation>
           </relocations>
           <transformers>
             <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
