@@ -150,7 +150,7 @@ public class CycleBusinessCalendarTest {
     startDate = sdf.parse("2000 02 26 10:00");
     assertThat(sdf.format(cbc.resolveDuedate("0 15 10 L-3 2 ?", startDate))).isEqualTo("2000 02 26 10:15");
     startDate = sdf.parse("2000 02 27 10:00");
-    assertThat(sdf.format(cbc.resolveDuedate("0 15 10 L-3 2 ?", startDate))).isEqualTo("2000 02 26 10:15");
+    assertThat(sdf.format(cbc.resolveDuedate("0 15 10 L-3 2 ?", startDate))).isEqualTo("2001 02 25 10:15");
   }
 
   @Test

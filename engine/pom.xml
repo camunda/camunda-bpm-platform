@@ -196,6 +196,12 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>com.cronutils</groupId>
+      <artifactId>cron-utils</artifactId>
+      <version>${version.cronutils}</version>
+    </dependency>
+
     <!-- test dependencies  -->
 
     <dependency>
@@ -496,6 +502,10 @@
             <relocation>
               <pattern>com.google.gson</pattern>
               <shadedPattern>camundajar.impl.com.google.gson</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>com.cronutils</pattern>
+              <shadedPattern>camundajar.impl.com.cronutils</shadedPattern>
             </relocation>
           </relocations>
           <transformers>
