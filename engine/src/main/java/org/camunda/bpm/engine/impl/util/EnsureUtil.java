@@ -128,6 +128,14 @@ public final class EnsureUtil {
   }
 
   @SuppressWarnings("rawtypes")
+  public static void ensureEmpty(Class<? extends ProcessEngineException> exceptionClass, String message, Collection collection) {
+    if (collection != null && !collection.isEmpty()) {
+      String variableName = collection.iterator().next().toString();
+      throw generateException(exceptionClass, message, variableName, "is not empty");
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
   public static void ensureNotEmpty(String variableName, Map map) {
     ensureNotEmpty("", variableName, map);
   }
