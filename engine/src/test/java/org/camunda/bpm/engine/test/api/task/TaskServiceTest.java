@@ -302,6 +302,7 @@ public class TaskServiceTest {
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void testDeleteTaskCommentNotExistingCommentId() {
     Task task = taskService.newTask();
@@ -315,6 +316,7 @@ public class TaskServiceTest {
     taskService.deleteTask(taskId, true);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void testDeleteTaskCommentWithoutProcessInstance() {
     Task task = taskService.newTask();
@@ -336,6 +338,7 @@ public class TaskServiceTest {
     taskService.deleteTask(taskId, true);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteTaskCommentWithProcessInstance() {
@@ -355,6 +358,7 @@ public class TaskServiceTest {
     assertNull(shouldBeDeleted);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void testDeleteTaskCommentsNullTaskId() {
     try {
@@ -375,6 +379,7 @@ public class TaskServiceTest {
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void testDeleteTaskCommentsNoComments() {
     Task task = taskService.newTask();
@@ -388,6 +393,7 @@ public class TaskServiceTest {
     taskService.deleteTask(taskId, true);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void testDeleteTaskComments() {
     Task task = taskService.newTask();
@@ -408,6 +414,7 @@ public class TaskServiceTest {
     taskService.deleteTask(taskId, true);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteProcessInstanceTaskComments() {
@@ -442,6 +449,7 @@ public class TaskServiceTest {
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void testUpdateTaskCommentNullTaskId() {
     Task task = taskService.newTask();
@@ -459,6 +467,7 @@ public class TaskServiceTest {
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void testUpdateTaskCommentNullMessage() {
     Task task = taskService.newTask();
@@ -476,6 +485,7 @@ public class TaskServiceTest {
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void testUpdateTaskCommentNotExistingCommentId() {
     Task task = taskService.newTask();
@@ -495,6 +505,7 @@ public class TaskServiceTest {
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void testUpdateTaskComment() {
     Task task = taskService.newTask();
@@ -513,6 +524,7 @@ public class TaskServiceTest {
     taskService.deleteTask(taskId, true);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testUpdateProcessTaskComment() {
@@ -541,6 +553,7 @@ public class TaskServiceTest {
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteProcessInstanceCommentNotExistingCommentId() {
@@ -550,6 +563,7 @@ public class TaskServiceTest {
     taskService.deleteProcessInstanceComment(processInstance.getId(), "notExistingCommentId");
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteTaskProcessInstanceComment() {
@@ -569,6 +583,7 @@ public class TaskServiceTest {
     assertThat(shouldBeDeletedLst).isEmpty();
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteProcessInstanceComment() {
@@ -606,6 +621,7 @@ public class TaskServiceTest {
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteProcessInstanceCommentsNoComments() {
@@ -616,6 +632,7 @@ public class TaskServiceTest {
     taskService.deleteProcessInstanceComments(processInstance.getId());
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteProcessInstanceCommentsWithoutTaskComments() {
@@ -634,6 +651,7 @@ public class TaskServiceTest {
     assertThat(shouldBeDeletedLst).isEmpty();
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteProcessInstanceCommentsWithTask() {
@@ -666,6 +684,7 @@ public class TaskServiceTest {
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testUpdateProcessInstanceCommentNullProcessInstanceId() {
@@ -681,6 +700,7 @@ public class TaskServiceTest {
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testUpdateProcessInstanceCommentNullMessage() {
@@ -697,6 +717,7 @@ public class TaskServiceTest {
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testUpdateProcessInstanceCommentNotExistingCommentId() {
@@ -716,6 +737,7 @@ public class TaskServiceTest {
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testUpdateProcessInstanceCommentWithTask() {
@@ -738,6 +760,7 @@ public class TaskServiceTest {
     assertEquals(updatedMessage, actual.getFullMessage());
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testUpdateProcessInstanceCommentWithoutTask() {
@@ -2723,6 +2746,7 @@ public class TaskServiceTest {
     assertThat(taskService.getAttachment(attachmentId)).isNull();
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testDeleteTaskAttachmentWithTaskIdNoLongerExists() {

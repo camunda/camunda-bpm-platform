@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
@@ -41,6 +42,7 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -102,6 +104,7 @@ public class ModificationExecutionSyncTest {
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void createSimpleModificationPlanWithHistoricQuery() {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
@@ -138,6 +141,7 @@ public class ModificationExecutionSyncTest {
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void createSimpleModificationPlanWithComplementaryRuntimeAndHistoryQueries() {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
@@ -157,6 +161,7 @@ public class ModificationExecutionSyncTest {
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void createSimpleModificationPlanWithHistoricQueryUnfinished() {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);

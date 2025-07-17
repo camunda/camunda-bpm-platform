@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
@@ -34,6 +35,7 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
@@ -180,6 +182,7 @@ public class TaskLastUpdatedTest {
     assertThat(taskResult.getLastUpdated()).isAfter(beforeUpdate);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void shouldSetLastUpdatedOnCreateAttachment() {
     // given
@@ -196,6 +199,7 @@ public class TaskLastUpdatedTest {
     assertThat(taskResult.getLastUpdated()).isAfter(beforeUpdate);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void shouldSetLastUpdatedOnChangeAttachment() {
     // given
@@ -231,6 +235,7 @@ public class TaskLastUpdatedTest {
     assertThat(taskResult.getLastUpdated()).isAfter(beforeUpdate);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void shouldSetLastUpdatedOnDeleteTaskAttachment() {
     // given
@@ -248,6 +253,7 @@ public class TaskLastUpdatedTest {
     assertThat(taskResult.getLastUpdated()).isAfter(beforeUpdate);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void shouldSetLastUpdatedOnComment() {
     // given
@@ -403,6 +409,7 @@ public class TaskLastUpdatedTest {
     assertThat(taskResult.getLastUpdated()).isAfter(beforeSubmit);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void shouldNotSaveTaskConcurrentlyUpdatedByDependentEntity() {
     // given
@@ -415,6 +422,7 @@ public class TaskLastUpdatedTest {
       .isInstanceOf(OptimisticLockingException.class);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void shouldSetLastUpdatedOnTaskDeleteComment() {
     // given
@@ -433,6 +441,7 @@ public class TaskLastUpdatedTest {
     assertThat(taskResult.getLastUpdated()).isAfter(beforeUpdate);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void shouldSetLastUpdatedOnTaskDeleteComments() {
     // given
@@ -452,6 +461,7 @@ public class TaskLastUpdatedTest {
     assertThat(taskResult.getLastUpdated()).isAfter(beforeUpdate);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void shouldSetLastUpdatedOnTaskCommentUpdate() {
     // given
@@ -470,6 +480,7 @@ public class TaskLastUpdatedTest {
     assertThat(taskResult.getLastUpdated()).isAfter(beforeUpdate);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void shouldSetLastUpdatedOnProcessInstanceDeleteComment() {
     // given
@@ -485,6 +496,7 @@ public class TaskLastUpdatedTest {
     assertThat(taskResult.getLastUpdated()).isNull();
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void shouldSetLastUpdatedOnProcessInstanceDeleteComments() {
     // given
@@ -501,6 +513,7 @@ public class TaskLastUpdatedTest {
     assertThat(taskResult.getLastUpdated()).isNull();
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void shouldSetLastUpdatedOnProcessInstanceCommentUpdate() {
     // given
