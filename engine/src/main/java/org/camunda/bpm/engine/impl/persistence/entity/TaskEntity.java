@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import java.util.stream.Collectors;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
@@ -756,10 +757,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public void deleteIdentityLink(String userId, String groupId, String type) {
     ensureTaskActive();
 
-    List<IdentityLinkEntity> identityLinks = Context
-        .getCommandContext()
-        .getIdentityLinkManager()
-        .findIdentityLinkByTaskUserGroupAndType(id, userId, groupId, type);
+    List<IdentityLinkEntity> identityLinks = getIdentityLinks(userId, groupId, type);
 
     for (IdentityLinkEntity identityLink: identityLinks) {
       fireDeleteIdentityLinkAuthorizationProvider(type, userId, groupId);
@@ -856,6 +854,14 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
 
     return taskIdentityLinkEntities;
+  }
+
+  public List<IdentityLinkEntity> getIdentityLinks(String userId, String groupId, String type) {
+    return getIdentityLinks().stream()
+        .filter(identityLink -> (userId == null || userId.equals(identityLink.getUserId()))
+            && (groupId == null || groupId.equals(identityLink.getGroupId()))
+            && (type == null || type.equals(identityLink.getType())))
+        .collect(Collectors.toList());
   }
 
   @SuppressWarnings("unchecked")

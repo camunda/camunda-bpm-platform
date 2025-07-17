@@ -76,6 +76,21 @@ public class TaskListenerTest extends AbstractTaskListenerTest {
 
   // CREATE Task Listener tests
 
+  // TODO move or delete this test case and its resources
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.testAddAndDeleteRecordsWithinSameListener.bpmn20.xml"})
+  public void testAddingAndDeletingRecordsWithinSameListener() {
+    runtimeService.startProcessInstanceByKey("taskListenerProcessAddAndDelete");
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("TaskCreateListener is listening!", task.getDescription());
+
+    assertEquals(0L, runtimeService.createVariableInstanceQuery().variableName("aVarName").count());
+    assertEquals(0L, taskService.createTaskQuery().taskCandidateUser("aCandidateUserId").count());
+    assertEquals(0L, taskService.createTaskQuery().taskCandidateGroup("aCandidateGroupId").count());
+    assertEquals(0L, taskService.createTaskQuery().taskCandidateGroup("anotherCandidateGroupId").count());
+    assertEquals(0L, taskService.createTaskQuery().taskAssignee("anAssigneeUserId").count());
+  }
+
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.bpmn20.xml"})
   public void testTaskCreateListener() {
