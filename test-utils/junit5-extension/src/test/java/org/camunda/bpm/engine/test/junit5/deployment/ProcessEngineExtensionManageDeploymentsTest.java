@@ -28,7 +28,7 @@ public class ProcessEngineExtensionManageDeploymentsTest {
   @RegisterExtension
   ProcessEngineExtension extension = ProcessEngineExtension.builder()
     // fail if DB is dirty after test
-    .ensureCleanAfterTest(true)
+    .ensureCleanAfterTest(true, true)
     .build();
 
   @Test
