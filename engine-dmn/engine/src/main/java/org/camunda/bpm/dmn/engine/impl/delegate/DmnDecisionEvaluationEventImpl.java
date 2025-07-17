@@ -30,6 +30,8 @@ public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEven
   protected long executedDecisionInstances;
   protected long executedDecisionElements;
 
+  protected String decisionInstanceId;
+
   @Override
   public DmnDecisionLogicEvaluationEvent getDecisionResult() {
     return decisionResult;
@@ -67,6 +69,15 @@ public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEven
   }
 
   @Override
+  public String getDecisionInstanceId() {
+    return decisionInstanceId;
+  }
+
+  public void setDecisionInstanceId(String decisionInstanceId) {
+    this.decisionInstanceId = decisionInstanceId;
+  }
+
+  @Override
   public String toString() {
     DmnDecision dmnDecision = decisionResult.getDecision();
     return "DmnDecisionEvaluationEventImpl{" +
@@ -76,6 +87,7 @@ public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEven
       ", requiredDecisionResults=" + requiredDecisionResults +
       ", executedDecisionInstances=" + executedDecisionInstances +
       ", executedDecisionElements=" + executedDecisionElements +
+      ", dmnDecisionInstanceId=" + decisionInstanceId +
       '}';
   }
 
