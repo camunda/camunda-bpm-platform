@@ -168,6 +168,33 @@ public class MultiTenancyRepositoryServiceTest {
   }
 
   @Test
+  public void deploymentWithDuplicateFilteringForDifferentTenantsRepeated() {
+    // given: a deployment with tenant ID
+    createDeploymentBuilder()
+        .enableDuplicateFiltering(false)
+        .name("twice")
+        .tenantId(TENANT_ONE)
+        .deploy();
+
+    // if the same process is deployed with the another tenant ID
+    createDeploymentBuilder()
+        .enableDuplicateFiltering(false)
+        .name("twice")
+        .tenantId(TENANT_TWO)
+        .deploy();
+
+    // and then with the first tenant ID again
+    createDeploymentBuilder()
+        .enableDuplicateFiltering(false)
+        .name("twice")
+        .tenantId(TENANT_ONE)
+        .deploy();
+
+    // then only 2 deployment is created
+    assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2L);
+  }
+
+  @Test
   public void deploymentWithDuplicateFilteringIgnoreDeploymentForNoTenant() {
     // given: a deployment without tenant ID
     createDeploymentBuilder()
