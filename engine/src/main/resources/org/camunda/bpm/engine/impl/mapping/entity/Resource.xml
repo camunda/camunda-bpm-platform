@@ -177,6 +177,12 @@
         <if test="processApplicationSource.equals(parameter.source)">
           )
         </if>
+        <if test="parameter.tenantId != null">
+          and D.TENANT_ID_ = #{ parameter.tenantId }
+        </if>
+        <if test="parameter.tenantId == null">
+          and D.TENANT_ID_ is null
+        </if>
       <if test="parameter.resourcesToFind != null &amp;&amp; parameter.resourcesToFind.size > 0">
         and B.NAME_ in 
         <foreach item="resourceName" index="index" collection="parameter.resourcesToFind"
