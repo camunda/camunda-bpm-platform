@@ -762,7 +762,9 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     for (IdentityLinkEntity identityLink: identityLinks) {
       fireDeleteIdentityLinkAuthorizationProvider(type, userId, groupId);
       identityLink.delete();
+      getIdentityLinks().remove(identityLink);
     }
+    isIdentityLinksInitialized = false;
   }
 
   public void deleteIdentityLinks() {
@@ -857,11 +859,19 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   }
 
   public List<IdentityLinkEntity> getIdentityLinks(String userId, String groupId, String type) {
-    return getIdentityLinks().stream()
+    List<IdentityLinkEntity> identityLinks = getIdentityLinks().stream()
         .filter(identityLink -> (userId == null || userId.equals(identityLink.getUserId()))
-            && (groupId == null || groupId.equals(identityLink.getGroupId()))
-            && (type == null || type.equals(identityLink.getType())))
+                && (groupId == null || groupId.equals(identityLink.getGroupId()))
+                && (type == null || type.equals(identityLink.getType())))
         .collect(Collectors.toList());
+    if (identityLinks.isEmpty()) {
+      identityLinks = Context
+          .getCommandContext()
+          .getIdentityLinkManager()
+          .findIdentityLinkByTaskUserGroupAndType(id, userId, groupId, type);
+      isIdentityLinksInitialized = false;
+    }
+    return identityLinks;
   }
 
   @SuppressWarnings("unchecked")
