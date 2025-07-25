@@ -99,6 +99,13 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
     assertEquals("foo", output.get(1));
   }
 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/test_bpmn_failing_2.bpmn", "org/camunda/bpm/engine/test/dmn/test_dmn_2.dmn" })
+  @Test
+  public void shouldDecisionRuleTaskExecuteWithoutErrors() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestCollectDmn");
+    // no exception should be thrown
+  }
+
   @Deployment(resources = { RESULT_LIST_BPMN, TEST_DECISION })
   @Test
   public void testResultListMapping() {
