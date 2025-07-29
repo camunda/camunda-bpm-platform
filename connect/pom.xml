@@ -14,6 +14,10 @@
   <inceptionYear>2014</inceptionYear>
   <packaging>pom</packaging>
 
+  <description>
+    Note: 7.24.0 is the last community edition release published on Maven Central. This library will not receive any new versions or releases. However, if you are interested in extended maintenance you could look into our enterprise edition. Get in touch with us: https://camunda.com/contact/
+  </description>
+
   <properties>
     <commons-codec.version>1.15</commons-codec.version>
     <connect.version.old>7.23.0</connect.version.old>

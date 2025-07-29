@@ -16,6 +16,10 @@
   <name>Camunda Platform - connect - bom</name>
   <packaging>pom</packaging>
 
+  <description>
+    Note: 7.24.0 is the last community edition release published on Maven Central. This library will not receive any new versions or releases. However, if you are interested in extended maintenance you could look into our enterprise edition. Get in touch with us: https://camunda.com/contact/
+  </description>
+
   <dependencyManagement>
     <dependencies>
 
