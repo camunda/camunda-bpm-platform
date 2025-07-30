@@ -19,6 +19,7 @@
   <description>
     This pom defines the modules that make up the build.
     The parent pom for all Camunda Platform projects can be found in the parent directory relative to this file.
+    Note: 7.24.0 is the last community edition release published on Maven Central. This library will not receive any new versions or releases. However, if you are interested in extended maintenance you could look into our enterprise edition. Get in touch with us: https://camunda.com/contact/
   </description>
 
   <properties>

@@ -12,6 +12,10 @@
   <name>Camunda Test Utils - Testcontainers</name>
   <packaging>jar</packaging>
 
+  <description>
+    Note: 7.24.0 is the last community edition release published on Maven Central. This library will not receive any new versions or releases. However, if you are interested in extended maintenance you could look into our enterprise edition. Get in touch with us: https://camunda.com/contact/
+  </description>
+
   <properties>
     <version.slf4j>1.7.26</version.slf4j>
   </properties>
