@@ -3,6 +3,9 @@
   "extends": [
     "config:base"
   ],
+  "addLabels": [
+    "dependencies"
+  ],
   "prConcurrentLimit": 10,
   "baseBranchPatterns": [
     "/!^master$/",
@@ -18,13 +21,12 @@
     "enabled": false
   },
   "lockFileMaintenance": {
-    //"automerge": true // auto-merge will be activated in a seconds step
+    //"automerge": true // auto-merge will be activated in a second step
     "enabled": true,
     "addLabels": [
       "automerge",
       "ci:e2e",
-      "ci:rest-api",
-      "ci:no-build"
+      "ci:rest-api"
     ],
     "branchPrefix": "{{{baseBranch}}}-"
   },
@@ -56,7 +58,7 @@
     },
     // Patch
     {
-      //"automerge": true // auto-merge will be activated in a seconds step
+      //"automerge": true // auto-merge will be activated in a second step
       "matchPackageNames": [
         "/^commons-fileupload/",
         "/^org.apache.commons:commons-lang3/",
@@ -81,8 +83,7 @@
       ],
       "addLabels": [
         "automerge",
-        "ci:all",
-        "ci:no-build"
+        "ci:all"
       ],
       "branchPrefix": "{{{baseBranch}}}-"
     },
@@ -114,12 +115,11 @@
         "minor"
       ],
       "addLabels": [
-        "ci:all",
-        "ci:no-build"
+        "ci:all"
       ],
       "branchPrefix": "{{{baseBranch}}}-",
       "automerge": false,
       "dependencyDashboardApproval": true
-    }
+    },
   ],
 }
