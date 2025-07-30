@@ -1,6 +1,20 @@
 {
-  "extends": [
-    "config:base",
-    "github>camunda/camunda-bpm-platform-maintenance:5214-renovate:.github/renovate.json"
-  ]
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["*"],
+      "excludePackagePatterns": [
+        "^org\.springframework\.boot",
+        "^org\.springframework",
+        "^org\.apache\.tomcat",
+        "^commons\-fileupload",
+        "^commons\-lang3"
+      ],
+      "enabled": false
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": false
+  }
 }
