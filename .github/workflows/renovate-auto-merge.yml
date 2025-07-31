@@ -4,11 +4,14 @@ on:
     types: [ opened, synchronize, reopened ]
 jobs:
   all-checks-passed:
-    if: contains(github.event.pull_request.labels.*.name, 'automerge') && github.actor == 'renovate[bot]'
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'automerge') && github.actor == 'renovate[bot]'}}
     name: All checks passed
     runs-on: ubuntu-latest
     permissions:
       checks: read
       contents: read
+    environment: delayenv
     steps:
-      - uses: wechuli/allcheckspassed@v1.2.0
+      - uses: wechuli/allcheckspassed@v1
+        with:
+          poll: false
