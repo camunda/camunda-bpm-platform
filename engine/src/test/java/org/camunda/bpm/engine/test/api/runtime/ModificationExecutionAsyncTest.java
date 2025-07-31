@@ -858,6 +858,7 @@ public class ModificationExecutionAsyncTest {
     assertThat(failedJob.getExceptionMessage()).contains("Process instance '" + deletedProcessInstanceId + "' cannot be modified");
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void testBatchExecutionFailureWithHistoricQueryThatMatchesDeletedInstance() {
     DeploymentWithDefinitions deployment = testRule.deploy(instance);
@@ -913,6 +914,7 @@ public class ModificationExecutionAsyncTest {
     assertThat(failedJob.getExceptionMessage()).contains("Process instance '" + deletedProcessInstanceId + "' cannot be modified");
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.syncAfterOneTaskProcess.bpmn20.xml" })
   public void testBatchExecutionWithHistoricQueryUnfinished() {
@@ -987,6 +989,7 @@ public class ModificationExecutionAsyncTest {
     assertBatchCreated(batch, processInstanceCount);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void testBatchCreationWithHistoricProcessInstanceQuery() {
     int processInstanceCount = 15;
@@ -1063,7 +1066,7 @@ public class ModificationExecutionAsyncTest {
     assertThat(failedJob.getExceptionMessage()).contains("Process instance '" + completedProcessInstanceId + "' cannot be modified");
   }
 
-
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.syncAfterOneTaskProcess.bpmn20.xml" })
   public void testBatchExecutionFailureWithHistoricQueryThatMatchesFinishedInstance() {
@@ -1145,6 +1148,7 @@ public class ModificationExecutionAsyncTest {
     assertBatchCreated(batch, processInstanceCount);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void testBatchCreationWithOverlappingProcessInstanceIdsAndHistoricQuery() {
     int processInstanceCount = 15;
@@ -1167,6 +1171,7 @@ public class ModificationExecutionAsyncTest {
     assertBatchCreated(batch, processInstanceCount);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void testBatchCreationWithOverlappingHistoricQueryAndQuery() {
     // given
