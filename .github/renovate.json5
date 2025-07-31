@@ -3,8 +3,7 @@
   "extends": [
     "config:base"
   ],
-  "branchPrefix": "",
-  "additionalBranchPrefix": "{{{baseBranch}}}-",
+  "branchName": "{{{baseBranch}}}-{{{branchTopic}}}",
   "addLabels": [
     "dependencies"
   ],
