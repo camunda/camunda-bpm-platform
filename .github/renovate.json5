@@ -3,6 +3,8 @@
   "extends": [
     "config:base"
   ],
+  "branchPrefix": "",
+  "additionalBranchPrefix": "{{{baseBranch}}}-",
   "addLabels": [
     "dependencies"
   ],
@@ -28,8 +30,6 @@
       "ci:e2e",
       "ci:rest-api"
     ],
-    "branchPrefix": "",
-    "additionalBranchPrefix": "{{{baseBranch}}}-"
   },
   "packageRules": [
     {
@@ -66,8 +66,6 @@
         "automerge",
         "ci:all"
       ],
-      "branchPrefix": "",
-      "additionalBranchPrefix": "{{{baseBranch}}}-"
     },
     {
       "matchUpdateTypes": [
@@ -77,8 +75,6 @@
       "addLabels": [
         "ci:all"
       ],
-      "branchPrefix": "",
-      "additionalBranchPrefix": "{{{baseBranch}}}-",
       "automerge": false,
       "dependencyDashboardApproval": true
     }
