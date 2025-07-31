@@ -28,11 +28,11 @@
       "ci:e2e",
       "ci:rest-api"
     ],
-    "branchPrefix": "{{{baseBranch}}}-"
+    "branchPrefix": "",
+    "additionalBranchPrefix": "{{{baseBranch}}}-"
   },
   "packageRules": [
     {
-      "enabled": false,
       "matchPackageNames": [
         "*",
         "!/^org.springframework/",
@@ -54,72 +54,33 @@
         "!/^com.mysql/",
         "!/^org.jboss.resteasy/",
         "!/^org.apache.groovy/"
-      ]
+      ],
+      "enabled": false
     },
-    // Patch
     {
       //"automerge": true // auto-merge will be activated in a second step
-      "matchPackageNames": [
-        "/^commons-fileupload/",
-        "/^org.apache.commons:commons-lang3/",
-        "/^net.minidev:json-smart/",
-        "/^com.jayway.jsonpath:json-path/",
-        "/^org.apache.httpcomponents.client5/",
-        "/^com.fasterxml.uuid/",
-        "/^com.fasterxml.jackson/",
-        "/^org.camunda.feel/",
-        "/^io.quarkus/",
-        "/^ch.qos.logback/",
-        "/^org.graalvm/",
-        "/^com.google.code.gson/",
-        "/^org.postgresql/",
-        "/^com.h2database/",
-        "/^com.mysql/",
-        "/^org.jboss.resteasy/",
-        "/^org.apache.groovy/"
-      ],
-      "updateTypes": [
+      "matchUpdateTypes": [
         "patch"
       ],
       "addLabels": [
         "automerge",
         "ci:all"
       ],
-      "branchPrefix": "{{{baseBranch}}}-"
+      "branchPrefix": "",
+      "additionalBranchPrefix": "{{{baseBranch}}}-"
     },
-    // major, minor
     {
-      "matchPackageNames": [
-        "/^org.springframework/",
-        "/^org.apache.tomcat/",
-        "/^commons-fileupload/",
-        "/^org.apache.commons:commons-lang3/",
-        "/^net.minidev:json-smart/",
-        "/^com.jayway.jsonpath:json-path/",
-        "/^org.apache.httpcomponents.client5/",
-        "/^com.fasterxml.uuid/",
-        "/^com.fasterxml.jackson/",
-        "/^org.camunda.feel/",
-        "/^io.quarkus/",
-        "/^ch.qos.logback/",
-        "/^org.graalvm/",
-        "/^com.google.code.gson/",
-        "/^org.postgresql/",
-        "/^com.h2database/",
-        "/^com.mysql/",
-        "/^org.jboss.resteasy/",
-        "/^org.apache.groovy/"
-      ],
-      "updateTypes": [
+      "matchUpdateTypes": [
         "major",
         "minor"
       ],
       "addLabels": [
         "ci:all"
       ],
-      "branchPrefix": "{{{baseBranch}}}-",
+      "branchPrefix": "",
+      "additionalBranchPrefix": "{{{baseBranch}}}-",
       "automerge": false,
       "dependencyDashboardApproval": true
-    },
-  ],
+    }
+  ]
 }
