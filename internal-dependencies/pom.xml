@@ -290,6 +290,12 @@
       </dependency>
 
       <dependency>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>catalina</artifactId>
+        <version>${version.tomcat}</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-jaxrs</artifactId>
         <version>${version.resteasy}</version>
