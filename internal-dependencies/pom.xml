@@ -290,12 +290,6 @@
       </dependency>
 
       <dependency>
-        <groupId>org.apache.tomcat</groupId>
-        <artifactId>catalina</artifactId>
-        <version>6.0.37</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-jaxrs</artifactId>
         <version>${version.resteasy}</version>

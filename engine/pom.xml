@@ -176,12 +176,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>catalina</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.jboss</groupId>
       <artifactId>jboss-vfs</artifactId>
       <version>3.1.0.Final</version>
