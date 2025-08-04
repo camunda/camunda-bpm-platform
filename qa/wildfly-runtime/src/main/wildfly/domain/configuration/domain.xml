@@ -135,11 +135,15 @@
                 <infinispan-timer-management name="persistent" cache-container="ejb" cache="persistent" max-active-timers="10000"/>
                 <infinispan-timer-management name="transient" cache-container="ejb" cache="transient" max-active-timers="10000"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:distributable-web:4.0" default-session-management="default" default-single-sign-on-management="default">
-                <infinispan-session-management name="default" cache-container="web" granularity="SESSION">
-                    <local-affinity/>
-                </infinispan-session-management>
-                <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
+            <subsystem xmlns="urn:jboss:domain:distributable-web:5.0">
+                <session-management default="default">
+                    <infinispan-session-management name="default" cache-container="web" granularity="SESSION">
+                        <local-affinity/>
+                    </infinispan-session-management>
+                </session-management>
+                <single-sign-on-management default="default">
+                    <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
+                </single-sign-on-management>
                 <local-routing/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:ee:6.0">
@@ -572,11 +576,15 @@
                 <infinispan-timer-management name="persistent" cache-container="ejb" cache="persistent" max-active-timers="10000"/>
                 <infinispan-timer-management name="transient" cache-container="ejb" cache="transient" max-active-timers="10000"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:distributable-web:4.0" default-session-management="default" default-single-sign-on-management="default">
-                <infinispan-session-management name="default" cache-container="web" granularity="SESSION">
-                    <primary-owner-affinity/>
-                </infinispan-session-management>
-                <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
+            <subsystem xmlns="urn:jboss:domain:distributable-web:5.0">
+                <session-management default="default">
+                    <infinispan-session-management name="default" cache-container="web" granularity="SESSION">
+                        <primary-owner-affinity/>
+                    </infinispan-session-management>
+                </session-management>
+                <single-sign-on-management default="default">
+                    <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
+                </single-sign-on-management>
                 <infinispan-routing cache-container="web" cache="routing"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:ee:6.0">
@@ -1040,11 +1048,15 @@
                 <infinispan-timer-management name="persistent" cache-container="ejb" cache="persistent" max-active-timers="10000"/>
                 <infinispan-timer-management name="transient" cache-container="ejb" cache="transient" max-active-timers="10000"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:distributable-web:4.0" default-session-management="default" default-single-sign-on-management="default">
-                <infinispan-session-management name="default" cache-container="web" granularity="SESSION">
-                    <local-affinity/>
-                </infinispan-session-management>
-                <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
+            <subsystem xmlns="urn:jboss:domain:distributable-web:5.0">
+                <session-management default="default">
+                    <infinispan-session-management name="default" cache-container="web" granularity="SESSION">
+                        <local-affinity/>
+                    </infinispan-session-management>
+                </session-management>
+                <single-sign-on-management default="default">
+                    <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
+                </single-sign-on-management>
                 <local-routing/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:ee:6.0">
@@ -1478,11 +1490,15 @@
                 <infinispan-timer-management name="persistent" cache-container="ejb" cache="persistent" max-active-timers="10000"/>
                 <infinispan-timer-management name="transient" cache-container="ejb" cache="transient" max-active-timers="10000"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:distributable-web:4.0" default-session-management="default" default-single-sign-on-management="default">
-                <infinispan-session-management name="default" cache-container="web" granularity="SESSION">
-                    <primary-owner-affinity/>
-                </infinispan-session-management>
-                <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
+            <subsystem xmlns="urn:jboss:domain:distributable-web:5.0">
+                <session-management default="default">
+                    <infinispan-session-management name="default" cache-container="web" granularity="SESSION">
+                        <primary-owner-affinity/>
+                    </infinispan-session-management>
+                </session-management>
+                <single-sign-on-management default="default">
+                    <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
+                </single-sign-on-management>
                 <infinispan-routing cache-container="web" cache="routing"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:ee:6.0">
