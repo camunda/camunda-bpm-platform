@@ -59,8 +59,8 @@
     <version.bouncycastle>1.47</version.bouncycastle>
 
     <!-- application servers -->
-    <version.wildfly>37.0.0.Beta1</version.wildfly>
-    <version.wildfly.core>29.0.0.Beta6</version.wildfly.core>
+    <version.wildfly>37.0.0.Final</version.wildfly>
+    <version.wildfly.core>29.0.0.Final</version.wildfly.core>
 
     <version.wildfly26>26.0.1.Final</version.wildfly26>
     <version.wildfly26.core>18.0.4.Final</version.wildfly26.core>
