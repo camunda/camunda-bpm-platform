@@ -24,7 +24,7 @@
     <cargo.wildfly26.container.id>wildfly26x</cargo.wildfly26.container.id>
     <!-- Needs to be adjusted with every WildFly update -->
     <!-- TODO: Update to WildFly 37 -->
-    <cargo.wildfly.container.id>wildfly36x</cargo.wildfly.container.id>
+    <cargo.wildfly.container.id>wildfly37x</cargo.wildfly.container.id>
 
     <redirect.test.output>true</redirect.test.output>
 
