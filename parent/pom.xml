@@ -244,7 +244,7 @@
         <plugin>
           <groupId>org.codehaus.cargo</groupId>
           <artifactId>cargo-maven3-plugin</artifactId>
-          <version>1.10.21</version>
+          <version>1.10.20</version>
         </plugin>
         <plugin>
           <groupId>net.kennychua</groupId>
