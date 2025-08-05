@@ -136,6 +136,72 @@
       location = "query"
       type = "integer"
       format = "int64"
-      last = last
       desc = "Only include jobs with a priority lower than or equal to the given value.
               Value must be a valid `long` value." />
+
+  <@lib.parameter
+      name = "processDefinitionKey"
+      location = "query"
+      type = "string"
+      desc = "Restrict to tasks that belong to a process definition with the given key." />
+
+  <@lib.parameter
+      name = "processDefinitionKeyIn"
+      location = "query"
+      type = "string"
+      desc = "Restrict to tasks that belong to a process definition with one of the given keys. The
+              keys need to be in a comma-separated list." />
+
+  <@lib.parameter
+      name = "processDefinitionName"
+      location = "query"
+      type = "string"
+      desc = "Restrict to tasks that belong to a process definition with the given name." />
+
+  <@lib.parameter
+      name = "processDefinitionNameLike"
+      location = "query"
+      type = "string"
+      desc = "Restrict to tasks that have a process definition name that has the parameter value as
+              a substring." />
+
+  <@lib.parameter
+      name = "variableNamesIgnoreCase"
+      location = "query"
+      type = "boolean"
+      defaultValue = "false"
+      desc = "Match all variable names in this query case-insensitively. If set
+              `variableName` and `variablename` are treated as equal." />
+
+  <@lib.parameter
+      name = "variableValuesIgnoreCase"
+      location = "query"
+      type = "boolean"
+      defaultValue = "false"
+      desc = "Match all variable values in this query case-insensitively. If set
+              `variableValue` and `variablevalue` are treated as equal." />
+
+  <@lib.parameter
+      name = "processVariables"
+      location = "query"
+      type = "string"
+      last = last
+      desc = "Only include tasks that belong to process instances that have variables with certain
+              values. Variable filtering expressions are comma-separated and are structured as
+              follows:
+
+              A valid parameter value has the form `key_operator_value`. `key` is the variable name,
+              `operator` is the comparison operator to be used and `value` the variable value.
+
+              **Note**: Values are always treated as String objects on server side.
+
+              Valid `operator` values are:
+              `eq` - equal to;
+              `neq` - not equal to;
+              `gt` - greater than;
+              `gteq` - greater than or equal to;
+              `lt` - lower than;
+              `lteq` - lower than or equal to;
+              `like`;
+              `notLike`.
+              `key` and `value` may not contain underscore or comma characters." />
