@@ -127,6 +127,64 @@
       desc = "Only include jobs with a priority lower than or equal to the given value.
               Value must be a valid `long` value." />
 
+  <@lib.property
+      name = "processDefinitionKey"
+      type = "string"
+      desc = "Restrict to tasks that belong to a process definition with the given key." />
+
+  <@lib.property
+      name = "processDefinitionKeyIn"
+      type = "array"
+      itemType = "string"
+      desc = "Restrict to tasks that belong to a process definition with one of the given keys. The
+                keys need to be in a comma-separated list." />
+
+  <@lib.property
+      name = "processDefinitionName"
+      type = "string"
+      desc = "Restrict to tasks that belong to a process definition with the given name." />
+
+  <@lib.property
+      name = "processDefinitionNameLike"
+      type = "string"
+      desc = "Restrict to tasks that have a process definition name that has the parameter value as
+                a substring." />
+
+  <@lib.property
+      name = "variableNamesIgnoreCase"
+      type = "boolean"
+      defaultValue = "false"
+      desc = "Match all variable names in this query case-insensitively. If set
+                `variableName` and `variablename` are treated as equal." />
+
+  <@lib.property
+      name = "variableValuesIgnoreCase"
+      type = "boolean"
+      defaultValue = "false"
+      desc = "Match all variable values in this query case-insensitively. If set
+                `variableValue` and `variablevalue` are treated as equal." />
+
+  <@lib.property
+      name = "processVariables"
+      type = "array"
+      dto = "VariableQueryParameterDto"
+      desc = "A JSON array to only include tasks that belong to a process instance with variables
+              with certain values. The array consists of JSON objects with three properties
+              `name`, `operator` and `value`. `name` is the variable name, `operator` is the
+              comparison operator to be used and `value` the variable value. `value` may be of
+              type `String`, `Number` or `Boolean`.
+
+              Valid `operator` values are:
+              `eq` - equal to;
+              `neq` - not equal to;
+              `gt` - greater than;
+              `gteq` - greater than or equal to;
+              `lt` - lower than;
+              `lteq` - lower than or equal to;
+              `like`;
+              `notLike`.
+              `key` and `value` may not contain underscore or comma characters." />
+
   "sorting": {
     "type": "array",
     "nullable": true,
