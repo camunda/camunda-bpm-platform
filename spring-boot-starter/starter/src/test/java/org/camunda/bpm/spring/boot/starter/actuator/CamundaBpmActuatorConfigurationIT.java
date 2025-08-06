@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.spring.boot.starter;
+package org.camunda.bpm.spring.boot.starter.actuator;
 
 import static org.junit.Assert.assertTrue;
 
+import org.camunda.bpm.spring.boot.starter.AbstractCamundaAutoConfigurationIT;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
 import org.junit.Test;
 import org.junit.runner.RunWith;
