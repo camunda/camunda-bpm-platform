@@ -216,6 +216,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   private Boolean withCommentAttachmentInfo;
 
+  private Boolean withTaskVariablesInReturn;
+
+  private Boolean withTaskLocalVariablesInReturn;
+
   public TaskQueryDto() {
 
   }
@@ -727,6 +731,16 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.withCommentAttachmentInfo = withCommentAttachmentInfo;
   }
 
+  @CamundaQueryParam(value = "withTaskVariablesInReturn", converter = BooleanConverter.class)
+  public void setWithTaskVariablesInReturn(Boolean withTaskVariablesInReturn) {
+    this.withTaskVariablesInReturn = withTaskVariablesInReturn;
+  }
+
+  @CamundaQueryParam(value = "withTaskLocalVariablesInReturn", converter = BooleanConverter.class)
+  public void setWithTaskLocalVariablesInReturn(Boolean withTaskLocalVariablesInReturn) {
+    this.withTaskLocalVariablesInReturn = withTaskLocalVariablesInReturn;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -1106,6 +1120,14 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   }
 
   public Boolean getWithCommentAttachmentInfo() { return withCommentAttachmentInfo;}
+
+  public Boolean getWithTaskVariablesInReturn() {
+    return withTaskVariablesInReturn;
+  }
+
+  public Boolean getWithTaskLocalVariablesInReturn() {
+    return withTaskLocalVariablesInReturn;
+  }
 
   @Override
   protected void applyFilters(TaskQuery query) {

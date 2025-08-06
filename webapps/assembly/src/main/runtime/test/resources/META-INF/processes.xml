@@ -7,23 +7,16 @@
   <process-engine name="default">
     <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration</configuration>
     <properties>
-      <property name="jdbcUrl">jdbc:h2:~/Downloads/h2/data-migrator.db;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
-      <property name="jdbcDriver">org.h2.Driver</property>
-      <property name="jdbcUsername">sa</property>
-      <property name="jdbcPassword"/>
       <property name="authorizationEnabled">true</property>
       <property name="history">full</property>
     </properties>
 
   </process-engine>
 
-  <!--<process-engine name="engine2">
+  <process-engine name="engine2">
     <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration</configuration>
     <properties>
-      <property name="jdbcUrl">jdbc:h2:~/Downloads/h2/data-migrator.db;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
-      <property name="jdbcDriver">org.h2.Driver</property>
-      <property name="jdbcUsername">sa</property>
-      <property name="jdbcPassword"/>
+      <property name="jdbcUrl">jdbc:h2:mem:activiti2;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
       <property name="authorizationEnabled">true</property>
     </properties>
 
@@ -32,13 +25,10 @@
   <process-engine name="engine3">
     <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration</configuration>
     <properties>
-      <property name="jdbcUrl">jdbc:h2:~/Downloads/h2/data-migrator.db;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
-      <property name="jdbcDriver">org.h2.Driver</property>
-      <property name="jdbcUsername">sa</property>
-      <property name="jdbcPassword"/>
+      <property name="jdbcUrl">jdbc:h2:mem:activiti3;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
       <property name="authorizationEnabled">true</property>
     </properties>
 
-  </process-engine>-->
+  </process-engine>
 
 </process-application>

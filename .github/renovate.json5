@@ -1,0 +1,81 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base"
+  ],
+  "branchName": "{{{baseBranch}}}-{{{branchTopic}}}",
+  "addLabels": [
+    "dependencies"
+  ],
+  "prConcurrentLimit": 10,
+  "baseBranchPatterns": [
+    "/!^master$/",
+    "7.24",
+    "7.23",
+    "7.22",
+    "7.21"
+  ],
+  "ignorePaths": [
+    "**/qa/**"
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": false
+  },
+  "lockFileMaintenance": {
+    //"automerge": true // auto-merge will be activated in a second step
+    "enabled": true,
+    "addLabels": [
+      "automerge",
+      "ci:e2e",
+      "ci:rest-api"
+    ],
+  },
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "*",
+        "!/^org.springframework/",
+        "!/^org.apache.tomcat/",
+        "!/^commons-fileupload/",
+        "!/^org.apache.commons:commons-lang3/",
+        "!/^net.minidev:json-smart/",
+        "!/^com.jayway.jsonpath:json-path/",
+        "!/^org.apache.httpcomponents.client5/",
+        "!/^com.fasterxml.uuid/",
+        "!/^com.fasterxml.jackson/",
+        "!/^org.camunda.feel/",
+        "!/^io.quarkus/",
+        "!/^ch.qos.logback/",
+        "!/^org.graalvm/",
+        "!/^com.google.code.gson/",
+        "!/^org.postgresql/",
+        "!/^com.h2database/",
+        "!/^com.mysql/",
+        "!/^org.jboss.resteasy/",
+        "!/^org.apache.groovy/"
+      ],
+      "enabled": false
+    },
+    {
+      //"automerge": true // auto-merge will be activated in a second step
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "addLabels": [
+        "automerge",
+        "ci:all"
+      ],
+    },
+    {
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ],
+      "addLabels": [
+        "ci:all"
+      ],
+      "automerge": false,
+      "dependencyDashboardApproval": true
+    }
+  ]
+}

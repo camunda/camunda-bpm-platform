@@ -16,14 +16,20 @@
  */
 package org.camunda.bpm.engine.rest.dto.task;
 
+import java.util.Map;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.task.Task;
 
-public class TaskWithAttachmentAndCommentDto extends TaskDto {
+public class TaskWithAttachmentAndCommentDto extends TaskWithVariablesDto {
 
   private boolean hasAttachment;
   private boolean hasComment;
 
   public TaskWithAttachmentAndCommentDto() {
+  }
+
+  public TaskWithAttachmentAndCommentDto(Task task, Map<String, VariableValueDto> variables) {
+    super(task, variables);
   }
 
   public TaskWithAttachmentAndCommentDto(Task task) {
@@ -44,11 +50,15 @@ public class TaskWithAttachmentAndCommentDto extends TaskDto {
     this.hasComment = hasComment;
   }
 
-  public static TaskDto fromEntity(Task task) {
-    TaskWithAttachmentAndCommentDto result = new TaskWithAttachmentAndCommentDto(task);
-
+  public static TaskDto fromEntity(Task task, Map<String, VariableValueDto> variables) {
+    TaskWithAttachmentAndCommentDto result = new TaskWithAttachmentAndCommentDto(task, variables);
     result.hasAttachment = task.hasAttachment();
     result.hasComment = task.hasComment();
     return result;
   }
+
+  public static TaskDto fromEntity(Task task) {
+    return fromEntity(task, null);
+  }
+
 }
