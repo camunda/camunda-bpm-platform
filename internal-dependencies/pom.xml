@@ -390,6 +390,12 @@
         <artifactId>json-path</artifactId>
         <version>${version.json-path}</version>
       </dependency>
+
+      <dependency>
+        <groupId>com.cronutils</groupId>
+        <artifactId>cron-utils</artifactId>
+        <version>${version.cronutils}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 </project>
