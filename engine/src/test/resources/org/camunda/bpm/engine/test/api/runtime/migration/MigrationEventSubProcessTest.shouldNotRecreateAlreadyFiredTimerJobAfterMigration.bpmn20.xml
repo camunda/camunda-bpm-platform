@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0z8cykr" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.12.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:process id="Process_0i2qa7z" isExecutable="true">
+    <bpmn:sequenceFlow id="Flow_0qcggmu" sourceRef="StartEvent_1" targetRef="Activity_0aj7wap" />
+    <bpmn:endEvent id="Event_1ts74zu">
+      <bpmn:incoming>Flow_0f1fbbx</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0f1fbbx" sourceRef="Activity_0aj7wap" targetRef="Event_1ts74zu" />
+    <bpmn:subProcess id="Activity_0c89z1s" triggeredByEvent="true">
+      <bpmn:startEvent id="Event_1rakt55" isInterrupting="false">
+        <bpmn:outgoing>Flow_1l3epwh</bpmn:outgoing>
+        <bpmn:timerEventDefinition id="TimerEventDefinition_0pxbo1s">
+          <bpmn:timeDate xsi:type="bpmn:tFormalExpression">2022-02-02T22:00</bpmn:timeDate>
+        </bpmn:timerEventDefinition>
+      </bpmn:startEvent>
+      <bpmn:task id="Activity_12ds827">
+        <bpmn:incoming>Flow_1l3epwh</bpmn:incoming>
+        <bpmn:outgoing>Flow_1s82smn</bpmn:outgoing>
+      </bpmn:task>
+      <bpmn:sequenceFlow id="Flow_1l3epwh" sourceRef="Event_1rakt55" targetRef="Activity_12ds827" />
+      <bpmn:endEvent id="Event_1613vwb">
+        <bpmn:incoming>Flow_1s82smn</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_1s82smn" sourceRef="Activity_12ds827" targetRef="Event_1613vwb" />
+    </bpmn:subProcess>
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_0qcggmu</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Activity_0aj7wap">
+      <bpmn:incoming>Flow_0qcggmu</bpmn:incoming>
+      <bpmn:outgoing>Flow_0f1fbbx</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_0i2qa7z">
+      <bpmndi:BPMNEdge id="Flow_0f1fbbx_di" bpmnElement="Flow_0f1fbbx">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="432" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qcggmu_di" bpmnElement="Flow_0qcggmu">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1ts74zu_di" bpmnElement="Event_1ts74zu">
+        <dc:Bounds x="432" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1o8o5wl_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_08rxsji_di" bpmnElement="Activity_0aj7wap">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1oip741_di" bpmnElement="Activity_0c89z1s" isExpanded="true">
+        <dc:Bounds x="250" y="320" width="350" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1l3epwh_di" bpmnElement="Flow_1l3epwh">
+        <di:waypoint x="308" y="410" />
+        <di:waypoint x="360" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1s82smn_di" bpmnElement="Flow_1s82smn">
+        <di:waypoint x="460" y="410" />
+        <di:waypoint x="512" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1mzchn4_di" bpmnElement="Event_1rakt55">
+        <dc:Bounds x="272" y="392" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_12ds827_di" bpmnElement="Activity_12ds827">
+        <dc:Bounds x="360" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1613vwb_di" bpmnElement="Event_1613vwb">
+        <dc:Bounds x="512" y="392" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
