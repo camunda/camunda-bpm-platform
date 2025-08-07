@@ -25,8 +25,6 @@ public class MicrometerMetricsReportingTask extends TimerTask {
     public void run() {
         List<MetricIntervalValue> metricsList = processEngine.getManagementService()
                 .createMetricsQuery().interval(1);
-        System.out.println("metricsList");
-        System.out.println(metricsList);
         if(metricsList.isEmpty()){
             return;
         }
