@@ -42,12 +42,10 @@ import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.migration.MigrationPlan;
@@ -334,7 +332,7 @@ public class BatchMigrationTest {
       assertEquals(sourceDeploymentId, migrationJob.getDeploymentId());
       assertNull(migrationJob.getProcessDefinitionId());
       assertNull(migrationJob.getProcessDefinitionKey());
-      assertNull(migrationJob.getProcessInstanceId());
+      assertNotNull(migrationJob.getProcessInstanceId());
       assertNull(migrationJob.getExecutionId());
     }
 
@@ -941,6 +939,41 @@ public class BatchMigrationTest {
 
     Assertions.assertThat(batch.getExecutionStartTime()).isEqualToIgnoringMillis(TEST_DATE);
     Assertions.assertThat(historicBatch.getExecutionStartTime()).isEqualToIgnoringMillis(TEST_DATE);
+  }
+
+  @Test
+  public void shouldCreateProcessInstanceRelatedBatchJobsForSingleInvocations() {
+    RuntimeService runtimeService = engineRule.getRuntimeService();
+    int processInstanceCount = 2;
+
+    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    List<String> processInstanceIds = new ArrayList<>();
+    for (int i = 0; i < processInstanceCount; i++) {
+      processInstanceIds.add(
+              runtimeService.startProcessInstanceById(sourceProcessDefinition.getId()).getId()
+      );
+    }
+
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+            .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+            .mapEqualActivities()
+            .build();
+
+    // when
+    Batch batch = runtimeService.newMigration(migrationPlan)
+            .processInstanceIds(processInstanceIds)
+            .executeAsync();
+
+    helper.executeSeedJob(batch);
+    List<Job> executionJobs = helper.getExecutionJobs(batch);
+
+    // then
+    //Making sure that processInstanceId is set in execution jobs #4205
+    assertThat(executionJobs)
+            .extracting("processInstanceId")
+            .containsExactlyInAnyOrder(processInstanceIds.toArray());
   }
 
   protected void assertBatchCreated(Batch batch, int processInstanceCount) {

@@ -233,6 +233,7 @@ public abstract class JobEntity extends AcquirableJobEntity
     persistentState.put("exceptionMessage", exceptionMessage);
     persistentState.put("suspensionState", suspensionState);
     persistentState.put("processDefinitionId", processDefinitionId);
+//    persistentState.put("processInstanceId", processInstanceId);
     persistentState.put("jobDefinitionId", jobDefinitionId);
     persistentState.put("deploymentId", deploymentId);
     persistentState.put("jobHandlerConfiguration", jobHandlerConfiguration);
@@ -249,6 +250,7 @@ public abstract class JobEntity extends AcquirableJobEntity
       this.execution = execution;
       executionId = execution.getId();
       processInstanceId = execution.getProcessInstanceId();
+      System.out.println("setExecution# "+processInstanceId);
       rootProcessInstanceId = execution.getRootProcessInstanceId();
       // if the execution is suspended, suspend the job entity as well to prevent unwanted job execution
       if(execution.isSuspended()) {
@@ -707,6 +709,7 @@ public abstract class JobEntity extends AcquirableJobEntity
     this.failedActivityId = failedActivityId;
   }
 
+  @Override
   public String getBatchId() {
     return batchId;
   }
