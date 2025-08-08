@@ -254,6 +254,9 @@ public class JobManager extends AbstractManager {
   public List<JobEntity> findJobsByProcessInstanceId(String processInstanceId) {
     return getDbEntityManager().selectList("selectJobsByProcessInstanceId", processInstanceId);
   }
+  public List<JobEntity> findJobsByProcessInstanceIdNotBatch(String processInstanceId) {
+    return getDbEntityManager().selectList("selectJobsByProcessInstanceIdNotBatch", processInstanceId);
+  }
 
   @SuppressWarnings("unchecked")
   public List<JobEntity> findJobsByJobDefinitionId(String jobDefinitionId) {

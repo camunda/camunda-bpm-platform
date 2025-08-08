@@ -182,7 +182,7 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
           && !(this instanceof SetExternalTaskRetriesJobHandler)
 //          && !(this instanceof BatchSetRemovalTimeJobHandler)
           ) {
-//        job.setProcessInstanceId(jobConfiguration.getIds().get(0));
+        job.setProcessInstanceId(jobConfiguration.getIds().get(0));
       }
 
       job.setDeploymentId(deploymentId);

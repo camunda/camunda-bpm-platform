@@ -176,8 +176,9 @@ public class MigratingInstanceParser {
   }
 
   protected List<JobEntity> fetchJobs(CommandContext commandContext, String processInstanceId) {
-    return commandContext.getJobManager().findJobsByProcessInstanceId(processInstanceId);
+    return commandContext.getJobManager().findJobsByProcessInstanceIdNotBatch(processInstanceId);
   }
+
 
   protected List<IncidentEntity> fetchIncidents(CommandContext commandContext, String processInstanceId) {
     return commandContext.getIncidentManager().findIncidentsByProcessInstance(processInstanceId);

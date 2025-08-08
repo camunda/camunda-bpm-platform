@@ -1147,9 +1147,6 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     JobEntity jobEntity = (JobEntity) job;
     evt.setJobId(jobEntity.getId());
-
-//    System.out.println("In history id: "+ jobEntity.getId());
-
     evt.setBatchId(jobEntity.getBatchId());
     evt.setJobDueDate(jobEntity.getDuedate());
     evt.setJobRetries(jobEntity.getRetries());
@@ -1196,7 +1193,6 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setFailedActivityId(jobEntity.getFailedActivityId());
     evt.setExecutionId(jobEntity.getExecutionId());
     evt.setProcessInstanceId(jobEntity.getProcessInstanceId());
-//    System.out.println("In history: "+ jobEntity.getProcessInstanceId());
     evt.setProcessDefinitionId(jobEntity.getProcessDefinitionId());
     evt.setProcessDefinitionKey(jobEntity.getProcessDefinitionKey());
     evt.setDeploymentId(jobEntity.getDeploymentId());
