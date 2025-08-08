@@ -1,0 +1,126 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.25.1
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
+ignore:
+  SNYK-JAVA-ORGAPACHETOMCAT-460328:
+    - '*':
+        reason: Imported from vulnerability scanner suppression list (CVE-2024-38286)
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:09:03.134Z
+  SNYK-JAVA-ORGAPACHETOMCAT-467247:
+    - '*':
+        reason: Imported from vulnerability scanner suppression list (CVE-2013-1571)
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:10:37.754Z
+  SNYK-JAVA-ORGAPACHETOMCAT-30845:
+    - '*':
+        reason: Imported from vulnerability scanner suppression list (CVE-2013-4590)
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:11:29.493Z
+  SNYK-JAVA-ORGAPACHETOMCAT-30846:
+    - '*':
+        reason: Imported from vulnerability scanner suppression list (CVE-2014-0033)
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:12:03.914Z
+  SNYK-JAVA-ORGAPACHETOMCAT-30847:
+    - '*':
+        reason: Imported from vulnerability scanner suppression list (CVE-2014-0096)
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:12:43.004Z
+  SNYK-JAVA-ORGAPACHETOMCAT-30848:
+    - '*':
+        reason: Imported from vulnerability scanner suppression list (CVE-2014-0119)
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:15:25.850Z
+  SNYK-JAVA-ORGAPACHETOMCAT-30849:
+    - '*':
+        reason: Imported from vulnerability scanner suppression list (CVE-2014-0230)
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:16:10.312Z
+  SNYK-JAVA-ORGAPACHETOMCAT-30850:
+    - '*':
+        reason: Imported from vulnerability scanner suppression list (CVE-2015-5174)
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:16:56.067Z
+  SNYK-JAVA-ORGAPACHETOMCAT-30851:
+    - '*':
+        reason: Imported from vulnerability scanner suppression list (CVE-2015-5345)
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:17:30.797Z
+  SNYK-JAVA-ORGAPACHETOMCAT-30852:
+    - '*':
+        reason: Imported from vulnerability scanner suppression list (CVE-2016-0706)
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:18:09.689Z
+  SNYK-JAVA-ORGAPACHETOMCAT-30853:
+    - '*':
+        reason: Imported from vulnerability scanner suppression list (CVE-2016-0714)
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:18:34.778Z
+  SNYK-JAVA-ORGAPACHETOMCAT-30854:
+    - '*':
+        reason: Imported from vulnerability scanner suppression list (CVE-2016-0762
+)
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:19:09.710Z
+  SNYK-JAVA-ORGAPACHETOMCAT-30855:
+    - '*':
+        reason: Imported from vulnerability scanner suppression list (CVE-2016-6797)
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:19:50.702Z
+  SNYK-JAVA-ORGAPACHETOMCAT-31537:
+    - '*':
+        reason: Imported from vulnerability scanner suppression list (CVE-2017-12617)
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:20:23.688Z
+  SNYK-JS-ANGULAR-2772735:
+    - '*':
+        reason: 'Fixed with https://jira.camunda.com/browse/SEC-115'
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:28:29.311Z
+  SNYK-JS-ANGULAR-3373044:
+    - '*':
+        reason: 'Fixed with https://jira.camunda.com/browse/SEC-284'
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:33:29.966Z
+  SNYK-JS-ANGULAR-3373045:
+    - '*':
+        reason: 'Fixed with https://jira.camunda.com/browse/SEC-284'
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:33:59.839Z
+  SNYK-JS-ANGULAR-3373046:
+    - '*':
+        reason: 'Fixed with https://jira.camunda.com/browse/SEC-284'
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:34:27.223Z
+  SNYK-JS-ANGULAR-6091113:
+    - '*':
+        reason: 'Fixed with https://jira.camunda.com/browse/SEC-900'
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:35:24.814Z
+  SNYK-JS-ANGULARTRANSLATE-6674061:
+    - '*':
+        reason: 'Fixed with https://jira.camunda.com/browse/SEC-1017'
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T10:57:56.060Z
+  SNYK-JS-BOOTSTRAP-7444593:
+    - '*':
+        reason: 'Fixed with https://jira.camunda.com/browse/SEC-1049'
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T12:10:47.382Z
+  SNYK-JS-BOOTSTRAP-7444617:
+    - '*':
+        reason: 'Fixed with https://jira.camunda.com/browse/SEC-1049'
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T12:12:27.685Z
+  SNYK-JS-ANGULAR-7924843:
+    - '*':
+        reason: 'Fixed with https://jira.camunda.com/browse/SEC-1111'
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T12:13:23.178Z
+  SNYK-JS-ANGULAR-7924842:
+    - '*':
+        reason: 'Fixed with https://jira.camunda.com/browse/SEC-1112'
+        expires: 2032-05-01T00:00:00.000Z
+        created: 2025-03-26T12:14:51.259Z
+patch: {}

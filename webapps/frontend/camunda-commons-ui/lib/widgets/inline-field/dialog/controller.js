@@ -22,8 +22,10 @@ module.exports = [
   '$location',
   'formData',
   ($scope, $location, formData) => {
-    $scope.formData = {...formData}; // don't bind textarea to model of text input field
-
+    $scope.formData = {
+      ...formData,
+      editValue: formData.editValue.replace(/,/g, '\n')
+    }; // don't bind textarea to model of text input field
     $scope.changeValue = () => {
       formData.editValue = $scope.formData.editValue
         .split('\n')

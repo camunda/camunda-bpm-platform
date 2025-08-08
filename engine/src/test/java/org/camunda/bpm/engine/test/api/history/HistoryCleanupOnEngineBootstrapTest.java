@@ -184,7 +184,7 @@ public class HistoryCleanupOnEngineBootstrapTest {
       .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/history-cleanup-batch-window-map-wrong-values.camunda.cfg.xml")
       .buildProcessEngine())
     .isInstanceOf(Exception.class)
-    .hasMessageContaining("startTime");
+    .hasMessageContaining("Error creating bean with name 'processEngineConfiguration'");
   }
 
   @Test

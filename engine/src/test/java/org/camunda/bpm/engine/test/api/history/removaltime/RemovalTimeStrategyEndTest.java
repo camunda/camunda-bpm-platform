@@ -340,11 +340,11 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   /**
-   * Test excluded on MariaDB and MySQL for now since it is failing randomly there.
+   * Test excluded on MySQL for now since it is failing randomly there.
    * See CAM-13291 for details.
    */
   @Test
-  @RequiredDatabase(excludes = {DbSqlSessionFactory.MARIADB, DbSqlSessionFactory.MYSQL})
+  @RequiredDatabase(excludes = {DbSqlSessionFactory.MYSQL})
   public void shouldResolveHistoricActivityInstanceInConcurrentEnvironment() {
     // given
     int degreeOfParallelism = 30;

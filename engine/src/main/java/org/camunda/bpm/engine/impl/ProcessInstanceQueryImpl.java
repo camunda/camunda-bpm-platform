@@ -48,6 +48,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   private static final long serialVersionUID = 1L;
   protected String processInstanceId;
+  protected String rootProcessInstanceId;
   protected String businessKey;
   protected String businessKeyLike;
   protected String processDefinitionId;
@@ -70,6 +71,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   protected String[] activityIds;
   protected boolean isRootProcessInstances;
   protected boolean isLeafProcessInstances;
+  protected String idAfter;
 
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
@@ -89,6 +91,12 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   public ProcessInstanceQueryImpl processInstanceId(String processInstanceId) {
     ensureNotNull("Process instance id", processInstanceId);
     this.processInstanceId = processInstanceId;
+    return this;
+  }
+
+  public ProcessInstanceQueryImpl rootProcessInstanceId(String rootProcessInstanceId) {
+    ensureNotNull("Root process instance id", rootProcessInstanceId);
+    this.rootProcessInstanceId = rootProcessInstanceId;
     return this;
   }
 
@@ -174,6 +182,11 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   public ProcessInstanceQuery subCaseInstanceId(String subCaseInstanceId) {
     ensureNotNull("subCaseInstanceId", subCaseInstanceId);
     this.subCaseInstanceId = subCaseInstanceId;
+    return this;
+  }
+
+  public ProcessInstanceQuery idAfter(String id) {
+    idAfter = id;
     return this;
   }
 
@@ -370,6 +383,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return processInstanceId;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
   public Set<String> getProcessInstanceIds() {
     return processInstanceIds;
   }
@@ -489,6 +506,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public String[] getTenantIds() {
     return tenantIds;
+  }
+
+  public String getIdAfter() {
+    return idAfter;
   }
 
   @Override

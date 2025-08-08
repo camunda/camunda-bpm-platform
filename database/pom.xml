@@ -6,13 +6,16 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-parent</artifactId>
     <relativePath>../parent</relativePath>
-    <version>7.23.0-SNAPSHOT</version>
+    <version>7.24.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-database-settings</artifactId>
   <packaging>pom</packaging>
   <name>Camunda Platform - database settings</name>
-  <description>Provides general dependencies and profiles for database testing</description>
+  <description>
+    Provides general dependencies and profiles for database testing.
+    Note: 7.24.0 is the last community edition release published on Maven Central. This library will not receive any new versions or releases. However, if you are interested in extended maintenance you could look into our enterprise edition. Get in touch with us: https://camunda.com/contact/
+  </description>
 
   <properties>
 
@@ -20,8 +23,6 @@
     <version.h2>2.3.232</version.h2>
     <version.h2-v1>1.4.200</version.h2-v1><!-- used for instance migration qa -->
     <version.oracle>23.5.0.24.07</version.oracle>
-    <version.mariadb>1.7.6</version.mariadb>
-    <version.mariadb-v1>1.1.8</version.mariadb-v1>
     <version.mysql>8.3.0</version.mysql>
     <version.sqlserver>8.4.1.jre8</version.sqlserver>
     <version.db2-11.5>11.5.0.0</version.db2-11.5>
@@ -30,7 +31,7 @@
     <version.liquibase>4.8.0</version.liquibase>
 
     <!-- needed for sql script and backward compatibility checks -->
-    <camunda.version.old>7.22.0</camunda.version.old>
+    <camunda.version.old>7.23.0</camunda.version.old>
 
     <!-- Testcontainers JDBC URL parameters. By default, an empty string -->
     <database.tc.params />
@@ -47,11 +48,6 @@
         <groupId>com.oracle.database.jdbc</groupId>
         <artifactId>ojdbc11</artifactId>
         <version>${version.oracle}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mariadb.jdbc</groupId>
-        <artifactId>mariadb-java-client</artifactId>
-        <version>${version.mariadb}</version>
       </dependency>
       <dependency>
         <groupId>com.mysql</groupId>
@@ -199,7 +195,6 @@
         <database.driver>org.h2.Driver</database.driver>
         <database.datasource.class>org.h2.jdbcx.JdbcDataSource</database.datasource.class>
         <jboss.datasource.filename>h2-ds.xml</jboss.datasource.filename>
-        <was.liberty.datasource.filename>h2-config.xml</was.liberty.datasource.filename>
         <hibernate.dialect>org.hibernate.dialect.H2Dialect</hibernate.dialect>
       </properties>
       <dependencies>
@@ -220,42 +215,6 @@
                   <groupId>com.h2database</groupId>
                   <artifactId>h2</artifactId>
                   <version>${version.h2}</version>
-                </dependency>
-              </dependencies>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-
-    <profile>
-      <id>mariadb</id>
-      <properties>
-        <database.type>mariadb</database.type>
-        <database.driver>org.mariadb.jdbc.Driver</database.driver>
-        <database.datasource.class>org.mariadb.jdbc.MySQLDataSource</database.datasource.class>
-        <database.tc.url>cammariadb:10.6</database.tc.url>
-        <database.tc.params>/${database.name}?user=${database.username}&amp;amp;password=${database.password}</database.tc.params>
-      </properties>
-
-      <dependencies>
-        <dependency>
-          <groupId>org.mariadb.jdbc</groupId>
-          <artifactId>mariadb-java-client</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>sql-maven-plugin</artifactId>
-              <dependencies>
-                <dependency>
-                  <groupId>org.mariadb.jdbc</groupId>
-                  <artifactId>mariadb-java-client</artifactId>
-                  <version>${version.mariadb}</version>
                 </dependency>
               </dependencies>
             </plugin>
@@ -341,7 +300,6 @@
         <database.driver>org.postgresql.Driver</database.driver>
         <database.datasource.class>org.postgresql.ds.PGSimpleDataSource</database.datasource.class>
         <jboss.datasource.filename>postgresql-ds.xml</jboss.datasource.filename>
-        <was.liberty.datasource.filename>postgresql-config.xml</was.liberty.datasource.filename>
         <hibernate.dialect>org.hibernate.dialect.PostgreSQLDialect</hibernate.dialect>
         <database.tc.url>campostgresql:13.2</database.tc.url>
       </properties>
@@ -376,7 +334,6 @@
       <properties>
         <database.datasource.class>org.postgresql.xa.PGXADataSource</database.datasource.class>
         <jboss.datasource.filename>postgresql-xa-ds.xml</jboss.datasource.filename>
-        <was.liberty.datasource.filename>postgresql-xa-config.xml</was.liberty.datasource.filename>
       </properties>
     </profile>
     <profile>

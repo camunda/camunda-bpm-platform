@@ -4,11 +4,15 @@
   <parent>
     <groupId>org.camunda.bpm.qa.upgrade</groupId>
     <artifactId>camunda-qa-db-instance-migration</artifactId>
-    <version>7.23.0-SNAPSHOT</version>
+    <version>7.24.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-qa-upgrade-test-fixture-73</artifactId>
   <packaging>jar</packaging>
+
+  <description>
+    Note: 7.24.0 is the last community edition release published on Maven Central. This library will not receive any new versions or releases. However, if you are interested in extended maintenance you could look into our enterprise edition. Get in touch with us: https://camunda.com/contact/
+  </description>
   <name>Camunda Platform - QA - upgrade - instance migration - test fixture - 7.3.0</name>
 
   <!-- Due to https://issues.apache.org/jira/browse/MRELEASE-799 the release test fails when
@@ -18,7 +22,6 @@
     <camunda.version.previous>7.2.0</camunda.version.previous>
 
     <version.h2>${version.h2-v1}</version.h2>
-    <version.mariadb>${version.mariadb-v1}</version.mariadb>
   </properties>
 
   <dependencyManagement>
@@ -87,23 +90,6 @@
                     <!-- patches for current minor version if any -->
                     <!-- 7.2.4 to 7.2.5 -->
                     <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.4_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.5.sql" />
-                  </target>
-                </configuration>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-              </execution>
-              <execution>
-                <id>copy-old-mysql-scripts-for-mariadb</id>
-                <phase>generate-test-resources</phase>
-                <configuration>
-                  <target>
-
-                    <!-- copy mysql upgrade scripts from 7.3 for mariadb as with 7.5 mariadb has own scripts -->
-                    <!-- TODO: if 7.2 patch scripts for mysql are created they probably also have to be copied for mariadb -->
-
-                    <copy file="${project.build.directory}/scripts-current/sql/upgrade/mysql_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" tofile="${project.build.directory}/scripts-current/sql/upgrade/mariadb_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" overwrite="true" />
-
                   </target>
                 </configuration>
                 <goals>

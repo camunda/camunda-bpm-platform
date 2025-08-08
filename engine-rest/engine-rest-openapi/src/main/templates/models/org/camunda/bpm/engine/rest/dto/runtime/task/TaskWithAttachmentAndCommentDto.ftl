@@ -1,6 +1,6 @@
 <#macro dto_macro docsUrl="">
 <@lib.dto
-    extends = "TaskDto" >
+    extends = "TaskWithVariablesDto" >
 
         <@lib.property
         name = "attachment"

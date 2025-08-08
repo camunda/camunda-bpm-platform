@@ -14,7 +14,6 @@
 #   timeout: [MAP; OPTIONAL - default timeout is 3600 seconds; Doc: defines a map containing Job timeouts (in seconds) for each DB type.]
 #     postgresql: [INT; OPTIONAL;]
 #     mysql: [INT; OPTIONAL;]
-#     mariadb: [INT; OPTIONAL;]
 #     oracle: [INT; OPTIONAL;]
 #     h2: [INT; OPTIONAL;]
 #     db2: [INT; OPTIONAL;]
@@ -25,27 +24,27 @@ db-unit:
   stash:
     runtimeStash: true
   labels:
+  - 'all'
   - 'all-db'
   - 'db2'
   - 'mysql'
   - 'oracle'
-  - 'mariadb'
   - 'sqlserver'
   - 'postgresql'
   podSpec:
     cpu: 4
-    images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
+    images: ['maven:3.9.7-eclipse-temurin-17', 'postgres:17.0']
 sql-scripts:
   directory: 'distro/sql-script'
   command: 'install -Pcheck-sql,'
   stash:
     runtimeStash: true
   labels:
+  - 'all'
   - 'all-db'
   - 'db2'
   - 'mysql'
   - 'oracle'
-  - 'mariadb'
   - 'sqlserver'
   - 'postgresql'
   podSpec:
@@ -57,6 +56,8 @@ instance-migration:
   stash:
     runtimeStash: true
     qaStash: true
+  labels:
+    - 'all'
   podSpec:
     cpu: 4
     images: ['maven:3.9.7-eclipse-temurin-11', 'postgres:17.0']
@@ -66,11 +67,11 @@ old-engine:
   stash:
     runtimeStash: true
   labels:
+  - 'all'
   - 'all-db'
   - 'db2'
   - 'mysql'
   - 'oracle'
-  - 'mariadb'
   - 'sqlserver'
   - 'postgresql'
   podSpec:
@@ -82,6 +83,8 @@ rolling-update:
   stash:
     runtimeStash: true
     qaStash: true
+  labels:
+    - 'all'
   podSpec:
     cpu: 4
     images: [ 'maven:3.9.7-eclipse-temurin-11', 'postgres:17.0' ]
@@ -90,6 +93,8 @@ large-data-tests:
   command: 'verify -Plarge-data-tests,'
   stash:
     runtimeStash: true
+  labels:
+    - 'all'
   podSpec:
     cpu: 4
     images: [ 'maven:3.9.7-eclipse-temurin-11', 'postgres:17.0' ]
@@ -100,6 +105,7 @@ engine-rest-unit-jersey-2:
   stash:
     runtimeStash: true
   labels:
+  - 'all'
   - 'rest-api'
   nodeLabel: 'h2'
   jdkVersion: 'jdk-11-0-21'
@@ -109,6 +115,7 @@ engine-rest-unit-resteasy:
   stash:
     runtimeStash: true
   labels:
+  - 'all'
   - 'rest-api'
   nodeLabel: 'h2'
   jdkVersion: 'jdk-11-0-21'
@@ -118,6 +125,7 @@ engine-rest-jakarta-unit-resteasy:
   stash:
     runtimeStash: true
   labels:
+    - 'all'
     - 'rest-api'
   nodeLabel: 'h2'
   jdkVersion: 'openjdk-jdk-17-latest'
@@ -127,24 +135,17 @@ engine-rest-unit-compatibility-wildfly:
   stash:
     runtimeStash: true
   labels:
+  - 'all'
   - 'rest-api'
   nodeLabel: 'h2'
   jdkVersion: 'jdk-11-0-21'
-engine-rest-IT-embedded-wildfly26:
-  directory: 'qa'
-  command: 'clean install -Pwildfly26,h2,webapps-integration,embedded-engine-rest'
-  stash:
-    runtimeStash: true
-    archiveStash: true
-  labels:
-  - 'rest-api'
-  nodeLabel: 'h2'
 engine-rest-jakarta-unit-compatibility-wildfly:
   directory: 'engine-rest/engine-rest-jakarta'
   command: 'clean install -Pwildfly-compatibility'
   stash:
     runtimeStash: true
   labels:
+    - 'all'
     - 'rest-api'
   nodeLabel: 'h2'
   jdkVersion: 'openjdk-jdk-17-latest'
@@ -155,6 +156,7 @@ platform-jdk-temurin-jdk-17-latest:
     runtimeStash: true
   withNpm: true
   jdkVersion: 'jdk-17-latest'
+  withPodSpec: true
   podSpec:
     cpu: 4
     images: ['maven:3.9.7-eclipse-temurin-17']
@@ -165,6 +167,7 @@ platform-jdk-temurin-jdk-21-latest:
     runtimeStash: true
   withNpm: true
   jdkVersion: 'jdk-21-latest'
+  withPodSpec: true
   podSpec:
     cpu: 4
     images: ['maven:3.9.7-eclipse-temurin-21']
@@ -182,12 +185,14 @@ platform-jdk-temurin-jdk-11-latest:
           !spring-boot-starter/starter-qa/integration-test-webapp/runtime,
           !distro/run,!distro/run/assembly,!distro/run/core,!distro/run/distro,!distro/run/modules,!distro/run/modules/example,
           !distro/run/modules/rest,!distro/run/modules/webapps,!distro/run/modules/oauth2,!distro/run/qa,!distro/run/qa/integration-tests,
-          !distro/run/qa/runtime,!distro/run/qa/example-plugin''
+          !distro/run/qa/runtime,!distro/run/qa/example-plugin,
+          !qa/integration-tests-engine-jakarta''
     -Pdistro,distro-ce'
   stash:
     runtimeStash: true
   withNpm: true
   jdkVersion: 'jdk-11-latest'
+  withPodSpec: true
   podSpec:
     cpu: 4
     images: ['maven:3.9.7-eclipse-temurin-11']
@@ -221,7 +226,8 @@ platform-jdk-jdk-11-latest:
           !spring-boot-starter/starter-qa/integration-test-webapp/runtime,
           !distro/run,!distro/run/assembly,!distro/run/core,!distro/run/distro,!distro/run/modules,!distro/run/modules/example,
           !distro/run/modules/rest,!distro/run/modules/webapps,!distro/run/modules/oauth2,!distro/run/qa,!distro/run/qa/integration-tests,
-          !distro/run/qa/runtime,!distro/run/qa/example-plugin''
+          !distro/run/qa/runtime,!distro/run/qa/example-plugin,
+          !qa/integration-tests-engine-jakarta''
     -Pdistro,distro-ce
     -Dskip.frontend.build=true'
   stash:

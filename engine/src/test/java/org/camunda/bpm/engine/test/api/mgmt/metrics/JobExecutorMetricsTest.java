@@ -16,21 +16,25 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
+import java.util.stream.Collectors;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.CallerRunsRejectedJobsHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.management.Metrics;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestHelper.ThreadControl;
 import org.camunda.bpm.engine.test.jobexecutor.ControllableJobExecutor;
@@ -178,9 +182,9 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
     long jobsSuccessful = managementService.createMetricsQuery().name(Metrics.JOB_SUCCESSFUL).sum();
     long jobsFailed = managementService.createMetricsQuery().name(Metrics.JOB_FAILED).sum();
     long jobCandidatesForAcquisition = managementService.createMetricsQuery()
-      .name(Metrics.JOB_ACQUIRED_SUCCESS).sum();
+        .name(Metrics.JOB_ACQUIRED_SUCCESS).sum();
     long exclusiveFollowupJobs = managementService.createMetricsQuery()
-      .name(Metrics.JOB_LOCKED_EXCLUSIVE).sum();
+        .name(Metrics.JOB_LOCKED_EXCLUSIVE).sum();
 
     assertEquals(6, jobsSuccessful);
     assertEquals(0, jobsFailed);
@@ -203,13 +207,18 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
       runtimeService.startProcessInstanceByKey("asyncServiceTaskProcess");
     }
 
-    // when executing the jobs
-    testRule.waitForJobExecutorToProcessAllJobs(5000L);
+    List<String> jobIds = managementService.createJobQuery()
+        .processDefinitionKey("asyncServiceTaskProcess").list()
+        .stream().map(Job::getId).collect(Collectors.toList());
+
+    // when executing only the three jobs using the RejectingJobExecutor
+    JobExecutor jobExecutor = ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).getJobExecutor();
+    jobExecutor.executeJobs(jobIds, (ProcessEngineImpl) processEngine);
 
     // then all of them were rejected by the job executor which is reflected by the metric
     long numRejectedJobs = managementService.createMetricsQuery().name(Metrics.JOB_EXECUTION_REJECTED).sum();
 
-    assertEquals(3, numRejectedJobs);
+    assertThat(numRejectedJobs).isEqualTo(3);
   }
 
   public static class RejectingJobExecutor extends DefaultJobExecutor {

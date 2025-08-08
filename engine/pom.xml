@@ -2,6 +2,10 @@
 
   <modelVersion>4.0.0</modelVersion>
 
+  <description>
+    Note: 7.24.0 is the last community edition release published on Maven Central. This library will not receive any new versions or releases. However, if you are interested in extended maintenance you could look into our enterprise edition. Get in touch with us: https://camunda.com/contact/
+  </description>
+
   <name>Camunda Platform - engine</name>
   <artifactId>camunda-engine</artifactId>
 
@@ -9,7 +13,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.23.0-SNAPSHOT</version>
+    <version>7.24.0-SNAPSHOT</version>
   </parent>
 
   <dependencyManagement>
@@ -26,7 +30,7 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-framework-bom</artifactId>
-        <version>${version.spring.framework}</version>
+        <version>${version.spring.framework6}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -196,6 +200,12 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>com.cronutils</groupId>
+      <artifactId>cron-utils</artifactId>
+      <version>${version.cronutils}</version>
+    </dependency>
+
     <!-- test dependencies  -->
 
     <dependency>
@@ -331,6 +341,13 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-bpm-archunit</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.h-thurow</groupId>
+      <artifactId>simple-jndi</artifactId>
+      <version>0.24.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -489,6 +506,10 @@
             <relocation>
               <pattern>com.google.gson</pattern>
               <shadedPattern>camundajar.impl.com.google.gson</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>com.cronutils</pattern>
+              <shadedPattern>camundajar.impl.com.cronutils</shadedPattern>
             </relocation>
           </relocations>
           <transformers>
@@ -687,25 +708,6 @@
       </build>
     </profile>
 
-    <profile>
-      <id>mariadb</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <failIfNoTests>false</failIfNoTests>
-              <trimStackTrace>false</trimStackTrace>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <excludes combine.children="append">
-                <exclude>**/CompetingMessageCorrelationTest.java</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
     <!-- check for api differences between latest minor release -->
     <profile>
       <id>check-api-compatibility</id>
@@ -875,7 +877,7 @@
     </profile>
 
     <profile>
-      <id>java15</id>
+     <id>exclude-post-jdk15-tests</id>
       <activation>
         <jdk>[15,)</jdk>
       </activation>
@@ -944,6 +946,24 @@
      <properties>
       <test.excludes>bpmn|cmmn</test.excludes>
      </properties>
+    </profile>
+
+    <profile>
+      <id>java11</id>
+      <activation>
+        <jdk>11</jdk>
+      </activation>
+      <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-framework-bom</artifactId>
+            <version>${version.spring.framework}</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
     </profile>
 
   </profiles>

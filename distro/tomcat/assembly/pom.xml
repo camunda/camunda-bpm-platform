@@ -3,7 +3,8 @@
 
   <description>
     Assembles the Camunda Platform and makes it ready for qa. 
-    The assembly is installed to maven later in the reactor, if the integration tests pass sucessfully
+    The assembly is installed to maven later in the reactor, if the integration tests pass successfully.
+    Note: 7.24.0 is the last community edition release published on Maven Central. This library will not receive any new versions or releases. However, if you are interested in extended maintenance you could look into our enterprise edition. Get in touch with us: https://camunda.com/contact/
   </description>
 
   <artifactId>camunda-tomcat-assembly</artifactId>
@@ -12,7 +13,7 @@
   <parent>
     <groupId>org.camunda.bpm.tomcat</groupId>
     <artifactId>camunda-tomcat</artifactId>
-    <version>7.23.0-SNAPSHOT</version>
+    <version>7.24.0-SNAPSHOT</version>
   </parent>
   
   <properties>

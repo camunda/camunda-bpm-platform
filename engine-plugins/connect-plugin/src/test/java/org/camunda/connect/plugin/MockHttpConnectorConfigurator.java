@@ -16,13 +16,11 @@
  */
 package org.camunda.connect.plugin;
 
-import java.io.IOException;
-
-import org.apache.http.HttpVersion;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.message.BasicHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicHttpResponse;
 import org.camunda.connect.httpclient.HttpConnector;
 import org.camunda.connect.httpclient.impl.HttpResponseImpl;
 import org.camunda.connect.spi.ConnectorConfigurator;
@@ -59,14 +57,27 @@ public class MockHttpConnectorConfigurator implements ConnectorConfigurator<Http
     return HttpConnector.class;
   }
 
-  static class TestHttpResonse extends BasicHttpResponse implements CloseableHttpResponse {
+  static class TestHttpResonse extends BasicHttpResponse implements ClassicHttpResponse {
+
+    private HttpEntity entity;
 
     public TestHttpResonse() {
-      super(HttpVersion.HTTP_1_1, 200, "OK");
+      super(200, "OK");
     }
 
-    public void close() throws IOException {
-      // no-op
+    @Override
+    public HttpEntity getEntity() {
+      return entity;
+    }
+
+    @Override
+    public void setEntity(HttpEntity entity) {
+      this.entity = entity;
+    }
+
+    @Override
+    public void close() {
+      /* NOP */
     }
   }
 
