@@ -17,7 +17,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../../database</relativePath>
-    <version>7.24.0-SNAPSHOT</version>
+    <version>7.24.0-alpha2</version>
   </parent>
 
   <modules>
@@ -41,7 +41,7 @@
     <url>http://github.com/camunda/camunda-external-task-client-java</url>
     <connection>scm:git:git@github.com:camunda/camunda-external-task-client-java.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-external-task-client-java.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>7.24.0-alpha2</tag>
   </scm>
 
 </project>
