@@ -625,7 +625,6 @@ public class FormServiceTest {
         .putValueTyped("object", objectValue(serializedValue).create()));
   }
 
-
   @Deployment
   @Test
   public void testSubmitStartFormWithBusinessKey() {
@@ -686,7 +685,6 @@ public class FormServiceTest {
     assertThat(variableEvents.get(1)).containsExactly(entry("foo", "bar"));
   }
 
-
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testSubmitStartFormWithAsyncStartEvent() {
@@ -714,7 +712,6 @@ public class FormServiceTest {
     assertThat(historicVariable.getName()).isEqualTo("foo");
     assertThat(historicVariable.getValue()).isEqualTo("bar");
   }
-
 
   @Test
   public void testSubmitStartFormWithAsyncStartEventExecuteJob() {
@@ -1215,8 +1212,6 @@ public class FormServiceTest {
     assertThat(hasLoadedAnyVariables).isFalse();
   }
 
-
-
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml")
   public void testSubmitTaskFormWithVarialbesInReturnShouldDeserializeObjectValue()
@@ -1659,6 +1654,7 @@ public class FormServiceTest {
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/form/FormServiceTest.shouldSubmitStartFormUsingFormKeyAndCamundaFormDefinition.bpmn",
       "org/camunda/bpm/engine/test/api/form/start.form" })
@@ -1679,6 +1675,7 @@ public class FormServiceTest {
     assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(1);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/form/FormServiceTest.shouldSubmitTaskFormUsingFormKeyAndCamundaFormDefinition.bpmn",
   "org/camunda/bpm/engine/test/api/form/task.form" })
@@ -1699,6 +1696,7 @@ public class FormServiceTest {
     assertThat(taskService.createTaskQuery().list()).hasSize(0);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/form/FormServiceTest.shouldSubmitStartFormUsingFormRefAndCamundaFormDefinition.bpmn",
   "org/camunda/bpm/engine/test/api/form/start.form" })
@@ -1720,6 +1718,7 @@ public class FormServiceTest {
     assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(1);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/form/FormServiceTest.shouldSubmitTaskFormUsingFormRefAndCamundaFormDefinition.bpmn",
   "org/camunda/bpm/engine/test/api/form/task.form" })
