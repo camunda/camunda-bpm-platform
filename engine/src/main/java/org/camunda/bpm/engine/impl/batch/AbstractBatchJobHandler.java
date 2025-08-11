@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.batch.externaltask.SetExternalTaskRetriesJobHandler;
 import org.camunda.bpm.engine.impl.batch.job.SetJobRetriesJobHandler;
+import org.camunda.bpm.engine.impl.batch.removaltime.BatchSetRemovalTimeJobHandler;
 import org.camunda.bpm.engine.impl.batch.removaltime.DecisionSetRemovalTimeJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -180,7 +181,7 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
           && !(this instanceof DeleteHistoricDecisionInstancesJobHandler)
           && !(this instanceof SetJobRetriesJobHandler)
           && !(this instanceof SetExternalTaskRetriesJobHandler)
-//          && !(this instanceof BatchSetRemovalTimeJobHandler)
+          && !(this instanceof BatchSetRemovalTimeJobHandler)
           ) {
         job.setProcessInstanceId(jobConfiguration.getIds().get(0));
       }
