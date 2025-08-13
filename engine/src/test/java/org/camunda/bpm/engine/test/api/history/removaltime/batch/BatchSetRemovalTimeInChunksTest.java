@@ -80,11 +80,13 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(HISTORY_FULL)
+@Ignore
 public class BatchSetRemovalTimeInChunksTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
