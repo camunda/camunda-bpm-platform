@@ -16,16 +16,16 @@
  */
 package org.camunda.bpm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import javax.ws.rs.core.MediaType;
 
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.sun.jersey.api.client.ClientResponse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class CsrfPreventionIT extends AbstractWebIntegrationTest {
 
@@ -40,15 +40,14 @@ public class CsrfPreventionIT extends AbstractWebIntegrationTest {
     // given
 
     // when
-    ClientResponse response = client.resource(appBasePath + TASKLIST_PATH)
-        .get(ClientResponse.class);
+    HttpResponse<String> response = Unirest.get(appBasePath + TASKLIST_PATH)
+        .asString();
 
     // then
     assertEquals(200, response.getStatus());
     String xsrfTokenHeader = getXsrfTokenHeader(response);
     String xsrfCookieValue = getXsrfCookieValue(response);
-    response.close();
-    
+
     assertNotNull(xsrfTokenHeader);
     assertEquals(32, xsrfTokenHeader.length());
     assertNotNull(xsrfCookieValue);
@@ -62,9 +61,9 @@ public class CsrfPreventionIT extends AbstractWebIntegrationTest {
     String modifyingRequestPath = "api/admin/auth/user/default/login/welcome";
 
     // when
-    ClientResponse response = client.resource(baseUrl + modifyingRequestPath)
-        .header("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_TYPE)
-        .post(ClientResponse.class);
+    HttpResponse<String> response = Unirest.post(baseUrl + modifyingRequestPath)
+        .header("Content-Type", MediaType.APPLICATION_FORM_URLENCODED)
+        .asString();
 
     // then
     assertEquals(403, response.getStatus());

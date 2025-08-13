@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.camunda.bpm.run</groupId>
     <artifactId>camunda-bpm-run-root</artifactId>
-    <version>7.23.0-SNAPSHOT</version>
+    <version>7.24.0-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
@@ -13,13 +13,17 @@
   <name>Camunda Platform - Run - QA</name>
   <packaging>pom</packaging>
 
+  <description>
+    Note: 7.24.0 is the last community edition release published on Maven Central. This library will not receive any new versions or releases. However, if you are interested in extended maintenance you could look into our enterprise edition. Get in touch with us: https://camunda.com/contact/
+  </description>
+
   <properties>
     <!-- default os -->
     <os.type>linux64</os.type>
 
     <version.jersey-json>1.15</version.jersey-json>
     <version.jersey-apache-client>1.15</version.jersey-apache-client>
-    <version.httpcomponents>4.5.10</version.httpcomponents>
+    <version.httpcomponents>5.3.1</version.httpcomponents>
     <version.junit>4.13.1</version.junit>
     <version.chromedriver>112.0.5615.49</version.chromedriver>
   </properties>
@@ -28,29 +32,17 @@
     <dependencies>
 
       <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpcomponents-client</artifactId>
+        <groupId>org.apache.httpcomponents.client5</groupId>
+        <artifactId>httpclient5-parent</artifactId>
         <version>${version.httpcomponents}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
 
       <dependency>
-        <groupId>com.sun.jersey.contribs</groupId>
-        <artifactId>jersey-apache-client4</artifactId>
-        <version>${version.jersey-apache-client}</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.seleniumhq.selenium</groupId>
         <artifactId>selenium-java</artifactId>
         <version>4.10.0</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-json</artifactId>
-        <version>${version.jersey-json}</version>
       </dependency>
 
       <!-- using 4.13 in order to have @BeforeParam/@AfterParam for parameterized 

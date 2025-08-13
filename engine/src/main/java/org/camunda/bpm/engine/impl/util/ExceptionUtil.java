@@ -18,8 +18,8 @@ package org.camunda.bpm.engine.impl.util;
 
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.DB2;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.H2;
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MARIADB_MYSQL;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MSSQL;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MYSQL;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.ORACLE;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.POSTGRES;
 
@@ -211,7 +211,7 @@ public class ExceptionUtil {
     // SqlServer & PostgreSQL
     return message.contains("foreign key constraint") ||
         "23000".equals(sqlState) && errorCode == 547 ||
-        // MySql & MariaDB & PostgreSQL
+        // MySql & PostgreSQL
         "23000".equals(sqlState) && errorCode == 1452 ||
         // Oracle & H2
         message.contains("integrity constraint") ||
@@ -243,7 +243,7 @@ public class ExceptionUtil {
     String sqlState = sqlException.getSQLState();
     int errorCode = sqlException.getErrorCode();
 
-    // MySQL & MariaDB
+    // MySQL
     return (message.contains("act_uniq_variable") && "23000".equals(sqlState) && errorCode == 1062)
         // PostgreSQL
         || (message.contains("act_uniq_variable") && "23505".equals(sqlState) && errorCode == 0)
@@ -256,8 +256,7 @@ public class ExceptionUtil {
   }
 
   public enum DEADLOCK_CODES {
-
-    MARIADB_MYSQL(1213, "40001"),
+    MYSQL(1213, "40001"),
     MSSQL(1205, "40001"),
     DB2(-911, "40001"),
     ORACLE(60, "61000"),
@@ -296,7 +295,7 @@ public class ExceptionUtil {
 
     int errorCode = sqlException.getErrorCode();
 
-    return MARIADB_MYSQL.equals(errorCode, sqlState) ||
+    return MYSQL.equals(errorCode, sqlState) ||
         MSSQL.equals(errorCode, sqlState) ||
         DB2.equals(errorCode, sqlState) ||
         ORACLE.equals(errorCode, sqlState) ||

@@ -5,13 +5,17 @@
   <groupId>org.camunda.bpm.qa</groupId>
 
   <packaging>pom</packaging>
+
+  <description>
+    Note: 7.24.0 is the last community edition release published on Maven Central. This library will not receive any new versions or releases. However, if you are interested in extended maintenance you could look into our enterprise edition. Get in touch with us: https://camunda.com/contact/
+  </description>
   <name>Camunda Platform - QA</name>
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.23.0-SNAPSHOT</version>
+    <version>7.24.0-SNAPSHOT</version>
   </parent>
 
   <properties>

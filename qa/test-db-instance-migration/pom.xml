@@ -5,12 +5,16 @@
   <artifactId>camunda-qa-db-instance-migration</artifactId>
 
   <packaging>pom</packaging>
+
+  <description>
+    Note: 7.24.0 is the last community edition release published on Maven Central. This library will not receive any new versions or releases. However, if you are interested in extended maintenance you could look into our enterprise edition. Get in touch with us: https://camunda.com/contact/
+  </description>
   <name>Camunda Platform - QA - upgrade - instance migration</name>
 
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.23.0-SNAPSHOT</version>
+    <version>7.24.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -43,6 +47,7 @@
     <module>test-fixture-721</module>
     <module>test-fixture-722</module>
     <module>test-fixture-723</module>
+    <module>test-fixture-724</module>
     <module>test-migration</module>
   </modules>
 

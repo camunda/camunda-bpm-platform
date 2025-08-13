@@ -31,6 +31,7 @@ public class TransitionInstanceImpl extends ProcessElementInstanceImpl implement
   protected String activityId;
   protected String activityName;
   protected String activityType;
+  protected String subProcessInstanceId;
 
   protected String[] incidentIds = NO_IDS;
   protected Incident[] incidents = new Incident[0];
@@ -87,6 +88,14 @@ public class TransitionInstanceImpl extends ProcessElementInstanceImpl implement
 
   public void setIncidents(Incident[] incidents) {
     this.incidents = incidents;
+  }
+
+  public void setSubProcessInstanceId(String subProcessInstanceId) {
+    this.subProcessInstanceId = subProcessInstanceId;
+  }
+
+  public String getSubProcessInstanceId() {
+    return subProcessInstanceId;
   }
 
   public String toString() {

@@ -4,9 +4,13 @@
   <parent>
     <artifactId>camunda-connect-root</artifactId>
     <groupId>org.camunda.connect</groupId>
-    <version>7.23.0-SNAPSHOT</version>
+    <version>7.24.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
+
+  <description>
+    Note: 7.24.0 is the last community edition release published on Maven Central. This library will not receive any new versions or releases. However, if you are interested in extended maintenance you could look into our enterprise edition. Get in touch with us: https://camunda.com/contact/
+  </description>
 
   <artifactId>camunda-connect-http-client</artifactId>
   <name>Camunda Platform - connect - http client</name>
@@ -19,15 +23,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-    </dependency>
-    <!-- commons-codec is a transitive dependency of httpclient;
-      we override its version here in order to update the default commons-codec
-      version which has known vulnerabilities, see https://jira.camunda.com/browse/CAM-12774 -->
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
     </dependency>
 
     <dependency>

@@ -5,11 +5,15 @@
     <groupId>org.camunda.bpm.model</groupId>
     <artifactId>camunda-model-apis</artifactId>
     <relativePath>../</relativePath>
-    <version>7.23.0-SNAPSHOT</version>
+    <version>7.24.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-dmn-model</artifactId>
   <packaging>jar</packaging>
+
+  <description>
+    Note: 7.24.0 is the last community edition release published on Maven Central. This library will not receive any new versions or releases. However, if you are interested in extended maintenance you could look into our enterprise edition. Get in touch with us: https://camunda.com/contact/
+  </description>
 
   <name>Camunda Platform - DMN Model API</name>
   <inceptionYear>2015</inceptionYear>

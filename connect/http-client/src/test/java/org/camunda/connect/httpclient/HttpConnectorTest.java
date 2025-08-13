@@ -21,16 +21,16 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
-import org.apache.http.Header;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpOptions;
-import org.apache.http.client.methods.HttpPatch;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.methods.HttpTrace;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.classic.methods.HttpOptions;
+import org.apache.hc.client5.http.classic.methods.HttpPatch;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.classic.methods.HttpTrace;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
 import org.camunda.commons.utils.IoUtil;
 import org.camunda.connect.ConnectorRequestException;
 import org.camunda.connect.Connectors;
@@ -133,10 +133,10 @@ public class HttpConnectorTest {
   }
 
   @Test
-  public void shouldSetUrlOnHttpRequest() {
+  public void shouldSetUrlOnHttpRequest() throws Exception {
     connector.createRequest().url(EXAMPLE_URL).get().execute();
     HttpGet request = interceptor.getTarget();
-    assertThat(request.getURI().toASCIIString()).isEqualTo(EXAMPLE_URL);
+    assertThat(request.getUri().toASCIIString()).isEqualTo(EXAMPLE_URL);
   }
 
   @Test
@@ -153,7 +153,7 @@ public class HttpConnectorTest {
   public void shouldSetHeadersOnHttpRequest() {
     connector.createRequest().url(EXAMPLE_URL).header("foo", "bar").header("hello", "world").get().execute();
     HttpGet request = interceptor.getTarget();
-    Header[] headers = request.getAllHeaders();
+    Header[] headers = request.getHeaders();
     assertThat(headers).hasSize(2);
   }
 
@@ -174,12 +174,12 @@ public class HttpConnectorTest {
     assertThat(contentLength).isEqualTo(EXAMPLE_PAYLOAD.length());
   }
 
-  protected void verifyHttpRequest(Class<? extends HttpRequestBase> requestClass) {
+  protected void verifyHttpRequest(Class<? extends BasicClassicHttpRequest> requestClass) {
     Object target = interceptor.getTarget();
     assertThat(target).isInstanceOf(requestClass);
 
     HttpRequest request = interceptor.getRequest();
-    HttpRequestBase requestBase = (HttpRequestBase) target;
+    BasicClassicHttpRequest requestBase = (BasicClassicHttpRequest) target;
     assertThat(requestBase.getMethod()).isEqualTo(request.getMethod());
   }
 

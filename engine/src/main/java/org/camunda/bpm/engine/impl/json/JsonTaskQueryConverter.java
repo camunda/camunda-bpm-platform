@@ -80,6 +80,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String UPDATED_AFTER = "updatedAfter";
   public static final String KEY = "key";
   public static final String KEYS = "keys";
+  public static final String KEY_NOT_IN = "keyNotIn";
   public static final String KEY_LIKE = "keyLike";
   public static final String PARENT_TASK_ID = "parentTaskId";
   public static final String PROCESS_DEFINITION_KEY = "processDefinitionKey";
@@ -186,6 +187,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     JsonUtil.addDateField(json, UPDATED_AFTER, query.getUpdatedAfter());
     JsonUtil.addField(json, KEY, query.getKey());
     JsonUtil.addArrayField(json, KEYS, query.getKeys());
+    JsonUtil.addArrayField(json, KEY_NOT_IN, query.getKeyNotIn());
     JsonUtil.addField(json, KEY_LIKE, query.getKeyLike());
     JsonUtil.addField(json, PARENT_TASK_ID, query.getParentTaskId());
     JsonUtil.addField(json, PROCESS_DEFINITION_KEY, query.getProcessDefinitionKey());
@@ -415,6 +417,9 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     }
     if (json.has(KEYS)) {
       query.taskDefinitionKeyIn(getArray(JsonUtil.getArray(json, KEYS)));
+    }
+    if (json.has(KEY_NOT_IN)) {
+      query.taskDefinitionKeyNotIn(getArray(JsonUtil.getArray(json, KEY_NOT_IN)));
     }
     if (json.has(KEY_LIKE)) {
       query.taskDefinitionKeyLike(JsonUtil.getString(json, KEY_LIKE));

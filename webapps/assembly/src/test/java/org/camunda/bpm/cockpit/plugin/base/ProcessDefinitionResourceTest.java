@@ -626,7 +626,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
       "processes/variables-process-with-call-activity.bpmn",
       "processes/user-task-process.bpmn"
   })
-  @RequiredDatabase(excludes = {DbSqlSessionFactory.MYSQL, DbSqlSessionFactory.MARIADB})
+  @RequiredDatabase(excludes = {DbSqlSessionFactory.MYSQL})
   public void testQueryWithComplexVariableFilter() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableProcessWithCallActivity");

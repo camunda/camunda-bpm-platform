@@ -1338,7 +1338,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     // which is locked
     externalTaskService.lock(externalTask.getId(), WORKER_ID, LOCK_TIME);
     // and the lock expires
-    // we eliminate milliseconds due to MySQL/MariaDB datetime precision
+    // we eliminate milliseconds due to MySQL datetime precision
     Date lockExpiredTime = formatter.parse(
         formatter.format(DateUtils.addMilliseconds(ClockUtil.getCurrentTime(), (int) (LOCK_TIME + 1000L))));
     ClockUtil.setCurrentTime(lockExpiredTime);

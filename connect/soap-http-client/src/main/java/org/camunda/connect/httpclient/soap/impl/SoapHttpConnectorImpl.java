@@ -16,8 +16,8 @@
  */
 package org.camunda.connect.httpclient.soap.impl;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
 import org.camunda.connect.httpclient.impl.AbstractHttpConnector;
 import org.camunda.connect.httpclient.impl.AbstractHttpRequest;
 import org.camunda.connect.httpclient.soap.SoapHttpConnector;
@@ -26,7 +26,7 @@ import org.camunda.connect.httpclient.soap.SoapHttpResponse;
 
 public class SoapHttpConnectorImpl extends AbstractHttpConnector<SoapHttpRequest, SoapHttpResponse> implements SoapHttpConnector {
 
-  protected static final SoapHttpConnectorLogger LOG = SoapHttpLogger.SOAP_CONNECTOR_LOGGER;
+  protected static final SoapHttpConnectorLogger LOG = SoapHttpLogger.SOAP_HTTP_CONNECTOR_LOGGER;
 
   public SoapHttpConnectorImpl() {
     super(SoapHttpConnector.ID);
@@ -40,20 +40,20 @@ public class SoapHttpConnectorImpl extends AbstractHttpConnector<SoapHttpRequest
     return new SoapHttpRequestImpl(this);
   }
 
-  protected SoapHttpResponse createResponse(CloseableHttpResponse response) {
+  protected SoapHttpResponse createResponse(ClassicHttpResponse response) {
     return new SoapHttpResponseImpl(response);
   }
 
   @Override
   public SoapHttpResponse execute(SoapHttpRequest request) {
     // always use the POST method
-    ((AbstractHttpRequest) request).post();
+    ((AbstractHttpRequest<?, ?>) request).post();
 
     return super.execute(request);
   }
 
   @Override
-  protected <T extends HttpRequestBase> void applyPayload(T httpRequest, SoapHttpRequest request) {
+  protected <T extends BasicClassicHttpRequest> void applyPayload(T httpRequest, SoapHttpRequest request) {
     // SOAP requires soap envelop body
     if (request.getPayload() == null || request.getPayload().trim().isEmpty()) {
       throw LOG.noPayloadSet();

@@ -90,9 +90,14 @@
   <@lib.property
       name = "businessKey"
       type = "string"
-      last = true
       desc = "The business key of the process instance the external task belongs to." />
 
+  <@lib.property
+      name = "createTime"
+      type = "string"
+      format = "date-time"
+      desc = "The date that the task was created."
+      last = true />
 
 </@lib.dto>
 
