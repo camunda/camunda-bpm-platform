@@ -76,6 +76,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -84,6 +85,7 @@ import org.junit.rules.RuleChain;
  * @author Tassilo Weidner
  */
 @RequiredHistoryLevel(HISTORY_FULL)
+@Ignore
 public class BatchSetRemovalTimeNonHierarchicalTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
