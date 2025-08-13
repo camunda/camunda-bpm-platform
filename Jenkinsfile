@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library@t268-nn']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
 
 def failedStageTypes = []
 
@@ -139,8 +139,7 @@ pipeline {
               if (env.BRANCH_NAME == cambpmDefaultBranch()) {
                 cambpmRunMaven('.',
                     'org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true',
-                    withCatch: false,
-                    withNpm: true)
+                    withCatch: false)
               }
             }
           },
