@@ -180,7 +180,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("processDefinitionId", "someProcessDefinitionId");
     parameters.put("processDefinitionVersionTag", "someProcessDefinitionVersionTag");
     parameters.put("processDefinitionKey", "procDefKey");
-    parameters.put("processDefinitionKeyIn", "procDefKey1,procDefKey2");
+    parameters.put("processDefinitionKeyIn", "procDefKey2,procDefKey3");
     parameters.put("processDefinitionName", "procDefName");
     parameters.put("processDefinitionNameLike", "procDefName%");
     parameters.put("active", "true");
