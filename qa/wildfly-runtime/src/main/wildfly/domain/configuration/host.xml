@@ -49,8 +49,6 @@
             <heap size="64m" max-size="256m"/>
             <jvm-options>
                 <option value="-server"/>
-                <option value="-XX:MetaspaceSize=96m"/>
-                <option value="-XX:MaxMetaspaceSize=256m"/>
             </jvm-options>
         </jvm>
     </jvms>
@@ -67,7 +65,7 @@
     </servers>
     <profile>
         <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
-        <subsystem xmlns="urn:wildfly:elytron:18.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+        <subsystem xmlns="urn:wildfly:elytron:community:18.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto" register-jaspi-factory="false">
             <providers>
                 <aggregate-providers name="combined-providers">
                     <providers name="elytron"/>

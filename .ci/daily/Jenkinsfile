@@ -79,7 +79,6 @@ pipeline {
                 cambpmRunMaven('.',
                   "package javadoc:javadoc javadoc:aggregate -Pdistro,distro-wildfly,distro-webjar,javadocs -pl " +
                   "'!distro/wildfly/modules,!distro/wildfly26/modules,!engine-rest/engine-rest-openapi' -DskipTests=true -Dskip.frontend.build=true",
-                  withNpm: true,
                   jdkVersion: 'jdk-17-latest')
                 def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
                 cambpmPublishDocs("\"target/site/apidocs/\"", projectVersion, "javadoc")
@@ -101,7 +100,6 @@ pipeline {
                 sh "apk -U add openjdk17-jdk maven rsync openssh libstdc++ libgcc bash"
                 cambpmRunMaven('./engine-rest',
                   "package -Dmaven.test.skip -pl '!engine-rest,!assembly'",
-                  withNpm: true,
                   jdkVersion: 'jdk-11-latest',
                   withPodSpec: true)
                 def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
@@ -164,17 +162,15 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('.',
                   "deploy source:jar source:test-jar javadoc:javadoc -Dskip-zip-frontend-sources=true -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -B",
-                  withNpm: true,
                   jdkVersion: 'jdk-17-latest',
                   withPodSpec: true)
                 script {
                   str = 's@:camunda-nexus:.*\\\$@:central:https://central.sonatype.com/repository/maven-snapshots/@g'
                   sh(label: 'Change staging from Nexus to Maven Central snapshots', script: 'sed -i ' + str + ' staging/deferred/.index')
                 }
-               
+
                 cambpmRunMaven('.',
                   "org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true -B",
-                  withNpm: true,
                   jdkVersion: 'jdk-17-latest',
                   withPodSpec: true)
               },
@@ -200,7 +196,6 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('.',
                   "install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -B",
-                  withNpm: true,
                   jdkVersion: 'jdk-17-latest',
                   settingsXml: 'public-repo',
                   withPodSpec: true)
