@@ -584,19 +584,19 @@ public class DbSqlSessionFactory implements SessionFactory {
     // db2
     databaseSpecificLimitBeforeStatements.put(DB2, "");
     optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements.put(DB2, "");
-    databaseSpecificInnerLimitAfterStatements.put(DB2, ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow}");
     databaseSpecificLimitAfterStatements.put(DB2, "LIMIT #{maxResults} OFFSET #{firstResult}");
-    optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements.put(DB2, "FETCH FIRST ${maxResults} ROWS ONLY");
+    optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements.put(DB2, "LIMIT #{maxResults}");
+    databaseSpecificLimitBeforeWithoutOffsetStatements.put(DB2, "");
+    databaseSpecificLimitAfterWithoutOffsetStatements.put(DB2, "LIMIT #{maxResults}");
+    databaseSpecificInnerLimitAfterStatements.put(DB2, databaseSpecificLimitAfterStatements.get(DB2));
     databaseSpecificLimitBetweenStatements.put(DB2, "");
     databaseSpecificLimitBetweenFilterStatements.put(DB2, "");
     databaseSpecificLimitBetweenAcquisitionStatements.put(DB2, "");
     databaseSpecificLimitBeforeInUpdate.put(DB2, "");
     databaseSpecificLimitAfterInUpdate.put(DB2, "");
-    databaseSpecificLimitBeforeWithoutOffsetStatements.put(DB2, "");
-    databaseSpecificLimitAfterWithoutOffsetStatements.put(DB2, "FETCH FIRST ${maxResults} ROWS ONLY");
     databaseSpecificOrderByStatements.put(DB2, defaultOrderBy);
-    databaseSpecificLimitBeforeNativeQueryStatements.put(DB2, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${internalOrderBy}) rnk FROM (");
-    databaseSpecificDistinct.put(DB2, "");
+    databaseSpecificLimitBeforeNativeQueryStatements.put(DB2, "");
+    databaseSpecificDistinct.put(DB2, "distinct");
     databaseSpecificNumericCast.put(DB2, "");
 
     databaseSpecificCountDistinctBeforeStart.put(DB2, defaultDistinctCountBeforeStart);
