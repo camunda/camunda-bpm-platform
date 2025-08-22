@@ -85,7 +85,7 @@ public class ExclusiveJobAcquisitionTest {
     // given
     engineConfig.setJobExecutorActivate(false);
     engineConfig.setJobExecutorAcquireExclusiveOverProcessHierarchies(false); // disable the feature
-    
+
     jobExecutor.setMaxJobsPerAcquisition(10);
     jobExecutor.setCorePoolSize(1);
 
@@ -293,7 +293,7 @@ public class ExclusiveJobAcquisitionTest {
     public void executeJobs(List<String> jobIds, ProcessEngineImpl processEngine) {
       super.executeJobs(jobIds, processEngine);
 
-      System.out.println("jobIds = " + jobIds);
+//      System.out.println("jobIds = " + jobIds);
       jobBatches.add(new HashSet<>(jobIds));
     }
 
