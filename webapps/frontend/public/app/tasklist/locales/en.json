@@ -129,7 +129,7 @@
     "AddUserLink": "Add User Link",
     "Assign": "Assign",
     "BACK": "Back",
-    "BANNER_CE_EOL_TEXT": "It is time to migrate to Camunda 8. The last release of Camunda 7 CE will be in October 2025. Please have a look at our <a href=\"https://docs.camunda.io/docs/guides/migrating-from-camunda-7/\">migration guide</a>.",
+    "BANNER_CE_EOL_TEXT": "It is time to migrate to Camunda 8. The last release of Camunda 7 CE will be in October 2025. Please have a look at our <a href=\"https://docs.camunda.io/docs/guides/migrating-from-camunda-7/?utm_medium=referral&utm_source=c7-community\">migration guide</a>.",
     "BEFORE": "before",
     "BOOLEAN": "Boolean",
     "BUSINESS_KEY": "Business Key",
