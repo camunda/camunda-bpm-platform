@@ -470,9 +470,6 @@
             <if test="query.taskId != null">
               ${queryType} RES.ID_ = #{query.taskId}
             </if>
-            <if test="query.taskIdAfter != null">
-              ${queryType} RES.ID_ > #{query.taskIdAfter}
-            </if>
             <if test="query.processDefinitionId != null">
               ${queryType} RES.PROC_DEF_ID_ = #{query.processDefinitionId}
             </if>

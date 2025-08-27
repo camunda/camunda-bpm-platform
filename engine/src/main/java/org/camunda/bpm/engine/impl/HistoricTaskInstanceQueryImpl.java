@@ -105,8 +105,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected Date startedAfter;
   protected Date startedBefore;
 
-  protected String taskIdAfter;
-
   protected List<HistoricTaskInstanceQueryImpl> queries = new ArrayList<>(Arrays.asList(this));
   protected boolean isOrQueryActive = false;
 
@@ -135,14 +133,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
       .findHistoricTaskInstancesByQueryCriteria(this, page);
   }
 
-  public HistoricTaskInstanceQueryImpl idAfter(String id) {
-    this.taskIdAfter = id;
-    return this;
-  }
-
-  public String getTaskIdAfter() {
-    return taskIdAfter;
-  }
 
   public HistoricTaskInstanceQueryImpl processInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;

@@ -375,9 +375,6 @@
       <if test="activityInstanceId != null">
         and RES.ID_ = #{activityInstanceId}
       </if>
-      <if test="activityInstanceIdAfter != null">
-        RES.ID_ > #{activityInstanceIdAfter}
-      </if>
       <if test="executionId != null">
         and RES.EXECUTION_ID_ = #{executionId}
       </if>
