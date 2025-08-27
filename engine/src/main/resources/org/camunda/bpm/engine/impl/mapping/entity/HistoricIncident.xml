@@ -433,9 +433,6 @@
       <if test="id != null">
         RES.ID_ = #{id}
       </if>
-      <if test="incidentIdAfter != null">
-        RES.ID_ > #{incidentIdAfter}
-      </if>
       <if test="incidentType != null">
         and RES.INCIDENT_TYPE_ = #{incidentType}
       </if>

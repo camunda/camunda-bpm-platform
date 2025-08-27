@@ -99,7 +99,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected Set<String> state = new HashSet<>();
 
   protected String caseInstanceId;
-  protected String processInstanceIdAfter;
 
   protected List<HistoricProcessInstanceQueryImpl> queries = new ArrayList<>(Collections.singletonList(this));
   protected boolean isOrQueryActive = false;
@@ -111,16 +110,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public HistoricProcessInstanceQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
-  }
-
-
-  public HistoricProcessInstanceQueryImpl idAfter(String id) {
-    this.processInstanceIdAfter = id;
-    return this;
-  }
-
-  public String getIdAfter() {
-    return processInstanceIdAfter;
   }
 
   public HistoricProcessInstanceQueryImpl processInstanceId(String processInstanceId) {
