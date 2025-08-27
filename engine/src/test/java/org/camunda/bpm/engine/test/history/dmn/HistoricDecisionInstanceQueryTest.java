@@ -180,6 +180,21 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   @Test
+  public void testQuerySortByDecisionInstanceId() {
+    ProcessInstance pi1 = startProcessInstanceAndEvaluateDecision();
+    ProcessInstance pi2 = startProcessInstanceAndEvaluateDecision();
+    String decisionInstanceId1 = historyService.createHistoricDecisionInstanceQuery().processInstanceId(pi1.getId()).singleResult().getId();
+    String decisionInstanceId2 = historyService.createHistoricDecisionInstanceQuery().processInstanceId(pi2.getId()).singleResult().getId();
+
+    List<HistoricDecisionInstance> orderAsc = historyService.createHistoricDecisionInstanceQuery().orderByDecisionInstanceId().asc().list();
+    assertThat(orderAsc.get(0).getId()).isEqualTo(decisionInstanceId1);
+
+    List<HistoricDecisionInstance> orderDesc = historyService.createHistoricDecisionInstanceQuery().orderByDecisionInstanceId().desc().list();
+    assertThat(orderDesc.get(0).getId()).isEqualTo(decisionInstanceId2);
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  @Test
   public void testQueryByDecisionInstanceId() {
     ProcessInstance pi1 = startProcessInstanceAndEvaluateDecision();
     ProcessInstance pi2 = startProcessInstanceAndEvaluateDecision();

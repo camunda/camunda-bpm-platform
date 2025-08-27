@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.query.QueryProperty;
  */
 public interface HistoricDecisionInstanceQueryProperty {
 
+  public static final QueryProperty DECISION_INSTANCE_ID = new QueryPropertyImpl("ID_");
   public static final QueryProperty EVALUATION_TIME = new QueryPropertyImpl("EVAL_TIME_");
   public static final QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
 
