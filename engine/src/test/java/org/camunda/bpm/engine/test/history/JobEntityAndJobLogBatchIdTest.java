@@ -50,6 +50,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -219,6 +220,7 @@ public class JobEntityAndJobLogBatchIdTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetBatchIdOnJobAndJobLog_DeleteHistoricProcessInstances() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess("process")

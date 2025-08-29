@@ -48,7 +48,6 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.BatchHelper;
-import org.camunda.bpm.engine.test.util.AssertUtil;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -666,6 +665,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
       super(engineRule);
     }
 
+    @Override
     public JobDefinition getExecutionJobDefinition(Batch batch) {
       return engineRule.getManagementService().createJobDefinitionQuery()
           .jobDefinitionId(batch.getBatchJobDefinitionId())

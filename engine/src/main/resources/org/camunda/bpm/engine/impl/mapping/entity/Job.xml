@@ -53,7 +53,7 @@
         and JOB_DEF_ID_ = #{parameter.jobDefinitionId, jdbcType=VARCHAR}
       </if>
       <if test="parameter.processInstanceId != null">
-        and PROCESS_INSTANCE_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR}
+        and PROCESS_INSTANCE_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR} and BATCH_ID_ is null
       </if>
       <if test="parameter.processDefinitionId != null">
         and PROCESS_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=VARCHAR}
@@ -290,6 +290,14 @@
     select *
     from ${prefix}ACT_RU_JOB J
     where J.PROCESS_INSTANCE_ID_ = #{parameter}
+  </select>
+
+  <select id="selectJobsByProcessInstanceIdNotBatch"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject"
+          resultMap="jobResultMap">
+    select *
+    from ${prefix}ACT_RU_JOB J
+    where J.PROCESS_INSTANCE_ID_ = #{parameter} and J.BATCH_ID_ is null
   </select>
 
   <select id="selectJobsByJobDefinitionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
