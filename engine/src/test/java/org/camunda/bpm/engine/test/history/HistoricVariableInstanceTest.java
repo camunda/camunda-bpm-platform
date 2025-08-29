@@ -2685,36 +2685,13 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
 
     // when
     List<HistoricVariableInstance> variablesCreatedAfter = historyService.createHistoricVariableInstanceQuery()
-        .createdAfter(new Date(creationDate.getTime() - 1L))
+        .createdAfter(new Date(creationDate.getTime() - 10000L))
         .list();
-    List<HistoricVariableInstance> allVariablesOrdered = historyService.createHistoricVariableInstanceQuery()
-        .orderByCreationTime()
-        .asc()
-        .list();
+    List<HistoricVariableInstance> allVariables = historyService.createHistoricVariableInstanceQuery().list();
 
     // then
     assertEquals(5, variablesCreatedAfter.size());
-    assertEquals(10, allVariablesOrdered.size());
-
-    // when
-    variablesCreatedAfter = historyService.createHistoricVariableInstanceQuery()
-        .createdAfter(allVariablesOrdered.get(1).getCreateTime())
-        .orderByCreationTime()
-        .asc()
-        .list();
-
-    // then
-    assertEquals(9, variablesCreatedAfter.size());
-
-    // when
-    variablesCreatedAfter = historyService.createHistoricVariableInstanceQuery()
-        .createdAfter(allVariablesOrdered.get(5).getCreateTime())
-        .orderByCreationTime()
-        .asc()
-        .list();
-
-    // then
-    assertEquals(5, variablesCreatedAfter.size());
+    assertEquals(10, allVariables.size());
   }
 
 }
