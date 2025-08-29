@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.test.history.dmn;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.propertyComparator;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 import static org.junit.Assert.fail;
 
 import java.util.Date;
@@ -181,16 +184,23 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   @Test
   public void testQuerySortByDecisionInstanceId() {
-    ProcessInstance pi1 = startProcessInstanceAndEvaluateDecision();
-    ProcessInstance pi2 = startProcessInstanceAndEvaluateDecision();
-    String decisionInstanceId1 = historyService.createHistoricDecisionInstanceQuery().processInstanceId(pi1.getId()).singleResult().getId();
-    String decisionInstanceId2 = historyService.createHistoricDecisionInstanceQuery().processInstanceId(pi2.getId()).singleResult().getId();
+    for (int i = 0; i < 5; i++) {
+      startProcessInstanceAndEvaluateDecision();
+    }
 
-    List<HistoricDecisionInstance> orderAsc = historyService.createHistoricDecisionInstanceQuery().orderByDecisionInstanceId().asc().list();
-    assertThat(orderAsc.get(0).getId()).isEqualTo(decisionInstanceId1);
+    List<HistoricDecisionInstance> orderAsc = historyService.createHistoricDecisionInstanceQuery()
+        .orderByDecisionInstanceId()
+        .asc()
+        .list();
+    assertThat(orderAsc.size()).isEqualTo(5);
+    verifySorting(orderAsc, propertyComparator(HistoricDecisionInstance::getId));
 
-    List<HistoricDecisionInstance> orderDesc = historyService.createHistoricDecisionInstanceQuery().orderByDecisionInstanceId().desc().list();
-    assertThat(orderDesc.get(0).getId()).isEqualTo(decisionInstanceId2);
+    List<HistoricDecisionInstance> orderDesc = historyService.createHistoricDecisionInstanceQuery()
+        .orderByDecisionInstanceId()
+        .desc()
+        .list();
+    assertThat(orderDesc.size()).isEqualTo(5);
+    verifySorting(orderDesc, inverted(propertyComparator(HistoricDecisionInstance::getId)));
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
