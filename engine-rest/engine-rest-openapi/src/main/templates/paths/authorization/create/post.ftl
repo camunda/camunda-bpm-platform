@@ -46,9 +46,9 @@
                          "removalTime": "2018-02-10T14:33:19.000+0200",
                          "rootProcessInstanceId": "f8259e5d-ab9d-11e8-8449-e4a7a094a9d6",
                          "links":[
-                           {"method": "GET", href":"http://localhost:8080/engine-rest/authorization/anAuthorizationId", "rel":"self"},
-                           {"method": "PUT", href":"http://localhost:8080/engine-rest/authorization/anAuthorizationId", "rel":"update"},
-                           {"method": "DELETE", href":"http://localhost:8080/engine-rest/authorization/anAuthorizationId", "rel":"delete"}
+                           {"method": "GET", "href":"http://localhost:8080/engine-rest/authorization/anAuthorizationId", "rel":"self"},
+                           {"method": "PUT", "href":"http://localhost:8080/engine-rest/authorization/anAuthorizationId", "rel":"update"},
+                           {"method": "DELETE", "href":"http://localhost:8080/engine-rest/authorization/anAuthorizationId", "rel":"delete"}
                          ]
                        }
                      }']
