@@ -2310,7 +2310,7 @@ public class BpmnParse extends Parse {
       ) {
     if (activity.getActivityBehavior() == null) {
       addError("One of the attributes 'class', 'delegateExpression', 'type', "
-          + "or 'expression' is mandatory on " + elementName + ". If you are using a connector, make sure the"
+          + "or 'expression' is mandatory on " + elementName + ". If you are using a connector, make sure the "
           + "connect process engine plugin is registered with the process engine.", serviceTaskElement);
     }
   }
