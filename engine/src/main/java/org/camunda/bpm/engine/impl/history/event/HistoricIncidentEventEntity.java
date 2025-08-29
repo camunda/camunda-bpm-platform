@@ -42,6 +42,7 @@ public class HistoricIncidentEventEntity extends HistoryEvent {
   protected String historyConfiguration;
   protected String failedActivityId;
   protected String annotation;
+  protected String rootCauseIncidentMessage;
 
   public Date getCreateTime() {
     return createTime;
@@ -169,6 +170,14 @@ public class HistoricIncidentEventEntity extends HistoryEvent {
 
   public void setAnnotation(String annotation) {
     this.annotation = annotation;
+  }
+
+  public String getRootCauseIncidentMessage() {
+    return rootCauseIncidentMessage;
+  }
+
+  public void setRootCauseIncidentMessage(String rootCauseIncidentMessage) {
+    this.rootCauseIncidentMessage = rootCauseIncidentMessage;
   }
 
 }
