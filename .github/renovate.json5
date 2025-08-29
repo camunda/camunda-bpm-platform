@@ -3,7 +3,8 @@
   "extends": [
     "config:base"
   ],
-  "branchName": "{{{baseBranch}}}-{{{branchTopic}}}",
+  "rebaseWhen": "behind-base-branch",
+  "branchName": "{{{baseBranch}}}-renovate-{{{branchTopic}}}",
   "addLabels": [
     "dependencies"
   ],
@@ -22,7 +23,7 @@
     "enabled": false
   },
   "lockFileMaintenance": {
-    //"automerge": true // auto-merge will be activated in a second step
+    "automerge": true
     "enabled": true,
     "addLabels": [
       "automerge",
@@ -57,7 +58,7 @@
       "enabled": false
     },
     {
-      //"automerge": true // auto-merge will be activated in a second step
+      "automerge": true
       "matchUpdateTypes": [
         "patch"
       ],
