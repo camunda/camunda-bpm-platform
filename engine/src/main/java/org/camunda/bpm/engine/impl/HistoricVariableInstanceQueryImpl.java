@@ -390,5 +390,9 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   public List<String> getVariableNameIn() {
     return variableNameIn;
   }
+  
+  public Date getCreatedAfter() {
+    return createdAfter;
+  }
 
 }
