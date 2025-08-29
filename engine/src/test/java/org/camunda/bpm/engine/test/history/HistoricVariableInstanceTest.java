@@ -2698,7 +2698,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
 
     // when
     variablesCreatedAfter = historyService.createHistoricVariableInstanceQuery()
-        .createdAfter(allVariablesOrdered.get(0).getCreateTime())
+        .createdAfter(allVariablesOrdered.get(1).getCreateTime())
         .orderByCreationTime()
         .asc()
         .list();
@@ -2708,7 +2708,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
 
     // when
     variablesCreatedAfter = historyService.createHistoricVariableInstanceQuery()
-        .createdAfter(allVariablesOrdered.get(4).getCreateTime())
+        .createdAfter(allVariablesOrdered.get(5).getCreateTime())
         .orderByCreationTime()
         .asc()
         .list();
