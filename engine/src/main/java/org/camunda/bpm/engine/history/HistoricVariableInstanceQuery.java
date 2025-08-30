@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.history;
 
+import java.util.Date;
 import org.camunda.bpm.engine.query.Query;
 
 
@@ -64,6 +65,11 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
   HistoricVariableInstanceQuery orderByProcessInstanceId();
 
   HistoricVariableInstanceQuery orderByVariableName();
+
+  /**
+   * Order by the creation time (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
+  HistoricVariableInstanceQuery orderByCreationTime();
 
   /** Only select historic process variables with the given process instance ids. */
   HistoricVariableInstanceQuery processInstanceIdIn(String... processInstanceIds);
@@ -124,5 +130,10 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
 
   /** Only select historic process variables with the given variable names. */
   HistoricVariableInstanceQuery variableNameIn(String... names);
+
+  /**
+   * Only select historic process variables that were created after the given date.
+   */
+  HistoricVariableInstanceQuery createdAfter(Date date);
 
 }

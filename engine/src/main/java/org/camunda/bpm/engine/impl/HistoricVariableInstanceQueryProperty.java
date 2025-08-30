@@ -31,4 +31,5 @@ public interface HistoricVariableInstanceQueryProperty {
   QueryProperty VARIABLE_NAME = new QueryPropertyImpl("NAME_");
   QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
   QueryProperty VARIABLE_ID = new QueryPropertyImpl("ID_");
+  QueryProperty CREATE_TIME = new QueryPropertyImpl("CREATE_TIME_");
 }
