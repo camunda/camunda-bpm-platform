@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.test.history;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.propertyComparator;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 import static org.junit.Assert.assertEquals;
@@ -32,6 +33,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -51,6 +53,7 @@ import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
@@ -2649,6 +2652,50 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     // then
     assertEquals(5, historicVariableInstances.size());
     verifySorting(historicVariableInstances, propertyComparator(HistoricVariableInstance::getId));
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testCallSimpleSubProcess.bpmn20.xml", "org/camunda/bpm/engine/test/history/simpleSubProcess.bpmn20.xml" })
+  @Test
+  public void shouldBeCorrectlySortedWhenSortingByVariableCreationTime() {
+    // given
+    runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
+
+    // when
+    List<HistoricVariableInstance> historicVariableInstancesAsc =
+        historyService.createHistoricVariableInstanceQuery().orderByCreationTime().asc().list();
+    List<HistoricVariableInstance> historicVariableInstancesDesc =
+        historyService.createHistoricVariableInstanceQuery().orderByCreationTime().desc().list();
+
+    // then
+    assertEquals(5, historicVariableInstancesAsc.size());
+    assertEquals(5, historicVariableInstancesDesc.size());
+    verifySorting(historicVariableInstancesAsc, propertyComparator(HistoricVariableInstance::getCreateTime));
+    verifySorting(historicVariableInstancesDesc, inverted(propertyComparator(HistoricVariableInstance::getCreateTime)));
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testCallSimpleSubProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/history/simpleSubProcess.bpmn20.xml" })
+  @Test
+  public void shouldQueryByCreatedAfter() {
+    // given
+    Calendar creationDate = Calendar.getInstance();
+    ClockUtil.setCurrentTime(creationDate.getTime());
+    runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
+
+    creationDate.add(Calendar.HOUR, 1);
+    ClockUtil.setCurrentTime(creationDate.getTime());
+    runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
+
+    // when
+    List<HistoricVariableInstance> variablesCreatedAfter = historyService.createHistoricVariableInstanceQuery()
+        .createdAfter(creationDate.getTime())
+        .list();
+    List<HistoricVariableInstance> allVariables = historyService.createHistoricVariableInstanceQuery().list();
+
+    // then
+    assertEquals(5, variablesCreatedAfter.size());
+    assertEquals(10, allVariables.size());
   }
 
 }
