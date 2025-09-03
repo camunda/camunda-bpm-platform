@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
@@ -69,6 +70,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   protected boolean isByteArrayFetchingEnabled = true;
   protected boolean isCustomObjectDeserializationEnabled = true;
   protected String variableIdAfter;
+  protected Date createdAfter;
 
   public HistoricVariableInstanceQueryImpl() {
   }
@@ -84,6 +86,11 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   public String getVariableIdAfter() {
     return variableIdAfter;
+  }
+
+  public HistoricVariableInstanceQuery createdAfter(Date date) {
+    createdAfter = date;
+    return this;
   }
 
   public HistoricVariableInstanceQuery variableNameIn(String... names) {
@@ -303,6 +310,11 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return this;
   }
 
+  public HistoricVariableInstanceQuery orderByCreationTime() {
+    orderBy(HistoricVariableInstanceQueryProperty.CREATE_TIME);
+    return this;
+  }
+
   // getters and setters //////////////////////////////////////////////////////
 
   public String getProcessInstanceId() {
@@ -377,6 +389,10 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   public List<String> getVariableNameIn() {
     return variableNameIn;
+  }
+  
+  public Date getCreatedAfter() {
+    return createdAfter;
   }
 
 }

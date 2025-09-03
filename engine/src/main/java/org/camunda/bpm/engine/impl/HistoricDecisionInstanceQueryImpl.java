@@ -237,6 +237,12 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
   }
 
   @Override
+  public HistoricDecisionInstanceQuery orderByDecisionInstanceId(){
+    orderBy(HistoricDecisionInstanceQueryProperty.DECISION_INSTANCE_ID);
+    return this;
+  }
+
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext
