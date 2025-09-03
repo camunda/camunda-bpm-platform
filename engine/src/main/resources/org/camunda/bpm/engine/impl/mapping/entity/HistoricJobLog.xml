@@ -248,6 +248,17 @@
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
   </delete>
 
+  <delete id="deleteHistoricJobLogByProcessInstanceIdsNotBatch">
+    delete
+    from ${prefix}ACT_HI_JOB_LOG
+    where
+      <bind name="listOfIds" value="list"/>
+      <bind name="fieldName" value="'PROCESS_INSTANCE_ID_'"/>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+    and BATCH_ID_ is null
+  </delete>
+
   <delete id="deleteHistoricJobLogByProcessDefinitionId">
     delete from ${prefix}ACT_HI_JOB_LOG where PROCESS_DEF_ID_ = #{processDefinitionId}
   </delete>
