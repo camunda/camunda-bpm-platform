@@ -220,7 +220,6 @@ public class JobEntityAndJobLogBatchIdTest {
   }
 
   @Test
-  @Ignore
   public void shouldSetBatchIdOnJobAndJobLog_DeleteHistoricProcessInstances() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess("process")

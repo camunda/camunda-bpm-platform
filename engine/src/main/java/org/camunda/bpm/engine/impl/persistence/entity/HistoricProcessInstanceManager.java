@@ -92,7 +92,7 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
         commandContext.getHistoricTaskInstanceManager().deleteHistoricTaskInstancesByProcessInstanceIds(partition, false);
         commandContext.getHistoricActivityInstanceManager().deleteHistoricActivityInstancesByProcessInstanceIds(partition);
         commandContext.getHistoricIncidentManager().deleteHistoricIncidentsByProcessInstanceIds(partition);
-        commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByProcessInstanceIds(partition);
+        commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByProcessInstanceIdsNotBatch(partition);
         commandContext.getHistoricExternalTaskLogManager().deleteHistoricExternalTaskLogsByProcessInstanceIds(partition);
         commandContext.getAuthorizationManager().deleteAuthorizationsByResourceIds(Resources.HISTORIC_PROCESS_INSTANCE, partition);
 

@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.batch.deletion.DeleteHistoricProcessInstancesJobHandler;
 import org.camunda.bpm.engine.impl.batch.externaltask.SetExternalTaskRetriesJobHandler;
 import org.camunda.bpm.engine.impl.batch.job.SetJobRetriesJobHandler;
 import org.camunda.bpm.engine.impl.batch.removaltime.BatchSetRemovalTimeJobHandler;

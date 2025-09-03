@@ -86,7 +86,6 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(HISTORY_FULL)
-@Ignore
 public class BatchSetRemovalTimeInChunksTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
@@ -762,6 +761,7 @@ public class BatchSetRemovalTimeInChunksTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_ExternalTaskLog() {
     // given
     testRule.process().externalTask().deploy().start();

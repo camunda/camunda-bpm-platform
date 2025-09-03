@@ -153,7 +153,6 @@ public class TaskListenerErrorThrowTest extends AbstractTaskListenerTest {
   public void testThrowErrorOnCreateAndCatchOnEventSubprocess() {
     // given
     BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnEventSubprocess(TaskListener.EVENTNAME_CREATE);
-    System.out.println(Bpmn.convertToString(model));
     testRule.deploy(model);
 
     // when

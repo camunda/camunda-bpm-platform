@@ -293,7 +293,6 @@ public class ExclusiveJobAcquisitionTest {
     public void executeJobs(List<String> jobIds, ProcessEngineImpl processEngine) {
       super.executeJobs(jobIds, processEngine);
 
-//      System.out.println("jobIds = " + jobIds);
       jobBatches.add(new HashSet<>(jobIds));
     }
 

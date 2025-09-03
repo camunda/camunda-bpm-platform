@@ -58,6 +58,8 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
+import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
@@ -717,7 +719,14 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
 
     job = historyService.createHistoricJobLogQuery()
       .processInstanceId(processInstanceId)
+      .jobDefinitionType(AsyncContinuationJobHandler.TYPE)
       .singleResult();
+    var jobLogs =historyService.createHistoricJobLogQuery()
+        .processInstanceId(processInstanceId)
+        .list();
+
+    // assert that each jobLog from jobLogs has the correct removal time
+    assertThat(jobLogs).extracting(HistoricJobLog::getRemovalTime).containsOnly(REMOVAL_TIME);
 
     // then
     assertThat(job.getRemovalTime()).isEqualTo(REMOVAL_TIME);

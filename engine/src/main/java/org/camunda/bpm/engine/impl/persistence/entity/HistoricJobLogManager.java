@@ -119,6 +119,10 @@ public class HistoricJobLogManager extends AbstractHistoricManager {
     deleteExceptionByteArrayByParameterMap("processInstanceIdIn", processInstanceIds.toArray());
     getDbEntityManager().deletePreserveOrder(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByProcessInstanceIds", processInstanceIds);
   }
+  public void deleteHistoricJobLogsByProcessInstanceIdsNotBatch(List<String> processInstanceIds) {
+    deleteExceptionByteArrayByParameterMap("processInstanceIdIn", processInstanceIds.toArray());
+    getDbEntityManager().deletePreserveOrder(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByProcessInstanceIdsNotBatch", processInstanceIds);
+  }
 
   public void deleteHistoricJobLogsByProcessDefinitionId(String processDefinitionId) {
     if (isHistoryEnabled()) {
