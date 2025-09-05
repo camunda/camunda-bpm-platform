@@ -613,7 +613,7 @@
                     or
                   </if>
                   <if test="query.candidateGroupLike != null">
-                    I.GROUP_ID_ LIKE #{candidateGroupLike}
+                    I.GROUP_ID_ LIKE #{query.candidateGroupLike}
                   </if>
                   )
                 </if>
