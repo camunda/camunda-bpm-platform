@@ -21,6 +21,8 @@ assignees:
 
 ### Solution Ideas
 
+### Workarounds
+
 ### Hints
 
 ### Links
