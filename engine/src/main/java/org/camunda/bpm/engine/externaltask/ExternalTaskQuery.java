@@ -16,10 +16,11 @@
  */
 package org.camunda.bpm.engine.externaltask;
 
+import org.camunda.bpm.engine.query.Query;
+
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
-
-import org.camunda.bpm.engine.query.Query;
 
 /**
  * @author Thorben Lindhauer
@@ -85,9 +86,34 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
   ExternalTaskQuery processInstanceIdIn(String... processInstanceIdIn);
 
   /**
+   * Only select tasks which are part of a process instance which has the given
+   * process definition key.
+   */
+  ExternalTaskQuery processDefinitionKey(String processDefinitionKey);
+
+  /**
+   * Only select tasks which are part of a process instance which has one of the
+   * given process definition keys.
+   */
+  ExternalTaskQuery processDefinitionKeyIn(String... processDefinitionKeys);
+
+  /**
    * Only select external tasks that belong to an instance of the given process definition
    */
   ExternalTaskQuery processDefinitionId(String processDefinitionId);
+
+  /**
+   * Only select tasks which are part of a process instance which has the given
+   * process definition name.
+   */
+  ExternalTaskQuery processDefinitionName(String processDefinitionName);
+
+  /**
+   * Only select tasks which are part of a process instance which process definition
+   * name  is like the given parameter.
+   * The syntax is that of SQL: for example usage: nameLike(%processDefinitionName%)
+   */
+  ExternalTaskQuery processDefinitionNameLike(String processDefinitionName);
 
   /**
    * Only select external tasks that belong to an instance of the given activity
@@ -116,6 +142,68 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    * @return the builded external task query
    */
   ExternalTaskQuery priorityLowerThanOrEquals(long priority);
+
+  /**
+   * Only select tasks which have are part of a process that have a variable
+   * with the given name set to the given value.
+   */
+  ExternalTaskQuery processVariableValueEquals(String variableName, Object variableValue);
+
+  /**
+   * Only select tasks which have a variable with the given name, but
+   * with a different value than the passed value.
+   * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
+   * are not supported.
+   */
+  ExternalTaskQuery processVariableValueNotEquals(String variableName, Object variableValue);
+
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name and matching the given value.
+   * The syntax is that of SQL: for example usage: valueLike(%value%)
+   */
+  ExternalTaskQuery processVariableValueLike(String variableName, String variableValue);
+
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name and not matching the given value.
+   * The syntax is that of SQL: for example usage: valueNotLike(%value%)
+   */
+  ExternalTaskQuery processVariableValueNotLike(String variableName, String variableValue);
+
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name and a value greater than the given one.
+   */
+  ExternalTaskQuery processVariableValueGreaterThan(String variableName, Object variableValue);
+
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name and a value greater than or equal to the given one.
+   */
+  ExternalTaskQuery processVariableValueGreaterThanOrEquals(String variableName, Object variableValue);
+
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name and a value less than the given one.
+   */
+  ExternalTaskQuery processVariableValueLessThan(String variableName, Object variableValue);
+
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name and a value greater than or equal to the given one.
+   */
+  ExternalTaskQuery processVariableValueLessThanOrEquals(String variableName, Object variableValue);
+
+  /**
+   * All queries for task-, process- and case-variables will match the variable names in a case-insensitive way.
+   */
+  ExternalTaskQuery matchVariableNamesIgnoreCase();
+
+  /**
+   * All queries for task-, process- and case-variables will match the variable values in a case-insensitive way.
+   */
+  ExternalTaskQuery matchVariableValuesIgnoreCase();
 
   /**
    * Only select external tasks that are currently suspended

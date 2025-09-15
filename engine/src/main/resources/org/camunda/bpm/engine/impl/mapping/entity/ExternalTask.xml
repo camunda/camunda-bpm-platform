@@ -394,6 +394,22 @@
       <if test="processDefinitionId != null">
         and RES.PROC_DEF_ID_ = #{processDefinitionId}
       </if>
+      <if test="processDefinitionKey != null">
+        and PD.KEY_ = #{processDefinitionKey}
+      </if>
+      <if test="processDefinitionKeys != null &amp;&amp; processDefinitionKeys.length > 0">
+        and PD.KEY_ in
+        <foreach item="item" index="index" collection="processDefinitionKeys"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+      </if>
+      <if test="processDefinitionName != null">
+        and PD.NAME_ = #{processDefinitionName}
+      </if>
+      <if test="processDefinitionNameLike != null">
+        and PD.NAME_ like #{processDefinitionNameLike} ESCAPE ${escapeChar}
+      </if>
       <if test="activityId != null">
         and RES.ACT_ID_ = #{activityId}
       </if>
@@ -433,6 +449,26 @@
           #{tenantId}
         </foreach>
       </if>
+      <!-- queryVariables -->
+      <foreach collection="variables" index="index" item="queryVariableValue">
+        and EXISTS (
+        select
+        ID_
+        from
+        ${prefix}ACT_RU_VARIABLE
+        WHERE
+        <bind name="varPrefix" value="''"/>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableNameEqualsCaseInsensitive" />
+        <!-- When process instance or case instance variable is queried for, taskId should be null -->
+        and TASK_ID_ is null
+        and RES.PROC_INST_ID_ = PROC_INST_ID_
+        <bind name="varTypeField" value="'TYPE_'"/>
+        <if test="queryVariableValue.valueConditions != null">
+            and
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
+        </if>
+        )
+      </foreach>
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
     </where>
