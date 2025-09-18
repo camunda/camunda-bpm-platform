@@ -21,9 +21,12 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -68,6 +71,7 @@ public class SubmitTaskFormCmd implements Command<VariableMap>, Serializable {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkTaskWork(task);
     }
+    checkTaskAssignee(task);
 
     TaskDefinition taskDefinition = task.getTaskDefinition();
     if(taskDefinition != null) {
@@ -105,6 +109,13 @@ public class SubmitTaskFormCmd implements Command<VariableMap>, Serializable {
     else
     {
       return null;
+    }
+  }
+
+  public void checkTaskAssignee(TaskEntity task) {
+    Authentication authentication = Context.getCommandContext().getAuthentication();
+    if (authentication != null && !authentication.getUserId().equals(task.getAssignee())) {
+      throw new AuthorizationException("User " + authentication.getUserId() + " is not assigned to task " + task.getId());
     }
   }
 }
