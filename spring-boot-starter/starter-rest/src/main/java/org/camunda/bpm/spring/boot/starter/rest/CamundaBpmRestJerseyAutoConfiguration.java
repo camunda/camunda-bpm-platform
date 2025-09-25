@@ -20,13 +20,11 @@ import org.camunda.bpm.engine.rest.impl.FetchAndLockContextListener;
 import org.camunda.bpm.spring.boot.starter.CamundaBpmAutoConfiguration;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.jersey.JerseyAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.servlet.JerseyApplicationPath;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-@AutoConfigureBefore({ JerseyAutoConfiguration.class })
+@Configuration
 @AutoConfigureAfter({ CamundaBpmAutoConfiguration.class })
 public class CamundaBpmRestJerseyAutoConfiguration {
 
@@ -42,7 +40,9 @@ public class CamundaBpmRestJerseyAutoConfiguration {
   }
 
   @Bean
-  public CamundaBpmRestInitializer camundaBpmRestInitializer(JerseyApplicationPath applicationPath, CamundaBpmProperties props) {
+  public CamundaBpmRestInitializer camundaBpmRestInitializer(CamundaBpmProperties props) {
+    // Default REST API path for Jersey applications
+    String applicationPath = "/engine-rest/*";
     return new CamundaBpmRestInitializer(applicationPath, props);
   }
 }
