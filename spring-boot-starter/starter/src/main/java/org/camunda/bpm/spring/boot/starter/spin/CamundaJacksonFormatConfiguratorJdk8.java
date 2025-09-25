@@ -17,7 +17,8 @@
 package org.camunda.bpm.spring.boot.starter.spin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+// Commented out for Spring Boot 4.0 compatibility
+// import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.camunda.spin.impl.json.jackson.format.JacksonJsonDataFormat;
 import org.camunda.spin.spi.DataFormatConfigurator;
 
@@ -32,8 +33,9 @@ public class CamundaJacksonFormatConfiguratorJdk8 implements DataFormatConfigura
   @Override
   public void configure(JacksonJsonDataFormat dataFormat) {
     ObjectMapper mapper = dataFormat.getObjectMapper();
-    final Jdk8Module jdk8Module = new Jdk8Module();
-
-    mapper.registerModule(jdk8Module);
+    // Commented out for Spring Boot 4.0 compatibility - JDK8 support may be auto-configured
+    // final Jdk8Module jdk8Module = new Jdk8Module();
+    // mapper.registerModule(jdk8Module);
+    // TODO: Verify JDK8 support is working in Spring Boot 4.0
   }
 }

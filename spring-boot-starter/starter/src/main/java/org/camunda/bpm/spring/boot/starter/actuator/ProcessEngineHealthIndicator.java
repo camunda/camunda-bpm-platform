@@ -17,11 +17,11 @@
 package org.camunda.bpm.spring.boot.starter.actuator;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.springframework.boot.actuate.health.AbstractHealthIndicator;
-import org.springframework.boot.actuate.health.Health.Builder;
+import org.springframework.boot.actuate.health.Contributor;
+import org.springframework.boot.actuate.health.SystemHealthDescriptor;
 import org.springframework.util.Assert;
 
-public class ProcessEngineHealthIndicator extends AbstractHealthIndicator {
+public class ProcessEngineHealthIndicator implements Contributor.Blocking {
 
   private final ProcessEngine processEngine;
 
@@ -31,8 +31,17 @@ public class ProcessEngineHealthIndicator extends AbstractHealthIndicator {
   }
 
   @Override
-  protected void doHealthCheck(Builder builder) throws Exception {
-    builder.up().withDetail("name", processEngine.getName());
+  public SystemHealthDescriptor getHealth() {
+    try {
+      return SystemHealthDescriptor.up()
+          .withDetail("name", processEngine.getName())
+          .build();
+    } catch (Exception ex) {
+      return SystemHealthDescriptor.down()
+          .withDetail("name", processEngine.getName())
+          .withException(ex)
+          .build();
+    }
   }
 
 }

@@ -17,7 +17,8 @@
 package org.camunda.bpm.spring.boot.starter.spin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+// Commented out for Spring Boot 4.0 compatibility
+// import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.camunda.spin.impl.json.jackson.format.JacksonJsonDataFormat;
 import org.camunda.spin.spi.DataFormatConfigurator;
 
@@ -32,8 +33,9 @@ public class CamundaJacksonFormatConfiguratorJSR310 implements DataFormatConfigu
   @Override
   public void configure(JacksonJsonDataFormat dataFormat) {
     ObjectMapper mapper = dataFormat.getObjectMapper();
-    final JavaTimeModule javaTimeModule = new JavaTimeModule();
-
-    mapper.registerModule(javaTimeModule);
+    // Commented out for Spring Boot 4.0 compatibility - JSR310 support may be auto-configured
+    // final JavaTimeModule javaTimeModule = new JavaTimeModule();
+    // mapper.registerModule(javaTimeModule);
+    // TODO: Verify JSR310 support is working in Spring Boot 4.0
   }
 }
