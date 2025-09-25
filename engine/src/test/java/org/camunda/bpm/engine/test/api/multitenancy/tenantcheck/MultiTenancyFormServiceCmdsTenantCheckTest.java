@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -371,6 +372,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
     String taskId = taskService.createTaskQuery().processDefinitionId(processDefinitionId).singleResult().getId();
 
     identityService.setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
+    taskService.claim(taskId, "aUserId");
 
     formService.submitTaskForm(taskId, null);
 
@@ -415,6 +417,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
 
     identityService.setAuthentication("aUserId", null);
     processEngineConfiguration.setTenantCheckEnabled(false);
+    taskService.claim(taskId, "aUserId");
 
     formService.submitTaskForm(taskId, null);
 
@@ -546,4 +549,26 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
     // then
     assertEquals("aTaskFormKey", formService.getTaskFormKey(task.getProcessDefinitionId(), task.getTaskDefinitionKey()));
   }
+
+  @Test
+  public void testSubmitTaskFormByNonAssignedUser() {
+    // given authenticated user is not assigned to a given task
+    testRule.deploy("org/camunda/bpm/engine/test/api/authorization/formKeyProcess.bpmn20.xml");
+    identityService.setAuthentication("userA", null, null);
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+    runtimeService.startProcessInstanceById(processDefinitionId);
+    assertEquals(taskService.createTaskQuery().processDefinitionId(processDefinitionId).count(), 1);
+    String taskId = taskService.createTaskQuery().processDefinitionId(processDefinitionId).singleResult().getId();
+    taskService.claim(taskId, "userB");
+
+    // when submitting task form
+    assertThatThrownBy(() -> formService.submitTaskForm(taskId, null))
+        // then authorization exception is thrown
+        .isInstanceOf(AuthorizationException.class)
+        .hasMessageContaining("User userA is not assigned to task");
+
+    // and task is not completed
+    assertEquals(taskService.createTaskQuery().processDefinitionId(processDefinitionId).count(), 1);
+  }
+
 }
