@@ -24,10 +24,10 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.springframework.boot.actuate.health.AbstractHealthIndicator;
-import org.springframework.boot.actuate.health.Health.Builder;
+import org.springframework.boot.actuate.health.Contributor;
+import org.springframework.boot.actuate.health.SystemHealthDescriptor;
 
-public class JobExecutorHealthIndicator extends AbstractHealthIndicator {
+public class JobExecutorHealthIndicator implements Contributor.Blocking {
 
   private final JobExecutor jobExecutor;
 
@@ -36,14 +36,17 @@ public class JobExecutorHealthIndicator extends AbstractHealthIndicator {
   }
 
   @Override
-  protected void doHealthCheck(Builder builder) throws Exception {
+  public SystemHealthDescriptor getHealth() {
     boolean active = jobExecutor.isActive();
     if (active) {
-      builder = builder.up();
+      return SystemHealthDescriptor.up()
+          .withDetail("jobExecutor", Details.from(jobExecutor))
+          .build();
     } else {
-      builder = builder.down();
+      return SystemHealthDescriptor.down()
+          .withDetail("jobExecutor", Details.from(jobExecutor))
+          .build();
     }
-    builder.withDetail("jobExecutor", Details.from(jobExecutor));
   }
 
   public static class Details {

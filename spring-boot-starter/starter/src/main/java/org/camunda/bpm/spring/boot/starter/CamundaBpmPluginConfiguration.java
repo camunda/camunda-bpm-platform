@@ -16,15 +16,17 @@
  */
 package org.camunda.bpm.spring.boot.starter;
 
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+// Jackson modules may not be needed in Spring Boot 4.0 - auto-configured
+//import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+//import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+//import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.spring.boot.starter.plugin.ApplicationContextClassloaderSwitchPlugin;
-import org.camunda.bpm.spring.boot.starter.spin.CamundaJacksonFormatConfiguratorJSR310;
-import org.camunda.bpm.spring.boot.starter.spin.CamundaJacksonFormatConfiguratorJdk8;
-import org.camunda.bpm.spring.boot.starter.spin.CamundaJacksonFormatConfiguratorParameterNames;
+// Commented out for Spring Boot 4.0 compatibility
+//import org.camunda.bpm.spring.boot.starter.spin.CamundaJacksonFormatConfiguratorJSR310;
+//import org.camunda.bpm.spring.boot.starter.spin.CamundaJacksonFormatConfiguratorJdk8;
+//import org.camunda.bpm.spring.boot.starter.spin.CamundaJacksonFormatConfiguratorParameterNames;
 import org.camunda.bpm.spring.boot.starter.spin.SpringBootSpinProcessEnginePlugin;
 import org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin;
 import org.camunda.spin.impl.json.jackson.format.JacksonJsonDataFormat;
@@ -47,6 +49,8 @@ public class CamundaBpmPluginConfiguration {
      which breaks auto-configuration for Jackson Java 8 modules.
   */
 
+  // Commented out for Spring Boot 4.0 compatibility - Jackson modules may be auto-configured
+  /*
   @ConditionalOnClass({JacksonJsonDataFormat.class, JavaTimeModule.class})
   @ConditionalOnMissingClass("spinjar.com.fasterxml.jackson.databind.ObjectMapper")
   @Configuration
@@ -85,6 +89,7 @@ public class CamundaBpmPluginConfiguration {
     }
 
   }
+  */
 
   @ConditionalOnClass(SpinProcessEnginePlugin.class)
   @Configuration

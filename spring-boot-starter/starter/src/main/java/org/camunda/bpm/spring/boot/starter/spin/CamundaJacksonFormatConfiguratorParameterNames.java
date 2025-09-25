@@ -17,7 +17,8 @@
 package org.camunda.bpm.spring.boot.starter.spin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+// Commented out for Spring Boot 4.0 compatibility  
+// import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.camunda.spin.impl.json.jackson.format.JacksonJsonDataFormat;
 import org.camunda.spin.spi.DataFormatConfigurator;
 
@@ -32,8 +33,9 @@ public class CamundaJacksonFormatConfiguratorParameterNames implements DataForma
   @Override
   public void configure(JacksonJsonDataFormat dataFormat) {
     ObjectMapper mapper = dataFormat.getObjectMapper();
-    final ParameterNamesModule parameterNamesModule = new ParameterNamesModule();
-
-    mapper.registerModule(parameterNamesModule);
+    // Commented out for Spring Boot 4.0 compatibility - ParameterNames support may be auto-configured
+    // final ParameterNamesModule parameterNamesModule = new ParameterNamesModule();
+    // mapper.registerModule(parameterNamesModule);
+    // TODO: Verify ParameterNames support is working in Spring Boot 4.0
   }
 }
