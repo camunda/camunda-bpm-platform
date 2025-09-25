@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
@@ -40,6 +41,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.junit.Test;
@@ -784,6 +786,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
     assertEquals("taskAfterJoin", task.getTaskDefinitionKey());
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = ASYNC_CONCURRENT_PARALLEL_GATEWAY)
   @Test
   public void shouldCompleteWithConcurrentExecution_ParallelGateway() {
@@ -799,6 +802,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
         .isEqualTo("COMPLETED");
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = ASYNC_CONCURRENT_PARALLEL_INCLUSIVE_GATEWAY)
   @Test
   public void shouldCompleteWithConcurrentExecution_InclusiveGateway() {
