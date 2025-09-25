@@ -29,6 +29,14 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
+      <dependency>
+        <!-- Import Jersey BOM for Spring Boot 4.0 compatibility -->
+        <groupId>org.glassfish.jersey</groupId>
+        <artifactId>jersey-bom</artifactId>
+        <version>${version.jersey4}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   
