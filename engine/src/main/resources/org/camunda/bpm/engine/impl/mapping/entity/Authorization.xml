@@ -353,7 +353,7 @@
   </select>
 
   <select id="selectAuthorizedGroupIds" resultType="string">
-    SELECT distinct(A.GROUP_ID_) FROM ${prefix}ACT_RU_AUTHORIZATION A
+    SELECT distinct(A.GROUP_ID_) FROM ${prefix}ACT_RU_AUTHORIZATION A WHERE A.GROUP_ID_ IS NOT NULL
   </select>
 
   <select id="selectAuthorization" resultMap="authorizationResultMap">
